@@ -31,9 +31,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQui
 
 /**
  * Class to store double distance, integer DBID results.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses DoubleIntegerArrayQuickSort
  */
 class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
@@ -77,7 +77,7 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
 
   /**
    * Constructor.
-   * 
+   *
    * @param size Initial size
    */
   protected DoubleIntegerDBIDList(int size) {
@@ -119,7 +119,7 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
 
   /**
    * Add an entry, consisting of distance and internal index.
-   * 
+   *
    * @param dist Distance
    * @param id Internal index
    */
@@ -220,7 +220,7 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
 
   /**
    * Truncate the list to the given size, freeing the memory.
-   * 
+   *
    * @param newsize New size
    */
   public void truncate(int newsize) {
@@ -252,9 +252,9 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
 
   /**
    * List iterator.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class Itr implements DoubleIntegerDBIDListIter, IntegerDBIDArrayIter {
@@ -317,6 +317,11 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
     @Override
     public DoubleDBIDPair getPair() {
       return new DoubleIntegerDBIDPair(dists[pos], ids[pos]);
+    }
+
+    @Override
+    public String toString() {
+      return doubleValue() + ":" + internalGetIndex() + "@" + pos;
     }
   }
 }

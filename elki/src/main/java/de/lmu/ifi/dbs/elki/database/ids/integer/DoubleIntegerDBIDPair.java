@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 
 /**
  * Pair containing a double value and an integer DBID.
- * 
+ *
  * @author Erich Schubert
  */
 class DoubleIntegerDBIDPair implements DoubleDBIDPair, IntegerDBIDRef {
@@ -40,7 +40,7 @@ class DoubleIntegerDBIDPair implements DoubleDBIDPair, IntegerDBIDRef {
    * The DB id.
    */
   int id;
-  
+
   /**
    * Constructor.
    *
@@ -66,5 +66,10 @@ class DoubleIntegerDBIDPair implements DoubleDBIDPair, IntegerDBIDRef {
   @Override
   public double doubleValue() {
     return value;
+  }
+
+  @Override
+  public String toString() {
+    return value + ":" + id;
   }
 }
