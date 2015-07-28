@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction.ProbabilityDensityFunction;
-import de.lmu.ifi.dbs.elki.datasource.filter.transform.UncertainifyFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.UncertainifyFilter;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -50,7 +50,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
    *
    * @param probabilityDensityFunction
    */
-  public ContinuousUncertainObject(final F probabilityDensityFunction) {
+  public ContinuousUncertainObject(F probabilityDensityFunction) {
     this.probabilityDensityFunction = probabilityDensityFunction;
   }
 
@@ -67,7 +67,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
    * @param probabilityDensityFunction
    * @param dimensions
    */
-  public ContinuousUncertainObject(final F probabilityDensityFunction, final int dimensions) {
+  public ContinuousUncertainObject(F probabilityDensityFunction, int dimensions) {
     this(probabilityDensityFunction.getDefaultBounds(dimensions), probabilityDensityFunction);
   }
 
@@ -77,8 +77,8 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
    * @param bounds
    * @param probabilityDensityFunction
    */
-  public ContinuousUncertainObject(final SpatialComparable bounds, final F probabilityDensityFunction) {
-    this(bounds, probabilityDensityFunction, new RandomFactory(null));
+  public ContinuousUncertainObject(SpatialComparable bounds, F probabilityDensityFunction) {
+    this(bounds, probabilityDensityFunction, RandomFactory.DEFAULT);
   }
 
   /**
@@ -88,7 +88,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
    * @param probabilityDensityFunction
    * @param randomFactory
    */
-  public ContinuousUncertainObject(final SpatialComparable bounds, final F probabilityDensityFunction, final RandomFactory randomFactory) {
+  public ContinuousUncertainObject(SpatialComparable bounds, F probabilityDensityFunction, RandomFactory randomFactory) {
     this.bounds = bounds;
     this.dimensions = bounds.getDimensionality();
     this.probabilityDensityFunction = probabilityDensityFunction;
@@ -102,8 +102,8 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
    * @param max
    * @param probabilityDensityFunction
    */
-  public ContinuousUncertainObject(final double[] min, final double[] max, final F probabilityDensityFunction) {
-    this(min, max, probabilityDensityFunction, new RandomFactory(null));
+  public ContinuousUncertainObject(double[] min, double[] max, F probabilityDensityFunction) {
+    this(min, max, probabilityDensityFunction, RandomFactory.DEFAULT);
   }
 
   /**
@@ -114,7 +114,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
    * @param probabilityDensityFunction
    * @param randomFactory
    */
-  public ContinuousUncertainObject(final double[] min, final double[] max, final F probabilityDensityFunction, final RandomFactory randomFactory) {
+  public ContinuousUncertainObject(double[] min, double[] max, F probabilityDensityFunction, RandomFactory randomFactory) {
     this.bounds = new HyperBoundingBox(min, max);
     this.dimensions = min.length;
     this.probabilityDensityFunction = probabilityDensityFunction;
@@ -127,8 +127,8 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
   }
 
   @Override
-  public UncertainObject<UOModel> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
-    return this.probabilityDensityFunction.uncertainify(vec, blur, uncertainify, dims);
+  public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur) {
+    return this.probabilityDensityFunction.uncertainify(vec, blur);
   }
 
   /**

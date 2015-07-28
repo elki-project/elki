@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.filter.transform;
+package de.lmu.ifi.dbs.elki.datasource.filter.typeconversions;
 
 /*
  This file is part of ELKI:
@@ -35,18 +35,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * 
  * Filter class to transform a database containing vector fields (TODO I need to
  * express this more correctly) into a database containing
  * {@link UncertainObject} fields.
- * 
+ *
  * The purpose for that is to use those transformed databases in experiments
  * regarding uncertain data in some way.
- * 
+ *
  * @author Alexander Koos
  *
  * @param <UO> Uncertainty model
@@ -72,29 +70,13 @@ public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO
   private boolean blur;
 
   /**
-   * The flag groundtruth specifies, if the given data shall be uncertainified
-   * or used directly by some model dependent metric to build the uncertain
-   * objects.
-   */
-  private boolean uncertainify;
-
-  /**
-   * If the flag uncertainify is set false, dims is used to specify the
-   * dimensionality of the input data.
-   */
-  private int dims;
-
-  /**
-   * 
    * Constructor.
    *
    * @param uoModel
    */
-  public UncertainifyFilter(UO uoModel, boolean blur, boolean uncertainify, int dims) {
+  public UncertainifyFilter(UO uoModel, boolean blur) {
     this.uncertainityModel = uoModel;
     this.blur = blur;
-    this.uncertainify = uncertainify;
-    this.dims = dims;
   }
 
   @Override
@@ -109,7 +91,7 @@ public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO
   @SuppressWarnings("unchecked")
   @Override
   protected U filterSingleObject(NumberVector obj) {
-    return (U) uncertainityModel.uncertainify(obj, blur, uncertainify, dims);
+    return (U) uncertainityModel.uncertainify(obj, blur);
   }
 
   @Override
@@ -125,7 +107,7 @@ public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Alexander Koos
    *
    * @apiviz.exclude
@@ -146,20 +128,6 @@ public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO
     "Shall the center for the uo be the genuine data? -- 'True' means 'no'.");
 
     /**
-     * Parameter to specify if the data given is a groundtruth to be
-     * uncertainified or if it is to be wrapped into an uo directly.
-     */
-    public static final OptionID UNCERTAINIFY_ID = new OptionID("uncertainifyFilter.uncertainifyFlag", //
-    "Shall the data be used directly to build an uncertain object.");
-
-    /**
-     * Parameter to specify the dimensionality of the data to correctly set the
-     * dimensionality of the experiment.
-     */
-    public static final OptionID DIMENSIONAL_ID = new OptionID("uncertainifyFilter.dimensionalityConstraint", //
-    "What dimensionaliy does the data have.");
-
-    /**
      * Field to hold the uncertainityModel
      */
     protected UO uncertainityModel;
@@ -168,16 +136,6 @@ public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO
      * Field to hold the blur flag.
      */
     protected boolean blur;
-
-    /**
-     * Field to hold the groundtruth flag.
-     */
-    protected boolean uncertainify;
-
-    /**
-     * Field to hold the dimensional constraint.
-     */
-    protected int dims;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -190,19 +148,11 @@ public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO
       if(config.grab(pblur)) {
         blur = pblur.getValue();
       }
-      final Flag pground = new Flag(UNCERTAINIFY_ID);
-      if(config.grab(pground)) {
-        uncertainify = pground.getValue();
-      }
-      final IntParameter pdims = new IntParameter(DIMENSIONAL_ID, 0);
-      if(config.grab(pdims)) {
-        dims = pdims.getValue();
-      }
     }
 
     @Override
     protected UncertainifyFilter<UO, U> makeInstance() {
-      return new UncertainifyFilter<UO, U>(uncertainityModel, blur, uncertainify, dims);
+      return new UncertainifyFilter<UO, U>(uncertainityModel, blur);
     }
   }
 }

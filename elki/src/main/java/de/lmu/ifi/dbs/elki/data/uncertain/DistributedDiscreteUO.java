@@ -124,38 +124,25 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
   }
 
   @Override
-  public UncertainObject<UOModel> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
+  public UncertainObject<UOModel> uncertainify(final NumberVector vec, final boolean blur) {
     final List<Pair<DoubleVector, Integer>> sampleList = new ArrayList<Pair<DoubleVector, Integer>>();
-    if(uncertainify) {
-      final int genuine = this.rand.nextInt(vec.getDimensionality());
-      final double difMin = this.rand.nextDouble() * (this.maxMin - this.minMin) + this.minMin;
-      final double difMax = this.rand.nextDouble() * (this.maxMax - this.minMax) + this.minMax;
-      final double randDev = blur ? (this.rand.nextInt(2) == 0 ? this.rand.nextDouble() * -difMin : this.rand.nextDouble() * difMax) : 0;
-      final int distributionSize = this.rand.nextInt((int) (this.multMax - this.multMin) + 1) + (int) this.multMin;
-      final int[] iweights = UncertainUtil.calculateRandomIntegerWeights(distributionSize, this.totalProbability, this.rand);
-      for(int i = 0; i < distributionSize; i++) {
-        if(i == genuine) {
-          sampleList.add(new Pair<DoubleVector, Integer>(new DoubleVector(vec.getColumnVector()), iweights[i]));
-          continue;
-        }
-        final double[] spair = new double[vec.getDimensionality()];
-        for(int j = 0; j < vec.getDimensionality(); j++) {
-          final double gtv = vec.doubleValue(j);
-          spair[j] = gtv + this.rand.nextDouble() * difMax - this.rand.nextDouble() * difMin + randDev;
-        }
-        sampleList.add(new Pair<DoubleVector, Integer>(new DoubleVector(spair), iweights[i]));
+    final int genuine = this.rand.nextInt(vec.getDimensionality());
+    final double difMin = this.rand.nextDouble() * (this.maxMin - this.minMin) + this.minMin;
+    final double difMax = this.rand.nextDouble() * (this.maxMax - this.minMax) + this.minMax;
+    final double randDev = blur ? (this.rand.nextInt(2) == 0 ? this.rand.nextDouble() * -difMin : this.rand.nextDouble() * difMax) : 0;
+    final int distributionSize = this.rand.nextInt((int) (this.multMax - this.multMin) + 1) + (int) this.multMin;
+    final int[] iweights = UncertainUtil.calculateRandomIntegerWeights(distributionSize, this.totalProbability, this.rand);
+    for(int i = 0; i < distributionSize; i++) {
+      if(i == genuine) {
+        sampleList.add(new Pair<DoubleVector, Integer>(new DoubleVector(vec.getColumnVector()), iweights[i]));
+        continue;
       }
-    }
-    else {
-      final double[] val = new double[dims];
-      for(int i = 0; i < vec.getDimensionality(); i++) {
-        if(i % (dims + 1) == dims) {
-          sampleList.add(new Pair<DoubleVector, Integer>(new DoubleVector(val), Integer.valueOf((int) vec.doubleValue(i))));
-        }
-        else {
-          val[i % dims] = vec.doubleValue(i);
-        }
+      final double[] spair = new double[vec.getDimensionality()];
+      for(int j = 0; j < vec.getDimensionality(); j++) {
+        final double gtv = vec.doubleValue(j);
+        spair[j] = gtv + this.rand.nextDouble() * difMax - this.rand.nextDouble() * difMin + randDev;
       }
+      sampleList.add(new Pair<DoubleVector, Integer>(new DoubleVector(spair), iweights[i]));
     }
     return new UncertainObject<UOModel>(new DistributedDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), vec.getColumnVector());
   }

@@ -57,7 +57,7 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
   // under engineered approach, until everything is
   // fine and I can give more priority to beauty
   // than to functionality.
-  public UniformDiscreteUO(final double minMin, final double maxMin, final double minMax, final double maxMax, final long multMin, final long multMax, final long distributionSeed, final RandomFactory randFac) {
+  public UniformDiscreteUO(double minMin, double maxMin, double minMax, double maxMax, long multMin, long multMax, long distributionSeed, RandomFactory randFac) {
     this.minMin = minMin;
     this.maxMin = maxMin;
     this.minMax = minMax;
@@ -69,7 +69,7 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
   }
 
   // Constructor
-  public UniformDiscreteUO(final List<DoubleVector> samplePoints, final RandomFactory randomFactory) {
+  public UniformDiscreteUO(List<DoubleVector> samplePoints, RandomFactory randomFactory) {
     this.samplePoints = samplePoints;
     this.dimensions = samplePoints.get(0).getDimensionality();
     this.rand = randomFactory.getRandom();
@@ -86,11 +86,11 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
   }
 
   protected void setBounds() {
-    final double min[] = new double[this.dimensions];
+    double min[] = new double[this.dimensions];
     Arrays.fill(min, Double.MAX_VALUE);
-    final double max[] = new double[this.dimensions];
+    double max[] = new double[this.dimensions];
     Arrays.fill(max, -Double.MAX_VALUE);
-    for(final DoubleVector samplePoint : this.samplePoints) {
+    for(DoubleVector samplePoint : this.samplePoints) {
       for(int d = 0; d < this.dimensions; d++) {
         min[d] = Math.min(min[d], samplePoint.doubleValue(d));
         max[d] = Math.max(max[d], samplePoint.doubleValue(d));
@@ -100,37 +100,26 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
   }
 
   @Override
-  public UncertainObject<UOModel> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
-    final List<DoubleVector> sampleList = new ArrayList<DoubleVector>();
-    if(uncertainify) {
-      final int genuine = this.drand.nextInt(vec.getDimensionality());
-      final double difMin = this.drand.nextDouble() * (this.maxMin - this.minMin) + this.minMin;
-      final double difMax = this.drand.nextDouble() * (this.maxMax - this.minMax) + this.minMax;
-      final double randDev = blur ? (this.drand.nextInt(2) == 0 ? this.drand.nextDouble() * -difMin : this.drand.nextDouble() * difMax) : 0;
-      final int distributionSize = this.drand.nextInt((int) (this.multMax - this.multMin) + 1) + (int) this.multMin;
-      for(int i = 0; i < distributionSize; i++) {
-        if(i == genuine) {
-          sampleList.add(new DoubleVector(vec.getColumnVector()));
-          continue;
-        }
-        final double[] svec = new double[vec.getDimensionality()];
-        for(int j = 0; j < vec.getDimensionality(); j++) {
-          final double gtv = vec.doubleValue(j);
-          svec[j] = gtv + this.drand.nextDouble() * difMax - this.drand.nextDouble() * difMin + randDev;
-        }
-        sampleList.add(new DoubleVector(svec));
+  public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur) {
+    List<DoubleVector> sampleList = new ArrayList<DoubleVector>();
+    int genuine = this.drand.nextInt(vec.getDimensionality());
+    double difMin = this.drand.nextDouble() * (this.maxMin - this.minMin) + this.minMin;
+    double difMax = this.drand.nextDouble() * (this.maxMax - this.minMax) + this.minMax;
+    double randDev = blur ? (this.drand.nextInt(2) == 0 ? this.drand.nextDouble() * -difMin : this.drand.nextDouble() * difMax) : 0;
+    int distributionSize = this.drand.nextInt((int) (this.multMax - this.multMin) + 1) + (int) this.multMin;
+    for(int i = 0; i < distributionSize; i++) {
+      if(i == genuine) {
+        sampleList.add(new DoubleVector(vec.getColumnVector()));
+        continue;
       }
-    }
-    else {
-      final double[] val = new double[dims];
-      for(int i = 0; i < vec.getDimensionality(); i++) {
-        val[i % dims] = vec.doubleValue(i);
-        if(i % dims == dims - 1) {
-          sampleList.add(new DoubleVector(val));
-        }
+      double[] svec = new double[vec.getDimensionality()];
+      for(int j = 0; j < vec.getDimensionality(); j++) {
+        double gtv = vec.doubleValue(j);
+        svec[j] = gtv + this.drand.nextDouble() * difMax - this.drand.nextDouble() * difMin + randDev;
       }
+      sampleList.add(new DoubleVector(svec));
     }
-    return new UncertainObject<UOModel>(new UniformDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), vec.getColumnVector());
+    return new UncertainObject<UOModel>(new UniformDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), vec);
   }
 
   public static class Parameterizer extends DistributedDiscreteUO.Parameterizer {

@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.data.uncertain.ContinuousUncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.transform.UncertainifyFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.UncertainifyFilter;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -154,68 +154,39 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
   }
 
   @Override
-  public UncertainObject<UOModel> uncertainify(final NumberVector vec, final boolean blur, final boolean uncertainify, final int dims) {
+  public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur) {
     final int multiplicity = this.urand.nextInt((int) (this.multMax - this.multMin) + 1) + (int) this.multMin;
     final List<DoubleVector> means = new ArrayList<DoubleVector>();
     final List<DoubleVector> variances = new ArrayList<DoubleVector>();
     int[] weights;
-    if(uncertainify) {
-      weights = UncertainUtil.calculateRandomIntegerWeights(multiplicity, this.weightMax, this.urand);
-      for(int h = 0; h < multiplicity; h++) {
-        final double[] imeans = new double[vec.getDimensionality()];
-        final double[] ivariances = new double[vec.getDimensionality()];
-        final double minBound = (this.urand.nextDouble() * (this.maxMin - this.minMin)) + this.minMin;
-        final double maxBound = (this.urand.nextDouble() * (this.maxMax - this.minMax)) + this.minMax;
-        for(int i = 0; i < vec.getDimensionality(); i++) {
-          ivariances[i] = (this.urand.nextDouble() * (this.maxDev - this.minDev)) + this.minDev;
-          if(blur) {
-            for(int j = 0; j < UOModel.DEFAULT_TRY_LIMIT; j++) {
-              final double val = this.urand.nextGaussian() * ivariances[i] + vec.doubleValue(i);
-              if(val >= vec.doubleValue(i) - minBound && val <= vec.doubleValue(i) + maxBound) {
-                imeans[i] = val;
-                break;
-              }
-            }
-            if(imeans[i] == 0.0 && (imeans[i] < vec.doubleValue(i) - (minBound * ivariances[i]) || imeans[i] > vec.doubleValue(i) + (maxBound * ivariances[i]))) {
-              imeans[i] = this.urand.nextInt(2) == 1 ? vec.doubleValue(i) - (minBound * ivariances[i]) : vec.doubleValue(i) + (maxBound * ivariances[i]);
+    weights = UncertainUtil.calculateRandomIntegerWeights(multiplicity, this.weightMax, this.urand);
+    for(int h = 0; h < multiplicity; h++) {
+      final double[] imeans = new double[vec.getDimensionality()];
+      final double[] ivariances = new double[vec.getDimensionality()];
+      final double minBound = (this.urand.nextDouble() * (this.maxMin - this.minMin)) + this.minMin;
+      final double maxBound = (this.urand.nextDouble() * (this.maxMax - this.minMax)) + this.minMax;
+      for(int i = 0; i < vec.getDimensionality(); i++) {
+        ivariances[i] = (this.urand.nextDouble() * (this.maxDev - this.minDev)) + this.minDev;
+        if(blur) {
+          for(int j = 0; j < UOModel.DEFAULT_TRY_LIMIT; j++) {
+            final double val = this.urand.nextGaussian() * ivariances[i] + vec.doubleValue(i);
+            if(val >= vec.doubleValue(i) - minBound && val <= vec.doubleValue(i) + maxBound) {
+              imeans[i] = val;
+              break;
             }
           }
-          else {
-            imeans[i] = vec.doubleValue(i);
+          if(imeans[i] == 0.0 && (imeans[i] < vec.doubleValue(i) - (minBound * ivariances[i]) || imeans[i] > vec.doubleValue(i) + (maxBound * ivariances[i]))) {
+            imeans[i] = this.urand.nextInt(2) == 1 ? vec.doubleValue(i) - (minBound * ivariances[i]) : vec.doubleValue(i) + (maxBound * ivariances[i]);
           }
         }
-        means.add(new DoubleVector(imeans));
-        variances.add(new DoubleVector(ivariances));
+        else {
+          imeans[i] = vec.doubleValue(i);
+        }
       }
+      means.add(new DoubleVector(imeans));
+      variances.add(new DoubleVector(ivariances));
     }
-    else {
-      final int scale = 1 + 2 * dims;
-      weights = new int[dims];
-      for(int i = 0; i < dims; i++) {
-        weights[i] = (int) vec.doubleValue(i * scale);
-        means.add(this.extractVectorFromData(vec, dims, (i + 1) * scale - (2 * dims)));
-        variances.add(this.extractVectorFromData(vec, dims, (i + 1) * scale - (dims)));
-      }
-    }
-
     return new UncertainObject<UOModel>(new ContinuousUncertainObject<>(new IndependentGaussianDistributionFunction(means, variances, weights), vec.getDimensionality()), vec.getColumnVector());
-  }
-
-  /**
-   * Method to extract a vector of length dims with offset from a given data
-   * vector.
-   *
-   * @param data
-   * @param dims
-   * @param offset
-   * @return
-   */
-  private DoubleVector extractVectorFromData(final NumberVector data, final int dims, final int offset) {
-    final double[] result = new double[dims];
-    for(int i = 0; i < dims; i++) {
-      result[i] = data.doubleValue(offset + i);
-    }
-    return new DoubleVector(result);
   }
 
   /**

@@ -69,9 +69,8 @@ public abstract class ProbabilityDensityFunction {
   /**
    * Construct an {@link UncertainObject} from a given vector.
    *
+   * @param vec Vector
    * @param blur TODO
-   * @param uncertainify TODO
-   * @param dims TODO
    */
-  public abstract UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur, boolean uncertainify, int dims);
+  public abstract UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur);
 }

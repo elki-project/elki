@@ -47,29 +47,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  */
 public class UniformDistributionFunction extends ProbabilityDensityFunction {
   /**
-   * Field to hold the value the randomly created maximum negative deviation
-   * from the groundtruth shall have in minimum.
+   * Field to hold the value the randomly created minimum and maximum deviation.
    */
-  protected double minMin;
-  
-  /**
-   * Field to hold the value the randomly created maximum negative deviation
-   * from the groundtruth shall have in maximum.
-   */
-  protected double maxMin;
-  
-  /**
-   * Field to hold the value the randomly created maximum positive deviation
-   * from the groundtruth shall have in minimum.
-   */
-  protected double minMax;
-  
-  /**
-   * Field to hold the value the randomly created maximum positive deviation
-   * from the groundtruth shall have in maximum.
-   */
-  protected double maxMax;
-  
+  protected double min, max;
+
   /**
    * Field to hold the random for uncertainification.
    */
@@ -78,25 +59,14 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
   /**
    * Constructor.
    *
-   * @param minMin
-   * @param maxMin
-   * @param minMax
-   * @param maxMax
+   * @param min
+   * @param max
    * @param rand
    */
-  public UniformDistributionFunction(final double minMin, final double maxMin, final double minMax, final double maxMax, final Random rand) {
-    this.minMin = minMin;
-    this.maxMin = maxMin;
-    this.minMax = minMax;
-    this.maxMax = maxMax;
+  public UniformDistributionFunction(double min, double max, RandomFactory rand) {
+    this.min = min;
+    this.max = max;
     this.rand = rand;
-  }
-  
-  /**
-   * Constructor - blank, perhaps obsolete.
-   */
-  public UniformDistributionFunction() {
-    // TODO Auto-generated constructor stub
   }
 
   @Override
@@ -127,26 +97,20 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
   }
 
   @Override
-  public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur, boolean uncertainify, int dims) {
-    final double[] min = new double[uncertainify ? vec.getDimensionality() : dims];
-    final double[] max = new double[uncertainify ? vec.getDimensionality() : dims];
+  public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur) {
+    final double[] min = new double[vec.getDimensionality()];
+    final double[] max = new double[vec.getDimensionality()];
     Random r = rand.getSingleThreadedRandom();
-    for(int i = 0; i < (uncertainify ? vec.getDimensionality() : dims); i++) {
-      if(uncertainify) {
-        final double preDev = r.nextDouble();
-        final double difMin = (r.nextDouble() * (maxMin - minMin)) + minMin;
-        final double difMax = (r.nextDouble() * (maxMax - minMax)) + minMax;
-        final double randDev = blur ? ((r.nextInt() % 2) == 0 ? preDev * -difMin : preDev * difMax) : 0;
-        min[i] = vec.doubleValue(i) - (r.nextDouble() * difMin) + randDev;
-        max[i] = vec.doubleValue(i) + (r.nextDouble() * difMax) + randDev;
-      }
-      else {
-        min[i] = vec.doubleValue(i);
-        max[i] = vec.doubleValue(i + dims);
-      }
+    for(int i = 0; i < vec.getDimensionality(); i++) {
+      final double preDev = r.nextDouble();
+      final double difMin = (r.nextDouble() * (this.max - this.min)) + this.min;
+      final double difMax = (r.nextDouble() * (this.max - this.min)) + this.min;
+      final double randDev = blur ? ((r.nextInt() % 2) == 0 ? preDev * -difMin : preDev * difMax) : 0;
+      min[i] = vec.doubleValue(i) - (r.nextDouble() * difMin) + randDev;
+      max[i] = vec.doubleValue(i) + (r.nextDouble() * difMax) + randDev;
     }
 
-    return new UncertainObject<UOModel>(new ContinuousUncertainObject<>(min, max, new UniformDistributionFunction(), new RandomFactory(r.nextLong())), vec.getColumnVector());
+    return new UncertainObject<UOModel>(new ContinuousUncertainObject<>(min, max, this, new RandomFactory(r.nextLong())), vec);
   }
   
   /**
@@ -155,55 +119,25 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
    * @author Alexander Koos
    */
   public final static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Minimum and maximum allowed deviation.
+     */
+    protected double min, max;
 
-    /**
-     * Field to hold parameter value.
-     */
-    protected double minMin;
-    
-    /**
-     * Field to hold parameter value.
-     */
-    protected double maxMin;
-    
-    /**
-     * Field to hold parameter value.
-     */
-    protected double minMax;
-    
-    /**
-     * Field to hold parameter value.
-     */
-    protected double maxMax;
-    
     /**
      * Field to hold random for uncertainification.
      */
     protected Random rand;
     
     /**
-     * Parameter to specify the minimum value for randomly drawn deviation from
-     * the groundtruth in negative direction.
+     * Parameter to specify the minimum value for randomly drawn deviation.
      */
-    public static final OptionID MIN_MIN_ID = new OptionID("objects.lbound.min", "Minimum lower boundary.");
+    public static final OptionID MIN_ID = new OptionID("objects.mindev", "Minimum deviation.");
 
     /**
-     * Parameter to specify the maximum value for randomly drawn deviation from
-     * the groundtruth in negative direction.
+     * Parameter to specify the maximum value for randomly drawn deviation.
      */
-    public static final OptionID MAX_MIN_ID = new OptionID("objects.lbound.max", "Maximum lower boundary.");
-
-    /**
-     * Parameter to specify the minimum value for randomly drawn deviation from
-     * the groundtruth in positive direction.
-     */
-    public static final OptionID MIN_MAX_ID = new OptionID("objects.ubound.min", "Minimum upper boundary.");
-
-    /**
-     * Parameter to specify the maximum value for randomly drawn deviation from
-     * the groundtruth in positive direction.
-     */
-    public static final OptionID MAX_MAX_ID = new OptionID("objects.ubound.max", "Maximum upper boundary.");
+    public static final OptionID MAX_ID = new OptionID("objects.maxdev", "Maximum deviation.");
 
     /**
      * Parameter to specify the seed for uncertainification.
@@ -213,21 +147,13 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter pminMin = new DoubleParameter(MIN_MIN_ID, UOModel.DEFAULT_MIN_MAX_DEVIATION);
+      final DoubleParameter pminMin = new DoubleParameter(MIN_ID, 0.);
       if(config.grab(pminMin)) {
-        minMin = pminMin.getValue();
+        min = pminMin.getValue();
       }
-      final DoubleParameter pmaxMin = new DoubleParameter(MAX_MIN_ID, UOModel.DEFAULT_MIN_MAX_DEVIATION);
+      final DoubleParameter pmaxMin = new DoubleParameter(MAX_ID);
       if(config.grab(pmaxMin)) {
-        minMin = pmaxMin.getValue();
-      }
-      final DoubleParameter pminMax = new DoubleParameter(MIN_MAX_ID, UOModel.DEFAULT_MIN_MAX_DEVIATION);
-      if(config.grab(pminMax)) {
-        minMin = pminMax.getValue();
-      }
-      final DoubleParameter pmaxMax = new DoubleParameter(MAX_MAX_ID, UOModel.DEFAULT_MIN_MAX_DEVIATION);
-      if(config.grab(pmaxMax)) {
-        maxMax = pmaxMax.getValue();
+        max = pmaxMin.getValue();
       }
       final LongParameter pseed = new LongParameter(SEED_ID);
       pseed.setOptional(true);
@@ -240,7 +166,7 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
     
     @Override
     protected Object makeInstance() {
-      return new UniformDistributionFunction(minMin, maxMin, minMax, maxMax, rand);
+      return new UniformDistributionFunction(min, max, rand);
     }
   }
 }

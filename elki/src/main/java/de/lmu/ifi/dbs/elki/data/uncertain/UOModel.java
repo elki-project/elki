@@ -102,10 +102,8 @@ public abstract class UOModel implements SpatialComparable {
    *
    * @param vec
    * @param blur
-   * @param groundtruth
-   * @param dims
    *
    * @return
    */
-  public abstract UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur, boolean uncertainify, int dims);
+  public abstract UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur);
 }
