@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.gui;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -293,7 +293,7 @@ public class ResultWindow extends JFrame implements ResultListener {
   /**
    * Close the visualizer window.
    */
-  public void close() {
+  protected void close() {
     this.setVisible(false);
     this.dispose();
   }
@@ -340,7 +340,7 @@ public class ResultWindow extends JFrame implements ResultListener {
   /**
    * Save/export the current plot.
    */
-  public void saveCurrentPlot() {
+  protected void saveCurrentPlot() {
     // TODO: exclude "do not export" layers!
     final SVGPlot currentPlot = svgCanvas.getPlot();
     if(currentPlot != null) {
@@ -425,7 +425,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
   /**
    * Handle a resize event.
-   * 
+   *
    * @param newratio New window size ratio.
    */
   protected void handleResize(double newratio) {
@@ -434,7 +434,7 @@ public class ResultWindow extends JFrame implements ResultListener {
     }
   }
 
-  public JMenuItem makeMenuItemForVisualizer(Result r) {
+  private JMenuItem makeMenuItemForVisualizer(Result r) {
     if(VisualizationTask.class.isInstance(r)) {
       final VisualizationTask v = (VisualizationTask) r;
       JMenuItem item;
