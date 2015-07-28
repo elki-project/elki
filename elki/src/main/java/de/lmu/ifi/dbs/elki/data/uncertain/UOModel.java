@@ -79,6 +79,8 @@ public abstract class UOModel implements SpatialComparable {
   public final static int DEFAULT_TRY_LIMIT = 1000;
 
   public abstract DoubleVector drawSample();
+  
+  public abstract DoubleVector getMean();
 
   @Override
   public double getMin(final int dimension) {

@@ -125,6 +125,10 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
   public DoubleVector drawSample() {
     return this.probabilityDensityFunction.drawValue(this.bounds, this.rand);
   }
+  
+  public DoubleVector getMean() {
+    return this.probabilityDensityFunction.getMean(this.bounds);
+  }
 
   @Override
   public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur) {

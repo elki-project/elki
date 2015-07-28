@@ -84,6 +84,20 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
       
     return new DoubleVector(values);
   }
+  
+  public DoubleVector getMean(SpatialComparable bounds) {
+    double[] meanVals = new double[bounds.getDimensionality()];
+    
+    for(int i = 0; i < bounds.getDimensionality(); i++) {
+      if(!Double.valueOf(bounds.getMax(i) - bounds.getMin(i)).isInfinite()){
+        meanVals[i] = (bounds.getMax(i) - bounds.getMin(i)) / 2;
+      } else {
+        meanVals[i] = 0;
+      }
+    }
+    
+    return new DoubleVector(meanVals);
+  }
 
   @Override
   public SpatialComparable getDefaultBounds(final int dimensions) {

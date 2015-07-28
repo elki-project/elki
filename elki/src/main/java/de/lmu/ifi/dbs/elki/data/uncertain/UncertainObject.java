@@ -49,6 +49,10 @@ public class UncertainObject<U extends UOModel> extends AbstractNumberVector {
   public DoubleVector drawSample() {
     return this.sampleModel.drawSample();
   }
+  
+  public DoubleVector getMean() {
+    return this.sampleModel.getMean();
+  }
 
   public DoubleVector drawCenter() {
     return new DoubleVector(this.values);

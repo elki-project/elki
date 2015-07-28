@@ -56,6 +56,8 @@ public abstract class ProbabilityDensityFunction {
    * use for algorithms on uncertain data.
    */
   public abstract DoubleVector drawValue(SpatialComparable bounds, final Random rand);
+  
+  public abstract DoubleVector getMean(SpatialComparable bounds);
 
   /**
    * In case no bounds are explicitly given create some via a default metric

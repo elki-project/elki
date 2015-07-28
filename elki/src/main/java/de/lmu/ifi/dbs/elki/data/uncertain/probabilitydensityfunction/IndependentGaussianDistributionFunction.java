@@ -147,6 +147,24 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
 
     return AbstractGaussianDistributionFunction.noSample;
   }
+  
+  public DoubleVector getMean(SpatialComparable bounds) {
+    double[] meanVals = new double[bounds.getDimensionality()];
+    int sumWeights = 0;
+    
+    for (int i=0; i<this.means.size(); i++) {
+      for (int j=0; j<bounds.getDimensionality(); j++) {
+        meanVals[j] += this.means.get(i).getValues()[j] * this.weights[i];
+        sumWeights += this.weights[i];
+      }
+    }
+    
+    for (int j=0; j<bounds.getDimensionality(); j++) {
+      meanVals[j] /= sumWeights;
+    }
+    
+    return new DoubleVector(meanVals);
+  }
 
   @Override
   protected List<DoubleVector> getDeviationVector() {
