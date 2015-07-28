@@ -28,15 +28,15 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 
 /**
  * Type information to specify that a type has a fixed dimensionality.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <V> Vector type
  */
 public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends VectorTypeInformation<V> {
   /**
    * Constructor for a type request without dimensionality constraints.
-   * 
+   *
    * @param cls Class constraint
    * @param <V> vector type
    */
@@ -46,7 +46,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Constructor for a type request with dimensionality constraints.
-   * 
+   *
    * @param cls Class constraint
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
@@ -63,7 +63,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
-   * 
+   *
    * @param factory Factory class
    * @param dim Dimensionality
    * @param labels Labels
@@ -72,12 +72,12 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
   public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int dim, String[] labels, ByteBufferSerializer<? super V> serializer) {
     super(factory, serializer, dim, dim);
     this.labels = labels;
-    assert (labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
+    assert(labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
   }
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
-   * 
+   *
    * @param factory Factory class
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
@@ -89,7 +89,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
-   * 
+   *
    * @param factory Factory class
    * @param dim Dimensionality
    * @param serializer Serializer
@@ -100,7 +100,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
-   * 
+   *
    * @param factory Factory class
    * @param dim Dimensionality
    * @param labels Labels
@@ -108,12 +108,12 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
   public VectorFieldTypeInformation(FeatureVector.Factory<V, ?> factory, int dim, String[] labels) {
     super(factory, factory.getDefaultSerializer(), dim, dim);
     this.labels = labels;
-    assert (labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
+    assert(labels == null || labels.length == dim) : "Created vector field with incomplete labels.";
   }
 
   /**
    * Constructor for a request with minimum and maximum dimensionality.
-   * 
+   *
    * @param cls Vector restriction class.
    * @param mindim Minimum dimensionality request
    * @param maxdim Maximum dimensionality request
@@ -124,7 +124,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Constructor with given dimensionality and factory, so usually an instance.
-   * 
+   *
    * @param factory Factory class
    * @param dim Dimensionality
    */
@@ -134,13 +134,16 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   @Override
   public boolean isAssignableFromType(TypeInformation type) {
+    if(this == type) {
+      return true;
+    }
     // Do all checks from superclass
-    if (!super.isAssignableFromType(type)) {
+    if(!super.isAssignableFromType(type)) {
       return false;
     }
     // Additionally check that mindim == maxdim.
     VectorTypeInformation<?> other = (VectorTypeInformation<?>) type;
-    if (other.mindim != other.maxdim) {
+    if(other.mindim != other.maxdim) {
       return false;
     }
     return true;
@@ -148,11 +151,11 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Get the dimensionality of the type.
-   * 
+   *
    * @return dimensionality
    */
   public int getDimensionality() {
-    if (mindim != maxdim) {
+    if(mindim != maxdim) {
       throw new UnsupportedOperationException("Requesting dimensionality for a type request without defined dimensionality!");
     }
     return mindim;
@@ -161,14 +164,15 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder(getRestrictionClass().getSimpleName());
-    if (mindim == maxdim) {
+    if(mindim == maxdim) {
       buf.append(",dim=").append(mindim);
-    } else {
+    }
+    else {
       buf.append(",field");
-      if (mindim >= 0) {
+      if(mindim >= 0) {
         buf.append(",mindim=").append(mindim);
       }
-      if (maxdim < Integer.MAX_VALUE) {
+      if(maxdim < Integer.MAX_VALUE) {
         buf.append(",maxdim=").append(maxdim);
       }
     }
@@ -177,12 +181,12 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Get the column label.
-   * 
+   *
    * @param col Column number
    * @return Label
    */
   public String getLabel(int col) {
-    if (labels == null) {
+    if(labels == null) {
       return null;
     }
     return labels[col];
@@ -190,7 +194,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
 
   /**
    * Get the column labels.
-   * 
+   *
    * @return labels
    */
   protected String[] getLabels() {
