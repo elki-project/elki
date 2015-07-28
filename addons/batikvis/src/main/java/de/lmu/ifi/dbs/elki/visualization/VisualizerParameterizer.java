@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -95,8 +95,6 @@ public class VisualizerParameterizer {
    * These are {@code *.properties} files in the package
    * {@link de.lmu.ifi.dbs.elki.visualization.style}.
    * </p>
-   *
-   *
    */
   public static final OptionID STYLELIB_ID = new OptionID("visualizer.stylesheet", "Style properties file to use, included properties: classic, default, greyscale, neon, presentation, print");
 
