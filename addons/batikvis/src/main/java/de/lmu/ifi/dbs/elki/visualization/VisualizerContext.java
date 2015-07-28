@@ -56,11 +56,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 /**
  * Map to store context information for the visualizer. This can be any data
  * that should to be shared among plots, such as line colors, styles etc.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  *         TODO: remove this class
- * 
+ *
  * @apiviz.landmark
  * @apiviz.composedOf StyleLibrary
  * @apiviz.composedOf SelectionResult
@@ -108,7 +108,7 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   /**
    * Constructor. We currently require a Database and a Result.
-   * 
+   *
    * @param result Result
    * @param projectors Projectors to use
    * @param factories Visualizer Factories to use
@@ -122,12 +122,16 @@ public class VisualizerContext implements DataStoreListener, Result {
     // Ensure that various common results needed by visualizers are
     // automatically created
     final Database db = ResultUtil.findDatabase(result);
+    if(db == null) {
+      LOG.warning("No database reachable from " + result);
+      return;
+    }
     ResultUtil.ensureClusteringResult(db, result);
     this.selection = ResultUtil.ensureSelectionResult(db);
-    for (Relation<?> rel : ResultUtil.getRelations(result)) {
+    for(Relation<?> rel : ResultUtil.getRelations(result)) {
       ResultUtil.getSamplingResult(rel);
       // FIXME: this is a really ugly workaround. :-(
-      if (TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+      if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
         Relation<? extends NumberVector> vrel = (Relation<? extends NumberVector>) rel;
         ResultUtil.getScalesResult(vrel);
@@ -141,7 +145,7 @@ public class VisualizerContext implements DataStoreListener, Result {
     processNewResult(result, result);
 
     // For proxying events.
-    ResultUtil.findDatabase(result).addDataStoreListener(this);
+    db.addDataStoreListener(this);
     // Add a result listener. Don't expose these methods to avoid inappropriate
     // use.
     addResultListener(new ResultListener() {
@@ -164,16 +168,17 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   /**
    * Generate a new style result for the given style library.
-   * 
+   *
    * @param stylelib Style library
    */
   protected void makeStyleResult(StyleLibrary stylelib) {
     styleresult = new StyleResult();
     styleresult.setStyleLibrary(stylelib);
     List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
-    if (clusterings.size() > 0) {
+    if(clusterings.size() > 0) {
       styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0), stylelib));
-    } else {
+    }
+    else {
       Clustering<Model> c = generateDefaultClustering();
       styleresult.setStylingPolicy(new ClusterStylingPolicy(c, stylelib));
     }
@@ -182,7 +187,7 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   /**
    * Get the full result object
-   * 
+   *
    * @return result object
    */
   public HierarchicalResult getResult() {
@@ -191,7 +196,7 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   /**
    * Get the hierarchy object
-   * 
+   *
    * @return hierarchy object
    */
   public ResultHierarchy getHierarchy() {
@@ -200,7 +205,7 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   /**
    * Get the style result.
-   * 
+   *
    * @return Style result
    */
   public StyleResult getStyleResult() {
@@ -209,7 +214,7 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   /**
    * Generate a default (fallback) clustering.
-   * 
+   *
    * @return generated clustering
    */
   private Clustering<Model> generateDefaultClustering() {
@@ -219,7 +224,8 @@ public class VisualizerContext implements DataStoreListener, Result {
       // Try to cluster by labels
       ByLabelHierarchicalClustering split = new ByLabelHierarchicalClustering();
       c = split.run(db);
-    } catch (NoSupportedDataTypeException e) {
+    }
+    catch(NoSupportedDataTypeException e) {
       // Put everything into one
       c = new TrivialAllInOne().run(db);
     }
@@ -230,7 +236,7 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   /**
    * Get the current selection.
-   * 
+   *
    * @return selection
    */
   public DBIDSelection getSelection() {
@@ -239,7 +245,7 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   /**
    * Set a new selection.
-   * 
+   *
    * @param sel Selection
    */
   public void setSelection(DBIDSelection sel) {
@@ -250,7 +256,7 @@ public class VisualizerContext implements DataStoreListener, Result {
   /**
    * Adds a listener for the <code>DataStoreEvent</code> posted after the
    * content changes.
-   * 
+   *
    * @param l the listener to add
    * @see #removeDataStoreListener
    */
@@ -260,7 +266,7 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   /**
    * Removes a listener previously added with <code>addDataStoreListener</code>.
-   * 
+   *
    * @param l the listener to remove
    * @see #addDataStoreListener
    */
@@ -273,30 +279,32 @@ public class VisualizerContext implements DataStoreListener, Result {
    */
   @Override
   public void contentChanged(DataStoreEvent e) {
-    for (DataStoreListener listener : listenerList.getListeners(DataStoreListener.class)) {
+    for(DataStoreListener listener : listenerList.getListeners(DataStoreListener.class)) {
       listener.contentChanged(e);
     }
   }
 
   /**
    * Process a particular result.
-   * 
+   *
    * @param baseResult Base Result
    * @param newResult Newly added Result
    */
   private void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    for (ProjectorFactory p : projectors) {
+    for(ProjectorFactory p : projectors) {
       try {
         p.processNewResult(baseResult, newResult);
-      } catch (Throwable e) {
+      }
+      catch(Throwable e) {
         LOG.warning("ProjectorFactory " + p.getClass().getCanonicalName() + " failed:", e);
       }
     }
     // Collect all visualizers.
-    for (VisFactory f : factories) {
+    for(VisFactory f : factories) {
       try {
         f.processNewResult(baseResult, newResult);
-      } catch (Throwable e) {
+      }
+      catch(Throwable e) {
         LOG.warning("VisFactory " + f.getClass().getCanonicalName() + " failed:", e);
       }
     }
@@ -304,7 +312,7 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   /**
    * Register a result listener.
-   * 
+   *
    * @param listener Result listener.
    */
   public void addResultListener(ResultListener listener) {
@@ -313,7 +321,7 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   /**
    * Remove a result listener.
-   * 
+   *
    * @param listener Result listener.
    */
   public void removeResultListener(ResultListener listener) {
