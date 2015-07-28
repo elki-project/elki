@@ -24,10 +24,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
  */
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -52,13 +51,13 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
 
 /**
- *
  * This classes purpose is to wrap and use a "normal" clustering algorithm in a
  * way for dealing with uncertain data of some kind.
  *
@@ -77,33 +76,154 @@ import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
  * the {@link EvaluationStep}.
  *
  * @author Alexander Koos
- *
  */
 public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>> {
+  /**
+   * Initialize a Logger.
+   */
+  private static final Logging LOG = Logging.getLogger(PWCClusteringAlgorithm.class);
 
   /**
+   * The algorithm to be wrapped and run.
+   */
+  private final ClusteringAlgorithm<?> algorithm;
+
+  /**
+   * The algorithm for meta-clustering.
+   */
+  private final ClusteringAlgorithm<?> metaAlgorithm;
+
+  /**
+   * How many clusterings shall be made for comparison.
+   */
+  private final int depth;
+
+  /**
+   * Constructor, quite trivial.
    *
+   * @param algorithm
+   * @param depth
+   */
+  public PWCClusteringAlgorithm(ClusteringAlgorithm<?> algorithm, int depth, ClusteringAlgorithm<?> metaAlgorithm) {
+    this.algorithm = algorithm;
+    this.depth = depth;
+    this.metaAlgorithm = metaAlgorithm;
+  }
+
+  /**
+   * This run method will do the wrapping.
+   *
+   * Its called from {@link AbstractAlgorithm#run(Database)} and performs the
+   * call to the algorithms particular run method as well as the storing and
+   * comparison of the resulting Clusterings.
+   *
+   * @param database
+   * @param relation
+   * @return
+   */
+  public Clustering<?> run(final Database database, final Relation<UncertainObject<?>> relation) {
+    final ArrayList<Clustering<?>> clusterings = new ArrayList<>();
+    {
+      final int dim = RelationUtil.dimensionality(relation);
+      final DBIDs ids = relation.getDBIDs();
+      // Add the raw input data:
+      {
+        final WritableDataStore<NumberVector> store0 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
+        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          store0.put(iter, relation.get(iter).drawCenter());
+        }
+        clusterings.add(runClusteringAlgorithm(database, ids, store0, dim, "Raw input data"));
+      }
+      // Add the uncertain model:
+      { // FIXME: this is the same as above, currently!
+        // * final WritableDataStore<NumberVector> store1 =
+        // DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB,
+        // NumberVector.class);
+        /*
+         * for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+         * store1.put(iter, relation.get(iter).drawCenter()); }
+         */
+        // clusterings.add(runClusteringAlgorithm(database, ids, store1, dim,
+        // "Uncertain Model: Center of Mass"));
+      }
+      // Add samples:
+      for(int i = 0; i < this.depth; i++) {
+        final WritableDataStore<NumberVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
+        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+          store.put(iter, relation.get(iter).drawSample());
+        }
+        clusterings.add(runClusteringAlgorithm(database, ids, store, dim, "Sample " + i));
+      }
+    }
+
+    // Step 2: perform the meta clustering.
+    DBIDRange rids = DBIDFactory.FACTORY.generateStaticDBIDRange(clusterings.size());
+    final WritableDataStore<Clustering<?>> datastore = DataStoreUtil.makeStorage(rids, DataStoreFactory.HINT_DB, Clustering.class);
+    Iterator<Clustering<?>> it2 = clusterings.iterator();
+    for(final DBIDIter iter = rids.iter(); iter.valid(); iter.advance()) {
+      datastore.put(iter, it2.next());
+    }
+    assert(rids.size() == clusterings.size());
+
+    final Relation<Clustering<?>> simRelation = new MaterializedRelation<Clustering<?>>(TypeUtil.CLUSTERING, rids, "Clusterings", datastore);
+    ProxyDatabase d = new ProxyDatabase(rids, simRelation);
+    Clustering<?> c = this.metaAlgorithm.run(d);
+    d.getHierarchy().remove(d, c);
+    return c;
+  }
+
+  /**
+   * Run a clustering algorithm on a single instance.
+   *
+   * @param database Database
+   * @param ids
+   * @param store
+   * @param dim
+   * @param title
+   * @return
+   */
+  protected Clustering<?> runClusteringAlgorithm(final Database database, final DBIDs ids, final WritableDataStore<NumberVector> store, final int dim, final String title) {
+    final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
+    final Relation<NumberVector> sample = new MaterializedRelation<>(t, ids, title, store);
+    ProxyDatabase d = new ProxyDatabase(ids, sample);
+    Clustering<?> clusterResult = this.algorithm.run(d);
+    d.getHierarchy().remove(sample);
+    d.getHierarchy().remove(clusterResult);
+    database.getHierarchy().add(database, sample);
+    database.getHierarchy().add(sample, clusterResult);
+    return clusterResult;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(new SimpleTypeInformation<>(UncertainObject.class));
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return PWCClusteringAlgorithm.LOG;
+  }
+
+  /**
    * Parameterization class.
    *
    * @author Alexander Koos
-   *
    */
   public static class Parameterizer extends AbstractParameterizer {
-
     /**
      * Field to store parameter value for depth.
      */
-    protected long tryDepth;
+    protected int tryDepth;
 
     /**
      * Field to store the algorithm.
      */
-    protected Algorithm algorithm;
+    protected ClusteringAlgorithm<?> algorithm;
 
     /**
      * Field to store the inner algorithm for meta-clustering
      */
-    protected Algorithm metaAlgorithm;
+    protected ClusteringAlgorithm<?> metaAlgorithm;
 
     /**
      * Parameter to hand an algorithm for creating the meta-clustering to our
@@ -129,152 +249,33 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     public final static OptionID DEPTH_ID = new OptionID("uncert.depth", "Amount of sample-clusterings to be made.");
 
     @Override
-    protected Object makeInstance() {
+    protected PWCClusteringAlgorithm makeInstance() {
       return new PWCClusteringAlgorithm(this.algorithm, this.tryDepth, this.metaAlgorithm);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     protected void makeOptions(final Parameterization config) {
       super.makeOptions(config);
-      final ClassParameter malgorithm = new ClassParameter(Parameterizer.META_ALGORITHM_ID, Algorithm.class);
+      final ClassParameter<ClusteringAlgorithm<?>> malgorithm = new ClassParameter<>(Parameterizer.META_ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(malgorithm)) {
-        this.metaAlgorithm = (Algorithm) malgorithm.instantiateClass(config);
+        this.metaAlgorithm = malgorithm.instantiateClass(config);
+        if(this.metaAlgorithm != null && this.metaAlgorithm.getInputTypeRestriction().length > 0 && //
+        !this.metaAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.CLUSTERING)) {
+          config.reportError(new WrongParameterValueException(malgorithm, malgorithm.getValueAsString(), "The meta clustering algorithm (as configured) does not accept clustering results."));
+        }
       }
-      final ClassParameter palgorithm = new ClassParameter(Parameterizer.ALGORITHM_ID, Algorithm.class);
+      final ClassParameter<ClusteringAlgorithm<?>> palgorithm = new ClassParameter<>(Parameterizer.ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(palgorithm)) {
-        this.algorithm = (Algorithm) palgorithm.instantiateClass(config);
+        this.algorithm = palgorithm.instantiateClass(config);
+        if(this.algorithm != null && this.algorithm.getInputTypeRestriction().length > 0 && //
+        !this.algorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
+          config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + this.algorithm.getInputTypeRestriction()[0]));
+        }
       }
-      final LongParameter pdepth = new LongParameter(Parameterizer.DEPTH_ID, UOModel.DEFAULT_ENSAMBLE_DEPTH);
+      final IntParameter pdepth = new IntParameter(Parameterizer.DEPTH_ID, UOModel.DEFAULT_ENSEMBLE_DEPTH);
       if(config.grab(pdepth)) {
         this.tryDepth = pdepth.getValue();
       }
     }
-  }
-
-  /**
-   * The algorithm to be wrapped and run.
-   */
-  private final Algorithm algorithm;
-
-  /**
-   * The algorithm for meta-clustering.
-   */
-  private final Algorithm metaAlgorithm;
-
-  /**
-   * Initialize a Logger.
-   */
-  private static final Logging LOG = Logging.getLogger(PWCClusteringAlgorithm.class);
-
-  /**
-   * How many clusterings shall be made for comparison.
-   */
-  private final long depth;
-
-  /**
-   *
-   * Constructor, quite trivial.
-   *
-   * @param algorithm
-   * @param depth
-   */
-  public PWCClusteringAlgorithm(final Algorithm algorithm, final long depth, final Algorithm metaAlgorithm) {
-    this.algorithm = algorithm;
-    this.depth = depth;
-    this.metaAlgorithm = metaAlgorithm;
-  }
-
-  @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new SimpleTypeInformation<>(UncertainObject.class));
-  }
-
-  @Override
-  protected Logging getLogger() {
-    return PWCClusteringAlgorithm.LOG;
-  }
-
-  /**
-   *
-   * This run method will do the wrapping.
-   *
-   * Its called from {@link AbstractAlgorithm#run(Database)} and performs the
-   * call to the algorithms particular run method as well as the storing and
-   * comparison of the resulting Clusterings.
-   *
-   * @param database
-   * @param relation
-   * @return
-   */
-  @SuppressWarnings({ "unchecked" })
-  public Clustering<Model> run(final Database database, final Relation<UncertainObject<UOModel>> relation) {
-    final ArrayList<Clustering<Model>> clusterings = new ArrayList<Clustering<Model>>();
-    final ArrayList<Clustering<Model>> rclusterings = new ArrayList<Clustering<Model>>();
-    final List<Relation<NumberVector>> rlist = new ArrayList<Relation<NumberVector>>();
-    {
-      final int dim = RelationUtil.dimensionality(relation);
-      final DBIDs ids = relation.getDBIDs();
-      // Add the raw input data:
-      {
-        final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
-        final WritableDataStore<NumberVector> store0 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
-        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          store0.put(iter, relation.get(iter).drawCenter());
-        }
-        final Relation<NumberVector> ground = new MaterializedRelation<>(database, t, ids, "Raw input data", store0);
-        rlist.add(ground);
-      }
-      // Add the uncertain model:
-      /*{ // FIXME: this is the same as above, currently!
-        final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
-        final WritableDataStore<NumberVector> store1 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
-        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          store1.put(iter, relation.get(iter).drawCenter());
-        }
-        final Relation<NumberVector> obs = new MaterializedRelation<>(database, t, ids, "Uncertain Model: Center of Mass", store1);
-        rlist.add(obs);
-      }*/
-      // Add samples:
-      for(int i = 0; i < this.depth; i++) {
-        final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
-        final WritableDataStore<NumberVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
-        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          store.put(iter, relation.get(iter).drawSample());
-        }
-        final Relation<NumberVector> sample = new MaterializedRelation<>(database, t, ids, "Sample " + i, store);
-        rlist.add(sample);
-      }
-    }
-
-    for(final Relation<NumberVector> r : rlist) {
-      ProxyDatabase d = new ProxyDatabase(r.getDBIDs(), r);
-      Clustering<Model> clusterResult = (Clustering<Model>) this.algorithm.run(d);
-
-      database.getHierarchy().add(database, r);
-      database.getHierarchy().add(r, clusterResult);
-
-      if(r.getLongName().startsWith("Sample")) {
-        clusterings.add(clusterResult);
-      }
-      else {
-        rclusterings.add(clusterResult);
-      }
-    }
-    rclusterings.addAll(clusterings);
-
-    SimpleTypeInformation<Clustering<Model>> TYPE = new SimpleTypeInformation<>(Clustering.class);
-    DBIDRange rids = DBIDFactory.FACTORY.generateStaticDBIDRange(rclusterings.size());
-    final WritableDataStore<Clustering<Model>> datastore = DataStoreUtil.makeStorage(rids, DataStoreFactory.HINT_DB, Clustering.class);
-    Iterator<Clustering<Model>> it2 = rclusterings.iterator();
-    for(final DBIDIter iter = rids.iter(); iter.valid(); iter.advance()) {
-      datastore.put(iter, it2.next());
-    }
-    assert(rids.size() == rclusterings.size());
-
-    final Relation<Clustering<Model>> simRelation = new MaterializedRelation<Clustering<Model>>(database, TYPE, rids, "Clusterings", datastore);
-    ProxyDatabase d = new ProxyDatabase(rids, simRelation);
-
-    return (Clustering<Model>) this.metaAlgorithm.run(d);
   }
 }

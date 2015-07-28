@@ -74,43 +74,22 @@ public abstract class UOModel implements SpatialComparable {
 
   public final static double DEFAULT_MAX_TOTAL_PROBABILITY = 1.0;
 
-  public final static long DEFAULT_ENSAMBLE_DEPTH = 10l;
+  public final static int DEFAULT_ENSEMBLE_DEPTH = 10;
 
   public final static int DEFAULT_TRY_LIMIT = 1000;
 
   public abstract DoubleVector drawSample();
 
-  /**
-   * Returns the Low-Boundary of a specific dimension of the particular
-   * Uncertain-Data-Object.
-   *
-   * @param dimension
-   *
-   * @return
-   */
   @Override
   public double getMin(final int dimension) {
     return this.bounds.getMin(dimension);
   }
 
-  /**
-   * Returns the High-Boundary of a specific dimension of the particular
-   * Uncertain-Data-Object.
-   *
-   * @param dimension
-   *
-   * @return
-   */
   @Override
   public double getMax(final int dimension) {
     return this.bounds.getMax(dimension);
   }
 
-  /**
-   * Returns the dimensionality of the particular Uncertain-Data-Object.
-   *
-   * @return
-   */
   @Override
   public int getDimensionality() {
     return this.dimensions;
