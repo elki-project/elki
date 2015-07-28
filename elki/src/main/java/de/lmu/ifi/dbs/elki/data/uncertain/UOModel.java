@@ -1,31 +1,53 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
 
+/*
+This file is part of ELKI:
+Environment for Developing KDD-Applications Supported by Index-Structures
+
+Copyright (C) 2015
+Ludwig-Maximilians-Universität München
+Lehr- und Forschungseinheit für Datenbanksysteme
+ELKI Development Team
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 
 /**
  * An abstract class used to define the basic format for Uncertain-Data-Objects.
- * 
+ *
  * The SpatialComparable parameter asserts, that the Uncertain-Data-Objects from
  * classes derived from UOModel are fit for indexing via R-Trees.
- * 
+ *
  * The method drawSample is planned to retrieve SamplePoints from a particular
  * Uncertain-Data-Object.
- * 
+ *
  * To implement drawSample to retrieve such SamplePoints random, iterative or in
  * any other way is a matter of the particular author.
- * 
+ *
  * The way one shapes his Uncertain-Data-Objects and there possible values isn't
  * of our concern, but drawSample shall return a {@link DoubleVector} for its
  * result to be easy to use with else ELKI algorithms.
- * 
+ *
  * @author Alexander Koos
  */
-public abstract class UOModel implements Model, SpatialComparable {
+public abstract class UOModel implements SpatialComparable {
   protected Random rand;
 
   protected SpatialComparable bounds;
@@ -58,35 +80,13 @@ public abstract class UOModel implements Model, SpatialComparable {
 
   public abstract DoubleVector drawSample();
 
-  public abstract int getWeight();
-
-  /**
-   * Explicitly sets a {@link SpatialComparable} to bound the particular
-   * Uncertain-Data-Object.
-   * 
-   * @param bounds
-   */
-  public void setBounds(final SpatialComparable bounds) {
-    this.bounds = bounds;
-  }
-
-  /**
-   * Returns the {@link SpatialComparable} bounding the particular
-   * Uncertain-Data-Object.
-   * 
-   * @return 
-   */
-  public SpatialComparable getBounds() {
-    return this.bounds;
-  }
-
   /**
    * Returns the Low-Boundary of a specific dimension of the particular
    * Uncertain-Data-Object.
-   * 
+   *
    * @param dimension
-   * 
-   * @return 
+   *
+   * @return
    */
   @Override
   public double getMin(final int dimension) {
@@ -96,10 +96,10 @@ public abstract class UOModel implements Model, SpatialComparable {
   /**
    * Returns the High-Boundary of a specific dimension of the particular
    * Uncertain-Data-Object.
-   * 
+   *
    * @param dimension
-   * 
-   * @return 
+   *
+   * @return
    */
   @Override
   public double getMax(final int dimension) {
@@ -108,8 +108,8 @@ public abstract class UOModel implements Model, SpatialComparable {
 
   /**
    * Returns the dimensionality of the particular Uncertain-Data-Object.
-   * 
-   * @return 
+   *
+   * @return
    */
   @Override
   public int getDimensionality() {
@@ -120,21 +120,13 @@ public abstract class UOModel implements Model, SpatialComparable {
    * This method's purpose is to be implemented by particular uncertainity
    * models in a way, they can be used as parameters to create an uncertain
    * dataset out of a given certain dataset (a groundtruth by any means).
-   * 
+   *
    * @param vec
    * @param blur
    * @param groundtruth
    * @param dims
-   * 
-   * @return 
+   *
+   * @return
    */
   public abstract UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur, boolean uncertainify, int dims);
-
-  /**
-   * Creates a vector that makes it possible to visualize databases containing
-   * {@link UncertainObject}
-   * 
-   * @return 
-   */
-  public abstract DoubleVector getAnker();
 }

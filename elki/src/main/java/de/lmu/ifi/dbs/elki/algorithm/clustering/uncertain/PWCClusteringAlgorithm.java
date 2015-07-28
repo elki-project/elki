@@ -29,7 +29,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -221,28 +220,27 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
         final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
         final WritableDataStore<NumberVector> store0 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
         for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          UncertainObject<UOModel> v = relation.get(iter);
-          store0.put(iter, new DoubleVector(v.getValues()));
+          store0.put(iter, relation.get(iter).drawCenter());
         }
         final Relation<NumberVector> ground = new MaterializedRelation<>(database, t, ids, "Raw input data", store0);
         rlist.add(ground);
       }
       // Add the uncertain model:
-      {
+      /*{ // FIXME: this is the same as above, currently!
         final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
         final WritableDataStore<NumberVector> store1 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
         for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          store1.put(iter, new DoubleVector(relation.get(iter).getValues()));
+          store1.put(iter, relation.get(iter).drawCenter());
         }
         final Relation<NumberVector> obs = new MaterializedRelation<>(database, t, ids, "Uncertain Model: Center of Mass", store1);
         rlist.add(obs);
-      }
+      }*/
       // Add samples:
       for(int i = 0; i < this.depth; i++) {
         final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
         final WritableDataStore<NumberVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
         for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          store.put(iter, new DoubleVector(relation.get(iter).drawSample().getValues()));
+          store.put(iter, relation.get(iter).drawSample());
         }
         final Relation<NumberVector> sample = new MaterializedRelation<>(database, t, ids, "Sample " + i, store);
         rlist.add(sample);

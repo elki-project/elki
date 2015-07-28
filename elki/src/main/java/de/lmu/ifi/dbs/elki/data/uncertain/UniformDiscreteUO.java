@@ -1,20 +1,10 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
-
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -33,6 +23,16 @@ import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+
 /**
  * This class is derived from {@link AbstractDiscreteUncertainObject} and models
  * Discrete-Uncertain-Data-Objects with a uniform distribution of their values
@@ -40,22 +40,11 @@ import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
  * and they sum up to 1.
  *
  * @author Alexander Koos
- *
  */
 public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<DoubleVector>> {
-  private double sampleProbability;
+  private double minMin, maxMin, minMax, maxMax;
 
-  private double minMin;
-
-  private double maxMin;
-
-  private double minMax;
-
-  private double maxMax;
-
-  private long multMin;
-
-  private long multMax;
+  private long multMin, multMax;
 
   private Random drand;
 
@@ -80,22 +69,11 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
   }
 
   // Constructor
-  public UniformDiscreteUO(final List<DoubleVector> samplePoints) {
-    this(samplePoints, new RandomFactory(null));
-  }
-
-  // Constructor
   public UniformDiscreteUO(final List<DoubleVector> samplePoints, final RandomFactory randomFactory) {
     this.samplePoints = samplePoints;
     this.dimensions = samplePoints.get(0).getDimensionality();
     this.rand = randomFactory.getRandom();
     this.setBounds();
-  }
-
-  @Override
-  public double getSampleProbability(final int position) {
-    // parameter may be ignored due to uniform distribution
-    return this.sampleProbability;
   }
 
   @Override
@@ -105,12 +83,6 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
     // to simply draw a sample by returning the point at
     // Index := random.mod(samplePoints.size())
     return this.samplePoints.get(this.rand.nextInt(this.samplePoints.size()));
-  }
-
-  public void addSamplePoint(final DoubleVector samplePoint) {
-    this.samplePoints.add(samplePoint);
-    this.sampleProbability = this.sampleProbability * (this.samplePoints.size() - 1) / this.samplePoints.size();
-    this.setBounds();
   }
 
   protected void setBounds() {
@@ -158,7 +130,7 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
         }
       }
     }
-    return new UncertainObject<UOModel>(new UniformDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), new DoubleVector(vec.getColumnVector()));
+    return new UncertainObject<UOModel>(new UniformDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), vec.getColumnVector());
   }
 
   public static class Parameterizer extends DistributedDiscreteUO.Parameterizer {
@@ -166,19 +138,5 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
     protected UniformDiscreteUO makeInstance() {
       return new UniformDiscreteUO(this.minMin, this.maxMin, this.minMax, this.maxMax, this.multMin, this.multMax, this.distributionSeed, this.randFac);
     }
-  }
-
-  @Override
-  public DoubleVector getAnker() {
-    final double[] references = new double[this.getDimensionality()];
-    for(final DoubleVector vec : this.samplePoints) {
-      for(int i = 0; i < this.getDimensionality(); i++) {
-        references[i] += vec.doubleValue(i);
-      }
-    }
-    for(int i = 0; i < references.length; i++) {
-      references[i] /= this.samplePoints.size();
-    }
-    return new DoubleVector(references);
   }
 }

@@ -1,15 +1,10 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
 
-import de.lmu.ifi.dbs.elki.data.AbstractNumberVector;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,62 +23,39 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.AbstractNumberVector;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+
 /**
  * This class is a generic wrapper, that encapsulates sampleModels derived from
  * {@link UOModel}.
  *
  * @author Alexander Koos
  *
- * @param <U>
+ * @param <U> Model type
  */
-public class UncertainObject<U extends UOModel> extends AbstractNumberVector implements SpatialComparable {
-  protected U sampleModel;
-
-  protected int id;
+public class UncertainObject<U extends UOModel> extends AbstractNumberVector {
+  private final U sampleModel;
 
   private final double[] values;
 
-  // Pretty weird Constructor
-  public UncertainObject() {
-    // One could want to use this and therefore
-    // extend this class by setters or by making
-    // it's fields public - honestly I don't really
-    // like that idea...
-    this.values = null;
-  }
-
-  // Constructor
-  public UncertainObject(final int id, final U sampleModel) {
+  public UncertainObject(final U sampleModel, final NumberVector values) {
     this.sampleModel = sampleModel;
-    this.id = id;
-    this.values = sampleModel.getAnker().getValues();
-  }
-
-  public UncertainObject(final int id, final U sampleModel, final DoubleVector values) {
-    this.sampleModel = sampleModel;
-    this.id = id;
-    this.values = values.getValues();
-  }
-
-  public UncertainObject(final U sampleModel, final DoubleVector values) {
-    this.sampleModel = sampleModel;
-    this.values = values.getValues();
+    this.values = values.getColumnVector().getArrayRef();
   }
 
   public DoubleVector drawSample() {
     return this.sampleModel.drawSample();
   }
 
+  public DoubleVector drawCenter() {
+    return new DoubleVector(this.values);
+  }
+
   public U getModel() {
     return this.sampleModel;
-  }
-
-  public double[] getValues() {
-    return this.values;
-  }
-
-  public double[] getObservation() {
-    return this.sampleModel.getAnker().getValues();
   }
 
   @Override
@@ -99,18 +71,6 @@ public class UncertainObject<U extends UOModel> extends AbstractNumberVector imp
   @Override
   public double getMax(final int dimension) {
     return this.sampleModel.getMax(dimension);
-  }
-
-  public SpatialComparable getBounds() {
-    return this.sampleModel.getBounds();
-  }
-
-  public void setBounds(final SpatialComparable bounds) {
-    this.sampleModel.setBounds(bounds);
-  }
-
-  public int getWeight() {
-    return this.sampleModel.getWeight();
   }
 
   @Deprecated

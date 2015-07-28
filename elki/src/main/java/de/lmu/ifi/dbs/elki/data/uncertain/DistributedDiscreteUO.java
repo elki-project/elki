@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.uncertain;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -71,11 +71,6 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
   }
 
   // Constructor
-  public DistributedDiscreteUO(final List<Pair<DoubleVector, Integer>> samplePoints) {
-    this(samplePoints, new RandomFactory(null));
-  }
-
-  // Constructor
   public DistributedDiscreteUO(final List<Pair<DoubleVector, Integer>> samplePoints, final RandomFactory randomFactory) {
     int check = 0;
     for(final Pair<DoubleVector, Integer> pair : samplePoints) {
@@ -102,13 +97,6 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
     this.setBounds();
   }
 
-  // note that the user has to be certain, he looks upon the
-  // correct Point in the list
-  @Override
-  public double getSampleProbability(final int position) {
-    return this.samplePoints.get(position).getSecond();
-  }
-
   @Override
   public DoubleVector drawSample() {
     final int[] weights = new int[this.samplePoints.size()];
@@ -119,16 +107,6 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
     final int ind = UncertainUtil.drawIndexFromIntegerWeights(this.rand, weights, this.totalProbability);
 
     return ind < this.samplePoints.size() ? this.samplePoints.get(ind).getFirst() : DistributedDiscreteUO.noObjectChosen;
-  }
-
-  public void addSamplePoint(final Pair<DoubleVector, Integer> samplePoint) {
-    this.samplePoints.add(samplePoint);
-    final int check = this.totalProbability;
-    if(check + samplePoint.getSecond() > UOModel.PROBABILITY_SCALE) {
-      throw new IllegalArgumentException("[W: ]\tThe new sum of probabilities exceeded a total of 1.");
-    }
-    this.totalProbability = check;
-    this.setBounds();
   }
 
   protected void setBounds() {
@@ -143,11 +121,6 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
       }
     }
     this.bounds = new HyperBoundingBox(min, max);
-  }
-
-  @Override
-  public int getWeight() {
-    return this.samplePoints.size();
   }
 
   @Override
@@ -184,7 +157,7 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
         }
       }
     }
-    return new UncertainObject<UOModel>(new DistributedDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), new DoubleVector(vec.getColumnVector()));
+    return new UncertainObject<UOModel>(new DistributedDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), vec.getColumnVector());
   }
 
   public static class Parameterizer extends AbstractParameterizer {
@@ -263,24 +236,9 @@ public class DistributedDiscreteUO extends AbstractDiscreteUncertainObject<List<
       }
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
-    protected AbstractDiscreteUncertainObject makeInstance() {
+    protected AbstractDiscreteUncertainObject<?> makeInstance() {
       return new DistributedDiscreteUO(this.minMin, this.maxMin, this.minMax, this.maxMax, this.multMin, this.multMax, this.distributionSeed, this.maxTotalProb, this.randFac);
     }
-  }
-
-  @Override
-  public DoubleVector getAnker() {
-    final double[] references = new double[this.getDimensionality()];
-    for(final Pair<DoubleVector, Integer> pair : this.samplePoints) {
-      for(int i = 0; i < this.getDimensionality(); i++) {
-        references[i] += pair.getFirst().doubleValue(i);
-      }
-    }
-    for(int i = 0; i < references.length; i++) {
-      references[i] /= this.samplePoints.size();
-    }
-    return new DoubleVector(references);
   }
 }

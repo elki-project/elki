@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.uncertain;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -45,29 +45,8 @@ import java.util.List;
 public abstract class AbstractDiscreteUncertainObject<T extends List<?>> extends UOModel {
   protected T samplePoints;
 
-  public abstract double getSampleProbability(final int position);
-
-  /**
-   * Returns the weight, i.e. the number of different possible values, of the
-   * particular Uncertain-Data-Object.
-   *
-   * @return int
-   */
-  @Override
-  public int getWeight() {
-    return this.samplePoints.size();
-  }
-
-  public T getObservationsReference() {
-    return this.samplePoints;
-  }
-
-  @SuppressWarnings({ "unchecked", "serial" })
+  @SuppressWarnings({ "unchecked" })
   public T getObservationsCopy() {
-    return (T) (new ArrayList<Object>() {
-      {
-        this.addAll(AbstractDiscreteUncertainObject.this.samplePoints);
-      }
-    });
+    return (T) new ArrayList<Object>(AbstractDiscreteUncertainObject.this.samplePoints);
   }
 }

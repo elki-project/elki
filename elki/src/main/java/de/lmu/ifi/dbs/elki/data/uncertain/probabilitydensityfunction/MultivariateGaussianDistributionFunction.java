@@ -1,5 +1,28 @@
 package de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction;
 
+/*
+This file is part of ELKI:
+Environment for Developing KDD-Applications Supported by Index-Structures
+
+Copyright (C) 2015
+Ludwig-Maximilians-Universität München
+Lehr- und Forschungseinheit für Datenbanksysteme
+ELKI Development Team
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import java.util.ArrayList;
 import java.util.List;
 /*
@@ -43,14 +66,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
- *
  * ProbabilityDensityFunction class to model n-variate gaussian distributions.
  *
  * Used for construction of {@link UncertainObject}, filtering with
  * {@link UncertainifyFilter} and sampling with {@link PWCClusteringAlgorithm}.
  *
  * @author Alexander Koos
- *
  */
 public class MultivariateGaussianDistributionFunction extends AbstractGaussianDistributionFunction<Matrix> {
   /**
@@ -60,7 +81,6 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
   private boolean rotate;
 
   /**
-   *
    * Constructor.
    *
    * @param minDev
@@ -88,7 +108,6 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
   }
 
   /**
-   *
    * Constructor.
    *
    * @param means
@@ -99,7 +118,6 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
   }
 
   /**
-   *
    * Constructor.
    *
    * @param means
@@ -168,7 +186,6 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
   }
 
   /**
-   *
    * For a list of covariance matrices given look up the values from their
    * CholeskyDecompositions diagonal and give them back as a list of vectors.
    *
@@ -247,11 +264,10 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
       }
     }
 
-    return new UncertainObject<UOModel>(new ContinuousUncertainObject<MultivariateGaussianDistributionFunction>(new MultivariateGaussianDistributionFunction(means, variances, weights), vec.getDimensionality()), new DoubleVector(vec.getColumnVector()));
+    return new UncertainObject<UOModel>(new ContinuousUncertainObject<>(new MultivariateGaussianDistributionFunction(means, variances, weights), vec.getDimensionality()), vec.getColumnVector());
   }
 
   /**
-   *
    * Extracts the vector of means from a given vector of input data.
    *
    * @param vec
@@ -269,7 +285,6 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
   }
 
   /**
-   *
    * Extracts a covariance matrix from a given vector of input data containing
    * the matrix' serialized form.
    *
@@ -291,7 +306,6 @@ public class MultivariateGaussianDistributionFunction extends AbstractGaussianDi
   }
 
   /**
-   *
    * Iff rotate: randomly generate covariance matrix by multiplying one lower
    * triangular matrix with its transposed. That way drawn samples will be
    * rotated in their space.

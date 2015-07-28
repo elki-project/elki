@@ -1,4 +1,26 @@
 package de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction;
+/*
+This file is part of ELKI:
+Environment for Developing KDD-Applications Supported by Index-Structures
+
+Copyright (C) 2015
+Ludwig-Maximilians-Universität München
+Lehr- und Forschungseinheit für Datenbanksysteme
+ELKI Development Team
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +44,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
- *
  * ProbabilityDensityFunction class to model dimensional independent gaussian
  * distributions.
  *
@@ -30,7 +51,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * {@link UncertainifyFilter} and sampling with {@link PWCClusteringAlgorithm}.
  *
  * @author Alexander Koos
- *
  */
 public class IndependentGaussianDistributionFunction extends AbstractGaussianDistributionFunction<DoubleVector> {
   /**
@@ -178,11 +198,10 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
       }
     }
 
-    return new UncertainObject<UOModel>(new ContinuousUncertainObject<IndependentGaussianDistributionFunction>(new IndependentGaussianDistributionFunction(means, variances, weights), vec.getDimensionality()), new DoubleVector(vec.getColumnVector()));
+    return new UncertainObject<UOModel>(new ContinuousUncertainObject<>(new IndependentGaussianDistributionFunction(means, variances, weights), vec.getDimensionality()), vec.getColumnVector());
   }
 
   /**
-   *
    * Method to extract a vector of length dims with offset from a given data
    * vector.
    *
@@ -200,11 +219,9 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
   }
 
   /**
-   *
    * Parameterizer class.
    *
    * @author Alexander Koos
-   *
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

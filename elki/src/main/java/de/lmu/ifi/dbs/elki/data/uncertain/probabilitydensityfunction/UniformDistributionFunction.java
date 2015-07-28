@@ -1,25 +1,10 @@
 package de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction;
 
-import java.util.Random;
-
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.uncertain.ContinuousUncertainObject;
-import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
-import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -37,36 +22,51 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.uncertain.ContinuousUncertainObject;
+import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
+import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
- * ProbabilityDensityFunction class to model uncertain objects
- * where values are randomly drawn, bounded by a {@link SpatialComparable}
- * without further constraints.
- * 
+ * ProbabilityDensityFunction class to model uncertain objects where values are
+ * randomly drawn, bounded by a {@link SpatialComparable} without further
+ * constraints.
+ *
  * @author Alexander Koos
  */
 public class UniformDistributionFunction extends ProbabilityDensityFunction {
   /**
-   * Field to hold the value the randomly created maximum negative
-   * deviation from the groundtruth shall have in minimum.
+   * Field to hold the value the randomly created maximum negative deviation
+   * from the groundtruth shall have in minimum.
    */
   protected double minMin;
   
   /**
-   * Field to hold the value the randomly created maximum negative
-   * deviation from the groundtruth shall have in maximum.
+   * Field to hold the value the randomly created maximum negative deviation
+   * from the groundtruth shall have in maximum.
    */
   protected double maxMin;
   
   /**
-   * Field to hold the value the randomly created maximum positive
-   * deviation from the groundtruth shall have in minimum.
+   * Field to hold the value the randomly created maximum positive deviation
+   * from the groundtruth shall have in minimum.
    */
   protected double minMax;
   
   /**
-   * Field to hold the value the randomly created maximum positive
-   * deviation from the groundtruth shall have in maximum.
+   * Field to hold the value the randomly created maximum positive deviation
+   * from the groundtruth shall have in maximum.
    */
   protected double maxMax;
   
@@ -76,7 +76,6 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
   protected Random rand;
 
   /**
-   * 
    * Constructor.
    *
    * @param minMin
@@ -94,9 +93,7 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
   }
   
   /**
-   * 
    * Constructor - blank, perhaps obsolete.
-   *
    */
   public UniformDistributionFunction() {
     // TODO Auto-generated constructor stub
@@ -107,9 +104,10 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
     double[] values = new double[bounds.getDimensionality()];
     
     for(int i = 0; i < bounds.getDimensionality(); i++) {
-      if(!Double.valueOf(bounds.getMax(i) - bounds.getMin(i)).isInfinite()){
+      if((bounds.getMax(i) - bounds.getMin(i)) < Double.POSITIVE_INFINITY) {
         values[i] = rand.nextDouble() * (bounds.getMax(i) - bounds.getMin(i)) + bounds.getMin(i);
-      } else {
+      }
+      else {
         values[i] = rand.nextInt(2) == 0 ? rand.nextDouble() * rand.nextInt(Integer.MAX_VALUE) : rand.nextDouble() * (-rand.nextInt(Integer.MAX_VALUE));
       }
     }
@@ -132,29 +130,29 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
   public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur, boolean uncertainify, int dims) {
     final double[] min = new double[uncertainify ? vec.getDimensionality() : dims];
     final double[] max = new double[uncertainify ? vec.getDimensionality() : dims];
-    for(int i = 0; i < ( uncertainify ? vec.getDimensionality() : dims ); i++) {
-      if( uncertainify ) {
-        final double preDev = rand.nextDouble();
-        final double difMin = ( rand.nextDouble() * ( maxMin - minMin ) ) + minMin;
-        final double difMax = ( rand.nextDouble() * ( maxMax - minMax ) ) + minMax;
-        final double randDev = blur ? ( (rand.nextInt() % 2) == 0 ? preDev * -difMin : preDev * difMax ) : 0 ;
-        min[i] = vec.doubleValue(i) - (rand.nextDouble() * difMin) + randDev;
-        max[i] = vec.doubleValue(i) + (rand.nextDouble() * difMax) + randDev;
-      } else {
+    Random r = rand.getSingleThreadedRandom();
+    for(int i = 0; i < (uncertainify ? vec.getDimensionality() : dims); i++) {
+      if(uncertainify) {
+        final double preDev = r.nextDouble();
+        final double difMin = (r.nextDouble() * (maxMin - minMin)) + minMin;
+        final double difMax = (r.nextDouble() * (maxMax - minMax)) + minMax;
+        final double randDev = blur ? ((r.nextInt() % 2) == 0 ? preDev * -difMin : preDev * difMax) : 0;
+        min[i] = vec.doubleValue(i) - (r.nextDouble() * difMin) + randDev;
+        max[i] = vec.doubleValue(i) + (r.nextDouble() * difMax) + randDev;
+      }
+      else {
         min[i] = vec.doubleValue(i);
         max[i] = vec.doubleValue(i + dims);
       }
     }
-    
-    return new UncertainObject<UOModel>(new ContinuousUncertainObject<UniformDistributionFunction>(min, max, new UniformDistributionFunction(), new RandomFactory(rand.nextLong())), new DoubleVector(vec.getColumnVector()));
+
+    return new UncertainObject<UOModel>(new ContinuousUncertainObject<>(min, max, new UniformDistributionFunction(), new RandomFactory(r.nextLong())), vec.getColumnVector());
   }
   
   /**
-   * 
    * Parameterizer class.
    * 
    * @author Alexander Koos
-   *
    */
   public final static class Parameterizer extends AbstractParameterizer {
 
@@ -184,34 +182,34 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
     protected Random rand;
     
     /**
-     * Parameter to specify the minimum value for randomly drawn
-     * deviation from the groundtruth in negative direction.
+     * Parameter to specify the minimum value for randomly drawn deviation from
+     * the groundtruth in negative direction.
      */
-    public static final OptionID MIN_MIN_ID = new OptionID("objects.lbound.min","Minimum lower boundary.");
-    
+    public static final OptionID MIN_MIN_ID = new OptionID("objects.lbound.min", "Minimum lower boundary.");
+
     /**
-     * Parameter to specify the maximum value for randomly drawn
-     * deviation from the groundtruth in negative direction.
+     * Parameter to specify the maximum value for randomly drawn deviation from
+     * the groundtruth in negative direction.
      */
-    public static final OptionID MAX_MIN_ID = new OptionID("objects.lbound.max","Maximum lower boundary.");
-    
+    public static final OptionID MAX_MIN_ID = new OptionID("objects.lbound.max", "Maximum lower boundary.");
+
     /**
-     * Parameter to specify the minimum value for randomly drawn
-     * deviation from the groundtruth in positive direction.
+     * Parameter to specify the minimum value for randomly drawn deviation from
+     * the groundtruth in positive direction.
      */
-    public static final OptionID MIN_MAX_ID = new OptionID("objects.ubound.min","Minimum upper boundary.");
-    
+    public static final OptionID MIN_MAX_ID = new OptionID("objects.ubound.min", "Minimum upper boundary.");
+
     /**
-     * Parameter to specify the maximum value for randomly drawn
-     * deviation from the groundtruth in positive direction.
+     * Parameter to specify the maximum value for randomly drawn deviation from
+     * the groundtruth in positive direction.
      */
-    public static final OptionID MAX_MAX_ID = new OptionID("objects.ubound.max","Maximum upper boundary.");
-    
+    public static final OptionID MAX_MAX_ID = new OptionID("objects.ubound.max", "Maximum upper boundary.");
+
     /**
      * Parameter to specify the seed for uncertainification.
      */
-    public static final OptionID SEED_ID = new OptionID("uo.pdf.seed","Seed for uncertain objects private Random.");
-    
+    public static final OptionID SEED_ID = new OptionID("uo.pdf.seed", "Seed for uncertain objects private Random.");
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
