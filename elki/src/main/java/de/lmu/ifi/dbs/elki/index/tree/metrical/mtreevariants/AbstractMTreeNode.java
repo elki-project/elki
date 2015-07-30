@@ -74,7 +74,7 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
   public void adjustEntry(E entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, N, E, ?> mTree) {
     entry.setRoutingObjectID(routingObjectID);
     entry.setParentDistance(parentDistance);
-    entry.setCoveringRadius(coveringRadius(routingObjectID, mTree));
+    entry.setCoveringRadius(coveringRadiusFromEntries(routingObjectID, mTree));
   }
 
   /**
@@ -84,13 +84,11 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
    * @param mTree the M-Tree
    * @return the covering radius of this node
    */
-  public double coveringRadius(DBID routingObjectID, AbstractMTree<O, N, E, ?> mTree) {
+  public double coveringRadiusFromEntries(DBID routingObjectID, AbstractMTree<O, N, E, ?> mTree) {
     double coveringRadius = 0.;
     for(int i = 0; i < getNumEntries(); i++) {
       E entry = getEntry(i);
-      final double distance = mTree.distance(routingObjectID, entry.getRoutingObjectID());
-      entry.setParentDistance(distance);
-      final double cover = distance + entry.getCoveringRadius();
+      final double cover = entry.getParentDistance() + entry.getCoveringRadius();
       coveringRadius = coveringRadius < cover ? cover : coveringRadius;
     }
     return coveringRadius;

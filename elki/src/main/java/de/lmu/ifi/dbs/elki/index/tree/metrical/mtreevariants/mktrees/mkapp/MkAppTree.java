@@ -395,7 +395,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
    */
   @Override
   protected MkAppEntry createNewDirectoryEntry(MkAppTreeNode<O> node, DBID routingObjectID, double parentDistance) {
-    return new MkAppDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
+    return new MkAppDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadiusFromEntries(routingObjectID, this), null);
   }
 
   /**

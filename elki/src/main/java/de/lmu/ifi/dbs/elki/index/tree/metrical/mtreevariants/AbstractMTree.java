@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -189,9 +189,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
 
     // test
     if(EXTRA_INTEGRITY_CHECKS) {
-      if(withPreInsert) {
-        getRoot().integrityCheck(this, getRootEntry());
-      }
+      getRoot().integrityCheck(this, getRootEntry());
     }
   }
 

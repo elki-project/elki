@@ -85,7 +85,7 @@ abstract public class MTree<O> extends AbstractMTree<O, MTreeNode<O>, MTreeEntry
    */
   @Override
   protected MTreeEntry createNewDirectoryEntry(MTreeNode<O> node, DBID routingObjectID, double parentDistance) {
-    return new MTreeDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this));
+    return new MTreeDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadiusFromEntries(routingObjectID, this));
   }
 
   /**

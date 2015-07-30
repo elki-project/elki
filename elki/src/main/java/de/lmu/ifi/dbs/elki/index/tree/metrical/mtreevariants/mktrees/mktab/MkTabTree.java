@@ -188,7 +188,7 @@ public class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNode<O>, MkT
    */
   @Override
   protected MkTabEntry createNewDirectoryEntry(MkTabTreeNode<O> node, DBID routingObjectID, double parentDistance) {
-    return new MkTabDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistances());
+    return new MkTabDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadiusFromEntries(routingObjectID, this), node.kNNDistances());
   }
 
   /**

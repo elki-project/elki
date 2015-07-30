@@ -732,7 +732,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
    */
   @Override
   protected MkCoPEntry createNewDirectoryEntry(MkCoPTreeNode<O> node, DBID routingObjectID, double parentDistance) {
-    return new MkCoPDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), null);
+    return new MkCoPDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadiusFromEntries(routingObjectID, this), null);
     // node.conservativeKnnDistanceApproximation(k_max));
   }
 

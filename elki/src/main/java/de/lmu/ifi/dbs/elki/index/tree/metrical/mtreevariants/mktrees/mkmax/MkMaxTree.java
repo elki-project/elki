@@ -319,7 +319,7 @@ public class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNode<O>, MkM
    */
   @Override
   protected MkMaxEntry createNewDirectoryEntry(MkMaxTreeNode<O> node, DBID routingObjectID, double parentDistance) {
-    return new MkMaxDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistance());
+    return new MkMaxDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadiusFromEntries(routingObjectID, this), node.kNNDistance());
   }
 
   /**
