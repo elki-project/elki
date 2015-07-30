@@ -118,7 +118,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, Abs
 
     BreadthFirstEnumeration<DeLiCluNode, DeLiCluEntry> bfs = new BreadthFirstEnumeration<>(this, getRootPath());
     while(bfs.hasMoreElements()) {
-      Entry entry = bfs.nextElement().getLastPathComponent().getEntry();
+      Entry entry = bfs.nextElement().getEntry();
       if(!entry.isLeafEntry()) {
         numNodes++;
       }

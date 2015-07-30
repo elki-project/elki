@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.DistanceEntry;
@@ -117,7 +116,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
     while(enumeration.hasMoreElements()) {
       IndexTreePath<E> path = enumeration.nextElement();
-      E entry = path.getLastPathComponent().getEntry();
+      E entry = path.getEntry();
       if(entry.isLeafEntry()) {
         objects++;
         result.append("\n    ").append(entry.toString());
@@ -171,7 +170,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     }
 
     // determine parent distance
-    E parentEntry = subtree.getLastPathComponent().getEntry();
+    E parentEntry = subtree.getEntry();
     double parentDistance = distance(parentEntry.getRoutingObjectID(), entry.getRoutingObjectID());
     entry.setParentDistance(parentDistance);
 
@@ -282,8 +281,8 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     }
 
     // get the root of the subtree
-    Integer nodeIndex = subtree.getLastPathComponent().getIndex();
-    N node = getNode(subtree.getLastPathComponent().getEntry());
+    Integer nodeIndex = subtree.getIndex();
+    N node = getNode(subtree.getEntry());
 
     // overflow in node; split the node
     if(hasOverflow(node)) {
@@ -325,7 +324,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       // node is not root
       else {
         // get the parent and add the new split node
-        E parentEntry = subtree.getParentPath().getLastPathComponent().getEntry();
+        E parentEntry = subtree.getParentPath().getEntry();
         N parent = getNode(parentEntry);
         if(getLogger().isDebugging()) {
           getLogger().debugFine("parent " + parent);
@@ -350,9 +349,9 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     // node
     else {
       if(!isRoot(node)) {
-        E parentEntry = subtree.getParentPath().getLastPathComponent().getEntry();
+        E parentEntry = subtree.getParentPath().getEntry();
         N parent = getNode(parentEntry);
-        int index = subtree.getLastPathComponent().getIndex();
+        int index = subtree.getIndex();
         E entry = parent.getEntry(index);
         node.adjustEntry(entry, entry.getRoutingObjectID(), entry.getParentDistance(), this);
         // write changes in parent to file
@@ -435,7 +434,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       getLogger().debugFine(msg);
     }
 
-    return new IndexTreePath<>(new TreeIndexPathComponent<>(getRootEntry(), null));
+    return new IndexTreePath<>(null, getRootEntry(), -1);
   }
 
   @Override
@@ -444,7 +443,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
     while(enumeration.hasMoreElements()) {
       IndexTreePath<E> path = enumeration.nextElement();
-      E entry = path.getLastPathComponent().getEntry();
+      E entry = path.getEntry();
       if(!entry.isLeafEntry()) {
         // TODO: any way to skip unnecessary reads?
         N node = getNode(entry);

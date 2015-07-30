@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -59,7 +58,7 @@ public class MinimumEnlargementInsert<O, N extends AbstractMTreeNode<O, N, E>, E
    * @return the path of the appropriate subtree to insert the given object
    */
   private IndexTreePath<E> choosePath(AbstractMTree<O, N, E, ?> tree, E object, IndexTreePath<E> subtree) {
-    N node = tree.getNode(subtree.getLastPathComponent().getEntry());
+    N node = tree.getNode(subtree.getEntry());
 
     // leaf
     if (node.isLeaf()) {
@@ -111,6 +110,6 @@ public class MinimumEnlargementInsert<O, N extends AbstractMTreeNode<O, N, E>, E
       bestEntry.setCoveringRadius(bestEntry.getCoveringRadius() + enlarge);
     }
 
-    return choosePath(tree, object, subtree.pathByAddingChild(new TreeIndexPathComponent<>(bestEntry, bestIdx)));
+    return choosePath(tree, object, new IndexTreePath<>(subtree, bestEntry, bestIdx));
   }
 }

@@ -87,7 +87,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
       reinsertions = BitsUtil.copy(reinsertions, level);
     }
     BitsUtil.setI(reinsertions, level);
-    final E entry = path.getLastPathComponent().getEntry();
+    final E entry = path.getEntry();
     assert (!entry.isLeafEntry()) : "Unexpected leaf entry";
     int[] cands = reinsertStrategy.computeReinserts(node, NodeArrayAdapter.STATIC, entry);
     if(cands == null || cands.length == 0) {
