@@ -57,7 +57,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
-@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
+@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
+title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
+booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", //
+url = "http://www.vldb.org/conf/1997/P426.PDF")
 public class RandomSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> extends MTreeSplit<O, N, E> {
   /**
    * Random generator.
@@ -83,14 +86,14 @@ public class RandomSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTre
    */
   @Override
   public Assignments<E> split(AbstractMTree<O, N, E, ?> tree, N node) {
-    int pos1 = random.nextInt(node.getNumEntries());
-    int pos2 = random.nextInt(node.getNumEntries() - 1);
+    final int n = node.getNumEntries();
+    int pos1 = random.nextInt(n);
+    int pos2 = random.nextInt(n - 1);
     if(pos2 >= pos1) {
       ++pos2;
     }
     DBID id1 = node.getEntry(pos1).getRoutingObjectID();
     DBID id2 = node.getEntry(pos2).getRoutingObjectID();
-
     return balancedPartition(tree, node, id1, id2);
   }
 

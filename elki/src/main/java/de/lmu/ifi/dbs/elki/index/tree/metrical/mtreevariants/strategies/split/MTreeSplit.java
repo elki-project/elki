@@ -76,13 +76,14 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
    *         specified node
    */
   Assignments<E> balancedPartition(AbstractMTree<O, N, E, ?> tree, N node, DBID routingObject1, DBID routingObject2) {
+    assert (routingObject1 != null && routingObject2 != null);
     final int n = node.getNumEntries(), l = n - 2;
     int[] idx1 = new int[l], idx2 = new int[l];
     double[] dis1 = new double[l], dis2 = new double[l];
 
     Assignments<E> assign = new Assignments<>((n + 1) >> 1);
     assign.setFirstRoutingObject(routingObject1);
-    assign.setFirstRoutingObject(routingObject2);
+    assign.setSecondRoutingObject(routingObject2);
     for(int i = 0, j = 0; i < n; i++) {
       final E ent = node.getEntry(i);
       final DBID id = ent.getRoutingObjectID();
@@ -104,7 +105,7 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
     DoubleIntegerArrayQuickSort.sort(dis1, idx1, l);
     DoubleIntegerArrayQuickSort.sort(dis2, idx2, l);
 
-    long[] assigned = BitsUtil.zero(node.getNumEntries());
+    long[] assigned = BitsUtil.zero(n);
     int p1 = 0, p2 = 0;
     for(int i = 0; i < l; ++i) {
       p1 = assignBest(assign, assigned, node, dis1, idx1, p1, false);
@@ -112,8 +113,8 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
         p2 = assignBest(assign, assigned, node, dis2, idx2, p2, true);
       }
     }
-    assert (assign.getFirstAssignments().size() >> 1 == n >> 1);
-    assert (assign.getSecondAssignments().size() >> 1 == n >> 1);
+    assert (assign.getFirstAssignments().size() + assign.getSecondAssignments().size() == n) : "Sizes do not sum up: " + assign.getFirstAssignments().size() + " + " + assign.getFirstAssignments().size() + " != " + n;
+    assert (Math.abs(assign.getFirstAssignments().size() - assign.getSecondAssignments().size()) <= 1) : assign.getFirstAssignments().size() + " " + assign.getSecondAssignments().size();
     return assign;
   }
 
