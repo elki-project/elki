@@ -160,7 +160,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   protected void insertLeafEntry(E entry) {
     lastInsertedEntry = entry;
     // choose subtree for insertion
-    IndexTreePath<E> subtree = choosePath(getRootPath(), entry, 1);
+    IndexTreePath<E> subtree = choosePath(getRootPath(), entry, height, 1);
 
     if(getLogger().isDebugging()) {
       getLogger().debugFine("insertion-subtree " + subtree);
@@ -181,10 +181,10 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @param entry the directory entry to be inserted
    * @param level the level at which the directory entry is to be inserted
    */
-  protected void insertDirectoryEntry(E entry, int level) {
+  protected void insertDirectoryEntry(E entry, int depth) {
     lastInsertedEntry = entry;
     // choose node for insertion of o
-    IndexTreePath<E> subtree = choosePath(getRootPath(), entry, level);
+    IndexTreePath<E> subtree = choosePath(getRootPath(), entry, depth, 1);
     if(getLogger().isDebugging()) {
       getLogger().debugFine("subtree " + subtree);
     }
@@ -517,13 +517,13 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * 
    * @param subtree the subtree to be tested for insertion
    * @param mbr the mbr to be inserted
-   * @param level the level at which the mbr should be inserted (level 1
-   *        indicates leaf-level)
+   * @param depth Reinsertion depth, 1 indicates root level
+   * @param cur Current depth
    * @return the path of the appropriate subtree to insert the given mbr
    */
-  protected IndexTreePath<E> choosePath(IndexTreePath<E> subtree, SpatialComparable mbr, int level) {
+  protected IndexTreePath<E> choosePath(IndexTreePath<E> subtree, SpatialComparable mbr, int depth, int cur) {
     if(getLogger().isDebuggingFiner()) {
-      getLogger().debugFiner("node " + subtree + ", level " + level);
+      getLogger().debugFiner("node " + subtree + ", depth " + depth);
     }
 
     N node = getNode(subtree.getEntry());
@@ -536,36 +536,23 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
     // first test on containment
     IndexTreePath<E> newSubtree = containedTest(subtree, node, mbr);
     if(newSubtree != null) {
-      if(height - subtree.getPathCount() == level) {
-        return newSubtree;
-      }
-      else {
-        return choosePath(newSubtree, mbr, level);
-      }
+      return (++cur == depth) ? newSubtree : choosePath(newSubtree, mbr, depth, cur);
     }
 
     N childNode = getNode(node.getEntry(0));
-    int num = settings.insertionStrategy.choose(node, NodeArrayAdapter.STATIC, mbr, height, subtree.getPathCount());
+    int num = settings.insertionStrategy.choose(node, NodeArrayAdapter.STATIC, mbr, height, cur);
     newSubtree = new IndexTreePath<>(subtree, node.getEntry(num), num);
+    ++cur;
+    if(cur == depth) {
+      return newSubtree;
+    }
     // children are leafs
     if(childNode.isLeaf()) {
-      if(height - subtree.getPathCount() == level) {
-        return newSubtree;
-      }
-      else {
-        throw new IllegalArgumentException("childNode is leaf, but currentLevel != level: " + (height - subtree.getPathCount()) + " != " + level);
-      }
+      assert cur == newSubtree.getPathCount(); // Check for programming errors
+      throw new IllegalArgumentException("childNode is leaf, but currentDepth != depth: " + cur + " != " + depth);
     }
     // children are directory nodes
-    else {
-      // desired level is reached
-      if(height - subtree.getPathCount() == level) {
-        return newSubtree;
-      }
-      else {
-        return choosePath(newSubtree, mbr, level);
-      }
-    }
+    return choosePath(newSubtree, mbr, depth, cur);
   }
 
   /**
@@ -623,7 +610,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * @param offs the nodes indexes to reinsert
    */
   public void reInsert(N node, IndexTreePath<E> path, int[] offs) {
-    final int level = height - (path.getPathCount() - 1);
+    final int depth = path.getPathCount();
 
     long[] remove = BitsUtil.zero(node.getCapacity());
     List<E> reInsertEntries = new ArrayList<>(offs.length);
@@ -662,9 +649,9 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       }
       else {
         if(getLogger().isDebugging()) {
-          getLogger().debug("reinsert " + entry + " at " + level);
+          getLogger().debug("reinsert " + entry + " at " + depth);
         }
-        insertDirectoryEntry(entry, level);
+        insertDirectoryEntry(entry, depth);
       }
     }
   }

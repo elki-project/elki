@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
+import java.util.ArrayList;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -98,29 +100,6 @@ public class IndexTreePath<E extends Entry> {
   }
 
   /**
-   * Returns the path component at the specified index.
-   * 
-   * @param element an int specifying an element in the path, where 0 is the
-   *        first element in the path
-   * @return the Object at that index location
-   * @throws IllegalArgumentException if the index is beyond the length of the
-   *         path
-   */
-  public IndexTreePath<E> getPathComponent(int element) {
-    int pathLength = getPathCount();
-
-    if(element < 0 || element >= pathLength) {
-      throw new IllegalArgumentException("Index " + element + " is out of the specified range");
-    }
-
-    IndexTreePath<E> path = this;
-    for(int i = pathLength - 1; i != element; i--) {
-      path = path.parentPath;
-    }
-    return path;
-  }
-
-  /**
    * Returns <code>true</code> if <code>this == o</code> has the value
    * <code>true</code> or o is not null and o is of the same class as this
    * instance and the two index paths are of the same length, and contain the
@@ -129,7 +108,6 @@ public class IndexTreePath<E extends Entry> {
    * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent#equals(Object)
    */
   @Override
-  @SuppressWarnings("unchecked")
   public boolean equals(Object o) {
     if(o == this) {
       return true;
@@ -138,13 +116,9 @@ public class IndexTreePath<E extends Entry> {
       return false;
     }
 
-    IndexTreePath<E> other = (IndexTreePath<E>) o;
-
-    if(getPathCount() != other.getPathCount()) {
-      return false;
-    }
+    IndexTreePath<?> other = (IndexTreePath<?>) o;
     for(IndexTreePath<E> path = this; path != null; path = path.parentPath) {
-      if(path.index != other.index || !(path.entry.equals(other.entry))) {
+      if(other == null || path.index != other.index || !(path.entry.equals(other.entry))) {
         return false;
       }
       other = other.parentPath;
@@ -172,11 +146,15 @@ public class IndexTreePath<E extends Entry> {
   public String toString() {
     StringBuilder buffer = new StringBuilder("[");
 
-    for(int counter = 0, maxCounter = getPathCount(); counter < maxCounter; counter++) {
+    ArrayList<String> c = new ArrayList<>();
+    for(IndexTreePath<E> p = this; p != null; p = p.getParentPath()) {
+      c.add("@" + index + ":" + entry.toString());
+    }
+    for(int counter = c.size() - 1; counter >= 0; --counter) {
+      buffer.append(c.get(counter));
       if(counter > 0) {
         buffer.append(", ");
       }
-      buffer.append(getPathComponent(counter));
     }
     buffer.append("]");
     return buffer.toString();
