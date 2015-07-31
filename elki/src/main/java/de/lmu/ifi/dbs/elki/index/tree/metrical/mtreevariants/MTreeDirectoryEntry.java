@@ -97,8 +97,12 @@ public class MTreeDirectoryEntry extends AbstractDirectoryEntry implements MTree
    * @param coveringRadius the covering radius to be set
    */
   @Override
-  public final void setCoveringRadius(double coveringRadius) {
+  public final boolean setCoveringRadius(double coveringRadius) {
+    if(this.coveringRadius == coveringRadius) {
+      return false;
+    }
     this.coveringRadius = coveringRadius;
+    return true;
   }
 
   /**
@@ -117,8 +121,12 @@ public class MTreeDirectoryEntry extends AbstractDirectoryEntry implements MTree
    * @param objectID the id to be set
    */
   @Override
-  public final void setRoutingObjectID(DBID objectID) {
+  public final boolean setRoutingObjectID(DBID objectID) {
+    if(objectID == routingObjectID || DBIDUtil.equal(objectID, routingObjectID)) {
+      return false;
+    }
     this.routingObjectID = objectID;
+    return true;
   }
 
   /**
@@ -139,8 +147,12 @@ public class MTreeDirectoryEntry extends AbstractDirectoryEntry implements MTree
    * @param parentDistance the distance to be set
    */
   @Override
-  public final void setParentDistance(double parentDistance) {
+  public final boolean setParentDistance(double parentDistance) {
+    if(this.parentDistance == parentDistance) {
+      return false;
+    }
     this.parentDistance = parentDistance;
+    return true;
   }
 
   /**
@@ -187,22 +199,22 @@ public class MTreeDirectoryEntry extends AbstractDirectoryEntry implements MTree
    */
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
+    if(this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if(o == null || getClass() != o.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if(!super.equals(o)) {
       return false;
     }
 
     final MTreeDirectoryEntry that = (MTreeDirectoryEntry) o;
 
-    if (Math.abs(coveringRadius - that.coveringRadius) < Double.MIN_NORMAL) {
+    if(Math.abs(coveringRadius - that.coveringRadius) < Double.MIN_NORMAL) {
       return false;
     }
-    if (Math.abs(parentDistance - that.parentDistance) < Double.MIN_NORMAL) {
+    if(Math.abs(parentDistance - that.parentDistance) < Double.MIN_NORMAL) {
       return false;
     }
     return !(routingObjectID != null ? !DBIDUtil.equal(routingObjectID, that.routingObjectID) : that.routingObjectID != null);

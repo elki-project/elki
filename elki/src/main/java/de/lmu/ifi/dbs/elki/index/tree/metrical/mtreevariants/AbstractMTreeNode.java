@@ -70,11 +70,13 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
    * @param parentDistance the distance from the routing object of this node to
    *        the routing object of the parent node
    * @param mTree the M-Tree object holding this node
+   * @return {@code true} if adjustment of parent is needed
    */
-  public void adjustEntry(E entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, N, E, ?> mTree) {
-    entry.setRoutingObjectID(routingObjectID);
-    entry.setParentDistance(parentDistance);
-    entry.setCoveringRadius(coveringRadiusFromEntries(routingObjectID, mTree));
+  public boolean adjustEntry(E entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, N, E, ?> mTree) {
+    boolean changed = entry.setRoutingObjectID(routingObjectID);
+    changed |= entry.setParentDistance(parentDistance);
+    changed |= entry.setCoveringRadius(coveringRadiusFromEntries(routingObjectID, mTree));
+    return changed;
   }
 
   /**

@@ -279,7 +279,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     }
 
     // get the root of the subtree
-    Integer nodeIndex = subtree.getIndex();
+    int nodeIndex = subtree.getIndex();
     N node = getNode(subtree.getEntry());
 
     // overflow in node; split the node
@@ -307,7 +307,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       writeNode(node);
       writeNode(newNode);
 
-      if(getLogger().isDebugging()) {
+      if(getLogger().isDebuggingFine()) {
         String msg = "Split Node " + node.getPageID() + " (" + this.getClass() + ")\n" + //
         "      newNode " + newNode.getPageID() + "\n" + //
         "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + //
@@ -349,18 +349,19 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
         adjustTree(subtree.getParentPath());
       }
     }
-    // no overflow, only adjust parameters of the entry representing the
-    // node
+    // no overflow, only adjust parameters of the entry representing the node
     else {
       if(!isRoot(node)) {
         E parentEntry = subtree.getParentPath().getEntry();
         N parent = getNode(parentEntry);
         int index = subtree.getIndex();
         E entry = parent.getEntry(index);
-        node.adjustEntry(entry, entry.getRoutingObjectID(), entry.getParentDistance(), this);
+        boolean changed = node.adjustEntry(entry, entry.getRoutingObjectID(), entry.getParentDistance(), this);
         // write changes in parent to file
-        writeNode(parent);
-        adjustTree(subtree.getParentPath());
+        if(changed) {
+          writeNode(parent);
+          adjustTree(subtree.getParentPath());
+        }
       }
       // root level is reached
       else {

@@ -68,8 +68,8 @@ class MkTabTreeNode<O> extends AbstractMTreeNode<O, MkTabTreeNode<O>, MkTabEntry
 
     double[] result = new double[k];
 
-    for (int i = 0; i < getNumEntries(); i++) {
-      for (int j = 0; j < k; j++) {
+    for(int i = 0; i < getNumEntries(); i++) {
+      for(int j = 0; j < k; j++) {
         MkTabEntry entry = getEntry(i);
         result[j] = Math.max(result[j], entry.getKnnDistance(j + 1));
       }
@@ -79,10 +79,11 @@ class MkTabTreeNode<O> extends AbstractMTreeNode<O, MkTabTreeNode<O>, MkTabEntry
   }
 
   @Override
-  public void adjustEntry(MkTabEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, MkTabTreeNode<O>, MkTabEntry, ?> mTree) {
+  public boolean adjustEntry(MkTabEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, MkTabTreeNode<O>, MkTabEntry, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust knn distances
     entry.setKnnDistances(kNNDistances());
+    return true; // TODO: improve
   }
 
   /**
@@ -99,7 +100,7 @@ class MkTabTreeNode<O> extends AbstractMTreeNode<O, MkTabTreeNode<O>, MkTabEntry
     // test knn distances
     MkTabEntry entry = parent.getEntry(index);
     double[] knnDistances = kNNDistances();
-    if (!entry.getKnnDistances().equals(knnDistances)) {
+    if(!entry.getKnnDistances().equals(knnDistances)) {
       String soll = knnDistances.toString();
       String ist = entry.getKnnDistances().toString();
       throw new RuntimeException("Wrong knnDistances in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);

@@ -46,8 +46,9 @@ public interface MTreeEntry extends Entry {
    * is a leaf entry, the id of the routing object, otherwise.
    * 
    * @param objectID the id to be set
+   * @return TODO
    */
-  void setRoutingObjectID(DBID objectID);
+  boolean setRoutingObjectID(DBID objectID);
 
   /**
    * Returns the distance from the routing object of this entry to the routing
@@ -61,8 +62,9 @@ public interface MTreeEntry extends Entry {
    * Sets the distance from the routing object to routing object of its parent.
    * 
    * @param parentDistance the distance to be set
+   * @return TODO
    */
-  void setParentDistance(double parentDistance);
+  boolean setParentDistance(double parentDistance);
 
   /**
    * Returns the covering radius if this entry is a directory entry, null
@@ -77,6 +79,7 @@ public interface MTreeEntry extends Entry {
    * throws an UnsupportedOperationException otherwise.
    * 
    * @param coveringRadius the covering radius to be set
+   * @return TODO
    */
-  void setCoveringRadius(double coveringRadius);
+  boolean setCoveringRadius(double coveringRadius);
 }
