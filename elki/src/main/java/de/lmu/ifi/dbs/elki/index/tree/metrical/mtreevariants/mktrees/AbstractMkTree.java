@@ -84,6 +84,9 @@ public abstract class AbstractMkTree<O, N extends AbstractMTreeNode<O, N, E>, E 
     if(id1 == null || id2 == null) {
       return Double.NaN;
     }
+    if(DBIDUtil.equal(id1, id2)) {
+      return 0.;
+    }
     statistics.countDistanceCalculation();
     return distanceQuery.distance(id1, id2);
   }

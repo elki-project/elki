@@ -42,11 +42,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Elke Achtert
  * 
- * @param <O> the type of DatabaseObject to be stored in the M-Tree
+ * @param <O> the type of objects to be stored in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
-@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
+@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
+title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
+booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", //
+url = "http://www.vldb.org/conf/1997/P426.PDF")
 public class MMRadSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> extends MTreeSplit<O, N, E> {
   /**
    * Creates a new split object.

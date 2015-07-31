@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * 
  * @param <O> Object type
  */
-public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
+public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
   /**
    * The relation indexed.
    */
@@ -85,6 +85,9 @@ public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>
   public double distance(DBIDRef id1, DBIDRef id2) {
     if(id1 == null || id2 == null) {
       return Double.NaN;
+    }
+    if(DBIDUtil.equal(id1, id2)) {
+      return 0.;
     }
     statistics.countDistanceCalculation();
     return distanceQuery.distance(id1, id2);
