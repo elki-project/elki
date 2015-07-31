@@ -308,12 +308,18 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       writeNode(newNode);
 
       if(getLogger().isDebugging()) {
-        String msg = "Split Node " + node.getPageID() + " (" + this.getClass() + ")\n" + "      newNode " + newNode.getPageID() + "\n" + "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + "      firstAssignments(" + node.getPageID() + ") " + assignments.getFirstAssignments() + "\n" + "      firstCR " + assignments.getFirstCoveringRadius() + "\n" + "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" + "      secondAssignments(" + newNode.getPageID() + ") " + assignments.getSecondAssignments() + "\n" + "      secondCR " + assignments.getSecondCoveringRadius() + "\n";
+        String msg = "Split Node " + node.getPageID() + " (" + this.getClass() + ")\n" + //
+        "      newNode " + newNode.getPageID() + "\n" + //
+        "      firstPromoted " + assignments.getFirstRoutingObject() + "\n" + //
+        "      firstAssignments(" + node.getPageID() + ") " + assignments.getFirstAssignments() + "\n" + //
+        "      firstCR " + assignments.computeFirstCover(node.isLeaf()) + "\n" + //
+        "      secondPromoted " + assignments.getSecondRoutingObject() + "\n" + //
+        "      secondAssignments(" + newNode.getPageID() + ") " + assignments.getSecondAssignments() + "\n" + //
+        "      secondCR " + assignments.computeSecondCover(node.isLeaf()) + "\n";
         getLogger().debugFine(msg);
       }
 
-      // if root was split: create a new root that points the two split
-      // nodes
+      // if root was split: create a new root that points the two split nodes
       if(isRoot(node)) {
         // FIXME: stimmen die parentDistance der Kinder in node & splitNode?
         IndexTreePath<E> newRootPath = createNewRoot(node, newNode, assignments.getFirstRoutingObject(), assignments.getSecondRoutingObject());

@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -49,16 +50,6 @@ public class Assignments<E extends MTreeEntry> {
   private DBID id2;
 
   /**
-   * The first covering radius.
-   */
-  private double firstCoveringRadius;
-
-  /**
-   * The second covering radius.
-   */
-  private double secondCoveringRadius;
-
-  /**
    * The assignments to the first routing object.
    */
   private List<DistanceEntry<E>> firstAssignments;
@@ -73,18 +64,77 @@ public class Assignments<E extends MTreeEntry> {
    * 
    * @param id1 the first routing object
    * @param id2 the second routing object
-   * @param firstCoveringRadius the first covering radius
-   * @param secondCoveringRadius the second covering radius
-   * @param firstAssignments the assignments to the first routing object
-   * @param secondAssignments the assignments to the second routing object
+   * @param size Maximum number of entries per list
    */
-  public Assignments(DBID id1, DBID id2, double firstCoveringRadius, double secondCoveringRadius, List<DistanceEntry<E>> firstAssignments, List<DistanceEntry<E>> secondAssignments) {
+  public Assignments(DBID id1, DBID id2, int size) {
     this.id1 = id1;
     this.id2 = id2;
-    this.firstCoveringRadius = firstCoveringRadius;
-    this.secondCoveringRadius = secondCoveringRadius;
-    this.firstAssignments = firstAssignments;
-    this.secondAssignments = secondAssignments;
+    this.firstAssignments = new ArrayList<>(size);
+    this.secondAssignments = new ArrayList<>(size);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param size Maximum number of entries per list
+   */
+  public Assignments(int size) {
+    this.id1 = null;
+    this.id2 = null;
+    this.firstAssignments = new ArrayList<>(size);
+    this.secondAssignments = new ArrayList<>(size);
+  }
+
+  /**
+   * Add an entry to the first set.
+   * 
+   * @param ent Entry
+   * @param dist Distance
+   * @param pos Position in parent
+   */
+  public void addToFirst(E ent, double dist, int pos) {
+    firstAssignments.add(new DistanceEntry<>(ent, dist, pos));
+  }
+
+  /**
+   * Compute the covering radius of the first assignment.
+   * 
+   * @param leaf {@code true} if in leaf mode.
+   * @return Covering radius.
+   */
+  public double computeFirstCover(boolean leaf) {
+    double max = 0.;
+    for(DistanceEntry<E> e : firstAssignments) {
+      double cover = leaf ? e.getDistance() : (e.getEntry().getCoveringRadius() + e.getDistance());
+      max = cover > max ? cover : max;
+    }
+    return max;
+  }
+
+  /**
+   * Compute the covering radius of the second assignment.
+   * 
+   * @param leaf {@code true} if in leaf mode.
+   * @return Covering radius.
+   */
+  public double computeSecondCover(boolean leaf) {
+    double max = 0.;
+    for(DistanceEntry<E> e : secondAssignments) {
+      double cover = leaf ? e.getDistance() : (e.getEntry().getCoveringRadius() + e.getDistance());
+      max = cover > max ? cover : max;
+    }
+    return max;
+  }
+
+  /**
+   * Add an entry to the second set.
+   * 
+   * @param ent Entry
+   * @param dist Distance
+   * @param pos Position in parent
+   */
+  public void addToSecond(E ent, double dist, int pos) {
+    secondAssignments.add(new DistanceEntry<>(ent, dist, pos));
   }
 
   /**
@@ -106,24 +156,6 @@ public class Assignments<E extends MTreeEntry> {
   }
 
   /**
-   * Returns the first covering radius.
-   * 
-   * @return the first covering radius
-   */
-  public double getFirstCoveringRadius() {
-    return firstCoveringRadius;
-  }
-
-  /**
-   * Returns the second covering radius.
-   * 
-   * @return the second covering radius
-   */
-  public double getSecondCoveringRadius() {
-    return secondCoveringRadius;
-  }
-
-  /**
    * Returns the assignments to the first routing object.
    * 
    * @return the assignments to the first routing object
@@ -139,5 +171,23 @@ public class Assignments<E extends MTreeEntry> {
    */
   public List<DistanceEntry<E>> getSecondAssignments() {
     return secondAssignments;
+  }
+
+  /**
+   * Set the first routing object.
+   * 
+   * @param routingObjectID First routing object
+   */
+  public void setFirstRoutingObject(DBID routingObjectID) {
+    this.id1 = routingObjectID;
+  }
+
+  /**
+   * Set the second routing object.
+   * 
+   * @param routingObjectID Second routing object
+   */
+  public void setSecondRoutingObject(DBID routingObjectID) {
+    this.id2 = routingObjectID;
   }
 }

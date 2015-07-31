@@ -69,12 +69,13 @@ public class MRadSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeE
     double miSumCR = Double.POSITIVE_INFINITY;
     double[] distanceMatrix = computeDistanceMatrix(tree, node);
 
+    boolean leaf = node.isLeaf();
     Assignments<E> bestAssignment = null;
     for(int i = 0; i < node.getNumEntries(); i++) {
       for(int j = i + 1; j < node.getNumEntries(); j++) {
         Assignments<E> currentAssignments = balancedPartition(tree, node, i, j, distanceMatrix);
 
-        double sumCR = currentAssignments.getFirstCoveringRadius() + currentAssignments.getSecondCoveringRadius();
+        double sumCR = currentAssignments.computeFirstCover(leaf) + currentAssignments.computeSecondCover(leaf);
         if(sumCR < miSumCR) {
           miSumCR = sumCR;
           bestAssignment = currentAssignments;
