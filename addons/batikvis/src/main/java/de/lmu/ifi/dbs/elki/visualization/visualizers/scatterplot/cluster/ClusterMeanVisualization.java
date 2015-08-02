@@ -37,7 +37,9 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -91,18 +93,23 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(HierarchicalResult baseResult, Result result) {
+    ResultHierarchy h = baseResult.getHierarchy();
     // Find clusterings we can visualize:
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
         // Does the cluster have a model with cluster means?
         if(testMeanModel(c)) {
-          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-          for(ScatterPlotProjector<?> p : ps) {
-            final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-            task.level = VisualizationTask.LEVEL_DATA + 1;
-            baseResult.getHierarchy().add(c, task);
-            baseResult.getHierarchy().add(p, task);
+          for(Iter<Result> it = h.iterParents(c); it.valid(); it.advance()) {
+            for(Iter<Result> it2 = h.iterDescendants(it.get()); it2.valid(); it2.advance()) {
+              if(it2.get() instanceof ScatterPlotProjector) {
+                ScatterPlotProjector<?> p = (ScatterPlotProjector<?>) it2.get();
+                final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
+                task.level = VisualizationTask.LEVEL_DATA + 1;
+                h.add(c, task);
+                h.add(p, task);
+              }
+            }
           }
         }
       }
