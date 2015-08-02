@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -138,6 +139,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   @Override
   public void run() {
     final Database database = inputstep.getDatabase();
+    ResultHierarchy hier = database.getHierarchy();
     Relation<NumberVector> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
@@ -246,15 +248,15 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       }
     }
     SimilarityMatrix smat = new ComputeSimilarityMatrixImage.SimilarityMatrix(img, relation, ids);
-    database.getHierarchy().add(database, smat);
+    hier.add(database, smat);
 
-    VisualizerContext context = vispar.newContext(database);
+    VisualizerContext context = vispar.newContext(hier);
 
     // Attach visualizers to results
     SimilarityMatrixVisualizer factory = new SimilarityMatrixVisualizer();
-    factory.processNewResult(database, database);
+    factory.processNewResult(hier, database);
 
-    List<VisualizationTask> tasks = ResultUtil.filterResults(database, VisualizationTask.class);
+    List<VisualizationTask> tasks = ResultUtil.filterResults(hier, VisualizationTask.class);
     for(VisualizationTask task : tasks) {
       if(task.getFactory() == factory) {
         showVisualization(context, factory, task);

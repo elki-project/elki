@@ -34,8 +34,8 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -81,15 +81,15 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(result, ScatterPlotProjector.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, result, ScatterPlotProjector.class);
     for(ScatterPlotProjector<?> p : ps) {
       final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
       task.thumbnail = false;
       task.noexport = true;
       task.noembed = true;
-      baseResult.getHierarchy().add(p, task);
+      hier.add(p, task);
     }
   }
 
@@ -160,7 +160,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       deleteChildren(container);
 
       ArrayList<VisualizationTask> vis = new ArrayList<>();
-      Collection<VisualizationTask> visualizers = ResultUtil.filterResults(task.getResult(), VisualizationTask.class);
+      Collection<VisualizationTask> visualizers = ResultUtil.filterResults(rel.getHierarchy(), rel, VisualizationTask.class);
       for(VisualizationTask task : visualizers) {
         if(task.tool && !vis.contains(task)) {
           vis.add(task);

@@ -34,8 +34,8 @@ import org.w3c.dom.svg.SVGPoint;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -73,12 +73,12 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<OPTICSProjector> ops = ResultUtil.filterResults(hier, result, OPTICSProjector.class);
     for(OPTICSProjector p : ops) {
       final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      baseResult.getHierarchy().add(p, task);
+      hier.add(p, task);
     }
   }
 

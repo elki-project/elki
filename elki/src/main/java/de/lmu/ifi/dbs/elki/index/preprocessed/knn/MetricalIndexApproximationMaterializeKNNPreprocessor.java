@@ -158,7 +158,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    */
   private MetricalIndexTree<O, N, E> getMetricalIndex(Relation<O> relation) throws IllegalStateException {
     Class<MetricalIndexTree<O, N, E>> mcls = ClassGenericsUtil.uglyCastIntoSubclass(MetricalIndexTree.class);
-    ArrayList<MetricalIndexTree<O, N, E>> indexes = ResultUtil.filterResults(relation, mcls);
+    ArrayList<MetricalIndexTree<O, N, E>> indexes = ResultUtil.filterResults(relation.getHierarchy(), relation, mcls);
     // FIXME: check we got the right the representation
     if(indexes.size() == 1) {
       return indexes.get(0);

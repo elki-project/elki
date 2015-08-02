@@ -143,7 +143,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
    * @return Evaluation result
    */
   public static EvaluationResult findOrCreate(ResultHierarchy hierarchy, Result parent, String name, String shortname) {
-    ArrayList<EvaluationResult> ers = ResultUtil.filterResults(parent, EvaluationResult.class);
+    ArrayList<EvaluationResult> ers = ResultUtil.filterResults(hierarchy, parent, EvaluationResult.class);
     EvaluationResult ev = null;
     for(EvaluationResult e : ers) {
       if(shortname.equals(e.getShortName())) {

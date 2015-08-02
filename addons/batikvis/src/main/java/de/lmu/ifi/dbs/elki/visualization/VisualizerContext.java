@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
@@ -79,7 +78,7 @@ public class VisualizerContext implements DataStoreListener, Result {
   /**
    * The full result object
    */
-  private HierarchicalResult result;
+  private ResultHierarchy hier;
 
   /**
    * The event listeners for this context.
@@ -109,26 +108,26 @@ public class VisualizerContext implements DataStoreListener, Result {
   /**
    * Constructor. We currently require a Database and a Result.
    *
-   * @param result Result
+   * @param hier Result hierarchy
    * @param projectors Projectors to use
    * @param factories Visualizer Factories to use
    */
-  public VisualizerContext(HierarchicalResult result, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories) {
+  public VisualizerContext(ResultHierarchy hier, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories) {
     super();
-    this.result = result;
+    this.hier = hier;
     this.projectors = projectors;
     this.factories = factories;
 
     // Ensure that various common results needed by visualizers are
     // automatically created
-    final Database db = ResultUtil.findDatabase(result);
+    final Database db = ResultUtil.findDatabase(hier);
     if(db == null) {
-      LOG.warning("No database reachable from " + result);
+      LOG.warning("No database reachable from " + hier);
       return;
     }
-    ResultUtil.ensureClusteringResult(db, result);
+    ResultUtil.ensureClusteringResult(db, db);
     this.selection = ResultUtil.ensureSelectionResult(db);
-    for(Relation<?> rel : ResultUtil.getRelations(result)) {
+    for(Relation<?> rel : ResultUtil.getRelations(db)) {
       ResultUtil.getSamplingResult(rel);
       // FIXME: this is a really ugly workaround. :-(
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
@@ -142,7 +141,7 @@ public class VisualizerContext implements DataStoreListener, Result {
     // result.getHierarchy().add(result, this);
 
     // Add visualizers.
-    processNewResult(result, result);
+    processNewResult(hier, db);
 
     // For proxying events.
     db.addDataStoreListener(this);
@@ -151,7 +150,7 @@ public class VisualizerContext implements DataStoreListener, Result {
     addResultListener(new ResultListener() {
       @Override
       public void resultAdded(Result child, Result parent) {
-        processNewResult(getResult(), child);
+        processNewResult(getHierarchy(), child);
       }
 
       @Override
@@ -172,9 +171,10 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param stylelib Style library
    */
   protected void makeStyleResult(StyleLibrary stylelib) {
+    final Database db = ResultUtil.findDatabase(hier);
     styleresult = new StyleResult();
     styleresult.setStyleLibrary(stylelib);
-    List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
+    List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(db);
     if(clusterings.size() > 0) {
       styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0), stylelib));
     }
@@ -182,16 +182,7 @@ public class VisualizerContext implements DataStoreListener, Result {
       Clustering<Model> c = generateDefaultClustering();
       styleresult.setStylingPolicy(new ClusterStylingPolicy(c, stylelib));
     }
-    result.getHierarchy().add(result, styleresult);
-  }
-
-  /**
-   * Get the full result object
-   *
-   * @return result object
-   */
-  public HierarchicalResult getResult() {
-    return result;
+    hier.add(db, styleresult);
   }
 
   /**
@@ -200,7 +191,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @return hierarchy object
    */
   public ResultHierarchy getHierarchy() {
-    return result.getHierarchy();
+    return hier;
   }
 
   /**
@@ -218,7 +209,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @return generated clustering
    */
   private Clustering<Model> generateDefaultClustering() {
-    final Database db = ResultUtil.findDatabase(getResult());
+    final Database db = ResultUtil.findDatabase(hier);
     Clustering<Model> c = null;
     try {
       // Try to cluster by labels
@@ -287,13 +278,13 @@ public class VisualizerContext implements DataStoreListener, Result {
   /**
    * Process a particular result.
    *
-   * @param baseResult Base Result
+   * @param hier Result hierarchy
    * @param newResult Newly added Result
    */
-  private void processNewResult(HierarchicalResult baseResult, Result newResult) {
+  private void processNewResult(ResultHierarchy hier, Result newResult) {
     for(ProjectorFactory p : projectors) {
       try {
-        p.processNewResult(baseResult, newResult);
+        p.processNewResult(hier, newResult);
       }
       catch(Throwable e) {
         LOG.warning("ProjectorFactory " + p.getClass().getCanonicalName() + " failed:", e);
@@ -302,7 +293,7 @@ public class VisualizerContext implements DataStoreListener, Result {
     // Collect all visualizers.
     for(VisFactory f : factories) {
       try {
-        f.processNewResult(baseResult, newResult);
+        f.processNewResult(hier, newResult);
       }
       catch(Throwable e) {
         LOG.warning("VisFactory " + f.getClass().getCanonicalName() + " failed:", e);

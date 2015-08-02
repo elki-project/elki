@@ -60,8 +60,8 @@ import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -173,12 +173,12 @@ public class EvaluateSquaredErrors implements Evaluator {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
     if(crs.size() < 1) {
       return;
     }
-    Database db = ResultUtil.findDatabase(baseResult);
+    Database db = ResultUtil.findDatabase(hier);
     Relation<NumberVector> rel = db.getRelation(distance.getInputTypeRestriction());
     for(Clustering<?> c : crs) {
       evaluateClustering(db, rel, c);

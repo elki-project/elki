@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -125,9 +124,8 @@ public class Segments extends BasicResult implements Iterable<Segment> {
    * Initialize segments. Add DB objects via addObject method.
    * 
    * @param clusterings List of clusterings in comparison
-   * @param baseResult used to retrieve db objects
    */
-  public Segments(List<Clustering<?>> clusterings, HierarchicalResult baseResult) {
+  public Segments(List<Clustering<?>> clusterings) {
     super("cluster pair segments", "pair-segments");
     this.clusterings = clusterings;
     this.clusteringsCount = clusterings.size();

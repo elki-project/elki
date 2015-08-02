@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -105,9 +105,9 @@ public class EvaluateClustering implements Evaluator {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Database db = ResultUtil.findDatabase(baseResult);
-    List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    Database db = ResultUtil.findDatabase(hier);
+    List<Clustering<?>> crs = ResultUtil.getClusteringResults(newResult);
     if(crs == null || crs.size() < 1) {
       return;
     }
@@ -115,7 +115,7 @@ public class EvaluateClustering implements Evaluator {
     Clustering<?> refc = null;
     // Try to find an existing reference clustering (globally)
     {
-      Collection<Clustering<?>> cs = ResultUtil.filterResults(baseResult, Clustering.class);
+      Collection<Clustering<?>> cs = ResultUtil.filterResults(hier, db, Clustering.class);
       for(Clustering<?> test : cs) {
         if(isReferenceResult(test)) {
           refc = test;
@@ -125,7 +125,7 @@ public class EvaluateClustering implements Evaluator {
     }
     // Try to find an existing reference clustering (locally)
     if(refc == null) {
-      Collection<Clustering<?>> cs = ResultUtil.filterResults(result, Clustering.class);
+      Collection<Clustering<?>> cs = ResultUtil.filterResults(hier, newResult, Clustering.class);
       for(Clustering<?> test : cs) {
         if(isReferenceResult(test)) {
           refc = test;

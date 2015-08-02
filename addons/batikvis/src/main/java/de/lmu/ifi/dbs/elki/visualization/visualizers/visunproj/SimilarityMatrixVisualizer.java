@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -67,15 +67,15 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ComputeSimilarityMatrixImage.SimilarityMatrix> prs = ResultUtil.filterResults(result, ComputeSimilarityMatrixImage.SimilarityMatrix.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<ComputeSimilarityMatrixImage.SimilarityMatrix> prs = ResultUtil.filterResults(hier, result, ComputeSimilarityMatrixImage.SimilarityMatrix.class);
     for(ComputeSimilarityMatrixImage.SimilarityMatrix pr : prs) {
       // Add plots, attach visualizer
       final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
       task.width = 1.0;
       task.height = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
-      baseResult.getHierarchy().add(pr, task);
+      hier.add(pr, task);
     }
   }
 
@@ -145,7 +145,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
       final double hlsize = StyleLibrary.SCALE * zoom * iratio / size;
       final double vlsize = StyleLibrary.SCALE * zoom / size;
       int i = 0;
-      Database database = ResultUtil.findDatabase(context.getResult());
+      Database database = ResultUtil.findDatabase(context.getHierarchy());
       final Relation<String> lrep = DatabaseUtil.guessObjectLabelRepresentation(database);
       for(DBIDIter id = result.getIDs().iter(); id.valid(); id.advance()) {
         String label = lrep.get(id);

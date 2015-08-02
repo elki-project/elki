@@ -100,7 +100,7 @@ public class AlgorithmTabPanel extends ParameterTabPanel {
     }
     checkDependencies();
     if (input.isComplete() && basedOnDatabase != null) {
-      if (algorithms.getResult() == null) {
+      if (algorithms.getResultHierarchy() == null) {
         return Status.STATUS_FAILED;
       } else {
         return Status.STATUS_COMPLETE;

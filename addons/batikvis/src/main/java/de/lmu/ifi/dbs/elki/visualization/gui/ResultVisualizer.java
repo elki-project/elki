@@ -27,9 +27,9 @@ import javax.swing.JFrame;
 
 import de.lmu.ifi.dbs.elki.gui.GUIUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -111,12 +111,12 @@ public class ResultVisualizer implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(final HierarchicalResult top, final Result result) {
+  public void processNewResult(final ResultHierarchy hier, final Result result) {
     // FIXME: not really re-entrant to generate new contexts...
-    final VisualizerContext context = manager.newContext(top);
+    final VisualizerContext context = manager.newContext(hier);
 
     if(title == null) {
-      title = VisualizerParameterizer.getTitle(ResultUtil.findDatabase(top), result);
+      title = VisualizerParameterizer.getTitle(ResultUtil.findDatabase(hier), result);
     }
 
     if(title == null) {
@@ -128,7 +128,7 @@ public class ResultVisualizer implements ResultHandler {
       public void run() {
         try {
           GUIUtil.setLookAndFeel();
-          ResultWindow window = new ResultWindow(title, top, context, single);
+          ResultWindow window = new ResultWindow(title, context, single);
           window.setVisible(true);
           window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         }

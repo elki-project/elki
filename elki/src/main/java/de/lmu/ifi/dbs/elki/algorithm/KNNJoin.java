@@ -112,7 +112,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
-    Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(relation, SpatialIndexTree.class);
+    Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(relation.getHierarchy(), relation, SpatialIndexTree.class);
     if(indexes.size() != 1) {
       throw new AbortException("KNNJoin found " + indexes.size() + " spatial indexes, expected exactly one.");
     }

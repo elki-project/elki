@@ -26,8 +26,8 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 
 /**
@@ -52,7 +52,7 @@ public class ClusterPairSegmentAnalysis implements Evaluator {
    * Perform clusterings evaluation
    */
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     // Get all new clusterings
     // TODO: handle clusterings added later, too. Can we update the result?
     
@@ -63,7 +63,7 @@ public class ClusterPairSegmentAnalysis implements Evaluator {
     }
 
     // create segments
-    Segments segments = new Segments(clusterings, baseResult);
-    baseResult.getHierarchy().add(result, segments);
+    Segments segments = new Segments(clusterings);
+    hier.add(result, segments);
   }
 }

@@ -150,14 +150,14 @@ public class KMLOutputHandler implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    ArrayList<OutlierResult> ors = ResultUtil.filterResults(newResult, OutlierResult.class);
-    ArrayList<Clustering<?>> crs = ResultUtil.filterResults(newResult, Clustering.class);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    ArrayList<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
+    ArrayList<Clustering<?>> crs = ResultUtil.filterResults(hier, newResult, Clustering.class);
     if(ors.size() + crs.size() > 1) {
       throw new AbortException("More than one visualizable result found. The KML writer only supports a single result!");
     }
+    Database database = ResultUtil.findDatabase(hier);
     for(OutlierResult outlierResult : ors) {
-      Database database = ResultUtil.findDatabase(baseResult);
       try {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(filename));
@@ -183,7 +183,6 @@ public class KMLOutputHandler implements ResultHandler {
       }
     }
     for(Clustering<?> clusteringResult : crs) {
-      Database database = ResultUtil.findDatabase(baseResult);
       try {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(filename));

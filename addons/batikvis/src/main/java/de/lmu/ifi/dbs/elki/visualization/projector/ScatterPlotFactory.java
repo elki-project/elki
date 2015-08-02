@@ -29,8 +29,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -69,15 +69,15 @@ public class ScatterPlotFactory implements ProjectorFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    ArrayList<Relation<?>> rels = ResultUtil.filterResults(newResult, Relation.class);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    ArrayList<Relation<?>> rels = ResultUtil.filterResults(hier, newResult, Relation.class);
     for(Relation<?> rel : rels) {
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
         Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
         final int dim = RelationUtil.dimensionality(vrel);
         ScatterPlotProjector<NumberVector> proj = new ScatterPlotProjector<>(vrel, Math.min(maxdim, dim));
-        baseResult.getHierarchy().add(vrel, proj);
+        hier.add(vrel, proj);
       }
     }
   }

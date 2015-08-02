@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultProcessor;
 
 /**
@@ -39,9 +39,9 @@ public interface ProjectorFactory extends ResultProcessor {
   /**
    * Add projections for the given result (tree) to the result tree.
    * 
-   * @param baseResult Context to work with
+   * @param hier Context to work with
    * @param newResult Result to process
    */
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult);
+  public void processNewResult(ResultHierarchy hier, Result newResult);
 }

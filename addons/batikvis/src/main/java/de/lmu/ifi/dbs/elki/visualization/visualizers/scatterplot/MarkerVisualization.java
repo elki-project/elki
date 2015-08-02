@@ -31,8 +31,8 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -77,16 +77,16 @@ public class MarkerVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     // Find a style result to visualize:
-    Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
+    Collection<StyleResult> styleres = ResultUtil.filterResults(hier, result, StyleResult.class);
     for(StyleResult c : styleres) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
         task.level = VisualizationTask.LEVEL_DATA;
-        baseResult.getHierarchy().add(c, task);
-        baseResult.getHierarchy().add(p, task);
+        hier.add(c, task);
+        hier.add(p, task);
       }
     }
   }

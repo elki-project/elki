@@ -45,8 +45,8 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
@@ -98,15 +98,15 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<AbstractMaterializeKNNPreprocessor<?>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<AbstractMaterializeKNNPreprocessor<?>> kNNIndex = ResultUtil.filterResults(hier, result, AbstractMaterializeKNNPreprocessor.class);
     for(AbstractMaterializeKNNPreprocessor<?> kNN : kNNIndex) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, kNN, p.getRelation(), this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
-        baseResult.getHierarchy().add(kNN, task);
-        baseResult.getHierarchy().add(p, task);
+        hier.add(kNN, task);
+        hier.add(p, task);
       }
     }
   }

@@ -27,8 +27,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -77,9 +76,9 @@ public class KDDTask {
   private OutputStep outputStep;
 
   /**
-   * The result object.
+   * The result hierarchy.
    */
-  private HierarchicalResult result;
+  private ResultHierarchy hier;
 
   /**
    * Constructor.
@@ -108,25 +107,25 @@ public class KDDTask {
     Database db = inputStep.getDatabase();
 
     // Algorithms - Data Mining Step
-    result = algorithmStep.runAlgorithms(db);
+    hier = algorithmStep.runAlgorithms(db);
 
     // TODO: this could be nicer
-    result.getHierarchy().add(result, new SettingsResult(settings));
+    hier.add(db, new SettingsResult(settings));
 
     // Evaluation
-    evaluationStep.runEvaluators(result, db);
+    evaluationStep.runEvaluators(hier, db);
 
     // Output / Visualization
-    outputStep.runResultHandlers(result);
+    outputStep.runResultHandlers(hier, db);
   }
 
   /**
-   * Get the algorithms result.
+   * Get the algorithms result hierarchy.
    * 
-   * @return the result
+   * @return the result hierarchy
    */
-  public Result getResult() {
-    return result;
+  public ResultHierarchy getResultHierarchy() {
+    return hier;
   }
 
   /**

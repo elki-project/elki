@@ -66,7 +66,7 @@ public class ParallelPlotProjector<V extends NumberVector> extends AbstractHiera
   @Override
   public Collection<PlotItem> arrange() {
     List<PlotItem> col = new ArrayList<>(1);
-    List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
+    List<VisualizationTask> tasks = ResultUtil.filterResults(getHierarchy(), this, VisualizationTask.class);
     if(tasks.size() > 0) {
       ScalesResult scales = ResultUtil.getScalesResult(rel);
       ProjectionParallel proj = new SimpleParallel(scales.getScales());

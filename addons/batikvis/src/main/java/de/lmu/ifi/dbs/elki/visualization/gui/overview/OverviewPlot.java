@@ -39,7 +39,6 @@ import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
@@ -160,11 +159,10 @@ public class OverviewPlot implements ResultListener {
   /**
    * Constructor.
    * 
-   * @param result Result to visualize
    * @param context Visualizer context
    * @param single Single view mode
    */
-  public OverviewPlot(HierarchicalResult result, VisualizerContext context, boolean single) {
+  public OverviewPlot(VisualizerContext context, boolean single) {
     super();
     this.context = context;
     this.single = single;
@@ -183,7 +181,8 @@ public class OverviewPlot implements ResultListener {
   private RectangleArranger<PlotItem> arrangeVisualizations(double width, double height) {
     RectangleArranger<PlotItem> plotmap = new RectangleArranger<>(width, height);
 
-    ArrayList<Projector> projectors = ResultUtil.filterResults(context.getResult(), Projector.class);
+    ResultHierarchy hier = context.getHierarchy();
+    ArrayList<Projector> projectors = ResultUtil.filterResults(hier, Projector.class);
     // Rectangle layout
     for(Projector p : projectors) {
       Collection<PlotItem> projs = p.arrange();
@@ -196,8 +195,7 @@ public class OverviewPlot implements ResultListener {
       }
     }
 
-    ResultHierarchy hier = context.getHierarchy();
-    ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(context.getResult(), VisualizationTask.class);
+    ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(hier, VisualizationTask.class);
     nextTask: for(VisualizationTask task : tasks) {
       if(!task.visible) {
         continue;

@@ -92,7 +92,7 @@ public class ResultWriter implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseresult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     TextWriter writer = new TextWriter();
 
     StreamFactory output;
@@ -119,7 +119,7 @@ public class ResultWriter implements ResultHandler {
       throw new IllegalStateException("Error opening output.", e);
     }
     try {
-      Database db = ResultUtil.findDatabase(baseresult);
+      Database db = ResultUtil.findDatabase(hier);
       writer.output(db, result, output, filter);
     } catch (IOException e) {
       throw new IllegalStateException("Input/Output error while writing result.", e);

@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleArrayStaticHistogram;
@@ -110,17 +110,17 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     // Find a style result to visualize:
-    Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
+    Collection<StyleResult> styleres = ResultUtil.filterResults(hier, result, StyleResult.class);
     for(StyleResult c : styleres) {
-      Collection<HistogramProjector<?>> ps = ResultUtil.filterResults(baseResult, HistogramProjector.class);
+      Collection<HistogramProjector<?>> ps = ResultUtil.filterResults(hier, HistogramProjector.class);
       for(HistogramProjector<?> p : ps) {
         // register self
         final VisualizationTask task = new VisualizationTask(CNAME, c, p.getRelation(), this);
         task.level = VisualizationTask.LEVEL_DATA;
-        baseResult.getHierarchy().add(c, task);
-        baseResult.getHierarchy().add(p, task);
+        hier.add(c, task);
+        hier.add(p, task);
       }
     }
   }

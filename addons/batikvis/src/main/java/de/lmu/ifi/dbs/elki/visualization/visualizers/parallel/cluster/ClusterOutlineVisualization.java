@@ -37,8 +37,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -97,18 +97,18 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     // We attach ourselves to the style library, not the clustering, so there is
     // only one hull.
-    Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
+    Collection<StyleResult> styleres = ResultUtil.filterResults(hier, result, StyleResult.class);
     for(StyleResult s : styleres) {
-      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
+      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(hier, ParallelPlotProjector.class);
       for(ParallelPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, s, p.getRelation(), this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
         task.initDefaultVisibility(false);
-        baseResult.getHierarchy().add(s, task);
-        baseResult.getHierarchy().add(p, task);
+        hier.add(s, task);
+        hier.add(p, task);
       }
     }
   }

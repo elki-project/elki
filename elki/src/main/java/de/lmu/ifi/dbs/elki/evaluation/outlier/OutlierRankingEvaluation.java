@@ -42,9 +42,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -170,8 +170,8 @@ public class OutlierRankingEvaluation implements Evaluator {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Database db = ResultUtil.findDatabase(baseResult);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Database db = ResultUtil.findDatabase(hier);
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
     if(positiveids.size() == 0) {

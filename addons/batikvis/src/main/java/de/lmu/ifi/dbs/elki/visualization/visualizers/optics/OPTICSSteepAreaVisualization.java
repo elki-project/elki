@@ -33,8 +33,8 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -69,15 +69,15 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<OPTICSProjector> ops = ResultUtil.filterResults(hier, result, OPTICSProjector.class);
     for(OPTICSProjector p : ops) {
       final SteepAreaResult steep = findSteepAreaResult(p.getResult());
       if(steep != null) {
         final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
         task.level = VisualizationTask.LEVEL_DATA + 1;
-        baseResult.getHierarchy().add(p, task);
-        baseResult.getHierarchy().add(steep, task);
+        hier.add(p, task);
+        hier.add(steep, task);
       }
     }
   }

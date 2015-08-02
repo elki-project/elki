@@ -36,8 +36,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
@@ -170,14 +170,14 @@ public class VisualizerParameterizer {
   /**
    * Make a new visualization context
    *
-   * @param result Base result
+   * @param hier Result hierarchy
    * @return New context
    */
-  public VisualizerContext newContext(HierarchicalResult result) {
+  public VisualizerContext newContext(ResultHierarchy hier) {
     if(samplesize > 0) {
-      Collection<Relation<?>> rels = ResultUtil.filterResults(result, Relation.class);
+      Collection<Relation<?>> rels = ResultUtil.filterResults(hier, Relation.class);
       for(Relation<?> rel : rels) {
-        if(!ResultUtil.filterResults(rel, SamplingResult.class).isEmpty()) {
+        if(!ResultUtil.filterResults(hier, rel, SamplingResult.class).isEmpty()) {
           continue;
         }
         int size = rel.size();
@@ -188,7 +188,7 @@ public class VisualizerParameterizer {
         }
       }
     }
-    VisualizerContext context = new VisualizerContext(result, stylelib, projectors, factories);
+    VisualizerContext context = new VisualizerContext(hier, stylelib, projectors, factories);
     return context;
   }
 

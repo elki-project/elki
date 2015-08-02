@@ -33,8 +33,8 @@ import org.w3c.dom.svg.SVGPoint;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -77,12 +77,12 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<UpdatableDatabase> dbs = ResultUtil.filterResults(result, UpdatableDatabase.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<UpdatableDatabase> dbs = ResultUtil.filterResults(hier, result, UpdatableDatabase.class);
     if(dbs.isEmpty()) {
       return;
     }
-    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
     for(ScatterPlotProjector<?> p : ps) {
       final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
@@ -91,7 +91,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
       task.noexport = true;
       task.initDefaultVisibility(false);
       // baseResult.getHierarchy().add(p.getRelation(), task);
-      baseResult.getHierarchy().add(p, task);
+      hier.add(p, task);
     }
   }
 

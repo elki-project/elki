@@ -26,8 +26,8 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
 import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 
 /**
@@ -46,10 +46,10 @@ public class OPTICSProjectorFactory implements ProjectorFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Collection<ClusterOrder> cos = ResultUtil.filterResults(newResult, ClusterOrder.class);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    Collection<ClusterOrder> cos = ResultUtil.filterResults(hier, newResult, ClusterOrder.class);
     for(ClusterOrder co : cos) {
-      baseResult.getHierarchy().add(co, new OPTICSProjector(co));
+      hier.add(co, new OPTICSProjector(co));
     }
   }
 }

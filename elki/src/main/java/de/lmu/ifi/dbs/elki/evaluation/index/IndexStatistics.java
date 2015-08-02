@@ -30,8 +30,8 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTree;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -53,10 +53,10 @@ public class IndexStatistics implements Evaluator {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Database db = ResultUtil.findDatabase(baseResult);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    Database db = ResultUtil.findDatabase(hier);
     Collection<String> header = null;
-    final ArrayList<IndexTree<?, ?>> indexes = ResultUtil.filterResults(result, IndexTree.class);
+    final ArrayList<IndexTree<?, ?>> indexes = ResultUtil.filterResults(hier, newResult, IndexTree.class);
     if (indexes == null || indexes.size() <= 0) {
       return;
     }

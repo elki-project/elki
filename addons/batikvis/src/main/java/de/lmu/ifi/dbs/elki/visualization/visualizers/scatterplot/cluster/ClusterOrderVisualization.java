@@ -32,8 +32,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -72,16 +72,16 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ClusterOrder> cos = ResultUtil.filterResults(result, ClusterOrder.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<ClusterOrder> cos = ResultUtil.filterResults(hier, result, ClusterOrder.class);
     for(ClusterOrder co : cos) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, co, p.getRelation(), this);
         task.initDefaultVisibility(false);
         task.level = VisualizationTask.LEVEL_DATA - 1;
-        baseResult.getHierarchy().add(co, task);
-        baseResult.getHierarchy().add(p, task);
+        hier.add(co, task);
+        hier.add(p, task);
       }
     }
   }

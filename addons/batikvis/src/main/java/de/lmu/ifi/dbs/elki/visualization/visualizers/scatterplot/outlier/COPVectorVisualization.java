@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -81,15 +81,15 @@ public class COPVectorVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    List<OutlierResult> ors = ResultUtil.filterResults(hier, result, OutlierResult.class);
     for (OutlierResult o : ors) {
-      List<Relation<?>> rels = ResultUtil.filterResults(o, Relation.class);
+      List<Relation<?>> rels = ResultUtil.filterResults(hier, o, Relation.class);
       for (Relation<?> rel : rels) {
         if (!rel.getShortName().equals(COP.COP_ERRORVEC)) {
           continue;
         }
-        List<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+        List<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
         boolean vis = true;
         for (ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), this);
@@ -97,8 +97,8 @@ public class COPVectorVisualization extends AbstractVisFactory {
           if (!vis) {
             task.initDefaultVisibility(false);
           }
-          baseResult.getHierarchy().add(o, task);
-          baseResult.getHierarchy().add(p, task);
+          hier.add(o, task);
+          hier.add(p, task);
         }
       }
     }

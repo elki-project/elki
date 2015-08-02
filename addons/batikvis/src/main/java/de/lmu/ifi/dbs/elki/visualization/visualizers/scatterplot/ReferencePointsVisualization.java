@@ -30,9 +30,9 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -66,15 +66,15 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ReferencePointsResult<?>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<ReferencePointsResult<?>> rps = ResultUtil.filterResults(hier, result, ReferencePointsResult.class);
     for(ReferencePointsResult<?> rp : rps) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, rp, p.getRelation(), this);
         task.level = VisualizationTask.LEVEL_DATA;
-        baseResult.getHierarchy().add(rp, task);
-        baseResult.getHierarchy().add(p, task);
+        hier.add(rp, task);
+        hier.add(p, task);
       }
     }
   }

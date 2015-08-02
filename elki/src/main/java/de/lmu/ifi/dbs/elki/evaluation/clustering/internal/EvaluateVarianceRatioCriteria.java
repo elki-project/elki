@@ -43,8 +43,8 @@ import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -205,12 +205,12 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
     if(crs.size() < 1) {
       return;
     }
-    Database db = ResultUtil.findDatabase(baseResult);
+    Database db = ResultUtil.findDatabase(hier);
     Relation<? extends NumberVector> rel = db.getRelation(EuclideanDistanceFunction.STATIC.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {

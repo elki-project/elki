@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -92,22 +91,21 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    ResultHierarchy h = baseResult.getHierarchy();
+  public void processNewResult(ResultHierarchy hier, Result result) {
     // Find clusterings we can visualize:
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, result, Clustering.class);
     for(Clustering<?> c : clusterings) {
       if(c.getAllClusters().size() > 0) {
         // Does the cluster have a model with cluster means?
         if(testMeanModel(c)) {
-          for(Iter<Result> it = h.iterParents(c); it.valid(); it.advance()) {
-            for(Iter<Result> it2 = h.iterDescendants(it.get()); it2.valid(); it2.advance()) {
+          for(Iter<Result> it = hier.iterParents(c); it.valid(); it.advance()) {
+            for(Iter<Result> it2 = hier.iterDescendants(it.get()); it2.valid(); it2.advance()) {
               if(it2.get() instanceof ScatterPlotProjector) {
                 ScatterPlotProjector<?> p = (ScatterPlotProjector<?>) it2.get();
                 final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
                 task.level = VisualizationTask.LEVEL_DATA + 1;
-                h.add(c, task);
-                h.add(p, task);
+                hier.add(c, task);
+                hier.add(p, task);
               }
             }
           }

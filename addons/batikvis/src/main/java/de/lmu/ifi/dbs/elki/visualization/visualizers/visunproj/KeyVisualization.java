@@ -38,8 +38,8 @@ import org.w3c.dom.events.EventTarget;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
@@ -72,9 +72,9 @@ public class KeyVisualization extends AbstractVisFactory {
   private static final String NAME = "Cluster Key";
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
     // Find clusterings we can visualize:
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, newResult, Clustering.class);
     for (Clustering<?> c : clusterings) {
       final int numc = c.getAllClusters().size();
       final int topc = c.getToplevelClusters().size();
@@ -109,7 +109,7 @@ public class KeyVisualization extends AbstractVisFactory {
         if (numc < 20) {
           task.nodetail = true;
         }
-        baseResult.getHierarchy().add(c, task);
+        hier.add(c, task);
       }
     }
   }

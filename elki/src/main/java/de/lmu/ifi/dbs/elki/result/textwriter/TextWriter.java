@@ -179,7 +179,7 @@ public class TextWriter {
 
     // Split result objects in different known types:
     {
-      List<Result> results = ResultUtil.filterResults(r, Result.class);
+      List<Result> results = ResultUtil.filterResults(db.getHierarchy(), r, Result.class);
       for(Result res : results) {
         if(filter != null) {
           final String nam = res.getShortName();

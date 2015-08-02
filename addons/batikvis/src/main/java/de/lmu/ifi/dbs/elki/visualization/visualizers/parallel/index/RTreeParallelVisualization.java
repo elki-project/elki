@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -95,17 +95,17 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    ArrayList<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    ArrayList<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>> trees = ResultUtil.filterResults(hier, result, AbstractRStarTree.class);
     for(AbstractRStarTree<RStarTreeNode, SpatialEntry, ?> tree : trees) {
       if(tree instanceof Result) {
-        Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
+        Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(hier, ParallelPlotProjector.class);
         for(ParallelPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
           task.level = VisualizationTask.LEVEL_BACKGROUND + 2;
           task.default_visibility = false;
-          baseResult.getHierarchy().add((Result) tree, task);
-          baseResult.getHierarchy().add(p, task);
+          hier.add((Result) tree, task);
+          hier.add(p, task);
         }
       }
     }

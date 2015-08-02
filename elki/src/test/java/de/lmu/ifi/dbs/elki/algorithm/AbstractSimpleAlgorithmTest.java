@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -200,14 +201,15 @@ public abstract class AbstractSimpleAlgorithmTest {
     OutlierROCCurve rocCurve = ClassGenericsUtil.parameterizeOrAbort(OutlierROCCurve.class, params);
 
     // Ensure the result has been added to the hierarchy:
-    if(db.getHierarchy().numParents(result) < 1) {
-      db.getHierarchy().add(db, result);
+    ResultHierarchy hier = db.getHierarchy();
+    if(hier.numParents(result) < 1) {
+      hier.add(db, result);
     }
 
     // Compute ROC and AUC:
-    rocCurve.processNewResult(db, result);
+    rocCurve.processNewResult(hier, result);
     // Find the ROC results
-    Collection<OutlierROCCurve.ROCResult> rocs = ResultUtil.filterResults(result, OutlierROCCurve.ROCResult.class);
+    Collection<OutlierROCCurve.ROCResult> rocs = ResultUtil.filterResults(hier, result, OutlierROCCurve.ROCResult.class);
     org.junit.Assert.assertTrue("No ROC result found.", !rocs.isEmpty());
     double auc = rocs.iterator().next().getAUC();
     org.junit.Assert.assertFalse("More than one ROC result found.", rocs.size() > 1);

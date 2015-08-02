@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionRecallCurve.PRCurv
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -187,14 +187,14 @@ public class XYCurveVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    final ArrayList<XYCurve> curves = ResultUtil.filterResults(result, XYCurve.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    final ArrayList<XYCurve> curves = ResultUtil.filterResults(hier, result, XYCurve.class);
     for(XYCurve curve : curves) {
       final VisualizationTask task = new VisualizationTask(NAME, curve, null, this);
       task.width = 1.0;
       task.height = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
-      baseResult.getHierarchy().add(curve, task);
+      hier.add(curve, task);
     }
   }
 

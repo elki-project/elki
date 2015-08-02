@@ -143,7 +143,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     }
 
     this.context = context;
-    this.database = ResultUtil.findDatabase(context.getResult());
+    this.database = ResultUtil.findDatabase(context.getHierarchy());
     // FIXME: re-add labels
     this.crep = null; //database.getClassLabelQuery();
     this.orep = null; //database.getObjectLabelQuery();

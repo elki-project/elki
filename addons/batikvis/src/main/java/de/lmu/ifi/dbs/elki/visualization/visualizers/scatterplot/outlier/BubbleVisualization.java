@@ -32,8 +32,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -109,10 +109,10 @@ public class BubbleVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<OutlierResult> ors = ResultUtil.filterResults(hier, result, OutlierResult.class);
     for(OutlierResult o : ors) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
       boolean vis = true;
       // Quick and dirty hack: hide if parent result is also an outlier result
       // Since that probably is already visible and we're redundant.
@@ -128,8 +128,8 @@ public class BubbleVisualization extends AbstractVisFactory {
         if(!vis) {
           task.initDefaultVisibility(false);
         }
-        baseResult.getHierarchy().add(o, task);
-        baseResult.getHierarchy().add(p, task);
+        hier.add(o, task);
+        hier.add(p, task);
       }
     }
   }

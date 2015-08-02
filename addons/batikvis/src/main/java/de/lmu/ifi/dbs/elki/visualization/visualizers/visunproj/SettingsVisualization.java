@@ -28,8 +28,8 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
@@ -134,15 +134,15 @@ public class SettingsVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Collection<SettingsResult> settingsResults = ResultUtil.filterResults(newResult, SettingsResult.class);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    Collection<SettingsResult> settingsResults = ResultUtil.filterResults(hier, newResult, SettingsResult.class);
     for(SettingsResult sr : settingsResults) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
       task.width = 1.0;
       task.height = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
       task.initDefaultVisibility(false);
-      baseResult.getHierarchy().add(sr, task);
+      hier.add(sr, task);
     }
   }
 

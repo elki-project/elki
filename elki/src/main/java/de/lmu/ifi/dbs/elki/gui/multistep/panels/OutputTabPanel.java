@@ -25,7 +25,8 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 
 import java.lang.ref.WeakReference;
 
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
@@ -77,7 +78,7 @@ public class OutputTabPanel extends ParameterTabPanel {
   @Override
   protected synchronized void configureStep(Parameterization config) {
     outs = config.tryInstantiate(OutputStep.class);
-    if (config.getErrors().size() > 0) {
+    if(config.getErrors().size() > 0) {
       outs = null;
     }
     basedOnResult = null;
@@ -85,34 +86,35 @@ public class OutputTabPanel extends ParameterTabPanel {
 
   @Override
   protected void executeStep() {
-    if (input.canRun() && !input.isComplete()) {
+    if(input.canRun() && !input.isComplete()) {
       input.execute();
     }
-    if (evals.canRun() && !evals.isComplete()) {
+    if(evals.canRun() && !evals.isComplete()) {
       evals.execute();
     }
-    if (!input.isComplete()) {
+    if(!input.isComplete()) {
       throw new AbortException("Input data not available.");
     }
-    if (!evals.isComplete()) {
+    if(!evals.isComplete()) {
       throw new AbortException("Evaluation failed.");
     }
     // Get the database and run the algorithms
-    HierarchicalResult result = evals.getEvaluationStep().getResult();
-    outs.runResultHandlers(result);
-    basedOnResult = new WeakReference<Object>(result);
+    Database database = input.getInputStep().getDatabase();
+    ResultHierarchy hier = evals.getEvaluationStep().getResultHierarchy();
+    outs.runResultHandlers(hier, database);
+    basedOnResult = new WeakReference<Object>(hier);
   }
 
   @Override
   protected Status getStatus() {
-    if (outs == null) {
+    if(outs == null) {
       return Status.STATUS_UNCONFIGURED;
     }
-    if (!input.canRun() || !evals.canRun()) {
+    if(!input.canRun() || !evals.canRun()) {
       return Status.STATUS_CONFIGURED;
     }
     checkDependencies();
-    if (input.isComplete() && evals.isComplete() && basedOnResult != null) {
+    if(input.isComplete() && evals.isComplete() && basedOnResult != null) {
       // TODO: is there a FAILED state here, too?
       return Status.STATUS_COMPLETE;
     }
@@ -121,7 +123,7 @@ public class OutputTabPanel extends ParameterTabPanel {
 
   @Override
   public void panelUpdated(ParameterTabPanel o) {
-    if (o == input || o == evals) {
+    if(o == input || o == evals) {
       checkDependencies();
       updateStatus();
     }
@@ -131,8 +133,8 @@ public class OutputTabPanel extends ParameterTabPanel {
    * Test if the dependencies are still valid.
    */
   private void checkDependencies() {
-    if (basedOnResult != null) {
-      if (!input.isComplete() || !evals.isComplete() || basedOnResult.get() != evals.getEvaluationStep().getResult()) {
+    if(basedOnResult != null) {
+      if(!input.isComplete() || !evals.isComplete() || basedOnResult.get() != evals.getEvaluationStep().getResultHierarchy()) {
         // We've become invalidated, notify.
         basedOnResult = null;
         firePanelUpdated();

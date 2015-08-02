@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -88,12 +88,12 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<OPTICSProjector> ops = ResultUtil.filterResults(hier, result, OPTICSProjector.class);
     for(OPTICSProjector p : ops) {
       final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      baseResult.getHierarchy().add(p, task);
+      hier.add(p, task);
     }
   }
 

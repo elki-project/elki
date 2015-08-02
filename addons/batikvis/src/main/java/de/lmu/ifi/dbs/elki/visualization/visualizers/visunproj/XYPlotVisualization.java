@@ -31,8 +31,8 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.XYPlot;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -160,14 +160,14 @@ public class XYPlotVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    final ArrayList<XYPlot> plots = ResultUtil.filterResults(result, XYPlot.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    final ArrayList<XYPlot> plots = ResultUtil.filterResults(hier, result, XYPlot.class);
     for(XYPlot plot : plots) {
       final VisualizationTask task = new VisualizationTask(NAME, plot, null, this);
       task.width = 1.0;
       task.height = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
-      baseResult.getHierarchy().add(plot, task);
+      hier.add(plot, task);
     }
   }
 

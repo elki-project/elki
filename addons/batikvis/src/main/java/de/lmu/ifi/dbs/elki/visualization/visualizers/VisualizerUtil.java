@@ -54,7 +54,7 @@ public final class VisualizerUtil {
   public static void setVisible(VisualizerContext context, VisualizationTask task, boolean visibility) {
     // Hide other tools
     if (visibility && task.tool) {
-      final List<VisualizationTask> visualizers = ResultUtil.filterResults(context.getResult(), VisualizationTask.class);
+      final List<VisualizationTask> visualizers = ResultUtil.filterResults(context.getHierarchy(), VisualizationTask.class);
       for (VisualizationTask other : visualizers) {
         if (other != task && other.tool && other.visible) {
           other.visible = false;

@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -121,20 +121,20 @@ public class VoronoiVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     // Find clusterings we can visualize:
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, result, Clustering.class);
     for (Clustering<?> c : clusterings) {
       if (c.getAllClusters().size() > 0) {
         // Does the cluster have a model with cluster means?
         if (testMeanModel(c)) {
-          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
           for (ScatterPlotProjector<?> p : ps) {
             if (RelationUtil.dimensionality(p.getRelation()) == 2) {
               final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
               task.level = VisualizationTask.LEVEL_DATA + 3;
-              baseResult.getHierarchy().add(p, task);
-              baseResult.getHierarchy().add(c, task);
+              hier.add(p, task);
+              hier.add(c, task);
             }
           }
         }

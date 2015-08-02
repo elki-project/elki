@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -75,14 +75,14 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<OPTICSProjector> ops = ResultUtil.filterResults(hier, result, OPTICSProjector.class);
     for(OPTICSProjector p : ops) {
-      final Clustering<OPTICSModel> ocl = findOPTICSClustering(baseResult);
+      final Clustering<OPTICSModel> ocl = findOPTICSClustering(hier, result);
       if(ocl != null) {
         final VisualizationTask task = new VisualizationTask(NAME, ocl, null, this);
         task.level = VisualizationTask.LEVEL_DATA;
-        baseResult.getHierarchy().add(p, task);
+        hier.add(p, task);
       }
     }
     // TODO: also run when a new clustering is added, instead of just new
@@ -103,12 +103,13 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   /**
    * Find the first OPTICS clustering child of a result.
    * 
+   * @param hier Result hierarchy
    * @param result Result to start searching at
    * @return OPTICS clustering
    */
   @SuppressWarnings("unchecked")
-  protected static Clustering<OPTICSModel> findOPTICSClustering(Result result) {
-    Collection<Clustering<?>> cs = ResultUtil.filterResults(result, Clustering.class);
+  protected static Clustering<OPTICSModel> findOPTICSClustering(ResultHierarchy hier, Result result) {
+    Collection<Clustering<?>> cs = ResultUtil.filterResults(hier, result, Clustering.class);
     for(Clustering<?> clus : cs) {
       if(clus.getToplevelClusters().size() == 0) {
         continue;

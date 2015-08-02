@@ -33,9 +33,9 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.KMLOutputHandler;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -75,13 +75,13 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(result, ScatterPlotProjector.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, result, ScatterPlotProjector.class);
     for(ScatterPlotProjector<?> p : ps) {
       final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
       task.level = VisualizationTask.LEVEL_DATA + 1;
       task.initDefaultVisibility(false);
-      baseResult.getHierarchy().add(p, task);
+      hier.add(p, task);
     }
   }
 

@@ -18,8 +18,8 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -166,12 +166,12 @@ public class EvaluateCIndex<O> implements Evaluator {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
     if(crs.size() < 1) {
       return;
     }
-    Database db = ResultUtil.findDatabase(baseResult);
+    Database db = ResultUtil.findDatabase(hier);
     Relation<O> rel = db.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> dq = db.getDistanceQuery(rel, distance);
 

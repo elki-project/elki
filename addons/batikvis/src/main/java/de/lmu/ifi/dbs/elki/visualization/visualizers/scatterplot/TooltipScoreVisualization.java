@@ -33,8 +33,8 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -94,40 +94,40 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     // TODO: we can also visualize other scores!
-    Collection<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+    Collection<OutlierResult> ors = ResultUtil.filterResults(hier, result, OutlierResult.class);
     for(OutlierResult o : ors) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
       for(ScatterPlotProjector<?> p : ps) {
         final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), p.getRelation(), this);
         task.tool = true;
         task.initDefaultVisibility(false);
-        baseResult.getHierarchy().add(o.getScores(), task);
-        baseResult.getHierarchy().add(p, task);
+        hier.add(o.getScores(), task);
+        hier.add(p, task);
       }
     }
-    Collection<Relation<?>> rrs = ResultUtil.filterResults(result, Relation.class);
+    Collection<Relation<?>> rrs = ResultUtil.filterResults(hier, result, Relation.class);
     for(Relation<?> r : rrs) {
       if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation()) && !TypeUtil.INTEGER.isAssignableFromType(r.getDataTypeInformation())) {
         continue;
       }
       // Skip if we already considered it above
       boolean add = true;
-      for(Hierarchy.Iter<Result> p = baseResult.getHierarchy().iterChildren(r); p.valid(); p.advance()) {
+      for(Hierarchy.Iter<Result> p = hier.iterChildren(r); p.valid(); p.advance()) {
         if(p.get() instanceof VisualizationTask && ((VisualizationTask) p.get()).getFactory() instanceof TooltipScoreVisualization) {
           add = false;
           break;
         }
       }
       if(add) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, r, p.getRelation(), this);
           task.tool = true;
           task.initDefaultVisibility(false);
-          baseResult.getHierarchy().add(r, task);
-          baseResult.getHierarchy().add(p, task);
+          hier.add(r, task);
+          hier.add(p, task);
         }
       }
     }

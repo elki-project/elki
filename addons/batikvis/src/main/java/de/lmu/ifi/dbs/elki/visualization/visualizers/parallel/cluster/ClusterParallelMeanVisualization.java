@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -76,20 +76,20 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     // Find clusterings we can visualize:
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, result, Clustering.class);
     for (Clustering<?> c : clusterings) {
       if (c.getAllClusters().size() > 0) {
         // Does the cluster have a model with cluster means?
         Clustering<MeanModel> mcls = findMeanModel(c);
         if (mcls != null) {
-          Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
+          Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(hier, ParallelPlotProjector.class);
           for (ParallelPlotProjector<?> p : ps) {
             final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
             task.level = VisualizationTask.LEVEL_DATA + 1;
-            baseResult.getHierarchy().add(c, task);
-            baseResult.getHierarchy().add(p, task);
+            hier.add(c, task);
+            hier.add(p, task);
           }
         }
       }

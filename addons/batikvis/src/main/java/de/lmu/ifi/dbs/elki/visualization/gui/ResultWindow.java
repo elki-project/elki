@@ -45,7 +45,6 @@ import javax.swing.SwingUtilities;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
@@ -197,8 +196,10 @@ public class ResultWindow extends JFrame implements ResultListener {
       menubar.removeAll();
       menubar.add(filemenu);
       ResultHierarchy hier = context.getHierarchy();
-      for(Hierarchy.Iter<Result> iter = hier.iterChildren(result); iter.valid(); iter.advance()) {
-        recursiveBuildMenu(menubar, iter.get());
+      for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
+        if(hier.numParents(iter.get()) == 0) {
+          recursiveBuildMenu(menubar, iter.get());
+        }
       }
     }
 
@@ -296,11 +297,6 @@ public class ResultWindow extends JFrame implements ResultListener {
   private DetailView currentSubplot = null;
 
   /**
-   * Result to visualize
-   */
-  private HierarchicalResult result;
-
-  /**
    * Single view mode. No overview / detail view split
    */
   private boolean single = false;
@@ -309,14 +305,12 @@ public class ResultWindow extends JFrame implements ResultListener {
    * Constructor.
    * 
    * @param title Window title
-   * @param result Result to visualize
    * @param context Visualizer context
    * @param single Single visualization mode
    */
-  public ResultWindow(String title, HierarchicalResult result, VisualizerContext context, boolean single) {
+  public ResultWindow(String title, VisualizerContext context, boolean single) {
     super(title);
     this.context = context;
-    this.result = result;
     this.single = single;
 
     // close handler
@@ -341,7 +335,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
     this.getContentPane().add(panel);
 
-    this.overview = new OverviewPlot(result, context, single);
+    this.overview = new OverviewPlot(context, single);
     // when a subplot is clicked, show the selected subplot.
     overview.addActionListener(new ActionListener() {
       @Override

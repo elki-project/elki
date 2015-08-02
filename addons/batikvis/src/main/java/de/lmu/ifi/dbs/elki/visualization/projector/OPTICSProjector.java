@@ -75,7 +75,7 @@ public class OPTICSProjector extends AbstractHierarchicalResult implements Proje
   @Override
   public Collection<PlotItem> arrange() {
     List<PlotItem> col = new ArrayList<>(1);
-    List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
+    List<VisualizationTask> tasks = ResultUtil.filterResults(getHierarchy(), this, VisualizationTask.class);
     if(tasks.size() > 0) {
       final PlotItem it = new PlotItem(4., 1., new OPTICSProjection(this));
       it.tasks = tasks;

@@ -34,8 +34,8 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -90,47 +90,47 @@ public class TooltipStringVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<Relation<?>> reps = ResultUtil.filterResults(result, Relation.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<Relation<?>> reps = ResultUtil.filterResults(hier, result, Relation.class);
     for(Relation<?> rep : reps) {
       if(DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME_ID, rep, p.getRelation(), this);
           task.tool = true;
           task.initDefaultVisibility(false);
-          baseResult.getHierarchy().add(rep, task);
-          baseResult.getHierarchy().add(p, task);
+          hier.add(rep, task);
+          hier.add(p, task);
         }
       }
       if(ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME_CLASS, rep, p.getRelation(), this);
           task.tool = true;
           task.initDefaultVisibility(false);
-          baseResult.getHierarchy().add(rep, task);
-          baseResult.getHierarchy().add(p, task);
+          hier.add(rep, task);
+          hier.add(p, task);
         }
       }
       if(LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME_LABEL, rep, p.getRelation(), this);
           task.tool = true;
           task.initDefaultVisibility(false);
-          baseResult.getHierarchy().add(rep, task);
-          baseResult.getHierarchy().add(p, task);
+          hier.add(rep, task);
+          hier.add(p, task);
         }
       }
       if(ExternalID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           final VisualizationTask task = new VisualizationTask(NAME_EID, rep, p.getRelation(), this);
           task.tool = true;
           task.initDefaultVisibility(false);
-          baseResult.getHierarchy().add(rep, task);
-          baseResult.getHierarchy().add(p, task);
+          hier.add(rep, task);
+          hier.add(p, task);
         }
       }
     }

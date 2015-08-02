@@ -123,7 +123,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
   }
 
   public ClusterOrder run(Database database, Relation<NV> relation) {
-    Collection<DeLiCluTreeIndex<NV>> indexes = ResultUtil.filterResults(database, DeLiCluTreeIndex.class);
+    Collection<DeLiCluTreeIndex<NV>> indexes = ResultUtil.filterResults(database.getHierarchy(), relation, DeLiCluTreeIndex.class);
     if(indexes.size() != 1) {
       throw new AbortException("DeLiClu found " + indexes.size() + " DeLiCluTree indexes. DeLiClu needs a special index to operate, therefore you need to add this index to your database.");
     }

@@ -31,7 +31,6 @@ import org.apache.batik.util.SVGConstants;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
@@ -102,7 +101,7 @@ public class ExportVisualizations implements ResultHandler {
   /**
    * Base result
    */
-  HierarchicalResult baseResult = null;
+  Result baseResult = null;
 
   /**
    * Visualizer context
@@ -129,7 +128,7 @@ public class ExportVisualizations implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
     if(output.isFile()) {
       throw new AbortException("Output folder cannot be an existing file.");
     }
@@ -138,18 +137,18 @@ public class ExportVisualizations implements ResultHandler {
         throw new AbortException("Could not create output directory.");
       }
     }
-    if(this.baseResult != baseResult) {
-      this.baseResult = baseResult;
+    if(this.baseResult == null) {
+      this.baseResult = newResult;
       context = null;
       counter = 0;
       LOG.verbose("Note: Reusing visualization exporter for more than one result is untested.");
     }
     if(context == null) {
-      context = manager.newContext(baseResult);
+      context = manager.newContext(hier);
     }
 
     // Projected visualizations
-    ArrayList<Projector> projectors = ResultUtil.filterResults(baseResult, Projector.class);
+    ArrayList<Projector> projectors = ResultUtil.filterResults(hier, Projector.class);
     for(Projector proj : projectors) {
       // TODO: allow selecting individual projections only.
       Collection<PlotItem> items = proj.arrange();
@@ -157,8 +156,7 @@ public class ExportVisualizations implements ResultHandler {
         processItem(item);
       }
     }
-    ResultHierarchy hier = baseResult.getHierarchy();
-    ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(baseResult, VisualizationTask.class);
+    ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(hier, VisualizationTask.class);
     for(VisualizationTask task : tasks) {
       boolean isprojected = false;
       for(Hierarchy.Iter<Result> iter = hier.iterParents(task); iter.valid(); iter.advance()) {

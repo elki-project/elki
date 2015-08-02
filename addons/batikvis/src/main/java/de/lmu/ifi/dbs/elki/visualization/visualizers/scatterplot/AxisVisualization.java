@@ -29,8 +29,8 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -71,12 +71,12 @@ public class AxisVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(result, ScatterPlotProjector.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, result, ScatterPlotProjector.class);
     for(ScatterPlotProjector<?> p : ps) {
       final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
       task.level = VisualizationTask.LEVEL_BACKGROUND;
-      baseResult.getHierarchy().add(p, task);
+      hier.add(p, task);
     }
   }
 

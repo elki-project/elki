@@ -91,7 +91,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
   protected void preprocess() {
     DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
 
-    Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(relation, SpatialIndexTree.class);
+    Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(relation.getHierarchy(), relation, SpatialIndexTree.class);
     if(indexes.size() != 1) {
       throw new AbortException(SpatialApproximationMaterializeKNNPreprocessor.class.getSimpleName() + " found " + indexes.size() + " spatial indexes, expected exactly one.");
     }

@@ -79,7 +79,7 @@ public class ScatterPlotProjector<V extends NumberVector> extends AbstractHierar
   @Override
   public Collection<PlotItem> arrange() {
     List<PlotItem> layout = new ArrayList<>(1);
-    List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
+    List<VisualizationTask> tasks = ResultUtil.filterResults(getHierarchy(), this, VisualizationTask.class);
     if(tasks.size() > 0) {
       ScalesResult scales = ResultUtil.getScalesResult(rel);
       final PlotItem master;

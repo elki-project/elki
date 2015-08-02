@@ -31,9 +31,8 @@ import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -64,7 +63,7 @@ public class AlgorithmStep implements WorkflowStep {
   /**
    * The algorithm output
    */
-  private BasicResult result = null;
+  private ResultHierarchy hier = null;
 
   /**
    * Constructor.
@@ -82,12 +81,11 @@ public class AlgorithmStep implements WorkflowStep {
    * @param database Database
    * @return Algorithm result
    */
-  public HierarchicalResult runAlgorithms(Database database) {
-    result = new BasicResult("Algorithm Step", "main");
-    result.addChildResult(database);
+  public ResultHierarchy runAlgorithms(Database database) {
+    hier = database.getHierarchy();
     if(LOG.isStatistics()) {
       boolean first = true;
-      for(Iter<Result> it = database.getHierarchy().iterDescendants(database); it.valid(); it.advance()) {
+      for(Iter<Result> it = hier.iterDescendants(database); it.valid(); it.advance()) {
         if(!(it.get() instanceof Index)) {
           continue;
         }
@@ -107,7 +105,7 @@ public class AlgorithmStep implements WorkflowStep {
       }
       if(LOG.isStatistics()) {
         boolean first = true;
-        for(Iter<Result> it = database.getHierarchy().iterDescendants(database); it.valid(); it.advance()) {
+        for(Iter<Result> it = hier.iterDescendants(database); it.valid(); it.advance()) {
           if(!(it.get() instanceof Index)) {
             continue;
           }
@@ -119,19 +117,19 @@ public class AlgorithmStep implements WorkflowStep {
         }
       }
       if(res != null) {
-        result.addChildResult(res);
+        hier.add(database, res);
       }
     }
-    return result;
+    return hier;
   }
 
   /**
-   * Get the algorithm result.
+   * Get the result hierarchy.
    * 
-   * @return Algorithm result.
+   * @return Result hierarchy.
    */
-  public HierarchicalResult getResult() {
-    return result;
+  public ResultHierarchy getResultHierarchy() {
+    return hier;
   }
 
   /**

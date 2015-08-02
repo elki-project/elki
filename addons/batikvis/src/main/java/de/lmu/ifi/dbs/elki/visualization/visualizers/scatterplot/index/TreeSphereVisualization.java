@@ -39,8 +39,8 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -102,17 +102,17 @@ public class TreeSphereVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
     for(ScatterPlotProjector<?> p : ps) {
-      Collection<AbstractMTree<?, ?, ?, ?>> trees = ResultUtil.filterResults(result, AbstractMTree.class);
+      Collection<AbstractMTree<?, ?, ?, ?>> trees = ResultUtil.filterResults(hier, result, AbstractMTree.class);
       for(AbstractMTree<?, ?, ?, ?> tree : trees) {
         if(canVisualize(tree) && tree instanceof Result) {
           final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
           task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
           task.initDefaultVisibility(false);
-          baseResult.getHierarchy().add((Result) tree, task);
-          baseResult.getHierarchy().add(p, task);
+          hier.add((Result) tree, task);
+          hier.add(p, task);
         }
       }
     }

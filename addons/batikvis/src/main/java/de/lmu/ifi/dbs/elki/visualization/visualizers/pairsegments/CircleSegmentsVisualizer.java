@@ -44,8 +44,8 @@ import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segment;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segments;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -114,25 +114,25 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     // If no comparison result found abort
-    List<Segments> segments = ResultUtil.filterResults(result, Segments.class);
+    List<Segments> segments = ResultUtil.filterResults(hier, result, Segments.class);
     for(Segments segmentResult : segments) {
       SegmentsStylingPolicy policy;
-      List<SegmentsStylingPolicy> styles = ResultUtil.filterResults(segmentResult, SegmentsStylingPolicy.class);
+      List<SegmentsStylingPolicy> styles = ResultUtil.filterResults(hier, segmentResult, SegmentsStylingPolicy.class);
       if(!styles.isEmpty()) {
         policy = styles.get(0);
       }
       else {
         policy = new SegmentsStylingPolicy(segmentResult);
-        baseResult.getHierarchy().add(segmentResult, policy);
+        hier.add(segmentResult, policy);
       }
       // create task for visualization
       final VisualizationTask task = new VisualizationTask(NAME, policy, null, this);
       task.width = 2.0;
       task.height = 2.0;
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      baseResult.getHierarchy().add(segmentResult, task);
+      hier.add(segmentResult, task);
     }
   }
 

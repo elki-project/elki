@@ -29,8 +29,8 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -82,14 +82,14 @@ public class EvaluationVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    final ArrayList<EvaluationResult> srs = ResultUtil.filterResults(newResult, EvaluationResult.class);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    final ArrayList<EvaluationResult> srs = ResultUtil.filterResults(hier, newResult, EvaluationResult.class);
     for(EvaluationResult sr : srs) {
       final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
       task.width = .5;
       task.height = sr.numLines() * .05;
       task.level = VisualizationTask.LEVEL_STATIC;
-      baseResult.getHierarchy().add(sr, task);
+      hier.add(sr, task);
     }
   }
 

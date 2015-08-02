@@ -32,9 +32,9 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -162,14 +162,14 @@ public class HistogramVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    List<HistogramResult<? extends NumberVector>> histograms = ResultUtil.filterResults(newResult, HistogramResult.class);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    List<HistogramResult<? extends NumberVector>> histograms = ResultUtil.filterResults(hier, newResult, HistogramResult.class);
     for (HistogramResult<? extends NumberVector> histogram : histograms) {
       final VisualizationTask task = new VisualizationTask(NAME, histogram, null, this);
       task.width = 2.0;
       task.height = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
-      baseResult.getHierarchy().add(histogram, task);
+      hier.add(histogram, task);
     }
   }
 

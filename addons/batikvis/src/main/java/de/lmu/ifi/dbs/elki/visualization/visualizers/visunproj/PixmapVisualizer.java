@@ -29,9 +29,9 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -62,15 +62,15 @@ public class PixmapVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<PixmapResult> prs = ResultUtil.filterResults(result, PixmapResult.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<PixmapResult> prs = ResultUtil.filterResults(hier, result, PixmapResult.class);
     for(PixmapResult pr : prs) {
       // Add plots, attach visualizer
       final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
       task.width = pr.getImage().getWidth() / (double) pr.getImage().getHeight();
       task.height = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
-      baseResult.getHierarchy().add(pr, task);
+      hier.add(pr, task);
     }
   }
 

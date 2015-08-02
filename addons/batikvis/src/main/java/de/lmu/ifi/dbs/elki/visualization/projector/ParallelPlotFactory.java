@@ -28,8 +28,8 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 
 /**
@@ -48,15 +48,15 @@ public class ParallelPlotFactory implements ProjectorFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Collection<Relation<?>> rels = ResultUtil.filterResults(newResult, Relation.class);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    Collection<Relation<?>> rels = ResultUtil.filterResults(hier, newResult, Relation.class);
     for(Relation<?> rel : rels) {
       // TODO: multi-relational parallel plots
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
         Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
         ParallelPlotProjector<NumberVector> proj = new ParallelPlotProjector<>(vrel);
-        baseResult.getHierarchy().add(vrel, proj);
+        hier.add(vrel, proj);
       }
     }
   }

@@ -36,8 +36,8 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
@@ -77,19 +77,19 @@ public class PolygonVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<Relation<?>> results = ResultUtil.filterResults(result, Relation.class);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Collection<Relation<?>> results = ResultUtil.filterResults(hier, result, Relation.class);
     for(Relation<?> rel : results) {
       if(TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
         // Assume that a 2d projector is using the same coordinates as the
         // polygons.
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
+        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
         for(ScatterPlotProjector<?> p : ps) {
           if(RelationUtil.dimensionality(p.getRelation()) == 2) {
             final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), this);
             task.level = VisualizationTask.LEVEL_DATA - 10;
-            baseResult.getHierarchy().add(rel, task);
-            baseResult.getHierarchy().add(p, task);
+            hier.add(rel, task);
+            hier.add(p, task);
           }
         }
       }

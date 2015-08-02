@@ -23,9 +23,9 @@ package de.lmu.ifi.dbs.elki.application.jsmap;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -62,9 +62,9 @@ public class JSONResultHandler implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
     if(server == null) {
-      server = new JSONWebServer(port, baseResult);
+      server = new JSONWebServer(port, hier, newResult);
     }
 
     // TODO: stop somehow. UI with stop button?

@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 import java.lang.ref.WeakReference;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
@@ -97,9 +97,9 @@ public class EvaluationTabPanel extends ParameterTabPanel {
     }
     // Get the database and run the algorithms
     Database database = input.getInputStep().getDatabase();
-    HierarchicalResult result = algs.getAlgorithmStep().getResult();
-    evals.runEvaluators(result, database);
-    basedOnResult = new WeakReference<Object>(result);
+    ResultHierarchy hier = algs.getAlgorithmStep().getResultHierarchy();
+    evals.runEvaluators(hier, database);
+    basedOnResult = new WeakReference<Object>(hier);
   }
 
   /**
@@ -147,7 +147,7 @@ public class EvaluationTabPanel extends ParameterTabPanel {
    */
   private void checkDependencies() {
     if (basedOnResult != null) {
-      if (!input.isComplete() || !algs.isComplete() || basedOnResult.get() != algs.getAlgorithmStep().getResult()) {
+      if (!input.isComplete() || !algs.isComplete() || basedOnResult.get() != algs.getAlgorithmStep().getResultHierarchy()) {
         // We've become invalidated, notify.
         basedOnResult = null;
         firePanelUpdated();
