@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -41,7 +42,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
@@ -61,6 +61,7 @@ import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CloneInlineImages;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailTranscoder;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -90,6 +91,41 @@ public class SVGPlot {
    * Attribute to block export of element.
    */
   public static final String NO_EXPORT_ATTRIBUTE = "noexport";
+
+  /**
+   * Batik DOM implementation.
+   */
+  private static final DOMImplementation BATIK_DOM;
+
+  /**
+   * DOM implementations to try.
+   */
+  private static final String[] BATIK_DOMS = {//
+  "org.apache.batik.anim.dom.SVG12DOMImplementation", // Batik 1.8
+  "org.apache.batik.anim.dom.SVGDOMImplementation", // Batik 1.8
+  "org.apache.batik.dom.svg.SVGDOMImplementation", // Batik 1.7
+  "com.sun.org.apache.xerces.internal.dom.DOMImplementationImpl", // Untested
+  };
+
+  // Locate a usable DOM implementation.
+  static {
+    DOMImplementation dom = null;
+    for(String s : BATIK_DOMS) {
+      try {
+        Class<?> c = Class.forName(s);
+        Method m = c.getDeclaredMethod("getDOMImplementation");
+        DOMImplementation ret = DOMImplementation.class.cast(m.invoke(null));
+        if(ret != null) {
+          dom = ret;
+          break;
+        }
+      }
+      catch(Exception e) {
+        continue;
+      }
+    }
+    BATIK_DOM = dom;
+  }
 
   /**
    * SVG document we plot to.
@@ -137,7 +173,7 @@ public class SVGPlot {
   public SVGPlot() {
     super();
     // Get a DOMImplementation.
-    DOMImplementation domImpl = SVGDOMImplementation.getDOMImplementation();
+    DOMImplementation domImpl = getDomImpl();
     DocumentType dt = domImpl.createDocumentType(SVGConstants.SVG_SVG_TAG, SVGConstants.SVG_PUBLIC_ID, SVGConstants.SVG_SYSTEM_ID);
     // Workaround: sometimes DocumentType doesn't work right, which
     // causes problems with
@@ -163,6 +199,18 @@ public class SVGPlot {
 
     // create a CSS class manager.
     cssman = new CSSClassManager();
+  }
+
+  /**
+   * Get a suitable SVG DOM implementation from Batik 1.7 or 1.8.
+   * 
+   * @return DOM implementation
+   */
+  public static DOMImplementation getDomImpl() {
+    if(BATIK_DOM == null) {
+      throw new AbortException("No usable Apache Batik SVG DOM could be located.");
+    }
+    return BATIK_DOM;
   }
 
   /**
@@ -374,7 +422,7 @@ public class SVGPlot {
    * @return cloned document
    */
   protected SVGDocument cloneDocument() {
-    return (SVGDocument) new CloneNoExport().cloneDocument(SVGDOMImplementation.getDOMImplementation(), document);
+    return (SVGDocument) new CloneNoExport().cloneDocument(getDomImpl(), document);
   }
 
   /**
