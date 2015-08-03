@@ -48,8 +48,8 @@ public class DatabaseEventManager {
   private EventListenerList listenerList = new EventListenerList();
 
   /**
-   * Indicates whether DataStoreEvents should be accumulated and fired as one event on
-   * demand.
+   * Indicates whether DataStoreEvents should be accumulated and fired as one
+   * event on demand.
    */
   private boolean accumulateDataStoreEvents = false;
 
@@ -67,7 +67,7 @@ public class DatabaseEventManager {
    * Collects successive insertion, deletion or update events. The accumulated
    * event will be fired when {@link #flushDataStoreEvents()} is called or a
    * different event type occurs.
-   * 
+   *
    * @see #flushDataStoreEvents()
    * @see DataStoreEvent
    */
@@ -80,7 +80,7 @@ public class DatabaseEventManager {
    * DataStoreEvent, i.e. notifies all registered DataStoreListener how the
    * content of the database has been changed since
    * {@link #accumulateDataStoreEvents()} was called.
-   * 
+   *
    * @see #accumulateDataStoreEvents
    * @see DataStoreListener
    * @see DataStoreEvent
@@ -106,7 +106,7 @@ public class DatabaseEventManager {
   /**
    * Adds a <code>DataStoreListener</code> for a <code>DataStoreEvent</code>
    * posted after the content of the database changes.
-   * 
+   *
    * @param l the listener to add
    * @see #removeListener(DataStoreListener)
    * @see DataStoreListener
@@ -119,7 +119,7 @@ public class DatabaseEventManager {
   /**
    * Removes a <code>DataStoreListener</code> previously added with
    * {@link #addListener(DataStoreListener)}.
-   * 
+   *
    * @param l the listener to remove
    * @see #addListener(DataStoreListener)
    * @see DataStoreListener
@@ -131,7 +131,7 @@ public class DatabaseEventManager {
 
   /**
    * Adds a <code>ResultListener</code> to be notified on new results.
-   * 
+   *
    * @param l the listener to add
    * @see #removeListener(ResultListener)
    * @see ResultListener
@@ -144,12 +144,12 @@ public class DatabaseEventManager {
   /**
    * Removes a <code>ResultListener</code> previously added with
    * {@link #addListener(ResultListener)}.
-   * 
+   *
    * @param l the listener to remove
    * @see #addListener(ResultListener)
    * @see ResultListener
    * @see Result
-   * 
+   *
    */
   public void removeListener(ResultListener l) {
     listenerList.remove(ResultListener.class, l);
@@ -158,7 +158,7 @@ public class DatabaseEventManager {
   /**
    * Convenience method, calls {@code fireObjectsChanged(insertions,
    * DataStoreEvent.Type.INSERT)}.
-   * 
+   *
    * @param insertions the objects that have been inserted
    * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
@@ -170,7 +170,7 @@ public class DatabaseEventManager {
   /**
    * Convenience method, calls {@code fireObjectChanged(insertion,
    * DataStoreEvent.Type.INSERT)}.
-   * 
+   *
    * @param insertion the object that has been inserted
    * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
@@ -182,7 +182,7 @@ public class DatabaseEventManager {
   /**
    * Convenience method, calls {@code fireObjectsChanged(updates,
    * DataStoreEvent.Type.UPDATE)}.
-   * 
+   *
    * @param updates the objects that have been updated
    * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#UPDATE
@@ -194,7 +194,7 @@ public class DatabaseEventManager {
   /**
    * Convenience method, calls {@code fireObjectsChanged(deletions,
    * DataStoreEvent.Type.DELETE)}.
-   * 
+   *
    * @param deletions the objects that have been removed
    * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
@@ -206,7 +206,7 @@ public class DatabaseEventManager {
   /**
    * Convenience method, calls {@code fireObjectChanged(deletion,
    * DataStoreEvent.Type.DELETE)}.
-   * 
+   *
    * @param deletion the object that has been removed
    * @see #fireObjectsChanged
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
@@ -219,12 +219,12 @@ public class DatabaseEventManager {
    * Handles a DataStoreEvent with the specified type. If the current event type
    * is not equal to the specified type, the events accumulated up to now will
    * be fired first.
-   * 
+   *
    * The new event will be aggregated and fired on demand if
    * {@link #accumulateDataStoreEvents} is set, otherwise all registered
    * <code>DataStoreListener</code> will be notified immediately that the
    * content of the database has been changed.
-   * 
+   *
    * @param objects the objects that have been changed, i.e. inserted, deleted
    *        or updated
    */
@@ -233,14 +233,25 @@ public class DatabaseEventManager {
     if(currentDataStoreEventType != null && !currentDataStoreEventType.equals(type)) {
       flushDataStoreEvents();
     }
-    if (this.dataStoreObjects == null) {
-      this.dataStoreObjects = DBIDUtil.newHashSet();
+    if(accumulateDataStoreEvents) {
+      if(this.dataStoreObjects == null) {
+        this.dataStoreObjects = DBIDUtil.newHashSet();
+      }
+      this.dataStoreObjects.addDBIDs(objects);
+      currentDataStoreEventType = type;
     }
-    this.dataStoreObjects.addDBIDs(objects);
-    currentDataStoreEventType = type;
+    else {
+      // inform listeners
+      Map<Type, DBIDs> os = new HashMap<>(1);
+      os.put(type, DBIDUtil.makeUnmodifiable(objects));
+      DataStoreEvent e = new DataStoreEvent(this, os);
 
-    if(!accumulateDataStoreEvents) {
-      flushDataStoreEvents();
+      Object[] listeners = listenerList.getListenerList();
+      for(int i = listeners.length - 2; i >= 0; i -= 2) {
+        if(listeners[i] == DataStoreListener.class) {
+          ((DataStoreListener) listeners[i + 1]).contentChanged(e);
+        }
+      }
     }
   }
 
@@ -248,21 +259,21 @@ public class DatabaseEventManager {
    * Handles a DataStoreEvent with the specified type. If the current event type
    * is not equal to the specified type, the events accumulated up to now will
    * be fired first.
-   * 
+   *
    * The new event will be aggregated and fired on demand if
    * {@link #accumulateDataStoreEvents} is set, otherwise all registered
    * <code>DataStoreListener</code> will be notified immediately that the
    * content of the database has been changed.
-   * 
-   * @param object the object that has been changed, i.e. inserted, deleted
-   *        or updated
+   *
+   * @param object the object that has been changed, i.e. inserted, deleted or
+   *        updated
    */
   private void fireObjectChanged(DBIDRef object, DataStoreEvent.Type type) {
     // flush first
     if(currentDataStoreEventType != null && !currentDataStoreEventType.equals(type)) {
       flushDataStoreEvents();
     }
-    if (this.dataStoreObjects == null) {
+    if(this.dataStoreObjects == null) {
       this.dataStoreObjects = DBIDUtil.newHashSet();
     }
     this.dataStoreObjects.add(object);
@@ -276,7 +287,7 @@ public class DatabaseEventManager {
   /**
    * Informs all registered <code>ResultListener</code> that a new result was
    * added.
-   * 
+   *
    * @param r New child result added
    * @param parent Parent result that was added to
    */
@@ -289,7 +300,7 @@ public class DatabaseEventManager {
   /**
    * Informs all registered <code>ResultListener</code> that a new result has
    * been removed.
-   * 
+   *
    * @param r result that has been removed
    * @param parent Parent result that has been removed
    */
