@@ -29,19 +29,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * The WGS84 spheroid earth model, without height model (so not a geoid, just a
  * spheroid!)
- * 
+ *
  * Note that EGM96 uses the same spheroid, but what really makes the difference
  * is it's geoid expansion.
- * 
+ *
  * Radius: 6378137.0 m
- * 
+ *
  * Flattening: 1 / 298.257223563
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  */
-@Alias({ "wgs84", "WGS-84", "WGS84" })
+@Alias({ "WGS-84", "WGS84" })
 public class WGS84SpheroidEarthModel extends AbstractEarthModel {
   /**
    * Static instance.
@@ -72,9 +72,9 @@ public class WGS84SpheroidEarthModel extends AbstractEarthModel {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
