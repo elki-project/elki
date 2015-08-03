@@ -26,12 +26,10 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.ContinuousUncertainObject;
-import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
-import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -45,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  *
  * @author Alexander Koos
  */
-public class UniformDistributionFunction extends ProbabilityDensityFunction {
+public class UniformDistributionFunction extends ProbabilityDensityFunction<UniformDistributionFunction> {
   /**
    * Field to hold the value the randomly created minimum and maximum deviation.
    */
@@ -113,20 +111,24 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction {
   }
 
   @Override
-  public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur) {
-    final double[] min = new double[vec.getDimensionality()];
-    final double[] max = new double[vec.getDimensionality()];
+  public <A> ContinuousUncertainObject<UniformDistributionFunction> uncertainify(A array, NumberArrayAdapter<?, A> adapter, boolean blur) {
+    final int dim = adapter.size(array);
+    final double[] min = new double[dim];
+    final double[] max = new double[dim];
     Random r = rand.getSingleThreadedRandom();
-    for(int i = 0; i < vec.getDimensionality(); i++) {
+    for(int i = 0; i < dim; i++) {
       final double preDev = r.nextDouble();
       final double difMin = (r.nextDouble() * (this.max - this.min)) + this.min;
       final double difMax = (r.nextDouble() * (this.max - this.min)) + this.min;
-      final double randDev = blur ? ((r.nextInt() % 2) == 0 ? preDev * -difMin : preDev * difMax) : 0;
-      min[i] = vec.doubleValue(i) - (r.nextDouble() * difMin) + randDev;
-      max[i] = vec.doubleValue(i) + (r.nextDouble() * difMax) + randDev;
+      double v = adapter.getDouble(array, i);
+      if(blur) {
+        v += ((r.nextInt() % 2) == 0 ? preDev * -difMin : preDev * difMax);
+      }
+      min[i] = v - (r.nextDouble() * difMin);
+      max[i] = v + (r.nextDouble() * difMax);
     }
 
-    return new UncertainObject<UOModel>(new ContinuousUncertainObject<>(min, max, this, new RandomFactory(r.nextLong())), vec);
+    return new ContinuousUncertainObject<>(min, max, this, new RandomFactory(r.nextLong()));
   }
   
   /**

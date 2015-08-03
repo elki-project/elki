@@ -1,37 +1,18 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * This class is derived from {@link AbstractDiscreteUncertainObject} and models
@@ -41,39 +22,30 @@ import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
  *
  * @author Alexander Koos
  */
-public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<DoubleVector>> {
-  private double minMin, maxMin, minMax, maxMax;
-
-  private long multMin, multMax;
-
-  private Random drand;
-
-  // Constructor for uncertainifyFilter-use
-  //
-  // This one is basically constructing a Factory,
-  // one could argue that it would be better practice
-  // to actually implement such a factory, but for
-  // the time being I'll stick with this kind of
-  // under engineered approach, until everything is
-  // fine and I can give more priority to beauty
-  // than to functionality.
-  public UniformDiscreteUO(double minMin, double maxMin, double minMax, double maxMax, long multMin, long multMax, long distributionSeed, RandomFactory randFac) {
-    this.minMin = minMin;
-    this.maxMin = maxMin;
-    this.minMax = minMax;
-    this.maxMax = maxMax;
-    this.multMin = multMin;
-    this.multMax = multMax;
-    this.rand = randFac.getRandom();
-    this.drand = (new RandomFactory(distributionSeed)).getRandom();
-  }
+public class UniformDiscreteUO extends UncertainObject {
+  private DoubleVector[] samples;
 
   // Constructor
-  public UniformDiscreteUO(List<DoubleVector> samplePoints, RandomFactory randomFactory) {
-    this.samplePoints = samplePoints;
-    this.dimensions = samplePoints.get(0).getDimensionality();
+  public UniformDiscreteUO(DoubleVector[] samples, RandomFactory randomFactory) {
+    this.samples = samples;
+    this.dimensions = samples[0].getDimensionality();
     this.rand = randomFactory.getRandom();
-    this.setBounds();
+    // Compute bounds:
+    final double min[] = new double[this.dimensions];
+    final double max[] = new double[this.dimensions];
+    DoubleVector first = this.samples[0];
+    for(int d = 0; d < this.dimensions; d++) {
+      min[d] = max[d] = first.doubleValue(d);
+    }
+    for(int i = 1; i < this.samples.length; i++) {
+      DoubleVector v = this.samples[i];
+      for(int d = 0; d < this.dimensions; d++) {
+        final double c = v.doubleValue(d);
+        min[d] = c < min[d] ? c : min[d];
+        max[d] = c > max[d] ? c : max[d];
+      }
+    }
+    this.bounds = new HyperBoundingBox(min, max);
   }
 
   @Override
@@ -82,68 +54,157 @@ public class UniformDiscreteUO extends AbstractDiscreteUncertainObject<List<Doub
     // precisely 1:samplePoints.size(), it should be fair enough
     // to simply draw a sample by returning the point at
     // Index := random.mod(samplePoints.size())
-    return this.samplePoints.get(this.rand.nextInt(this.samplePoints.size()));
+    return samples[rand.nextInt(samples.length)];
   }
 
   @Override
   public DoubleVector getMean() {
     double[] meanVals = new double[this.dimensions];
 
-    for (DoubleVector sp : this.samplePoints) {
+    for(DoubleVector sp : samples) {
       double[] vals = sp.getValues();
-      for (int i=0; i<this.dimensions; i++) {
+      for(int i = 0; i < this.dimensions; i++) {
         meanVals[i] += vals[i];
       }
     }
 
-    for (int i=0; i<this.dimensions; i++) {
+    for(int i = 0; i < this.dimensions; i++) {
       meanVals[i] /= this.dimensions;
     }
 
     return new DoubleVector(meanVals);
   }
 
-  protected void setBounds() {
-    double min[] = new double[this.dimensions];
-    Arrays.fill(min, Double.MAX_VALUE);
-    double max[] = new double[this.dimensions];
-    Arrays.fill(max, -Double.MAX_VALUE);
-    for(DoubleVector samplePoint : this.samplePoints) {
-      for(int d = 0; d < this.dimensions; d++) {
-        min[d] = Math.min(min[d], samplePoint.doubleValue(d));
-        max[d] = Math.max(max[d], samplePoint.doubleValue(d));
-      }
-    }
-    this.bounds = new HyperBoundingBox(min, max);
-  }
-
   @Override
-  public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur) {
-    List<DoubleVector> sampleList = new ArrayList<DoubleVector>();
-    int genuine = this.drand.nextInt(vec.getDimensionality());
-    double difMin = this.drand.nextDouble() * (this.maxMin - this.minMin) + this.minMin;
-    double difMax = this.drand.nextDouble() * (this.maxMax - this.minMax) + this.minMax;
-    double randDev = blur ? (this.drand.nextInt(2) == 0 ? this.drand.nextDouble() * -difMin : this.drand.nextDouble() * difMax) : 0;
-    int distributionSize = this.drand.nextInt((int) (this.multMax - this.multMin) + 1) + (int) this.multMin;
-    for(int i = 0; i < distributionSize; i++) {
-      if(i == genuine) {
-        sampleList.add(new DoubleVector(vec.getColumnVector()));
-        continue;
-      }
-      double[] svec = new double[vec.getDimensionality()];
-      for(int j = 0; j < vec.getDimensionality(); j++) {
-        double gtv = vec.doubleValue(j);
-        svec[j] = gtv + this.drand.nextDouble() * difMax - this.drand.nextDouble() * difMin + randDev;
-      }
-      sampleList.add(new DoubleVector(svec));
-    }
-    return new UncertainObject<UOModel>(new UniformDiscreteUO(sampleList, new RandomFactory(this.drand.nextLong())), vec);
+  public Double getValue(int dimension) {
+    // Not particularly meaningful, but currently unused anyway.
+    return (bounds.getMax(dimension) + bounds.getMin(dimension)) * .5;
   }
 
-  public static class Parameterizer extends DistributedDiscreteUO.Parameterizer {
+  public static class Factory extends UncertainObject.Factory<UniformDiscreteUO> {
+    private double minMin, maxMin, minMax, maxMax;
+
+    private int multMin, multMax;
+
+    private Random drand;
+
+    // Constructor for uncertainifyFilter-use
+    //
+    // This one is basically constructing a Factory,
+    // one could argue that it would be better practice
+    // to actually implement such a factory, but for
+    // the time being I'll stick with this kind of
+    // under engineered approach, until everything is
+    // fine and I can give more priority to beauty
+    // than to functionality.
+    public Factory(double minMin, double maxMin, double minMax, double maxMax, int multMin, int multMax, RandomFactory randFac) {
+      this.minMin = minMin;
+      this.maxMin = maxMin;
+      this.minMax = minMax;
+      this.maxMax = maxMax;
+      this.multMin = multMin;
+      this.multMax = multMax;
+      this.drand = randFac.getRandom();
+    }
+
     @Override
-    protected UniformDiscreteUO makeInstance() {
-      return new UniformDiscreteUO(this.minMin, this.maxMin, this.minMax, this.maxMax, this.multMin, this.multMax, this.distributionSeed, this.randFac);
+    public <A> UniformDiscreteUO newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
+      final int dim = adapter.size(array);
+      final int distributionSize = drand.nextInt((int) (multMax - multMin) + 1) + (int) multMin;
+      DoubleVector[] samples = new DoubleVector[distributionSize];
+      double difMin = drand.nextDouble() * (maxMin - minMin) + minMin;
+      double difMax = drand.nextDouble() * (maxMax - minMax) + minMax;
+      double randDev = blur ? (drand.nextInt(2) == 0 ? drand.nextDouble() * -difMin : drand.nextDouble() * difMax) : 0;
+      for(int i = 0; i < distributionSize; i++) {
+        double[] svec = new double[dim];
+        for(int j = 0; j < dim; j++) {
+          double gtv = adapter.getDouble(array, j);
+          svec[j] = gtv + drand.nextDouble() * difMax - drand.nextDouble() * difMin + randDev;
+        }
+        samples[i] = new DoubleVector(svec);
+      }
+      return new UniformDiscreteUO(samples, new RandomFactory(drand.nextLong()));
+    }
+
+    @Override
+    public Class<? super UniformDiscreteUO> getRestrictionClass() {
+      return UniformDiscreteUO.class;
+    }
+
+    @Override
+    public ByteBufferSerializer<UniformDiscreteUO> getDefaultSerializer() {
+      return null; // Not yet available.
+    }
+
+    // TODO: remove redundancy with DistributedDiscreteUO.Parameterizer
+    public static class Parameterizer extends AbstractParameterizer {
+      protected double minMin, maxMin, minMax, maxMax;
+
+      protected int multMin, multMax;
+
+      protected RandomFactory randFac;
+
+      protected double maxTotalProb;
+
+      public static final OptionID MIN_MIN_ID = new OptionID("objects.lbound.min", "Minimum lower boundary.");
+
+      public static final OptionID MAX_MIN_ID = new OptionID("objects.lbound.max", "Maximum lower boundary.");
+
+      public static final OptionID MIN_MAX_ID = new OptionID("objects.ubound.min", "Minimum upper boundary.");
+
+      public static final OptionID MAX_MAX_ID = new OptionID("objects.ubound.max", "Maximum upper boundary.");
+
+      public static final OptionID MULT_MIN_ID = new OptionID("uo.mult.min", "Minimum Points per uncertain object.");
+
+      public static final OptionID MULT_MAX_ID = new OptionID("uo.mult.max", "Maximum Points per uncertain object.");
+
+      public static final OptionID SEED_ID = new OptionID("uo.seed", "Seed for uncertainification.");
+
+      public static final OptionID DISTRIBUTION_SEED_ID = new OptionID("ret.uo.seed", "Seed for uncertain objects private Random.");
+
+      public static final OptionID MAXIMUM_PROBABILITY_ID = new OptionID("uo.maxprob", "Maximum total probability to draw a valid sample at all.");
+
+      @Override
+      protected void makeOptions(final Parameterization config) {
+        super.makeOptions(config);
+        final DoubleParameter pminMin = new DoubleParameter(Parameterizer.MIN_MIN_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION);
+        if(config.grab(pminMin)) {
+          this.minMin = pminMin.getValue();
+        }
+        final DoubleParameter pmaxMin = new DoubleParameter(Parameterizer.MAX_MIN_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION);
+        if(config.grab(pmaxMin)) {
+          this.maxMin = pmaxMin.getValue();
+        }
+        final DoubleParameter pminMax = new DoubleParameter(Parameterizer.MIN_MAX_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION);
+        if(config.grab(pminMax)) {
+          this.minMax = pminMax.getValue();
+        }
+        final DoubleParameter pmaxMax = new DoubleParameter(Parameterizer.MAX_MAX_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION);
+        if(config.grab(pmaxMax)) {
+          this.maxMax = pmaxMax.getValue();
+        }
+        final IntParameter pmultMin = new IntParameter(Parameterizer.MULT_MIN_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
+        if(config.grab(pmultMin)) {
+          this.multMin = pmultMin.getValue();
+        }
+        final IntParameter pmultMax = new IntParameter(Parameterizer.MULT_MAX_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
+        if(config.grab(pmultMax)) {
+          this.multMax = pmultMax.getValue();
+        }
+        final RandomParameter pseed = new RandomParameter(Parameterizer.SEED_ID);
+        if(config.grab(pseed)) {
+          this.randFac = pseed.getValue();
+        }
+        final DoubleParameter maxProb = new DoubleParameter(Parameterizer.MAXIMUM_PROBABILITY_ID, UncertainObject.DEFAULT_MAX_TOTAL_PROBABILITY);
+        if(config.grab(maxProb)) {
+          this.maxTotalProb = maxProb.getValue();
+        }
+      }
+
+      @Override
+      protected Factory makeInstance() {
+        return new Factory(minMin, maxMin, minMax, maxMax, multMin, multMax, randFac);
+      }
     }
   }
 }

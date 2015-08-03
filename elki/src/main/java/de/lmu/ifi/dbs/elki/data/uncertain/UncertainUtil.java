@@ -47,7 +47,7 @@ public class UncertainUtil {
     double baseSum = 0.0;
     final int[] probDis = new int[size];
     for(int i = 0; i < size; i++) {
-      probDis[i] = rand.nextInt(UOModel.DEFAULT_PROBABILITY_SEED) + 1;
+      probDis[i] = rand.nextInt(UncertainObject.DEFAULT_PROBABILITY_SEED) + 1;
       baseSum += probDis[i];
     }
     baseSum /= totalProb;
@@ -67,7 +67,7 @@ public class UncertainUtil {
    * @return
    */
   public static int drawIndexFromIntegerWeights(final Random rand, final int[] weights, final int totalProb) {
-    final int index = rand.nextInt(UOModel.PROBABILITY_SCALE);
+    final int index = rand.nextInt(UncertainObject.PROBABILITY_SCALE);
     for(int i = 0, sum = 0;; i++) {
       sum += weights[i];
       if(sum >= index || sum >= totalProb) {

@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.UniformDiscreteUO;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -66,7 +65,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <O> Object type
  */
 // FIXME add @Reference
-public class FDBSCAN<O extends UncertainObject<UOModel>> extends DBSCAN<O> {
+// FIXME: we CANNOT interherit from DBSCAN, because we operate on
+// UncertainObject, but need a distance function defined on Samples.
+// We can, however, implement the predicates of GeneralizedDBSCAN maybe?
+// OR: maybe we can just define an uncertain distance function to use?
+public class FDBSCAN<O extends UncertainObject> extends DBSCAN<O> {
   /**
    * The logger for this class.
    */
@@ -223,7 +226,7 @@ public class FDBSCAN<O extends UncertainObject<UOModel>> extends DBSCAN<O> {
    */
   private DBIDs getEpsilonNeighbours(DBIDRef startObjectID, Relation<O> relation, double epsilon) {
     final ModifiableDBIDs epsilonNeighbours = DBIDUtil.newArray();
-    final UncertainObject<UOModel> uo = relation.get(startObjectID);
+    final O uo = relation.get(startObjectID);
 
     // look at each object once
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
@@ -231,7 +234,7 @@ public class FDBSCAN<O extends UncertainObject<UOModel>> extends DBSCAN<O> {
       if(iter.internalGetIndex() == startObjectID.internalGetIndex()) {
         continue;
       }
-      UncertainObject<UOModel> possibleNeighbour = relation.get(iter);
+      O possibleNeighbour = relation.get(iter);
 
       boolean inside = true, possible = true;
       for(int i = 0; i < uo.getDimensionality(); i++) {
@@ -263,16 +266,18 @@ public class FDBSCAN<O extends UncertainObject<UOModel>> extends DBSCAN<O> {
         continue;
       }
 
-      if(uo.getModel() instanceof UniformDiscreteUO) {
+      if(uo instanceof UniformDiscreteUO) {
         int matches = 0;
         // Look at each pairing, respectively the cartesian product of both
         // samplesets. Hence we iterate over both lists.
         // To prevent us from holding the lists of samples in the memory, we
         // retrieve them from the uncertain objects directly.
         // TODO: Avoid copies.
-        for(DoubleVector uoSample : ((UniformDiscreteUO) uo.getModel()).getObservationsCopy()) {
-          for(DoubleVector possibleNeighbourSample : ((UniformDiscreteUO) possibleNeighbour.getModel()).getObservationsCopy()) {
-            // FIXME: ugly cast.
+        final UniformDiscreteUO uuo = (UniformDiscreteUO) uo;
+        final UniformDiscreteUO upn = (UniformDiscreteUO) possibleNeighbour;
+        for(DoubleVector uoSample : uuo.getObservationsCopy()) {
+          for(DoubleVector possibleNeighbourSample : upn.getObservationsCopy()) {
+            // FIXME: ugly cast. This IS an error, so ignoring this is not OK.
             if(((AbstractPrimitiveDistanceFunction<NumberVector>) getDistanceFunction()).distance(uoSample, possibleNeighbourSample) <= epsilon) {
               matches++;
             }
@@ -291,7 +296,7 @@ public class FDBSCAN<O extends UncertainObject<UOModel>> extends DBSCAN<O> {
         // E.g. if we have a threshold of 0.5 and a sampleSize of 5, it would be
         // sufficient to have 12 matches.
         // 12 / 25 = 0.48, which is lower than the given 0.5.
-        if(matches >= (((UniformDiscreteUO) uo.getModel()).getObservationsCopy().size() * ((UniformDiscreteUO) possibleNeighbour.getModel()).getObservationsCopy().size() * threshold)) {
+        if(matches >= (uuo.getObservationsCopy().size() * upn.getObservationsCopy().size() * threshold)) {
           epsilonNeighbours.add(iter);
         }
       }
@@ -307,9 +312,9 @@ public class FDBSCAN<O extends UncertainObject<UOModel>> extends DBSCAN<O> {
         int matches = 0;
         for(int i = 0; i < sampleSize; i++) {
           for(int j = 0; j < sampleSize; j++) {
-            // We just use UncertainObject.drawSample inline to prevent us from
+            // We just use UOModel.drawSample inline to prevent us from
             // the need to store the lists of samples.
-            // FIXME: ugly cast.
+            // FIXME: ugly cast. This IS an error, so ignoring this is not OK.
             if(((AbstractPrimitiveDistanceFunction<NumberVector>) getDistanceFunction()).distance(uo.drawSample(), possibleNeighbour.drawSample()) <= epsilon) {
               matches++;
             }
@@ -342,7 +347,7 @@ public class FDBSCAN<O extends UncertainObject<UOModel>> extends DBSCAN<O> {
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends UncertainObject<UOModel>> extends DBSCAN.Parameterizer<O> {
+  public static class Parameterizer<O extends UncertainObject> extends DBSCAN.Parameterizer<O> {
     /**
      * The OptionID to retrieve the threshold as discussed in {@link FDBSCAN}
      * from the user input. Must be a decimal value between 0 and 1, the default

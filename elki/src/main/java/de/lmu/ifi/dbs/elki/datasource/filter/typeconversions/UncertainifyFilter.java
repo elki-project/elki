@@ -27,14 +27,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -50,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <UO> Uncertainty model
  * @param <U> Uncertain object type
  */
-public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO>> extends AbstractConversionFilter<NumberVector, U> {
+public class UncertainifyFilter<UO extends UncertainObject> extends AbstractConversionFilter<NumberVector, UO> {
   /**
    * Class logger.
    */
@@ -61,22 +60,15 @@ public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO
    * uncertainified and how the the sampling is made in the
    * {@link de.lmu.ifi.dbs.elki.workflow.AlgorithmStep}.
    */
-  private UO uncertainityModel;
-
-  /**
-   * The flag blur specifies, if the boundaries of the uncertain object shall be
-   * centered on a randomized value or on the given data.
-   */
-  private boolean blur;
+  private UncertainObject.Factory<UO> uncertainityModel;
 
   /**
    * Constructor.
    *
    * @param uoModel
    */
-  public UncertainifyFilter(UO uoModel, boolean blur) {
+  public UncertainifyFilter(UncertainObject.Factory<UO> uoModel) {
     this.uncertainityModel = uoModel;
-    this.blur = blur;
   }
 
   @Override
@@ -84,14 +76,9 @@ public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO
     return LOG;
   }
 
-  /**
-   * Transforms a single vector object into an uncertainified version, wrapped
-   * into an {@link UncertainObject}.
-   */
-  @SuppressWarnings("unchecked")
   @Override
-  protected U filterSingleObject(NumberVector obj) {
-    return (U) uncertainityModel.uncertainify(obj, blur);
+  protected UO filterSingleObject(NumberVector obj) {
+    return uncertainityModel.newFeatureVector(obj, ArrayLikeUtil.NUMBERVECTORADAPTER);
   }
 
   @Override
@@ -100,9 +87,9 @@ public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO
   }
 
   @Override
-  protected SimpleTypeInformation<U> convertedType(SimpleTypeInformation<NumberVector> in) {
+  protected SimpleTypeInformation<UO> convertedType(SimpleTypeInformation<NumberVector> in) {
     final int dim = ((VectorFieldTypeInformation<NumberVector>) in).getDimensionality();
-    return VectorFieldTypeInformation.typeRequest(UncertainObject.class, dim, dim);
+    return new VectorFieldTypeInformation<UO>(uncertainityModel, dim);
   }
 
   /**
@@ -112,7 +99,7 @@ public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<UO extends UOModel, U extends UncertainObject<UO>> extends AbstractParameterizer {
+  public static class Parameterizer<UO extends UncertainObject> extends AbstractParameterizer {
     /**
      * Parameter to specify the uncertainityModel used for the
      * uncertainification.
@@ -121,38 +108,22 @@ public class UncertainifyFilter<UO extends UOModel, U extends UncertainObject<UO
     "To uncertainify a Database a Model for uncertainity is needed.");
 
     /**
-     * Parameter to specify if the boundaries of the uncertain object shall be
-     * centered on the genuine data or on a sampled point.
-     */
-    public static final OptionID BLUR_DATA_ID = new OptionID("uncertainifyFilter.blurData", //
-    "Shall the center for the uo be the genuine data? -- 'True' means 'no'.");
-
-    /**
      * Field to hold the uncertainityModel
      */
-    protected UO uncertainityModel;
-
-    /**
-     * Field to hold the blur flag.
-     */
-    protected boolean blur;
+    protected UncertainObject.Factory<UO> uncertainityModel;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<UO> uoModel = new ObjectParameter<>(UNCERTAINITY_MODEL_ID, UOModel.class);
+      final ObjectParameter<UncertainObject.Factory<UO>> uoModel = new ObjectParameter<>(UNCERTAINITY_MODEL_ID, UncertainObject.Factory.class);
       if(config.grab(uoModel)) {
         uncertainityModel = uoModel.instantiateClass(config);
-      }
-      final Flag pblur = new Flag(BLUR_DATA_ID);
-      if(config.grab(pblur)) {
-        blur = pblur.getValue();
       }
     }
 
     @Override
-    protected UncertainifyFilter<UO, U> makeInstance() {
-      return new UncertainifyFilter<UO, U>(uncertainityModel, blur);
+    protected UncertainifyFilter<UO> makeInstance() {
+      return new UncertainifyFilter<UO>(uncertainityModel);
     }
   }
 }

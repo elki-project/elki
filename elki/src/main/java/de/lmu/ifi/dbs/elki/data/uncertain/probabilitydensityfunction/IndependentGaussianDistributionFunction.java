@@ -28,14 +28,13 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.PWCClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.ContinuousUncertainObject;
-import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.UncertainifyFilter;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -52,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  *
  * @author Alexander Koos
  */
-public class IndependentGaussianDistributionFunction extends AbstractGaussianDistributionFunction<DoubleVector> {
+public class IndependentGaussianDistributionFunction extends AbstractGaussianDistributionFunction<DoubleVector, IndependentGaussianDistributionFunction> {
   /**
    * Constructor.
    *
@@ -128,7 +127,7 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
     int index = 0;
     final double[] values = new double[bounds.getDimensionality()];
 
-    for(int j = 0; j < UOModel.DEFAULT_TRY_LIMIT; j++) {
+    for(int j = 0; j < UncertainObject.DEFAULT_TRY_LIMIT; j++) {
       if(weights.length > 1) {
         index = UncertainUtil.drawIndexFromIntegerWeights(rand, weights, weightMax);
       }
@@ -175,39 +174,41 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
   }
 
   @Override
-  public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur) {
+  public <A> ContinuousUncertainObject<IndependentGaussianDistributionFunction> uncertainify(A array, NumberArrayAdapter<?, A> adapter, boolean blur) {
+    final int dim = adapter.size(array);
     final int multiplicity = urand.nextInt((multMax - multMin) + 1) + multMin;
     final List<DoubleVector> means = new ArrayList<DoubleVector>();
     final List<DoubleVector> variances = new ArrayList<DoubleVector>();
     int[] weights;
     weights = UncertainUtil.calculateRandomIntegerWeights(multiplicity, weightMax, urand);
     for(int h = 0; h < multiplicity; h++) {
-      final double[] imeans = new double[vec.getDimensionality()];
-      final double[] ivariances = new double[vec.getDimensionality()];
+      final double[] imeans = new double[dim];
+      final double[] ivariances = new double[dim];
       final double minBound = (urand.nextDouble() * (maxMin - minMin)) + minMin;
       final double maxBound = (urand.nextDouble() * (maxMax - minMax)) + minMax;
-      for(int i = 0; i < vec.getDimensionality(); i++) {
+      for(int i = 0; i < dim; i++) {
         ivariances[i] = (urand.nextDouble() * (maxDev - minDev)) + minDev;
+        final double vi = adapter.getDouble(array, i);
         if(blur) {
-          for(int j = 0; j < UOModel.DEFAULT_TRY_LIMIT; j++) {
-            final double val = this.urand.nextGaussian() * ivariances[i] + vec.doubleValue(i);
-            if(val >= vec.doubleValue(i) - minBound && val <= vec.doubleValue(i) + maxBound) {
+          for(int j = 0; j < UncertainObject.DEFAULT_TRY_LIMIT; j++) {
+            final double val = this.urand.nextGaussian() * ivariances[i] + vi;
+            if(val >= vi - minBound && val <= vi + maxBound) {
               imeans[i] = val;
               break;
             }
           }
-          if(imeans[i] == 0.0 && (imeans[i] < vec.doubleValue(i) - (minBound * ivariances[i]) || imeans[i] > vec.doubleValue(i) + (maxBound * ivariances[i]))) {
-            imeans[i] = this.urand.nextInt(2) == 1 ? vec.doubleValue(i) - (minBound * ivariances[i]) : vec.doubleValue(i) + (maxBound * ivariances[i]);
+          if(imeans[i] == 0.0 && (imeans[i] < vi - (minBound * ivariances[i]) || imeans[i] > vi + (maxBound * ivariances[i]))) {
+            imeans[i] = this.urand.nextInt(2) == 1 ? vi - (minBound * ivariances[i]) : vi + (maxBound * ivariances[i]);
           }
         }
         else {
-          imeans[i] = vec.doubleValue(i);
+          imeans[i] = vi;
         }
       }
       means.add(new DoubleVector(imeans));
       variances.add(new DoubleVector(ivariances));
     }
-    return new UncertainObject<UOModel>(new ContinuousUncertainObject<>(new IndependentGaussianDistributionFunction(means, variances, weights), vec.getDimensionality()), vec.getColumnVector());
+    return new ContinuousUncertainObject<>(new IndependentGaussianDistributionFunction(means, variances, weights), dim);
   }
 
   /**
@@ -315,35 +316,35 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
     @Override
     protected void makeOptions(final Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter pDevMin = new DoubleParameter(Parameterizer.STDDEV_MIN_ID, UOModel.DEFAULT_STDDEV);
+      final DoubleParameter pDevMin = new DoubleParameter(Parameterizer.STDDEV_MIN_ID, UncertainObject.DEFAULT_STDDEV);
       if(config.grab(pDevMin)) {
         this.stddevMin = pDevMin.getValue();
       }
-      final DoubleParameter pDevMax = new DoubleParameter(Parameterizer.STDDEV_MAX_ID, UOModel.DEFAULT_STDDEV);
+      final DoubleParameter pDevMax = new DoubleParameter(Parameterizer.STDDEV_MAX_ID, UncertainObject.DEFAULT_STDDEV);
       if(config.grab(pDevMax)) {
         this.stddevMax = pDevMax.getValue();
       }
-      final DoubleParameter pMinMin = new DoubleParameter(Parameterizer.MIN_MIN_ID, UOModel.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
+      final DoubleParameter pMinMin = new DoubleParameter(Parameterizer.MIN_MIN_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
       if(config.grab(pMinMin)) {
         this.minMin = pMinMin.getValue();
       }
-      final DoubleParameter pMaxMin = new DoubleParameter(Parameterizer.MAX_MIN_ID, UOModel.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
+      final DoubleParameter pMaxMin = new DoubleParameter(Parameterizer.MAX_MIN_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
       if(config.grab(pMaxMin)) {
         this.maxMin = pMaxMin.getValue();
       }
-      final DoubleParameter pMinMax = new DoubleParameter(Parameterizer.MIN_MAX_ID, UOModel.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
+      final DoubleParameter pMinMax = new DoubleParameter(Parameterizer.MIN_MAX_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
       if(config.grab(pMinMax)) {
         this.minMax = pMinMax.getValue();
       }
-      final DoubleParameter pMaxMax = new DoubleParameter(Parameterizer.MAX_MAX_ID, UOModel.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
+      final DoubleParameter pMaxMax = new DoubleParameter(Parameterizer.MAX_MAX_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
       if(config.grab(pMaxMax)) {
         this.maxMax = pMaxMax.getValue();
       }
-      final IntParameter pMultMin = new IntParameter(Parameterizer.MULT_MIN_ID, UOModel.DEFAULT_MULTIPLICITY);
+      final IntParameter pMultMin = new IntParameter(Parameterizer.MULT_MIN_ID, UncertainObject.DEFAULT_MULTIPLICITY);
       if(config.grab(pMultMin)) {
         this.multMin = pMultMin.getValue();
       }
-      final IntParameter pMultMax = new IntParameter(Parameterizer.MULT_MAX_ID, UOModel.DEFAULT_MULTIPLICITY);
+      final IntParameter pMultMax = new IntParameter(Parameterizer.MULT_MAX_ID, UncertainObject.DEFAULT_MULTIPLICITY);
       if(config.grab(pMultMax)) {
         this.multMax = pMultMax.getValue();
       }

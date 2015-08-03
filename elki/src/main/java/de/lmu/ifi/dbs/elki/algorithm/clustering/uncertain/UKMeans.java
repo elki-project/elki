@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
 // TODO: JavaDoc
+// FIXME: add @Reference
 public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * CLass logger.
@@ -76,7 +77,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
   }
 
   // TODO: JavaDoc
-  public Clustering<?> run(final Database database, final Relation<UncertainObject<?>> relation) {
+  public Clustering<?> run(final Database database, final Relation<UncertainObject> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final DBIDs ids = relation.getDBIDs();
     final WritableDataStore<NumberVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);

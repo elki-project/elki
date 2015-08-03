@@ -25,34 +25,23 @@ package de.lmu.ifi.dbs.elki.data.uncertain;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.PWCClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction.ProbabilityDensityFunction;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.UncertainifyFilter;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
-public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> extends UOModel {
+public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> extends UncertainObject {
   /**
-   * Field holding the probabilityDensityFunction this object will use for one
-   * of the following tasks: - Uncertainification in
-   * {@link UncertainifyFilter#filter(de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle)}
-   * - drawing samples in
-   * {@link PWCClusteringAlgorithm#run(de.lmu.ifi.dbs.elki.database.Database, de.lmu.ifi.dbs.elki.database.relation.Relation)}
+   * Field holding the probabilityDensityFunction this object will use for
+   * drawing samples in {@link PWCClusteringAlgorithm}
    */
   private F probabilityDensityFunction;
-
-  /**
-   * Constructor for uncertainification.
-   *
-   * @param probabilityDensityFunction
-   */
-  public ContinuousUncertainObject(F probabilityDensityFunction) {
-    this.probabilityDensityFunction = probabilityDensityFunction;
-  }
 
   /**
    * Constructor.
@@ -132,39 +121,72 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction> ext
   }
 
   @Override
-  public UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur) {
-    return probabilityDensityFunction.uncertainify(vec, blur);
+  public Double getValue(int dimension) {
+    // Not particularly meaningful, but currently unused anyway.
+    return (bounds.getMax(dimension) + bounds.getMin(dimension)) * .5;
   }
 
-  /**
-   * Parameterizer class.
-   *
-   * @author Alexander Koos
-   */
-  public static class Parameterizer<F extends ProbabilityDensityFunction> extends AbstractParameterizer {
+  public static class Factory<F extends ProbabilityDensityFunction<F>> extends UncertainObject.Factory<ContinuousUncertainObject<F>> {
     /**
-     * Parameter to specify the {@link ProbabilityDensityFunction} to be used
-     * for uncertainification.
+     * Field holding the probabilityDensityFunction this object will use for
+     * uncertainification in {@link UncertainifyFilter#filter}
      */
-    public static final OptionID PROBABILITY_DENSITY_FUNCTION_ID = new OptionID("cuo.pdf", "This parameter is used to choose what kind of continuous probability-density-model is to be used.");
+    private F probabilityDensityFunction;
 
     /**
-     * Field to hold parameter value.
+     * Constructor for uncertainification.
+     *
+     * @param probabilityDensityFunction
      */
-    protected F pdf;
-
-    @Override
-    protected void makeOptions(final Parameterization config) {
-      super.makeOptions(config);
-      final ObjectParameter<F> ppdf = new ObjectParameter<>(Parameterizer.PROBABILITY_DENSITY_FUNCTION_ID, ProbabilityDensityFunction.class);
-      if(config.grab(ppdf)) {
-        this.pdf = ppdf.instantiateClass(config);
-      }
+    public Factory(F probabilityDensityFunction) {
+      this.probabilityDensityFunction = probabilityDensityFunction;
     }
 
     @Override
-    protected ContinuousUncertainObject<F> makeInstance() {
-      return new ContinuousUncertainObject<F>(pdf);
+    public <A> ContinuousUncertainObject<F> newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
+      return probabilityDensityFunction.uncertainify(array, adapter, blur);
+    }
+
+    @Override
+    public ByteBufferSerializer<ContinuousUncertainObject<F>> getDefaultSerializer() {
+      return null; // FIXME: not yet available.
+    }
+
+    @Override
+    public Class<? super ContinuousUncertainObject<F>> getRestrictionClass() {
+      return ContinuousUncertainObject.class;
+    }
+
+    /**
+     * Parameterizer class.
+     *
+     * @author Alexander Koos
+     */
+    public static class Parameterizer<F extends ProbabilityDensityFunction<F>> extends AbstractParameterizer {
+      /**
+       * Parameter to specify the {@link ProbabilityDensityFunction} to be used
+       * for uncertainification.
+       */
+      public static final OptionID PROBABILITY_DENSITY_FUNCTION_ID = new OptionID("cuo.pdf", "This parameter is used to choose what kind of continuous probability-density-model is to be used.");
+
+      /**
+       * Field to hold parameter value.
+       */
+      protected F pdf;
+
+      @Override
+      protected void makeOptions(final Parameterization config) {
+        super.makeOptions(config);
+        final ObjectParameter<F> ppdf = new ObjectParameter<>(Parameterizer.PROBABILITY_DENSITY_FUNCTION_ID, ProbabilityDensityFunction.class);
+        if(config.grab(ppdf)) {
+          this.pdf = ppdf.instantiateClass(config);
+        }
+      }
+
+      @Override
+      protected Factory<F> makeInstance() {
+        return new Factory<F>(pdf);
+      }
     }
   }
 }

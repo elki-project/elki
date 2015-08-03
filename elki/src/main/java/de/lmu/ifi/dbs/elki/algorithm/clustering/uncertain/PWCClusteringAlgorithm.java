@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
@@ -122,19 +121,11 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    * @param relation Data relation of uncertain objects
    * @return Clustering result
    */
-  public Clustering<?> run(final Database database, final Relation<UncertainObject<?>> relation) {
+  public Clustering<?> run(final Database database, final Relation<? extends UncertainObject> relation) {
     final ArrayList<Clustering<?>> clusterings = new ArrayList<>();
     {
       final int dim = RelationUtil.dimensionality(relation);
       final DBIDs ids = relation.getDBIDs();
-      // Add the raw input data:
-      {
-        final WritableDataStore<NumberVector> store0 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
-        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          store0.put(iter, relation.get(iter).getOriginalValues());
-        }
-        runClusteringAlgorithm(relation, ids, store0, dim, "Raw input data");
-      }
       // Add the uncertain model:
       {
         final WritableDataStore<NumberVector> store1 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
@@ -269,7 +260,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
           config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + this.algorithm.getInputTypeRestriction()[0]));
         }
       }
-      final IntParameter pdepth = new IntParameter(Parameterizer.DEPTH_ID, UOModel.DEFAULT_ENSEMBLE_DEPTH);
+      final IntParameter pdepth = new IntParameter(Parameterizer.DEPTH_ID, UncertainObject.DEFAULT_ENSEMBLE_DEPTH);
       if(config.grab(pdepth)) {
         this.tryDepth = pdepth.getValue();
       }

@@ -26,10 +26,10 @@ package de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
+import de.lmu.ifi.dbs.elki.data.uncertain.ContinuousUncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
  * Abstract class specifying the minimum constraints to the layout for
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
  *
  * @author Alexander Koos
  */
-public abstract class ProbabilityDensityFunction {
+public abstract class ProbabilityDensityFunction<F extends ProbabilityDensityFunction<F>> {
   /**
    * Used in methods for setting bounds to initialize the array used in search
    * for extreme points.
@@ -56,7 +56,7 @@ public abstract class ProbabilityDensityFunction {
    * use for algorithms on uncertain data.
    */
   public abstract DoubleVector drawValue(SpatialComparable bounds, final Random rand);
-  
+
   public abstract DoubleVector getMean(SpatialComparable bounds);
 
   /**
@@ -73,6 +73,7 @@ public abstract class ProbabilityDensityFunction {
    *
    * @param vec Vector
    * @param blur TODO
+   * @param <A> Input data type
    */
-  public abstract UncertainObject<UOModel> uncertainify(NumberVector vec, boolean blur);
+  public abstract <A> ContinuousUncertainObject<F> uncertainify(A array, NumberArrayAdapter<?, A> adapter, boolean blur);
 }

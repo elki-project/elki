@@ -6,7 +6,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.uncertain.UOModel;
+import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
@@ -20,7 +20,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  *
  * @author Alexander Koos
  */
-public abstract class AbstractGaussianDistributionFunction<V> extends ProbabilityDensityFunction {
+public abstract class AbstractGaussianDistributionFunction<V, F extends AbstractGaussianDistributionFunction<V, F>> extends ProbabilityDensityFunction<F> {
 
   /**
    * Field to hold the value the randomly created variance shall have in
@@ -81,7 +81,7 @@ public abstract class AbstractGaussianDistributionFunction<V> extends Probabilit
 
   protected int[] weights;
 
-  protected int weightMax = UOModel.PROBABILITY_SCALE; // reset by constructor
+  protected int weightMax = UncertainObject.PROBABILITY_SCALE; // reset by constructor
   // in case no bounded sample has been found
 
   protected static DoubleVector noSample = new DoubleVector(new double[] { Double.NEGATIVE_INFINITY });
