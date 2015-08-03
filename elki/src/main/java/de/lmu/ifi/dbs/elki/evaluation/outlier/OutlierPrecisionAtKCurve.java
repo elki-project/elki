@@ -50,9 +50,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 /**
  * Compute a curve containing the precision values for an outlier detection
  * method.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has PrecisionAtKCurve
  */
 public class OutlierPrecisionAtKCurve implements Evaluator {
@@ -62,24 +62,6 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
   private static final Logging LOG = Logging.getLogger(OutlierPrecisionAtKCurve.class);
 
   /**
-   * The pattern to identify positive classes.
-   * 
-   * <p>
-   * Key: {@code -precision.positive}
-   * </p>
-   */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("precision.positive", "Class label for the 'positive' class.");
-
-  /**
-   * Maximum value for k
-   * 
-   * <p>
-   * Key: {@code -precision.k}
-   * </p>
-   */
-  public static final OptionID MAX_K_ID = new OptionID("precision.maxk", "Maximum value of 'k' to compute the curve up to.");
-
-  /**
    * Stores the "positive" class.
    */
   private Pattern positiveClassName;
@@ -87,11 +69,11 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
   /**
    * Maximum value for k
    */
-  int maxk = Integer.MAX_VALUE;
+  private int maxk = Integer.MAX_VALUE;
 
   /**
    * Constructor.
-   * 
+   *
    * @param positiveClassName Pattern to recognize outliers
    * @param maxk Maximum value for k
    */
@@ -145,21 +127,18 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
       }
       curve.addAndSimplify(k, pos / (double) k);
     }
-    if(LOG.isVerbose()) {
-      LOG.verbose("Precision @ " + lastk + " " + ((pos * 1.0) / lastk));
-    }
     return curve;
   }
 
   /**
    * Precision at K curve.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class PrecisionAtKCurve extends XYCurve {
     /**
      * Constructor.
-     * 
+     *
      * @param size Size estimation
      */
     public PrecisionAtKCurve(String labelx, String labely, int size) {
@@ -178,16 +157,12 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
 
     @Override
     public void writeToText(TextWriterStream out, String label) {
-      final int last = size() - 1;
-      out.commentPrintLn("Precision @ " + ((int) getX(last)) + ": " + getY(last));
-      out.commentPrintSeparator();
-      out.flush();
       out.commentPrint(labelx);
       out.commentPrint(" ");
       out.commentPrint(labely);
       out.flush();
-      for(int pos = 0; pos < data.size(); pos+=2) {
-        out.inlinePrint((int)data.get(pos));
+      for(int pos = 0; pos < data.size(); pos += 2) {
+        out.inlinePrint((int) data.get(pos));
         out.inlinePrint(data.get(pos + 1));
         out.flush();
       }
@@ -196,15 +171,39 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    protected Pattern positiveClassName = null;
+    /**
+     * The pattern to identify positive classes.
+     *
+     * <p>
+     * Key: {@code -precision.positive}
+     * </p>
+     */
+    public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("precision.positive", "Class label for the 'positive' class.");
 
-    protected int maxk = Integer.MAX_VALUE;
+    /**
+     * Maximum value for k
+     *
+     * <p>
+     * Key: {@code -precision.k}
+     * </p>
+     */
+    public static final OptionID MAX_K_ID = new OptionID("precision.maxk", "Maximum value of 'k' to compute the curve up to.");
+
+    /**
+     * Stores the "positive" class.
+     */
+    private Pattern positiveClassName;
+
+    /**
+     * Maximum value for k
+     */
+    private int maxk = Integer.MAX_VALUE;
 
     @Override
     protected void makeOptions(Parameterization config) {

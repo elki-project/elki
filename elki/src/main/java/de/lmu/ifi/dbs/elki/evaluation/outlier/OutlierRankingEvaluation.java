@@ -55,11 +55,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 
 /**
  * Evaluate outlier scores by their ranking
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.uses OutlierResult
  * @apiviz.has EvaluationResult oneway - - «create»
  */
@@ -68,15 +68,6 @@ public class OutlierRankingEvaluation implements Evaluator {
    * The logger.
    */
   private static final Logging LOG = Logging.getLogger(OutlierRankingEvaluation.class);
-
-  /**
-   * The pattern to identify positive classes.
-   * 
-   * <p>
-   * Key: {@code -rocauc.positive}
-   * </p>
-   */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("outliereval.positive", "Class label for the 'positive' class.");
 
   /**
    * Stores the "positive" class.
@@ -90,7 +81,7 @@ public class OutlierRankingEvaluation implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param positive_class_name Positive class name pattern
    */
   public OutlierRankingEvaluation(Pattern positive_class_name) {
@@ -177,18 +168,26 @@ public class OutlierRankingEvaluation implements Evaluator {
 
     if(nonefound) {
       return;
-      // logger.warning("No results found to process with ROC curve analyzer. Got "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
+      // LOG.warning("No results found to process with ROC curve analyzer. Got "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
     }
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The pattern to identify positive classes.
+     *
+     * <p>
+     * Key: {@code -rocauc.positive}
+     * </p>
+     */
+    public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("outliereval.positive", "Class label for the 'positive' class.");
     /**
      * Pattern for positive class.
      */

@@ -47,11 +47,11 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
 
 /**
  * Evaluator that tries to auto-run a number of evaluation methods.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.uses OutlierResult
  * @apiviz.uses Clustering
  * @apiviz.composedOf OutlierROCCurve
@@ -115,7 +115,7 @@ public class AutomaticEvaluation implements Evaluator {
       new OutlierRankingEvaluation(pat).processNewResult(baseResult, newResult);
       // Compute ROC curve
       new OutlierROCCurve(pat).processNewResult(baseResult, newResult);
-      // Compute Precision at k
+      // Compute Precision at k, up to 2k.
       new OutlierPrecisionAtKCurve(pat, min << 1).processNewResult(baseResult, newResult);
       // Compute ROC curve
       new OutlierPrecisionRecallCurve(pat).processNewResult(baseResult, newResult);
@@ -156,9 +156,9 @@ public class AutomaticEvaluation implements Evaluator {
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 
 /**
  * Abstract base class useful for testing various algorithms.
- * 
+ *
  * @author Erich Schubert
  */
 public abstract class AbstractSimpleAlgorithmTest {
@@ -75,7 +75,7 @@ public abstract class AbstractSimpleAlgorithmTest {
   /**
    * Validate that parameterization succeeded: no parameters left, no
    * parameterization errors.
-   * 
+   *
    * @param config Parameterization to test
    */
   protected void testParameterizationOk(ListParameterization config) {
@@ -90,7 +90,7 @@ public abstract class AbstractSimpleAlgorithmTest {
 
   /**
    * Generate a simple DoubleVector database from a file.
-   * 
+   *
    * @param filename File to load
    * @param expectedSize Expected size in records
    * @param params Extra parameters
@@ -121,7 +121,7 @@ public abstract class AbstractSimpleAlgorithmTest {
 
   /**
    * Generate a simple DoubleVector database from a file.
-   * 
+   *
    * @param filename File to load
    * @param expectedSize Expected size in records
    * @return Database
@@ -132,7 +132,7 @@ public abstract class AbstractSimpleAlgorithmTest {
 
   /**
    * Find a clustering result, fail if there is more than one or none.
-   * 
+   *
    * @param result Base result
    * @return Clustering
    */
@@ -145,7 +145,7 @@ public abstract class AbstractSimpleAlgorithmTest {
 
   /**
    * Test the clustering result by comparing the score with an expected value.
-   * 
+   *
    * @param database Database to test
    * @param clustering Clustering result
    * @param expected Expected score
@@ -166,7 +166,7 @@ public abstract class AbstractSimpleAlgorithmTest {
 
   /**
    * Validate the cluster sizes with an expected result.
-   * 
+   *
    * @param clustering Clustering to test
    * @param expected Expected cluster sizes
    */
@@ -188,7 +188,7 @@ public abstract class AbstractSimpleAlgorithmTest {
 
   /**
    * Test the AUC value for an outlier result.
-   * 
+   *
    * @param db Database
    * @param positive Positive class name
    * @param result Outlier result to process
@@ -196,7 +196,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    */
   protected void testAUC(Database db, String positive, OutlierResult result, double expected) {
     ListParameterization params = new ListParameterization();
-    params.addParameter(OutlierROCCurve.POSITIVE_CLASS_NAME_ID, positive);
+    params.addParameter(OutlierROCCurve.Parameterizer.POSITIVE_CLASS_NAME_ID, positive);
     OutlierROCCurve rocCurve = ClassGenericsUtil.parameterizeOrAbort(OutlierROCCurve.class, params);
 
     // Ensure the result has been added to the hierarchy:
@@ -216,7 +216,7 @@ public abstract class AbstractSimpleAlgorithmTest {
 
   /**
    * Test the outlier score of a single object.
-   * 
+   *
    * @param result Result object to use
    * @param id Object ID
    * @param expected expected value

@@ -53,18 +53,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 /**
  * Compute a ROC curve to evaluate a ranking algorithm and compute the
  * corresponding ROCAUC value.
- * 
+ *
  * The parameter {@code -rocauc.positive} specifies the class label of
  * "positive" hits.
- * 
+ *
  * The nested algorithm {@code -algorithm} will be run, the result will be
  * searched for an iterable or ordering result, which then is compared with the
  * clustering obtained via the given class label.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.uses OutlierResult
  * @apiviz.uses ROC
  * @apiviz.has ROCResult oneway - - «create»
@@ -82,22 +82,13 @@ public class OutlierROCCurve implements Evaluator {
   private static final Logging LOG = Logging.getLogger(OutlierROCCurve.class);
 
   /**
-   * The pattern to identify positive classes.
-   * 
-   * <p>
-   * Key: {@code -rocauc.positive}
-   * </p>
-   */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("rocauc.positive", "Class label for the 'positive' class.");
-
-  /**
    * Stores the "positive" class.
    */
   private Pattern positiveClassName;
 
   /**
    * Constructor.
-   * 
+   *
    * @param positive_class_name Positive class name pattern
    */
   public OutlierROCCurve(Pattern positive_class_name) {
@@ -111,20 +102,12 @@ public class OutlierROCCurve implements Evaluator {
     }
     XYCurve roccurve = ROCEvaluation.materializeROC(new DBIDsTest(positiveids), new SimpleAdapter(order.iter()));
     double rocauc = XYCurve.areaUnderCurve(roccurve);
-    if(LOG.isVerbose()) {
-      LOG.verbose(ROCAUC_LABEL + ": " + rocauc);
-    }
-
     return new ROCResult(roccurve, rocauc);
   }
 
   private ROCResult computeROCResult(int size, SetDBIDs positiveids, OutlierResult or) {
     XYCurve roccurve = ROCEvaluation.materializeROC(new DBIDsTest(positiveids), new OutlierScoreAdapter(or));
     double rocauc = XYCurve.areaUnderCurve(roccurve);
-    if(LOG.isVerbose()) {
-      LOG.verbose(ROCAUC_LABEL + ": " + rocauc);
-    }
-
     return new ROCResult(roccurve, rocauc);
   }
 
@@ -166,7 +149,7 @@ public class OutlierROCCurve implements Evaluator {
 
   /**
    * Result object for ROC curves.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class ROCResult extends XYCurve {
@@ -177,7 +160,7 @@ public class OutlierROCCurve implements Evaluator {
 
     /**
      * Constructor.
-     * 
+     *
      * @param col roc curve
      * @param rocauc ROC AUC value
      */
@@ -213,12 +196,20 @@ public class OutlierROCCurve implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The pattern to identify positive classes.
+     *
+     * <p>
+     * Key: {@code -rocauc.positive}
+     * </p>
+     */
+    public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("rocauc.positive", "Class label for the 'positive' class.");
     /**
      * Pattern for positive class.
      */
