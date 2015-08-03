@@ -41,9 +41,9 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 /**
  * KDDTask encapsulates the common workflow of an <i>unsupervised</i> knowledge
  * discovery task.
- * 
+ *
  * @author Arthur Zimek
- * 
+ *
  * @apiviz.composedOf InputStep
  * @apiviz.composedOf AlgorithmStep
  * @apiviz.composedOf EvaluationStep
@@ -82,7 +82,7 @@ public class KDDTask {
 
   /**
    * Constructor.
-   * 
+   *
    * @param inputStep
    * @param algorithmStep
    * @param evaluationStep
@@ -105,9 +105,10 @@ public class KDDTask {
   public void run() {
     // Input step
     Database db = inputStep.getDatabase();
+    hier = db.getHierarchy();
 
     // Algorithms - Data Mining Step
-    hier = algorithmStep.runAlgorithms(db);
+    algorithmStep.runAlgorithms(db);
 
     // TODO: this could be nicer
     hier.add(db, new SettingsResult(settings));
@@ -121,7 +122,7 @@ public class KDDTask {
 
   /**
    * Get the algorithms result hierarchy.
-   * 
+   *
    * @return the result hierarchy
    */
   public ResultHierarchy getResultHierarchy() {
@@ -130,9 +131,9 @@ public class KDDTask {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -170,7 +171,7 @@ public class KDDTask {
 
   /**
    * Runs a KDD task accordingly to the specified parameters.
-   * 
+   *
    * @param args parameter list according to description
    */
   public static void main(String[] args) {

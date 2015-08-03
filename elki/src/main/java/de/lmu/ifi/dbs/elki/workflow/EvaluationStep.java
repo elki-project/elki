@@ -29,6 +29,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
@@ -39,9 +40,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
 
 /**
  * The "evaluation" step, where data is analyzed.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has Evaluator
  * @apiviz.uses Result
  */
@@ -52,13 +53,13 @@ public class EvaluationStep implements WorkflowStep {
   private List<Evaluator> evaluators = null;
 
   /**
-   * Result hierarchy.
+   * Result.
    */
-  private ResultHierarchy hier;
+  private Result stepresult;
 
   /**
    * Constructor.
-   * 
+   *
    * @param evaluators
    */
   public EvaluationStep(List<Evaluator> evaluators) {
@@ -67,7 +68,8 @@ public class EvaluationStep implements WorkflowStep {
   }
 
   public void runEvaluators(ResultHierarchy hier, Database db) {
-    this.hier = hier;
+    // Currently only serves indication purposes.
+    stepresult = new BasicResult("Evaluation Step", "evaluation-step");
     // Run evaluation helpers
     if(evaluators != null) {
       new Evaluation(hier, evaluators).update(db);
@@ -76,25 +78,25 @@ public class EvaluationStep implements WorkflowStep {
 
   /**
    * Class to handle running the evaluators on a database instance.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public class Evaluation implements ResultListener {
-    /**
-     * Result hierarchy
-     */
-    private ResultHierarchy hier;
-
     /**
      * Evaluators to run.
      */
     private List<Evaluator> evaluators;
 
     /**
+     * Result hierarchy
+     */
+    private ResultHierarchy hier;
+
+    /**
      * Constructor.
-     * 
+     *
      * @param hier Result hierarchy
      * @param evaluators Evaluators
      */
@@ -107,7 +109,7 @@ public class EvaluationStep implements WorkflowStep {
 
     /**
      * Update on a particular result.
-     * 
+     *
      * @param r Result
      */
     public void update(Result r) {
@@ -136,9 +138,9 @@ public class EvaluationStep implements WorkflowStep {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -149,7 +151,7 @@ public class EvaluationStep implements WorkflowStep {
 
     /**
      * Parameter ID to specify the evaluators to run.
-     * 
+     *
      * Key:
      * <p>
      * {@code -evaluator}
@@ -177,11 +179,11 @@ public class EvaluationStep implements WorkflowStep {
   }
 
   /**
-   * Return the result hierarchy.
-   * 
-   * @return Result hierarchy
+   * Return the result.
+   *
+   * @return Result
    */
-  public ResultHierarchy getResultHierarchy() {
-    return hier;
+  public Result getResult() {
+    return stepresult;
   }
 }

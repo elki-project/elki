@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Panel to handle data processing
- * 
+ *
  * @author Erich Schubert
  */
 public class AlgorithmTabPanel extends ParameterTabPanel {
@@ -58,7 +58,7 @@ public class AlgorithmTabPanel extends ParameterTabPanel {
 
   /**
    * Constructor. We depend on an input panel.
-   * 
+   *
    * @param input Input panel to depend on.
    */
   public AlgorithmTabPanel(InputTabPanel input) {
@@ -100,7 +100,7 @@ public class AlgorithmTabPanel extends ParameterTabPanel {
     }
     checkDependencies();
     if (input.isComplete() && basedOnDatabase != null) {
-      if (algorithms.getResultHierarchy() == null) {
+      if (algorithms.getResult() == null) {
         return Status.STATUS_FAILED;
       } else {
         return Status.STATUS_COMPLETE;
@@ -111,7 +111,7 @@ public class AlgorithmTabPanel extends ParameterTabPanel {
 
   /**
    * Get the algorithm step object.
-   * 
+   *
    * @return Algorithm step
    */
   public AlgorithmStep getAlgorithmStep() {

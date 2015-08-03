@@ -52,9 +52,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 /**
  * Class that automatically generates all visualizations and exports them into
  * SVG files.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf VisualizerParameterizer
  */
 // TODO: make more parameterizable, wrt. what to skip
@@ -115,7 +115,7 @@ public class ExportVisualizations implements ResultHandler {
 
   /**
    * Constructor.
-   * 
+   *
    * @param output Output folder
    * @param manager Parameterizer
    * @param ratio Canvas ratio
@@ -144,7 +144,7 @@ public class ExportVisualizations implements ResultHandler {
       LOG.verbose("Note: Reusing visualization exporter for more than one result is untested.");
     }
     if(context == null) {
-      context = manager.newContext(hier);
+      context = manager.newContext(hier, baseResult);
     }
 
     // Projected visualizations
@@ -240,9 +240,9 @@ public class ExportVisualizations implements ResultHandler {
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

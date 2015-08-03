@@ -63,13 +63,13 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Swing window to manage a particular result visualization.
- * 
+ *
  * Yes, this is very basic and ad-hoc. Feel free to contribute something more
  * advanced to ELKI!
- * 
+ *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
- * 
+ *
  * @apiviz.composedOf JSVGSynchronizedCanvas
  * @apiviz.composedOf OverviewPlot
  * @apiviz.composedOf SelectionTableWindow
@@ -131,6 +131,9 @@ public class ResultWindow extends JFrame implements ResultListener {
      */
     private JMenu visualizersMenu;
 
+    /**
+     * Constructor.
+     */
     public DynamicMenu() {
       menubar = new JMenuBar();
       filemenu = new JMenu("File");
@@ -196,8 +199,16 @@ public class ResultWindow extends JFrame implements ResultListener {
       menubar.removeAll();
       menubar.add(filemenu);
       ResultHierarchy hier = context.getHierarchy();
-      for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
-        if(hier.numParents(iter.get()) == 0) {
+      Result start = context.getBaseResult();
+      if(start == null) {
+        for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
+          if(hier.numParents(iter.get()) == 0) {
+            recursiveBuildMenu(menubar, iter.get());
+          }
+        }
+      }
+      else {
+        for(Hierarchy.Iter<Result> iter = hier.iterChildren(start); iter.valid(); iter.advance()) {
           recursiveBuildMenu(menubar, iter.get());
         }
       }
@@ -246,7 +257,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
     /**
      * Get the menu bar component.
-     * 
+     *
      * @return Menu bar component
      */
     public JMenuBar getMenuBar() {
@@ -255,7 +266,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
     /**
      * Enable / disable the overview menu.
-     * 
+     *
      * @param b Flag
      */
     public void enableOverview(boolean b) {
@@ -266,7 +277,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
     /**
      * Enable / disable the export menu.
-     * 
+     *
      * @param b Flag
      */
     public void enableExport(boolean b) {
@@ -303,7 +314,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
   /**
    * Constructor.
-   * 
+   *
    * @param title Window title
    * @param context Visualizer context
    * @param single Single visualization mode
@@ -410,7 +421,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
   /**
    * Navigate to a subplot.
-   * 
+   *
    * @param e
    */
   protected void showSubplot(DetailViewSelectedEvent e) {
@@ -422,7 +433,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
   /**
    * Navigate to a particular plot.
-   * 
+   *
    * @param plot Plot to show.
    */
   private void showPlot(SVGPlot plot) {

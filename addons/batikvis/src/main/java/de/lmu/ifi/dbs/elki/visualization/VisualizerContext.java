@@ -106,15 +106,22 @@ public class VisualizerContext implements DataStoreListener, Result {
   private StyleResult styleresult;
 
   /**
+   * Starting point of the result tree, may be {@code null}.
+   */
+  private Result baseResult;
+
+  /**
    * Constructor. We currently require a Database and a Result.
    *
    * @param hier Result hierarchy
+   * @param start Starting result
    * @param projectors Projectors to use
    * @param factories Visualizer Factories to use
    */
-  public VisualizerContext(ResultHierarchy hier, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories) {
+  public VisualizerContext(ResultHierarchy hier, Result start, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories) {
     super();
     this.hier = hier;
+    this.baseResult = start;
     this.projectors = projectors;
     this.factories = factories;
 
@@ -327,5 +334,14 @@ public class VisualizerContext implements DataStoreListener, Result {
   @Override
   public String getShortName() {
     return "vis-context";
+  }
+
+  /**
+   * Starting point for visualization, may be {@code null}.
+   *
+   * @return Starting point in the result tree, may be {@code null}.
+   */
+  public Result getBaseResult() {
+    return baseResult;
   }
 }

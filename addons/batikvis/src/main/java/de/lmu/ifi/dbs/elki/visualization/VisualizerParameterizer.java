@@ -171,9 +171,10 @@ public class VisualizerParameterizer {
    * Make a new visualization context
    *
    * @param hier Result hierarchy
+   * @param start Starting result
    * @return New context
    */
-  public VisualizerContext newContext(ResultHierarchy hier) {
+  public VisualizerContext newContext(ResultHierarchy hier, Result start) {
     if(samplesize > 0) {
       Collection<Relation<?>> rels = ResultUtil.filterResults(hier, Relation.class);
       for(Relation<?> rel : rels) {
@@ -188,8 +189,7 @@ public class VisualizerParameterizer {
         }
       }
     }
-    VisualizerContext context = new VisualizerContext(hier, stylelib, projectors, factories);
-    return context;
+    return new VisualizerContext(hier, start, stylelib, projectors, factories);
   }
 
   /**

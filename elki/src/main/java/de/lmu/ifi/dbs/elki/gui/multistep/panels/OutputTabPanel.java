@@ -26,14 +26,14 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 import java.lang.ref.WeakReference;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
  * Panel to handle result output / visualization
- * 
+ *
  * @author Erich Schubert
  */
 public class OutputTabPanel extends ParameterTabPanel {
@@ -64,7 +64,7 @@ public class OutputTabPanel extends ParameterTabPanel {
 
   /**
    * Constructor. We depend on an input panel.
-   * 
+   *
    * @param input Input panel to depend on.
    */
   public OutputTabPanel(InputTabPanel input, EvaluationTabPanel evals) {
@@ -100,9 +100,9 @@ public class OutputTabPanel extends ParameterTabPanel {
     }
     // Get the database and run the algorithms
     Database database = input.getInputStep().getDatabase();
-    ResultHierarchy hier = evals.getEvaluationStep().getResultHierarchy();
-    outs.runResultHandlers(hier, database);
-    basedOnResult = new WeakReference<Object>(hier);
+    outs.runResultHandlers(database.getHierarchy(), database);
+    Result eres = evals.getEvaluationStep().getResult();
+    basedOnResult = new WeakReference<Object>(eres);
   }
 
   @Override
@@ -134,7 +134,7 @@ public class OutputTabPanel extends ParameterTabPanel {
    */
   private void checkDependencies() {
     if(basedOnResult != null) {
-      if(!input.isComplete() || !evals.isComplete() || basedOnResult.get() != evals.getEvaluationStep().getResultHierarchy()) {
+      if(!input.isComplete() || !evals.isComplete() || basedOnResult.get() != evals.getEvaluationStep().getResult()) {
         // We've become invalidated, notify.
         basedOnResult = null;
         firePanelUpdated();

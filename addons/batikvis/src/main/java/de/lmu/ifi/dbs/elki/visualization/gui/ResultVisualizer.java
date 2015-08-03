@@ -42,10 +42,10 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
 
 /**
  * Handler to process and visualize a Result.
- * 
+ *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
- * 
+ *
  * @apiviz.composedOf VisualizerParameterizer
  * @apiviz.uses ResultWindow oneway
  */
@@ -55,26 +55,6 @@ public class ResultVisualizer implements ResultHandler {
    * Get a logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(ResultVisualizer.class);
-
-  /**
-   * Parameter to specify the window title
-   * <p>
-   * Key: {@code -vis.window.title}
-   * </p>
-   * <p>
-   * Default value: "ELKI Result Visualization"
-   * </p>
-   */
-  public static final OptionID WINDOW_TITLE_ID = new OptionID("vis.window.title", "Title to use for visualization window.");
-
-  /**
-   * Flag to set single display
-   *
-   * <p>
-   * Key: -vis.single
-   * </p>
-   */
-  public static final OptionID SINGLE_ID = new OptionID("vis.window.single", "Embed visualizers in a single window, not using thumbnails and detail views.");
 
   /**
    * Stores the set title.
@@ -97,8 +77,13 @@ public class ResultVisualizer implements ResultHandler {
   boolean single;
 
   /**
+   * Current result window.
+   */
+  ResultWindow window;
+
+  /**
    * Constructor.
-   * 
+   *
    * @param title Window title
    * @param manager Parameterization manager for visualizers
    * @param single Flag to indicat single-view mode.
@@ -112,23 +97,23 @@ public class ResultVisualizer implements ResultHandler {
 
   @Override
   public void processNewResult(final ResultHierarchy hier, final Result result) {
-    // FIXME: not really re-entrant to generate new contexts...
-    final VisualizerContext context = manager.newContext(hier);
+    if(window == null) {
+      if(title == null) {
+        title = VisualizerParameterizer.getTitle(ResultUtil.findDatabase(hier), result);
+        if(title == null) {
+          title = DEFAULT_TITLE;
+        }
+      }
 
-    if(title == null) {
-      title = VisualizerParameterizer.getTitle(ResultUtil.findDatabase(hier), result);
-    }
-
-    if(title == null) {
-      title = DEFAULT_TITLE;
+      GUIUtil.setLookAndFeel();
+      VisualizerContext context = manager.newContext(hier, result);
+      window = new ResultWindow(title, context, single);
     }
 
     javax.swing.SwingUtilities.invokeLater(new Runnable() {
       @Override
       public void run() {
         try {
-          GUIUtil.setLookAndFeel();
-          ResultWindow window = new ResultWindow(title, context, single);
           window.setVisible(true);
           window.setExtendedState(window.getExtendedState() | JFrame.MAXIMIZED_BOTH);
         }
@@ -141,12 +126,32 @@ public class ResultVisualizer implements ResultHandler {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the window title
+     * <p>
+     * Key: {@code -vis.window.title}
+     * </p>
+     * <p>
+     * Default value: "ELKI Result Visualization"
+     * </p>
+     */
+    public static final OptionID WINDOW_TITLE_ID = new OptionID("vis.window.title", "Title to use for visualization window.");
+
+    /**
+     * Flag to set single display
+     *
+     * <p>
+     * Key: -vis.single
+     * </p>
+     */
+    public static final OptionID SINGLE_ID = new OptionID("vis.window.single", "Embed visualizers in a single window, not using thumbnails and detail views.");
+
     /**
      * Stores the set title.
      */
