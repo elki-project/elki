@@ -1,53 +1,22 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.io.BufferedLineReader;
 
 /**
  * Class that emulates the behavior of an java ServiceLoader, except that the
  * classes are <em>not</em> automatically instantiated. This is more lazy, but
  * also we need to do the instantiations our way with the parameterizable API.
- * 
+ *
  * @author Erich Schubert
  */
-public class ELKIServiceLoader implements Iterator<Class<?>> {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(ELKIServiceLoader.class);
-
+public class ELKIServiceLoader {
   /**
    * Resource name prefix for the ELKI functionality discovery.
    *
@@ -76,25 +45,10 @@ public class ELKIServiceLoader implements Iterator<Class<?>> {
   private ClassLoader cl;
 
   /**
-   * Enumeration of configuration files
-   */
-  private Enumeration<URL> configfiles;
-
-  /**
-   * Current iterator
-   */
-  private Iterator<Class<?>> curiter = null;
-
-  /**
-   * Next class to return
-   */
-  private Class<?> nextclass;
-
-  /**
    * Constructor.
-   * 
+   *
    * @param parent Parent class
-   * @param cl Classloader to use
+   * @param cl Classloader to use for loading resources
    */
   public ELKIServiceLoader(Class<?> parent, ClassLoader cl) {
     this.parent = parent;
@@ -103,112 +57,81 @@ public class ELKIServiceLoader implements Iterator<Class<?>> {
 
   /**
    * Constructor, using the system class loader.
-   * 
+   *
    * @param parent Parent class
    */
   public ELKIServiceLoader(Class<?> parent) {
     this(parent, ClassLoader.getSystemClassLoader());
-    getServiceFiles(parent);
   }
 
   /**
-   * Get services files for a given class.
-   * 
-   * @param parent Parent class
+   * Load the service file.
    */
-  private void getServiceFiles(Class<?> parent) {
+  public void load() {
+    ELKIServiceRegistry registry = ELKIServiceRegistry.singleton();
     try {
       String fullName = RESOURCE_PREFIX + parent.getName();
-      configfiles = cl.getResources(fullName);
+      Enumeration<URL> configfiles = cl.getResources(fullName);
+      while(configfiles.hasMoreElements()) {
+        URL nextElement = configfiles.nextElement();
+        try (
+            InputStreamReader is = new InputStreamReader(nextElement.openStream(), "utf-8");
+            BufferedLineReader r = new BufferedLineReader(is)) {
+          while(r.nextLine()) {
+            parseLine(r.getBuffer(), registry, nextElement);
+          }
+        }
+        catch(IOException x) {
+          throw new AbortException("Error reading configuration file", x);
+        }
+      }
     }
     catch(IOException x) {
       throw new AbortException("Could not load service configuration files.", x);
     }
   }
 
-  @Override
-  public boolean hasNext() {
-    if(nextclass != null) {
-      return true;
-    }
-    // Find next iterator
-    while((curiter == null) || !curiter.hasNext()) {
-      if(!configfiles.hasMoreElements()) {
-        return false;
-      }
-      curiter = parseFile(configfiles.nextElement());
-    }
-    nextclass = curiter.next();
-    return true;
-  }
-
-  private Iterator<Class<?>> parseFile(URL nextElement) {
-    ArrayList<Class<?>> classes = new ArrayList<>();
-    try {
-      BufferedReader r = new BufferedReader(new InputStreamReader(nextElement.openStream(), "utf-8"));
-      while(parseLine(r.readLine(), classes, nextElement)) {
-        // Continue
-      }
-    }
-    catch(IOException x) {
-      throw new AbortException("Error reading configuration file", x);
-    }
-    return classes.iterator();
-  }
-
-  private boolean parseLine(String line, ArrayList<Class<?>> classes, URL nextElement) {
+  /**
+   * Parse a single line from a service registry file.
+   *
+   * @param line Line to read
+   * @param registry Registry to update
+   * @param nam File name for error reporting
+   */
+  private void parseLine(CharSequence line, ELKIServiceRegistry registry, URL nam) {
     if(line == null) {
-      return false;
+      return;
     }
-    // Ignore comments, trim whitespace
-    {
-      int begin = 0;
-      int end = line.indexOf(COMMENT_CHAR);
-      if(end < 0) {
-        end = line.length();
-      }
-      while(begin < end && line.charAt(begin) == ' ') {
-        begin++;
-      }
-      while(end - 1 > begin && line.charAt(end - 1) == ' ') {
-        end--;
-      }
-      if(begin > 0 || end < line.length()) {
-        line = line.substring(begin, end);
-      }
+    int begin = 0, end = line.length();
+    while(begin < end && line.charAt(begin) == ' ') {
+      begin++;
     }
-    if(line.length() <= 0) {
-      return true; // Empty/comment lines are okay, continue
+    if(begin >= end || line.charAt(begin) == '#') {
+      return; // Empty/comment lines are okay, continue
     }
-    // Try to load the class
-    try {
-      Class<?> cls = cl.loadClass(line);
-      // Should not happen. Check anyway.
-      if(cls == null) {
-        return true;
+    assert(begin == 0 || line.charAt(begin - 1) == ' ');
+    // Find end of class name:
+    int cend = begin + 1;
+    while(cend < end && line.charAt(cend) != ' ') {
+      cend++;
+    }
+    // Class name:
+    String cname = line.subSequence(begin, cend).toString();
+    registry.register(parent, cname);
+    for(int abegin = cend + 1, aend = -1; abegin < end; abegin = aend + 1) {
+      // Skip whitespace:
+      while(abegin < end && line.charAt(abegin) == ' ') {
+        abegin++;
       }
-      if(parent.isAssignableFrom(cls)) {
-        classes.add(cls);
+      // Find next whitespace:
+      aend = abegin + 1;
+      while(aend < end && line.charAt(aend) != ' ') {
+        aend++;
       }
-      else {
-        LOG.warning("Class " + line + " does not implement " + parent + " but listed in service file " + nextElement);
+      if(abegin < aend) {
+        registry.registerAlias(parent, line.subSequence(abegin, aend).toString(), cname);
       }
     }
-    catch(ClassNotFoundException e) {
-      LOG.warning("Class not found: " + line + "; listed in service file " + nextElement, e);
-    }
-    return true;
-  }
-
-  @Override
-  public Class<?> next() {
-    Class<?> ret = nextclass;
-    nextclass = null;
-    return ret;
-  }
-
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException();
+    return;
   }
 }

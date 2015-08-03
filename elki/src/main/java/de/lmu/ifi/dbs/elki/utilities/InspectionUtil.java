@@ -1,5 +1,21 @@
 package de.lmu.ifi.dbs.elki.utilities;
 
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Modifier;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,26 +41,9 @@ package de.lmu.ifi.dbs.elki.utilities;
 
 import gnu.trove.set.hash.THashSet;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Modifier;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.WeakHashMap;
-
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
-
 /**
  * A collection of inspection-related utility functions.
- * 
+ *
  * @author Erich Schubert
  */
 public class InspectionUtil {
@@ -63,24 +62,24 @@ public class InspectionUtil {
    */
   private static final String[] DEFAULT_IGNORES = {
       // Sun Java
-  "java.", "com.sun.",
+      "java.", "com.sun.",
       // Batik classes
-  "org.apache.",
+      "org.apache.",
       // W3C / SVG / XML classes
-  "org.w3c.", "org.xml.", "javax.xml.",
+      "org.w3c.", "org.xml.", "javax.xml.",
       // JUnit
-  "org.junit.", "junit.", "org.hamcrest.",
+      "org.junit.", "junit.", "org.hamcrest.",
       // Eclipse
-  "org.eclipse.",
+      "org.eclipse.",
       // ApiViz
-  "org.jboss.apiviz.",
+      "org.jboss.apiviz.",
       // JabRef
-  "spin.", "osxadapter.", "antlr.", "ca.odell.", "com.jgoodies.", "com.michaelbaranov.", "com.mysql.", "gnu.dtools.", "net.sf.ext.", "net.sf.jabref.", "org.antlr.", "org.gjt.", "org.java.plugin.", "org.jempbox.", "org.pdfbox.", "wsi.ra.",
+      "spin.", "osxadapter.", "antlr.", "ca.odell.", "com.jgoodies.", "com.michaelbaranov.", "com.mysql.", "gnu.dtools.", "net.sf.ext.", "net.sf.jabref.", "org.antlr.", "org.gjt.", "org.java.plugin.", "org.jempbox.", "org.pdfbox.", "wsi.ra.",
       // GNU trove
-  "gnu.trove.",
+      "gnu.trove.",
       // Java OpenGL
-  "jogamp.", "com.jogamp.", "javax.media.", "jogl.util."
-  //
+      "jogamp.", "com.jogamp.", "javax.media.", "jogl.util."
+      //
   };
 
   /**
@@ -89,39 +88,26 @@ public class InspectionUtil {
   public static final String FACTORY_POSTFIX = "$Factory";
 
   /**
-   * Weak hash map for class lookups
-   */
-  private static WeakHashMap<Class<?>, List<Class<?>>> CLASS_CACHE = new WeakHashMap<>();
-
-  /**
    * (Non-weak) cache for all "frequently scanned" classes.
    */
   private static List<Class<?>> MASTER_CACHE = null;
 
   /**
-   * Cached version of "findAllImplementations". For Parameterizable classes
-   * only!
-   * 
+   * Cached version of "findAllImplementations".<br />
+   * For {@link Parameterizable} classes only!
+   *
    * @param c Class to scan for
    * @return Found implementations
    */
   public static List<Class<?>> cachedFindAllImplementations(Class<?> c) {
-    if(c == null) {
-      return Collections.emptyList();
-    }
-    List<Class<?>> res = CLASS_CACHE.get(c);
-    if(res == null) {
-      res = findAllImplementations(c, false, true);
-      CLASS_CACHE.put(c, res);
-    }
-    return res;
+    return findAllImplementations(c, false, true);
   }
 
   /**
    * Find all implementations of a given class in the classpath.
-   * 
+   *
    * Note: returned classes may be abstract.
-   * 
+   *
    * @param c Class restriction
    * @param everything include interfaces, abstract and private classes
    * @param parameterizable only return classes instantiable by the
@@ -129,23 +115,58 @@ public class InspectionUtil {
    * @return List of found classes.
    */
   public static List<Class<?>> findAllImplementations(Class<?> c, boolean everything, boolean parameterizable) {
-    // For removing duplicates:
-    THashSet<Class<?>> dupes = new THashSet<>();
-    ArrayList<Class<?>> known = new ArrayList<>();
+    if(c == null) {
+      return Collections.emptyList();
+    }
+    ELKIServiceRegistry registry = ELKIServiceRegistry.singleton();
     // Add all from service files (i.e. jars)
-    {
-      Iterator<Class<?>> iter = new ELKIServiceLoader(c);
-      while(iter.hasNext()) {
-        known.add(iter.next());
+    if(!registry.contains(c)) {
+      new ELKIServiceLoader(c).load();
+      // Build cache on first use (only if in development mode)
+      if(MASTER_CACHE == null) {
+        MASTER_CACHE = slowScan();
       }
-      dupes.addAll(known);
+      // Update registry from scan:
+      Iterator<Class<?>> iter = MASTER_CACHE.iterator();
+      while(iter.hasNext()) {
+        Class<?> clazz = iter.next();
+        // Skip other classes.
+        if(!c.isAssignableFrom(clazz)) {
+          continue;
+        }
+        // skip abstract / private classes.
+        if(Modifier.isInterface(clazz.getModifiers()) || Modifier.isAbstract(clazz.getModifiers()) || Modifier.isPrivate(clazz.getModifiers())) {
+          continue;
+        }
+        boolean instantiable = false;
+        try {
+          instantiable = clazz.getConstructor() != null;
+        }
+        catch(Exception | Error e) {
+          // ignore
+        }
+        try {
+          instantiable = instantiable || ClassGenericsUtil.getParameterizer(clazz) != null;
+        }
+        catch(Exception | Error e) {
+          // ignore
+        }
+        if(!instantiable) {
+          continue;
+        }
+        registry.register(c, clazz);
+      }
     }
-    // Build cache on first use:
-    if(MASTER_CACHE == null) {
-      MASTER_CACHE = slowScan();
+    // Default is served from the registry
+    if(!everything && parameterizable) {
+      return registry.findAllImplementations(c);
     }
-    Iterator<Class<?>> iter = MASTER_CACHE.iterator();
-    while(iter.hasNext()) {
+    // This codepath is used by utility classes to also find buggy
+    // implementations (e.g. non-instantiable, abstract) of the interfaces.
+    List<Class<?>> known = registry.findAllImplementations(c);
+    // For quickly skipping seen entries:
+    THashSet<Class<?>> dupes = new THashSet<>(known);
+    for(Iterator<Class<?>> iter = MASTER_CACHE.iterator(); iter.hasNext();) {
       Class<?> cls = iter.next();
       if(dupes.contains(cls)) {
         continue;
@@ -184,58 +205,57 @@ public class InspectionUtil {
   /**
    * Find an implementation of the given interface / super class, given a
    * relative class name or alias name.
-   * 
+   *
    * @param restrictionClass Restriction class
    * @param value Class name, relative class name, or nickname.
    * @return Class found or {@code null}
    */
-  @SuppressWarnings("unchecked")
   public static <C> Class<? extends C> findImplementation(Class<? super C> restrictionClass, String value) {
-    // Try exact class factory first.
-    try {
-      return (Class<? extends C>) CLASSLOADER.loadClass(value + FACTORY_POSTFIX);
-    }
-    catch(ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    try {
-      return (Class<? extends C>) CLASSLOADER.loadClass(value);
-    }
-    catch(ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    final String completedName = restrictionClass.getPackage().getName() + "." + value;
-    // Try factory for guessed name next
-    try {
-      return (Class<? extends C>) CLASSLOADER.loadClass(completedName + FACTORY_POSTFIX);
-    }
-    catch(ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    // Last try: guessed name prefix only
-    try {
-      return (Class<? extends C>) CLASSLOADER.loadClass(completedName);
-    }
-    catch(ClassNotFoundException e) {
-      // Ignore, retry
-    }
-    // Try aliases:
-    for(Class<?> c : InspectionUtil.cachedFindAllImplementations(restrictionClass)) {
-      if(c.isAnnotationPresent(Alias.class)) {
-        Alias aliases = c.getAnnotation(Alias.class);
-        for(String alias : aliases.value()) {
-          if(alias.equalsIgnoreCase(value) || alias.equalsIgnoreCase(completedName)) {
-            return (Class<? extends C>) c;
-          }
+    ELKIServiceRegistry registry = ELKIServiceRegistry.singleton();
+    // Add all from service files (i.e. jars)
+    if(!registry.contains(restrictionClass)) {
+      new ELKIServiceLoader(restrictionClass).load();
+      // Build cache on first use (only if in development mode)
+      if(MASTER_CACHE == null) {
+        MASTER_CACHE = slowScan();
+      }
+      // Update registry from scan:
+      Iterator<Class<?>> iter = MASTER_CACHE.iterator();
+      while(iter.hasNext()) {
+        Class<?> clazz = iter.next();
+        // Skip other classes.
+        if(!restrictionClass.isAssignableFrom(clazz)) {
+          continue;
         }
+        // skip abstract / private classes.
+        if(Modifier.isInterface(clazz.getModifiers()) || Modifier.isAbstract(clazz.getModifiers()) || Modifier.isPrivate(clazz.getModifiers())) {
+          continue;
+        }
+        boolean instantiable = false;
+        try {
+          instantiable = clazz.getConstructor() != null;
+        }
+        catch(Exception | Error e) {
+          // ignore
+        }
+        try {
+          instantiable = instantiable || ClassGenericsUtil.getParameterizer(clazz) != null;
+        }
+        catch(Exception | Error e) {
+          // ignore
+        }
+        if(!instantiable) {
+          continue;
+        }
+        registry.register(restrictionClass, clazz);
       }
     }
-    return null;
+    return registry.findImplementation(restrictionClass, value);
   }
 
   /**
    * Perform a full (slow) scan for classes.
-   * 
+   *
    * @return List with the scan result
    */
   private static List<Class<?>> slowScan() {
@@ -292,9 +312,9 @@ public class InspectionUtil {
 
   /**
    * Class to iterate over a directory tree.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   static class DirClassIterator implements Iterator<String> {
@@ -314,7 +334,7 @@ public class InspectionUtil {
 
     /**
      * Constructor from Directory
-     * 
+     *
      * @param path Directory to iterate over
      */
     public DirClassIterator(File path, String[] ignorepackages) {
@@ -393,9 +413,9 @@ public class InspectionUtil {
 
   /**
    * Sort classes by their class name. Package first, then class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class ClassSorter implements Comparator<Class<?>> {
