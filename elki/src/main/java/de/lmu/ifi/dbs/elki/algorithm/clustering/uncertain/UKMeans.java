@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -45,6 +46,12 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 // TODO: JavaDoc
 // FIXME: add @Reference
@@ -103,4 +110,41 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
   }
 
   // FIXME: add Parameterizer, to allow using this in the GUI.
+  public static class Parameterizer extends AbstractParameterizer {
+    private KMeansInitialization<? super NumberVector> initializer;
+    
+    private int k;
+    
+    private int maxiter;
+    
+    public static final OptionID INIT_ID = new OptionID("ukmeans.initialization", "Method to choose the initial means.");
+    
+    public final static OptionID K_ID = new OptionID("ukmeans.k","The number of clusters to find.");
+    
+    public final static OptionID MAXITER_ID = new OptionID("ukmeans.maxiter","The maximum number of iterations to do. 0 means no limit.");
+    
+    @Override
+    public void makeOptions(Parameterization config) {
+      super.makeOptions(config);ObjectParameter<KMeansInitialization<? super NumberVector>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
+      if(config.grab(initialP)) {
+        initializer = initialP.instantiateClass(config);
+      }
+      IntParameter maxiterP = new IntParameter(MAXITER_ID, 0);
+      maxiterP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      if(config.grab(maxiterP)) {
+        maxiter = maxiterP.getValue();
+      }
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+    }
+    
+    @Override
+    protected UKMeans makeInstance() {
+      return new UKMeans(k, maxiter, initializer);
+    }
+    
+  }
 }
