@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu.DeLiCluTree;
@@ -88,7 +89,7 @@ title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency o
 booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", //
 url = "http://dx.doi.org/10.1007/11731139_16")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu" })
-public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgorithm<NV, ClusterOrder> implements OPTICSTypeAlgorithm {
+public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgorithm<NV, ClusterOrder>implements OPTICSTypeAlgorithm {
   /**
    * The logger for this class.
    */
@@ -301,15 +302,16 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
     ArrayList<IndexTreePath<DeLiCluEntry>> p = new ArrayList<>(l - 1);
     // All except the last (= root).
     IndexTreePath<DeLiCluEntry> it = path;
-    for(; it.getParentPath() == null; it = it.getParentPath()) {
+    for(; it.getParentPath() != null; it = it.getParentPath()) {
       p.add(it);
     }
-    SpatialDirectoryEntry rootEntry = (SpatialDirectoryEntry) it.getEntry();
+    assert(p.size() == l - 1);
+    DeLiCluEntry rootEntry = it.getEntry();
     reinsertExpanded(distFunction, index, p, l - 2, rootEntry, knns);
   }
 
-  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV> distFunction, DeLiCluTree index, List<IndexTreePath<DeLiCluEntry>> path, int pos, SpatialDirectoryEntry parentEntry, DataStore<KNNList> knns) {
-    DeLiCluNode parentNode = index.getNode(parentEntry.getPageID());
+  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV> distFunction, DeLiCluTree index, List<IndexTreePath<DeLiCluEntry>> path, int pos, DeLiCluEntry parentEntry, DataStore<KNNList> knns) {
+    DeLiCluNode parentNode = index.getNode(parentEntry);
     SpatialEntry entry2 = path.get(pos).getEntry();
 
     if(entry2.isLeafEntry()) {
@@ -326,10 +328,9 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
       }
       return;
     }
-    assert(pos > 1);
     TIntSet expanded = index.getExpanded(entry2);
     for(int i = 0; i < parentNode.getNumEntries(); i++) {
-      SpatialDirectoryEntry entry1 = (SpatialDirectoryEntry) parentNode.getEntry(i);
+      DeLiCluDirectoryEntry entry1 = (DeLiCluDirectoryEntry) parentNode.getEntry(i);
 
       // not yet expanded
       if(!expanded.contains(entry1.getPageID())) {
