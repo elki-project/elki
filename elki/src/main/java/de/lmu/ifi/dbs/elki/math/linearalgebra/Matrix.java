@@ -1,36 +1,12 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import gnu.trove.list.array.TDoubleArrayList;
-
 import java.io.BufferedReader;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import de.lmu.ifi.dbs.elki.datasource.parser.DoubleArray;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -38,15 +14,15 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 /**
  * A two-dimensional matrix class, where the data is stored as two-dimensional
  * array.
- * 
+ *
  * Implementation note: this class contains various optimizations that
  * theoretically the java hotspot compiler should optimize on its own. However,
  * they do show up a hotspots in the profiler (in cpu=times mode), so it does
  * make a difference at least when optimizing other parts of ELKI.
- * 
+ *
  * @author Elke Achtert
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses Vector
  * @apiviz.landmark
  */
@@ -84,7 +60,7 @@ public class Matrix {
 
   /**
    * Array for internal storage of elements.
-   * 
+   *
    * @serial internal array storage.
    */
   protected final double[][] elements;
@@ -98,7 +74,7 @@ public class Matrix {
 
   /**
    * Constructs an m-by-n matrix of zeros.
-   * 
+   *
    * @param m number of rows
    * @param n number of columns
    */
@@ -109,7 +85,7 @@ public class Matrix {
 
   /**
    * Constructs an m-by-n constant matrix.
-   * 
+   *
    * @param m number of rows
    * @param n number of columns
    * @param s A scalar value defining the constant value in the matrix
@@ -126,7 +102,7 @@ public class Matrix {
 
   /**
    * Constructs a matrix from a 2-D array.
-   * 
+   *
    * @param elements an array of arrays of doubles defining the values of the
    *        matrix
    * @throws IllegalArgumentException if not all rows conform in the same length
@@ -143,7 +119,7 @@ public class Matrix {
 
   /**
    * Construct a matrix from a one-dimensional packed array
-   * 
+   *
    * @param values One-dimensional array of doubles, packed by columns (ala
    *        Fortran).
    * @param m Number of rows.
@@ -164,7 +140,7 @@ public class Matrix {
 
   /**
    * Constructor, cloning an existing matrix.
-   * 
+   *
    * @param mat Matrix to clone
    */
   public Matrix(Matrix mat) {
@@ -173,7 +149,7 @@ public class Matrix {
 
   /**
    * Construct a matrix from a copy of a 2-D array.
-   * 
+   *
    * @param A Two-dimensional array of doubles.
    * @return new matrix
    * @throws IllegalArgumentException All rows must have the same length
@@ -193,7 +169,7 @@ public class Matrix {
 
   /**
    * Returns the unit matrix of the specified dimension.
-   * 
+   *
    * @param dim the dimensionality of the unit matrix
    * @return the unit matrix of the specified dimension
    */
@@ -207,7 +183,7 @@ public class Matrix {
 
   /**
    * Returns the zero matrix of the specified dimension.
-   * 
+   *
    * @param dim the dimensionality of the unit matrix
    * @return the zero matrix of the specified dimension
    */
@@ -218,7 +194,7 @@ public class Matrix {
 
   /**
    * Generate matrix with random elements
-   * 
+   *
    * @param m Number of rows.
    * @param n Number of columns.
    * @return An m-by-n matrix with uniformly distributed random elements.
@@ -235,7 +211,7 @@ public class Matrix {
 
   /**
    * Generate identity matrix
-   * 
+   *
    * @param m Number of rows.
    * @param n Number of columns.
    * @return An m-by-n matrix with ones on the diagonal and zeros elsewhere.
@@ -251,7 +227,7 @@ public class Matrix {
   /**
    * Returns a quadratic Matrix consisting of zeros and of the given values on
    * the diagonal.
-   * 
+   *
    * @param diagonal the values on the diagonal
    * @return the resulting matrix
    */
@@ -266,7 +242,7 @@ public class Matrix {
   /**
    * Returns a quadratic Matrix consisting of zeros and of the given values on
    * the diagonal.
-   * 
+   *
    * @param diagonal the values on the diagonal
    * @return the resulting matrix
    */
@@ -280,7 +256,7 @@ public class Matrix {
 
   /**
    * Make a deep copy of a matrix.
-   * 
+   *
    * @return a new matrix containing the same values as this matrix
    */
   public final Matrix copy() {
@@ -301,7 +277,7 @@ public class Matrix {
 
   /**
    * Access the internal two-dimensional array.
-   * 
+   *
    * @return Pointer to the two-dimensional array of matrix elements.
    */
   public final double[][] getArrayRef() {
@@ -310,7 +286,7 @@ public class Matrix {
 
   /**
    * Copy the internal two-dimensional array.
-   * 
+   *
    * @return Two-dimensional array copy of matrix elements.
    */
   public final double[][] getArrayCopy() {
@@ -323,7 +299,7 @@ public class Matrix {
 
   /**
    * Returns the dimensionality of the rows of this matrix.
-   * 
+   *
    * @return m, the number of rows.
    */
   public final int getRowDimensionality() {
@@ -332,7 +308,7 @@ public class Matrix {
 
   /**
    * Returns the dimensionality of the columns of this matrix.
-   * 
+   *
    * @return n, the number of columns.
    */
   public final int getColumnDimensionality() {
@@ -341,7 +317,7 @@ public class Matrix {
 
   /**
    * Get a single element.
-   * 
+   *
    * @param i Row index.
    * @param j Column index.
    * @return A(i,j)
@@ -353,7 +329,7 @@ public class Matrix {
 
   /**
    * Set a single element.
-   * 
+   *
    * @param i Row index.
    * @param j Column index.
    * @param s A(i,j).
@@ -367,7 +343,7 @@ public class Matrix {
 
   /**
    * Increments a single element.
-   * 
+   *
    * @param i the row index
    * @param j the column index
    * @param s the increment value: A(i,j) = A(i.j) + s.
@@ -381,7 +357,7 @@ public class Matrix {
 
   /**
    * Make a one-dimensional row packed copy of the internal array.
-   * 
+   *
    * @return Matrix elements packed in a one-dimensional array by rows.
    */
   public final double[] getRowPackedCopy() {
@@ -394,7 +370,7 @@ public class Matrix {
 
   /**
    * Make a one-dimensional column packed copy of the internal array.
-   * 
+   *
    * @return Matrix elements packed in a one-dimensional array by columns.
    */
   public final double[] getColumnPackedCopy() {
@@ -409,7 +385,7 @@ public class Matrix {
 
   /**
    * Get a submatrix.
-   * 
+   *
    * @param i0 Initial row index
    * @param i1 Final row index
    * @param j0 Initial column index
@@ -432,7 +408,7 @@ public class Matrix {
 
   /**
    * Get a submatrix.
-   * 
+   *
    * @param r Array of row indices.
    * @param c Array of column indices.
    * @return A(r(:),c(:))
@@ -455,7 +431,7 @@ public class Matrix {
 
   /**
    * Get a submatrix.
-   * 
+   *
    * @param r Array of row indices.
    * @param j0 Initial column index
    * @param j1 Final column index
@@ -477,7 +453,7 @@ public class Matrix {
 
   /**
    * Get a submatrix.
-   * 
+   *
    * @param i0 Initial row index
    * @param i1 Final row index
    * @param c Array of column indices.
@@ -501,7 +477,7 @@ public class Matrix {
 
   /**
    * Set a submatrix.
-   * 
+   *
    * @param i0 Initial row index
    * @param i1 Final row index
    * @param j0 Initial column index
@@ -522,7 +498,7 @@ public class Matrix {
 
   /**
    * Set a submatrix.
-   * 
+   *
    * @param r Array of row indices.
    * @param c Array of column indices.
    * @param X A(r(:),c(:))
@@ -543,7 +519,7 @@ public class Matrix {
 
   /**
    * Set a submatrix.
-   * 
+   *
    * @param r Array of row indices.
    * @param j0 Initial column index
    * @param j1 Final column index
@@ -563,7 +539,7 @@ public class Matrix {
 
   /**
    * Set a submatrix.
-   * 
+   *
    * @param i0 Initial row index
    * @param i1 Final row index
    * @param c Array of column indices.
@@ -585,7 +561,7 @@ public class Matrix {
 
   /**
    * Returns the <code>i</code>th row of this matrix as vector.
-   * 
+   *
    * @param i the index of the row to be returned
    * @return the <code>i</code>th row of this matrix
    */
@@ -596,7 +572,7 @@ public class Matrix {
 
   /**
    * Sets the <code>j</code>th row of this matrix to the specified vector.
-   * 
+   *
    * @param j the index of the column to be set
    * @param row the value of the column to be set
    */
@@ -609,7 +585,7 @@ public class Matrix {
 
   /**
    * Returns the <code>j</code>th column of this matrix as vector.
-   * 
+   *
    * @param j the index of the column to be returned
    * @return the <code>j</code>th column of this matrix
    */
@@ -623,7 +599,7 @@ public class Matrix {
 
   /**
    * Sets the <code>j</code>th column of this matrix to the specified column.
-   * 
+   *
    * @param j the index of the column to be set
    * @param column the value of the column to be set
    */
@@ -638,7 +614,7 @@ public class Matrix {
 
   /**
    * Matrix transpose.
-   * 
+   *
    * @return A<sup>T</sup>
    */
   public final Matrix transpose() {
@@ -653,7 +629,7 @@ public class Matrix {
 
   /**
    * C = A + B
-   * 
+   *
    * @param B another matrix
    * @return A + B in a new Matrix
    */
@@ -663,7 +639,7 @@ public class Matrix {
 
   /**
    * C = A + s
-   * 
+   *
    * @param s scalar value
    * @return A + s in a new Matrix
    */
@@ -673,7 +649,7 @@ public class Matrix {
 
   /**
    * C = A + s
-   * 
+   *
    * @param s scalar value
    * @return A + s * E in a new Matrix
    */
@@ -683,7 +659,7 @@ public class Matrix {
 
   /**
    * C = A + s * B
-   * 
+   *
    * @param B another matrix
    * @param s scalar
    * @return A + s * B in a new Matrix
@@ -694,7 +670,7 @@ public class Matrix {
 
   /**
    * A = A + B
-   * 
+   *
    * @param B another matrix
    * @return A + B in this Matrix
    */
@@ -710,7 +686,7 @@ public class Matrix {
 
   /**
    * A = A + s
-   * 
+   *
    * @param s constant to add to every cell
    * @return A + s in this Matrix
    */
@@ -725,7 +701,7 @@ public class Matrix {
 
   /**
    * A = A + s
-   * 
+   *
    * @param s constant to add to the diagonal
    * @return A + s in this Matrix
    */
@@ -738,7 +714,7 @@ public class Matrix {
 
   /**
    * A = A + s * B
-   * 
+   *
    * @param B another matrix
    * @param s Scalar
    * @return A + s * B in this Matrix
@@ -755,7 +731,7 @@ public class Matrix {
 
   /**
    * C = A - B
-   * 
+   *
    * @param B another matrix
    * @return A - B in a new Matrix
    */
@@ -765,7 +741,7 @@ public class Matrix {
 
   /**
    * C = A - s * B
-   * 
+   *
    * @param B another matrix
    * @param s Scalar
    * @return A - s * B in a new Matrix
@@ -776,7 +752,7 @@ public class Matrix {
 
   /**
    * A = A - B
-   * 
+   *
    * @param B another matrix
    * @return A - B in this Matrix
    */
@@ -792,7 +768,7 @@ public class Matrix {
 
   /**
    * A = A - s * B
-   * 
+   *
    * @param B another matrix
    * @param s Scalar
    * @return A - s * B in this Matrix
@@ -809,7 +785,7 @@ public class Matrix {
 
   /**
    * Multiply a matrix by a scalar, C = s*A
-   * 
+   *
    * @param s scalar
    * @return s*A
    */
@@ -819,7 +795,7 @@ public class Matrix {
 
   /**
    * Multiply a matrix by a scalar in place, A = s*A
-   * 
+   *
    * @param s scalar
    * @return replace A by s*A
    */
@@ -834,7 +810,7 @@ public class Matrix {
 
   /**
    * Linear algebraic matrix multiplication, A * B
-   * 
+   *
    * @param B another matrix
    * @return Matrix product, A * B
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
@@ -867,7 +843,7 @@ public class Matrix {
 
   /**
    * Linear algebraic matrix multiplication, A * B
-   * 
+   *
    * @param B a vector
    * @return Matrix product, A * B
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
@@ -891,7 +867,7 @@ public class Matrix {
 
   /**
    * Linear algebraic matrix multiplication, A<sup>T</sup> * B
-   * 
+   *
    * @param B another matrix
    * @return Matrix product, A<sup>T</sup> * B
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
@@ -914,7 +890,7 @@ public class Matrix {
 
   /**
    * Linear algebraic matrix multiplication, A<sup>T</sup> * B
-   * 
+   *
    * @param B another matrix
    * @return Matrix product, A<sup>T</sup> * B
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
@@ -944,7 +920,7 @@ public class Matrix {
 
   /**
    * Linear algebraic matrix multiplication, A * B^T
-   * 
+   *
    * @param B another matrix
    * @return Matrix product, A * B^T
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
@@ -971,7 +947,7 @@ public class Matrix {
 
   /**
    * Linear algebraic matrix multiplication, A^T * B^T. Computed as (B*A)^T
-   * 
+   *
    * @param B another matrix
    * @return Matrix product, A^T * B^T
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
@@ -1005,7 +981,7 @@ public class Matrix {
 
   /**
    * Solve A*X = B
-   * 
+   *
    * @param B right hand side
    * @return solution if A is square, least squares solution otherwise
    */
@@ -1015,7 +991,7 @@ public class Matrix {
 
   /**
    * Matrix inverse or pseudoinverse
-   * 
+   *
    * @return inverse(A) if A is square, pseudoinverse otherwise.
    */
   public final Matrix inverse() {
@@ -1024,7 +1000,7 @@ public class Matrix {
 
   /**
    * Matrix inverse for square matrixes.
-   * 
+   *
    * @return inverse(A), or inverse(A + epsilon E) if singular.
    */
   public final Matrix robustInverse() {
@@ -1037,7 +1013,7 @@ public class Matrix {
 
   /**
    * Matrix determinant
-   * 
+   *
    * @return determinant
    */
   public final double det() {
@@ -1046,7 +1022,7 @@ public class Matrix {
 
   /**
    * Matrix rank
-   * 
+   *
    * @return effective numerical rank, obtained from SVD.
    */
   public final int rank() {
@@ -1055,7 +1031,7 @@ public class Matrix {
 
   /**
    * Matrix condition (2 norm)
-   * 
+   *
    * @return ratio of largest to smallest singular value.
    */
   public final double cond() {
@@ -1064,7 +1040,7 @@ public class Matrix {
 
   /**
    * Matrix trace.
-   * 
+   *
    * @return sum of the diagonal elements.
    */
   public final double trace() {
@@ -1077,7 +1053,7 @@ public class Matrix {
 
   /**
    * One norm
-   * 
+   *
    * @return maximum column sum.
    */
   public final double norm1() {
@@ -1094,7 +1070,7 @@ public class Matrix {
 
   /**
    * Two norm
-   * 
+   *
    * @return maximum singular value.
    */
   public final double norm2() {
@@ -1103,7 +1079,7 @@ public class Matrix {
 
   /**
    * Infinity norm
-   * 
+   *
    * @return maximum row sum.
    */
   public final double normInf() {
@@ -1120,7 +1096,7 @@ public class Matrix {
 
   /**
    * Frobenius norm
-   * 
+   *
    * @return sqrt of sum of squares of all elements.
    */
   public final double normF() {
@@ -1157,7 +1133,7 @@ public class Matrix {
    * independent to the columns of this matrix. Linearly independence is given,
    * if the matrix resulting from appending <code>a</code> to this matrix has
    * full rank.
-   * 
+   *
    * @param columnMatrix the column matrix to be tested for linear independence
    * @return true if the specified column matrix is linearly independent to the
    *         columns of this matrix
@@ -1244,7 +1220,7 @@ public class Matrix {
 
   /**
    * Returns true, if this matrix is symmetric, false otherwise.
-   * 
+   *
    * @return true, if this matrix is symmetric, false otherwise
    */
   public final boolean isSymmetric() {
@@ -1264,7 +1240,7 @@ public class Matrix {
   /**
    * Completes this d x c basis of a subspace of R^d to a d x d basis of R^d,
    * i.e. appends c-d columns to this basis.
-   * 
+   *
    * @return the appended columns
    */
   public final Matrix completeBasis() {
@@ -1292,7 +1268,7 @@ public class Matrix {
   /**
    * Completes this d x c basis of a subspace of R^d to a d x d basis of R^d,
    * i.e. appends c-d columns to this basis.
-   * 
+   *
    * @return the appended columns
    */
   public final Matrix completeToOrthonormalBasis() {
@@ -1320,7 +1296,7 @@ public class Matrix {
 
   /**
    * Returns a matrix which consists of this matrix and the specified columns.
-   * 
+   *
    * @param columns the columns to be appended
    * @return the new matrix with the appended columns
    */
@@ -1344,7 +1320,7 @@ public class Matrix {
 
   /**
    * Returns an orthonormalization of this matrix.
-   * 
+   *
    * @return the orthonormalized matrix
    */
   public final Matrix orthonormalize() {
@@ -1370,7 +1346,7 @@ public class Matrix {
   /**
    * Adds a given value to the diagonal entries if the entry is smaller than the
    * constant.
-   * 
+   *
    * @param constant value to add to the diagonal entries
    * @return a new Matrix differing from this Matrix by the given value added to
    *         the diagonal entries
@@ -1391,7 +1367,7 @@ public class Matrix {
    * printed matrices can be read back in (provided they were printed using US
    * Locale). Elements are separated by whitespace, all the elements for each
    * row appear on a single line, the last row is followed by a blank line.
-   * 
+   *
    * @param input the input stream.
    * @return New matrix
    * @throws java.io.IOException on input error
@@ -1409,7 +1385,7 @@ public class Matrix {
     tokenizer.wordChars(0, 255);
     tokenizer.whitespaceChars(0, ' ');
     tokenizer.eolIsSignificant(true);
-    TDoubleArrayList v = new TDoubleArrayList();
+    DoubleArray v = new DoubleArray();
 
     // Ignore initial empty lines
     while(tokenizer.nextToken() == StreamTokenizer.TT_EOL) {
@@ -1501,7 +1477,7 @@ public class Matrix {
   /**
    * Compare two matrices with a delta parameter to take numerical errors into
    * account.
-   * 
+   *
    * @param obj other object to compare with
    * @param maxdelta maximum delta allowed
    * @return true if delta smaller than maximum
@@ -1536,7 +1512,7 @@ public class Matrix {
   /**
    * Compare two matrices with a delta parameter to take numerical errors into
    * account.
-   * 
+   *
    * @param obj other object to compare with
    * @return almost equals with delta {@link #DELTA}
    */

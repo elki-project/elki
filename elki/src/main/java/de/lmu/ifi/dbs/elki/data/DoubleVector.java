@@ -1,36 +1,11 @@
 package de.lmu.ifi.dbs.elki.data;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import gnu.trove.list.TDoubleList;
-
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import de.lmu.ifi.dbs.elki.datasource.parser.DoubleArray;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
@@ -38,9 +13,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Vector type using {@code double[]} storage for real numbers.
- * 
+ *
  * @author Arthur Zimek
- * 
+ *
  * @apiviz.landmark
  */
 public class DoubleVector extends AbstractNumberVector {
@@ -71,7 +46,7 @@ public class DoubleVector extends AbstractNumberVector {
 
   /**
    * Private constructor. NOT for public use.
-   * 
+   *
    * @param values Values to use
    * @param nocopy Flag to not copy the array
    */
@@ -81,7 +56,7 @@ public class DoubleVector extends AbstractNumberVector {
 
   /**
    * Create a DoubleVector consisting of the given double values.
-   * 
+   *
    * @param values the values to be set as values of the DoubleVector
    */
   public DoubleVector(double[] values) {
@@ -90,7 +65,7 @@ public class DoubleVector extends AbstractNumberVector {
 
   /**
    * Expects a matrix of one column.
-   * 
+   *
    * @param columnMatrix a matrix of one column
    */
   public DoubleVector(Vector columnMatrix) {
@@ -120,7 +95,7 @@ public class DoubleVector extends AbstractNumberVector {
 
   /**
    * Get a copy of the raw double[] array.
-   * 
+   *
    * @return copy of values array.
    */
   public double[] getValues() {
@@ -148,9 +123,9 @@ public class DoubleVector extends AbstractNumberVector {
 
   /**
    * Factory for Double vectors.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has DoubleVector
    */
   public static class Factory extends AbstractNumberVector.Factory<DoubleVector> {
@@ -171,8 +146,8 @@ public class DoubleVector extends AbstractNumberVector {
 
     @Override
     public <A> DoubleVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
-      if(adapter == ArrayLikeUtil.TDOUBLELISTADAPTER) {
-        return new DoubleVector(((TDoubleList) array).toArray(), true);
+      if(adapter.getClass() == DoubleArray.class) {
+        return new DoubleVector(((DoubleArray)array).toArray(), true);
       }
       final int dim = adapter.size(array);
       double[] values = new double[dim];
@@ -194,9 +169,9 @@ public class DoubleVector extends AbstractNumberVector {
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer extends AbstractParameterizer {
@@ -210,16 +185,16 @@ public class DoubleVector extends AbstractNumberVector {
   /**
    * Serialization class for dense double vectors with up to 127 dimensions, by
    * using a byte for storing the dimensionality.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses DoubleVector - - «serializes»
    */
   public static class SmallSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override
     public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final byte dimensionality = buffer.get();
-      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
+      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
       ;
       final double[] values = new double[dimensionality];
       for(int i = 0; i < dimensionality; i++) {
@@ -230,8 +205,8 @@ public class DoubleVector extends AbstractNumberVector {
 
     @Override
     public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
-      assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
-      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
+      assert(vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
+      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
       buffer.put((byte) vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
         buffer.putDouble(vec.values[i]);
@@ -240,7 +215,7 @@ public class DoubleVector extends AbstractNumberVector {
 
     @Override
     public int getByteSize(DoubleVector vec) {
-      assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
+      assert(vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_BYTE + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
     }
   }
@@ -249,16 +224,16 @@ public class DoubleVector extends AbstractNumberVector {
    * Serialization class for dense double vectors with up to
    * {@link Short#MAX_VALUE} dimensions, by using a short for storing the
    * dimensionality.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses DoubleVector - - «serializes»
    */
   public static class ShortSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override
     public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final short dimensionality = buffer.getShort();
-      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
+      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
       ;
       final double[] values = new double[dimensionality];
       for(int i = 0; i < dimensionality; i++) {
@@ -269,8 +244,8 @@ public class DoubleVector extends AbstractNumberVector {
 
     @Override
     public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
-      assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
-      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
+      assert(vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
+      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
       buffer.putShort((short) vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
         buffer.putDouble(vec.values[i]);
@@ -279,23 +254,23 @@ public class DoubleVector extends AbstractNumberVector {
 
     @Override
     public int getByteSize(DoubleVector vec) {
-      assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
+      assert(vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
     }
   }
 
   /**
    * Serialization class for variable dimensionality by using VarInt encoding.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses DoubleVector - - «serializes»
    */
   public static class VariableSerializer implements ByteBufferSerializer<DoubleVector> {
     @Override
     public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
-      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
+      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
       final double[] values = new double[dimensionality];
       for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getDouble();
@@ -305,7 +280,7 @@ public class DoubleVector extends AbstractNumberVector {
 
     @Override
     public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
-      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
+      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
         buffer.putDouble(vec.values[i]);

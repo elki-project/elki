@@ -1,34 +1,10 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import gnu.trove.list.array.TDoubleArrayList;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.datasource.parser.DoubleArray;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -38,14 +14,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
 
 /**
  * Parameter class for a parameter specifying a list of vectors.
- * 
+ *
  * @author Steffi Wanka
  * @author Erich Schubert
  */
 public class VectorListParameter extends ListParameter<VectorListParameter, List<Vector>> {
   /**
    * Constructs a vector list parameter with the given name and description.
-   * 
+   *
    * @param optionID Option ID
    * @param constraint Constraint
    * @param defaultValue Default value
@@ -57,7 +33,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
 
   /**
    * Constructs a vector list parameter with the given name and description.
-   * 
+   *
    * @param optionID Option ID
    * @param constraint Constraint
    * @param optional Optional flag
@@ -69,7 +45,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
 
   /**
    * Constructs a vector list parameter with the given name and description.
-   * 
+   *
    * @param optionID Option ID
    * @param constraint Constraint
    */
@@ -80,7 +56,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
 
   /**
    * Constructs a vector list parameter with the given name and description.
-   * 
+   *
    * @param optionID Option ID
    * @param defaultValue Default value
    */
@@ -92,7 +68,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
 
   /**
    * Constructs a vector list parameter with the given name and description.
-   * 
+   *
    * @param optionID Option ID
    * @param optional Optional flag
    */
@@ -102,7 +78,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
 
   /**
    * Constructs a vector list parameter with the given name and description.
-   * 
+   *
    * @param optionID Option ID
    */
   public VectorListParameter(OptionID optionID) {
@@ -152,7 +128,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
       }
       ArrayList<Vector> vecs = new ArrayList<>();
 
-      TDoubleArrayList vectorCoord = new TDoubleArrayList();
+      DoubleArray vectorCoord = new DoubleArray();
       for(String vector : vectors) {
         vectorCoord.clear();
         String[] coordinates = SPLIT.split(vector);
@@ -178,10 +154,9 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
 
   /**
    * Returns a string representation of the parameter's type.
-   * 
-   * @return 
-   *         &quot;&lt;double_11,...,double_1n:...:double_m1,...,double_mn&gt;&quot
-   *         ;
+   *
+   * @return &quot;&lt;double_11,...,double_1n:...:double_m1,...,double_mn&gt;&
+   *         quot ;
    */
   @Override
   public String getSyntax() {

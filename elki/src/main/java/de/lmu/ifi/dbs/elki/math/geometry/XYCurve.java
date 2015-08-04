@@ -1,29 +1,6 @@
 package de.lmu.ifi.dbs.elki.math.geometry;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import gnu.trove.list.array.TDoubleArrayList;
+import de.lmu.ifi.dbs.elki.datasource.parser.DoubleArray;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
@@ -32,7 +9,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * An XYCurve is an ordered collection of 2d points, meant for chart generation.
  * Of key interest is the method {@link #addAndSimplify} which tries to simplify
  * the curve while adding points.
- * 
+ *
  * @author Erich Schubert
  */
 public class XYCurve implements Result, TextWriteable {
@@ -44,7 +21,7 @@ public class XYCurve implements Result, TextWriteable {
   /**
    * X and Y positions
    */
-  protected TDoubleArrayList data;
+  protected DoubleArray data;
 
   /**
    * Label of X axis
@@ -70,27 +47,27 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Constructor with labels
-   * 
+   *
    * @param labelx Label for X axis
    * @param labely Label for Y axis
    */
   public XYCurve(String labelx, String labely) {
     super();
-    this.data = new TDoubleArrayList();
+    this.data = new DoubleArray();
     this.labelx = labelx;
     this.labely = labely;
   }
 
   /**
    * Constructor with size estimate and labels.
-   * 
+   *
    * @param labelx Label for X axis
    * @param labely Label for Y axis
    * @param size Estimated size (initial allocation size)
    */
   public XYCurve(String labelx, String labely, int size) {
     super();
-    this.data = new TDoubleArrayList(size << 1);
+    this.data = new DoubleArray(size << 1);
     this.labelx = labelx;
     this.labely = labely;
   }
@@ -104,7 +81,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Constructor with size estimate
-   * 
+   *
    * @param size Estimated size (initial allocation size)
    */
   public XYCurve(int size) {
@@ -113,12 +90,12 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Constructor, cloning an existing curve.
-   * 
+   *
    * @param curve Curve to clone.
    */
   public XYCurve(XYCurve curve) {
     super();
-    this.data = new TDoubleArrayList(curve.data);
+    this.data = new DoubleArray(curve.data);
     this.labelx = curve.labelx;
     this.labely = curve.labely;
     this.minx = curve.minx;
@@ -129,7 +106,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Add a coordinate pair, but don't simplify
-   * 
+   *
    * @param x X coordinate
    * @param y Y coordinate
    */
@@ -144,7 +121,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Add a coordinate pair, performing curve simplification if possible.
-   * 
+   *
    * @param x X coordinate
    * @param y Y coordinate
    */
@@ -182,7 +159,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Get label of x axis
-   * 
+   *
    * @return label of x axis
    */
   public String getLabelx() {
@@ -191,7 +168,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Get label of y axis
-   * 
+   *
    * @return label of y axis
    */
   public String getLabely() {
@@ -200,7 +177,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Minimum on x axis.
-   * 
+   *
    * @return Minimum on X
    */
   public double getMinx() {
@@ -209,7 +186,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Maximum on x axis.
-   * 
+   *
    * @return Maximum on X
    */
   public double getMaxx() {
@@ -218,7 +195,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Minimum on y axis.
-   * 
+   *
    * @return Minimum on Y
    */
   public double getMiny() {
@@ -227,7 +204,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Maximum on y axis.
-   * 
+   *
    * @return Maximum on Y
    */
   public double getMaxy() {
@@ -236,7 +213,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Curve X value at given position
-   * 
+   *
    * @param off Offset
    * @return X value
    */
@@ -246,7 +223,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Curve Y value at given position
-   * 
+   *
    * @param off Offset
    * @return Y value
    */
@@ -256,7 +233,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Rescale the graph.
-   * 
+   *
    * @param sx Scaling factor for X axis
    * @param sy Scaling factor for Y axis
    */
@@ -271,7 +248,7 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Size of curve.
-   * 
+   *
    * @return curve length
    */
   public int size() {
@@ -280,23 +257,23 @@ public class XYCurve implements Result, TextWriteable {
 
   /**
    * Get an iterator for the curve.
-   * 
+   *
    * Note: this is <em>not</em> a Java style iterator, since the only way to get
    * positions is using "next" in Java style. Here, we can have two getters for
    * current values!
-   * 
+   *
    * Instead, use this style of iteration: <blockquote>
-   * 
+   *
    * <pre>
-   * {@code 
+   * {@code
    * for (XYCurve.Itr it = curve.iterator(); it.valid(); it.advance()) {
    *   doSomethingWith(it.getX(), it.getY());
    * }
    * }
    * </pre>
-   * 
+   *
    * </blockquote>
-   * 
+   *
    * @return Iterator
    */
   public Itr iterator() {
@@ -342,12 +319,12 @@ public class XYCurve implements Result, TextWriteable {
    * Compute the area under curve for a curve
    * <em>monotonously increasing in X</em>. You might need to relate this to the
    * total area of the chart.
-   * 
+   *
    * @param curve Curve
    * @return Area under curve.
    */
   public static double areaUnderCurve(XYCurve curve) {
-    TDoubleArrayList data = curve.data;
+    DoubleArray data = curve.data;
     double prevx = data.get(0), prevy = data.get(1);
     if (prevx > curve.minx) {
       throw new UnsupportedOperationException("Curves must be monotone on X for areaUnderCurve to be valid.");
@@ -373,21 +350,21 @@ public class XYCurve implements Result, TextWriteable {
    * reason is that we want to have {@code #getX()} and {@code #getY()}
    * operations, which does not work consistently with Java's
    * <code>next()</code> style of iterations.
-   * 
+   *
    * Instead, use this style of iteration: <blockquote>
-   * 
+   *
    * <pre>
-   * {@code 
+   * {@code
    * for (XYCurve.Itr it = curve.iterator(); it.valid(); it.advance()) {
    *   doSomethingWith(it.getX(), it.getY());
    * }
    * }
    * </pre>
-   * 
+   *
    * </blockquote>
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public class Itr {
@@ -398,7 +375,7 @@ public class XYCurve implements Result, TextWriteable {
 
     /**
      * Get x value of current element.
-     * 
+     *
      * @return X value of current element
      */
     public double getX() {
@@ -407,7 +384,7 @@ public class XYCurve implements Result, TextWriteable {
 
     /**
      * Get y value of current element.
-     * 
+     *
      * @return Y value of current element
      */
     public double getY() {
@@ -423,7 +400,7 @@ public class XYCurve implements Result, TextWriteable {
 
     /**
      * Test if the iterator can advance.
-     * 
+     *
      * @return True when the iterator can be advanced.
      */
     public boolean valid() {
