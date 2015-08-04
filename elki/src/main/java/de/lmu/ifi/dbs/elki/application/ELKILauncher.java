@@ -29,7 +29,7 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 
 /**
  * Class to launch ELKI.
@@ -51,7 +51,7 @@ public class ELKILauncher {
    */
   public static void main(String[] args) {
     if(args.length > 0 && args[0].charAt(0) != '-') {
-      Class<?> cls = InspectionUtil.findImplementation(AbstractApplication.class, args[0]);
+      Class<?> cls = ELKIServiceRegistry.findImplementation(AbstractApplication.class, args[0]);
       if(cls != null) {
         try {
           Method m = cls.getMethod("main", String[].class);

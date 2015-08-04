@@ -49,8 +49,8 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -154,7 +154,7 @@ public class CheckELKIServices {
       LOG.warning("Service file name is not a class name: " + prop);
       return;
     }
-    List<Class<?>> impls = InspectionUtil.findAllImplementations(cls, false, false);
+    List<Class<?>> impls = ELKIServiceRegistry.findAllImplementations(cls, false, false);
     HashSet<String> names = new HashSet<>();
     for(Class<?> c2 : impls) {
       names.add(c2.getName());
@@ -234,7 +234,7 @@ public class CheckELKIServices {
    */
   @SuppressWarnings("unchecked")
   private void checkAliases(Class<?> parent, String classname, String[] parts) {
-    Class<?> c = InspectionUtil.findImplementation((Class<Object>) parent, classname);
+    Class<?> c = ELKIServiceRegistry.findImplementation((Class<Object>) parent, classname);
     Alias ann = c.getAnnotation(Alias.class);
     if(ann == null) {
       if(parts.length > 1) {

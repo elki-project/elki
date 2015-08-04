@@ -1,9 +1,9 @@
 /**
  * <p><b>Utility and helper classes</b> - commonly used data structures, output formatting, exceptions, ...</p>
- * 
+ *
  * <p>Specialized utility classes (which often collect static utility methods only) can be found
  * in other places of ELKI as well, as seen below.</p>
- * 
+ *
  * <p>Important utility function collections:</p>
  * <ul>
  * <li>Basic and low-level:<ul>
@@ -33,7 +33,7 @@
  * </ul></li>
  * <li>Specialized:<ul>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil}: Managing parameter settings</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.InspectionUtil}: class and classpath inspection.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry}: class and classpath inspection.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.documentation.DocumentationUtil}: documentation extraction from annotations.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil}: reporting page file accesses.</li>
  * </ul></li>

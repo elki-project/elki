@@ -35,40 +35,23 @@ public class ELKIServiceLoader {
   public static final char COMMENT_CHAR = '#';
 
   /**
-   * Parent class
+   * Constructor - do not use.
    */
-  private Class<?> parent;
-
-  /**
-   * Classloader
-   */
-  private ClassLoader cl;
-
-  /**
-   * Constructor.
-   *
-   * @param parent Parent class
-   * @param cl Classloader to use for loading resources
-   */
-  public ELKIServiceLoader(Class<?> parent, ClassLoader cl) {
-    this.parent = parent;
-    this.cl = cl;
-  }
-
-  /**
-   * Constructor, using the system class loader.
-   *
-   * @param parent Parent class
-   */
-  public ELKIServiceLoader(Class<?> parent) {
-    this(parent, ClassLoader.getSystemClassLoader());
+  private ELKIServiceLoader() {
+    // Do not use.
   }
 
   /**
    * Load the service file.
    */
-  public void load() {
-    ELKIServiceRegistry registry = ELKIServiceRegistry.singleton();
+  public static void load(Class<?> parent) {
+    load(parent, ClassLoader.getSystemClassLoader());
+  }
+
+  /**
+   * Load the service file.
+   */
+  public static void load(Class<?> parent, ClassLoader cl) {
     try {
       String fullName = RESOURCE_PREFIX + parent.getName();
       Enumeration<URL> configfiles = cl.getResources(fullName);
@@ -78,7 +61,7 @@ public class ELKIServiceLoader {
             InputStreamReader is = new InputStreamReader(nextElement.openStream(), "utf-8");
             BufferedLineReader r = new BufferedLineReader(is)) {
           while(r.nextLine()) {
-            parseLine(r.getBuffer(), registry, nextElement);
+            parseLine(parent, r.getBuffer(), nextElement);
           }
         }
         catch(IOException x) {
@@ -94,11 +77,11 @@ public class ELKIServiceLoader {
   /**
    * Parse a single line from a service registry file.
    *
+   * @param parent PArent class
    * @param line Line to read
-   * @param registry Registry to update
    * @param nam File name for error reporting
    */
-  private void parseLine(CharSequence line, ELKIServiceRegistry registry, URL nam) {
+  private static void parseLine(Class<?> parent, CharSequence line, URL nam) {
     if(line == null) {
       return;
     }
@@ -117,7 +100,7 @@ public class ELKIServiceLoader {
     }
     // Class name:
     String cname = line.subSequence(begin, cend).toString();
-    registry.register(parent, cname);
+    ELKIServiceRegistry.register(parent, cname);
     for(int abegin = cend + 1, aend = -1; abegin < end; abegin = aend + 1) {
       // Skip whitespace:
       while(abegin < end && line.charAt(abegin) == ' ') {
@@ -129,7 +112,7 @@ public class ELKIServiceLoader {
         aend++;
       }
       if(abegin < aend) {
-        registry.registerAlias(parent, line.subSequence(abegin, aend).toString(), cname);
+        ELKIServiceRegistry.registerAlias(parent, line.subSequence(abegin, aend).toString(), cname);
       }
     }
     return;

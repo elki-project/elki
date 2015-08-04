@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -402,13 +402,13 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       // Init menu for SIGMOD demo. TODO: make more flexible.
       {
         ArrayList<String> options = menuOverlay.getOptions();
-        for (Class<?> clz : InspectionUtil.cachedFindAllImplementations(Layouter3DPC.class)) {
+        for (Class<?> clz : ELKIServiceRegistry.findAllImplementations(Layouter3DPC.class)) {
           options.add(clz.getSimpleName());
         }
         if (options.size() > 0) {
           options.add(null); // Spacer.
         }
-        for (Class<?> clz : InspectionUtil.cachedFindAllImplementations(DimensionSimilarity.class)) {
+        for (Class<?> clz : ELKIServiceRegistry.findAllImplementations(DimensionSimilarity.class)) {
           options.add(clz.getSimpleName());
         }
       }
@@ -435,7 +435,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
     @SuppressWarnings("unchecked")
     protected void relayout(String parname) {
       try {
-        final Class<?> layoutc = InspectionUtil.findImplementation(Layouter3DPC.class, parname);
+        final Class<?> layoutc = ELKIServiceRegistry.findImplementation(Layouter3DPC.class, parname);
         if (layoutc != null) {
           ListParameterization params = new ListParameterization();
           if (shared.settings.sim != null) {
@@ -451,7 +451,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
         // Try with Dimension Similarity instead.
       }
       try {
-        final Class<?> simc = InspectionUtil.findImplementation(DimensionSimilarity.class, parname);
+        final Class<?> simc = ELKIServiceRegistry.findImplementation(DimensionSimilarity.class, parname);
         if (simc != null) {
           shared.settings.sim = ClassGenericsUtil.tryInstantiate(DimensionSimilarity.class, simc, new EmptyParameterization());
           if (!(shared.settings.layout instanceof SimilarityBasedLayouter3DPC)) {

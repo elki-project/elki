@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -62,10 +62,10 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Utility class to determine the visualizers for a result class.
- * 
+ *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has VisualizerContext oneway - - «create»
  * @apiviz.uses VisFactory oneway - n «configure»
@@ -78,10 +78,10 @@ public class VisualizerParameterizer {
 
   /**
    * Parameter to get the style properties file.
-   * 
+   *
    * <p>
    * Key: -visualizer.stylesheet
-   * 
+   *
    * Default: default properties file <br>
    * included stylesheets:
    * <ul>
@@ -95,8 +95,8 @@ public class VisualizerParameterizer {
    * These are {@code *.properties} files in the package
    * {@link de.lmu.ifi.dbs.elki.visualization.style}.
    * </p>
-   * 
-   * 
+   *
+   *
    */
   public static final OptionID STYLELIB_ID = new OptionID("visualizer.stylesheet", "Style properties file to use, included properties: classic, default, greyscale, neon, presentation, print");
 
@@ -107,10 +107,10 @@ public class VisualizerParameterizer {
 
   /**
    * Parameter to enable visualizers
-   * 
+   *
    * <p>
    * Key: -vis.enable
-   * 
+   *
    * Default: ELKI core
    * </p>
    */
@@ -118,7 +118,7 @@ public class VisualizerParameterizer {
 
   /**
    * Parameter to set the sampling level
-   * 
+   *
    * <p>
    * Key: -vis.sampling
    * </p>
@@ -147,14 +147,14 @@ public class VisualizerParameterizer {
 
   /**
    * Random seed for sampling.
-   * 
+   *
    * FIXME: make parameterizable.
    */
   private RandomFactory rnd = RandomFactory.DEFAULT;
 
   /**
    * Constructor.
-   * 
+   *
    * @param samplesize
    * @param stylelib Style library
    * @param projectors Projectors
@@ -171,7 +171,7 @@ public class VisualizerParameterizer {
 
   /**
    * Make a new visualization context
-   * 
+   *
    * @param result Base result
    * @return New context
    */
@@ -196,7 +196,7 @@ public class VisualizerParameterizer {
 
   /**
    * Try to automatically generate a title for this.
-   * 
+   *
    * @param db Database
    * @param result Result object
    * @return generated title
@@ -257,9 +257,9 @@ public class VisualizerParameterizer {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -304,14 +304,14 @@ public class VisualizerParameterizer {
 
     /**
      * Collect and instantiate all projector factories.
-     * 
+     *
      * @param config Parameterization
      * @param filter Filter
      * @return List of all adapters found.
      */
     private static <O> Collection<ProjectorFactory> collectProjectorFactorys(MergedParameterization config, Pattern filter) {
       ArrayList<ProjectorFactory> factories = new ArrayList<>();
-      for(Class<?> c : InspectionUtil.cachedFindAllImplementations(ProjectorFactory.class)) {
+      for(Class<?> c : ELKIServiceRegistry.findAllImplementations(ProjectorFactory.class)) {
         if(filter != null && !filter.matcher(c.getCanonicalName()).find()) {
           continue;
         }
@@ -334,14 +334,14 @@ public class VisualizerParameterizer {
 
     /**
      * Collect and instantiate all visualizer factories.
-     * 
+     *
      * @param config Parameterization
      * @param filter Filter
      * @return List of all adapters found.
      */
     private static <O> Collection<VisFactory> collectVisFactorys(MergedParameterization config, Pattern filter) {
       ArrayList<VisFactory> factories = new ArrayList<>();
-      for(Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
+      for(Class<?> c : ELKIServiceRegistry.findAllImplementations(VisFactory.class)) {
         if(filter != null && !filter.matcher(c.getCanonicalName()).find()) {
           continue;
         }

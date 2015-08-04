@@ -66,8 +66,8 @@ import de.lmu.ifi.dbs.elki.logging.CLISmartHandler;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -508,7 +508,7 @@ public class MiniGUI extends AbstractApplication {
             params = new ArrayList<>(Arrays.asList(args));
             // TODO: it would be nicer to use the Parameterization API for this!
             if(params.size() > 0) {
-              Class<? extends AbstractApplication> c = InspectionUtil.findImplementation(AbstractApplication.class, params.get(0));
+              Class<? extends AbstractApplication> c = ELKIServiceRegistry.findImplementation(AbstractApplication.class, params.get(0));
               if(c != null) {
                 gui.maincls = c;
                 params.remove(0); // on success

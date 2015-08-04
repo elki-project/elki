@@ -22,11 +22,14 @@ package de.lmu.ifi.dbs.elki.utilities;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.lang.reflect.Modifier;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -54,38 +57,21 @@ public class ELKIServiceRegistry {
   public static final String FACTORY_POSTFIX = "$Factory";
 
   /**
-   * Singleton.
-   */
-  private static ELKIServiceRegistry registry;
-
-  /**
-   * Singleton constructor, use {@link #singleton()}.
-   */
-  private ELKIServiceRegistry() {
-    // SINGLETON
-  }
-
-  /**
-   * Get the singleon instance.
-   *
-   * @return Singleton instance.
-   */
-  public static ELKIServiceRegistry singleton() {
-    if(registry == null) {
-      registry = new ELKIServiceRegistry();
-    }
-    return registry;
-  }
-
-  /**
    * Registry data.
    */
-  Map<Class<?>, Entry> data = new HashMap<Class<?>, Entry>();
+  private static Map<Class<?>, Entry> data = new HashMap<Class<?>, Entry>();
 
   /**
    * Value to abuse for failures.
    */
   final static Class<?> FAILED_LOAD = Entry.class;
+
+  /**
+   * Do not use constructor.
+   */
+  private ELKIServiceRegistry() {
+    // Do not use.
+  }
 
   /**
    * Entry in the service registry.
@@ -182,7 +168,7 @@ public class ELKIServiceRegistry {
    * @param parent Parent class
    * @param cname Class name
    */
-  protected void register(Class<?> parent, String cname) {
+  protected static void register(Class<?> parent, String cname) {
     Entry e = data.get(parent);
     if(e == null) {
       data.put(parent, e = new Entry());
@@ -200,7 +186,7 @@ public class ELKIServiceRegistry {
    * @param parent Class
    * @param clazz Implementation
    */
-  protected void register(Class<?> parent, Class<?> clazz) {
+  protected static void register(Class<?> parent, Class<?> clazz) {
     Entry e = data.get(parent);
     if(e == null) {
       data.put(parent, e = new Entry());
@@ -222,10 +208,141 @@ public class ELKIServiceRegistry {
    * @param alias Alias name
    * @param cname Class name
    */
-  protected void registerAlias(Class<?> parent, String alias, String cname) {
+  protected static void registerAlias(Class<?> parent, String alias, String cname) {
     Entry e = data.get(parent);
     assert(e != null);
     e.addAlias(alias, cname);
+  }
+
+  /**
+   * Attempt to load a class
+   *
+   * @param value Class name to try.
+   * @return Class, or {@code null}.
+   */
+  private static Class<?> tryLoadClass(String value) {
+    try {
+      return CLASSLOADER.loadClass(value);
+    }
+    catch(ClassNotFoundException e) {
+      return null;
+    }
+  }
+
+  /**
+   * Test if a registry entry has already been created.
+   *
+   * @param c Class
+   * @return {@code true} if a registry entry has been created.
+   */
+  protected static boolean contains(Class<?> c) {
+    return data.containsKey(c);
+  }
+
+  /**
+   * Find all implementations of a particular interface.
+   *
+   * @param restrictionClass Class to scan for
+   * @return Found implementations
+   */
+  public static List<Class<?>> findAllImplementations(Class<?> restrictionClass) {
+    if(restrictionClass == null) {
+      return Collections.emptyList();
+    }
+    if(!contains(restrictionClass)) {
+      ELKIServiceLoader.load(restrictionClass);
+      ELKIServiceScanner.load(restrictionClass);
+    }
+    Entry e = data.get(restrictionClass);
+    if(e == null) {
+      return Collections.emptyList();
+    }
+    // Start loading classes:
+    ArrayList<Class<?>> ret = new ArrayList<>(e.len);
+    for(int pos = 0; pos < e.len; pos++) {
+      Class<?> c = e.clazzes[pos];
+      if(c == null) {
+        c = tryLoadClass(e.names[pos]);
+        if(c == null) {
+          LOG.warning("Failed to load class " + e.names[pos] + " for interface " + restrictionClass.getName());
+          e.clazzes[pos] = FAILED_LOAD;
+        }
+        e.clazzes[pos] = c;
+      }
+      if(c == FAILED_LOAD) {
+        continue;
+      }
+      // Linear scan, but cheap enough.
+      if(!ret.contains(c)) {
+        ret.add(c);
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * Find all implementations of a given class in the classpath.
+   *
+   * Note: returned classes may be abstract.
+   *
+   * @param c Class restriction
+   * @param everything include interfaces, abstract and private classes
+   * @param parameterizable only return classes instantiable by the
+   *        parameterizable API
+   * @return List of found classes.
+   */
+  public static List<Class<?>> findAllImplementations(Class<?> c, boolean everything, boolean parameterizable) {
+    if(c == null) {
+      return Collections.emptyList();
+    }
+    // Default is served from the registry
+    if(!everything && parameterizable) {
+      return findAllImplementations(c);
+    }
+    // Add all from service files (i.e. jars)
+    if(!contains(c)) {
+      ELKIServiceLoader.load(c);
+      ELKIServiceScanner.load(c);
+    }
+    // This codepath is used by utility classes to also find buggy
+    // implementations (e.g. non-instantiable, abstract) of the interfaces.
+    List<Class<?>> known = findAllImplementations(c);
+    // For quickly skipping seen entries:
+    HashSet<Class<?>> dupes = new HashSet<>(known);
+    for(Iterator<Class<?>> iter = ELKIServiceScanner.nonindexedClasses(); iter.hasNext();) {
+      Class<?> cls = iter.next();
+      if(dupes.contains(cls)) {
+        continue;
+      }
+      // skip abstract / private classes.
+      if(!everything && (Modifier.isInterface(cls.getModifiers()) || Modifier.isAbstract(cls.getModifiers()) || Modifier.isPrivate(cls.getModifiers()))) {
+        continue;
+      }
+      if(!c.isAssignableFrom(cls)) {
+        continue;
+      }
+      if(parameterizable) {
+        boolean instantiable = false;
+        try {
+          instantiable = cls.getConstructor() != null;
+        }
+        catch(Exception | Error e) {
+          // ignore
+        }
+        try {
+          instantiable = instantiable || ClassGenericsUtil.getParameterizer(cls) != null;
+        }
+        catch(Exception | Error e) {
+          // ignore
+        }
+        if(!instantiable) {
+          continue;
+        }
+      }
+      known.add(cls);
+      dupes.add(cls);
+    }
+    return known;
   }
 
   /**
@@ -236,7 +353,12 @@ public class ELKIServiceRegistry {
    * @param value Class name, relative class name, or nickname.
    * @return Class found or {@code null}
    */
-  public <C> Class<? extends C> findImplementation(Class<? super C> restrictionClass, String value) {
+  public static <C> Class<? extends C> findImplementation(Class<? super C> restrictionClass, String value) {
+    // Add all from service files (i.e. jars)
+    if(!contains(restrictionClass)) {
+      ELKIServiceLoader.load(restrictionClass);
+      ELKIServiceScanner.load(restrictionClass);
+    }
     Entry e = data.get(restrictionClass);
     int pos = -1;
     Class<?> clazz = null;
@@ -304,63 +426,5 @@ public class ELKIServiceRegistry {
     @SuppressWarnings("unchecked")
     Class<? extends C> ret = (Class<? extends C>) clazz.asSubclass(restrictionClass);
     return ret;
-  }
-
-  /**
-   * Attempt to load a class
-   *
-   * @param value Class name to try.
-   * @return Class, or {@code null}.
-   */
-  private static Class<?> tryLoadClass(String value) {
-    try {
-      return CLASSLOADER.loadClass(value);
-    }
-    catch(ClassNotFoundException e) {
-      return null;
-    }
-  }
-
-  /**
-   * Find all implementations of the given interface / super class.
-   *
-   * @param restrictionClass Restriction class
-   * @return Iterator of classes
-   */
-  public List<Class<?>> findAllImplementations(Class<?> restrictionClass) {
-    Entry e = data.get(restrictionClass);
-    if(e == null) {
-      return Collections.emptyList();
-    }
-    ArrayList<Class<?>> ret = new ArrayList<>(e.len);
-    for(int pos = 0; pos < e.len; pos++) {
-      Class<?> c = e.clazzes[pos];
-      if(c == null) {
-        c = tryLoadClass(e.names[pos]);
-        if(c == null) {
-          LOG.warning("Failed to load class " + e.names[pos] + " for interface " + restrictionClass.getName());
-          e.clazzes[pos] = FAILED_LOAD;
-        }
-        e.clazzes[pos] = c;
-      }
-      if(c == FAILED_LOAD) {
-        continue;
-      }
-      // Linear scan, but cheap enough.
-      if(!ret.contains(c)) {
-        ret.add(c);
-      }
-    }
-    return ret;
-  }
-
-  /**
-   * Test if a registry entry has already been created.
-   *
-   * @param c Class
-   * @return {@code true} if a registry entry has been created.
-   */
-  protected boolean contains(Class<?> c) {
-    return data.containsKey(c);
   }
 }

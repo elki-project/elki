@@ -58,7 +58,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceScanner;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -243,7 +244,7 @@ public class DocumentParameters {
   private static void buildParameterIndex(Map<Class<?>, List<Parameter<?>>> byclass, Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) {
     final ArrayList<TrackedParameter> options = new ArrayList<>();
     ExecutorService es = Executors.newSingleThreadExecutor();
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false, true)) {
+    for(final Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, false, true)) {
       // Doesn't have a proper name?
       if(cls.getCanonicalName() == null) {
         continue;
@@ -475,7 +476,7 @@ public class DocumentParameters {
     body.appendChild(maindl);
 
     List<Class<?>> classes = new ArrayList<>(byclass.keySet());
-    Collections.sort(classes, new InspectionUtil.ClassSorter());
+    Collections.sort(classes, new ELKIServiceScanner.ClassSorter());
 
     for(Class<?> cls : classes) {
       // DT = definition term
@@ -606,7 +607,7 @@ public class DocumentParameters {
 
   private static void makeByClassOverviewWiki(Map<Class<?>, List<Parameter<?>>> byclass, WikiStream out) {
     List<Class<?>> classes = new ArrayList<>(byclass.keySet());
-    Collections.sort(classes, new InspectionUtil.ClassSorter());
+    Collections.sort(classes, new ELKIServiceScanner.ClassSorter());
 
     for(Class<?> cls : classes) {
       out.indent = 0;

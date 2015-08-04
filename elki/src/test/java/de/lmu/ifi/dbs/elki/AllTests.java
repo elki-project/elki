@@ -22,11 +22,11 @@ package de.lmu.ifi.dbs.elki;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 
 /**
  * Build a test suite with all tests included with ELKI
@@ -41,7 +41,7 @@ public class AllTests extends TestSuite {
    */
   public static Test suite() {
     TestSuite suite = new TestSuite();
-    for(Class<?> cls : InspectionUtil.findAllImplementations(TestCase.class, false, false)) {
+    for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(TestCase.class, false, false)) {
       if(cls == AllTests.class) {
         continue;
       }
@@ -50,7 +50,7 @@ public class AllTests extends TestSuite {
         suite.addTest(test);
       }
     }
-    for(Class<?> cls : InspectionUtil.findAllImplementations(JUnit4Test.class, false, false)) {
+    for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(JUnit4Test.class, false, false)) {
       if(cls == AllTests.class) {
         continue;
       }

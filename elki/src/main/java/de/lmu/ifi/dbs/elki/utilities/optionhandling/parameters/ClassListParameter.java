@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnusedParameterException;
@@ -37,12 +37,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 
 /**
  * Parameter class for a parameter specifying a list of class names.
- * 
+ *
  * @author Steffi Wanka
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses InspectionUtil
- * 
+ *
  * @param <C> Class type
  */
 // TODO: Add missing constructors. (ObjectListParameter also!)
@@ -55,7 +55,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
   /**
    * Constructs a class list parameter with the given optionID and restriction
    * class.
-   * 
+   *
    * @param optionID the unique id of this parameter
    * @param restrictionClass the restriction class of the list of class names
    * @param optional specifies if this parameter is an optional parameter
@@ -69,7 +69,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
   /**
    * Constructs a class list parameter with the given optionID and restriction
    * class.
-   * 
+   *
    * @param optionID the unique id of this parameter
    * @param restrictionClass the restriction class of the list of class names
    */
@@ -134,7 +134,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
 
       List<Class<? extends C>> cls = new ArrayList<>(classes.length);
       for(String cl : classes) {
-        Class<? extends C> clz = InspectionUtil.findImplementation(restrictionClass, cl);
+        Class<? extends C> clz = ELKIServiceRegistry.findImplementation(restrictionClass, cl);
         if(clz != null) {
           cls.add(clz);
         }
@@ -160,7 +160,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
 
   /**
    * Returns the restriction class of this class parameter.
-   * 
+   *
    * @return the restriction class of this class parameter.
    */
   public Class<C> getRestrictionClass() {
@@ -169,16 +169,16 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
 
   /**
    * Get an iterator over all known implementations of the class restriction.
-   * 
+   *
    * @return List object
    */
   public List<Class<?>> getKnownImplementations() {
-    return InspectionUtil.cachedFindAllImplementations(getRestrictionClass());
+    return ELKIServiceRegistry.findAllImplementations(getRestrictionClass());
   }
 
   /**
    * Returns a string representation of the parameter's type.
-   * 
+   *
    * @return &quot;&lt;class_1,...,class_n&gt;&quot;
    */
   @Override
@@ -193,7 +193,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
    * <p/>
    * If the Class for the class names is not found, the instantiation is tried
    * using the package of the restriction class as package of the class name.
-   * 
+   *
    * @param config Parameterization to use (if Parameterizable))
    * @return a list of new instances for the value of this class list parameter
    */
@@ -222,7 +222,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
   /**
    * Provides a description string listing all classes for the given superclass
    * or interface as specified in the properties.
-   * 
+   *
    * @return a description string listing all classes for the given superclass
    *         or interface as specified in the properties
    */
@@ -259,7 +259,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
 
   /**
    * This class sometimes provides a list of value descriptions.
-   * 
+   *
    * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#hasValuesDescription()
    */
   @Override
@@ -269,7 +269,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
 
   /**
    * Return a description of known valid classes.
-   * 
+   *
    * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#getValuesDescription()
    */
   @Override
@@ -279,7 +279,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
     }
     return "";
   }
-  
+
   @Override
   public int size() {
     return getValue().size();

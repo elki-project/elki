@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -50,9 +50,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 /**
  * Perform some consistency checks on classes that cannot be specified as Java
  * interface.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.uses AbstractParameterizer
  */
@@ -122,7 +122,7 @@ public class CheckParameterizables {
     }
 
     final String internal = de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer.class.getPackage().getName();
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false, false)) {
+    for(final Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, false, false)) {
       // Classes in the same package are special and don't cause warnings.
       if(cls.getName().startsWith(internal)) {
         continue;
@@ -163,7 +163,7 @@ public class CheckParameterizables {
 
   /**
    * Check all supertypes of a class.
-   * 
+   *
    * @param cls Class to check.
    * @return {@code true} when at least one supertype is a known parameterizable
    *         type.
@@ -179,9 +179,9 @@ public class CheckParameterizables {
 
   /**
    * Current verification state.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   enum State {
