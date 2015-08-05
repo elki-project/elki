@@ -396,9 +396,10 @@ public class ELKIServiceRegistry {
     }
     // Last, try aliases:
     if(clazz == null && e != null && e.aliaslen > 0) {
-      for(int i = 0; i < e.aliaslen; i++) {
-        if(e.aliases[i++].equalsIgnoreCase(value)) {
-          clazz = findImplementation(restrictionClass, e.aliases[i]);
+      String value2 = restrictionClass.getPackage().getName() + "." + value;
+      for(int i = 0; i < e.aliaslen; i += 2) {
+        if(e.aliases[i].equalsIgnoreCase(value) || e.aliases[i].equalsIgnoreCase(value2)) {
+          clazz = findImplementation(restrictionClass, e.aliases[++i]);
           break;
         }
       }
