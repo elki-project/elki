@@ -26,14 +26,15 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 
 /**
  * Class to store double distance, integer DBID results.
- * 
+ *
  * Currently unused. Needs benchmarking.
- * 
+ *
  * @author Erich Schubert
  */
 class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, IntegerDBIDs {
@@ -57,7 +58,7 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, IntegerDBID
 
   /**
    * Constructor.
-   * 
+   *
    * @param size Initial size
    */
   protected DoubleIntegerDBIDPairList(int size) {
@@ -101,7 +102,7 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, IntegerDBID
 
   /**
    * Add an entry, consisting of distance and internal index.
-   * 
+   *
    * @param pair entry
    */
   protected void addInternal(DoubleIntegerDBIDPair pair) {
@@ -196,12 +197,12 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, IntegerDBID
 
   /**
    * List iterator.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
-  private class Itr implements DoubleDBIDListIter, IntegerDBIDArrayIter {
+  private class Itr implements DoubleDBIDListMIter, IntegerDBIDArrayIter {
     int pos = 0;
 
     @Override
@@ -249,8 +250,23 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, IntegerDBID
     }
 
     @Override
+    public void setDBID(DBIDRef ref) {
+      data[pos].id = ref.internalGetIndex();
+    }
+
+    @Override
+    public void setDouble(double value) {
+      data[pos].value = value;
+    }
+
+    @Override
     public DoubleDBIDPair getPair() {
       return data[pos];
+    }
+
+    @Override
+    public void remove() {
+      DoubleIntegerDBIDPairList.this.remove(pos);
     }
   }
 }

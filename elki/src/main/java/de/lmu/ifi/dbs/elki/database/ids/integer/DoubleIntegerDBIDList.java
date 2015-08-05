@@ -257,7 +257,7 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
    *
    * @apiviz.exclude
    */
-  private class Itr implements DoubleIntegerDBIDListIter, IntegerDBIDArrayIter {
+  private class Itr implements DoubleIntegerDBIDListMIter {
     /**
      * Current offset.
      */
@@ -312,6 +312,21 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
     @Override
     public double doubleValue() {
       return dists[pos];
+    }
+
+    @Override
+    public void remove() {
+      DoubleIntegerDBIDList.this.remove(pos);
+    }
+
+    @Override
+    public void setDBID(DBIDRef ref) {
+      ids[pos] = ref.internalGetIndex();
+    }
+
+    @Override
+    public void setDouble(double value) {
+      dists[pos] = value;
     }
 
     @Override

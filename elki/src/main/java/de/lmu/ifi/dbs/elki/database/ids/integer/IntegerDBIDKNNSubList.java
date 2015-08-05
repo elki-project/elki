@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 
 /**
  * Sublist of an existing result to contain only the first k elements.
- * 
+ *
  * @author Erich Schubert
  */
 public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
@@ -50,7 +50,7 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
 
   /**
    * Constructor.
-   * 
+   *
    * @param inner Inner instance
    * @param k k value
    */
@@ -90,7 +90,7 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
   }
 
   @Override
-  public DoubleIntegerDBIDListIter iter() {
+  public Itr iter() {
     return new Itr();
   }
 
@@ -116,9 +116,9 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
 
   /**
    * Iterator for the sublist.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class Itr implements DoubleIntegerDBIDListIter {

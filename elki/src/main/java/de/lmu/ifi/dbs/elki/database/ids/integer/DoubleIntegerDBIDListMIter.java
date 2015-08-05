@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.ids.integer;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,18 +23,13 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListMIter;
 
 /**
- * Combination interface for KNNList and IntegerDBIDs.
+ * Combination interface for modifiable iterators.
  *
  * @author Erich Schubert
  */
-public interface IntegerDBIDKNNList extends KNNList, DoubleDBIDList, IntegerDBIDs {
-  @Override
-  DoubleIntegerDBIDListIter iter();
+interface DoubleIntegerDBIDListMIter extends DoubleIntegerDBIDListIter, DoubleDBIDListMIter {
 
-  @Override
-  public DoubleIntegerDBIDPair get(int index);
 }

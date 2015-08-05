@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,15 +25,15 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 /**
  * Modifiable API for Distance-DBID results
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf DoubleDBIDPair
  */
 public interface ModifiableDoubleDBIDList extends DoubleDBIDList {
   /**
    * Add an object to this result.
-   * 
+   *
    * @param distance Distance to add
    * @param id DBID to add
    */
@@ -41,7 +41,7 @@ public interface ModifiableDoubleDBIDList extends DoubleDBIDList {
 
   /**
    * Add an element.
-   * 
+   *
    * @param pair Pair to add
    */
   void add(DoubleDBIDPair pair);
@@ -58,23 +58,27 @@ public interface ModifiableDoubleDBIDList extends DoubleDBIDList {
 
   /**
    * Swap to entries in the list.
-   * 
+   *
    * @param i First entry
    * @param j Second entry
    */
   void swap(int i, int j);
-  
+
   /**
    * Remove the entry at position p by shifting the remainder forward.
-   * 
+   *
    * @param p Entry offset to remove
    */
   void remove(int p);
 
   /**
-   * Remove the entry at position p by swapping with the last (not preserving the order).
-   * 
+   * Remove the entry at position p by swapping with the last (not preserving
+   * the order).
+   *
    * @param p Entry offset to remove
    */
   void removeSwap(int p);
+
+  @Override
+  DoubleDBIDListMIter iter();
 }

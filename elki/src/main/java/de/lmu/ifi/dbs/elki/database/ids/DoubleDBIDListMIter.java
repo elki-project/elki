@@ -1,10 +1,9 @@
 package de.lmu.ifi.dbs.elki.database.ids;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,51 +22,23 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
- * Collection of double values associated with objects.
- *
- * To iterate over the results, use the following code:
- *
- * <pre>
- * {@code
- * for (DoubleDBIDListIter iter = result.iter(); iter.valid(); iter.advance()) {
- *   // You can get the distance via: iter.doubleValue();
- *   // And use iter just like any other DBIDRef
- * }
- * }
- * </pre>
- *
- * If you are only interested in the IDs of the objects, the following is also
- * sufficient:
- *
- * <pre>
- * {@code
- * for (DBIDIter iter = result.iter(); iter.valid(); iter.advance()) {
- *   // Use iter just like any other DBIDRef
- * }
- * }
- * </pre>
+ * Modifiable DBIDList iterator.
  *
  * @author Erich Schubert
- *
- * @apiviz.landmark
- *
- * @apiviz.composedOf DoubleDBIDPair
- * @apiviz.has DoubleDBIDListIter
  */
-public interface DoubleDBIDList extends DBIDs {
-  @Override
-  int size();
+public interface DoubleDBIDListMIter extends DoubleDBIDListIter, DBIDArrayMIter {
+  /**
+   * Update the current DBID value.
+   *
+   * @param ref Current value.
+   */
+  void setDBID(DBIDRef ref);
 
   /**
-   * Materialize a single pair.
+   * Update the value at the current position.
    *
-   * @param off Offset
-   * @return Pair
+   * @param value New value
    */
-  DoubleDBIDPair get(int off);
-
-  @Override
-  DoubleDBIDListIter iter();
+  void setDouble(double value);
 }

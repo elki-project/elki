@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 /**
  * kNN list, but without automatic sorting. Use with care, as others may expect
  * the results to be sorted!
- * 
+ *
  * @author Erich Schubert
  */
 public class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDList implements IntegerDBIDKNNList {
@@ -46,7 +46,7 @@ public class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDList implements I
 
   /**
    * Constructor.
-   * 
+   *
    * @param k K parameter
    * @param size Actual size
    */
