@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.kd;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -55,22 +55,42 @@ import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Simple implementation of a static in-memory K-D-tree. Does not support
  * dynamic updates or anything, but also is very simple and memory efficient:
  * all it uses is one {@link ArrayModifiableDBIDs} to sort the data in a
  * serialized tree.
- * 
+ *
+ * Reference:
+ * <p>
+ * J. L. Bentley<br/>
+ * Multidimensional binary search trees used for associative searching<br />
+ * Communications of the ACM, Vol. 18 Issue 9, Sept. 1975
+ * </p>
+ *
+ * TODO: Optimize construction time by copying attributes to a temporary array
+ * before quickselect?
+ *
+ * TODO: add support for weighted Minkowski distances.
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KDTreeKNNQuery
  * @apiviz.has KDTreeRangeQuery
- * 
+ *
  * @param <O> Vector type
  */
-@Reference(authors = "J. L. Bentley", title = "Multidimensional binary search trees used for associative searching", booktitle = "Communications of the ACM, Vol. 18 Issue 9, Sept. 1975", url = "http://dx.doi.org/10.1145/361002.361007")
-public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIndex<O> implements KNNIndex<O>, RangeIndex<O> {
+@Reference(authors = "J. L. Bentley", //
+title = "Multidimensional binary search trees used for associative searching", //
+booktitle = "Communications of the ACM, Vol. 18 Issue 9, Sept. 1975", //
+url = "http://dx.doi.org/10.1145/361002.361007")
+public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>implements KNNIndex<O>, RangeIndex<O> {
   /**
    * Class logger
    */
@@ -87,6 +107,11 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
   int dims = -1;
 
   /**
+   * Maximum size of leaf nodes.
+   */
+  int leafsize;
+
+  /**
    * Counter for comparisons.
    */
   final Counter objaccess;
@@ -98,11 +123,14 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to index
+   * @param leafsize Maximum size of leaf nodes
    */
-  public MinimalisticMemoryKDTree(Relation<O> relation) {
+  public MinimalisticMemoryKDTree(Relation<O> relation, int leafsize) {
     super(relation);
+    this.leafsize = leafsize;
+    assert(leafsize >= 1);
     if(LOG.isStatistics()) {
       String prefix = this.getClass().getName();
       this.objaccess = LOG.newCounter(prefix + ".objaccess");
@@ -126,23 +154,24 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
    * Recursively build the tree by partial sorting. O(n log n) complexity.
    * Apparently there exists a variant in only O(n log log n)? Please
    * contribute!
-   * 
+   *
    * @param left Interval minimum
    * @param right Interval maximum
    * @param axis Current splitting axis
    * @param comp Comparator
    */
   private void buildTree(int left, int right, int axis, SortDBIDsBySingleDimension comp) {
-    final int middle = (left + right) >>> 1;
+    int middle = (left + right) >>> 1;
     comp.setDimension(axis);
-
     QuickSelect.quickSelect(sorted, comp, left, right, middle);
+
     final int next = (axis + 1) % dims;
-    if(left < middle) {
+    if(left + leafsize < middle) {
       buildTree(left, middle, next, comp);
     }
-    if(middle + 1 < right) {
-      buildTree(middle + 1, right, next, comp);
+    ++middle;
+    if(middle + leafsize < right) {
+      buildTree(middle, right, next, comp);
     }
   }
 
@@ -218,7 +247,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
 
   /**
    * kNN query for the k-d-tree.
-   * 
+   *
    * @author Erich Schubert
    */
   public class KDTreeKNNQuery extends AbstractDistanceKNNQuery<O> {
@@ -229,7 +258,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
 
     /**
      * Constructor.
-     * 
+     *
      * @param distanceQuery Distance query
      * @param norm Norm to use
      */
@@ -247,7 +276,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
 
     /**
      * Perform a kNN search on the kd-tree.
-     * 
+     *
      * @param left Subtree begin
      * @param right Subtree end (exclusive)
      * @param axis Current splitting axis
@@ -258,10 +287,21 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
      * @return New upper bound of kNN distance.
      */
     private double kdKNNSearch(int left, int right, int axis, O query, KNNHeap knns, DBIDArrayIter iter, double maxdist) {
+      if(right - left <= leafsize) {
+        for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
+          double dist = norm.distance(query, relation.get(iter));
+          countObjectAccess();
+          countDistanceComputation();
+          if(dist <= maxdist) {
+            knns.insert(dist, iter);
+          }
+          maxdist = knns.getKNNDistance();
+        }
+        return maxdist;
+      }
       // Look at current node:
       final int middle = (left + right) >>> 1;
-      iter.seek(middle);
-      O split = relation.get(iter);
+      O split = relation.get(iter.seek(middle));
       countObjectAccess();
 
       // Distance to axis:
@@ -278,8 +318,8 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
         double dist = norm.distance(query, split);
         countDistanceComputation();
         if(dist <= maxdist) {
-          iter.seek(middle);
-          knns.insert(dist, iter);
+          assert(iter.getOffset() == middle);
+          knns.insert(dist, iter /* .seek(middle) */);
           maxdist = knns.getKNNDistance();
         }
         if(left < middle) {
@@ -299,8 +339,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
             double dist = norm.distance(query, split);
             countDistanceComputation();
             if(dist <= maxdist) {
-              iter.seek(middle);
-              knns.insert(dist, iter);
+              knns.insert(dist, iter.seek(middle));
               maxdist = knns.getKNNDistance();
             }
           }
@@ -317,8 +356,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
             double dist = norm.distance(query, split);
             countDistanceComputation();
             if(dist <= maxdist) {
-              iter.seek(middle);
-              knns.insert(dist, iter);
+              knns.insert(dist, iter.seek(middle));
               maxdist = knns.getKNNDistance();
             }
           }
@@ -333,7 +371,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
 
   /**
    * kNN query for the k-d-tree.
-   * 
+   *
    * @author Erich Schubert
    */
   public class KDTreeRangeQuery extends AbstractDistanceRangeQuery<O> {
@@ -344,7 +382,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
 
     /**
      * Constructor.
-     * 
+     *
      * @param distanceQuery Distance query
      * @param norm Norm to use
      */
@@ -360,7 +398,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
 
     /**
      * Perform a kNN search on the kd-tree.
-     * 
+     *
      * @param left Subtree begin
      * @param right Subtree end (exclusive)
      * @param axis Current splitting axis
@@ -370,10 +408,20 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
      * @param radius Query radius
      */
     private void kdRangeSearch(int left, int right, int axis, O query, ModifiableDoubleDBIDList res, DBIDArrayIter iter, double radius) {
+      if(right - left <= leafsize) {
+        for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
+          double dist = norm.distance(query, relation.get(iter));
+          countObjectAccess();
+          countDistanceComputation();
+          if(dist <= radius) {
+            res.add(dist, iter);
+          }
+        }
+        return;
+      }
       // Look at current node:
       final int middle = (left + right) >>> 1;
-      iter.seek(middle);
-      O split = relation.get(iter);
+      O split = relation.get(iter.seek(middle));
       countObjectAccess();
 
       // Distance to axis:
@@ -390,8 +438,8 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
         double dist = norm.distance(query, split);
         countDistanceComputation();
         if(dist <= radius) {
-          iter.seek(middle);
-          res.add(dist, iter);
+          assert(iter.getOffset() == middle);
+          res.add(dist, iter /* .seek(middle) */);
         }
       }
       if(left < middle && (onleft || close)) {
@@ -405,31 +453,80 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
 
   /**
    * Factory class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.stereotype factory
    * @apiviz.has MinimalisticMemoryKDTree
-   * 
+   *
    * @param <O> Vector type
    */
   @Alias({ "minikd", "kd" })
   public static class Factory<O extends NumberVector> implements IndexFactory<O, MinimalisticMemoryKDTree<O>> {
     /**
-     * Constructor. Trivial parameterizable.
+     * Maximum size of leaf nodes.
+     */
+    int leafsize;
+
+    /**
+     * Constructor.
      */
     public Factory() {
+      this(1);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param leafsize Maximum size of leaf nodes.
+     */
+    public Factory(int leafsize) {
       super();
+      this.leafsize = leafsize;
     }
 
     @Override
     public MinimalisticMemoryKDTree<O> instantiate(Relation<O> relation) {
-      return new MinimalisticMemoryKDTree<>(relation);
+      return new MinimalisticMemoryKDTree<>(relation, leafsize);
     }
 
     @Override
     public TypeInformation getInputTypeRestriction() {
       return TypeUtil.NUMBER_VECTOR_FIELD;
+    }
+
+    /**
+     * Parameterization class.
+     *
+     * @author Erich Schubert
+     *
+     * @apiviz.exclude
+     */
+    public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+      /**
+       * Option for setting the maximum leaf size.
+       */
+      public static final OptionID LEAFSIZE_P = new OptionID("kd.leafsize", "Maximum leaf size for the k-d-tree. Nodes will be split until their size is smaller than this threshold.");
+
+      /**
+       * Maximum size of leaf nodes.
+       */
+      int leafsize;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        IntParameter leafP = new IntParameter(LEAFSIZE_P, 1) //
+        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+        if(config.grab(leafP)) {
+          leafsize = leafP.intValue();
+        }
+      }
+
+      @Override
+      protected Factory<O> makeInstance() {
+        return new Factory<>(leafsize);
+      }
     }
   }
 }
