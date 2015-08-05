@@ -44,11 +44,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 
 /**
  * Utility functions for use with vectors.
- * 
+ *
  * Note: obviously, many functions are class methods or database related.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses NumberVector
  */
 public final class VectorUtil {
@@ -61,7 +61,7 @@ public final class VectorUtil {
 
   /**
    * Produce a new vector based on random numbers in [0:1].
-   * 
+   *
    * @param factory Vector factory
    * @param dim desired dimensionality
    * @param r Random generator
@@ -74,7 +74,7 @@ public final class VectorUtil {
 
   /**
    * Produce a new vector based on random numbers in [0:1].
-   * 
+   *
    * @param factory Vector factory
    * @param dim desired dimensionality
    * @param <V> vector type
@@ -86,7 +86,7 @@ public final class VectorUtil {
 
   /**
    * Compute the angle for sparse vectors.
-   * 
+   *
    * @param v1 First vector
    * @param v2 Second vector
    * @return angle
@@ -140,14 +140,15 @@ public final class VectorUtil {
 
   /**
    * Compute the angle between two vectors.
-   * 
+   *
    * @param v1 first vector
    * @param v2 second vector
    * @param o Origin
    * @return Angle
    */
   public static double angle(NumberVector v1, NumberVector v2, Vector o) {
-    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality(), dimo = o.getDimensionality();
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality(),
+        dimo = o.getDimensionality();
     final int mindim = (dim1 <= dim2) ? dim1 : dim2;
     // Essentially, we want to compute this:
     // v1' = v1 - o, v2' = v2 - o
@@ -185,14 +186,15 @@ public final class VectorUtil {
 
   /**
    * Compute the angle between two vectors.
-   * 
+   *
    * @param v1 first vector
    * @param v2 second vector
    * @param o Origin
    * @return Angle
    */
   public static double angle(NumberVector v1, NumberVector v2, NumberVector o) {
-    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality(), dimo = o.getDimensionality();
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality(),
+        dimo = o.getDimensionality();
     final int mindim = (dim1 <= dim2) ? dim1 : dim2;
     // Essentially, we want to compute this:
     // v1' = v1 - o, v2' = v2 - o
@@ -229,9 +231,9 @@ public final class VectorUtil {
 
   /**
    * Compute the absolute cosine of the angle between two vectors.
-   * 
+   *
    * To convert it to radians, use <code>Math.acos(angle)</code>!
-   * 
+   *
    * @param v1 first vector
    * @param v2 second vector
    * @return Angle
@@ -277,7 +279,7 @@ public final class VectorUtil {
 
   /**
    * Compute the minimum angle between two rectangles.
-   * 
+   *
    * @param v1 first rectangle
    * @param v2 second rectangle
    * @return Angle
@@ -344,7 +346,7 @@ public final class VectorUtil {
   /**
    * Compute the scalar product (inner product) of this and the given
    * DoubleVector.
-   * 
+   *
    * @param d1 the first vector to compute the scalar product for
    * @param d2 the second vector to compute the scalar product for
    * @return the scalar product (inner product) of this and the given
@@ -361,7 +363,7 @@ public final class VectorUtil {
 
   /**
    * Compute medoid for a given subset.
-   * 
+   *
    * @param relation Relation to process
    * @param sample Sample set
    * @return Medoid vector
@@ -384,7 +386,7 @@ public final class VectorUtil {
    * This is an ugly hack, but we don't want to have the {@link Matrix} class
    * depend on {@link NumberVector}. Maybe a future version will no longer need
    * this.
-   * 
+   *
    * @param mat Matrix
    * @param v Vector
    * @return {@code mat * v}, as double array.
@@ -407,9 +409,9 @@ public final class VectorUtil {
 
   /**
    * Compare number vectors by a single dimension.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class SortDBIDsBySingleDimension implements Comparator<DBIDRef> {
@@ -425,7 +427,7 @@ public final class VectorUtil {
 
     /**
      * Constructor.
-     * 
+     *
      * @param data Vector data source
      * @param dim Dimension to sort by
      */
@@ -437,7 +439,7 @@ public final class VectorUtil {
 
     /**
      * Constructor.
-     * 
+     *
      * @param data Vector data source
      */
     public SortDBIDsBySingleDimension(Relation<? extends NumberVector> data) {
@@ -447,7 +449,7 @@ public final class VectorUtil {
 
     /**
      * Get the dimension to sort by.
-     * 
+     *
      * @return Dimension to sort with
      */
     public int getDimension() {
@@ -456,7 +458,7 @@ public final class VectorUtil {
 
     /**
      * Set the dimension to sort by.
-     * 
+     *
      * @param d2 Dimension to sort with
      */
     public void setDimension(int d2) {
@@ -465,15 +467,17 @@ public final class VectorUtil {
 
     @Override
     public int compare(DBIDRef id1, DBIDRef id2) {
-      return Double.compare(data.get(id1).doubleValue(d), data.get(id2).doubleValue(d));
+      final double v1 = data.get(id1).doubleValue(d);
+      final double v2 = data.get(id2).doubleValue(d);
+      return v1 < v2 ? -1 : v1 > v2 ? +1 : 0;
     }
   }
 
   /**
    * Compare number vectors by a single dimension.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class SortVectorsBySingleDimension implements Comparator<NumberVector> {
@@ -484,7 +488,7 @@ public final class VectorUtil {
 
     /**
      * Constructor.
-     * 
+     *
      * @param dim Dimension to sort by.
      */
     public SortVectorsBySingleDimension(int dim) {
@@ -501,7 +505,7 @@ public final class VectorUtil {
 
     /**
      * Get the dimension to sort by.
-     * 
+     *
      * @return Dimension to sort with
      */
     public int getDimension() {
@@ -510,7 +514,7 @@ public final class VectorUtil {
 
     /**
      * Set the dimension to sort by.
-     * 
+     *
      * @param d2 Dimension to sort with
      */
     public void setDimension(int d2) {
@@ -519,13 +523,15 @@ public final class VectorUtil {
 
     @Override
     public int compare(NumberVector o1, NumberVector o2) {
-      return Double.compare(o1.doubleValue(d), o2.doubleValue(d));
+      final double v1 = o1.doubleValue(d);
+      final double v2 = o2.doubleValue(d);
+      return v1 < v2 ? -1 : v1 > v2 ? +1 : 0;
     }
   }
 
   /**
    * Project a number vector to the specified attributes.
-   * 
+   *
    * @param v a NumberVector to project
    * @param selectedAttributes the attributes selected for projection
    * @param factory Vector factory
