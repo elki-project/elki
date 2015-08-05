@@ -103,7 +103,7 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
 
   @Override
   public HashSetModifiableDBIDs newHashSet() {
-    return new TroveHashSetModifiableDBIDs();
+    return new FastutilIntOpenHashSetModifiableDBIDs();
   }
 
   @Override
@@ -113,7 +113,7 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
 
   @Override
   public HashSetModifiableDBIDs newHashSet(int size) {
-    return new TroveHashSetModifiableDBIDs(size);
+    return new FastutilIntOpenHashSetModifiableDBIDs(size);
   }
 
   @Override
@@ -123,7 +123,7 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
 
   @Override
   public HashSetModifiableDBIDs newHashSet(DBIDs existing) {
-    return new TroveHashSetModifiableDBIDs(existing);
+    return new FastutilIntOpenHashSetModifiableDBIDs(existing);
   }
 
   @Override

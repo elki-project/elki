@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.evaluation.classification.holdout;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -33,13 +31,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 /**
  * A stratified n-fold crossvalidation to distribute the data to n buckets where
  * each bucket exhibits approximately the same distribution of classes as does
  * the complete data set. The buckets are disjoint. The distribution is
  * deterministic.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.7.0
  */
@@ -72,9 +71,9 @@ public class StratifiedCrossValidation extends AbstractHoldout {
   public void initialize(MultipleObjectsBundle bundle) {
     super.initialize(bundle);
     fold = 0;
-    TIntArrayList[] classBuckets = new TIntArrayList[this.labels.size()];
+    IntArrayList[] classBuckets = new IntArrayList[this.labels.size()];
     for(int i = 0; i < this.labels.size(); i++) {
-      classBuckets[i] = new TIntArrayList();
+      classBuckets[i] = new IntArrayList();
     }
     for(int i = 0, l = bundle.dataLength(); i < l; ++i) {
       ClassLabel label = (ClassLabel) bundle.data(i, labelcol);
@@ -90,9 +89,9 @@ public class StratifiedCrossValidation extends AbstractHoldout {
     // TODO: shuffle the class buckets?
     sizes = new int[nfold];
     assignment = new int[bundle.dataLength()];
-    for(TIntArrayList bucket : classBuckets) {
+    for(IntArrayList bucket : classBuckets) {
       for(int i = 0; i < bucket.size(); i++) {
-        assignment[bucket.get(i)] = i % nfold;
+        assignment[bucket.getInt(i)] = i % nfold;
       }
     }
   }
@@ -121,9 +120,9 @@ public class StratifiedCrossValidation extends AbstractHoldout {
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

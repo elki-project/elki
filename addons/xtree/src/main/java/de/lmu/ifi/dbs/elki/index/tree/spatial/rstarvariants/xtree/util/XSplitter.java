@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util;
 
-import gnu.trove.iterator.TIntIterator;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -46,6 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
+
+import it.unimi.dsi.fastutil.ints.IntIterator;
 
 /**
  * Provides methods for splitting X-tree nodes.
@@ -381,7 +381,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    *        dimensions
    * @return common split dimensions
    */
-  private TIntIterator getCommonSplitDimensions(N node) {
+  private IntIterator getCommonSplitDimensions(N node) {
     Collection<SplitHistory> splitHistories = new ArrayList<>(node.getNumEntries());
     for (int i = 0; i < node.getNumEntries(); i++) {
       SpatialEntry entry = node.getEntry(i);
@@ -411,7 +411,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    * @return The dimension with the minimum surface sum, or <code>null</code> if
    *         dimensionIterable yielded nothing
    */
-  private int chooseSplitAxis(TIntIterator dimensionIterator, int minEntries, int maxEntries) {
+  private int chooseSplitAxis(IntIterator dimensionIterator, int minEntries, int maxEntries) {
     // assert that there ARE dimensions to be tested
     if(!dimensionIterator.hasNext()) {
       return -1;
@@ -439,7 +439,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
     }
 
     while(dimensionIterator.hasNext()) {
-      int d = dimensionIterator.next();
+      int d = dimensionIterator.nextInt();
       sortEntriesForDimension(d, entriesByLB, entriesByUB);
       double surfaceSum = generateDistributionsAndSurfaceSums(minEntries, maxEntries, entriesByLB, entriesByUB);
       if(maxEntries <= node.getNumEntries() / 2) { // add opposite ranges
@@ -654,7 +654,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
       // minFanout not set for allowing underflowing nodes
       return null;
     }
-    TIntIterator dimensionListing;
+    IntIterator dimensionListing;
     if(node.getEntry(0) instanceof XTreeDirectoryEntry) {
       // filter common split dimensions
       dimensionListing = getCommonSplitDimensions(node);

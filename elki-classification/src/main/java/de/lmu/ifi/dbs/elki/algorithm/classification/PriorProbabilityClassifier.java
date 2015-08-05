@@ -20,10 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.classification;
 
-import gnu.trove.iterator.TObjectIntIterator;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
@@ -36,11 +32,14 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
  * Classifier to classify instances based on the prior probability of classes in
  * the database, without using the actual data values.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.7.0
  */
@@ -79,23 +78,23 @@ public class PriorProbabilityClassifier extends AbstractClassifier<Object, Resul
    */
   @Override
   public void buildClassifier(Database database, Relation<? extends ClassLabel> labelrep) {
-    TObjectIntMap<ClassLabel> count = new TObjectIntHashMap<>();
+    Object2IntOpenHashMap<ClassLabel> count = new Object2IntOpenHashMap<>();
     for(DBIDIter iter = labelrep.iterDBIDs(); iter.valid(); iter.advance()) {
-      count.adjustOrPutValue(labelrep.get(iter), 1, 1);
+      count.addTo(labelrep.get(iter), 1);
     }
     int max = Integer.MIN_VALUE;
     double size = labelrep.size();
 
     distribution = new double[count.size()];
     labels = new ArrayList<>(count.size());
-    TObjectIntIterator<ClassLabel> iter = count.iterator();
+    ObjectIterator<Entry<ClassLabel>> iter = count.object2IntEntrySet().fastIterator();
     for(int i = 0; iter.hasNext(); ++i) {
-      iter.advance();
-      distribution[i] = iter.value() / size;
-      labels.add(iter.key());
-      if(iter.value() > max) {
-        max = iter.value();
-        prediction = iter.key();
+      Entry<ClassLabel> entry = iter.next();
+      distribution[i] = entry.getIntValue() / size;
+      labels.add(entry.getKey());
+      if(entry.getIntValue() > max) {
+        max = entry.getIntValue();
+        prediction = entry.getKey();
       }
     }
   }

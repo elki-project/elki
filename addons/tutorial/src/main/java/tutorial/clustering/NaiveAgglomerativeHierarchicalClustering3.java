@@ -46,29 +46,29 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 
 /**
  * This tutorial will step you through implementing a well known clustering
  * algorithm, agglomerative hierarchical clustering, in multiple steps.
- * 
+ *
  * This is the third step, where we add support for different linkage
  * strategies.
- * 
+ *
  * This is the naive O(n^3) algorithm. See {@link SLINK} for a much faster
  * algorithm (however, only for single-linkage).
- * 
+ *
  * Reference (for the update formulas):
  * <p>
  * A Review of Classification<br />
  * R. M. Cormack<br />
  * Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @param <O> Object type
  */
 @Reference(title = "A Review of Classification", authors = "R. M. Cormack", booktitle = "Journal of the Royal Statistical Society. Series A, Vol. 134, No. 3", url = "http://www.jstor.org/stable/2344237")
@@ -80,12 +80,12 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
 
   /**
    * Different linkage strategies.
-   * 
+   *
    * The update formulas here come from:<br />
    * R. M. Cormack, A Review of Classification
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static enum Linkage {//
@@ -156,7 +156,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function to use
    * @param numclusters Number of clusters
    * @param linkage Linkage strategy
@@ -169,7 +169,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
@@ -211,7 +211,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
     // have every object point to itself initially
     ArrayModifiableDBIDs parent = DBIDUtil.newArray(ids);
     // Active clusters, when not trivial.
-    TIntObjectMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
+    Int2ReferenceMap<ModifiableDBIDs> clusters = new Int2ReferenceOpenHashMap<>();
 
     // Repeat until everything merged, except the desired number of clusters:
     final int stop = size - numclusters;
@@ -322,7 +322,7 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
 
   /**
    * Compute the size of a complete x by x triangle (minus diagonal)
-   * 
+   *
    * @param x Offset
    * @return Size of complete triangle
    */
@@ -343,9 +343,9 @@ public class NaiveAgglomerativeHierarchicalClustering3<O> extends AbstractDistan
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    *
    * @param <O> Object type

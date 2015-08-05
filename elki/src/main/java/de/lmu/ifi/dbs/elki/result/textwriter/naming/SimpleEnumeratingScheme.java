@@ -26,8 +26,7 @@ import java.util.Map;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 
-import gnu.trove.impl.Constants;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 /**
  * Simple enumerating naming scheme. Cluster names are generated as follows:
@@ -50,7 +49,7 @@ public class SimpleEnumeratingScheme implements NamingScheme {
   /**
    * Count how often each name occurred so far.
    */
-  private TObjectIntHashMap<String> namefreq;
+  private Object2IntOpenHashMap<String> namefreq;
 
   /**
    * Assigned cluster names.
@@ -70,7 +69,7 @@ public class SimpleEnumeratingScheme implements NamingScheme {
    */
   public SimpleEnumeratingScheme(Clustering<?> clustering) {
     super();
-    this.namefreq = new TObjectIntHashMap<>(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, 0);
+    this.namefreq = new Object2IntOpenHashMap<>();
     this.names = new HashMap<>();
     this.clustering = clustering;
     updateNames();
@@ -85,7 +84,7 @@ public class SimpleEnumeratingScheme implements NamingScheme {
         continue;
       }
       String sugname = cluster.getNameAutomatic();
-      int count = namefreq.adjustOrPutValue(sugname, 1, 1);
+      int count = namefreq.addTo(sugname, 1);
       names.put(cluster, sugname + " " + count);
     }
   }
@@ -103,7 +102,7 @@ public class SimpleEnumeratingScheme implements NamingScheme {
     }
     if(nam.endsWith(NULLPOSTFIX)) {
       String basename = nam.substring(0, nam.length() - NULLPOSTFIX.length());
-      if(namefreq.get(basename) == 1) {
+      if(namefreq.getInt(basename) == 1) {
         nam = basename;
       }
     }

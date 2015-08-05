@@ -26,9 +26,10 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.ints.IntSets;
 
 /**
  * DeLiCluTree is a spatial index structure based on an R-Tree. DeLiCluTree is
@@ -50,7 +51,7 @@ public abstract class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluE
   /**
    * Holds the ids of the expanded nodes.
    */
-  private TIntObjectHashMap<TIntHashSet> expanded = new TIntObjectHashMap<>();
+  private Int2ObjectOpenHashMap<IntSet> expanded = new Int2ObjectOpenHashMap<>();
 
   /**
    * Constructor.
@@ -69,9 +70,9 @@ public abstract class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluE
    * @param entry2 the second node
    */
   public void setExpanded(SpatialEntry entry1, SpatialEntry entry2) {
-    TIntHashSet exp1 = expanded.get(getPageID(entry1));
+    IntSet exp1 = expanded.get(getPageID(entry1));
     if(exp1 == null) {
-      exp1 = new TIntHashSet();
+      exp1 = new IntOpenHashSet();
       expanded.put(getPageID(entry1), exp1);
     }
     exp1.add(getPageID(entry2));
@@ -83,12 +84,9 @@ public abstract class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluE
    * @param entry the id of the node for which the expansions should be returned
    * @return the nodes which are already expanded with the specified node
    */
-  public TIntSet getExpanded(SpatialEntry entry) {
-    TIntHashSet exp = expanded.get(getPageID(entry));
-    if(exp != null) {
-      return exp;
-    }
-    return new TIntHashSet();
+  public IntSet getExpanded(SpatialEntry entry) {
+    IntSet exp = expanded.get(getPageID(entry));
+    return (exp != null) ? exp : IntSets.EMPTY_SET;
   }
 
   /**
@@ -97,12 +95,9 @@ public abstract class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluE
    * @param entry the id of the node for which the expansions should be returned
    * @return the nodes which are already expanded with the specified node
    */
-  public TIntSet getExpanded(DeLiCluNode entry) {
-    TIntHashSet exp = expanded.get(entry.getPageID());
-    if(exp != null) {
-      return exp;
-    }
-    return new TIntHashSet();
+  public IntSet getExpanded(DeLiCluNode entry) {
+    IntSet exp = expanded.get(entry.getPageID());
+    return (exp != null) ? exp : IntSets.EMPTY_SET;
   }
 
   /**

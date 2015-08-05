@@ -30,14 +30,15 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
-import gnu.trove.iterator.TIntDoubleIterator;
-import gnu.trove.map.TIntDoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
  * Sparse vector type, using {@code int[]} for storing the values, and
  * {@code int[]} for storing the indexes, approximately 8 bytes per non-zero
  * integer value.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.2
  */
@@ -69,7 +70,7 @@ public class SparseIntegerVector implements SparseNumberVector {
 
   /**
    * Direct constructor.
-   * 
+   *
    * @param indexes Indexes Must be sorted!
    * @param values Associated value.
    * @param dimensionality "true" dimensionality
@@ -84,14 +85,14 @@ public class SparseIntegerVector implements SparseNumberVector {
   /**
    * Create a SparseIntegerVector consisting of double values according to the
    * specified mapping of indices and values.
-   * 
+   *
    * @param values the values to be set as values of the real vector
    * @param dimensionality the dimensionality of this feature vector
    * @throws IllegalArgumentException if the given dimensionality is too small
    *         to cover the given values (i.e., the maximum index of any value not
    *         zero is bigger than the given dimensionality)
    */
-  public SparseIntegerVector(TIntDoubleMap values, int dimensionality) throws IllegalArgumentException {
+  public SparseIntegerVector(Int2DoubleOpenHashMap values, int dimensionality) throws IllegalArgumentException {
     if(values.size() > dimensionality) {
       throw new IllegalArgumentException("values.size() > dimensionality!");
     }
@@ -100,10 +101,9 @@ public class SparseIntegerVector implements SparseNumberVector {
     this.values = new int[values.size()];
     // Import and sort the indexes
     {
-      TIntDoubleIterator iter = values.iterator();
+      ObjectIterator<Int2DoubleMap.Entry> iter = values.int2DoubleEntrySet().fastIterator();
       for(int i = 0; iter.hasNext(); i++) {
-        iter.advance();
-        this.indexes[i] = iter.key();
+        this.indexes[i] = iter.next().getIntKey();
       }
       Arrays.sort(this.indexes);
     }
@@ -122,7 +122,7 @@ public class SparseIntegerVector implements SparseNumberVector {
 
   /**
    * Get the maximum dimensionality.
-   * 
+   *
    * @return the maximum dimensionality seen
    */
   private int getMaxDim() {
@@ -137,7 +137,7 @@ public class SparseIntegerVector implements SparseNumberVector {
   /**
    * Create a SparseIntegerVector consisting of double values according to the
    * specified mapping of indices and values.
-   * 
+   *
    * @param values the values to be set as values of the real vector
    * @throws IllegalArgumentException if the given dimensionality is too small
    *         to cover the given values (i.e., the maximum index of any value not
@@ -179,8 +179,8 @@ public class SparseIntegerVector implements SparseNumberVector {
 
   /**
    * Sets the dimensionality to the new value.
-   * 
-   * 
+   *
+   *
    * @param dimensionality the new dimensionality
    * @throws IllegalArgumentException if the given dimensionality is too small
    *         to cover the given values (i.e., the maximum index of any value not
@@ -256,16 +256,16 @@ public class SparseIntegerVector implements SparseNumberVector {
    * Create a String representation of this SparseIntegerVector as suitable for
    * {@link de.lmu.ifi.dbs.elki.datasource.parser.SparseNumberVectorLabelParser}
    * .
-   * 
+   *
    * The returned String is a single line with entries separated by
    * {@link NumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
    * number of values actually not zero. Following entries are pairs of Integer
    * and Integer where the Integer gives the index of the dimensionality and the
    * Integer gives the corresponding value.
-   * 
+   *
    * Example: a vector (0,1.2,1.3,0)<sup>T</sup> would result in the String<br>
    * <code>2 2 1.2 3 1.3</code><br>
-   * 
+   *
    * @return a String representation of this SparseIntegerVector
    */
   @Override
@@ -309,9 +309,9 @@ public class SparseIntegerVector implements SparseNumberVector {
 
   /**
    * Factory class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has SparseIntegerVector
    */
   public static class Factory implements SparseNumberVector.Factory<SparseIntegerVector> {
@@ -338,7 +338,7 @@ public class SparseIntegerVector implements SparseNumberVector {
     }
 
     @Override
-    public SparseIntegerVector newNumberVector(TIntDoubleMap values, int maxdim) {
+    public SparseIntegerVector newNumberVector(Int2DoubleOpenHashMap values, int maxdim) {
       return new SparseIntegerVector(values, maxdim);
     }
 
@@ -354,9 +354,9 @@ public class SparseIntegerVector implements SparseNumberVector {
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer extends AbstractParameterizer {
@@ -369,9 +369,9 @@ public class SparseIntegerVector implements SparseNumberVector {
 
   /**
    * Serialization class using VarInt encodings.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses SparseIntegerVector - - «serializes»
    */
   public static class VariableSerializer implements ByteBufferSerializer<SparseIntegerVector> {

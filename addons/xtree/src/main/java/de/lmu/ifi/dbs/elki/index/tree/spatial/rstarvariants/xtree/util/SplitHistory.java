@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util;
 
-import gnu.trove.iterator.TIntIterator;
-
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -30,6 +28,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
+
+import it.unimi.dsi.fastutil.ints.IntIterator;
 
 /**
  * History of all splits ever occurred in a Node.
@@ -81,7 +81,7 @@ public final class SplitHistory implements Serializable, Cloneable {
    * @param splitHistories
    * @return list of split dimensions
    */
-  public static TIntIterator getCommonDimensions(Collection<SplitHistory> splitHistories) {
+  public static IntIterator getCommonDimensions(Collection<SplitHistory> splitHistories) {
     Iterator<SplitHistory> it = splitHistories.iterator();
     long[] checkSet = BitsUtil.copy(it.next().dimBits);
     while(it.hasNext()) {

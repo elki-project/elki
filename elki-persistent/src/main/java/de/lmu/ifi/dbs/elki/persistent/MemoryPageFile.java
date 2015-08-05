@@ -20,17 +20,16 @@
  */
 package de.lmu.ifi.dbs.elki.persistent;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
- * A memory based implementation of a PageFile that simulates I/O-access.<br>
+ * A memory based implementation of a PageFile that simulates I/O-access.
  * Implemented as a Map with keys representing the ids of the saved pages.
- * 
+ *
  * @author Elke Achtert
  * @since 0.2
- * 
+ *
  * @param <P> Page type
  */
 public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
@@ -42,17 +41,17 @@ public class MemoryPageFile<P extends Page> extends AbstractStoringPageFile<P> {
   /**
    * Holds the pages.
    */
-  private final TIntObjectMap<P> file;
+  private final Int2ObjectOpenHashMap<P> file;
 
   /**
    * Creates a new MemoryPageFile that is supported by a cache with the
    * specified parameters.
-   * 
+   *
    * @param pageSize the size of a page in Bytes
    */
   public MemoryPageFile(int pageSize) {
     super(pageSize);
-    this.file = new TIntObjectHashMap<>();
+    this.file = new Int2ObjectOpenHashMap<>();
   }
 
   @Override

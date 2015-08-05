@@ -30,15 +30,16 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import gnu.trove.iterator.TIntDoubleIterator;
-import gnu.trove.map.TIntDoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
  * Vector using a dense bit set encoding, based on {@code long[]} storage.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.2
- * 
+ *
  * @apiviz.composedOf Bit
  */
 public class BitVector implements SparseNumberVector {
@@ -65,7 +66,7 @@ public class BitVector implements SparseNumberVector {
   /**
    * Create a new BitVector corresponding to the specified bits and of the
    * specified dimensionality.
-   * 
+   *
    * @param bits the bits to be set in this BitVector.
    * @param dimensionality the dimensionality of this BitVector
    */
@@ -86,7 +87,7 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Get the value of a single bit.
-   * 
+   *
    * @param dimension Bit number to get
    * @return {@code true} when set
    */
@@ -149,11 +150,11 @@ public class BitVector implements SparseNumberVector {
    * Returns a Vector representing in one column and
    * <code>getDimensionality()</code> rows the values of this BitVector as
    * double values.
-   * 
+   *
    * @return a Matrix representing in one column and
    *         <code>getDimensionality()</code> rows the values of this BitVector
    *         as double values
-   * 
+   *
    * @see de.lmu.ifi.dbs.elki.data.NumberVector#toArray()
    */
   @Override
@@ -168,7 +169,7 @@ public class BitVector implements SparseNumberVector {
   /**
    * Returns whether this BitVector contains all bits that are set to true in
    * the specified BitSet.
-   * 
+   *
    * @param bitset the bits to inspect in this BitVector
    * @return true if this BitVector contains all bits that are set to true in
    *         the specified BitSet, false otherwise
@@ -188,7 +189,7 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Returns a copy of the bits currently set in this BitVector.
-   * 
+   *
    * @return a copy of the bits currently set in this BitVector
    */
   public long[] cloneBits() {
@@ -197,7 +198,7 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Compute the vector cardinality (uncached!)
-   * 
+   *
    * @return Vector cardinality
    */
   public int cardinality() {
@@ -206,7 +207,7 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Compute the Jaccard similarity of two bit vectors.
-   * 
+   *
    * @param v2 Second bit vector
    * @return Jaccard similarity (intersection / union)
    */
@@ -216,7 +217,7 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Compute the Hamming distance of two bit vectors.
-   * 
+   *
    * @param v2 Second bit vector
    * @return Hamming distance (number of bits difference)
    */
@@ -226,7 +227,7 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Compute the vector intersection size.
-   * 
+   *
    * @param v2 Second bit vector
    * @return Intersection size (number of bits in both)
    */
@@ -236,7 +237,7 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Compute the vector union size.
-   * 
+   *
    * @param v2 Second bit vector
    * @return Intersection size (number of bits in both)
    */
@@ -246,7 +247,7 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Compute whether two vectors intersect.
-   * 
+   *
    * @param v2 Second bit vector
    * @return {@code true} if they intersect in at least one bit.
    */
@@ -256,7 +257,7 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Combine onto v using the AND operation, i.e. {@code v &= this}.
-   * 
+   *
    * @param v Existing bit set of same length.
    */
   public void andOnto(long[] v) {
@@ -265,7 +266,7 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Combine onto v using the OR operation, i.e. {@code v |= this}.
-   * 
+   *
    * @param v Existing bit set of same length.
    */
   public void orOnto(long[] v) {
@@ -274,7 +275,7 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Combine onto v using the XOR operation, i.e. {@code v ^= this}.
-   * 
+   *
    * @param v Existing bit set of same length.
    */
   public void xorOnto(long[] v) {
@@ -286,7 +287,7 @@ public class BitVector implements SparseNumberVector {
    * suitable to be parsed by
    * {@link de.lmu.ifi.dbs.elki.datasource.parser.BitVectorLabelParser
    * BitVectorLabelParser}.
-   * 
+   *
    * {@inheritDoc}
    */
   @Override
@@ -305,7 +306,7 @@ public class BitVector implements SparseNumberVector {
    * Indicates whether some other object is "equal to" this BitVector. This
    * BitVector is equal to the given object, if the object is a BitVector of
    * same dimensionality and with identical bits set.
-   * 
+   *
    * {@inheritDoc}
    */
   @Override
@@ -324,9 +325,9 @@ public class BitVector implements SparseNumberVector {
 
   /**
    * Factory for bit vectors.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has BitVector
    */
   public static class Factory implements SparseNumberVector.Factory<BitVector> {
@@ -355,13 +356,13 @@ public class BitVector implements SparseNumberVector {
     }
 
     @Override
-    public BitVector newNumberVector(TIntDoubleMap values, int maxdim) {
+    public BitVector newNumberVector(Int2DoubleOpenHashMap values, int maxdim) {
       long[] bits = BitsUtil.zero(maxdim);
       // Import and sort the indexes
-      for(TIntDoubleIterator iter = values.iterator(); iter.hasNext();) {
-        iter.advance();
-        if(iter.value() != 0.) {
-          BitsUtil.setI(bits, iter.key());
+      for(ObjectIterator<Int2DoubleMap.Entry> iter = values.int2DoubleEntrySet().iterator(); iter.hasNext();) {
+        Int2DoubleMap.Entry entry = iter.next();
+        if(entry.getDoubleValue() != 0.) {
+          BitsUtil.setI(bits, entry.getIntKey());
         }
       }
       return new BitVector(bits, maxdim);
@@ -379,9 +380,9 @@ public class BitVector implements SparseNumberVector {
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer extends AbstractParameterizer {
@@ -396,9 +397,9 @@ public class BitVector implements SparseNumberVector {
    * Serialization class for dense integer vectors with up to
    * {@link Short#MAX_VALUE} dimensions, by using a short for storing the
    * dimensionality.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses BitVector - - «serializes»
    */
   public static class ShortSerializer implements ByteBufferSerializer<BitVector> {

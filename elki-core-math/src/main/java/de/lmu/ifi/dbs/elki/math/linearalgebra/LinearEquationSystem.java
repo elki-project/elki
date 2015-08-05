@@ -20,21 +20,21 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import gnu.trove.list.array.TIntArrayList;
-import net.jafama.FastMath;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Arrays;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
+import net.jafama.FastMath;
+
 /**
  * Class for systems of linear equations.
- * 
+ *
  * @author Elke Achtert
  * @since 0.2
  */
@@ -112,7 +112,7 @@ public class LinearEquationSystem {
   /**
    * Constructs a linear equation system with given coefficient matrix
    * <code>a</code> and right hand side <code>b</code>.
-   * 
+   *
    * @param a the matrix of the coefficients of the linear equation system
    * @param b the right hand side of the linear equation system
    */
@@ -147,7 +147,7 @@ public class LinearEquationSystem {
   /**
    * Constructs a linear equation system with given coefficient matrix
    * <code>a</code> and right hand side <code>b</code>.
-   * 
+   *
    * @param a the matrix of the coefficients of the linear equation system
    * @param b the right hand side of the linear equation system
    * @param rowPermutations the row permutations, row i is at position row[i]
@@ -184,7 +184,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns a copy of the coefficient array of this linear equation system.
-   * 
+   *
    * @return a copy of the coefficient array of this linear equation system
    */
   public double[][] getCoefficents() {
@@ -193,7 +193,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns a copy of the right hand side of this linear equation system.
-   * 
+   *
    * @return a copy of the right hand side of this linear equation system
    */
   public double[] getRHS() {
@@ -202,7 +202,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns a copy of the row permutations, row i is at position row[i].
-   * 
+   *
    * @return a copy of the row permutations
    */
   public int[] getRowPermutations() {
@@ -212,7 +212,7 @@ public class LinearEquationSystem {
   /**
    * Returns a copy of the column permutations, column i is at position
    * column[i].
-   * 
+   *
    * @return a copy of the column permutations
    */
   public int[] getColumnPermutations() {
@@ -221,7 +221,7 @@ public class LinearEquationSystem {
 
   /**
    * Tests if system has already been tested for solvability.
-   * 
+   *
    * @return true if a solution has already been computed, false otherwise.
    */
   public boolean isSolved() {
@@ -255,7 +255,7 @@ public class LinearEquationSystem {
 
   /**
    * Checks if a solved system is solvable.
-   * 
+   *
    * @return true if this linear equation system is solved and solvable
    */
   public boolean isSolvable() {
@@ -264,7 +264,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns a string representation of this equation system.
-   * 
+   *
    * @param prefix the prefix of each line
    * @param fractionDigits the number of fraction digits for output accuracy
    * @return a string representation of this equation system
@@ -281,7 +281,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns a string representation of this equation system.
-   * 
+   *
    * @param prefix the prefix of each line
    * @param nf the number format
    * @return a string representation of this equation system
@@ -316,7 +316,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns a string representation of this equation system.
-   * 
+   *
    * @param nf the number format
    * @return a string representation of this equation system
    */
@@ -326,7 +326,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns a string representation of this equation system.
-   * 
+   *
    * @param fractionDigits the number of fraction digits for output accuracy
    * @return a string representation of this equation system
    */
@@ -336,9 +336,9 @@ public class LinearEquationSystem {
 
   /**
    * Returns a string representation of the solution of this equation system.
-   * 
+   *
    * @param fractionDigits precision
-   * 
+   *
    * @return a string representation of the solution of this equation system
    */
   public String solutionToString(int fractionDigits) {
@@ -383,7 +383,7 @@ public class LinearEquationSystem {
   /**
    * Brings this linear equation system into reduced row echelon form with
    * choice of pivot method.
-   * 
+   *
    * @param method the pivot search method to use
    */
   private void reducedRowEchelonForm(int method) {
@@ -462,7 +462,7 @@ public class LinearEquationSystem {
   /**
    * Method for total pivot search, searches for x,y in {k,...n}, so that |a_xy|
    * > |a_ij|
-   * 
+   *
    * @param k search starts at entry (k,k)
    * @return the position of the found pivot element
    */
@@ -491,7 +491,7 @@ public class LinearEquationSystem {
 
   /**
    * Method for trivial pivot search, searches for non-zero entry.
-   * 
+   *
    * @param k search starts at entry (k,k)
    * @return the position of the found pivot element
    */
@@ -516,7 +516,7 @@ public class LinearEquationSystem {
 
   /**
    * permutes two matrix rows and two matrix columns
-   * 
+   *
    * @param pos1 the fist position for the permutation
    * @param pos2 the second position for the permutation
    */
@@ -536,7 +536,7 @@ public class LinearEquationSystem {
 
   /**
    * performs a pivot operation
-   * 
+   *
    * @param k pivoting takes place below (k,k)
    */
   private void pivotOperation(int k) {
@@ -585,7 +585,7 @@ public class LinearEquationSystem {
 
   /**
    * solves linear system with the chosen method
-   * 
+   *
    * @param method the pivot search method
    */
   private void solve(int method) throws NullPointerException {
@@ -607,24 +607,19 @@ public class LinearEquationSystem {
     }
 
     // compute one special solution
-    int cols = coeff[0].length;
-    TIntArrayList boundIndices = new TIntArrayList();
+    final int cols = coeff[0].length;
+    int numbound = 0, numfree = 0;
+    int[] boundIndices = new int[cols], freeIndices = new int[cols];
     x_0 = new double[cols];
-    for(int i = 0; i < coeff.length; i++) {
+    outer: for(int i = 0; i < coeff.length; i++) {
       for(int j = i; j < coeff[row[i]].length; j++) {
         if(coeff[row[i]][col[j]] == 1) {
           x_0[col[i]] = rhs[row[i]];
-          boundIndices.add(col[i]);
-          break;
+          boundIndices[numbound++] = col[i];
+          continue outer;
         }
       }
-    }
-    TIntArrayList freeIndices = new TIntArrayList();
-    for(int i = 0; i < coeff[0].length; i++) {
-      if(boundIndices.contains(i)) {
-        continue;
-      }
-      freeIndices.add(i);
+      freeIndices[numfree++] = i;
     }
 
     StringBuilder msg = new StringBuilder();
@@ -635,24 +630,23 @@ public class LinearEquationSystem {
     }
 
     // compute solution space of homogeneous linear equation system
-    boundIndices.sort();
+    Arrays.sort(boundIndices, 0, numbound);
     int freeIndex = 0;
     int boundIndex = 0;
-    u = new double[cols][freeIndices.size()];
+    u = new double[cols][numfree];
 
     for(int j = 0; j < u[0].length; j++) {
       for(int i = 0; i < u.length; i++) {
-        if(freeIndex < freeIndices.size() && i == freeIndices.get(freeIndex)) {
+        if(freeIndex < numfree && i == freeIndices[freeIndex]) {
           u[i][j] = 1;
         }
-        else if(boundIndex < boundIndices.size() && i == boundIndices.get(boundIndex)) {
-          u[i][j] = -coeff[row[boundIndex]][freeIndices.get(freeIndex)];
+        else if(boundIndex < numbound && i == boundIndices[boundIndex]) {
+          u[i][j] = -coeff[row[boundIndex]][freeIndices[freeIndex]];
           boundIndex++;
         }
       }
       freeIndex++;
-      boundIndex = 0;
-
+      boundIndex = 0; // Restart
     }
 
     if(LOG.isDebugging()) {
@@ -668,7 +662,7 @@ public class LinearEquationSystem {
 
   /**
    * Checks solvability of this linear equation system with the chosen method.
-   * 
+   *
    * @param method the pivot search method
    * @return true if linear system in solvable
    */
@@ -695,7 +689,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns the maximum integer digits in each column of the specified values.
-   * 
+   *
    * @param values the values array
    * @return the maximum integer digits in each column of the specified values
    */
@@ -711,7 +705,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns the maximum integer digits of the specified values.
-   * 
+   *
    * @param values the values array
    * @return the maximum integer digits of the specified values
    */
@@ -725,7 +719,7 @@ public class LinearEquationSystem {
 
   /**
    * Returns the integer digits of the specified double value.
-   * 
+   *
    * @param d the double value
    * @return the integer digits of the specified double value
    */
@@ -741,7 +735,7 @@ public class LinearEquationSystem {
    * Helper method for output of equations and solution. Appends the specified
    * double value to the given string buffer according the number format and the
    * maximum number of integer digits.
-   * 
+   *
    * @param nf the number format
    * @param buffer the string buffer to append the value to
    * @param value the value to append
@@ -763,7 +757,7 @@ public class LinearEquationSystem {
 
   /**
    * Return dimensionality of spanned subspace.
-   * 
+   *
    * @return dim
    */
   public int subspacedim() {

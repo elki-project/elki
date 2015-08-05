@@ -49,14 +49,14 @@ public class LMCLUSTest extends AbstractClusterAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(LMCLUS.Parameterizer.MINSIZE_ID, 100);
     params.addParameter(LMCLUS.Parameterizer.THRESHOLD_ID, 10);
-    params.addParameter(LMCLUS.Parameterizer.RANDOM_ID, 2);
+    params.addParameter(LMCLUS.Parameterizer.RANDOM_ID, 6);
 
     LMCLUS lmclus = ClassGenericsUtil.parameterizeOrAbort(LMCLUS.class, params);
     testParameterizationOk(params);
 
     Clustering<Model> result = lmclus.run(db);
-    testFMeasure(db, result, 0.49033868);
-    testClusterSizes(result, new int[] { 23, 577 });
+    testFMeasure(db, result, 0.487716464);
+    testClusterSizes(result, new int[] { 30, 570 });
   }
 
   /**

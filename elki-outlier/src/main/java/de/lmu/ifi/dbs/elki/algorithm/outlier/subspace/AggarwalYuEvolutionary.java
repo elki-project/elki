@@ -20,11 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -56,26 +52,28 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.array.TIntArrayList;
+
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntIterator;
 
 /**
  * Evolutionary variant (EAFOD) of the high-dimensional outlier detection
  * algorithm by Aggarwal and Yu.
+ *
+ * Reference:
  * <p>
- * Reference: <br />
  * Outlier detection for high dimensional data<br />
  * C.C. Aggarwal, P. S. Yu <br />
  * Proc. 2001 ACM SIGMOD international conference on Management of data
  * </p>
- * 
+ *
  * @author Ahmed Hettab
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.has EvolutionarySearch oneway - - runs
  * @apiviz.has Individuum oneway - - obtains
- * 
+ *
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
 // TODO: progress logging!
@@ -114,7 +112,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
   /**
    * Constructor.
-   * 
+   *
    * @param k K
    * @param phi Phi
    * @param m M
@@ -128,7 +126,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
   /**
    * Performs the evolutionary algorithm on the given database.
-   * 
+   *
    * @param database Database
    * @param relation Relation
    * @return Result
@@ -172,9 +170,9 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
   /**
    * The inner class to handle the actual evolutionary computation.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has Individuum oneway - - evolves
    */
   private class EvolutionarySearch {
@@ -205,7 +203,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
     /**
      * Constructor.
-     * 
+     *
      * @param relation Database to use
      * @param ranges DBID ranges to process
      * @param m Population size
@@ -273,7 +271,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
     /**
      * check the termination criterion.
-     * 
+     *
      * @param pop Population
      * @return Convergence
      */
@@ -323,7 +321,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
     /**
      * Produce an initial (random) population.
-     * 
+     *
      * @param popsize Population size
      * @return Sorted list of Individuums
      */
@@ -355,13 +353,13 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
     /**
      * Select surviving individuums weighted by rank.
-     * 
+     *
      * the selection criterion for the genetic algorithm: <br>
      * roulette wheel mechanism: <br>
      * where the probability of sampling an individual of the population was
      * proportional to p - r(i), where p is the size of population and r(i) the
      * rank of i-th individual
-     * 
+     *
      * @param population Population
      * @return Survivors
      */
@@ -430,7 +428,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
     /**
      * Make a new individuum helper, computing sparsity=fitness
-     * 
+     *
      * @param gene Gene to evaluate
      * @return new individuum
      */
@@ -462,7 +460,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
     /**
      * Recombination method.
-     * 
+     *
      * @param parent1 First parent
      * @param parent2 Second parent
      * @return recombined children
@@ -470,9 +468,9 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     private Pair<Individuum, Individuum> recombineOptimized(Individuum parent1, Individuum parent2) {
       Pair<Individuum, Individuum> recombinePair;
       // Set of Positions in which either s1 or s2 are don't care
-      TIntArrayList Q = new TIntArrayList(dim);
+      IntArrayList Q = new IntArrayList(dim);
       // Set of Positions in which neither s1 or s2 is don't care
-      TIntArrayList R = new TIntArrayList(dim);
+      IntArrayList R = new IntArrayList(dim);
 
       for(int i = 0; i < dim; i++) {
         if((parent1.getGene()[i] == DONT_CARE) && (parent2.getGene()[i] != DONT_CARE)) {
@@ -491,37 +489,34 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
       // Extends gene greedily
       short[] b = best.getGene();
       int count = k - R.size();
-      TIntIterator q = Q.iterator();
+      IntIterator q = Q.iterator();
 
       while(count > 0) {
-        short[] l1 = b.clone();
-        short[] l2 = b.clone();
+        short[] l1 = b.clone(), l2 = b.clone();
 
         while(q.hasNext()) {
-          int next = q.next();
+          int next = q.nextInt();
           // pos = next;
 
-          {
-            boolean s1Null = (parent1.getGene()[next] == DONT_CARE);
-            boolean s2Null = (parent1.getGene()[next] == DONT_CARE);
+          boolean s1Null = (parent1.getGene()[next] == DONT_CARE);
+          boolean s2Null = (parent1.getGene()[next] == DONT_CARE);
 
-            l1[next] = parent1.getGene()[next];
-            l2[next] = parent2.getGene()[next];
+          l1[next] = parent1.getGene()[next];
+          l2[next] = parent2.getGene()[next];
 
-            final double sparsityL1 = sparsity(computeSubspaceForGene(l1, ranges).size(), dbsize, k, phi);
-            final double sparsityL2 = sparsity(computeSubspaceForGene(l2, ranges).size(), dbsize, k, phi);
+          final double sparsityL1 = sparsity(computeSubspaceForGene(l1, ranges).size(), dbsize, k, phi);
+          final double sparsityL2 = sparsity(computeSubspaceForGene(l2, ranges).size(), dbsize, k, phi);
 
-            if(sparsityL1 <= sparsityL2) {
-              b = l1.clone();
-              if(s1Null) {
-                count--;
-              }
+          if(sparsityL1 <= sparsityL2) {
+            b = l1.clone();
+            if(s1Null) {
+              count--;
             }
-            else {
-              b = l2.clone();
-              if(s2Null) {
-                count--;
-              }
+          }
+          else {
+            b = l2.clone();
+            if(s2Null) {
+              count--;
             }
           }
         }
@@ -549,7 +544,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     /**
      * Recursive method to build all possible gene combinations using positions
      * in r.
-     * 
+     *
      * @param r valid positions to use
      * @param i Offset in r to start at.
      * @param current Current gene
@@ -557,12 +552,12 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
      * @param parent2 Second parent
      * @return best gene combination
      */
-    private Individuum combineRecursive(TIntArrayList r, int i, short[] current, Individuum parent1, Individuum parent2) {
+    private Individuum combineRecursive(IntArrayList r, int i, short[] current, Individuum parent1, Individuum parent2) {
       if(i == r.size()) {
         return makeIndividuum(current);
       }
       // Position to modify
-      int pos = r.get(i);
+      int pos = r.getInt(i);
       // Build genes
       short[] gene1 = current.clone();
       short[] gene2 = current; // .clone();
@@ -577,7 +572,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
   /**
    * Individuum for the evolutionary search.
-   * 
+   *
    * @author Erich Schubert
    */
   private static class Individuum implements Comparable<Individuum> {
@@ -587,7 +582,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
     /**
      * Constructor
-     * 
+     *
      * @param fitness Fitness
      * @param gene Gene information
      */
@@ -598,7 +593,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
     /**
      * Get the gene.
-     * 
+     *
      * @return the gene information
      */
     public short[] getGene() {
@@ -607,7 +602,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
     /**
      * Get the fitness of this individuum.
-     * 
+     *
      * @return fitness
      */
     public double getFitness() {
@@ -616,7 +611,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
     /**
      * Create a "null" individuum (full space).
-     * 
+     *
      * @param dim Dimensionality
      * @return new individuum
      */
@@ -674,9 +669,9 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractAggarwalYuOutlier.Parameterizer {

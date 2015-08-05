@@ -42,18 +42,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 /**
  * Base class for supervised projection methods.
- * 
+ *
  * TODO: re-add sampling.
- * 
+ *
  * @author Angela Peng
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @param <V> Vector type
  */
 public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberVector> implements ObjectFilter {
@@ -64,7 +64,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
 
   /**
    * Constructor.
-   * 
+   *
    * @param projdimension Projection dimensionality
    */
   public AbstractSupervisedProjectionVectorFilter(int projdimension) {
@@ -145,7 +145,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
 
   /**
    * Get the output type from the input type after conversion.
-   * 
+   *
    * @param in input type restriction
    * @param factory Vector factory
    * @return output type restriction
@@ -156,14 +156,14 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
 
   /**
    * Class logger.
-   * 
+   *
    * @return Logger
    */
   protected abstract Logging getLogger();
 
   /**
    * computes the projection matrix
-   * 
+   *
    * @param vectorcolumn Vectors
    * @param classcolumn Class information
    * @param dim Dimensionality Dimensionality
@@ -173,18 +173,18 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
 
   /**
    * Partition the bundle based on the class label.
-   * 
+   *
    * @param classcolumn
    * @return Partitioned data set.
    */
-  protected <O> Map<O, TIntList> partition(List<? extends O> classcolumn) {
-    Map<O, TIntList> classes = new HashMap<>();
+  protected <O> Map<O, IntList> partition(List<? extends O> classcolumn) {
+    Map<O, IntList> classes = new HashMap<>();
     Iterator<? extends O> iter = classcolumn.iterator();
     for(int i = 0; iter.hasNext(); i++) {
       O lbl = iter.next();
-      TIntList ids = classes.get(lbl);
+      IntList ids = classes.get(lbl);
       if(ids == null) {
-        ids = new TIntArrayList();
+        ids = new IntArrayList();
         classes.put(lbl, ids);
       }
       ids.add(i);
@@ -194,11 +194,11 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <V> Vector type
    */
   public abstract static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {

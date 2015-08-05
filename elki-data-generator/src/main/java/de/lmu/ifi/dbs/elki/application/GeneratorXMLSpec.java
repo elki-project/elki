@@ -38,9 +38,9 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
+
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntIterator;
 
 /**
  * Generate a data set based on a specified model (using an XML specification)
@@ -130,14 +130,14 @@ public class GeneratorXMLSpec extends AbstractApplication {
       throw new AbortException("No model column found in bundle.");
     }
     ArrayList<Model> models = new ArrayList<>();
-    Map<Model, TIntList> modelMap = new HashMap<>();
+    Map<Model, IntArrayList> modelMap = new HashMap<>();
     { // Build a map from model to the actual objects
       for(int i = 0; i < data.dataLength(); i++) {
         Model model = (Model) data.data(i, modelcol);
-        TIntList modelids = modelMap.get(model);
+        IntArrayList modelids = modelMap.get(model);
         if(modelids == null) {
           models.add(model);
-          modelids = new TIntArrayList();
+          modelids = new IntArrayList();
           modelMap.put(model, modelids);
         }
         modelids.add(i);
@@ -145,7 +145,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
     }
     // compute global discard values
     int totalsize = 0, totaldisc = 0;
-    for(Entry<Model, TIntList> ent : modelMap.entrySet()) {
+    for(Entry<Model, IntArrayList> ent : modelMap.entrySet()) {
       totalsize += ent.getValue().size();
       if(ent.getKey() instanceof GeneratorSingleCluster) {
         totaldisc += ((GeneratorSingleCluster) ent.getKey()).getDiscarded();
@@ -155,7 +155,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
     outStream.append("########################################################").append(LINE_SEPARATOR);
     outStream.append("## Number of clusters: " + models.size()).append(LINE_SEPARATOR);
     for(Model model : models) {
-      TIntList ids = modelMap.get(model);
+      IntArrayList ids = modelMap.get(model);
       outStream.append("########################################################").append(LINE_SEPARATOR);
       outStream.append("## Size: " + ids.size()).append(LINE_SEPARATOR);
       if(model instanceof GeneratorSingleCluster) {
@@ -183,8 +183,8 @@ public class GeneratorXMLSpec extends AbstractApplication {
         outStream.append("## Density correction factor estimation: " + corf).append(LINE_SEPARATOR);
       }
       outStream.append("########################################################").append(LINE_SEPARATOR);
-      for(TIntIterator iter = ids.iterator(); iter.hasNext();) {
-        int num = iter.next();
+      for(IntIterator iter = ids.iterator(); iter.hasNext();) {
+        int num = iter.nextInt();
         for(int c = 0; c < data.metaLength(); c++) {
           if(c != modelcol) {
             if(c > 0) {

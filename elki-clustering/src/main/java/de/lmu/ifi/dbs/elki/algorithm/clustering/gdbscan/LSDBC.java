@@ -37,12 +37,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
@@ -58,7 +53,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import gnu.trove.list.array.TIntArrayList;
+
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.jafama.FastMath;
 
 /**
@@ -148,7 +144,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     // (Temporary) store the cluster ID assigned.
     final WritableIntegerDataStore clusterids = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, UNPROCESSED);
     // Note: these are not exact, as objects may be stolen from noise.
-    final TIntArrayList clustersizes = new TIntArrayList();
+    final IntArrayList clustersizes = new IntArrayList();
     clustersizes.add(0); // Unprocessed dummy value.
     clustersizes.add(0); // Noise counter.
 
@@ -177,7 +173,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
       else {
         // otherwise, it's a noise point
         clusterids.putInt(id, NOISE);
-        clustersizes.set(NOISE, clustersizes.get(NOISE) + 1);
+        clustersizes.set(NOISE, clustersizes.getInt(NOISE) + 1);
       }
       // We've completed this element
       LOG.incrementProcessed(progress);
@@ -192,7 +188,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     ArrayList<ArrayModifiableDBIDs> clusterlists = new ArrayList<>(clusterid);
     // add storage containers for clusters
     for(int i = 0; i < clustersizes.size(); i++) {
-      clusterlists.add(DBIDUtil.newArray(clustersizes.get(i)));
+      clusterlists.add(DBIDUtil.newArray(clustersizes.getInt(i)));
     }
     // do the actual inversion
     for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {

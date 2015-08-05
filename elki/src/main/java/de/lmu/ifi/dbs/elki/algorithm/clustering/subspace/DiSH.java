@@ -20,10 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
-import gnu.trove.map.hash.TCustomHashMap;
-import gnu.trove.procedure.TObjectObjectProcedure;
-import net.jafama.FastMath;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -79,14 +75,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenCustomHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+import net.jafama.FastMath;
 
 /**
  * Algorithm for detecting subspace hierarchies.
  *
  * Reference:
  * <p>
+ * <<<<<<< HEAD
  * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A.
  * Zimek:<br />
+ * =======
+ * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek:
+ * <br />
+ * >>>>>>> Migration to fastutil.
  * Detection and Visualization of Subspace Cluster Hierarchies. <br />
  * In Proc. 12th International Conference on Database Systems for Advanced
  * Applications (DASFAA), Bangkok, Thailand, 2007.
@@ -169,21 +174,18 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     final int dimensionality = RelationUtil.dimensionality(database);
 
     // extract clusters
-    TCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap = extractClusters(database, clusterOrder);
+    Object2ObjectOpenCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap = extractClusters(database, clusterOrder);
 
     if(LOG.isVerbose()) {
       final StringBuilder msg = new StringBuilder("Step 1: extract clusters\n");
-      clustersMap.forEachEntry(new TObjectObjectProcedure<long[], List<ArrayModifiableDBIDs>>() {
-        @Override
-        public boolean execute(long[] key, List<ArrayModifiableDBIDs> clusters) {
-          msg.append(BitsUtil.toStringLow(key, dimensionality)).append(" sizes:");
-          for(ArrayModifiableDBIDs c : clusters) {
-            msg.append(' ').append(c.size());
-          }
-          msg.append('\n');
-          return true; // continue
+      for(ObjectIterator<Object2ObjectMap.Entry<long[], List<ArrayModifiableDBIDs>>> iter = clustersMap.object2ObjectEntrySet().fastIterator(); iter.hasNext();) {
+        Object2ObjectMap.Entry<long[], List<ArrayModifiableDBIDs>> entry = iter.next();
+        msg.append(BitsUtil.toStringLow(entry.getKey(), dimensionality)).append(" sizes:");
+        for(ArrayModifiableDBIDs c : entry.getValue()) {
+          msg.append(' ').append(c.size());
         }
-      });
+        msg.append('\n');
+      }
       LOG.verbose(msg.toString());
     }
 
@@ -191,17 +193,14 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     checkClusters(database, clustersMap);
     if(LOG.isVerbose()) {
       final StringBuilder msg = new StringBuilder("Step 2: check clusters\n");
-      clustersMap.forEachEntry(new TObjectObjectProcedure<long[], List<ArrayModifiableDBIDs>>() {
-        @Override
-        public boolean execute(long[] key, List<ArrayModifiableDBIDs> clusters) {
-          msg.append(BitsUtil.toStringLow(key, dimensionality)).append(" sizes:");
-          for(ArrayModifiableDBIDs c : clusters) {
-            msg.append(' ').append(c.size());
-          }
-          msg.append('\n');
-          return true; // continue
+      for(ObjectIterator<Object2ObjectMap.Entry<long[], List<ArrayModifiableDBIDs>>> iter = clustersMap.object2ObjectEntrySet().fastIterator(); iter.hasNext();) {
+        Object2ObjectMap.Entry<long[], List<ArrayModifiableDBIDs>> entry = iter.next();
+        msg.append(BitsUtil.toStringLow(entry.getKey(), dimensionality)).append(" sizes:");
+        for(ArrayModifiableDBIDs c : entry.getValue()) {
+          msg.append(' ').append(c.size());
         }
-      });
+        msg.append('\n');
+      }
       LOG.verbose(msg.toString());
     }
 
@@ -248,9 +247,9 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @param clusterOrder the cluster order to extract the clusters from
    * @return the extracted clusters
    */
-  private TCustomHashMap<long[], List<ArrayModifiableDBIDs>> extractClusters(Relation<V> relation, DiSHClusterOrder clusterOrder) {
+  private Object2ObjectOpenCustomHashMap<long[], List<ArrayModifiableDBIDs>> extractClusters(Relation<V> relation, DiSHClusterOrder clusterOrder) {
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extract Clusters", relation.size(), LOG) : null;
-    TCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap = new TCustomHashMap<>(BitsUtil.TROVE_HASH_STRATEGY);
+    Object2ObjectOpenCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap = new Object2ObjectOpenCustomHashMap<>(BitsUtil.FASTUTIL_HASH_STRATEGY);
     // Note clusterOrder currently contains DBID objects anyway.
     WritableDataStore<Pair<long[], ArrayModifiableDBIDs>> entryToClusterMap = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, Pair.class);
     for(DBIDIter iter = clusterOrder.iter(); iter.valid(); iter.advance()) {
@@ -340,7 +339,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @param clustersMap the mapping of bits sets to clusters
    * @return a sorted list of the clusters
    */
-  private List<Cluster<SubspaceModel>> sortClusters(Relation<V> relation, TCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
+  private List<Cluster<SubspaceModel>> sortClusters(Relation<V> relation, Object2ObjectMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
     final int db_dim = RelationUtil.dimensionality(relation);
     // int num = 1;
     List<Cluster<SubspaceModel>> clusters = new ArrayList<>();
@@ -378,12 +377,12 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @param relation the relation storing the objects
    * @param clustersMap the map containing the clusters
    */
-  private void checkClusters(Relation<V> relation, TCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
+  private void checkClusters(Relation<V> relation, Object2ObjectMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
     final int dimensionality = RelationUtil.dimensionality(relation);
     // check if there are clusters < minpts
     // and add them to not assigned
     List<Pair<long[], ArrayModifiableDBIDs>> notAssigned = new ArrayList<>();
-    TCustomHashMap<long[], List<ArrayModifiableDBIDs>> newClustersMap = new TCustomHashMap<>(BitsUtil.TROVE_HASH_STRATEGY);
+    Object2ObjectMap<long[], List<ArrayModifiableDBIDs>> newClustersMap = new Object2ObjectOpenCustomHashMap<>(BitsUtil.FASTUTIL_HASH_STRATEGY);
     Pair<long[], ArrayModifiableDBIDs> noise = new Pair<>(BitsUtil.zero(dimensionality), DBIDUtil.newArray());
     for(long[] pv : clustersMap.keySet()) {
       // noise
@@ -438,8 +437,8 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @param clustersMap the map containing the clusters
    * @return the parent of the specified cluster
    */
-  private Pair<long[], ArrayModifiableDBIDs> findParent(Relation<V> relation, Pair<long[], ArrayModifiableDBIDs> child, TCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
-    NumberVector child_centroid = ProjectedCentroid.make(child.first, relation, child.second);
+  private Pair<long[], ArrayModifiableDBIDs> findParent(Relation<V> relation, Pair<long[], ArrayModifiableDBIDs> child, Object2ObjectMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
+    Centroid child_centroid = ProjectedCentroid.make(child.first, relation, child.second);
 
     Pair<long[], ArrayModifiableDBIDs> result = null;
     int resultCardinality = -1;

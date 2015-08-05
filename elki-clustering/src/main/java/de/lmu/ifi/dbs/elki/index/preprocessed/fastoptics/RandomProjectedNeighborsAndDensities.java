@@ -30,21 +30,8 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.FastOPTICS;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.datastore.*;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
@@ -58,8 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.array.TIntArrayList;
+
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntIterator;
 import net.jafama.FastMath;
 
 /**
@@ -216,7 +204,7 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
     LOG.statistics(new LongStatistic(PREFIX + ".num-scalar-products", numprod));
 
     // split entire point set, reuse projections by shuffling them
-    TIntArrayList proind = new TIntArrayList(nProject1d);
+    IntArrayList proind = new IntArrayList(nProject1d);
     for(int j = 0; j < nProject1d; j++) {
       proind.add(j);
     }
@@ -226,11 +214,15 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
       for(int i = 0; i < nProject1d; i++) {
         tmpPro[i] = projectedPoints[i];
       }
-      proind.shuffle(rand);
-      TIntIterator it = proind.iterator();
+      // Shuffle axes (Fisher-Yates)
+      for(int i = 1; i < nProject1d; i++) {
+        final int j = rand.nextInt(i);
+        proind.set(i, proind.set(j, proind.getInt(i))); // Swap i,j
+      }
+      IntIterator it = proind.iterator();
       int i = 0;
       while(it.hasNext()) {
-        int cind = it.next();
+        int cind = it.nextInt();
         projectedPoints[cind] = tmpPro[i];
         i++;
       }

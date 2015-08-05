@@ -44,7 +44,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import gnu.trove.map.hash.TIntObjectHashMap;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * Minimax Linkage clustering.
@@ -120,7 +121,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
 
     // Initialize space for result:
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
-    TIntObjectHashMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>(size);
+    Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>(size);
 
     double[] dists = new double[AGNES.triangleSize(size)];
     ArrayModifiableDBIDs prots = DBIDUtil.newArray(AGNES.triangleSize(size));
@@ -170,7 +171,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * @param clusters Current clusters
    * @param dq Distance query
    */
-  protected static void findMerge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq) {
+  protected static void findMerge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq) {
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
 
@@ -213,7 +214,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * @param x first cluster to merge
    * @param y second cluster to merge
    */
-  protected static void merge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
+  protected static void merge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
     assert (y < x);
     int offset = AGNES.triangleSize(x) + y;
 
@@ -259,7 +260,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * @param dq distance query of the data set
    * @param c the cluster to update distances to
    */
-  protected static <O> void updateMatrices(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int c) {
+  protected static <O> void updateMatrices(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int c) {
     // c is the new cluster.
     // Update entries (at (x,y) with x > y) in the matrix where x = c or y = c
 
@@ -297,7 +298,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * @param y index of cluster, y < x
    * @param dimensions number of dimensions
    */
-  protected static void updateEntry(double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
+  protected static void updateEntry(double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
     assert (y < x);
     ModifiableDBIDs cx = clusters.get(x), cy = clusters.get(y);
 

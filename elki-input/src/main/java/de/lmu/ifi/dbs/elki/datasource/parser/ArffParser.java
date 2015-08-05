@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,9 +49,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
-import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.map.hash.TIntDoubleHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
  * Parser to load WEKA .arff files into ELKI.
@@ -216,7 +219,7 @@ public class ArffParser implements Parser {
   }
 
   private Object[] loadSparseInstance(StreamTokenizer tokenizer, int[] targ, int[] dimsize, TypeInformation[] elkitypes, int metaLength) throws IOException {
-    TIntObjectHashMap<Object> map = new TIntObjectHashMap<>();
+    Int2ObjectOpenHashMap<Object> map = new Int2ObjectOpenHashMap<>();
     while(true) {
       nextToken(tokenizer);
       assert (tokenizer.ttype != StreamTokenizer.TT_EOF && tokenizer.ttype != StreamTokenizer.TT_EOL);
@@ -237,7 +240,7 @@ public class ArffParser implements Parser {
         nextToken(tokenizer);
         if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
           map.put(dim, TypeUtil.NUMBER_VECTOR_FIELD.equals(elkitypes[targ[dim]]) //
-              ? ParseUtil.parseDouble(tokenizer.sval) : tokenizer.sval);
+              ? (Double) ParseUtil.parseDouble(tokenizer.sval) : tokenizer.sval);
         }
         else {
           throw new AbortException("Unexpected token type encountered: " + tokenizer.toString());
@@ -256,14 +259,14 @@ public class ArffParser implements Parser {
       }
       assert (s >= 0);
       if(TypeUtil.NUMBER_VECTOR_FIELD.equals(elkitypes[out])) {
-        TIntDoubleHashMap f = new TIntDoubleHashMap(dimsize[out]);
-        for(TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext();) {
-          iter.advance();
-          int i = iter.key();
+        Int2DoubleOpenHashMap f = new Int2DoubleOpenHashMap(dimsize[out]);
+        for(ObjectIterator<Int2ObjectMap.Entry<Object>> iter = map.int2ObjectEntrySet().fastIterator(); iter.hasNext();) {
+          Int2ObjectMap.Entry<Object> entry = iter.next();
+          int i = entry.getIntKey();
           if(i < s || i >= s + dimsize[out]) {
             continue;
           }
-          double v = ((Double) iter.value()).doubleValue();
+          double v = ((Double) entry.getValue()).doubleValue();
           f.put(i - s, v);
         }
         data[out] = new SparseDoubleVector(f, dimsize[out]);
@@ -271,9 +274,9 @@ public class ArffParser implements Parser {
       else if(TypeUtil.LABELLIST.equals(elkitypes[out])) {
         // Build a label list out of successive labels
         labels.clear();
-        for(TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext();) {
-          iter.advance();
-          int i = iter.key();
+        for(ObjectIterator<Int2ObjectMap.Entry<Object>> iter = map.int2ObjectEntrySet().fastIterator(); iter.hasNext();) {
+          Int2ObjectMap.Entry<Object> entry = iter.next();
+          int i = entry.getIntKey();
           if(i < s) {
             continue;
           }
@@ -283,7 +286,7 @@ public class ArffParser implements Parser {
           if(labels.size() < i - s) {
             LOG.warning("Sparse consecutive labels are currently not correctly supported.");
           }
-          labels.add((String) iter.value());
+          labels.add((String) entry.getValue());
         }
         data[out] = LabelList.make(labels);
       }

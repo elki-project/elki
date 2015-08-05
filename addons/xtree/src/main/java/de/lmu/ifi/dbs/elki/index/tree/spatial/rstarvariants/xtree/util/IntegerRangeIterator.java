@@ -20,12 +20,13 @@
  */
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util;
 
-import gnu.trove.iterator.TIntIterator;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+
 /**
  * Iterator provider for an integer range from <code>from</code> to
  * <code>to</code>. Covers <code>[from,to[</code>.
  */
-public class IntegerRangeIterator implements TIntIterator {
+public class IntegerRangeIterator implements IntIterator {
   protected int n, to;
 
   public IntegerRangeIterator(int from, int to) {
@@ -39,8 +40,19 @@ public class IntegerRangeIterator implements TIntIterator {
   }
 
   @Override
-  public int next() {
+  public int nextInt() {
     return n++; // Post-increment!
+  }
+
+  @Deprecated
+  @Override
+  public Integer next() {
+    return nextInt();
+  }
+  
+  @Override
+  public int skip(int n) {
+    throw new UnsupportedOperationException();
   }
 
   @Override

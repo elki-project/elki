@@ -39,23 +39,24 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.TIntList;
+
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 /**
  * Linear Discriminant Analysis (LDA) / Fisher's linear discriminant.
- * 
+ *
  * Reference:
  * <p>
  * R. A. Fisher<br />
  * The use of multiple measurements in taxonomic problems<br />
  * Annals of Eugenics 7.2 (1936): 179-188.
  * </p>
- * 
+ *
  * @author Angela Peng
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @param <V> Vector type
  */
 @Alias("lda")
@@ -71,7 +72,7 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
 
   /**
    * Constructor.
-   * 
+   *
    * @param projdimension Projection dimensionality.
    */
   public LinearDiscriminantAnalysisFilter(int projdimension) {
@@ -80,7 +81,7 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
 
   @Override
   protected double[][] computeProjectionMatrix(List<V> vectorcolumn, List<? extends ClassLabel> classcolumn, int dim) {
-    Map<ClassLabel, TIntList> classes = partition(classcolumn);
+    Map<ClassLabel, IntList> classes = partition(classcolumn);
     // Fix indexing of classes:
     List<ClassLabel> keys = new ArrayList<>(classes.keySet());
     // Compute centroids:
@@ -102,9 +103,8 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
       for(int i = 0; i < numc; i++) {
         double[] c = centroids.get(i).getArrayRef();
         // TODO: different weighting strategies? Sampling?
-        // Note: GNU Trove iterator, not ELKI style!
-        for(TIntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
-          covmake.put(minusEquals(vectorcolumn.get(it.next()).toArray(), c));
+        for(IntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
+          covmake.put(minusEquals(vectorcolumn.get(it.nextInt()).toArray(), c));
         }
       }
       sigmaI = covmake.destroyToSampleMatrix();
@@ -123,21 +123,20 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
 
   /**
    * Compute the centroid for each class.
-   * 
+   *
    * @param dim Dimensionality
    * @param vectorcolumn Vector column
    * @param keys Key index
    * @param classes Classes
    * @return Centroids for each class.
    */
-  protected List<Centroid> computeCentroids(int dim, List<V> vectorcolumn, List<ClassLabel> keys, Map<ClassLabel, TIntList> classes) {
+  protected List<Centroid> computeCentroids(int dim, List<V> vectorcolumn, List<ClassLabel> keys, Map<ClassLabel, IntList> classes) {
     final int numc = keys.size();
     List<Centroid> centroids = new ArrayList<>(numc);
     for(int i = 0; i < numc; i++) {
       Centroid c = new Centroid(dim);
-      // Note: GNU Trove iterator, not ELKI style!
-      for(TIntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
-        c.put(vectorcolumn.get(it.next()));
+      for(IntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
+        c.put(vectorcolumn.get(it.nextInt()));
       }
       centroids.add(c);
     }
@@ -146,7 +145,7 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
 
   /**
    * Class logger.
-   * 
+   *
    * @return Logger
    */
   @Override
@@ -156,9 +155,9 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Angela Peng
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractSupervisedProjectionVectorFilter.Parameterizer<V> {

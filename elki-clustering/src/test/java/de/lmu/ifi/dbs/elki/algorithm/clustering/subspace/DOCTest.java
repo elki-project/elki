@@ -70,7 +70,7 @@ public class DOCTest extends AbstractClusterAlgorithmTest {
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(DOC.Parameterizer.RANDOM_ID, 5);
+    params.addParameter(DOC.Parameterizer.RANDOM_ID, 2);
     params.addParameter(DOC.Parameterizer.ALPHA_ID, 0.4);
     params.addParameter(DOC.Parameterizer.BETA_ID, 0.95);
     params.addFlag(DOC.Parameterizer.HEURISTICS_ID);
@@ -81,7 +81,7 @@ public class DOCTest extends AbstractClusterAlgorithmTest {
 
     // run DOC on database
     Clustering<?> result = doc.run(db);
-    testFMeasure(db, result, .531750);
-    testClusterSizes(result, new int[] { 1, 7, 14, 15, 20, 21, 22, 22, 27, 28, 30, 310, 333 });
+    testFMeasure(db, result, .5573367);
+    testClusterSizes(result, new int[] { 3, 5, 8, 8, 9, 10, 19, 42, 70, 73, 291, 312 });
   }
 }

@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
-import gnu.trove.map.hash.TIntDoubleHashMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 import net.jafama.FastMath;
 
 /**
@@ -469,7 +469,7 @@ public final class VectorUtil {
     int card = BitsUtil.cardinality(selectedAttributes);
     if(factory instanceof SparseNumberVector.Factory) {
       final SparseNumberVector.Factory<?> sfactory = (SparseNumberVector.Factory<?>) factory;
-      TIntDoubleHashMap values = new TIntDoubleHashMap(card, 1);
+      Int2DoubleOpenHashMap values = new Int2DoubleOpenHashMap(card, .8f);
       for(int d = BitsUtil.nextSetBit(selectedAttributes, 0); d >= 0; d = BitsUtil.nextSetBit(selectedAttributes, d + 1)) {
         if(v.doubleValue(d) != 0.0) {
           values.put(d, v.doubleValue(d));

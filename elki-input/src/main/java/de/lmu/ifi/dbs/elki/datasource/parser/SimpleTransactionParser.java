@@ -20,11 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
-import gnu.trove.iterator.TObjectIntIterator;
-import gnu.trove.list.array.TLongArrayList;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -34,25 +29,30 @@ import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+
 /**
  * Simple parser for transactional data, such as market baskets.
- * 
+ *
  * To keep the input format simple and readable, all tokens are assumed to be of
  * text and separated by whitespace, and each transaction is on a separate line.
- * 
+ *
  * An example file containing two transactions looks like this
- * 
+ *
  * <pre>
  * bread butter milk
  * paste tomato basil
  * </pre>
- * 
+ *
  * TODO: add a parameter to e.g. use the first or last entry as labels instead
  * of tokens.
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @apiviz.has BitVector
  */
 public class SimpleTransactionParser extends AbstractStreamingParser {
@@ -69,7 +69,7 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
   /**
    * Map.
    */
-  TObjectIntMap<String> keymap;
+  Object2IntOpenHashMap<String> keymap;
 
   /**
    * Metadata.
@@ -89,16 +89,17 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
   /**
    * Buffer, will be reused.
    */
-  TLongArrayList buf = new TLongArrayList();
+  LongArrayList buf = new LongArrayList();
 
   /**
    * Constructor.
-   * 
+   *
    * @param format Input format
    */
   public SimpleTransactionParser(CSVReaderFormat format) {
     super(format);
-    keymap = new TObjectIntHashMap<>(1001, .5f, -1);
+    keymap = new Object2IntOpenHashMap<>();
+    keymap.defaultReturnValue(-1);
   }
 
   @Override
@@ -120,7 +121,7 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
         buf.clear();
         for(/* initialized by nextLineExceptComments() */; tokenizer.valid(); tokenizer.advance()) {
           String token = tokenizer.getSubstring();
-          int t = keymap.get(token);
+          int t = keymap.getInt(token);
           if(t < 0) {
             t = keymap.size();
             keymap.put(token, t);
@@ -130,18 +131,18 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
           while(word >= buf.size()) { // Ensure size.
             buf.add(0L);
           }
-          buf.set(word, buf.get(word) | (1L << off));
+          buf.set(word, buf.getLong(word) | (1L << off));
         }
-        curvec = new BitVector(buf.toArray(), keymap.size());
+        curvec = new BitVector(buf.toLongArray(), keymap.size());
         return Event.NEXT_OBJECT;
       }
       nextevent = Event.END_OF_STREAM;
       // Construct final metadata:
       meta = new BundleMeta(1);
       String[] colnames = new String[keymap.size()];
-      for(TObjectIntIterator<String> iter = keymap.iterator(); iter.hasNext();) {
-        iter.advance();
-        colnames[iter.value()] = iter.key();
+      for(ObjectIterator<Object2IntMap.Entry<String>> iter = keymap.object2IntEntrySet().fastIterator(); iter.hasNext();) {
+        Object2IntMap.Entry<String> entry = iter.next();
+        colnames[entry.getIntValue()] = entry.getKey();
       }
       meta.add(new VectorFieldTypeInformation<>(BitVector.FACTORY, colnames.length, colnames));
       return Event.META_CHANGED; // Force a final meta update.
@@ -156,13 +157,13 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
     super.cleanup();
     curvec = null;
   }
-  
+
   @Override
   public Object data(int rnum) {
-    if(rnum == 0) {
-      return curvec;
+    if(rnum != 0) {
+      throw new ArrayIndexOutOfBoundsException();
     }
-    throw new ArrayIndexOutOfBoundsException();
+    return curvec;
   }
 
   @Override
@@ -181,9 +182,9 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractStreamingParser.Parameterizer {

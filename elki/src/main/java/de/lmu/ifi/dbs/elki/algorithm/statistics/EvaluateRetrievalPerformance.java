@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.statistics;
 
-import gnu.trove.iterator.TObjectIntIterator;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.AlternativeTypeInformation;
@@ -54,6 +52,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
  * Evaluate a distance functions performance by computing the mean average
@@ -134,7 +135,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
     ModifiableDoubleDBIDList nlist = DBIDUtil.newDistanceDBIDList(relation.size());
 
     // For counting labels seen in kNN
-    TObjectIntHashMap<Object> counters = new TObjectIntHashMap<>();
+    Object2IntOpenHashMap<Object> counters = new Object2IntOpenHashMap<>();
 
     // Statistics tracking
     double map = 0., mroc = 0.;
@@ -287,7 +288,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
      * @param counters (Reused) map for counting the class occurrences.
      * @param label Label(s) of query object
      */
-    public void evaluateKNN(double[] knnperf, ModifiableDoubleDBIDList nlist, Relation<?> lrelation, TObjectIntHashMap<Object> counters, Object label) {
+    public void evaluateKNN(double[] knnperf, ModifiableDoubleDBIDList nlist, Relation<?> lrelation, Object2IntOpenHashMap<Object> counters, Object label) {
       final int maxk = knnperf.length;
       int k = 1, prevk = 0, max = 0;
       counters.clear();
@@ -303,22 +304,23 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
         // End of ties.
         if(!iter.valid() || iter.doubleValue() > prev) {
           int pties = 0, ties = 0;
-          for(TObjectIntIterator<Object> cit = counters.iterator(); cit.hasNext();) {
-            cit.advance();
-            if(cit.value() < max) {
+          for(ObjectIterator<Object2IntMap.Entry<Object>> cit = counters.object2IntEntrySet().fastIterator(); cit.hasNext();) {
+            Object2IntMap.Entry<Object> entry = cit.next();
+            if(entry.getIntValue() < max) {
               continue;
             }
             ties++;
-            if(cit.key() == null) {
+            final Object key = entry.getKey();
+            if(key == null) {
               continue;
             }
-            if(cit.key().equals(label)) {
+            if(key.equals(label)) {
               pties++;
             }
             else if(label instanceof LabelList) {
               LabelList ll = (LabelList) label;
               for(int i = 0, e = ll.size(); i < e; i++) {
-                if(cit.key().equals(ll.get(i))) {
+                if(key.equals(ll.get(i))) {
                   pties++;
                   break;
                 }
@@ -339,17 +341,17 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
      * @param l Object labels
      * @return Maximum count
      */
-    public int countkNN(TObjectIntHashMap<Object> counters, Object l) {
+    public int countkNN(Object2IntOpenHashMap<Object> counters, Object l) {
       // Count each label, return maximum.
       if(l instanceof LabelList) {
         LabelList ll = (LabelList) l;
         int m = 0;
         for(int i = 0, e = ll.size(); i < e; i++) {
-          m = Math.max(m, counters.adjustOrPutValue(ll.get(i), 1, 1));
+          m = Math.max(m, counters.addTo(ll.get(i), 1));
         }
         return m;
       }
-      return counters.adjustOrPutValue(l, 1, 1);
+      return counters.addTo(l, 1);
     }
   }
 

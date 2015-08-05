@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.unionfind;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 
 /**
  * Union-find algorithm for primitive integers, with optimizations.
@@ -76,7 +76,7 @@ public class WeightedQuickUnionInteger {
 
   /**
    * Occupy the next unused index.
-   * 
+   *
    * @param weight Initial weight.
    * @return Next unused index.
    */
@@ -93,7 +93,7 @@ public class WeightedQuickUnionInteger {
 
   /**
    * Find the parent of an object.
-   * 
+   *
    * @param cur Current entry
    * @return Parent entry
    */
@@ -149,8 +149,8 @@ public class WeightedQuickUnionInteger {
    *
    * @return Root elements
    */
-  public TIntList getRoots() {
-    TIntList roots = new TIntArrayList();
+  public IntList getRoots() {
+    IntList roots = new IntArrayList();
     for(int i = 0; i < used; i++) {
       // roots or one element in component
       if(parent[i] == i) {
@@ -162,7 +162,7 @@ public class WeightedQuickUnionInteger {
 
   /**
    * Number of allocated indexes.
-   * 
+   *
    * @return Index number.
    */
   public int size() {

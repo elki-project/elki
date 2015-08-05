@@ -39,16 +39,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -70,8 +61,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import gnu.trove.iterator.TLongObjectIterator;
-import gnu.trove.map.hash.TLongObjectHashMap;
+
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.jafama.FastMath;
 
 /**
@@ -220,7 +211,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     /**
      * Data grid partitioning.
      */
-    TLongObjectHashMap<ModifiableDBIDs> grid;
+    Long2ObjectOpenHashMap<ModifiableDBIDs> grid;
 
     /**
      * Core identifier objects (shared to conserve memory).
@@ -310,9 +301,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       ModifiableDoubleDBIDList neighbors = DBIDUtil.newDistanceDBIDList(minpts << 1);
       // Run DBSCAN on each cell that has enough objects.
       FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Processing grid cells", mincells, LOG) : null;
-      for(TLongObjectIterator<ModifiableDBIDs> it = grid.iterator(); it.hasNext();) {
-        it.advance();
-        ModifiableDBIDs cellids = it.value();
+      for(ModifiableDBIDs cellids : grid.values()) {
         if(cellids.size() < minpts) {
           continue; // Too few objects.
         }
@@ -452,7 +441,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
      * @param offset Offset
      */
     protected void buildGrid(Relation<V> relation, int numcells, double[] offset) {
-      grid = new TLongObjectHashMap<ModifiableDBIDs>(numcells >>> 2);
+      grid = new Long2ObjectOpenHashMap<ModifiableDBIDs>(numcells >>> 2);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         V obj = relation.get(it);
         insertIntoGrid(it, obj, 0, 0);
@@ -500,9 +489,8 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       int tcount = 0;
       int hasmin = 0;
       double sqcount = 0;
-      for(TLongObjectIterator<ModifiableDBIDs> it = grid.iterator(); it.hasNext();) {
-        it.advance();
-        final int s = it.value().size();
+      for(ModifiableDBIDs cell : grid.values()) {
+        final int s = cell.size();
         if(s >= size >> 1) {
           LOG.warning("A single cell contains half of the database (" + s//
           + " objects). This will not scale very well.");

@@ -31,12 +31,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -48,22 +43,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 
 /**
  * This tutorial will step you through implementing a well known clustering
  * algorithm, agglomerative hierarchical clustering, in multiple steps.
- * 
+ *
  * This is the second step, where we increase the performance of the algorithm
  * by using an improved linear memory layout instead of ragged arrays.
- * 
+ *
  * This is the naive O(n^3) algorithm. See {@link SLINK} for a much faster
  * algorithm (however, only for single-linkage).
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @param <O> Object type
  */
 public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
@@ -79,7 +74,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function to use
    * @param numclusters Number of clusters
    */
@@ -90,7 +85,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
@@ -100,7 +95,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
 
-    if (size > 0x10000) {
+    if(size > 0x10000) {
       throw new AbortException("This implementation does not scale to data sets larger than " + 0x10000 + " instances (~17 GB RAM), which results in an integer overflow.");
     }
     LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
@@ -110,9 +105,9 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
-    for (int x = 0; ix.valid(); x++, ix.advance()) {
+    for(int x = 0; ix.valid(); x++, ix.advance()) {
       iy.seek(0);
-      for (int y = 0; y < x; y++, iy.advance()) {
+      for(int y = 0; y < x; y++, iy.advance()) {
         scratch[pos] = dq.distance(ix, iy);
         pos++;
       }
@@ -125,32 +120,32 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
     // have every object point to itself initially
     ArrayModifiableDBIDs parent = DBIDUtil.newArray(ids);
     // Active clusters, when not trivial.
-    TIntObjectMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
+    Int2ReferenceMap<ModifiableDBIDs> clusters = new Int2ReferenceOpenHashMap<>();
 
     // Repeat until everything merged, except the desired number of clusters:
     final int stop = size - numclusters;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", stop, LOG) : null;
-    for (int i = 0; i < stop; i++) {
+    for(int i = 0; i < stop; i++) {
       double min = Double.POSITIVE_INFINITY;
       int minx = -1, miny = -1;
-      for (int x = 0; x < size; x++) {
-        if (height[x] < Double.POSITIVE_INFINITY) {
+      for(int x = 0; x < size; x++) {
+        if(height[x] < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int xbase = triangleSize(x);
-        for (int y = 0; y < x; y++) {
-          if (height[y] < Double.POSITIVE_INFINITY) {
+        for(int y = 0; y < x; y++) {
+          if(height[y] < Double.POSITIVE_INFINITY) {
             continue;
           }
           final int idx = xbase + y;
-          if (scratch[idx] < min) {
+          if(scratch[idx] < min) {
             min = scratch[idx];
             minx = x;
             miny = y;
           }
         }
       }
-      assert (minx >= 0 && miny >= 0);
+      assert(minx >= 0 && miny >= 0);
       // Avoid allocating memory, by reusing existing iterators:
       ix.seek(minx);
       iy.seek(miny);
@@ -161,13 +156,14 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
       // Merge into cluster
       ModifiableDBIDs cx = clusters.get(minx);
       ModifiableDBIDs cy = clusters.get(miny);
-      if (cy == null) {
+      if(cy == null) {
         cy = DBIDUtil.newHashSet();
         cy.add(iy);
       }
-      if (cx == null) {
+      if(cx == null) {
         cy.add(ix);
-      } else {
+      }
+      else {
         cy.addDBIDs(cx);
         clusters.remove(minx);
       }
@@ -175,23 +171,23 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
       // Update distance matrix. Note: miny < minx
       final int xbase = triangleSize(minx), ybase = triangleSize(miny);
       // Write to (y, j), with j < y
-      for (int j = 0; j < miny; j++) {
-        if (height[j] < Double.POSITIVE_INFINITY) {
+      for(int j = 0; j < miny; j++) {
+        if(height[j] < Double.POSITIVE_INFINITY) {
           continue;
         }
         scratch[ybase + j] = Math.min(scratch[xbase + j], scratch[ybase + j]);
       }
       // Write to (j, y), with y < j < x
-      for (int j = miny + 1; j < minx; j++) {
-        if (height[j] < Double.POSITIVE_INFINITY) {
+      for(int j = miny + 1; j < minx; j++) {
+        if(height[j] < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int jbase = triangleSize(j);
         scratch[jbase + miny] = Math.min(scratch[xbase + j], scratch[jbase + miny]);
       }
       // Write to (j, y), with y < x < j
-      for (int j = minx + 1; j < size; j++) {
-        if (height[j] < Double.POSITIVE_INFINITY) {
+      for(int j = minx + 1; j < size; j++) {
+        if(height[j] < Double.POSITIVE_INFINITY) {
           continue;
         }
         final int jbase = triangleSize(j);
@@ -203,10 +199,10 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
 
     // Build the clustering result
     final Clustering<Model> dendrogram = new Clustering<>("Hierarchical-Clustering", "hierarchical-clustering");
-    for (int x = 0; x < size; x++) {
-      if (height[x] < Double.POSITIVE_INFINITY) {
+    for(int x = 0; x < size; x++) {
+      if(height[x] < Double.POSITIVE_INFINITY) {
         DBIDs cids = clusters.get(x);
-        if (cids == null) {
+        if(cids == null) {
           ix.seek(x);
           cids = DBIDUtil.deref(ix);
         }
@@ -220,7 +216,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
 
   /**
    * Compute the size of a complete x by x triangle (minus diagonal)
-   * 
+   *
    * @param x Offset
    * @return Size of complete triangle
    */
@@ -241,9 +237,9 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    *
    * @param <O> Object type
@@ -259,7 +255,7 @@ public class NaiveAgglomerativeHierarchicalClustering2<O> extends AbstractDistan
       super.makeOptions(config);
       IntParameter numclustersP = new IntParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID);
       numclustersP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if (config.grab(numclustersP)) {
+      if(config.grab(numclustersP)) {
         numclusters = numclustersP.intValue();
       }
     }

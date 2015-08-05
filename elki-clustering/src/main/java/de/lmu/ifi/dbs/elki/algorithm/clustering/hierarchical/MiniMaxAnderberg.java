@@ -26,12 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -40,7 +35,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import gnu.trove.map.hash.TIntObjectHashMap;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * This is a modification of the classic MiniMax algorithm for hierarchical
@@ -101,7 +97,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
 
     // Initialize space for result:
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
-    TIntObjectHashMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
+    Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>();
 
     // Compute the initial (lower triangular) distance matrix.
     double[] distances = new double[AGNES.triangleSize(size)];
@@ -172,7 +168,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * @param besti the nearest neighboring cluster
    * @param dq the range query
    */
-  protected void findMerge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters, double[] bestd, int[] besti, DistanceQuery<O> dq) {
+  protected void findMerge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, double[] bestd, int[] besti, DistanceQuery<O> dq) {
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
     // Find minimum:
@@ -210,7 +206,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * @param x first cluster to merge, with x > y
    * @param y second cluster to merge, with y < x
    */
-  protected void merge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
+  protected void merge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
     int offset = AGNES.triangleSize(x) + y;
 
     assert (y < x);
@@ -266,7 +262,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * @param x first cluster to merge, with x > y
    * @param y second cluster to merge, with y < x
    */
-  private void updateMatrices(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
+  private void updateMatrices(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
     // c is the new cluster.
     // Update entries (at (a,b) with a > b) in the matrix where a = y or b = y
 

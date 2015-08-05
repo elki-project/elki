@@ -20,10 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.style;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,13 +34,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 /**
  * Styling policy based on cluster membership.
  *
  * @author Erich Schubert
  * @since 0.4.0
- *
  */
 // TODO: fast enough? Some other kind of mapping we can use?
 public class ClusterStylingPolicy implements ClassStylingPolicy {
@@ -56,12 +53,12 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   /**
    * Map from cluster objects to color offsets.
    */
-  TObjectIntMap<Cluster<?>> cmap;
+  Object2IntOpenHashMap<Cluster<?>> cmap;
 
   /**
    * Colors
    */
-  TIntArrayList colors;
+  IntArrayList colors;
 
   /**
    * Clustering in use.
@@ -79,21 +76,23 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
     ColorLibrary colorset = style.getColorSet(StyleLibrary.PLOT);
     List<? extends Cluster<?>> clusters = clustering.getAllClusters();
     ids = new ArrayList<>(clusters.size());
-    colors = new TIntArrayList(clusters.size());
-    cmap = new TObjectIntHashMap<>(clusters.size(), .5f, -1);
+    colors = new IntArrayList(clusters.size());
+    cmap = new Object2IntOpenHashMap<>(clusters.size());
+    cmap.defaultReturnValue(-1);
 
     Iterator<? extends Cluster<?>> ci = clusters.iterator();
-    for (int i = 0; ci.hasNext(); i++) {
+    for(int i = 0; ci.hasNext(); i++) {
       Cluster<?> c = ci.next();
       ids.add(DBIDUtil.ensureSet(c.getIDs()));
       cmap.put(c, i);
       Color col = SVGUtil.stringToColor(colorset.getColor(i));
-      if (col != null) {
+      if(col != null) {
         colors.add(col.getRGB());
-      } else {
+      }
+      else {
         LoggingUtil.warning("Unrecognized color name: " + colorset.getColor(i));
       }
-      if (!ci.hasNext()) {
+      if(!ci.hasNext()) {
         break;
       }
     }
@@ -101,8 +100,8 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
 
   @Override
   public int getStyleForDBID(DBIDRef id) {
-    for (int i = 0; i < ids.size(); i++) {
-      if (ids.get(i).contains(id)) {
+    for(int i = 0; i < ids.size(); i++) {
+      if(ids.get(i).contains(id)) {
         return i;
       }
     }
@@ -111,9 +110,9 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
 
   @Override
   public int getColorForDBID(DBIDRef id) {
-    for (int i = 0; i < ids.size(); i++) {
-      if (ids.get(i).contains(id)) {
-        return colors.get(i);
+    for(int i = 0; i < ids.size(); i++) {
+      if(ids.get(i).contains(id)) {
+        return colors.getInt(i);
       }
     }
     return 0;
@@ -155,7 +154,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
    * @return Style number
    */
   public int getStyleForCluster(Cluster<?> c) {
-    return cmap.get(c);
+    return cmap.getInt(c);
   }
 
   @Override

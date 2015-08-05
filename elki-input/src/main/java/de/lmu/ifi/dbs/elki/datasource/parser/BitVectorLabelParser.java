@@ -26,17 +26,18 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import gnu.trove.list.array.TLongArrayList;
+
+import it.unimi.dsi.fastutil.longs.LongArrayList;
 
 /**
  * Parser for parsing one BitVector per line, bits separated by whitespace.
  * <p/>
  * Several labels may be given per BitVector. A label must not be parseable as
  * Bit. Lines starting with &quot;#&quot; will be ignored.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.2
- * 
+ *
  * @apiviz.has BitVector
  */
 @Title("Bit Vector Label Parser")
@@ -56,11 +57,11 @@ public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> imp
   /**
    * Buffer, will be reused.
    */
-  TLongArrayList buf = new TLongArrayList();
+  LongArrayList buf = new LongArrayList();
 
   /**
    * Constructor.
-   * 
+   *
    * @param format Input format
    */
   public BitVectorLabelParser(CSVReaderFormat format) {
@@ -78,7 +79,7 @@ public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> imp
           buf.add(0L);
         }
         if(tokenizer.getIntBase10() > 0) {
-          buf.set(word, buf.get(word) | (1L << off));
+          buf.set(word, buf.getLong(word) | (1L << off));
         }
         ++curdim;
       }
@@ -90,7 +91,7 @@ public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> imp
       return false;
     }
 
-    curvec = new BitVector(buf.toArray(), curdim);
+    curvec = new BitVector(buf.toLongArray(), curdim);
     curlbl = LabelList.make(labels);
     buf.clear();
     labels.clear();
@@ -104,9 +105,9 @@ public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> imp
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractStreamingParser.Parameterizer {

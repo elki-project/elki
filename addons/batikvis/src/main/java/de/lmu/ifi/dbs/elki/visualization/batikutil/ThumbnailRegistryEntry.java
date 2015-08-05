@@ -20,10 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.batikutil;
 
-import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.awt.image.RenderedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -44,10 +40,11 @@ import org.apache.batik.util.ParsedURLProtocolHandler;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * Access images via an internal image registry.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
@@ -80,7 +77,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
   /**
    * The image cache.
    */
-  private static final TIntObjectMap<SoftReference<RenderedImage>> images = new TIntObjectHashMap<>();
+  private static final Int2ObjectOpenHashMap<SoftReference<RenderedImage>> images = new Int2ObjectOpenHashMap<>();
 
   /**
    * Object counter
@@ -89,7 +86,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
 
   /**
    * Constructor.
-   * 
+   *
    * Note: there will usually be two instances created. One for handling the
    * image type, one for the URL handling. This is ok.
    */
@@ -103,7 +100,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
   /**
    * Put an image into the repository (note: the repository is only keeping a
    * weak reference!)
-   * 
+   *
    * @param img Image to put
    * @return Key
    */
@@ -115,9 +112,9 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
       images.put(key, new SoftReference<>(img));
       // Reorganize map, purge old entries
       if(counter % 50 == 49) {
-        for(TIntObjectIterator<SoftReference<RenderedImage>> iter = images.iterator(); iter.hasNext();) {
-          iter.advance();
-          if(iter.value() == null || iter.value().get() == null) {
+        for(Iterator<SoftReference<RenderedImage>> iter = images.values().iterator(); iter.hasNext();) {
+          SoftReference<RenderedImage> ref = iter.next();
+          if(ref == null || ref.get() == null) {
             iter.remove();
           }
         }
@@ -137,7 +134,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
 
   /**
    * Test for a compatible URL.
-   * 
+   *
    * @param url URL
    * @return Success code
    */
@@ -157,7 +154,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
 
   /**
    * Statically handle the URL access.
-   * 
+   *
    * @param url URL to access
    * @return Image, or null
    */
@@ -191,9 +188,9 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
 
   /**
    * URL representation for internal URLs.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   class InternalParsedURLData extends ParsedURLData {

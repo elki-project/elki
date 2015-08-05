@@ -31,10 +31,10 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * A size-limited heap similar to {@link TopBoundedHeap}, discarding elements
  * with the highest value. However, this variation keeps a list of tied
  * elements.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @param <E> Object type
  */
 public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
@@ -45,7 +45,7 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
 
   /**
    * Constructor with comparator.
-   * 
+   *
    * @param maxsize Maximum size of heap (unless tied)
    * @param comparator Comparator
    */
@@ -55,7 +55,7 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
 
   /**
    * Constructor for Comparable objects.
-   * 
+   *
    * @param maxsize Maximum size of heap (unless tied)
    */
   public TiedTopBoundedUpdatableHeap(int maxsize) {
@@ -81,7 +81,7 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
         if(e.equals(e2)) {
           if(compare(e, e2) <= 0) {
             i.remove();
-            index.remove(e2);
+            index.removeInt(e2);
           }
           return;
         }
@@ -91,7 +91,7 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
     // Updated object will be worse than the current ties
     if(pos >= 0 && !ties.isEmpty() && compare(e, ties.get(0)) < 0) {
       removeAt(pos);
-      index.remove(e);
+      index.removeInt(e);
       // assert(checkHeap() == null) : "removeObject broke heap: "+ checkHeap();
       // Move one object back from ties
       final E e2 = ties.remove(ties.size() - 1);
@@ -119,7 +119,7 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
     }
     else {
       E e = ties.remove(ties.size() - 1);
-      index.remove(e);
+      index.removeInt(e);
       return e;
     }
   }
@@ -144,10 +144,10 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
       index.put(e, IN_TIES);
     }
     else {
-      index.remove(e);
+      index.removeInt(e);
       // Also remove old ties.
       for(E e2 : ties) {
-        index.remove(e2);
+        index.removeInt(e2);
       }
       ties.clear();
     }

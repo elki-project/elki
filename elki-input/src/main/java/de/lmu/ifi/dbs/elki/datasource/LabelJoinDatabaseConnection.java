@@ -20,9 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.datasource;
 
-import gnu.trove.impl.Constants;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,13 +33,14 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 /**
  * Joins multiple data sources by their label
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.uses LabelList
  */
 public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
@@ -58,7 +56,7 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Constructor.
-   * 
+   *
    * @param filters Filters to use.
    * @param sources Data sources to join.
    */
@@ -75,7 +73,8 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
     }
 
     MultipleObjectsBundle first = bundles.get(0);
-    TObjectIntHashMap<String> labelmap = new TObjectIntHashMap<>(first.dataLength(), Constants.DEFAULT_LOAD_FACTOR, -1);
+    Object2IntOpenHashMap<String> labelmap = new Object2IntOpenHashMap<>(first.dataLength());
+    labelmap.defaultReturnValue(-1);
     // Process first bundle
     {
       // Identify a label column
@@ -145,19 +144,19 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
         }
         int row = -1;
         if(data instanceof String) {
-          row = labelmap.get(data);
+          row = labelmap.getInt(data);
         }
         else if(data instanceof LabelList) {
           final LabelList ll = (LabelList) data;
           for(int j = 0; j < ll.size(); j++) {
-            row = labelmap.get(ll.get(j));
+            row = labelmap.getInt(ll.get(j));
             if(row >= 0) {
               break;
             }
           }
         }
         else {
-          row = labelmap.get(data.toString());
+          row = labelmap.getInt(data.toString());
         }
         if(row < 0) {
           LOG.warning("Label not found for join: " + data + " in row " + i);
@@ -204,9 +203,9 @@ public class LabelJoinDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {

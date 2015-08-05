@@ -38,7 +38,7 @@ import org.w3c.dom.svg.SVGMatrix;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
@@ -94,7 +94,7 @@ public final class SVGUtil {
   /**
    * SVG color names conversion.
    */
-  final private static TObjectIntHashMap<String> SVG_COLOR_NAMES;
+  final private static Object2IntOpenHashMap<String> SVG_COLOR_NAMES;
 
   /**
    * Key not found value. Not a reasonable color, fully transparent!
@@ -103,7 +103,8 @@ public final class SVGUtil {
 
   static {
     // Build a reasonably sized hashmap. Use 0
-    SVG_COLOR_NAMES = new TObjectIntHashMap<>(90, .8f, NO_VALUE);
+    SVG_COLOR_NAMES = new Object2IntOpenHashMap<>(90);
+    SVG_COLOR_NAMES.defaultReturnValue(NO_VALUE);
     // List taken from SVG specification:
     // http://www.w3.org/TR/SVG/types.html#ColorKeywords
     SVG_COLOR_NAMES.put("aliceblue", 0xFFF0F8FF);
@@ -525,7 +526,7 @@ public final class SVGUtil {
    * @return Color value
    */
   public static Color stringToColor(String str) {
-    int icol = SVG_COLOR_NAMES.get(str.toLowerCase());
+    int icol = SVG_COLOR_NAMES.getInt(str.toLowerCase());
     if(icol != NO_VALUE) {
       return new Color(icol, false);
     }

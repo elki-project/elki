@@ -20,10 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.database.ids.integer;
 
-import gnu.trove.impl.hash.THashPrimitiveIterator;
-import gnu.trove.impl.hash.TIntHash;
-import gnu.trove.impl.hash.TPrimitiveHash;
-import gnu.trove.set.hash.TIntHashSet;
+import java.util.NoSuchElementException;
+
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -31,58 +29,123 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
+import it.unimi.dsi.fastutil.ints.IntIterator;
 
 /**
- * Implementation using GNU Trove Int Hash Sets.
- * 
+ * Implementation using Fastutil IntSet.
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.has Itr
  */
-class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBIDs {
+class FastutilIntOpenHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBIDs {
   /**
    * The actual store.
    */
-  TIntHashSet store;
+  IntOpenHashSet store;
+
+  /**
+   * Customized table.
+   *
+   * @author Erich Schubert
+   */
+  private static class IntOpenHashSet extends it.unimi.dsi.fastutil.ints.IntOpenHashSet {
+    /**
+     * Serial version
+     */
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Constructor.
+     */
+    public IntOpenHashSet() {
+      super();
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param size Size
+     */
+    public IntOpenHashSet(int size) {
+      super(size);
+    }
+
+    /**
+     * Scan position for pop().
+     */
+    private transient int c = -1;
+
+    /**
+     * Pop a single value from the hash table.
+     *
+     * @return Value removed.
+     */
+    public int popInt() {
+      if(size == 0) {
+        throw new NoSuchElementException();
+      }
+      if(containsNull) {
+        containsNull = false;
+        --size;
+        return 0;
+      }
+      final int key[] = this.key;
+      int k, pos = c < key.length ? c : key.length;
+      for(;;) {
+        if(pos <= 0)
+          pos = key.length;
+        k = key[--pos];
+        if(k != 0) {
+          size--;
+          shiftKeys(pos);
+          if(size < maxFill >> 2 && n > DEFAULT_INITIAL_SIZE) {
+            rehash(n >> 1);
+          }
+          c = pos;
+          return k;
+        }
+      }
+    }
+  }
 
   /**
    * Constructor.
-   * 
+   *
    * @param size Initial size
    */
-  protected TroveHashSetModifiableDBIDs(int size) {
+  protected FastutilIntOpenHashSetModifiableDBIDs(int size) {
     super();
-    this.store = new TIntHashSet(size);
+    this.store = new IntOpenHashSet(size);
   }
 
   /**
    * Constructor.
    */
-  protected TroveHashSetModifiableDBIDs() {
+  protected FastutilIntOpenHashSetModifiableDBIDs() {
     super();
-    this.store = new TIntHashSet();
+    this.store = new IntOpenHashSet();
   }
 
   /**
    * Constructor.
-   * 
+   *
    * @param existing Existing IDs
    */
-  protected TroveHashSetModifiableDBIDs(DBIDs existing) {
+  protected FastutilIntOpenHashSetModifiableDBIDs(DBIDs existing) {
     this(existing.size());
     this.addDBIDs(existing);
   }
 
   @Override
   public Itr iter() {
-    return new Itr(store);
+    return new Itr(store.iterator());
   }
 
   @Override
   public boolean addDBIDs(DBIDs ids) {
-    store.ensureCapacity(ids.size());
+    // TODO: re-add: store.ensureCapacity(ids.size());
     boolean success = false;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       success |= store.add(DBIDUtil.asInteger(iter));
@@ -158,65 +221,69 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
   @Override
   public DBIDVar pop(DBIDVar outvar) {
     if(store.size() == 0) {
-      throw new ArrayIndexOutOfBoundsException("Cannot pop() from an empty array.");
+      throw new NoSuchElementException("Cannot pop() from an empty array.");
     }
-    final byte[] states = store._states;
-    int i = store.capacity();
-    while(i-- > 0 && (states[i] != TPrimitiveHash.FULL)) {
-      ; // Not occupied. Continue
-    }
-    if(i < 0) { // Should never happen because size > 0
-      throw new ArrayIndexOutOfBoundsException("Cannot pop() from an empty array.");
-    }
-    final int val = store._set[i];
+    final int val = store.popInt();
     if(outvar instanceof IntegerDBIDVar) {
       ((IntegerDBIDVar) outvar).internalSetIndex(val);
     }
     else { // Fallback, should not happen (more expensive).
       outvar.set(DBIDUtil.importInteger(val));
     }
-    // Unfortunately, not visible: store.removeAt(i);
     store.remove(val);
     return outvar;
   }
 
   /**
-   * Iterator over trove hashs.
-   * 
+   * Iterator over Fastutil hashs.
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   protected static class Itr implements IntegerDBIDMIter {
     /**
-     * The actual iterator. We don't have multi inheritance.
+     * The actual iterator.
      */
-    TIntHashItr it;
+    IntIterator it;
+
+    /**
+     * Current value.
+     */
+    int prev;
 
     /**
      * Constructor.
-     * 
-     * @param hash Trove hash
+     *
+     * @param it Int set iterator
      */
-    public Itr(TIntHash hash) {
+    public Itr(IntIterator it) {
       super();
-      this.it = new TIntHashItr(hash);
+      if(it != null && it.hasNext()) {
+        this.it = it;
+        this.prev = it.nextInt();
+      }
     }
 
     @Override
     public boolean valid() {
-      return it.valid();
+      return it != null;
     }
 
     @Override
     public IntegerDBIDMIter advance() {
-      it.advance();
+      if(it != null && it.hasNext()) {
+        prev = it.nextInt();
+      }
+      else {
+        it = null;
+      }
       return this;
     }
 
     @Override
     public int internalGetIndex() {
-      return it.getInt();
+      return prev;
     }
 
     @Override
@@ -227,51 +294,6 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
     @Override
     public void remove() {
       it.remove();
-    }
-
-    /**
-     * Custom iterator over TIntHash.
-     * 
-     * @author Erich Schubert
-     * 
-     * @apiviz.exclude
-     */
-    private static class TIntHashItr extends THashPrimitiveIterator implements Iter {
-      /**
-       * The hash we access.
-       */
-      private TIntHash hash;
-
-      /**
-       * Constructor.
-       * 
-       * @param hash Hash to iterate over.
-       */
-      public TIntHashItr(TIntHash hash) {
-        super(hash);
-        this.hash = hash;
-        this._index = nextIndex(); // Find first element
-      }
-
-      /**
-       * Get the current value.
-       * 
-       * @return Current value
-       */
-      public int getInt() {
-        return hash._set[_index];
-      }
-
-      @Override
-      public Iter advance() {
-        this._index = nextIndex();
-        return this;
-      }
-
-      @Override
-      public boolean valid() {
-        return _index >= 0;
-      }
     }
   }
 }

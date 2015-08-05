@@ -27,7 +27,8 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import gnu.trove.map.hash.TObjectIntHashMap;
+
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
 /**
  * A very simple parser for categorial data, which will then be encoded as
@@ -55,12 +56,12 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
   /**
    * For String unification.
    */
-  TObjectIntHashMap<String> unique = new TObjectIntHashMap<>();
+  Object2IntOpenHashMap<String> unique = new Object2IntOpenHashMap<>();
 
   /**
    * Base for enumerating unique values.
    */
-  int ustart = Math.max(unique.getNoEntryValue() + 1, 1);
+  int ustart = Math.max(unique.defaultReturnValue() + 1, 1);
 
   /**
    * Pattern for NaN values.
@@ -111,8 +112,8 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
             attributes.add(Double.NaN);
             continue;
           }
-          int id = unique.get(s);
-          if(id == unique.getNoEntryValue()) {
+          int id = unique.getInt(s);
+          if(id == unique.defaultReturnValue()) {
             id = ustart + unique.size();
             unique.put(s, id);
           }

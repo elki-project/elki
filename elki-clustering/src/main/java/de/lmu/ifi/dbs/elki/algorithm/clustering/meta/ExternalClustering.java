@@ -53,13 +53,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
-import gnu.trove.iterator.TIntIntIterator;
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntListIterator;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
  * Read an external clustering result from a file, such as produced by
@@ -84,7 +84,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 @Description("Load clustering results from an external file. "//
 + "Each line is expected to consists of one clustering, one integer per point "//
 + "and an (optional) non-numeric label.")
-public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends Model>>implements ClusteringAlgorithm<Clustering<? extends Model>> {
+public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends Model>> implements ClusteringAlgorithm<Clustering<? extends Model>> {
   /**
    * The logger for this class.
    */
@@ -123,7 +123,7 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
         TokenizedReader reader = CSVReaderFormat.DEFAULT_FORMAT.makeReader()) {
       Tokenizer tokenizer = reader.getTokenizer();
       reader.reset(in);
-      TIntArrayList assignment = new TIntArrayList(database.getRelation(TypeUtil.DBID).size());
+      IntArrayList assignment = new IntArrayList(database.getRelation(TypeUtil.DBID).size());
       ArrayList<String> name = new ArrayList<>();
       line: while(reader.nextLineExceptComments()) {
         for(/* initialized by nextLineExceptComments */; tokenizer.valid(); tokenizer.advance()) {
@@ -162,33 +162,33 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
    * @param assignment Cluster assignment
    * @param name Name
    */
-  private void attachToRelation(Database database, Relation<?> r, TIntArrayList assignment, ArrayList<String> name) {
+  private void attachToRelation(Database database, Relation<?> r, IntArrayList assignment, ArrayList<String> name) {
     DBIDs ids = r.getDBIDs();
     if(!(ids instanceof ArrayDBIDs)) {
       throw new AbortException("External clusterings can only be used with static DBIDs.");
     }
-    TIntIntMap sizes = new TIntIntHashMap();
-    for(TIntIterator it = assignment.iterator(); it.hasNext();) {
-      sizes.adjustOrPutValue(it.next(), 1, 1);
+    Int2IntOpenHashMap sizes = new Int2IntOpenHashMap();
+    for(IntListIterator it = assignment.iterator(); it.hasNext();) {
+      sizes.addTo(it.nextInt(), 1);
     }
-    TIntObjectHashMap<ArrayModifiableDBIDs> cids = new TIntObjectHashMap<>(sizes.size());
-    for(TIntIntIterator it = sizes.iterator(); it.hasNext();) {
-      it.advance();
-      cids.put(it.key(), DBIDUtil.newArray(it.value()));
+    Int2ObjectOpenHashMap<ArrayModifiableDBIDs> cids = new Int2ObjectOpenHashMap<>(sizes.size());
+    for(ObjectIterator<Int2IntMap.Entry> it = sizes.int2IntEntrySet().fastIterator(); it.hasNext();) {
+      Int2IntMap.Entry entry = it.next();
+      cids.put(entry.getIntKey(), DBIDUtil.newArray(entry.getIntValue()));
     }
     {
       DBIDArrayIter it = ((ArrayDBIDs) ids).iter();
       for(int i = 0; i < assignment.size(); i++) {
-        cids.get(assignment.get(i)).add(it.seek(i));
+        cids.get(assignment.getInt(i)).add(it.seek(i));
       }
     }
     String nam = FormatUtil.format(name, " ");
     String snam = nam.toLowerCase().replace(' ', '-');
     Clustering<ClusterModel> result = new Clustering<>(nam, snam);
-    for(TIntObjectIterator<ArrayModifiableDBIDs> it = cids.iterator(); it.hasNext();) {
-      it.advance();
-      boolean noise = it.key() < 0;
-      result.addToplevelCluster(new Cluster<>(it.value(), noise, ClusterModel.CLUSTER));
+    for(ObjectIterator<Int2ObjectMap.Entry<ArrayModifiableDBIDs>> it = cids.int2ObjectEntrySet().fastIterator(); it.hasNext();) {
+      Int2ObjectMap.Entry<ArrayModifiableDBIDs> entry = it.next();
+      boolean noise = entry.getIntKey() < 0;
+      result.addToplevelCluster(new Cluster<>(entry.getValue(), noise, ClusterModel.CLUSTER));
     }
     database.getHierarchy().add(r, result);
   }

@@ -24,13 +24,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -41,7 +35,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import gnu.trove.map.hash.TIntObjectHashMap;
+
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * MiniMax hierarchical clustering using the NNchain algorithm.
@@ -114,7 +109,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
 
     // Initialize space for result:
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
-    TIntObjectHashMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
+    Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>();
 
     final int size = ids.size();
     double[] dists = new double[AGNES.triangleSize(size)];
@@ -143,7 +138,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
    * @param builder Result builder
    * @param clusters current clusters
    */
-  private void nnChainCore(int size, double[] distances, DBIDArrayMIter prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters) {
+  private void nnChainCore(int size, double[] distances, DBIDArrayMIter prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, Int2ObjectOpenHashMap<ModifiableDBIDs> clusters) {
     // The maximum chain size = number of ids + 1
     IntegerArray chain = new IntegerArray(size + 1);
 

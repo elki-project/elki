@@ -43,9 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import gnu.trove.impl.Constants;
-import gnu.trove.map.TLongDoubleMap;
-import gnu.trove.map.hash.TLongDoubleHashMap;
+import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 
 /**
  * Distance function that is based on double distances given by a distance
@@ -75,7 +73,7 @@ public class FileBasedSparseDoubleDistanceFunction extends AbstractDBIDRangeDist
   /**
    * The distance cache
    */
-  private TLongDoubleMap cache;
+  private Long2DoubleOpenHashMap cache;
 
   /**
    * Distance parser
@@ -139,7 +137,8 @@ public class FileBasedSparseDoubleDistanceFunction extends AbstractDBIDRangeDist
    */
   protected void loadCache(int size, InputStream in) throws IOException {
     // Expect a sparse matrix here.
-    cache = new TLongDoubleHashMap(size * 20, Constants.DEFAULT_LOAD_FACTOR, -1L, defaultDistance);
+    cache = new Long2DoubleOpenHashMap(size * 20);
+    cache.defaultReturnValue(Double.POSITIVE_INFINITY);
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
     parser.parse(in, new DistanceCacheWriter() {

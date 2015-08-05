@@ -20,14 +20,14 @@
  */
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
 
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.hash.TIntIntHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
 
 /**
  * Writable data store for double values.
@@ -39,7 +39,7 @@ public class MapIntegerDBIDDBIDStore implements WritableDBIDDataStore {
   /**
    * Data storage.
    */
-  private TIntIntMap map;
+  private Int2IntMap map;
 
   /**
    * Constructor.
@@ -48,7 +48,8 @@ public class MapIntegerDBIDDBIDStore implements WritableDBIDDataStore {
    */
   public MapIntegerDBIDDBIDStore(int size) {
     super();
-    map = new TIntIntHashMap(size, 0.5f, Integer.MIN_VALUE, DBIDUtil.asInteger(DBIDUtil.invalid()));
+    map = new Int2IntOpenHashMap(size);
+    map.defaultReturnValue(DBIDUtil.asInteger(DBIDUtil.invalid()));
   }
 
   @Override

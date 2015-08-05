@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.affinitypropagation;
 
-import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -47,26 +45,31 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
  * Cluster analysis by affinity propagation.
- * 
+ *
  * Reference:
  * <p>
  * Clustering by Passing Messages Between Data Points<br />
  * B. J. Frey and D. Dueck<br />
  * Science Vol 315
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @apiviz.composedOf AffinityPropagationInitialization
- * 
+ *
  * @param <O> object type
  */
 @Title("Affinity Propagation: Clustering by Passing Messages Between Data Points")
-@Reference(title = "Clustering by Passing Messages Between Data Points", authors = "B. J. Frey and D. Dueck", booktitle = "Science Vol 315", url = "http://dx.doi.org/10.1126/science.1136800")
+@Reference(title = "Clustering by Passing Messages Between Data Points", //
+authors = "B. J. Frey and D. Dueck", //
+booktitle = "Science Vol 315", //
+url = "http://dx.doi.org/10.1126/science.1136800")
 public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm<Clustering<MedoidModel>> implements ClusteringAlgorithm<Clustering<MedoidModel>> {
   /**
    * Class logger
@@ -95,7 +98,7 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
 
   /**
    * Constructor.
-   * 
+   *
    * @param initialization Similarity initialization
    * @param lambda Damping factor
    * @param convergence Termination threshold (Number of stable iterations)
@@ -111,7 +114,7 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
 
   /**
    * Perform affinity propagation clustering.
-   * 
+   *
    * @param db Database
    * @param relation Relation
    * @return Clustering result
@@ -203,7 +206,7 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
     }
     LOG.setCompleted(prog);
     // Cluster map, by lead object
-    TIntObjectHashMap<ModifiableDBIDs> map = new TIntObjectHashMap<>();
+    Int2ObjectOpenHashMap<ModifiableDBIDs> map = new Int2ObjectOpenHashMap<>();
     DBIDArrayIter i1 = ids.iter();
     for(int i = 0; i1.valid(); i1.advance(), i++) {
       int c = assignment[i];
@@ -216,9 +219,9 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
       cids.add(i1);
     }
     // If we stopped early, the cluster lead might be in a different cluster.
-    for(TIntObjectIterator<ModifiableDBIDs> iter = map.iterator(); iter.hasNext();) {
-      iter.advance(); // Trove iterator; advance first!
-      final int key = iter.key();
+    for(ObjectIterator<Int2ObjectOpenHashMap.Entry<ModifiableDBIDs>> iter = map.int2ObjectEntrySet().fastIterator(); iter.hasNext();) {
+      Int2ObjectOpenHashMap.Entry<ModifiableDBIDs> entry = iter.next();
+      final int key = entry.getIntKey();
       int targetkey = key;
       ModifiableDBIDs tids = null;
       // Chase arrows:
@@ -227,19 +230,19 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
         tids = map.get(targetkey);
       }
       if(tids != null && targetkey != key) {
-        tids.addDBIDs(iter.value());
+        tids.addDBIDs(entry.getValue());
         iter.remove();
       }
     }
 
     Clustering<MedoidModel> clustering = new Clustering<>("Affinity Propagation Clustering", "ap-clustering");
     ModifiableDBIDs noise = DBIDUtil.newArray();
-    for(TIntObjectIterator<ModifiableDBIDs> iter = map.iterator(); iter.hasNext();) {
-      iter.advance(); // Trove iterator; advance first!
-      i1.seek(iter.key());
-      if(iter.value().size() > 1) {
+    for(ObjectIterator<Int2ObjectOpenHashMap.Entry<ModifiableDBIDs>> iter = map.int2ObjectEntrySet().fastIterator(); iter.hasNext();) {
+      Int2ObjectOpenHashMap.Entry<ModifiableDBIDs> entry = iter.next();
+      i1.seek(entry.getIntKey());
+      if(entry.getValue().size() > 1) {
         MedoidModel mod = new MedoidModel(DBIDUtil.deref(i1));
-        clustering.addToplevelCluster(new Cluster<>(iter.value(), mod));
+        clustering.addToplevelCluster(new Cluster<>(entry.getValue(), mod));
       }
       else {
         noise.add(i1);
@@ -264,11 +267,11 @@ public class AffinityPropagationClusteringAlgorithm<O> extends AbstractAlgorithm
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> object type
    */
   public static class Parameterizer<O> extends AbstractParameterizer {

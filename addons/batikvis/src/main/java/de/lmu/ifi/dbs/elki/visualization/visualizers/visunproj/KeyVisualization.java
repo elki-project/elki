@@ -47,16 +47,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.jafama.FastMath;
 
 /**
  * Visualizer, displaying the key for a clustering.
- * 
+ *
  * TODO: re-add automatic sizing depending on the number of clusters.
- * 
+ *
  * TODO: also show in scatter plot detail view.
  *
  * @author Erich Schubert
@@ -88,7 +86,7 @@ public class KeyVisualization implements VisFactory {
 
   /**
    * Compute the size of the clustering.
-   * 
+   *
    * @param c Clustering
    * @return Array storing the depth and the number of leaf nodes.
    */
@@ -103,7 +101,7 @@ public class KeyVisualization implements VisFactory {
 
   /**
    * Recursive depth computation.
-   * 
+   *
    * @param hier Hierarchy
    * @param cluster Current cluster
    * @param size Counting array.
@@ -239,7 +237,7 @@ public class KeyVisualization implements VisFactory {
       }
       else {
         // For consistent keying:
-        TObjectIntMap<Cluster<Model>> cnum = new TObjectIntHashMap<>(allcs.size());
+        Object2IntOpenHashMap<Cluster<Model>> cnum = new Object2IntOpenHashMap<>(allcs.size());
         int i = 0;
         for(Cluster<Model> c : allcs) {
           cnum.put(c, i);
@@ -261,7 +259,7 @@ public class KeyVisualization implements VisFactory {
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     }
 
-    private double drawHierarchy(SVGPlot svgp, MarkerLibrary ml, DoubleDoublePair size, DoubleDoublePair pos, int depth, Cluster<Model> cluster, TObjectIntMap<Cluster<Model>> cnum, Hierarchy<Cluster<Model>> hier) {
+    private double drawHierarchy(SVGPlot svgp, MarkerLibrary ml, DoubleDoublePair size, DoubleDoublePair pos, int depth, Cluster<Model> cluster, Object2IntOpenHashMap<Cluster<Model>> cnum, Hierarchy<Cluster<Model>> hier) {
       final double maxwidth = 8.;
       DoubleDoublePair subpos = new DoubleDoublePair(pos.first + maxwidth, pos.second);
       int numc = hier.numChildren(cluster);
@@ -286,7 +284,7 @@ public class KeyVisualization implements VisFactory {
         posy = pos.second + .5;
         pos.second += 1.;
       }
-      ml.useMarker(svgp, layer, 0.3 + pos.first, posy + 0.5, cnum.get(cluster), 0.3);
+      ml.useMarker(svgp, layer, 0.3 + pos.first, posy + 0.5, cnum.getInt(cluster), 0.3);
       Element label = svgp.svgText(0.7 + pos.first, posy + 0.7, cluster.getNameAutomatic());
       SVGUtil.setCSSClass(label, KEY_ENTRY);
       layer.appendChild(label);

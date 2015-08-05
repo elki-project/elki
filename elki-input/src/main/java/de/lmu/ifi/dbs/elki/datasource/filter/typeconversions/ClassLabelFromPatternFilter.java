@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.filter.typeconversions;
 
-import gnu.trove.list.array.TIntArrayList;
-
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -36,10 +34,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 /**
  * Streaming filter to derive an outlier class label.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
@@ -53,7 +52,7 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
   /**
    * Bitset of label columns
    */
-  TIntArrayList labelcols = new TIntArrayList();
+  IntArrayList labelcols = new IntArrayList();
 
   /**
    * Label to return for positive matches.
@@ -72,7 +71,7 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
 
   /**
    * Constructor.
-   * 
+   *
    * @param pattern Pattern for matching
    * @param positive Positive label
    * @param negative Negative label
@@ -86,7 +85,7 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
 
   /**
    * Constructor.
-   * 
+   *
    * @param pattern Pattern for matching
    * @param positive Positive label
    * @param negative Negative label
@@ -126,7 +125,7 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
       getMeta(); // Trigger build
     }
     for(int i = 0; i < labelcols.size(); i++) {
-      Object o = source.data(labelcols.get(i));
+      Object o = source.data(labelcols.getInt(i));
       if(o == null) {
         continue;
       }
@@ -157,9 +156,9 @@ public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

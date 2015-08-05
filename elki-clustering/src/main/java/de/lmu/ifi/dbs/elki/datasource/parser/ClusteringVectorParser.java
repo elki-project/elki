@@ -20,14 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
-import gnu.trove.iterator.TIntIntIterator;
-import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.TIntIntMap;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -46,32 +38,37 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.ClusteringVectorDumper;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import it.unimi.dsi.fastutil.ints.Int2IntMap;
+import it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 /**
  * Parser for simple clustering results in vector form, as written by
  * {@link ClusteringVectorDumper}.
- * 
+ *
  * This allows reading the output of <em>multiple</em> clustering runs, and
  * analyze the results using ELKI algorithm.
- * 
+ *
  * The input format is very simple, each line containing a sequence of cluster
  * assignments in integer form, and an optional label:
- * 
+ *
  * <pre>
  * 0 0 1 1 0 First
  * 0 0 0 1 2 Second
  * </pre>
- * 
+ *
  * represents two clusterings for 5 objects. The first clustering has two
  * clusters, the second contains three clusters.
- * 
+ *
  * TODO: this parser currently is quite hacky, and could use a cleanup.
- * 
+ *
  * TODO: support noise, via negative cluster numbers?
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @apiviz.has Clustering
  */
 public class ClusteringVectorParser extends AbstractStreamingParser {
@@ -108,7 +105,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
   /**
    * Buffers, will be reused.
    */
-  TIntArrayList buf1 = new TIntArrayList();
+  IntArrayList buf1 = new IntArrayList();
 
   /**
    * Range of the DBID values.
@@ -127,7 +124,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
 
   /**
    * Constructor.
-   * 
+   *
    * @param format Input format
    */
   public ClusteringVectorParser(CSVReaderFormat format) {
@@ -152,17 +149,15 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
       while(reader.nextLineExceptComments()) {
         buf1.clear();
         lbl.clear();
-        TIntIntMap csize = new TIntIntHashMap();
-        TIntObjectMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
+        Int2IntOpenHashMap csize = new Int2IntOpenHashMap();
+        Int2ObjectOpenHashMap<ModifiableDBIDs> clusters = new Int2ObjectOpenHashMap<>();
         String name = null;
         for(/* initialized by nextLineExceptComments() */; tokenizer.valid(); tokenizer.advance()) {
           try {
             int cnum = tokenizer.getIntBase10();
             buf1.add(cnum);
             // Update cluster sizes:
-            if(!csize.increment(cnum)) {
-              csize.put(cnum, 1);
-            }
+            csize.addTo(cnum, 1);
           }
           catch(NumberFormatException e) {
             final String label = tokenizer.getSubstring();
@@ -185,19 +180,18 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
         }
         // Build clustering to store in the relation.
         curclu = new Clustering<>(name, name);
-        for(TIntIntIterator iter = csize.iterator(); iter.hasNext();) {
-          iter.advance();
-          if(iter.value() > 0) {
-            clusters.put(iter.key(), DBIDUtil.newArray(iter.value()));
+        for(ObjectIterator<Int2IntMap.Entry> iter = csize.int2IntEntrySet().fastIterator(); iter.hasNext();) {
+          Int2IntMap.Entry entry = iter.next();
+          if(entry.getIntValue() > 0) {
+            clusters.put(entry.getIntKey(), DBIDUtil.newArray(entry.getIntValue()));
           }
         }
         DBIDArrayIter iter = range.iter();
         for(int i = 0; i < buf1.size(); i++) {
-          clusters.get(buf1.get(i)).add(iter.seek(i));
+          clusters.get(buf1.getInt(i)).add(iter.seek(i));
         }
-        for(TIntObjectIterator<ModifiableDBIDs> iter2 = clusters.iterator(); iter2.hasNext();) {
-          iter2.advance();
-          curclu.addToplevelCluster(new Cluster<Model>(iter2.value(), ClusterModel.CLUSTER));
+        for(ModifiableDBIDs cids : clusters.values()) {
+          curclu.addToplevelCluster(new Cluster<Model>(cids, ClusterModel.CLUSTER));
         }
         // Label handling.
         if(!haslbl && !lbl.isEmpty()) {
@@ -248,9 +242,9 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractStreamingParser.Parameterizer {

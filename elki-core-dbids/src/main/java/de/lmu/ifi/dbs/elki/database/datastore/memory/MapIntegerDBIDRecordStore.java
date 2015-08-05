@@ -20,8 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableRecordStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -45,7 +45,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
   /**
    * Storage Map.
    */
-  private final TIntObjectMap<Object[]> data;
+  private final Int2ObjectMap<Object[]> data;
 
   /**
    * Constructor with existing data.
@@ -53,7 +53,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
    * @param rlen Number of columns (record length)
    * @param data Existing data map
    */
-  public MapIntegerDBIDRecordStore(int rlen, TIntObjectMap<Object[]> data) {
+  public MapIntegerDBIDRecordStore(int rlen, Int2ObjectMap<Object[]> data) {
     super();
     this.rlen = rlen;
     this.data = data;
@@ -65,7 +65,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
    * @param rlen Number of columns (record length)
    */
   public MapIntegerDBIDRecordStore(int rlen) {
-    this(rlen, new TIntObjectHashMap<Object[]>());
+    this(rlen, new Int2ObjectOpenHashMap<Object[]>());
   }
 
   /**
@@ -75,7 +75,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
    * @param rlen Number of columns (record length)
    */
   public MapIntegerDBIDRecordStore(int size, int rlen) {
-    this(rlen, new TIntObjectHashMap<Object[]>(size));
+    this(rlen, new Int2ObjectOpenHashMap<Object[]>(size));
   }
 
   @Override

@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
-import gnu.trove.map.hash.TIntDoubleHashMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 
 /**
  * <p>
@@ -52,11 +52,11 @@ import gnu.trove.map.hash.TIntDoubleHashMap;
  * are of the form <code>index value </code> each, where index is the number of
  * the corresponding dimension, and value is the value of the corresponding
  * attribute. A complete line then could look like this:
- * 
+ *
  * <pre>
  * 3 7 12.34 8 56.78 11 1.234 objectlabel
  * </pre>
- * 
+ *
  * where <code>3</code> indicates there are three attributes set,
  * <code>7,8,11</code> are the attributes indexes and there is a non-numerical
  * object label.
@@ -65,12 +65,12 @@ import gnu.trove.map.hash.TIntDoubleHashMap;
  * An index can be specified to identify an entry to be treated as class label.
  * This index counts all entries (numeric and labels as well) starting with 0.
  * </p>
- * 
+ *
  * @author Arthur Zimek
  * @since 0.2
- * 
+ *
  * @apiviz.has SparseNumberVector
- * 
+ *
  * @param <V> vector type
  */
 @Title("Sparse Vector Label Parser")
@@ -100,7 +100,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
   /**
    * (Reused) set of values for the number vector.
    */
-  TIntDoubleHashMap values = new TIntDoubleHashMap();
+  Int2DoubleOpenHashMap values = new Int2DoubleOpenHashMap();
 
   /**
    * (Reused) label buffer.
@@ -109,7 +109,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
 
   /**
    * Constructor.
-   * 
+   *
    * @param format Input format
    * @param labelIndices Indices to use as labels
    * @param factory Vector factory
@@ -121,7 +121,7 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
 
   /**
    * Constructor.
-   * 
+   *
    * @param colSep Column separator
    * @param quoteChars Quotation character
    * @param comment Comment pattern
@@ -203,9 +203,9 @@ public class SparseNumberVectorLabelParser<V extends SparseNumberVector> extends
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {

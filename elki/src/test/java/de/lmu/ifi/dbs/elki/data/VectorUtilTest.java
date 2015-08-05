@@ -24,8 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import gnu.trove.map.TIntDoubleMap;
-import gnu.trove.map.hash.TIntDoubleHashMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 
 /**
  * Unit test for angle computations in ELKI.
@@ -159,12 +158,12 @@ public class VectorUtilTest {
   @Test
   public void sparseAngleDegenerate() {
     NumberVector o1 = new SparseDoubleVector(new double[] {});
-    TIntDoubleMap v2 = new TIntDoubleHashMap();
+    Int2DoubleOpenHashMap v2 = new Int2DoubleOpenHashMap();
     v2.put(3, 0.);
     v2.put(4, 0.);
     v2.put(42, 0.);
     NumberVector o2 = new SparseDoubleVector(v2, 100);
-    TIntDoubleMap v3 = new TIntDoubleHashMap();
+    Int2DoubleOpenHashMap v3 = new Int2DoubleOpenHashMap();
     v3.put(15, 0.);
     v3.put(5, 1.);
     NumberVector v1 = new SparseDoubleVector(v3, 100);

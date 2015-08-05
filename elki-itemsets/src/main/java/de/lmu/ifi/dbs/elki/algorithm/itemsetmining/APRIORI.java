@@ -46,8 +46,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.InconsistentDataException;
-import gnu.trove.iterator.TLongIntIterator;
-import gnu.trove.map.hash.TLongIntHashMap;
+
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.jafama.FastMath;
 
 /**
@@ -239,7 +241,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
     // We quite aggressively size the map, assuming that almost each combination
     // is present somewhere. If this won't fit into memory, we're likely running
     // OOM somewhere later anyway!
-    TLongIntHashMap map = new TLongIntHashMap((f1 * (f1 - 1)) >>> 1);
+    Long2IntOpenHashMap map = new Long2IntOpenHashMap((f1 * (f1 - 1)) >>> 1);
     final long[] scratch = BitsUtil.zero(dim);
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       BitsUtil.setI(scratch, mask);
@@ -258,12 +260,12 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
     }
     // Generate candidates of length 2.
     List<SparseItemset> frequent = new ArrayList<>(f1 * (int) FastMath.sqrt(f1));
-    for(TLongIntIterator iter = map.iterator(); iter.hasNext();) {
-      iter.advance(); // Trove style iterator - advance first.
-      if(iter.value() >= needed) {
-        int ii = (int) (iter.key() >>> 32);
-        int ij = (int) (iter.key() & -1L);
-        frequent.add(new SparseItemset(new int[] { ii, ij }, iter.value()));
+    for(ObjectIterator<Long2IntMap.Entry> iter = map.long2IntEntrySet().fastIterator(); iter.hasNext();) {
+      Long2IntMap.Entry entry = iter.next();
+      if(entry.getIntValue() >= needed) {
+        int ii = (int) (entry.getLongKey() >>> 32);
+        int ij = (int) (entry.getLongKey() & -1L);
+        frequent.add(new SparseItemset(new int[] { ii, ij }, entry.getIntValue()));
       }
     }
     // The hashmap may produce them out of order.

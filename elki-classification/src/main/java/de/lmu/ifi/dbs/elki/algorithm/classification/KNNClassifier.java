@@ -20,10 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.classification;
 
-import gnu.trove.iterator.TObjectIntIterator;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -53,10 +49,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
+import it.unimi.dsi.fastutil.objects.Object2IntMap.Entry;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+
 /**
  * KNNClassifier classifies instances based on the class distribution among the
  * k nearest neighbors in a database.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.7.0
  * @param <O> the type of DatabaseObjects handled by this Algorithm
@@ -92,7 +92,7 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Result> implements Dista
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param k Number of nearest neighbors to access.
    */
@@ -112,19 +112,19 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Result> implements Dista
 
   @Override
   public ClassLabel classify(O instance) {
-    TObjectIntMap<ClassLabel> count = new TObjectIntHashMap<>();
+    Object2IntOpenHashMap<ClassLabel> count = new Object2IntOpenHashMap<>();
     KNNList query = knnq.getKNNForObject(instance, k);
     for(DoubleDBIDListIter neighbor = query.iter(); neighbor.valid(); neighbor.advance()) {
-      count.adjustOrPutValue(labelrep.get(neighbor), 1, 1);
+      count.addTo(labelrep.get(neighbor), 1);
     }
 
     int bestoccur = Integer.MIN_VALUE;
     ClassLabel bestl = null;
-    for(TObjectIntIterator<ClassLabel> iter = count.iterator(); iter.hasNext();) {
-      iter.advance();
-      if(iter.value() > bestoccur) {
-        bestoccur = iter.value();
-        bestl = iter.key();
+    for(ObjectIterator<Entry<ClassLabel>> iter = count.object2IntEntrySet().fastIterator(); iter.hasNext();) {
+      Entry<ClassLabel> entry = iter.next();
+      if(entry.getIntValue() > bestoccur) {
+        bestoccur = entry.getIntValue();
+        bestl = entry.getKey();
       }
     }
     return bestl;
@@ -175,9 +175,9 @@ public class KNNClassifier<O> extends AbstractAlgorithm<Result> implements Dista
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    *
    * @param <O> Object type

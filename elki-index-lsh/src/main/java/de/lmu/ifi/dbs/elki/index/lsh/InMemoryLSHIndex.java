@@ -20,10 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.index.lsh;
 
-import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -55,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * Locality Sensitive Hashing.
@@ -128,7 +125,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
     /**
      * The actual table
      */
-    ArrayList<TIntObjectMap<DBIDs>> hashtables;
+    ArrayList<Int2ObjectOpenHashMap<DBIDs>> hashtables;
 
     /**
      * Number of buckets to use.
@@ -162,7 +159,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
       final int numhash = hashfunctions.size();
       hashtables = new ArrayList<>(numhash);
       for(int i = 0; i < numhash; i++) {
-        hashtables.add(new TIntObjectHashMap<DBIDs>(numberOfBuckets));
+        hashtables.add(new Int2ObjectOpenHashMap<DBIDs>(numberOfBuckets));
       }
 
       // TODO: We assume all hash functions have the same dimensionality.
@@ -172,7 +169,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
       for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
         V obj = relation.get(iter);
         for(int i = 0; i < numhash; i++) {
-          final TIntObjectMap<DBIDs> table = hashtables.get(i);
+          final Int2ObjectOpenHashMap<DBIDs> table = hashtables.get(i);
           final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
           // Get the initial (unbounded) hash code:
           int hash = hashfunc.hashObject(obj, buf);
@@ -198,10 +195,9 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
       if(LOG.isStatistics()) {
         int min = Integer.MAX_VALUE, max = 0;
         for(int i = 0; i < numhash; i++) {
-          final TIntObjectMap<DBIDs> table = hashtables.get(i);
-          for(TIntObjectIterator<DBIDs> iter = table.iterator(); iter.hasNext();) {
-            iter.advance();
-            int size = iter.value().size();
+          final Int2ObjectOpenHashMap<DBIDs> table = hashtables.get(i);
+          for(DBIDs set : table.values()) {
+            final int size = set.size();
             if(size < min) {
               min = size;
             }
@@ -272,7 +268,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         final int numhash = hashtables.size();
         double[] buf = new double[hashfunctions.get(0).getNumberOfProjections()];
         for(int i = 0; i < numhash; i++) {
-          final TIntObjectMap<DBIDs> table = hashtables.get(i);
+          final Int2ObjectOpenHashMap<DBIDs> table = hashtables.get(i);
           final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
           // Get the initial (unbounded) hash code:
           int hash = hashfunc.hashObject(obj, buf);
@@ -324,7 +320,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         final int numhash = hashtables.size();
         double[] buf = new double[hashfunctions.get(0).getNumberOfProjections()];
         for(int i = 0; i < numhash; i++) {
-          final TIntObjectMap<DBIDs> table = hashtables.get(i);
+          final Int2ObjectOpenHashMap<DBIDs> table = hashtables.get(i);
           final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
           // Get the initial (unbounded) hash code:
           int hash = hashfunc.hashObject(obj, buf);

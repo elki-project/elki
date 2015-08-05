@@ -41,8 +41,8 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import gnu.trove.impl.Constants;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
+
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
@@ -82,6 +82,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
 
   @Override
   protected void preprocess() {
+    final Logging log = getLogger();
     DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
 
     MetricalIndexTree<O, N, E> index = getMetricalIndex(relation);
@@ -89,8 +90,8 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
     createStorage();
     MeanVariance pagesize = new MeanVariance();
     MeanVariance ksize = new MeanVariance();
-    if(getLogger().isVerbose()) {
-      getLogger().verbose("Approximating nearest neighbor lists to database objects");
+    if(log.isVerbose()) {
+      log.verbose("Approximating nearest neighbor lists to database objects");
     }
 
     List<E> leaves = index.getLeaves();
@@ -99,20 +100,21 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
       N node = index.getNode(leaf);
       int size = node.getNumEntries();
       pagesize.put(size);
-      if(getLogger().isDebuggingFinest()) {
-        getLogger().debugFinest("NumEntires = " + size);
+      if(log.isDebuggingFinest()) {
+        log.debugFinest("NumEntires = " + size);
       }
       // Collect the ids in this node.
       ArrayModifiableDBIDs ids = DBIDUtil.newArray(size);
       for(int i = 0; i < size; i++) {
         ids.add(((LeafEntry) node.getEntry(i)).getDBID());
       }
-      TObjectDoubleHashMap<DBIDPair> cache = new TObjectDoubleHashMap<>((size * size * 3) >> 2, Constants.DEFAULT_LOAD_FACTOR, Double.NaN);
+      Object2DoubleOpenHashMap<DBIDPair> cache = new Object2DoubleOpenHashMap<>((size * size * 3) >> 2);
+      cache.defaultReturnValue(Double.NaN);
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         KNNHeap kNN = DBIDUtil.newHeap(k);
         for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {
           DBIDPair key = DBIDUtil.newPair(id, id2);
-          double d = cache.remove(key);
+          double d = cache.removeDouble(key);
           if(d == d) { // Not NaN
             // consume the previous result.
             kNN.insert(d, id2);
@@ -129,15 +131,15 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
         ksize.put(kNN.size());
         storage.put(id, kNN.toKNNList());
       }
-      if(getLogger().isDebugging() && cache.size() > 0) {
-        getLogger().warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
+      if(log.isDebugging() && cache.size() > 0) {
+        log.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
       }
-      getLogger().incrementProcessed(progress);
+      log.incrementProcessed(progress);
     }
-    getLogger().ensureCompleted(progress);
-    if(getLogger().isVerbose()) {
-      getLogger().verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getSampleStddev());
-      getLogger().verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");
+    log.ensureCompleted(progress);
+    if(log.isVerbose()) {
+      log.verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getSampleStddev());
+      log.verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");
     }
   }
 

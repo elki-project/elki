@@ -50,7 +50,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import gnu.trove.list.array.TIntArrayList;
+
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 /**
  * Generalized DBSCAN, density-based clustering with noise.
@@ -200,7 +201,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       // (Temporary) store the cluster ID assigned.
       final WritableIntegerDataStore clusterids = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, UNPROCESSED);
       // Note: these are not exact, as objects may be stolen from noise.
-      final TIntArrayList clustersizes = new TIntArrayList();
+      final IntArrayList clustersizes = new IntArrayList();
       clustersizes.add(0); // Unprocessed dummy value.
       clustersizes.add(0); // Noise counter.
       final ArrayModifiableDBIDs activeSet = DBIDUtil.newArray();
@@ -226,7 +227,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
         else {
           // otherwise, it's a noise point
           clusterids.putInt(id, NOISE);
-          clustersizes.set(NOISE, clustersizes.get(NOISE) + 1);
+          clustersizes.set(NOISE, clustersizes.getInt(NOISE) + 1);
         }
         // We've completed this element
         LOG.incrementProcessed(progress);
@@ -240,9 +241,9 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
       ArrayModifiableDBIDs[] corelists = coremodel ? new ArrayModifiableDBIDs[clusterid] : null;
       // add storage containers for clusters
       for(int i = 0; i < clustersizes.size(); i++) {
-        clusterlists[i] = DBIDUtil.newArray(clustersizes.get(i));
+        clusterlists[i] = DBIDUtil.newArray(clustersizes.getInt(i));
         if(corelists != null) {
-          corelists[i] = DBIDUtil.newArray(clustersizes.get(i));
+          corelists[i] = DBIDUtil.newArray(clustersizes.getInt(i));
         }
       }
       // do the actual inversion

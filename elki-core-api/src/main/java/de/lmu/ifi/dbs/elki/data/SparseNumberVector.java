@@ -22,12 +22,11 @@ package de.lmu.ifi.dbs.elki.data;
 
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
-
-import gnu.trove.map.TIntDoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
 
 /**
  * Combines the SparseFeatureVector and NumberVector.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
@@ -44,17 +43,17 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
 
   /**
    * Iterator over non-zero features only, <em>ascendingly</em>.
-   * 
+   *
    * Note: depending on the underlying implementation, this may or may not be
    * the dimension. Use {@link #iterDim} to get the actual dimension. In fact,
    * usually this will be the ith non-zero value, assuming an array
    * representation.
-   * 
+   *
    * Think of this number as an iterator. For efficiency, it has a primitive
    * type!
-   * 
+   *
    * Intended usage:
-   * 
+   *
    * <pre>
    * {@code
    * for (int iter = v.iter(); v.iterValid(iter); iter = v.iterAdvance(iter)) {
@@ -64,7 +63,7 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
    * }
    * }
    * </pre>
-   * 
+   *
    * @return Identifier for the first non-zero dimension, <b>not necessarily the
    *         dimension!</b>
    */
@@ -75,14 +74,14 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
   
   /**
    * Update the vector space dimensionality.
-   * 
+   *
    * @param maxdim New dimensionality
    */
   void setDimensionality(int maxdim);
 
   /**
    * Get the value of the iterators' current dimension.
-   * 
+   *
    * @param iter Iterator
    * @return Value at the current position
    */
@@ -90,7 +89,7 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
 
   /**
    * Get the value of the iterators' current dimension.
-   * 
+   *
    * @param iter Iterator
    * @return Value at the current position
    */
@@ -100,7 +99,7 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
 
   /**
    * Get the value of the iterators' current dimension.
-   * 
+   *
    * @param iter Iterator
    * @return Value at the current position
    */
@@ -110,7 +109,7 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
 
   /**
    * Get the value of the iterators' current dimension.
-   * 
+   *
    * @param iter Iterator
    * @return Value at the current position
    */
@@ -120,7 +119,7 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
 
   /**
    * Get the value of the iterators' current dimension.
-   * 
+   *
    * @param iter Iterator
    * @return Value at the current position
    */
@@ -128,7 +127,7 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
 
   /**
    * Get the value of the iterators' current dimension.
-   * 
+   *
    * @param iter Iterator
    * @return Value at the current position
    */
@@ -194,21 +193,21 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
 
   /**
    * Factory for sparse number vectors: make from a dim-value map.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has SparseNumberVector
-   * 
+   *
    * @param <V> Vector type number type
    */
   interface Factory<V extends SparseNumberVector> extends NumberVector.Factory<V> {
     /**
      * Returns a new NumberVector of N for the given values.
-     * 
+     *
      * @param values the values of the NumberVector
      * @param maxdim Maximum dimensionality.
      * @return a new NumberVector of N for the given values
      */
-    V newNumberVector(TIntDoubleMap values, int maxdim);
+    V newNumberVector(Int2DoubleOpenHashMap values, int maxdim);
   }
 }

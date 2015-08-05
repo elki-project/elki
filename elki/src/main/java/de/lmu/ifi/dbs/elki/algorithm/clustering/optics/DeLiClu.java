@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
-import gnu.trove.set.TIntSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -63,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
 /**
  * DeliClu: Density-Based Hierarchical Clustering
@@ -330,7 +329,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
       }
       return;
     }
-    TIntSet expanded = index.getExpanded(entry2);
+    IntSet expanded = index.getExpanded(entry2);
     for(int i = 0; i < parentNode.getNumEntries(); i++) {
       DeLiCluDirectoryEntry entry1 = (DeLiCluDirectoryEntry) parentNode.getEntry(i);
 

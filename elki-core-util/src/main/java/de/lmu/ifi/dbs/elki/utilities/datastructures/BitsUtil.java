@@ -23,17 +23,17 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
 import java.util.Arrays;
 import java.util.Random;
 
-import gnu.trove.strategy.HashingStrategy;
+import it.unimi.dsi.fastutil.Hash.Strategy;
 
 /**
  * Utilities for bit operations.
- * 
+ *
  * Implementation note: words are stored in little-endian word order. This can
  * be a bit confusing, because a shift-right means "left" on the word level.
- * 
+ *
  * Naming: methods with a <code>C</code> return a copy, methods with
  * <code>I</code> modify in-place.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
@@ -69,28 +69,23 @@ public final class BitsUtil {
       9765625, 48828125, 244140625, 1220703125 };
 
   /**
-   * Hashing strategy to use with Trove.
+   * Hashing strategy to use with Fastutils.
    */
-  public static final HashingStrategy<long[]> TROVE_HASH_STRATEGY = new HashingStrategy<long[]>() {
-    /**
-     * Serial version number.
-     */
-    private static final long serialVersionUID = 1L;
-
+  public static final Strategy<long[]> FASTUTIL_HASH_STRATEGY = new Strategy<long[]>() {
     @Override
-    public int computeHashCode(long[] arg0) {
-      return BitsUtil.hashCode(arg0);
+    public int hashCode(long[] o) {
+      return BitsUtil.hashCode(o);
     }
 
     @Override
-    public boolean equals(long[] arg0, long[] arg1) {
-      return equal(arg0, arg1);
+    public boolean equals(long[] a, long[] b) {
+      return equal(a,b );
     }
   };
 
   /**
    * Allocate a new long[].
-   * 
+   *
    * @param bits Number of bits in storage
    * @return New array
    */
@@ -100,7 +95,7 @@ public final class BitsUtil {
 
   /**
    * Allocate a new long[].
-   * 
+   *
    * @param bits Number of bits in storage
    * @param init Initial value (of at most the size of a long, remaining bits
    *        will be 0)
@@ -114,7 +109,7 @@ public final class BitsUtil {
 
   /**
    * Create a vector initialized with "bits" ones.
-   * 
+   *
    * @param bits Size
    * @return new vector
    */
@@ -166,7 +161,7 @@ public final class BitsUtil {
 
   /**
    * Copy a bitset
-   * 
+   *
    * @param v Array to copy
    * @return Copy
    */
@@ -176,9 +171,9 @@ public final class BitsUtil {
 
   /**
    * Copy a bitset.
-   * 
+   *
    * Note: Bits beyond mincap <em>may</em> be retained!
-   * 
+   *
    * @param v Array to copy
    * @param mincap Target <em>minimum</em> capacity
    * @return Copy with space for at least "capacity" bits
@@ -195,9 +190,9 @@ public final class BitsUtil {
 
   /**
    * Copy a bitset.
-   * 
+   *
    * Note: Bits beyond mincap <em>may</em> be retained!
-   * 
+   *
    * @param v Array to copy
    * @param mincap Target <em>minimum</em> capacity
    * @param shift Number of bits to shift left
@@ -231,7 +226,7 @@ public final class BitsUtil {
 
   /**
    * Compute corresponding gray code as v XOR (v >>> 1)
-   * 
+   *
    * @param v Value
    * @return Gray code
    */
@@ -241,7 +236,7 @@ public final class BitsUtil {
 
   /**
    * Compute corresponding gray code as v XOR (v >>> 1)
-   * 
+   *
    * @param v Value
    * @return Gray code
    */
@@ -252,7 +247,7 @@ public final class BitsUtil {
 
   /**
    * Compute the inverted gray code, v XOR (v >>> 1) XOR (v >>> 2) ...
-   * 
+   *
    * @param v Value
    * @return Inverted gray code
    */
@@ -268,7 +263,7 @@ public final class BitsUtil {
 
   /**
    * Compute the inverted gray code, v XOR (v >>> 1) XOR (v >>> 2) ...
-   * 
+   *
    * @param v Value
    * @return Inverted gray code
    */
@@ -293,7 +288,7 @@ public final class BitsUtil {
 
   /**
    * Test for the bitstring to be all-zero.
-   * 
+   *
    * @param v Bitstring
    * @return true when all zero
    */
@@ -308,7 +303,7 @@ public final class BitsUtil {
 
   /**
    * Compute the cardinality (number of set bits)
-   * 
+   *
    * @param v Value
    * @return Number of bits set in long
    */
@@ -318,9 +313,9 @@ public final class BitsUtil {
 
   /**
    * Compute the cardinality (number of set bits)
-   * 
+   *
    * Low-endian layout for the array.
-   * 
+   *
    * @param v Value
    * @return Number of bits set in long[]
    */
@@ -334,7 +329,7 @@ public final class BitsUtil {
 
   /**
    * Invert bit number "off" in v.
-   * 
+   *
    * @param v Buffer
    * @param off Offset to flip
    */
@@ -344,9 +339,9 @@ public final class BitsUtil {
 
   /**
    * Invert bit number "off" in v.
-   * 
+   *
    * Low-endian layout for the array.
-   * 
+   *
    * @param v Buffer
    * @param off Offset to flip
    */
@@ -358,7 +353,7 @@ public final class BitsUtil {
 
   /**
    * Set bit number "off" in v.
-   * 
+   *
    * @param v Buffer
    * @param off Offset to set
    */
@@ -368,9 +363,9 @@ public final class BitsUtil {
 
   /**
    * Set bit number "off" in v.
-   * 
+   *
    * Low-endian layout for the array.
-   * 
+   *
    * @param v Buffer
    * @param off Offset to set
    */
@@ -382,7 +377,7 @@ public final class BitsUtil {
 
   /**
    * Put o onto v inplace, i.e. v = o
-   * 
+   *
    * @param v Primary object
    * @param o data to initialize to.
    * @return v
@@ -398,7 +393,7 @@ public final class BitsUtil {
 
   /**
    * Clear bit number "off" in v.
-   * 
+   *
    * @param v Buffer
    * @param off Offset to clear
    */
@@ -408,9 +403,9 @@ public final class BitsUtil {
 
   /**
    * Clear bit number "off" in v.
-   * 
+   *
    * Low-endian layout for the array.
-   * 
+   *
    * @param v Buffer
    * @param off Offset to clear
    */
@@ -422,7 +417,7 @@ public final class BitsUtil {
 
   /**
    * Set bit number "off" in v.
-   * 
+   *
    * @param v Buffer
    * @param off Offset to set
    */
@@ -432,9 +427,9 @@ public final class BitsUtil {
 
   /**
    * Set bit number "off" in v.
-   * 
+   *
    * Low-endian layout for the array.
-   * 
+   *
    * @param v Buffer
    * @param off Offset to set
    */
@@ -445,7 +440,7 @@ public final class BitsUtil {
 
   /**
    * Fill a vector initialized with "bits" ones.
-   * 
+   *
    * @param v Vector to fill.
    * @param bits Size
    */
@@ -459,9 +454,9 @@ public final class BitsUtil {
 
   /**
    * Zero the given set
-   * 
+   *
    * Low-endian layout for the array.
-   * 
+   *
    * @param v existing set
    * @return array set to zero
    */
@@ -472,7 +467,7 @@ public final class BitsUtil {
 
   /**
    * XOR o onto v inplace, i.e. v ^= o
-   * 
+   *
    * @param v Primary object
    * @param o data to xor
    * @return v
@@ -487,7 +482,7 @@ public final class BitsUtil {
 
   /**
    * XOR o onto v inplace, i.e. v ^= (o << off)
-   * 
+   *
    * @param v Primary object
    * @param o data to or
    * @param off Offset
@@ -528,7 +523,7 @@ public final class BitsUtil {
 
   /**
    * OR o onto v inplace, i.e. v |= o
-   * 
+   *
    * @param v Primary object
    * @param o data to or
    * @return v
@@ -544,9 +539,9 @@ public final class BitsUtil {
 
   /**
    * OR o onto v inplace, i.e. v |= (o << off)
-   * 
+   *
    * Note: Bits that are shifted outside of the size of v are discarded.
-   * 
+   *
    * @param v Primary object
    * @param o data to or
    * @param off Offset
@@ -587,7 +582,7 @@ public final class BitsUtil {
 
   /**
    * AND o onto v inplace, i.e. v &= o
-   * 
+   *
    * @param v Primary object
    * @param o data to and
    * @return v
@@ -604,7 +599,7 @@ public final class BitsUtil {
 
   /**
    * AND o onto v inplace, i.e. v &= (o << off)
-   * 
+   *
    * @param v Primary object
    * @param o data to or
    * @param off Offset
@@ -650,9 +645,9 @@ public final class BitsUtil {
 
   /**
    * AND o onto v in a copy, i.e. v & o
-   * 
+   *
    * The resulting array will have the shorter length of the two.
-   * 
+   *
    * @param v Primary object
    * @param o data to and
    * @return Copy of v and o
@@ -669,9 +664,9 @@ public final class BitsUtil {
 
   /**
    * AND o onto v in a copy, i.e. v & o
-   * 
+   *
    * The resulting array will have the shorter length of the two.
-   * 
+   *
    * @param v Primary object
    * @param o data to and
    * @return Copy of v and o
@@ -696,7 +691,7 @@ public final class BitsUtil {
 
   /**
    * NOTAND o onto v inplace, i.e. v &= ~o
-   * 
+   *
    * @param v Primary object
    * @param o data to and
    * @return v
@@ -711,7 +706,7 @@ public final class BitsUtil {
 
   /**
    * Invert v inplace.
-   * 
+   *
    * @param v Object to invert
    * @return v
    */
@@ -724,9 +719,9 @@ public final class BitsUtil {
 
   /**
    * Shift a long[] bitset inplace.
-   * 
+   *
    * Low-endian layout for the array.
-   * 
+   *
    * @param v existing bitset
    * @param off Offset to shift by
    * @return Bitset
@@ -769,9 +764,9 @@ public final class BitsUtil {
 
   /**
    * Shift a long[] bitset inplace.
-   * 
+   *
    * Low-endian layout for the array.
-   * 
+   *
    * @param v existing bitset
    * @param off Offset to shift by
    * @return Bitset
@@ -813,7 +808,7 @@ public final class BitsUtil {
 
   /**
    * Rotate a long to the right, cyclic with length len
-   * 
+   *
    * @param v Bits
    * @param shift Shift value
    * @param len Length
@@ -832,7 +827,7 @@ public final class BitsUtil {
 
   /**
    * Cycle a bitstring to the right.
-   * 
+   *
    * @param v Bit string
    * @param shift Number of steps to cycle
    * @param len Length
@@ -844,7 +839,7 @@ public final class BitsUtil {
 
   /**
    * Truncate a bit string to the given length (setting any higher bit to 0).
-   * 
+   *
    * @param v String to process
    * @param len Length (in bits) to truncate to
    */
@@ -861,7 +856,7 @@ public final class BitsUtil {
 
   /**
    * Rotate a long to the left, cyclic with length len
-   * 
+   *
    * @param v Bits
    * @param shift Shift value
    * @param len Length
@@ -880,7 +875,7 @@ public final class BitsUtil {
 
   /**
    * Cycle a bitstring to the right.
-   * 
+   *
    * @param v Bit string
    * @param shift Number of steps to cycle
    * @param len Length
@@ -892,7 +887,7 @@ public final class BitsUtil {
 
   /**
    * Convert bitset to a string consisting of "0" and "1", in high-endian order.
-   * 
+   *
    * @param v Value to process
    * @return String representation
    */
@@ -926,7 +921,7 @@ public final class BitsUtil {
 
   /**
    * Convert bitset to a string consisting of "0" and "1", in high-endian order.
-   * 
+   *
    * @param v Value to process
    * @param minw Minimum width
    * @return String representation
@@ -962,7 +957,7 @@ public final class BitsUtil {
 
   /**
    * Convert bitset to a string consisting of "0" and "1", in high-endian order.
-   * 
+   *
    * @param v Value to process
    * @return String representation
    */
@@ -982,7 +977,7 @@ public final class BitsUtil {
 
   /**
    * Convert bitset to a string consisting of "0" and "1", in low-endian order.
-   * 
+   *
    * @param v Value to process
    * @return String representation
    */
@@ -1016,7 +1011,7 @@ public final class BitsUtil {
 
   /**
    * Convert bitset to a string consisting of "0" and "1", in low-endian order.
-   * 
+   *
    * @param v Value to process
    * @param minw Minimum width
    * @return String representation
@@ -1052,7 +1047,7 @@ public final class BitsUtil {
 
   /**
    * Convert bitset to a string consisting of "0" and "1", in low-endian order.
-   * 
+   *
    * @param v Value to process
    * @return String representation
    */
@@ -1072,7 +1067,7 @@ public final class BitsUtil {
 
   /**
    * Convert the bitset into a decimal representation, e.g. <tt>0, 3, 5</tt>
-   * 
+   *
    * @param v Value
    * @param sep Value separator
    * @param offset Counting offset (usually, 0 or 1)
@@ -1093,7 +1088,7 @@ public final class BitsUtil {
 
   /**
    * Find the number of trailing zeros.
-   * 
+   *
    * @param v Bitset
    * @return Position of first set bit, -1 if no set bit was found.
    */
@@ -1110,7 +1105,7 @@ public final class BitsUtil {
 
   /**
    * Find the number of trailing zeros.
-   * 
+   *
    * @param v Bitset
    * @return Position of first set bit, v.length * 64 if no set bit was found.
    */
@@ -1127,10 +1122,10 @@ public final class BitsUtil {
 
   /**
    * Find the number of trailing zeros.
-   * 
+   *
    * Note: this has different semantics to {@link Long#numberOfLeadingZeros}
    * when the number is 0.
-   * 
+   *
    * @param v Long
    * @return Position of first set bit, -1 if no set bit was found.
    */
@@ -1140,9 +1135,9 @@ public final class BitsUtil {
 
   /**
    * Find the number of trailing zeros.
-   * 
+   *
    * Note: this is the same as {@link Long#numberOfTrailingZeros}
-   * 
+   *
    * @param v Long
    * @return Position of first set bit, 64 if no set bit was found.
    */
@@ -1152,9 +1147,9 @@ public final class BitsUtil {
 
   /**
    * Find the number of trailing zeros.
-   * 
+   *
    * Note: this is the same as {@link Long#numberOfTrailingZeros}
-   * 
+   *
    * @param v Long
    * @return Position of first set bit, 64 if no set bit was found.
    */
@@ -1164,7 +1159,7 @@ public final class BitsUtil {
 
   /**
    * Find the number of leading zeros.
-   * 
+   *
    * @param v Bitset
    * @return Position of first set bit, -1 if no set bit was found.
    */
@@ -1179,7 +1174,7 @@ public final class BitsUtil {
 
   /**
    * Find the number of leading zeros.
-   * 
+   *
    * @param v Bitset
    * @return Position of first set bit, v.length * 64 if no set bit was found.
    */
@@ -1196,10 +1191,10 @@ public final class BitsUtil {
 
   /**
    * Find the number of leading zeros; -1 if all zero
-   * 
+   *
    * Note: this has different semantics to {@link Long#numberOfLeadingZeros}
    * when the number is 0.
-   * 
+   *
    * @param v Bitset
    * @return Position of first set bit, -1 if no set bit was found.
    */
@@ -1209,10 +1204,10 @@ public final class BitsUtil {
 
   /**
    * Find the number of leading zeros; -1 if all zero
-   * 
+   *
    * Note: this has different semantics to {@link Long#numberOfLeadingZeros}
    * when the number is 0.
-   * 
+   *
    * @param v Bitset
    * @return Position of first set bit, -1 if no set bit was found.
    */
@@ -1222,9 +1217,9 @@ public final class BitsUtil {
 
   /**
    * Find the number of leading zeros; 64 if all zero
-   * 
+   *
    * Note: this the same as {@link Long#numberOfLeadingZeros}.
-   * 
+   *
    * @param v Bitset
    * @return Position of first set bit, 64 if no set bit was found.
    */
@@ -1234,9 +1229,9 @@ public final class BitsUtil {
 
   /**
    * Find the number of leading zeros; 32 if all zero
-   * 
+   *
    * Note: this the same as {@link Integer#numberOfLeadingZeros}.
-   * 
+   *
    * @param v Bitset
    * @return Position of first set bit, 32 if no set bit was found.
    */
@@ -1246,7 +1241,7 @@ public final class BitsUtil {
 
   /**
    * Find the previous set bit.
-   * 
+   *
    * @param v Value to process
    * @param start Start position (inclusive)
    * @return Position of previous set bit, or -1.
@@ -1262,7 +1257,7 @@ public final class BitsUtil {
 
   /**
    * Find the previous set bit.
-   * 
+   *
    * @param v Values to process
    * @param start Start position (inclusive)
    * @return Position of previous set bit, or -1.
@@ -1291,7 +1286,7 @@ public final class BitsUtil {
 
   /**
    * Find the previous clear bit.
-   * 
+   *
    * @param v Values to process
    * @param start Start position (inclusive)
    * @return Position of previous clear bit, or -1.
@@ -1307,7 +1302,7 @@ public final class BitsUtil {
 
   /**
    * Find the previous clear bit.
-   * 
+   *
    * @param v Values to process
    * @param start Start position (inclusive)
    * @return Position of previous clear bit, or -1.
@@ -1336,7 +1331,7 @@ public final class BitsUtil {
 
   /**
    * Find the next set bit.
-   * 
+   *
    * @param v Value to process
    * @param start Start position (inclusive)
    * @return Position of next set bit, or -1.
@@ -1352,7 +1347,7 @@ public final class BitsUtil {
 
   /**
    * Find the next set bit.
-   * 
+   *
    * @param v Value to process
    * @param start Start position (inclusive)
    * @return Position of next set bit, or -1.
@@ -1378,7 +1373,7 @@ public final class BitsUtil {
 
   /**
    * Find the next clear bit.
-   * 
+   *
    * @param v Value to process
    * @param start Start position (inclusive)
    * @return Position of next clear bit, or -1.
@@ -1393,7 +1388,7 @@ public final class BitsUtil {
 
   /**
    * Find the next clear bit.
-   * 
+   *
    * @param v Value to process
    * @param start Start position (inclusive)
    * @return Position of next clear bit, or -1.
@@ -1419,7 +1414,7 @@ public final class BitsUtil {
 
   /**
    * The magnitude is the position of the highest bit set
-   * 
+   *
    * @param v Vector v
    * @return position of highest bit set, or 0.
    */
@@ -1429,7 +1424,7 @@ public final class BitsUtil {
 
   /**
    * The magnitude is the position of the highest bit set
-   * 
+   *
    * @param v Vector v
    * @return position of highest bit set, or 0.
    */
@@ -1439,7 +1434,7 @@ public final class BitsUtil {
 
   /**
    * The magnitude is the position of the highest bit set
-   * 
+   *
    * @param v Vector v
    * @return position of highest bit set, or 0.
    */
@@ -1449,7 +1444,7 @@ public final class BitsUtil {
 
   /**
    * Test whether two Bitsets intersect.
-   * 
+   *
    * @param x First bitset
    * @param y Second bitset
    * @return {@code true} when the bitsets intersect.
@@ -1460,7 +1455,7 @@ public final class BitsUtil {
 
   /**
    * Test whether two Bitsets intersect.
-   * 
+   *
    * @param x First bitset
    * @param y Second bitset
    * @return {@code true} when the bitsets intersect.
@@ -1477,7 +1472,7 @@ public final class BitsUtil {
 
   /**
    * Compute the intersection size of two Bitsets.
-   * 
+   *
    * @param x First bitset
    * @param y Second bitset
    * @return Intersection size
@@ -1488,7 +1483,7 @@ public final class BitsUtil {
 
   /**
    * Compute the intersection size of two Bitsets.
-   * 
+   *
    * @param x First bitset
    * @param y Second bitset
    * @return Intersection size
@@ -1505,7 +1500,7 @@ public final class BitsUtil {
 
   /**
    * Compute the union size of two Bitsets.
-   * 
+   *
    * @param x First bitset
    * @param y Second bitset
    * @return Union size
@@ -1516,7 +1511,7 @@ public final class BitsUtil {
 
   /**
    * Compute the union size of two Bitsets.
-   * 
+   *
    * @param x First bitset
    * @param y Second bitset
    * @return Union size
@@ -1540,7 +1535,7 @@ public final class BitsUtil {
   /**
    * Compute the Hamming distance (Size of symmetric difference), i.e.
    * {@code cardinality(a ^ b)}.
-   * 
+   *
    * @param b1 First vector
    * @param b2 Second vector
    * @return Cardinality of symmetric difference
@@ -1552,7 +1547,7 @@ public final class BitsUtil {
   /**
    * Compute the Hamming distance (Size of symmetric difference), i.e.
    * {@code cardinality(a ^ b)}.
-   * 
+   *
    * @param x First vector
    * @param y Second vector
    * @return Cardinality of symmetric difference
@@ -1575,7 +1570,7 @@ public final class BitsUtil {
 
   /**
    * Capacity of the vector v.
-   * 
+   *
    * @param v Vector v
    * @return Capacity
    */
@@ -1585,7 +1580,7 @@ public final class BitsUtil {
 
   /**
    * Test two bitsets for equality
-   * 
+   *
    * @param x First bitset
    * @param y Second bitset
    * @return {@code true} when the bitsets are equal
@@ -1626,7 +1621,7 @@ public final class BitsUtil {
 
   /**
    * Compare two bitsets.
-   * 
+   *
    * @param x First bitset
    * @param y Second bitset
    * @return Comparison result
@@ -1673,7 +1668,7 @@ public final class BitsUtil {
 
   /**
    * Compute a hash code for the given bitset.
-   * 
+   *
    * @param x Bitset bitset
    * @return Hash code
    */
@@ -1687,7 +1682,7 @@ public final class BitsUtil {
 
   /**
    * Compute a hash code for the given bitset.
-   * 
+   *
    * @param x Bitset bitset
    * @return Hash code
    */
@@ -1704,7 +1699,7 @@ public final class BitsUtil {
 
   /**
    * Compute <code>m * pow(2., n)</code> using bit operations.
-   * 
+   *
    * @param m Mantissa
    * @param n Exponent
    * @return Double value
@@ -1746,7 +1741,7 @@ public final class BitsUtil {
   /**
    * Compute {@code m * Math.pow(10,e)} on the bit representation, for
    * assembling a floating point decimal value.
-   * 
+   *
    * @param m Mantisse
    * @param n Exponent to base 10.
    * @return Double value.

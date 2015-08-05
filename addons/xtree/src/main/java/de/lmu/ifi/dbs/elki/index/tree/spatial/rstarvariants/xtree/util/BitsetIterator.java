@@ -20,18 +20,18 @@
  */
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.util;
 
-import gnu.trove.iterator.TIntIterator;
-
 import java.util.NoSuchElementException;
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
+
+import it.unimi.dsi.fastutil.ints.IntIterator;
 
 /**
  * Iterator over the set bits of a {@code long[]} bitset, using the trove API.
  * 
  * @author Erich Schubert
  */
-class BitsetIterator implements TIntIterator {
+class BitsetIterator implements IntIterator {
   private final long[] bits;
 
   private int n;
@@ -47,7 +47,7 @@ class BitsetIterator implements TIntIterator {
   }
 
   @Override
-  public int next() {
+  public int nextInt() {
     if(n < 0) {
       throw new NoSuchElementException();
     }
@@ -55,7 +55,19 @@ class BitsetIterator implements TIntIterator {
     n = BitsUtil.nextSetBit(bits, n + 1);
     return r;
   }
+  
+  @Deprecated
+  @Override
+  public Integer next() {
+    return nextInt();
+  }
 
+  @Deprecated
+  @Override
+  public int skip(int n) {
+    throw new UnsupportedOperationException();
+  }
+  
   @Override
   public void remove() {
     throw new UnsupportedOperationException();

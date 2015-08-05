@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
-import gnu.trove.impl.Constants;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -44,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
@@ -105,12 +104,13 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
     for(int part = 0; part < partitions; part++) {
       final ArrayDBIDs ids = parts[part];
       final int size = ids.size();
-      TObjectDoubleHashMap<DBIDPair> cache = new TObjectDoubleHashMap<>((size * size * 3) >> 3, Constants.DEFAULT_LOAD_FACTOR, Double.NaN);
+      Object2DoubleOpenHashMap<DBIDPair> cache = new Object2DoubleOpenHashMap<>((size * size * 3) >> 3);
+      cache.defaultReturnValue(Double.NaN);
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         KNNHeap kNN = DBIDUtil.newHeap(k);
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
           DBIDPair key = DBIDUtil.newPair(iter, iter2);
-          double d = cache.remove(key);
+          double d = cache.removeDouble(key);
           if(d == d) { // Not NaN
             // consume the previous result.
             kNN.insert(d, iter2);

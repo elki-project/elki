@@ -20,11 +20,11 @@
  */
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 /**
  * A class to answer representation queries using a map. Basically, it is just a
@@ -39,14 +39,14 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
   /**
    * Storage Map.
    */
-  private TIntObjectMap<T> data;
+  private Int2ObjectMap<T> data;
 
   /**
    * Constructor.
    *
    * @param data Existing map
    */
-  public MapIntegerDBIDStore(TIntObjectMap<T> data) {
+  public MapIntegerDBIDStore(Int2ObjectMap<T> data) {
     super();
     this.data = data;
   }
@@ -56,7 +56,7 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
    */
   public MapIntegerDBIDStore() {
     super();
-    this.data = new TIntObjectHashMap<>();
+    this.data = new Int2ObjectOpenHashMap<>();
   }
 
   /**
@@ -65,7 +65,7 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
    * @param size Expected size
    */
   public MapIntegerDBIDStore(int size) {
-    this.data = new TIntObjectHashMap<>(size);
+    this.data = new Int2ObjectOpenHashMap<>(size);
   }
 
   @Override

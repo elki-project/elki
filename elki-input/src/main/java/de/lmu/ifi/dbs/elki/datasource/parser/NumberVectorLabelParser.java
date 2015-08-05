@@ -39,12 +39,13 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hash.Unique;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 /**
  * Parser for a simple CSV type of format, with columns separated by the given
@@ -126,7 +127,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
   /**
    * For String unification.
    */
-  Unique<String> unique = new Unique<>();
+  ObjectOpenHashSet<String> unique = new ObjectOpenHashSet<>();
 
   /**
    * Event to report next.

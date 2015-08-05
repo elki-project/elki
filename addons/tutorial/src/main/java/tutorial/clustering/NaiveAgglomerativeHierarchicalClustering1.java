@@ -31,12 +31,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -47,20 +42,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
+import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 
 /**
  * This tutorial will step you through implementing a well known clustering
  * algorithm, agglomerative hierarchical clustering, in multiple steps.
- * 
+ *
  * This is the first step, where we implement it with single linkage only, and
  * extract a fixed number of clusters. The follow up variants will be made more
  * flexible.
- * 
+ *
  * This is the naive O(n^3) algorithm. See {@link SLINK} for a much faster
  * algorithm (however, only for single-linkage).
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  * 
@@ -79,7 +74,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function to use
    * @param numclusters Number of clusters
    */
@@ -90,7 +85,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
@@ -121,7 +116,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
     // have every object point to itself initially
     ArrayModifiableDBIDs parent = DBIDUtil.newArray(ids);
     // Active clusters, when not trivial.
-    TIntObjectMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
+    Int2ReferenceMap<ModifiableDBIDs> clusters = new Int2ReferenceOpenHashMap<>();
 
     // Repeat until everything merged, except the desired number of clusters:
     final int stop = size - numclusters;
@@ -144,7 +139,7 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
           }
         }
       }
-      assert (minx >= 0 && miny >= 0);
+      assert(minx >= 0 && miny >= 0);
       // Avoid allocating memory, by reusing existing iterators:
       ix.seek(minx);
       iy.seek(miny);
@@ -205,11 +200,11 @@ public class NaiveAgglomerativeHierarchicalClustering1<O> extends AbstractDistan
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

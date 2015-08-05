@@ -20,11 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
-import gnu.trove.iterator.TIntDoubleIterator;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TIntDoubleHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.data.LabelList;
@@ -42,16 +37,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
+
 /**
  * A parser to load term frequency data, which essentially are sparse vectors
  * with text keys.
- * 
+ *
  * If your data does not contain frequencies, you can maybe use
  * {@link SimpleTransactionParser} instead.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.has SparseNumberVector
  */
 @Title("Term frequency parser")
@@ -70,7 +70,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
   /**
    * Map.
    */
-  TObjectIntMap<String> keymap;
+  Object2IntOpenHashMap<String> keymap;
 
   /**
    * Normalize.
@@ -85,7 +85,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
   /**
    * (Reused) set of values for the number vector.
    */
-  TIntDoubleHashMap values = new TIntDoubleHashMap();
+  Int2DoubleOpenHashMap values = new Int2DoubleOpenHashMap();
 
   /**
    * (Reused) label buffer.
@@ -94,7 +94,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
 
   /**
    * Constructor.
-   * 
+   *
    * @param normalize Normalize
    * @param factory Vector type
    */
@@ -113,7 +113,8 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
   public TermFrequencyParser(boolean normalize, CSVReaderFormat format, long[] labelIndices, SparseNumberVector.Factory<V> factory) {
     super(format, labelIndices, factory);
     this.normalize = normalize;
-    this.keymap = new TObjectIntHashMap<>(1001, .5f, -1);
+    this.keymap = new Object2IntOpenHashMap<>();
+    this.keymap.defaultReturnValue(-1);
     this.sparsefactory = factory;
   }
 
@@ -134,7 +135,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
       }
       try {
         double attribute = tokenizer.getDouble();
-        int curdim = keymap.get(curterm);
+        int curdim = keymap.getInt(curterm);
         if(curdim < 0) {
           curdim = numterms;
           keymap.put(curterm, curdim);
@@ -156,9 +157,9 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
     }
     haslabels |= !labels.isEmpty();
     if(normalize && Math.abs(len - 1.0) > Double.MIN_NORMAL) {
-      for(TIntDoubleIterator iter = values.iterator(); iter.hasNext();) {
-        iter.advance();
-        iter.setValue(iter.value() / len);
+      for(ObjectIterator<Int2DoubleMap.Entry> iter = values.int2DoubleEntrySet().fastIterator(); iter.hasNext();) {
+        Int2DoubleMap.Entry entry = iter.next();
+        entry.setValue(entry.getDoubleValue() / len);
       }
     }
 
@@ -187,9 +188,9 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends SparseNumberVector> extends NumberVectorLabelParser.Parameterizer<V> {

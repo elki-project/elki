@@ -41,8 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
-import gnu.trove.impl.Constants;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
@@ -107,12 +106,12 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
       for(int i = 0; i < size; i++) {
         ids.add(((LeafEntry) node.getEntry(i)).getDBID());
       }
-      TObjectDoubleHashMap<DBIDPair> cache = new TObjectDoubleHashMap<>((size * size * 3) >> 3, Constants.DEFAULT_LOAD_FACTOR, Double.NaN);
+      Object2DoubleOpenHashMap<DBIDPair> cache = new Object2DoubleOpenHashMap<>((size * size * 3) >> 3);
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
         KNNHeap kNN = DBIDUtil.newHeap(k);
         for(DBIDIter id2 = ids.iter(); id2.valid(); id2.advance()) {
           DBIDPair key = DBIDUtil.newPair(id, id2);
-          double d = cache.remove(key);
+          double d = cache.removeDouble(key);
           if(d == d) { // Not NaN
             // consume the previous result.
             kNN.insert(d, id2);

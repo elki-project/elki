@@ -28,20 +28,20 @@ import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 
-import gnu.trove.iterator.TIntDoubleIterator;
-import gnu.trove.map.TIntDoubleMap;
-import gnu.trove.map.hash.TIntDoubleHashMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleMap;
+import it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import net.jafama.FastMath;
 
 /**
  * Normalization for text frequency (TF) vectors, using the inverse document
  * frequency (IDF). See also: TF-IDF for text analysis.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.uses SparseNumberVector
- * 
+ *
  * @param <V> Vector type
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.InverseDocumentFrequencyNormalization", //
@@ -55,7 +55,7 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector>
   /**
    * The IDF storage.
    */
-  TIntDoubleMap idf = new TIntDoubleHashMap();
+  Int2DoubleOpenHashMap idf = new Int2DoubleOpenHashMap();
 
   /**
    * The number of objects in the dataset.
@@ -93,16 +93,15 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector>
   protected void prepareComplete() {
     final double dbsize = objcnt;
     // Compute IDF values
-    for(TIntDoubleIterator iter = idf.iterator(); iter.hasNext();) {
-      iter.advance();
-      // Note: dbsize is a double!
-      iter.setValue(FastMath.log(dbsize / iter.value()));
+    for(ObjectIterator<Int2DoubleMap.Entry> iter = idf.int2DoubleEntrySet().fastIterator(); iter.hasNext();) {
+      Int2DoubleMap.Entry entry = iter.next();
+      entry.setValue(FastMath.log(dbsize / entry.getDoubleValue()));
     }
   }
 
   @Override
   protected V filterSingleObject(V featureVector) {
-    TIntDoubleHashMap vals = new TIntDoubleHashMap();
+    Int2DoubleOpenHashMap vals = new Int2DoubleOpenHashMap();
     for(int it = featureVector.iter(); featureVector.iterValid(it); it = featureVector.iterAdvance(it)) {
       final int dim = featureVector.iterDim(it);
       vals.put(dim, featureVector.iterDoubleValue(it) * idf.get(dim));
@@ -112,7 +111,7 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector>
 
   @Override
   public V restore(V featureVector) {
-    TIntDoubleHashMap vals = new TIntDoubleHashMap();
+    Int2DoubleOpenHashMap vals = new Int2DoubleOpenHashMap();
     for(int it = featureVector.iter(); featureVector.iterValid(it); it = featureVector.iterAdvance(it)) {
       final int dim = featureVector.iterDim(it);
       vals.put(dim, featureVector.iterDoubleValue(it) / idf.get(dim));
