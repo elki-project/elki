@@ -461,7 +461,7 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
    *
    * @param <O> Vector type
    */
-  @Alias({ "minikd", "kd" })
+  @Alias({ "minikd" })
   public static class Factory<O extends NumberVector> implements IndexFactory<O, MinimalisticMemoryKDTree<O>> {
     /**
      * Maximum size of leaf nodes.

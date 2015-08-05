@@ -477,7 +477,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>i
    *
    * @param <O> Vector type
    */
-  @Alias({ "smallkd" })
+  @Alias({ "smallkd", "kd" })
   public static class Factory<O extends NumberVector> implements IndexFactory<O, SmallMemoryKDTree<O>> {
     /**
      * Maximum size of leaf nodes.
