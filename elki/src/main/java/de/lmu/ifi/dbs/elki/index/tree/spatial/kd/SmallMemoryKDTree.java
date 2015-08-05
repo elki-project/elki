@@ -66,7 +66,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * serialized tree and store the current attribute value.
  *
  * It needs about 3 times as much memory as {@link MinimalisticMemoryKDTree} but
- * should be faster in particular during construction.
+ * it is also considerably faster because it does not need to lookup this value
+ * from the vectors.
  *
  * Reference:
  * <p>
@@ -74,9 +75,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Multidimensional binary search trees used for associative searching<br />
  * Communications of the ACM, Vol. 18 Issue 9, Sept. 1975
  * </p>
- *
- * TODO: Optimize construction time by copying attributes to a temporary array
- * before quickselect?
  *
  * TODO: add support for weighted Minkowski distances.
  *
@@ -167,6 +165,7 @@ public class SmallMemoryKDTree<O extends NumberVector> extends AbstractIndex<O>i
     assert(left < right);
     for(iter.seek(left); iter.getOffset() < right; iter.advance()) {
       iter.setDouble(relation.get(iter).doubleValue(axis));
+      countObjectAccess();
     }
     if(right - left <= leafsize) {
       return;

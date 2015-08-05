@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
@@ -74,8 +75,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Communications of the ACM, Vol. 18 Issue 9, Sept. 1975
  * </p>
  *
- * TODO: Optimize construction time by copying attributes to a temporary array
- * before quickselect?
+ * The version {@link SmallMemoryKDTree} uses 3x more memory, but is
+ * considerably faster because it keeps a local copy of the attribute values,
+ * thus reducing the number of accesses to the relation substantially. In
+ * particular, this reduces construction time.
  *
  * TODO: add support for weighted Minkowski distances.
  *
@@ -146,8 +149,43 @@ public class MinimalisticMemoryKDTree<O extends NumberVector> extends AbstractIn
   public void initialize() {
     sorted = DBIDUtil.newArray(relation.getDBIDs());
     dims = RelationUtil.dimensionality(relation);
-    SortDBIDsBySingleDimension comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
+    final VectorUtil.SortDBIDsBySingleDimension comp;
+    if(objaccess != null) {
+      comp = new CountSortAccesses(objaccess, relation);
+    }
+    else {
+      comp = new VectorUtil.SortDBIDsBySingleDimension(relation);
+    }
     buildTree(0, sorted.size(), 0, comp);
+  }
+
+  /**
+   * Class to count object accesses during construnction.
+   *
+   * @author Erich Schubert
+   */
+  private static class CountSortAccesses extends VectorUtil.SortDBIDsBySingleDimension {
+    /**
+     * Counter for comparisons.
+     */
+    final Counter objaccess;
+
+    /**
+     * Constructor.
+     *
+     * @param objaccess Object access counter.
+     * @param data Data relation
+     */
+    public CountSortAccesses(Counter objaccess, Relation<? extends NumberVector> data) {
+      super(data);
+      this.objaccess = objaccess;
+    }
+
+    @Override
+    public int compare(DBIDRef id1, DBIDRef id2) {
+      objaccess.increment(2);
+      return super.compare(id1, id2);
+    }
   }
 
   /**
