@@ -38,10 +38,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -68,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96),
  * Portland, OR, 1996.
  * </p>
- * 
+ *
  * @author Arthur Zimek
  * @param <O> the type of Object the algorithm is applied to
  */
@@ -78,7 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
 booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
 url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
-public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>>implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -111,7 +110,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
 
   /**
    * Constructor with parameters.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param epsilon Epsilon value
    * @param minpts Minpts parameter
@@ -129,38 +128,15 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
     RangeQuery<O> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction());
     final int size = relation.size();
 
-    FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
-    IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
     resultList = new ArrayList<>();
     noise = DBIDUtil.newHashSet();
-    processedIDs = DBIDUtil.newHashSet(size);
     if(size < minpts) {
       // The can't be any clusters
       noise.addDBIDs(relation.getDBIDs());
-      if(objprog != null) {
-        objprog.setProcessed(noise.size(), LOG);
-      }
     }
     else {
-      // These will be reused:
-      ModifiableDoubleDBIDList neighbors = DBIDUtil.newDistanceDBIDList();
-      DoubleDBIDListIter iter = neighbors.iter();
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        if(!processedIDs.contains(iditer)) {
-          expandCluster(relation, rangeQuery, iditer, objprog, clusprog, neighbors, iter);
-        }
-        if(objprog != null && clusprog != null) {
-          objprog.setProcessed(processedIDs.size(), LOG);
-          clusprog.setProcessed(resultList.size(), LOG);
-        }
-        if(processedIDs.size() == size) {
-          break;
-        }
-      }
+      runDBSCAN(relation, rangeQuery);
     }
-    // Finish progress logging
-    LOG.ensureCompleted(objprog);
-    LOG.setCompleted(clusprog);
 
     Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
     for(ModifiableDBIDs res : resultList) {
@@ -173,29 +149,48 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
     return result;
   }
 
+  protected void runDBSCAN(Relation<O> relation, RangeQuery<O> rangeQuery) {
+    final int size = relation.size();
+    FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
+    IndefiniteProgress clusprog = LOG.isVerbose() ? new IndefiniteProgress("Number of clusters", LOG) : null;
+
+    processedIDs = DBIDUtil.newHashSet(size);
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      if(!processedIDs.contains(iditer)) {
+        expandCluster(relation, rangeQuery, iditer, objprog, clusprog);
+      }
+      if(objprog != null && clusprog != null) {
+        objprog.setProcessed(processedIDs.size(), LOG);
+        clusprog.setProcessed(resultList.size(), LOG);
+      }
+      if(processedIDs.size() == size) {
+        break;
+      }
+    }
+    // Finish progress logging
+    LOG.ensureCompleted(objprog);
+    LOG.setCompleted(clusprog);
+  }
+
   /**
    * DBSCAN-function expandCluster.
    *
    * Border-Objects become members of the first possible cluster.
-   * 
+   *
    * @param relation Database relation to run on
    * @param rangeQuery Range query to use
    * @param startObjectID potential seed of a new potential cluster
    * @param objprog the progress object for logging the current status
-   * @param neighbors Neighbor storage (recycled)
-   * @param neighboriter Iterator for the neighbors list.
    */
-  protected void expandCluster(Relation<O> relation, RangeQuery<O> rangeQuery, DBIDRef startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog, ModifiableDoubleDBIDList neighbors, DoubleDBIDListIter neighboriter) {
-    neighbors.clear();
-    rangeQuery.getRangeForDBID(startObjectID, epsilon, neighbors);
+  protected void expandCluster(Relation<O> relation, RangeQuery<O> rangeQuery, DBIDRef startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
+    DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
 
     // startObject is no core-object
     if(neighbors.size() < minpts) {
       noise.add(startObjectID);
       processedIDs.add(startObjectID);
-      if(objprog != null && clusprog != null) {
-        objprog.setProcessed(processedIDs.size(), LOG);
-        clusprog.setProcessed(resultList.size(), LOG);
+      if(objprog != null) {
+        objprog.incrementProcessed(LOG);
       }
       return;
     }
@@ -206,34 +201,30 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
 
     // try to expand the cluster
     HashSetModifiableDBIDs seeds = DBIDUtil.newHashSet();
-    processNeighbors(neighboriter.seek(0), currentCluster, seeds);
-    assert (!seeds.remove(startObjectID));
+    processNeighbors(neighbors.iter(), currentCluster, seeds);
 
     DBIDVar o = DBIDUtil.newVar();
     while(!seeds.isEmpty()) {
       seeds.pop(o);
-      neighbors.clear(); // Recycle
-      rangeQuery.getRangeForDBID(o, epsilon, neighbors);
+      neighbors = rangeQuery.getRangeForDBID(o, epsilon);
 
       if(neighbors.size() >= minpts) {
-        processNeighbors(neighboriter.seek(0), currentCluster, seeds);
-      }
-      if(processedIDs.size() == relation.size() && noise.size() == 0) {
-        break;
+        processNeighbors(neighbors.iter(), currentCluster, seeds);
       }
 
-      if(objprog != null && clusprog != null) {
-        objprog.setProcessed(processedIDs.size(), LOG);
-        int numClusters = currentCluster.size() > minpts ? resultList.size() + 1 : resultList.size();
-        clusprog.setProcessed(numClusters, LOG);
+      if(objprog != null) {
+        objprog.incrementProcessed(LOG);
       }
     }
     resultList.add(currentCluster);
+    if(clusprog != null) {
+      clusprog.setProcessed(resultList.size(), LOG);
+    }
   }
 
   /**
    * Process a single core point.
-   * 
+   *
    * @param neighborhood Neighborhood
    * @param currentCluster Current cluster
    * @param seeds Seed set
@@ -262,9 +253,9 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
@@ -278,11 +269,17 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
      * Parameter to specify the threshold for minimum number of points in the
      * epsilon-neighborhood of a point, must be an integer greater than 0.
      */
-    public static final OptionID MINPTS_ID = new OptionID("dbscan.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point.");
+    public static final OptionID MINPTS_ID = new OptionID("dbscan.minpts", "Threshold for minimum number of points in the epsilon-neighborhood of a point. The suggested value is '2 * dim - 1'.");
 
+    /**
+     * Holds the epsilon radius threshold.
+     */
     protected double epsilon;
 
-    protected int minpts = 0;
+    /**
+     * Holds the minimum cluster size.
+     */
+    protected int minpts;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -292,10 +289,13 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
         epsilon = epsilonP.getValue();
       }
 
-      IntParameter minptsP = new IntParameter(MINPTS_ID);
-      minptsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter minptsP = new IntParameter(MINPTS_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
+      }
+      if(minpts <= 2) {
+        LOG.warning("DBSCAN with minPts <= 2 is equivalent to single-link clustering at a single height. Consider using larger values of minPts.");
       }
     }
 
