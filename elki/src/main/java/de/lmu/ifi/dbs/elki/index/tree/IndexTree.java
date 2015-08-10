@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree;
+import de.lmu.ifi.dbs.elki.index.Index;
 
 /*
  This file is part of ELKI:
@@ -30,18 +31,18 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract super class for all tree based index classes.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.composedOf PageFile
  * @apiviz.has Node oneway - - contains
  * @apiviz.has TreeIndexHeader oneway
  * @apiviz.excludeSubtypes
- * 
+ *
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public abstract class IndexTree<N extends Node<E>, E extends Entry> {
+public abstract class IndexTree<N extends Node<E>, E extends Entry> implements Index {
   /**
    * The file storing the entries of this index.
    */
@@ -81,7 +82,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param pagefile page file to use
    */
   public IndexTree(PageFile<N> pagefile) {
@@ -92,6 +93,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   /**
    * Initialize the tree if the page file already existed.
    */
+  @Override
   public void initialize() {
     TreeIndexHeader header = createHeader();
     if (this.file.initialize(header)) {
@@ -102,14 +104,14 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Get the (STATIC) logger for this class.
-   * 
+   *
    * @return the static logger
    */
   protected abstract Logging getLogger();
 
   /**
    * Returns the entry representing the root if this index.
-   * 
+   *
    * @return the entry representing the root if this index
    */
   public final E getRootEntry() {
@@ -118,7 +120,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Page ID of the root entry.
-   * 
+   *
    * @return page id
    */
   public final int getRootID() {
@@ -127,7 +129,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Reads the root node of this index from the file.
-   * 
+   *
    * @return the root node of this index
    */
   public N getRoot() {
@@ -136,7 +138,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Test if a given ID is the root.
-   * 
+   *
    * @param page Page to test
    * @return Whether the page ID is the root
    */
@@ -146,7 +148,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Convert a directory entry to its page id.
-   * 
+   *
    * @param entry Entry
    * @return Page ID
    */
@@ -159,7 +161,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Returns the node with the specified id.
-   * 
+   *
    * @param nodeID the page id of the node to be returned
    * @return the node with the specified id
    */
@@ -173,7 +175,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Returns the node that is represented by the specified entry.
-   * 
+   *
    * @param entry the entry representing the node to be returned
    * @return the node that is represented by the specified entry
    */
@@ -183,7 +185,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Write a node to the backing storage.
-   * 
+   *
    * @param node Node to write
    */
   protected void writeNode(N node) {
@@ -192,7 +194,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Delete a node from the backing storage.
-   * 
+   *
    * @param node Node to delete
    */
   protected void deleteNode(N node) {
@@ -203,7 +205,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
    * Creates a header for this index structure which is an instance of
    * {@link TreeIndexHeader}. Subclasses may need to overwrite this method if
    * they need a more specialized header.
-   * 
+   *
    * @return a new header for this index structure
    */
   protected TreeIndexHeader createHeader() {
@@ -212,7 +214,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Initializes this index from an existing persistent file.
-   * 
+   *
    * @param header File header
    * @param file Page file
    */
@@ -234,7 +236,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Initializes the index.
-   * 
+   *
    * @param exampleLeaf an object that will be stored in the index
    */
   protected final void initialize(E exampleLeaf) {
@@ -257,7 +259,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Returns the path to the root of this tree.
-   * 
+   *
    * @return the path to the root of this tree
    */
   public final IndexTreePath<E> getRootPath() {
@@ -266,42 +268,42 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Determines the maximum and minimum number of entries in a node.
-   * 
+   *
    * @param exampleLeaf an object that will be stored in the index
    */
   protected abstract void initializeCapacities(E exampleLeaf);
 
   /**
    * Creates an empty root node and writes it to file.
-   * 
+   *
    * @param exampleLeaf an object that will be stored in the index
    */
   protected abstract void createEmptyRoot(E exampleLeaf);
 
   /**
    * Creates an entry representing the root node.
-   * 
+   *
    * @return an entry representing the root node
    */
   protected abstract E createRootEntry();
 
   /**
    * Creates a new leaf node with the specified capacity.
-   * 
+   *
    * @return a new leaf node
    */
   protected abstract N createNewLeafNode();
 
   /**
    * Creates a new directory node with the specified capacity.
-   * 
+   *
    * @return a new directory node
    */
   protected abstract N createNewDirectoryNode();
 
   /**
    * Performs necessary operations before inserting the specified entry.
-   * 
+   *
    * @param entry the entry to be inserted
    */
   protected void preInsert(E entry) {
@@ -310,7 +312,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Performs necessary operations after deleting the specified entry.
-   * 
+   *
    * @param entry the entry that was removed
    */
   protected void postDelete(E entry) {
@@ -320,13 +322,14 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
   /**
    * Log some statistics, if enabled.
    */
+  @Override
   public void logStatistics() {
     file.logStatistics();
   }
 
   /**
    * Get the page size of the backing storage.
-   * 
+   *
    * @return Page size
    */
   protected int getPageSize() {
@@ -335,7 +338,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> {
 
   /**
    * Directly access the backing page file.
-   * 
+   *
    * @return the page file
    */
   @Deprecated

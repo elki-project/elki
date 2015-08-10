@@ -52,15 +52,15 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * MkAppTree is a metrical index structure based on the concepts of the M-Tree
  * supporting efficient processing of reverse k nearest neighbor queries for
  * parameter k < kmax.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.composedOf MkAppTreeSettings
  * @apiviz.has MkAppTreeNode oneway - - contains
- * 
+ *
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  */
-public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry, MkAppTreeSettings<O>> {
+public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry, MkAppTreeSettings<O>> {
   /**
    * The logger for this class.
    */
@@ -68,7 +68,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to index
    * @param pageFile Page file
    * @param settings Tree settings
@@ -95,7 +95,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
 
   /**
    * Inserts the specified objects into this MkApp-Tree.
-   * 
+   *
    * @param entries the entries to be inserted
    */
   @Override
@@ -135,7 +135,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
   /**
    * Performs a reverse k-nearest neighbor query for the given object ID. The
    * query result is in ascending order to the distance to the query object.
-   * 
+   *
    * @param id the query object id
    * @param k the number of nearest neighbors to be returned
    * @return a List of the query results
@@ -193,7 +193,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
 
   /**
    * Returns the value of the k_max parameter.
-   * 
+   *
    * @return the value of the k_max parameter
    */
   public int getK_max() {
@@ -265,7 +265,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
 
   /**
    * Adjusts the knn distance in the subtree of the specified root entry.
-   * 
+   *
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
@@ -297,7 +297,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
 
   /**
    * Determines the ids of the leaf entries stored in the specified subtree.
-   * 
+   *
    * @param node the root of the subtree
    * @param result the result list containing the ids of the leaf entries stored
    *        in the specified subtree
@@ -319,7 +319,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
 
   /**
    * Computes the polynomial approximation of the specified knn-distances.
-   * 
+   *
    * @param knnDistances the knn-distances of the leaf entry
    * @return the polynomial approximation of the specified knn-distances.
    */
@@ -367,7 +367,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
 
   /**
    * Creates a new leaf node with the specified capacity.
-   * 
+   *
    * @return a new leaf node
    */
   @Override
@@ -377,7 +377,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
 
   /**
    * Creates a new directory node with the specified capacity.
-   * 
+   *
    * @return a new directory node
    */
   @Override
@@ -387,7 +387,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
 
   /**
    * Creates a new directory entry representing the specified node.
-   * 
+   *
    * @param node the node to be represented by the new entry
    * @param routingObjectID the id of the routing object of the node
    * @param parentDistance the distance from the routing object of the node to
@@ -400,7 +400,7 @@ public class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, MkAppEntry
 
   /**
    * Creates an entry representing the root node.
-   * 
+   *
    * @return an entry representing the root node
    */
   @Override

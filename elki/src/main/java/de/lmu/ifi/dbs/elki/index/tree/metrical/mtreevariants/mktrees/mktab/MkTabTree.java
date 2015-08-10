@@ -44,14 +44,14 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * supporting efficient processing of reverse k nearest neighbor queries for
  * parameter k < kmax. All knn distances for k <= kmax are stored in each entry
  * of a node.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.has MkTabTreeNode oneway - - contains
- * 
+ *
  * @param <O> Object type
  */
-public class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNode<O>, MkTabEntry, MkTreeSettings<O, MkTabTreeNode<O>, MkTabEntry>> {
+public abstract class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNode<O>, MkTabEntry, MkTreeSettings<O, MkTabTreeNode<O>, MkTabEntry>> {
   /**
    * The logger for this class.
    */
@@ -59,7 +59,7 @@ public class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNode<O>, MkT
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation
    * @param pagefile Page file
    * @param settings Settings
@@ -170,7 +170,7 @@ public class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNode<O>, MkT
 
   /**
    * Creates a new directory node with the specified capacity.
-   * 
+   *
    * @return a new directory node
    */
   @Override
@@ -180,7 +180,7 @@ public class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNode<O>, MkT
 
   /**
    * Creates a new directory entry representing the specified node.
-   * 
+   *
    * @param node the node to be represented by the new entry
    * @param routingObjectID the id of the routing object of the node
    * @param parentDistance the distance from the routing object of the node to
@@ -193,7 +193,7 @@ public class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNode<O>, MkT
 
   /**
    * Creates an entry representing the root node.
-   * 
+   *
    * @return an entry representing the root node
    */
   @Override
@@ -206,7 +206,7 @@ public class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNode<O>, MkT
    * query object and the given parameter k. It recursively traverses all paths
    * from the specified node, which cannot be excluded from leading to
    * qualifying objects.
-   * 
+   *
    * @param k the parameter k of the knn-query
    * @param q the id of the query object
    * @param node_entry the entry representing the node
@@ -245,7 +245,7 @@ public class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNode<O>, MkT
   /**
    * Returns an array that holds the maximum values of the both specified arrays
    * in each index.
-   * 
+   *
    * @param distances1 the first array
    * @param distances2 the second array
    * @return an array that holds the maximum values of the both specified arrays
@@ -265,7 +265,7 @@ public class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNode<O>, MkT
 
   /**
    * Returns a knn distance list with all distances set to null distance.
-   * 
+   *
    * @return a knn distance list with all distances set to null distance
    */
   private double[] initKnnDistanceList() {

@@ -38,12 +38,12 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * FlatRTree is a spatial index structure based on a R*-Tree but with a flat
  * directory. Apart from organizing the objects it also provides several methods
  * to search for certain object in the structure and ensures persistence.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.has FlatRStarTreeNode oneway - - contains
  */
-public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialEntry, AbstractRTreeSettings> {
+public abstract class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialEntry, AbstractRTreeSettings> {
   /**
    * The logger for this class.
    */
@@ -56,7 +56,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
 
   /**
    * Constructor.
-   * 
+   *
    * @param pagefile Page file
    * @param settings Tree settings
    */
@@ -87,7 +87,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
 
   /**
    * Returns the root node of this RTree.
-   * 
+   *
    * @return the root node of this RTree
    */
   @Override
@@ -97,7 +97,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
 
   /**
    * Returns the height of this FlatRTree.
-   * 
+   *
    * @return 2
    */
   @Override
@@ -158,7 +158,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
   /**
    * Returns true if in the specified node an overflow occurred, false
    * otherwise.
-   * 
+   *
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occurred, false otherwise
    */
@@ -176,7 +176,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
   /**
    * Returns true if in the specified node an underflow occurred, false
    * otherwise.
-   * 
+   *
    * @param node the node to be tested for underflow
    * @return true if in the specified node an underflow occurred, false
    *         otherwise
@@ -193,7 +193,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
 
   /**
    * Creates a new leaf node with the specified capacity.
-   * 
+   *
    * @return a new leaf node
    */
   @Override
@@ -203,7 +203,7 @@ public class FlatRStarTree extends AbstractRStarTree<FlatRStarTreeNode, SpatialE
 
   /**
    * Creates a new directory node with the specified capacity.
-   * 
+   *
    * @return a new directory node
    */
   @Override

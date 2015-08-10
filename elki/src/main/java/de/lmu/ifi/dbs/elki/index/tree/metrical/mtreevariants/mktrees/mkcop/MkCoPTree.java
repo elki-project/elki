@@ -50,15 +50,15 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * MkCopTree is a metrical index structure based on the concepts of the M-Tree
  * supporting efficient processing of reverse k nearest neighbor queries for
  * parameter k < kmax.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.has MkCoPTreeNode oneway - - contains
  * @apiviz.has ConvexHull
- * 
+ *
  * @param <O> Object type
  */
-public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry, MkTreeSettings<O, MkCoPTreeNode<O>, MkCoPEntry>> {
+public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry, MkTreeSettings<O, MkCoPTreeNode<O>, MkCoPEntry>> {
   /**
    * The logger for this class.
    */
@@ -71,7 +71,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to index
    * @param pagefile Page file
    * @param settings Tree settings
@@ -138,7 +138,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
   /**
    * Performs a reverse k-nearest neighbor query for the given object ID. The
    * query result is in ascending order to the distance to the query object.
-   * 
+   *
    * @param id the query object id
    * @param k the number of nearest neighbors to be returned
    * @return a List of the query results
@@ -182,7 +182,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
 
   /**
    * Returns the value of the k_max parameter.
-   * 
+   *
    * @return the value of the k_max parameter
    */
   public int getK_max() {
@@ -236,7 +236,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
 
   /**
    * Performs a reverse knn query.
-   * 
+   *
    * @param k the parameter k of the rknn query
    * @param q the id of the query object
    * @param result holds the true results (they need not to be refined)
@@ -293,7 +293,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
 
   /**
    * Adjusts the knn distance in the subtree of the specified root entry.
-   * 
+   *
    * @param entry the root entry of the current subtree
    * @param knnLists a map of knn lists for each leaf entry
    */
@@ -345,7 +345,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
    * Computes logarithmic skew (fractal dimension ie. m) and in kappx[0] and
    * kappx[1] the non-logarithmic values of the approximated first and last
    * nearest neighbor distances
-   * 
+   *
    * @param knnDistances TODO: Spezialbehandlung fuer identische Punkte in DB
    *        (insbes. Distanz 0)
    */
@@ -452,7 +452,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
 
   /**
    * Approximates the lower hull.
-   * 
+   *
    * @param convexHull
    * @param log_kDist
    * @param sum_log_kDist
@@ -704,7 +704,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
 
   /**
    * Creates a new leaf node with the specified capacity.
-   * 
+   *
    * @return a new leaf node
    */
   @Override
@@ -714,7 +714,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
 
   /**
    * Creates a new directory node with the specified capacity.
-   * 
+   *
    * @return a new directory node
    */
   @Override
@@ -724,7 +724,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
 
   /**
    * Creates a new directory entry representing the specified node.
-   * 
+   *
    * @param node the node to be represented by the new entry
    * @param routingObjectID the id of the routing object of the node
    * @param parentDistance the distance from the routing object of the node to
@@ -738,7 +738,7 @@ public class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, MkCoPEntry
 
   /**
    * Creates an entry representing the root node.
-   * 
+   *
    * @return an entry representing the root node
    */
   @Override
