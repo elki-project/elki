@@ -1,5 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.projector;
-
+package de.lmu.ifi.dbs.elki.visualization;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,32 +22,15 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
-import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
-
 /**
- * Produce OPTICS plot projections
+ * Currently an empty interface for visualization items, that serves the purpose
+ * of improving type safety.
  *
  * @author Erich Schubert
- *
- * @apiviz.has OPTICSProjector
  */
-public class OPTICSProjectorFactory implements ProjectorFactory {
-  /**
-   * Constructor.
-   */
-  public OPTICSProjectorFactory() {
-    super();
-  }
+public interface VisualizationItem {
 
-  @Override
-  public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, ClusterOrder.class, new VisualizerUtil.Handler1<ClusterOrder>() {
-      @Override
-      public void process(VisualizerContext context, ClusterOrder co) {
-        context.addVis(co, new OPTICSProjector(co));
-      }
-    });
-  }
+  String getLongName();
+
+  String getShortName();
 }

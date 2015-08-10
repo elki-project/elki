@@ -239,7 +239,7 @@ public class RectangleArranger<T> {
     }
     // Need to increase the total area
     if(bestinc > 0) {
-      assert (bestex == cols - 1 || bestey == rows - 1);
+      assert(bestex == cols - 1 || bestey == rows - 1);
       double inc = Math.max(bestwi, besthi * ratio);
       resize(inc);
 
@@ -287,7 +287,7 @@ public class RectangleArranger<T> {
   }
 
   protected void splitRow(int bestey, double besthi) {
-    assert (bestey < heights.size());
+    assert(bestey < heights.size());
     if(heights.get(bestey) - besthi <= Double.MIN_NORMAL) {
       return;
     }
@@ -301,7 +301,7 @@ public class RectangleArranger<T> {
   }
 
   protected void splitCol(int bestex, double bestwi) {
-    assert (bestex < widths.size());
+    assert(bestex < widths.size());
     if(widths.get(bestex) - bestwi <= Double.MIN_NORMAL) {
       return;
     }
@@ -370,23 +370,23 @@ public class RectangleArranger<T> {
     {
       double wsum = 0.0;
       for(int x = 0; x < cols; x++) {
-        assert (widths.get(x) > 0) : "Non-positive width: " + widths.get(x);
+        assert(widths.get(x) > 0) : "Non-positive width: " + widths.get(x) + " at " + x;
         wsum += widths.get(x);
       }
-      assert (Math.abs(wsum - twidth) < 1E-10);
+      assert(Math.abs(wsum - twidth) < 1E-10);
     }
     {
       double hsum = 0.0;
       for(int y = 0; y < rows; y++) {
-        assert (heights.get(y) > 0) : "Non-positive height: " + heights.get(y);
+        assert(heights.get(y) > 0) : "Non-positive height: " + heights.get(y) + " at " + y;
         hsum += heights.get(y);
       }
-      assert (Math.abs(hsum - theight) < 1E-10);
+      assert(Math.abs(hsum - theight) < 1E-10);
     }
     {
-      assert (usage.size() == rows);
+      assert(usage.size() == rows);
       for(int y = 0; y < rows; y++) {
-        assert (usage.get(y).size() == cols);
+        assert(usage.get(y).size() == cols);
       }
     }
     return true;

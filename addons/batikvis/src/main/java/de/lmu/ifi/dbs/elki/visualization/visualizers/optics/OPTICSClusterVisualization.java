@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
@@ -46,13 +47,14 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualize the clusters and cluster hierarchy found by OPTICS on the OPTICS
  * Plot.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -75,14 +77,15 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(hier, result, OPTICSProjector.class);
-    for(OPTICSProjector p : ops) {
-      final Clustering<OPTICSModel> ocl = findOPTICSClustering(hier, result);
+  public void processNewResult(VisualizerContext context, Object result) {
+    Hierarchy.Iter<OPTICSProjector> it = VisualizerUtil.filter(context, result, OPTICSProjector.class);
+    for(; it.valid(); it.advance()) {
+      OPTICSProjector p = it.get();
+      final Clustering<OPTICSModel> ocl = findOPTICSClustering(context.getHierarchy(), p.getResult());
       if(ocl != null) {
         final VisualizationTask task = new VisualizationTask(NAME, ocl, null, this);
         task.level = VisualizationTask.LEVEL_DATA;
-        hier.add(p, task);
+        context.addVis(p, task);
       }
     }
     // TODO: also run when a new clustering is added, instead of just new
@@ -102,7 +105,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
   /**
    * Find the first OPTICS clustering child of a result.
-   * 
+   *
    * @param hier Result hierarchy
    * @param result Result to start searching at
    * @return OPTICS clustering
@@ -130,9 +133,9 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses Clustering oneway - - «visualizes»
    */
   public class Instance extends AbstractOPTICSVisualization {
@@ -148,7 +151,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task) {
@@ -175,7 +178,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
     /**
      * Recursively draw clusters
-     * 
+     *
      * @param clusters Current set of clusters
      * @param depth Recursion depth
      * @param colormap Color mapping

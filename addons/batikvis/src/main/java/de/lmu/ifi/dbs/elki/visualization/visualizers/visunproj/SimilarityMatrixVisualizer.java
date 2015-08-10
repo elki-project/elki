@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  */
 
 import java.awt.image.RenderedImage;
-import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -32,24 +31,23 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualize a similarity matrix with object labels
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -67,16 +65,18 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<ComputeSimilarityMatrixImage.SimilarityMatrix> prs = ResultUtil.filterResults(hier, result, ComputeSimilarityMatrixImage.SimilarityMatrix.class);
-    for(ComputeSimilarityMatrixImage.SimilarityMatrix pr : prs) {
-      // Add plots, attach visualizer
-      final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
-      task.width = 1.0;
-      task.height = 1.0;
-      task.level = VisualizationTask.LEVEL_STATIC;
-      hier.add(pr, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, SimilarityMatrix.class, new VisualizerUtil.Handler1<SimilarityMatrix>() {
+      @Override
+      public void process(VisualizerContext context, SimilarityMatrix pr) {
+        // Add plots, attach visualizer
+        final VisualizationTask task = new VisualizationTask(NAME, pr, null, SimilarityMatrixVisualizer.this);
+        task.width = 1.0;
+        task.height = 1.0;
+        task.level = VisualizationTask.LEVEL_STATIC;
+        context.addVis(pr, task);
+      }
+    });
   }
 
   @Override
@@ -92,9 +92,9 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
 
   /**
    * Instance
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has SimilarityMatrix oneway - 1 visualizes
    */
   public class Instance extends AbstractVisualization {
@@ -105,7 +105,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task) {

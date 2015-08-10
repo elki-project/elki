@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  */
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -45,12 +44,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -60,14 +57,15 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
  * Visualizer for generating SVG-Elements containing ellipses for first, second
  * and third standard deviation
- * 
+ *
  * @author Robert Rödler
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -95,29 +93,29 @@ public class EMClusterVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    // Find clusterings we can visualize:
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, result, Clustering.class);
-    for(Clustering<?> c : clusterings) {
-      if(c.getAllClusters().size() > 0) {
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNewSiblings(context, start, Clustering.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<Clustering<?>, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, Clustering<?> c, ScatterPlotProjector<?> p) {
+        if(c.getAllClusters().size() == 0) {
+          return;
+        }
         // Does the cluster have a model with cluster means?
         Clustering<MeanModel> mcls = findMeanModel(c);
-        if(mcls != null) {
-          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
-          for(ScatterPlotProjector<?> p : ps) {
-            final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-            task.level = VisualizationTask.LEVEL_DATA + 3;
-            hier.add(c, task);
-            hier.add(p, task);
-          }
+        if(mcls == null) {
+          return;
         }
+        final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), EMClusterVisualization.this);
+        task.level = VisualizationTask.LEVEL_DATA + 3;
+        context.addVis(c, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   /**
    * Test if the given clustering has a mean model.
-   * 
+   *
    * @param c Clustering to inspect
    * @return the clustering cast to return a mean model, null otherwise.
    */
@@ -132,9 +130,9 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Robert Rödler
-   * 
+   *
    * @apiviz.has EMModel oneway - - visualizes
    * @apiviz.uses GrahamScanConvexHull2D
    */
@@ -167,7 +165,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
     /**
      * Constructor
-     * 
+     *
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task) {
@@ -376,7 +374,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
     /**
      * Draw an arc to simulate the hyper ellipse.
-     * 
+     *
      * @param path Path to draw to
      * @param cent Center
      * @param pre Previous point
@@ -431,7 +429,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection;
  */
 
 import java.awt.geom.Line2D;
-import java.util.Collection;
 
 import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.util.SVGConstants;
@@ -38,11 +37,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
@@ -51,13 +48,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 
 /**
  * Tool-Visualization for the tool to select objects
- * 
+ *
  * @author Robert Rödler
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance - - «create»
  */
@@ -69,7 +67,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
 
   /**
    * Input modes
-   * 
+   *
    * @apiviz.exclude
    */
   private enum Mode {
@@ -89,32 +87,32 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<SelectionResult> selectionResults = ResultUtil.filterResults(hier, result, SelectionResult.class);
-    for(SelectionResult selres : selectionResults) {
-      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(hier, ParallelPlotProjector.class);
-      for(ParallelPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, ParallelPlotProjector.class, //
+    new VisualizerUtil.Handler1<ParallelPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, context.getSelectionResult(), p.getRelation(), SelectionToolLineVisualization.this);
         task.level = VisualizationTask.LEVEL_INTERACTIVE;
         task.tool = true;
         task.thumbnail = false;
         task.noexport = true;
         task.initDefaultVisibility(false);
-        hier.add(selres, task);
-        hier.add(p, task);
+        context.addVis(context.getSelectionResult(), task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   /**
    * Instance.
-   * 
+   *
    * @author Robert Rödler
-   * 
+   *
    * @apiviz.has SelectionResult oneway - - updates
    * @apiviz.has DBIDSelection oneway - - updates
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector> implements DragableArea.DragListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector>implements DragableArea.DragListener {
     /**
      * CSS class of the selection rectangle while selecting.
      */
@@ -132,7 +130,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Task
      */
     public Instance(VisualizationTask task) {
@@ -156,7 +154,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
 
     /**
      * Delete the children of the element
-     * 
+     *
      * @param container SVG-Element
      */
     private void deleteChildren(Element container) {
@@ -193,7 +191,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
 
     /**
      * Get the current input mode, on each mouse event.
-     * 
+     *
      * @param evt Mouse event.
      * @return current input mode
      */
@@ -217,7 +215,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
 
     /**
      * Updates the selection in the context.<br>
-     * 
+     *
      * @param mode Input mode
      * @param p1 first point of the selected rectangle
      * @param p2 second point of the selected rectangle
@@ -311,7 +309,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     protected void addCSSClasses(SVGPlot svgp) {

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,20 +23,15 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -44,14 +39,15 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer for generating an SVG-Element representing the selected range.
- * 
+ *
  * @author Robert Rödler
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -75,24 +71,24 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<SelectionResult> selectionResults = ResultUtil.filterResults(hier, result, SelectionResult.class);
-    for(SelectionResult selres : selectionResults) {
-      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(hier, ParallelPlotProjector.class);
-      for(ParallelPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, ParallelPlotProjector.class, //
+    new VisualizerUtil.Handler1<ParallelPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, context.getSelectionResult(), p.getRelation(), SelectionAxisRangeVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
-        hier.add(selres, task);
-        hier.add(p, task);
+        context.addVis(context.getSelectionResult(), task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   /**
    * Instance
-   * 
+   *
    * @author Robert Rödler
-   * 
+   *
    * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has RangeSelection oneway - - visualizes
    */
@@ -104,7 +100,7 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task) {
@@ -116,7 +112,7 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {

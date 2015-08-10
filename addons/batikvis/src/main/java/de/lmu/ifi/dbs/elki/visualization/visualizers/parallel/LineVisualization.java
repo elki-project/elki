@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2012
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -35,10 +33,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
@@ -50,13 +48,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Generates data lines.
- * 
+ *
  * @author Robert Rödler
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -80,21 +79,23 @@ public class LineVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(hier, result, ParallelPlotProjector.class);
-    for(ParallelPlotProjector<?> p : ps) {
-      final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
-      task.level = VisualizationTask.LEVEL_DATA;
-      hier.add(p, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, ParallelPlotProjector.class, new VisualizerUtil.Handler1<ParallelPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), LineVisualization.this);
+        task.level = VisualizationTask.LEVEL_DATA;
+        context.addVis(p, task);
+      }
+    });
   }
 
   /**
    * Instance for a particular data set.
-   * 
+   *
    * @author Robert Rödler
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector>implements DataStoreListener {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -108,7 +109,7 @@ public class LineVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task) {
@@ -177,7 +178,7 @@ public class LineVisualization extends AbstractVisFactory {
 
     /**
      * Draw a single line.
-     * 
+     *
      * @param iter Object reference
      * @return Line element
      */
@@ -209,7 +210,7 @@ public class LineVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp, StylingPolicy sp) {

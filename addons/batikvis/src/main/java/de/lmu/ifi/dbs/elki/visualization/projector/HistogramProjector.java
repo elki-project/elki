@@ -30,10 +30,10 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
 import de.lmu.ifi.dbs.elki.visualization.projections.Simple1D;
@@ -42,15 +42,15 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisualizatio
 /**
  * ScatterPlotProjector is responsible for producing a set of scatterplot
  * visualizations.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses ScalesResult
  * @apiviz.uses Projection1D
- * 
+ *
  * @param <V> Vector type
  */
-public class HistogramProjector<V extends NumberVector> extends AbstractHierarchicalResult implements Projector {
+public class HistogramProjector<V extends NumberVector> implements Projector {
   /**
    * Relation we project.
    */
@@ -63,7 +63,7 @@ public class HistogramProjector<V extends NumberVector> extends AbstractHierarch
 
   /**
    * Constructor.
-   * 
+   *
    * @param rel Relation
    * @param maxdim Maximum dimension to use
    */
@@ -75,9 +75,9 @@ public class HistogramProjector<V extends NumberVector> extends AbstractHierarch
   }
 
   @Override
-  public Collection<PlotItem> arrange() {
+  public Collection<PlotItem> arrange(VisualizerContext context) {
     List<PlotItem> layout = new ArrayList<>(1 + dmax);
-    List<VisualizationTask> tasks = ResultUtil.filterResults(getHierarchy(), this, VisualizationTask.class);
+    List<VisualizationTask> tasks = context.getVisTasks(this);
     if (tasks.size() > 0){
       final double xoff = (dmax > 1) ? .1 : 0.;
       final double hheight = .5;
@@ -118,7 +118,7 @@ public class HistogramProjector<V extends NumberVector> extends AbstractHierarch
 
   /**
    * Get the relation we project.
-   * 
+   *
    * @return Relation
    */
   public Relation<V> getRelation() {

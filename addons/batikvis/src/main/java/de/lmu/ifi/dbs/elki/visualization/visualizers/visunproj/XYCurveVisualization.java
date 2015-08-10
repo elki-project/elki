@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,20 +23,15 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionRecallCurve.PRCurve;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve.ROCResult;
-import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionRecallCurve.PRCurve;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -50,12 +45,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualizer to render a simple 2D curve such as a ROC curve.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  * @apiviz.has XYCurve oneway - - visualizes
@@ -126,7 +122,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
       layer.appendChild(labelx);
       Element labely = svgp.svgText(margin * -.8, sizey * .5, curve.getLabely());
       SVGUtil.setCSSClass(labely, CSS_AXIS_LABEL);
-      SVGUtil.setAtt(labely, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90,"+FormatUtil.NF6.format(margin * -.8)+","+FormatUtil.NF6.format(sizey * .5)+")");
+      SVGUtil.setAtt(labely, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90," + FormatUtil.NF6.format(margin * -.8) + "," + FormatUtil.NF6.format(sizey * .5) + ")");
       layer.appendChild(labely);
     }
 
@@ -166,7 +162,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
 
   /**
    * Setup the CSS classes for the plot.
-   * 
+   *
    * @param svgp Plot
    */
   private void setupCSS(VisualizerContext context, SVGPlot svgp) {
@@ -187,15 +183,17 @@ public class XYCurveVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    final ArrayList<XYCurve> curves = ResultUtil.filterResults(hier, result, XYCurve.class);
-    for(XYCurve curve : curves) {
-      final VisualizationTask task = new VisualizationTask(NAME, curve, null, this);
-      task.width = 1.0;
-      task.height = 1.0;
-      task.level = VisualizationTask.LEVEL_STATIC;
-      hier.add(curve, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, XYCurve.class, new VisualizerUtil.Handler1<XYCurve>() {
+      @Override
+      public void process(VisualizerContext context, XYCurve curve) {
+        final VisualizationTask task = new VisualizationTask(NAME, curve, null, XYCurveVisualization.this);
+        task.width = 1.0;
+        task.height = 1.0;
+        task.level = VisualizationTask.LEVEL_STATIC;
+        context.addVis(curve, task);
+      }
+    });
   }
 
   @Override

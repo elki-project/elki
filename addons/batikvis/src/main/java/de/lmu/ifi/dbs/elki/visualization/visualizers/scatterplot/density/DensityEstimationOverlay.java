@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.density;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.density;
  */
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 
 import org.apache.batik.util.SVGConstants;
@@ -34,25 +33,24 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.KMLOutputHandler;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
  * A simple density estimation visualization, based on a simple kernel-density
  * <em>in the projection, not the actual data!</em>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -75,19 +73,21 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, result, ScatterPlotProjector.class);
-    for(ScatterPlotProjector<?> p : ps) {
-      final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
-      task.level = VisualizationTask.LEVEL_DATA + 1;
-      task.initDefaultVisibility(false);
-      hier.add(p, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, ScatterPlotProjector.class, new VisualizerUtil.Handler1<ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), DensityEstimationOverlay.this);
+        task.level = VisualizationTask.LEVEL_DATA + 1;
+        task.initDefaultVisibility(false);
+        context.addVis(p, task);
+      }
+    });
   }
 
   /**
    * Instance for a particular data set.
-   * 
+   *
    * @author Erich Schubert
    */
   // TODO: make parameterizable, in particular color map, kernel bandwidth and
@@ -105,7 +105,7 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Task
      */
     public Instance(VisualizationTask task) {
@@ -182,8 +182,10 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
       Arrays.sort(data, comp0);
 
       CanvasSize canvas = proj.estimateViewport();
-      double min0 = canvas.minx, max0 = canvas.maxx, ste0 = (max0 - min0) / resolution;
-      double min1 = canvas.miny, max1 = canvas.maxy, ste1 = (max1 - min1) / resolution;
+      double min0 = canvas.minx, max0 = canvas.maxx,
+          ste0 = (max0 - min0) / resolution;
+      double min1 = canvas.miny, max1 = canvas.maxy,
+          ste1 = (max1 - min1) / resolution;
 
       double kernf = 9. / (16 * bandwidth[0] * bandwidth[1]);
       double maxdens = 0.0;

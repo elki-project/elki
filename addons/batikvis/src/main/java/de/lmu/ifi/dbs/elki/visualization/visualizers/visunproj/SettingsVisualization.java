@@ -28,9 +28,6 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -42,12 +39,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Pseudo-Visualizer, that lists the settings of the algorithm-
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  * @apiviz.has SettingsResult oneway - - visualizes
@@ -86,7 +84,8 @@ public class SettingsVisualization extends AbstractVisFactory {
         try {
           if(setting.getOwner() instanceof Class) {
             name = ((Class<?>) setting.getOwner()).getName();
-          } else {
+          }
+          else {
             name = setting.getOwner().getClass().getName();
           }
           if(ClassParameter.class.isInstance(setting.getOwner())) {
@@ -134,16 +133,18 @@ public class SettingsVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
-    Collection<SettingsResult> settingsResults = ResultUtil.filterResults(hier, newResult, SettingsResult.class);
-    for(SettingsResult sr : settingsResults) {
-      final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
-      task.width = 1.0;
-      task.height = 1.0;
-      task.level = VisualizationTask.LEVEL_STATIC;
-      task.initDefaultVisibility(false);
-      hier.add(sr, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, SettingsResult.class, new VisualizerUtil.Handler1<SettingsResult>() {
+      @Override
+      public void process(VisualizerContext context, SettingsResult sr) {
+        final VisualizationTask task = new VisualizationTask(NAME, sr, null, SettingsVisualization.this);
+        task.width = 1.0;
+        task.height = 1.0;
+        task.level = VisualizationTask.LEVEL_STATIC;
+        task.initDefaultVisibility(false);
+        context.addVis(sr, task);
+      }
+    });
   }
 
   @Override

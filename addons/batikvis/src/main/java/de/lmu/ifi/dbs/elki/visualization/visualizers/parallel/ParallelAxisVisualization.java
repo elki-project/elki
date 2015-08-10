@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2012
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
@@ -33,10 +31,8 @@ import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
@@ -46,12 +42,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Generates a SVG-Element containing axes, including labeling.
- * 
+ *
  * @author Robert Rödler
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -74,13 +71,15 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(hier, result, ParallelPlotProjector.class);
-    for(ParallelPlotProjector<?> p : ps) {
-      final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
-      task.level = VisualizationTask.LEVEL_BACKGROUND;
-      hier.add(p, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, ParallelPlotProjector.class, new VisualizerUtil.Handler1<ParallelPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), ParallelAxisVisualization.this);
+        task.level = VisualizationTask.LEVEL_BACKGROUND;
+        context.addVis(p, task);
+      }
+    });
   }
 
   @Override
@@ -91,9 +90,9 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Robert Rödler
-   * 
+   *
    * @apiviz.uses SVGSimpleLinearAxis
    */
   // TODO: split into interactive / non-interactive parts?
@@ -110,7 +109,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task) {
@@ -160,7 +159,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
 
     /**
      * Add the main CSS classes.
-     * 
+     *
      * @param svgp Plot to draw to
      */
     private void addCSSClasses(SVGPlot svgp) {
@@ -183,7 +182,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
 
     /**
      * Add an event listener to the Element.
-     * 
+     *
      * @param tag Element to add the listener
      * @param i Tool number for the Element
      */
@@ -193,7 +192,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
         @Override
         public void handleEvent(Event evt) {
           proj.toggleDimInverted(i);
-          context.getHierarchy().resultChanged(proj);
+          context.visChanged(proj);
         }
       }, false);
     }

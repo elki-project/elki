@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.projector;
+package de.lmu.ifi.dbs.elki.visualization;
 
 /*
  This file is part of ELKI:
@@ -23,32 +23,18 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
-import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import java.util.EventListener;
 
 /**
- * Produce OPTICS plot projections
+ * Listener for visualization events.
  *
  * @author Erich Schubert
- *
- * @apiviz.has OPTICSProjector
  */
-public class OPTICSProjectorFactory implements ProjectorFactory {
+public interface VisualizationListener extends EventListener {
   /**
-   * Constructor.
+   * Visualization has changed.
+   *
+   * @param item Changed visualization
    */
-  public OPTICSProjectorFactory() {
-    super();
-  }
-
-  @Override
-  public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, ClusterOrder.class, new VisualizerUtil.Handler1<ClusterOrder>() {
-      @Override
-      public void process(VisualizerContext context, ClusterOrder co) {
-        context.addVis(co, new OPTICSProjector(co));
-      }
-    });
-  }
+  void visualizationChanged(VisualizationItem item);
 }

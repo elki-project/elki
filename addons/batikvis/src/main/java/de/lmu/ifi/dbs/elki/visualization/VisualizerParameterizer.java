@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -175,21 +176,25 @@ public class VisualizerParameterizer {
    * @return New context
    */
   public VisualizerContext newContext(ResultHierarchy hier, Result start) {
-    if(samplesize > 0) {
-      Collection<Relation<?>> rels = ResultUtil.filterResults(hier, Relation.class);
-      for(Relation<?> rel : rels) {
-        if(!ResultUtil.filterResults(hier, rel, SamplingResult.class).isEmpty()) {
-          continue;
-        }
-        int size = rel.size();
-        if(size > samplesize) {
-          SamplingResult sample = new SamplingResult(rel);
-          sample.setSample(DBIDUtil.randomSample(sample.getSample(), samplesize, rnd));
-          ResultUtil.addChildResult(rel, sample);
-        }
+    Relation<?> relation = null;
+    Collection<Relation<?>> rels = ResultUtil.filterResults(hier, Relation.class);
+    for(Relation<?> rel : rels) {
+      if(!TypeUtil.DBID.isAssignableFrom(rel.getDataTypeInformation()) && relation == null) {
+        relation = rel;
+      }
+      if(samplesize == 0) {
+        continue;
+      }
+      if(!ResultUtil.filterResults(hier, rel, SamplingResult.class).isEmpty()) {
+        continue;
+      }
+      if(rel.size() > samplesize) {
+        SamplingResult sample = new SamplingResult(rel);
+        sample.setSample(DBIDUtil.randomSample(sample.getSample(), samplesize, rnd));
+        ResultUtil.addChildResult(rel, sample);
       }
     }
-    return new VisualizerContext(hier, start, stylelib, projectors, factories);
+    return new VisualizerContext(hier, start, relation, stylelib, projectors, factories);
   }
 
   /**

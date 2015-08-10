@@ -32,16 +32,16 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 
 /**
  * Container class, with ugly casts to reduce generics crazyness.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.composedOf VisFactory
  * @apiviz.has SVGPlot
  * @apiviz.has VisFactory
  * @apiviz.has Projection oneway - 0:1
  */
-public class VisualizationTask implements Cloneable, Result, Comparable<VisualizationTask> {
+public class VisualizationTask implements VisualizationItem, Cloneable, Comparable<VisualizationTask> {
   /**
    * Constant for using thumbnail
    */
@@ -54,7 +54,7 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
 
   /**
    * Meta data key: Level for visualizer ordering
-   * 
+   *
    * Returns an integer indicating the "height" of this Visualizer. It is
    * intended to impose an ordering on the execution of Visualizers as a
    * Visualizer may depend on another Visualizer running earlier. <br>
@@ -183,7 +183,7 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
 
   /**
    * Visualization task.
-   * 
+   *
    * @param name Name
    * @param result Result
    * @param relation Relation to use
@@ -199,7 +199,7 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
 
   /**
    * Constructor
-   * 
+   *
    * @param name Name
    * @param context Context
    * @param result Result
@@ -225,7 +225,7 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
 
   /**
    * Get the visualizer context.
-   * 
+   *
    * @return context
    */
   public VisualizerContext getContext() {
@@ -234,7 +234,7 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
 
   /**
    * Get the visualizer factory.
-   * 
+   *
    * @return Visualizer factory
    */
   public VisFactory getFactory() {
@@ -270,7 +270,7 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
 
   /**
    * Init the default visibility of a task.
-   * 
+   *
    * @param vis Visibility.
    */
   public void initDefaultVisibility(boolean vis) {
@@ -289,7 +289,7 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
 
   /**
    * Special clone operation that replaces the target plot.
-   * 
+   *
    * @param newplot Replacement plot to use
    * @param context Visualizer context
    * @return clone with different plot
@@ -303,7 +303,7 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
 
   /**
    * Special clone operation to set projection and size.
-   * 
+   *
    * @param plot new plot
    * @param p Projection to use
    * @param width Width

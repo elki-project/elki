@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.greedyensemble;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.application.greedyensemble;
  */
 
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 
@@ -49,8 +48,8 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVoting;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingMean;
@@ -65,6 +64,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.SimpleSVGViewer;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SimilarityMatrixVisualizer;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
@@ -254,10 +254,11 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
     // Attach visualizers to results
     SimilarityMatrixVisualizer factory = new SimilarityMatrixVisualizer();
-    factory.processNewResult(hier, database);
+    factory.processNewResult(context, database);
 
-    List<VisualizationTask> tasks = ResultUtil.filterResults(hier, VisualizationTask.class);
-    for(VisualizationTask task : tasks) {
+    Hierarchy.Iter<VisualizationTask> it = VisualizerUtil.filter(context, VisualizationTask.class);
+    for(; it.valid(); it.advance()) {
+      VisualizationTask task = it.get();
       if(task.getFactory() == factory) {
         showVisualization(context, factory, task);
       }

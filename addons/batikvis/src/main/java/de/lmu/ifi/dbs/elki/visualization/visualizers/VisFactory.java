@@ -1,58 +1,34 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultProcessor;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationProcessor;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 
 /**
  * Defines the requirements for a visualizer. <br>
  * Note: Any implementation is supposed to provide a constructor without
  * parameters (default constructor) to be used for parameterization.
- * 
+ *
  * @author Remigius Wojdanowski
- * 
+ *
  * @apiviz.landmark
  * @apiviz.stereotype factory
  * @apiviz.uses Visualization - - «create»
  * @apiviz.uses VisualizationTask - - «create»
  */
-public interface VisFactory extends ResultProcessor {
+public interface VisFactory extends VisualizationProcessor {
   /**
    * Add visualizers for the given result (tree) to the context.
-   * 
-   * @param hier Context to work with
-   * @param newResult Result to process
+   * @param context TODO
+   * @param context Visualization context
+   * @param start Result to process
    */
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult);
+  public void processNewResult(VisualizerContext context, Object start);
 
   /**
    * Produce a visualization instance for the given task
-   * 
+   *
    * @param task Visualization task
    * @return Visualization
    */
@@ -60,7 +36,7 @@ public interface VisFactory extends ResultProcessor {
 
   /**
    * Produce a visualization instance for the given task that may use thumbnails
-   * 
+   *
    * @param task Visualization task
    * @return Visualization
    */

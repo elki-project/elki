@@ -1,30 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -34,25 +9,24 @@ import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Generates a SVG-Element containing Tooltips. Tooltips remain invisible until
  * their corresponding Marker is touched by the cursor and stay visible as long
  * as the cursor lingers on the marker.
- * 
+ *
  * @author Remigius Wojdanowski
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -90,58 +64,48 @@ public class TooltipStringVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<Relation<?>> reps = ResultUtil.filterResults(hier, result, Relation.class);
-    for(Relation<?> rep : reps) {
-      if(DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME_ID, rep, p.getRelation(), this);
+  public void processNewResult(VisualizerContext context, Object result) {
+    VisualizerUtil.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, Relation<?> rep, ScatterPlotProjector<?> p) {
+        if(DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+          final VisualizationTask task = new VisualizationTask(NAME_ID, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
           task.initDefaultVisibility(false);
-          hier.add(rep, task);
-          hier.add(p, task);
+          context.addVis(rep, task);
+          context.addVis(p, task);
         }
-      }
-      if(ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME_CLASS, rep, p.getRelation(), this);
+        if(ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+          final VisualizationTask task = new VisualizationTask(NAME_CLASS, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
           task.initDefaultVisibility(false);
-          hier.add(rep, task);
-          hier.add(p, task);
+          context.addVis(rep, task);
+          context.addVis(p, task);
         }
-      }
-      if(LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME_LABEL, rep, p.getRelation(), this);
+        if(LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+          final VisualizationTask task = new VisualizationTask(NAME_LABEL, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
           task.initDefaultVisibility(false);
-          hier.add(rep, task);
-          hier.add(p, task);
+          context.addVis(rep, task);
+          context.addVis(p, task);
         }
-      }
-      if(ExternalID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME_EID, rep, p.getRelation(), this);
+        if(ExternalID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+          final VisualizationTask task = new VisualizationTask(NAME_EID, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
           task.initDefaultVisibility(false);
-          hier.add(rep, task);
-          hier.add(p, task);
+          context.addVis(rep, task);
+          context.addVis(p, task);
         }
       }
-    }
+    });
   }
 
   /**
    * Instance
-   * 
+   *
    * @author Remigius Wojdanowski
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has Relation oneway - - visualizes
    */
   public class Instance extends AbstractTooltipVisualization {
@@ -157,7 +121,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Task
      */
     public Instance(VisualizationTask task) {
@@ -186,7 +150,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
 
     /**
      * Registers the Tooltip-CSS-Class at a SVGPlot.
-     * 
+     *
      * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
      */
     @Override

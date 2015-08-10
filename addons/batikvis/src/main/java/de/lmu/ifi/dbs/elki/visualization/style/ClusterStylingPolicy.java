@@ -44,9 +44,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * Styling policy based on cluster membership.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  */
 // TODO: fast enough? Some other kind of mapping we can use?
 public class ClusterStylingPolicy implements ClassStylingPolicy {
@@ -72,7 +72,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
 
   /**
    * Constructor.
-   * 
+   *
    * @param clustering Clustering to use.
    */
   public ClusterStylingPolicy(Clustering<?> clustering, StyleLibrary style) {
@@ -143,7 +143,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
 
   /**
    * Get the clustering used by this styling policy
-   * 
+   *
    * @return Clustering in use
    */
   public Clustering<?> getClustering() {
@@ -152,11 +152,21 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
 
   /**
    * Get the style number for a cluster.
-   * 
+   *
    * @param c Cluster
    * @return Style number
    */
   public int getStyleForCluster(Cluster<?> c) {
     return cmap.get(c);
+  }
+
+  @Override
+  public String getLongName() {
+    return clustering.getLongName();
+  }
+
+  @Override
+  public String getShortName() {
+    return clustering.getShortName();
   }
 }

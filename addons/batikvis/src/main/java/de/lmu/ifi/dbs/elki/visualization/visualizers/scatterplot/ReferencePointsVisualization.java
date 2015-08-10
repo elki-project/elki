@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -31,10 +30,8 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -42,13 +39,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * The actual visualization instance, for a single projection
- * 
+ *
  * @author Remigius Wojdanowski
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -66,17 +64,16 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<ReferencePointsResult<?>> rps = ResultUtil.filterResults(hier, result, ReferencePointsResult.class);
-    for(ReferencePointsResult<?> rp : rps) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, rp, p.getRelation(), this);
+  public void processNewResult(VisualizerContext context, Object result) {
+    VisualizerUtil.findNewResultVis(context, result, ReferencePointsResult.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<ReferencePointsResult<?>, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ReferencePointsResult<?> rp, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, rp, p.getRelation(), ReferencePointsVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
-        hier.add(rp, task);
-        hier.add(p, task);
+        context.addVis(rp, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   @Override
@@ -86,10 +83,10 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Remigius Wojdanowski
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has ReferencePointsResult oneway - - visualizes
    */
   // TODO: add a result listener for the reference points.
@@ -107,7 +104,7 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task) {
@@ -134,7 +131,7 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
 
     /**
      * Registers the Reference-Point-CSS-Class at a SVGPlot.
-     * 
+     *
      * @param svgp the SVGPlot to register the -CSS-Class.
      */
     private void setupCSS(SVGPlot svgp) {

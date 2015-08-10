@@ -26,8 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -87,7 +85,7 @@ public class LabelVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
+  public void processNewResult(VisualizerContext context, Object start) {
     // No auto discovery supported.
   }
 

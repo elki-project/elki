@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,19 +25,21 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 
 /**
  * A projector is responsible for adding projections to the visualization.
- * 
+ *
  * @author Erich Schubert
  */
-public interface Projector extends HierarchicalResult {
+public interface Projector extends VisualizationItem {
   /**
    * Produce an arrangement of projections.
-   * 
+   *
+   * @param context Visualization context
    * @return Arrangement.
    */
-  public Collection<PlotItem> arrange();
+  public Collection<PlotItem> arrange(VisualizerContext context);
 }

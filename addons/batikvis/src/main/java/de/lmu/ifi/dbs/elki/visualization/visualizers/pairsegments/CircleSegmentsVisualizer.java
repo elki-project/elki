@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -45,13 +45,14 @@ import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segments;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGCheckbox;
@@ -59,13 +60,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer to draw circle segments of clusterings and enable interactive
  * selection of segments. For "empty" segments, all related segments are
  * selected instead, to visualize the differences.
- * 
+ *
  * <p>
  * Reference:<br />
  * Evaluation of Clusterings – Metrics and Visual Support<br />
@@ -73,22 +75,25 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * Zimek<br />
  * In: Proc. 28th International Conference on Data Engineering (ICDE) 2012
  * </p>
- * 
+ *
  * <p>
  * Details on the experimental setup can be found at: <a
  * href="http://elki.dbs.ifi.lmu.de/wiki/Examples/ClusterEvaluation"
  * >wiki/Examples/ClusterEvaluation</a>
  * </p>
- * 
+ *
  * @author Sascha Goldhofer
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", url = "http://dx.doi.org/10.1109/ICDE.2012.128")
+@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", //
+authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", //
+url = "http://dx.doi.org/10.1109/ICDE.2012.128")
 public class CircleSegmentsVisualizer extends AbstractVisFactory {
   /**
    * Class logger
@@ -114,37 +119,40 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
+  public void processNewResult(VisualizerContext context, Object result) {
+    if (!(result instanceof Result)) {
+      return; // TODO: also activate on other results
+    }
     // If no comparison result found abort
-    List<Segments> segments = ResultUtil.filterResults(hier, result, Segments.class);
+    List<Segments> segments = ResultUtil.filterResults(context.getHierarchy(), (Result) result, Segments.class);
     for(Segments segmentResult : segments) {
       SegmentsStylingPolicy policy;
-      List<SegmentsStylingPolicy> styles = ResultUtil.filterResults(hier, segmentResult, SegmentsStylingPolicy.class);
-      if(!styles.isEmpty()) {
-        policy = styles.get(0);
+      Hierarchy.Iter<SegmentsStylingPolicy> it = VisualizerUtil.filter(context, result, SegmentsStylingPolicy.class);
+      if(it.valid()) {
+        policy = it.get();
       }
       else {
         policy = new SegmentsStylingPolicy(segmentResult);
-        hier.add(segmentResult, policy);
+        context.addVis(segmentResult, policy);
       }
       // create task for visualization
       final VisualizationTask task = new VisualizationTask(NAME, policy, null, this);
       task.width = 2.0;
       task.height = 2.0;
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      hier.add(segmentResult, task);
+      context.addVis(segmentResult, task);
     }
   }
 
   /**
    * Instance
-   * 
+   *
    * @author Sascha Goldhofer
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses Segments
    * @apiviz.has SegmentsStylingPolicy
-   * 
+   *
    */
   public class Instance extends AbstractVisualization implements ResultListener {
     /** Minimum width (radian) of Segment */
@@ -529,7 +537,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
     /**
      * Creates a gradient over a set of colors
-     * 
+     *
      * @param shades number of colors in the gradient
      * @param colors colors for the gradient
      * @return array of colors for CSS
@@ -675,15 +683,15 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
     /**
      * Proxy element to connect signals.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     private class SegmentListenerProxy implements EventListener {
       /**
        * Mouse double click time window in milliseconds
-       * 
+       *
        * TODO: does Batik have double click events?
        */
       public static final int EVT_DBLCLICK_DELAY = 350;
@@ -705,7 +713,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
       /**
        * Constructor.
-       * 
+       *
        * @param id Segment id
        * @param ringid Ring id
        */

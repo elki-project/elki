@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
@@ -157,6 +158,7 @@ public class ResultWindow extends JFrame implements ResultListener {
       exportItem.setMnemonic(KeyEvent.VK_E);
       exportItem.setEnabled(false);
       exportItem.addActionListener(new ActionListener() {
+
         @Override
         public void actionPerformed(ActionEvent ae) {
           saveCurrentPlot();
@@ -167,6 +169,7 @@ public class ResultWindow extends JFrame implements ResultListener {
       editItem = new JMenuItem("Table View/Edit");
       editItem.setMnemonic(KeyEvent.VK_T);
       editItem.addActionListener(new ActionListener() {
+
         @Override
         public void actionPerformed(ActionEvent ae) {
           showTableView();
@@ -199,36 +202,54 @@ public class ResultWindow extends JFrame implements ResultListener {
       menubar.removeAll();
       menubar.add(filemenu);
       ResultHierarchy hier = context.getHierarchy();
+      Hierarchy<Object> vistree = context.getVisHierarchy();
       Result start = context.getBaseResult();
       if(start == null) {
         for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
           if(hier.numParents(iter.get()) == 0) {
-            recursiveBuildMenu(menubar, iter.get());
+            recursiveBuildMenu(menubar, iter.get(), hier, vistree);
           }
         }
       }
       else {
         for(Hierarchy.Iter<Result> iter = hier.iterChildren(start); iter.valid(); iter.advance()) {
-          recursiveBuildMenu(menubar, iter.get());
+          recursiveBuildMenu(menubar, iter.get(), hier, vistree);
         }
       }
     }
 
-    private boolean recursiveBuildMenu(JComponent parent, Result r) {
-      ResultHierarchy hier = context.getHierarchy();
-
+    private boolean recursiveBuildMenu(JComponent parent, Object r, ResultHierarchy hier, Hierarchy<Object> vistree) {
       // Skip "adapter" results that do not have visualizers
       if(r instanceof ResultAdapter) {
-        if(hier.numChildren(r) <= 0) {
+        if(hier.numChildren((ResultAdapter) r) <= 0) {
           return false;
         }
       }
       // Make a submenu for this element
       boolean nochildren = true;
-      JMenu submenu = new JMenu((r.getLongName() != null) ? r.getLongName() : "unnamed");
-      // Add menus for any children
-      for(Hierarchy.Iter<Result> iter = hier.iterChildren(r); iter.valid(); iter.advance()) {
-        if(recursiveBuildMenu(submenu, iter.get())) {
+      final String nam;
+      if(r instanceof Result) {
+        nam = ((Result) r).getLongName();
+      }
+      else if(r instanceof VisualizationItem) {
+        nam = ((VisualizationItem) r).getLongName();
+      }
+      else {
+        return false;
+      }
+      JMenu submenu;
+      submenu = new JMenu((nam != null) ? nam : "unnamed");
+      // Add menus for any child results
+      if(r instanceof Result) {
+        for(Hierarchy.Iter<Result> iter = hier.iterChildren((Result) r); iter.valid(); iter.advance()) {
+          if(recursiveBuildMenu(submenu, iter.get(), hier, vistree)) {
+            nochildren = false;
+          }
+        }
+      }
+      // Add visualizers:
+      for(Hierarchy.Iter<Object> iter = vistree.iterChildren(r); iter.valid(); iter.advance()) {
+        if(recursiveBuildMenu(submenu, iter.get(), hier, vistree)) {
           nochildren = false;
         }
       }
@@ -488,58 +509,60 @@ public class ResultWindow extends JFrame implements ResultListener {
     }
   }
 
-  private JMenuItem makeMenuItemForVisualizer(Result r) {
-    if(VisualizationTask.class.isInstance(r)) {
-      final VisualizationTask v = (VisualizationTask) r;
-      JMenuItem item;
-
-      // Currently enabled?
-      final String name = v.getLongName();
-      boolean enabled = v.visible;
-      boolean istool = v.tool;
-      if(!istool) {
-        final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
-        visItem.addItemListener(new ItemListener() {
-          @Override
-          public void itemStateChanged(ItemEvent e) {
-            // We need SwingUtilities to avoid a deadlock!
-            SwingUtilities.invokeLater(new Runnable() {
-              @Override
-              public void run() {
-                VisualizerUtil.setVisible(context, v, visItem.getState());
-              }
-            });
-          }
-        });
-        item = visItem;
-      }
-      else {
-        final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
-        visItem.addItemListener(new ItemListener() {
-          @Override
-          public void itemStateChanged(ItemEvent e) {
-            // We need SwingUtilities to avoid a deadlock!
-            SwingUtilities.invokeLater(new Runnable() {
-              @Override
-              public void run() {
-                VisualizerUtil.setVisible(context, v, visItem.isSelected());
-              }
-            });
-          }
-        });
-        item = visItem;
-      }
-      if(v.hasoptions) {
-        final JMenu menu = new JMenu(name);
-        menu.add(item);
-        // TODO: build a menu for the visualizer!
-        return menu;
-      }
-      else {
-        return item;
-      }
+  private JMenuItem makeMenuItemForVisualizer(Object r) {
+    if(!VisualizationTask.class.isInstance(r)) {
+      return null;
     }
-    return null;
+    final VisualizationTask v = (VisualizationTask) r;
+    JMenuItem item;
+
+    // Currently enabled?
+    final String name = v.getLongName();
+    boolean enabled = v.visible;
+    boolean istool = v.tool;
+    if(!istool) {
+      final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
+      visItem.addItemListener(new ItemListener() {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+          // We need SwingUtilities to avoid a deadlock!
+          SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+              VisualizerUtil.setVisible(context, v, visItem.getState());
+            }
+          });
+        }
+      });
+      item = visItem;
+    }
+    else {
+      final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
+      visItem.addItemListener(new ItemListener() {
+
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+          // We need SwingUtilities to avoid a deadlock!
+          SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+              VisualizerUtil.setVisible(context, v, visItem.isSelected());
+            }
+          });
+        }
+      });
+      item = visItem;
+    }
+    if(v.hasoptions) {
+      final JMenu menu = new JMenu(name);
+      menu.add(item);
+      // TODO: build a menu for the visualizer!
+      return menu;
+
+    }
+    else {
+      return item;
+    }
   }
 
   @Override

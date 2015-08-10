@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -148,18 +147,25 @@ public class ExportVisualizations implements ResultHandler {
     }
 
     // Projected visualizations
-    ArrayList<Projector> projectors = ResultUtil.filterResults(hier, Projector.class);
-    for(Projector proj : projectors) {
+    Hierarchy<Object> vistree = context.getVisHierarchy();
+    for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
+      if (!(iter2.get() instanceof Projector)) {
+        continue;
+      }
+      Projector proj = (Projector) iter2.get();
       // TODO: allow selecting individual projections only.
-      Collection<PlotItem> items = proj.arrange();
+      Collection<PlotItem> items = proj.arrange(context);
       for(PlotItem item : items) {
         processItem(item);
       }
     }
-    ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(hier, VisualizationTask.class);
-    for(VisualizationTask task : tasks) {
+    for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
+      if (!(iter2.get() instanceof VisualizationTask)) {
+        continue;
+      }
+      VisualizationTask task = (VisualizationTask) iter2.get();
       boolean isprojected = false;
-      for(Hierarchy.Iter<Result> iter = hier.iterParents(task); iter.valid(); iter.advance()) {
+      for(Hierarchy.Iter<?> iter = vistree.iterParents(task); iter.valid(); iter.advance()) {
         if(iter.get() instanceof Projector) {
           isprojected = true;
           break;

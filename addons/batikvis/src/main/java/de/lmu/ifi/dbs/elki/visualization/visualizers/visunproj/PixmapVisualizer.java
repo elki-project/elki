@@ -24,27 +24,25 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  */
 
 import java.awt.image.RenderedImage;
-import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualize an arbitrary pixmap result.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -62,16 +60,18 @@ public class PixmapVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<PixmapResult> prs = ResultUtil.filterResults(hier, result, PixmapResult.class);
-    for(PixmapResult pr : prs) {
-      // Add plots, attach visualizer
-      final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
-      task.width = pr.getImage().getWidth() / (double) pr.getImage().getHeight();
-      task.height = 1.0;
-      task.level = VisualizationTask.LEVEL_STATIC;
-      hier.add(pr, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, PixmapResult.class, new VisualizerUtil.Handler1<PixmapResult>() {
+      @Override
+      public void process(VisualizerContext context, PixmapResult pr) {
+        // Add plots, attach visualizer
+        final VisualizationTask task = new VisualizationTask(NAME, pr, null, PixmapVisualizer.this);
+        task.width = pr.getImage().getWidth() / (double) pr.getImage().getHeight();
+        task.height = 1.0;
+        task.level = VisualizationTask.LEVEL_STATIC;
+        context.addVis(pr, task);
+      }
+    });
   }
 
   @Override
@@ -87,9 +87,9 @@ public class PixmapVisualizer extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has PixmapResult oneway - 1 visualizes
    */
   public class Instance extends AbstractVisualization {
@@ -100,7 +100,7 @@ public class PixmapVisualizer extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task) {

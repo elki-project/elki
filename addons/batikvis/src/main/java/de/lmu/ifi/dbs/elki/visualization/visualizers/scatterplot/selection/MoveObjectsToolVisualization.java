@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,21 +23,20 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea.DragListener;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -47,14 +46,15 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
  * Tool to move the currently selected objects.
- * 
+ *
  * @author Heidi Kolb
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -77,30 +77,33 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<UpdatableDatabase> dbs = ResultUtil.filterResults(hier, result, UpdatableDatabase.class);
-    if(dbs.isEmpty()) {
+  public void processNewResult(VisualizerContext context, Object start) {
+    Database db = ResultUtil.findDatabase(context.getHierarchy());
+    if(!(db instanceof UpdatableDatabase)) {
       return;
     }
-    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
-    for(ScatterPlotProjector<?> p : ps) {
-      final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), this);
-      task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      task.tool = true;
-      task.thumbnail = false;
-      task.noexport = true;
-      task.initDefaultVisibility(false);
-      // baseResult.getHierarchy().add(p.getRelation(), task);
-      hier.add(p, task);
-    }
+    VisualizerUtil.findNew(context, start, ScatterPlotProjector.class, //
+    new VisualizerUtil.Handler1<ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), MoveObjectsToolVisualization.this);
+        task.level = VisualizationTask.LEVEL_INTERACTIVE;
+        task.tool = true;
+        task.thumbnail = false;
+        task.noexport = true;
+        task.initDefaultVisibility(false);
+        // baseResult.getHierarchy().add(p.getRelation(), task);
+        context.addVis(p, task);
+      }
+    });
   }
 
   /**
    * Instance.
-   * 
+   *
    * @author Heidi Kolb
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has de.lmu.ifi.dbs.elki.data.NumberVector oneway - - edits
    */
   public class Instance extends AbstractScatterplotVisualization implements DragListener {
@@ -121,7 +124,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Task
      */
     public Instance(VisualizationTask task) {
@@ -152,7 +155,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
     /**
      * Updates the objects with the given DBIDs It will be moved depending on
      * the given Vector
-     * 
+     *
      * @param dbids - DBIDs of the objects to move
      * @param movingVector - Vector for moving object
      */
@@ -165,11 +168,11 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
        * database.getMetadataQuery(); for(DBID dbid : dbids) { NV obj =
        * database.get(dbid); // Copy metadata to keep DatabaseObjectMetadata
        * meta = mrep.get(dbid);
-       * 
+       *
        * Vector v = proj.projectDataToRenderSpace(obj); v.set(0, v.get(0) +
        * movingVector.get(0)); v.set(1, v.get(1) + movingVector.get(1)); NV nv =
        * proj.projectRenderToDataSpace(v, obj); nv.setID(obj.getID());
-       * 
+       *
        * try { database.delete(dbid); database.insert(new Pair<NV,
        * DatabaseObjectMetadata>(nv, meta)); } catch(UnableToComplyException e)
        * { de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e); } }
@@ -179,7 +182,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
 
     /**
      * Delete the children of the element
-     * 
+     *
      * @param container SVG-Element
      */
     private void deleteChildren(Element container) {
@@ -190,7 +193,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVGPlot
      */
     private void addCSSClasses(SVGPlot svgp) {

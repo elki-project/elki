@@ -1,39 +1,12 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import java.util.ArrayList;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGScoreBar;
@@ -41,22 +14,22 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
- * 
+ *
  * TODO: add indicator whether high values are better or low.
- * 
+ *
  * TODO: add indication/warning when values are out-of-bounds.
- * 
+ *
  * @author Erich Schubert
  * @author Sascha Goldhofer
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»
- * @apiviz.has 
- *             de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering.ScoreResult
- *             oneway - - visualizes
+ * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering.
+ *             ScoreResult oneway - - visualizes
  */
 public class EvaluationVisualization extends AbstractVisFactory {
   /**
@@ -82,15 +55,17 @@ public class EvaluationVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
-    final ArrayList<EvaluationResult> srs = ResultUtil.filterResults(hier, newResult, EvaluationResult.class);
-    for(EvaluationResult sr : srs) {
-      final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
-      task.width = .5;
-      task.height = sr.numLines() * .05;
-      task.level = VisualizationTask.LEVEL_STATIC;
-      hier.add(sr, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, EvaluationResult.class, new VisualizerUtil.Handler1<EvaluationResult>() {
+      @Override
+      public void process(VisualizerContext context, EvaluationResult sr) {
+        final VisualizationTask task = new VisualizationTask(NAME, sr, null, EvaluationVisualization.this);
+        task.width = .5;
+        task.height = sr.numLines() * .05;
+        task.level = VisualizationTask.LEVEL_STATIC;
+        context.addVis(sr, task);
+      }
+    });
   }
 
   private double addBarChart(SVGPlot svgp, Element parent, double ypos, String label, double value, double minValue, double maxValue, double baseValue, boolean reversed) {

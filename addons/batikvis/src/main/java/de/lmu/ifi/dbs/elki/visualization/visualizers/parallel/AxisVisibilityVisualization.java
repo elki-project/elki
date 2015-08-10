@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
@@ -31,10 +29,8 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -43,13 +39,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Layer for controlling axis visbility in parallel coordinates.
- * 
+ *
  * @author Robert Rödler
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -72,20 +69,22 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(hier, result, ParallelPlotProjector.class);
-    for(ParallelPlotProjector<?> p : ps) {
-      final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
-      task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      task.noexport = true;
-      task.thumbnail = false;
-      hier.add(p, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, ParallelPlotProjector.class, new VisualizerUtil.Handler1<ParallelPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), AxisVisibilityVisualization.this);
+        task.level = VisualizationTask.LEVEL_INTERACTIVE;
+        task.noexport = true;
+        task.thumbnail = false;
+        context.addVis(p, task);
+      }
+    });
   }
 
   /**
    * Instance for a particular data set.
-   * 
+   *
    * @author Robert Rödler
    * @author Erich Schubert
    */
@@ -128,7 +127,7 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task) {
@@ -171,7 +170,7 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
 
     /**
      * Make a button for a visible axis
-     * 
+     *
      * @param anum Axis number
      * @param apos Axis position in plot
      */
@@ -201,7 +200,7 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
 
     /**
      * Insert buttons for hidden dimensions.
-     * 
+     *
      * @param vnum Column number (= next visible axis number)
      * @param first First invisible axis
      * @param count Number of invisible axes
@@ -237,7 +236,7 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
 
     /**
      * Add an event listener to the Element
-     * 
+     *
      * @param tag Element to add the listener
      * @param axis Axis number (including hidden axes)
      */
@@ -248,7 +247,7 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
         public void handleEvent(Event evt) {
           if(proj.getVisibleDimensions() > 2) {
             proj.toggleAxisVisible(axis);
-            context.getHierarchy().resultChanged(proj);
+            context.visChanged(proj);
           }
         }
       }, false);
@@ -256,7 +255,7 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {

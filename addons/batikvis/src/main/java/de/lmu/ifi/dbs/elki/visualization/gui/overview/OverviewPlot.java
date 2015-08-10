@@ -40,11 +40,11 @@ import org.w3c.dom.events.EventTarget;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
@@ -59,10 +59,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Generate an overview plot for a set of visualizations.
- * 
+ *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has VisualizerContext
  * @apiviz.composedOf RectangleArranger
@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @apiviz.has DetailViewSelectedEvent
  * @apiviz.uses DetailView
  */
-public class OverviewPlot implements ResultListener {
+public class OverviewPlot implements ResultListener, VisualizationListener {
   /**
    * Our logging class
    */
@@ -158,7 +158,7 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Constructor.
-   * 
+   *
    * @param context Visualizer context
    * @param single Single view mode
    */
@@ -169,23 +169,30 @@ public class OverviewPlot implements ResultListener {
 
     // register context listener
     context.addResultListener(this);
+    context.addVisualizationListener(this);
   }
 
   /**
    * Recompute the layout of visualizations.
-   * 
+   *
    * @param width Initial width
    * @param height Initial height
    * @return Arrangement
    */
   private RectangleArranger<PlotItem> arrangeVisualizations(double width, double height) {
+    if(!(width > 0. && height > 0.)) {
+      LOG.warning("No size information during arrange()", new Throwable());
+      return new RectangleArranger<>(1., 1.);
+    }
     RectangleArranger<PlotItem> plotmap = new RectangleArranger<>(width, height);
 
-    ResultHierarchy hier = context.getHierarchy();
-    ArrayList<Projector> projectors = ResultUtil.filterResults(hier, Projector.class);
-    // Rectangle layout
-    for(Projector p : projectors) {
-      Collection<PlotItem> projs = p.arrange();
+    Hierarchy<Object> vistree = context.getVisHierarchy();
+    for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
+      if(!(iter2.get() instanceof Projector)) {
+        continue;
+      }
+      Projector p = (Projector) iter2.get();
+      Collection<PlotItem> projs = p.arrange(context);
       for(PlotItem it : projs) {
         if(it.w <= 0.0 || it.h <= 0.0) {
           LOG.warning("Plot item with improper size information: " + it);
@@ -195,12 +202,15 @@ public class OverviewPlot implements ResultListener {
       }
     }
 
-    ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(hier, VisualizationTask.class);
-    nextTask: for(VisualizationTask task : tasks) {
+    nextTask: for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
+      if(!(iter2.get() instanceof VisualizationTask)) {
+        continue;
+      }
+      VisualizationTask task = (VisualizationTask) iter2.get();
       if(!task.visible) {
         continue;
       }
-      for(Hierarchy.Iter<Result> iter = hier.iterParents(task); iter.valid(); iter.advance()) {
+      for(Hierarchy.Iter<?> iter = vistree.iterParents(task); iter.valid(); iter.advance()) {
         if(iter.get() instanceof Projector) {
           continue nextTask;
         }
@@ -218,10 +228,14 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Initialize the plot.
-   * 
+   *
    * @param ratio Initial ratio
    */
   public void initialize(double ratio) {
+    if(!(ratio > 0 && ratio < Double.POSITIVE_INFINITY)) {
+      LOG.warning("Invalid ratio: " + ratio, new Throwable());
+      ratio = 1.4;
+    }
     this.ratio = ratio;
     reinitialize();
   }
@@ -363,7 +377,7 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Produce thumbnail for a visualizer.
-   * 
+   *
    * @param thumbsize Thumbnail size
    * @param it Plot item
    * @param task Task
@@ -450,7 +464,7 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Test whether a task should be displayed in the overview plot.
-   * 
+   *
    * @param task Task to display
    * @return visibility
    */
@@ -477,7 +491,7 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Event triggered when a plot was selected.
-   * 
+   *
    * @param it Plot item selected
    * @return sub plot
    */
@@ -487,7 +501,7 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Adds an {@link ActionListener} to the plot.
-   * 
+   *
    * @param actionListener the {@link ActionListener} to be added
    */
   public void addActionListener(ActionListener actionListener) {
@@ -496,7 +510,7 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * When a subplot was selected, forward the event to listeners.
-   * 
+   *
    * @param it PlotItem selected
    */
   protected void triggerSubplotSelectEvent(PlotItem it) {
@@ -508,9 +522,9 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Event when a plot was selected.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public class SelectPlotEvent implements EventListener {
@@ -521,7 +535,7 @@ public class OverviewPlot implements ResultListener {
 
     /**
      * Constructor.
-     * 
+     *
      * @param it Item that was clicked
      */
     public SelectPlotEvent(PlotItem it) {
@@ -539,13 +553,14 @@ public class OverviewPlot implements ResultListener {
    * Destroy this overview plot.
    */
   public void destroy() {
+    context.removeVisualizationListener(this);
     context.removeResultListener(this);
     plot.dispose();
   }
 
   /**
    * Get the SVGPlot object.
-   * 
+   *
    * @return SVG plot
    */
   public SVGPlot getPlot() {
@@ -616,6 +631,15 @@ public class OverviewPlot implements ResultListener {
   @Override
   public void resultRemoved(Result child, Result parent) {
     LOG.debug("result removed: " + child);
+    lazyRefresh();
+  }
+
+  @Override
+  public void visualizationChanged(VisualizationItem child) {
+    LOG.debug("Visualization changed: " + child);
+    if(child instanceof VisualizationTask) {
+      reinitOnRefresh = true;
+    }
     lazyRefresh();
   }
 }

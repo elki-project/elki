@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,16 +23,12 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -42,13 +38,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Generates a SVG-Element containing axes, including labeling.
- * 
+ *
  * @author Remigius Wojdanowski
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -71,13 +68,15 @@ public class AxisVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, result, ScatterPlotProjector.class);
-    for(ScatterPlotProjector<?> p : ps) {
-      final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
-      task.level = VisualizationTask.LEVEL_BACKGROUND;
-      hier.add(p, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, ScatterPlotProjector.class, new VisualizerUtil.Handler1<ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), AxisVisualization.this);
+        task.level = VisualizationTask.LEVEL_BACKGROUND;
+        context.addVis(p, task);
+      }
+    });
   }
 
   @Override
@@ -88,17 +87,17 @@ public class AxisVisualization extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Erich Schubert
    * @author Remigius Wojdanowski
-   * 
+   *
    * @apiviz.uses SVGSimpleLinearAxis
-   * 
+   *
    */
   public class Instance extends AbstractScatterplotVisualization {
     /**
      * Constructor.
-     * 
+     *
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task) {

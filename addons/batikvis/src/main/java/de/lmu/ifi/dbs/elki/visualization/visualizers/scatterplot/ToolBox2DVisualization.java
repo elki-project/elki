@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  */
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -35,10 +34,10 @@ import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -51,9 +50,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Renders a tool box on the left of the 2D visualization
- * 
+ *
  * @author Heidi Kolb
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -81,23 +80,25 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, result, ScatterPlotProjector.class);
-    for(ScatterPlotProjector<?> p : ps) {
-      final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
-      task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      task.thumbnail = false;
-      task.noexport = true;
-      task.noembed = true;
-      hier.add(p, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, ScatterPlotProjector.class, new VisualizerUtil.Handler1<ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), ToolBox2DVisualization.this);
+        task.level = VisualizationTask.LEVEL_INTERACTIVE;
+        task.thumbnail = false;
+        task.noexport = true;
+        task.noembed = true;
+        context.addVis(p, task);
+      }
+    });
   }
 
   /**
    * Instance.
-   * 
+   *
    * @author Heidi Kolb
-   * 
+   *
    * @apiviz.has VisualizationTask oneway - - visualizes
    */
   public class Instance extends AbstractScatterplotVisualization {
@@ -123,7 +124,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Task
      */
     public Instance(VisualizationTask task) {
@@ -143,7 +144,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
 
     /**
      * Deletes the children of the container
-     * 
+     *
      * @param container Element to delete children
      */
     private void deleteChildren(Element container) {
@@ -160,8 +161,9 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       deleteChildren(container);
 
       ArrayList<VisualizationTask> vis = new ArrayList<>();
-      Collection<VisualizationTask> visualizers = ResultUtil.filterResults(rel.getHierarchy(), rel, VisualizationTask.class);
-      for(VisualizationTask task : visualizers) {
+      Hierarchy.Iter<VisualizationTask> it = VisualizerUtil.filter(context, rel, VisualizationTask.class);
+      for(; it.valid(); it.advance()) {
+        VisualizationTask task = it.get();
         if(task.tool && !vis.contains(task)) {
           vis.add(task);
         }
@@ -209,7 +211,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
@@ -247,7 +249,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
 
     /**
      * Add an event listener to the Element
-     * 
+     *
      * @param tag Element to add the listener
      * @param tool Tool represented by the Element
      */
@@ -263,7 +265,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
 
     /**
      * Handle the mouseClick - change the selected tool in the context
-     * 
+     *
      * @param tool Selected Tool
      */
     protected void handleMouseClick(VisualizationTask tool) {

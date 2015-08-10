@@ -30,10 +30,10 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
@@ -41,13 +41,13 @@ import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
 /**
  * ParallelPlotProjector is responsible for producing a parallel axes
  * visualization.
- * 
+ *
  * @author Robert Rödler
- * 
+ *
  * @param <V> Vector type
  */
 // TODO: support categorical features, and multiple relations too
-public class ParallelPlotProjector<V extends NumberVector> extends AbstractHierarchicalResult implements Projector {
+public class ParallelPlotProjector<V extends NumberVector> implements Projector {
   /**
    * Relation we project.
    */
@@ -55,7 +55,7 @@ public class ParallelPlotProjector<V extends NumberVector> extends AbstractHiera
 
   /**
    * Constructor.
-   * 
+   *
    * @param rel Relation
    */
   public ParallelPlotProjector(Relation<V> rel) {
@@ -64,9 +64,9 @@ public class ParallelPlotProjector<V extends NumberVector> extends AbstractHiera
   }
 
   @Override
-  public Collection<PlotItem> arrange() {
+  public Collection<PlotItem> arrange(VisualizerContext context) {
     List<PlotItem> col = new ArrayList<>(1);
-    List<VisualizationTask> tasks = ResultUtil.filterResults(getHierarchy(), this, VisualizationTask.class);
+    List<VisualizationTask> tasks = context.getVisTasks(this);
     if(tasks.size() > 0) {
       ScalesResult scales = ResultUtil.getScalesResult(rel);
       ProjectionParallel proj = new SimpleParallel(scales.getScales());
@@ -91,7 +91,7 @@ public class ParallelPlotProjector<V extends NumberVector> extends AbstractHiera
 
   /**
    * The relation we project.
-   * 
+   *
    * @return Relation
    */
   public Relation<V> getRelation() {

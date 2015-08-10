@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -40,22 +38,23 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Handle the marker in an OPTICS plot.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -72,7 +71,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
   /**
    * Input modes
-   * 
+   *
    * @apiviz.exclude
    */
   // TODO: Refactor all Mode copies into a shared class?
@@ -88,12 +87,13 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(hier, result, OPTICSProjector.class);
-    for(OPTICSProjector p : ops) {
-      final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+  public void processNewResult(VisualizerContext context, Object result) {
+    Hierarchy.Iter<OPTICSProjector> it = VisualizerUtil.filter(context, result, OPTICSProjector.class);
+    for(; it.valid(); it.advance()) {
+      OPTICSProjector p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, p.getResult(), null, this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      hier.add(p, task);
+      context.addVis(p, task);
     }
   }
 
@@ -110,10 +110,10 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Heidi Kolb
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses DBIDSelection oneway - 1 visualizes
    */
   public class Instance extends AbstractOPTICSVisualization implements DragableArea.DragListener {
@@ -139,7 +139,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task) {
@@ -201,7 +201,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     /**
      * Create a rectangle as marker (Marker higher than plot!)
-     * 
+     *
      * @param x1 X-Value for the marker
      * @param width Width of an entry
      * @return SVG-Element svg-rectangle
@@ -256,7 +256,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     /**
      * Get the current input mode, on each mouse event.
-     * 
+     *
      * @param evt Mouse event.
      * @return Input mode
      */
@@ -280,7 +280,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     /**
      * Gets the Index of the ClusterOrderEntry where the event occurred
-     * 
+     *
      * @param order List of ClusterOrderEntries
      * @param cPt clicked point
      * @return Index of the object
@@ -292,7 +292,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     /**
      * Updates the selection for the given ClusterOrderEntry.
-     * 
+     *
      * @param mode Input mode
      * @param begin first index to select
      * @param end last index to select

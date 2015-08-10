@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -40,12 +38,11 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
@@ -56,13 +53,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
  * Visualize the bounding sphere of a metric index.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -79,7 +77,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
   /**
    * Drawing modes.
-   * 
+   *
    * @apiviz.exclude
    */
   private enum Modus {
@@ -93,7 +91,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param settings Settings
    */
   public TreeSphereVisualization(Parameterizer settings) {
@@ -102,20 +100,20 @@ public class TreeSphereVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
-    for(ScatterPlotProjector<?> p : ps) {
-      Collection<AbstractMTree<?, ?, ?, ?>> trees = ResultUtil.filterResults(hier, result, AbstractMTree.class);
-      for(AbstractMTree<?, ?, ?, ?> tree : trees) {
-        if(canVisualize(tree) && tree instanceof Result) {
-          final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
-          task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
-          task.initDefaultVisibility(false);
-          hier.add((Result) tree, task);
-          hier.add(p, task);
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNewSiblings(context, start, AbstractMTree.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<AbstractMTree<?, ?, ?, ?>, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, AbstractMTree<?, ?, ?, ?> tree, ScatterPlotProjector<?> p) {
+        if(!canVisualize(tree)) {
+          return;
         }
+        final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), TreeSphereVisualization.this);
+        task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
+        task.initDefaultVisibility(false);
+        context.addVis((Result) tree, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   @Override
@@ -125,7 +123,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
   /**
    * Get the "p" value of an Lp norm.
-   * 
+   *
    * @param tree Tree to visualize
    * @return p value
    */
@@ -141,7 +139,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
   /**
    * Test for a visualizable index in the context's database.
-   * 
+   *
    * @param tree Tree to visualize
    * @return whether the tree is visualizable
    */
@@ -151,12 +149,12 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
   /**
    * Instance for a particular tree.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has AbstractMTree oneway - - visualizes
    * @apiviz.uses SVGHyperSphere
-   * 
+   *
    * @param <N> Tree node type
    * @param <E> Tree entry type
    */
@@ -176,7 +174,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
     /**
      * Constructor
-     * 
+     *
      * @param task Task
      */
     @SuppressWarnings("unchecked")
@@ -234,7 +232,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
     /**
      * Recursively draw the MBR rectangles.
-     * 
+     *
      * @param svgp SVG Plot
      * @param layer Layer
      * @param proj Projection
@@ -284,9 +282,9 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

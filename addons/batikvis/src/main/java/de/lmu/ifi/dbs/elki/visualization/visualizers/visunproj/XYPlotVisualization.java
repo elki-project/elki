@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,17 +23,12 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.XYPlot;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -47,12 +42,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualizer to render a simple 2D curve such as a ROC curve.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  * @apiviz.has XYPlot oneway - - visualizes
@@ -136,7 +132,7 @@ public class XYPlotVisualization extends AbstractVisFactory {
 
   /**
    * Setup the CSS classes for the plot.
-   * 
+   *
    * @param svgp Plot
    * @param plot Plot to render
    */
@@ -160,15 +156,17 @@ public class XYPlotVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    final ArrayList<XYPlot> plots = ResultUtil.filterResults(hier, result, XYPlot.class);
-    for(XYPlot plot : plots) {
-      final VisualizationTask task = new VisualizationTask(NAME, plot, null, this);
-      task.width = 1.0;
-      task.height = 1.0;
-      task.level = VisualizationTask.LEVEL_STATIC;
-      hier.add(plot, task);
-    }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, XYPlot.class, new VisualizerUtil.Handler1<XYPlot>() {
+      @Override
+      public void process(VisualizerContext context, XYPlot plot) {
+        final VisualizationTask task = new VisualizationTask(NAME, plot, null, XYPlotVisualization.this);
+        task.width = 1.0;
+        task.height = 1.0;
+        task.level = VisualizationTask.LEVEL_STATIC;
+        context.addVis(plot, task);
+      }
+    });
   }
 
   @Override

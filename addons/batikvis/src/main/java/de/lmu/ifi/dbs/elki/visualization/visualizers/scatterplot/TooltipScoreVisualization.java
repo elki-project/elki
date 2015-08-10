@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  */
 
 import java.text.NumberFormat;
-import java.util.Collection;
 import java.util.Locale;
 
 import org.apache.batik.util.SVGConstants;
@@ -32,33 +31,35 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Generates a SVG-Element containing Tooltips. Tooltips remain invisible until
  * their corresponding Marker is touched by the cursor and stay visible as long
  * as the cursor lingers on the marker.
- * 
+ *
  * @author Remigius Wojdanowski
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -80,7 +81,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param settings Settings
    */
   public TooltipScoreVisualization(Parameterizer settings) {
@@ -94,48 +95,55 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
+  public void processNewResult(VisualizerContext context, Object result) {
+    final ResultHierarchy hier = context.getHierarchy();
     // TODO: we can also visualize other scores!
-    Collection<OutlierResult> ors = ResultUtil.filterResults(hier, result, OutlierResult.class);
-    for(OutlierResult o : ors) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), p.getRelation(), this);
+    VisualizerUtil.findNewResultVis(context, result, OutlierResult.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), p.getRelation(), TooltipScoreVisualization.this);
         task.tool = true;
         task.initDefaultVisibility(false);
-        hier.add(o.getScores(), task);
-        hier.add(p, task);
+        context.addVis(o.getScores(), task);
+        context.addVis(p, task);
       }
-    }
-    Collection<Relation<?>> rrs = ResultUtil.filterResults(hier, result, Relation.class);
-    for(Relation<?> r : rrs) {
-      if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation()) && !TypeUtil.INTEGER.isAssignableFromType(r.getDataTypeInformation())) {
-        continue;
-      }
-      // Skip if we already considered it above
-      boolean add = true;
-      for(Hierarchy.Iter<Result> p = hier.iterChildren(r); p.valid(); p.advance()) {
-        if(p.get() instanceof VisualizationTask && ((VisualizationTask) p.get()).getFactory() instanceof TooltipScoreVisualization) {
-          add = false;
-          break;
+    });
+    VisualizerUtil.findNewResultVis(context, result, DoubleRelation.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<DoubleRelation, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, DoubleRelation r, ScatterPlotProjector<?> p) {
+        for(Iter<Result> it = hier.iterParents(r); it.valid(); it.advance()) {
+          if(it instanceof OutlierResult) {
+            return; // Handled by above case already.
+          }
         }
+        final VisualizationTask task = new VisualizationTask(NAME, r, p.getRelation(), TooltipScoreVisualization.this);
+        task.tool = true;
+        task.initDefaultVisibility(false);
+        context.addVis(r, task);
+        context.addVis(p, task);
       }
-      if(add) {
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, r, p.getRelation(), this);
-          task.tool = true;
-          task.initDefaultVisibility(false);
-          hier.add(r, task);
-          hier.add(p, task);
+    });
+    VisualizerUtil.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, Relation<?> r, ScatterPlotProjector<?> p) {
+        if(r instanceof DoubleRelation) {
+          return; // Handled above already.
         }
+        if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation()) && !TypeUtil.INTEGER.isAssignableFromType(r.getDataTypeInformation())) {
+          return;
+        }
+        final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, r, p.getRelation(), TooltipScoreVisualization.this);
+        task.tool = true;
+        task.initDefaultVisibility(false);
+        context.addVis(r, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   /**
    * Instance
-   * 
+   *
    * @author Remigius Wojdanowski
    * @author Erich Schubert
    */
@@ -152,7 +160,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
 
     /**
      * Constructor
-     * 
+     *
      * @param task Task
      */
     public Instance(VisualizationTask task) {
@@ -170,7 +178,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
 
     /**
      * Registers the Tooltip-CSS-Class at a SVGPlot.
-     * 
+     *
      * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
      */
     @Override
@@ -209,9 +217,9 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -222,11 +230,11 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
 
     /**
      * Parameter for the gamma-correction.
-     * 
+     *
      * <p>
      * Key: {@code -tooltip.digits}
      * </p>
-     * 
+     *
      * <p>
      * Default value: 4
      * </p>

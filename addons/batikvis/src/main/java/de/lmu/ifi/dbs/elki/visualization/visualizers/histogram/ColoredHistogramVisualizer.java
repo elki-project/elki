@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -37,8 +35,6 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleArrayStaticHistogram;
@@ -50,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -65,15 +62,16 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Generates a SVG-Element containing a histogram representing the distribution
  * of the database's objects.
- * 
+ *
  * @author Remigius Wojdanowski
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -95,7 +93,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param settings Settings
    */
   public ColoredHistogramVisualizer(Parameterizer settings) {
@@ -110,19 +108,18 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    // Find a style result to visualize:
-    Collection<StyleResult> styleres = ResultUtil.filterResults(hier, result, StyleResult.class);
-    for(StyleResult c : styleres) {
-      Collection<HistogramProjector<?>> ps = ResultUtil.filterResults(hier, HistogramProjector.class);
-      for(HistogramProjector<?> p : ps) {
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNew(context, start, HistogramProjector.class, //
+    new VisualizerUtil.Handler1<HistogramProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, HistogramProjector<?> p) {
         // register self
-        final VisualizationTask task = new VisualizationTask(CNAME, c, p.getRelation(), this);
+        final VisualizationTask task = new VisualizationTask(CNAME, context.getStyleResult(), p.getRelation(), ColoredHistogramVisualizer.this);
         task.level = VisualizationTask.LEVEL_DATA;
-        hier.add(c, task);
-        hier.add(p, task);
+        context.addVis(context.getStyleResult(), task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   @Override
@@ -133,11 +130,11 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
   /**
    * Instance
-   * 
+   *
    * @author Remigius Wojdanowski
-   * 
+   *
    * @apiviz.has NumberVector oneway - - visualizes
-   * 
+   *
    * @param <NV> Type of the DatabaseObject being visualized.
    */
   // FIXME: make non-static, react to database changes!
@@ -166,7 +163,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task) {
@@ -330,7 +327,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
     /**
      * Generate the needed CSS classes.
-     * 
+     *
      * @param svgp Plot context
      * @param numc Number of classes we need.
      */
@@ -368,15 +365,15 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Flag to specify the "curves" rendering style.
-     * 
+     *
      * <p>
      * Key: {@code -histogram.curves}
      * </p>
@@ -385,7 +382,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
     /**
      * Parameter to specify the number of bins to use in histogram.
-     * 
+     *
      * <p>
      * Key: {@code -projhistogram.bins} Default: 20
      * </p>

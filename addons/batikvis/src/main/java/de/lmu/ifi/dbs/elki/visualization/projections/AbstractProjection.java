@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,29 +24,28 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  */
 
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 
 /**
  * Abstract base projection class.
- * 
+ *
  * @author Erich Schubert
  */
-public abstract class AbstractProjection extends AbstractHierarchicalResult implements Projection {
+public abstract class AbstractProjection implements Projection {
   /**
    * Scales in data set
    */
   final protected LinearScale[] scales;
-  
+
   /**
    * Constructor.
-   * 
+   *
    * @param scales Scales to use
    */
   public AbstractProjection(LinearScale[] scales) {
     super();
     this.scales = scales;
   }
-  
+
   @Override
   public int getInputDimensionality() {
     return scales.length;
@@ -54,7 +53,7 @@ public abstract class AbstractProjection extends AbstractHierarchicalResult impl
 
   /**
    * Get the scales used, for rendering scales mostly.
-   * 
+   *
    * @param d Dimension
    * @return Scale used
    */

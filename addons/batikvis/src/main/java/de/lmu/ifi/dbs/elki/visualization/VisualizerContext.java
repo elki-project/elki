@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization;
 
+import java.util.ArrayList;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -46,6 +48,8 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -74,6 +78,11 @@ public class VisualizerContext implements DataStoreListener, Result {
    * Logger.
    */
   private static final Logging LOG = Logging.getLogger(VisualizerContext.class);
+
+  /**
+   * Visualization tree.
+   */
+  private HashMapHierarchy<Object> vistree = new HashMapHierarchy<>();
 
   /**
    * The full result object
@@ -111,6 +120,11 @@ public class VisualizerContext implements DataStoreListener, Result {
   private Result baseResult;
 
   /**
+   * Relation currently visualized.
+   */
+  private Relation<?> relation;
+
+  /**
    * Constructor. We currently require a Database and a Result.
    *
    * @param hier Result hierarchy
@@ -118,7 +132,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param projectors Projectors to use
    * @param factories Visualizer Factories to use
    */
-  public VisualizerContext(ResultHierarchy hier, Result start, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories) {
+  public VisualizerContext(ResultHierarchy hier, Result start, Relation<?> relation, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories) {
     super();
     this.hier = hier;
     this.baseResult = start;
@@ -148,7 +162,7 @@ public class VisualizerContext implements DataStoreListener, Result {
     // result.getHierarchy().add(result, this);
 
     // Add visualizers.
-    processNewResult(hier, db);
+    notifyFactories(db);
 
     // For proxying events.
     db.addDataStoreListener(this);
@@ -157,7 +171,7 @@ public class VisualizerContext implements DataStoreListener, Result {
     addResultListener(new ResultListener() {
       @Override
       public void resultAdded(Result child, Result parent) {
-        processNewResult(getHierarchy(), child);
+        notifyFactories(child);
       }
 
       @Override
@@ -232,6 +246,17 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   // TODO: add ShowVisualizer,HideVisualizer with tool semantics.
 
+  // TODO: add ShowVisualizer,HideVisualizer with tool semantics.
+
+  /**
+   * Get the current selection result.
+   *
+   * @return selection result
+   */
+  public SelectionResult getSelectionResult() {
+    return selection;
+  }
+
   /**
    * Get the current selection.
    *
@@ -249,6 +274,23 @@ public class VisualizerContext implements DataStoreListener, Result {
   public void setSelection(DBIDSelection sel) {
     selection.setSelection(sel);
     getHierarchy().resultChanged(selection);
+  }
+
+  /**
+   * Current relation.
+   */
+  public Relation<?> getRelation() {
+    return relation;
+  }
+
+  /**
+   * Set the current relation.
+   *
+   * @param rel Relation
+   */
+  public void setRelation(Relation<?> rel) {
+    this.relation = rel;
+    getHierarchy().resultChanged(this);
   }
 
   /**
@@ -283,32 +325,6 @@ public class VisualizerContext implements DataStoreListener, Result {
   }
 
   /**
-   * Process a particular result.
-   *
-   * @param hier Result hierarchy
-   * @param newResult Newly added Result
-   */
-  private void processNewResult(ResultHierarchy hier, Result newResult) {
-    for(ProjectorFactory p : projectors) {
-      try {
-        p.processNewResult(hier, newResult);
-      }
-      catch(Throwable e) {
-        LOG.warning("ProjectorFactory " + p.getClass().getCanonicalName() + " failed:", e);
-      }
-    }
-    // Collect all visualizers.
-    for(VisFactory f : factories) {
-      try {
-        f.processNewResult(hier, newResult);
-      }
-      catch(Throwable e) {
-        LOG.warning("VisFactory " + f.getClass().getCanonicalName() + " failed:", e);
-      }
-    }
-  }
-
-  /**
    * Register a result listener.
    *
    * @param listener Result listener.
@@ -324,6 +340,24 @@ public class VisualizerContext implements DataStoreListener, Result {
    */
   public void removeResultListener(ResultListener listener) {
     getHierarchy().removeResultListener(listener);
+  }
+
+  /**
+   * Add a listener.
+   *
+   * @param listener Listener to add
+   */
+  public void addVisualizationListener(VisualizationListener listener) {
+    listenerList.add(VisualizationListener.class, listener);
+  }
+
+  /**
+   * Add a listener.
+   *
+   * @param listener Listener to remove
+   */
+  public void removeVisualizationListener(VisualizationListener listener) {
+    listenerList.remove(VisualizationListener.class, listener);
   }
 
   @Override
@@ -343,5 +377,68 @@ public class VisualizerContext implements DataStoreListener, Result {
    */
   public Result getBaseResult() {
     return baseResult;
+  }
+
+  /**
+   * Add (register) a visualization.
+   *
+   * @param parent Parent object
+   * @param vis Visualization
+   */
+  public void addVis(Object parent, VisualizationItem vis) {
+    vistree.add(parent, vis);
+    visChanged(vis);
+  }
+
+  /**
+   * A visualization item has changed.
+   *
+   * @param item Item that has changed
+   */
+  public void visChanged(VisualizationItem item) {
+    notifyFactories(item);
+    for(VisualizationListener listener : listenerList.getListeners(VisualizationListener.class)) {
+      listener.visualizationChanged(item);
+    }
+  }
+
+  /**
+   * Notify factories of a change.
+   *
+   * @param item Item that has changed.
+   */
+  private void notifyFactories(Object item) {
+    for(ProjectorFactory p : projectors) {
+      try {
+        p.processNewResult(this, item);
+      }
+      catch(Throwable e) {
+        LOG.warning("ProjectorFactory " + p.getClass().getCanonicalName() + " failed:", e);
+      }
+    }
+    // Collect all visualizers.
+    for(VisFactory f : factories) {
+      try {
+        f.processNewResult(this, item);
+      }
+      catch(Throwable e) {
+        LOG.warning("VisFactory " + f.getClass().getCanonicalName() + " failed:", e);
+      }
+    }
+  }
+
+  public List<VisualizationTask> getVisTasks(VisualizationItem item) {
+    List<VisualizationTask> out = new ArrayList<>();
+    for(Hierarchy.Iter<?> iter = vistree.iterDescendants(item); iter.valid(); iter.advance()) {
+      Object o = iter.get();
+      if(o instanceof VisualizationTask) {
+        out.add((VisualizationTask) o);
+      }
+    }
+    return out;
+  }
+
+  public Hierarchy<Object> getVisHierarchy() {
+    return vistree;
   }
 }

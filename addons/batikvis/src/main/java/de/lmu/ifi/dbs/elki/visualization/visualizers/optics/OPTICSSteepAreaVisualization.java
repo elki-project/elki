@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  */
 
 import java.awt.Color;
-import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -34,11 +33,10 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
@@ -46,12 +44,13 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualize the steep areas found in an OPTICS plot
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -69,15 +68,16 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(hier, result, OPTICSProjector.class);
-    for(OPTICSProjector p : ops) {
+  public void processNewResult(VisualizerContext context, Object result) {
+    Hierarchy.Iter<OPTICSProjector> it = VisualizerUtil.filter(context, result, OPTICSProjector.class);
+    for(; it.valid(); it.advance()) {
+      OPTICSProjector p = it.get();
       final SteepAreaResult steep = findSteepAreaResult(p.getResult());
       if(steep != null) {
-        final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+        final VisualizationTask task = new VisualizationTask(NAME, p.getResult(), null, this);
         task.level = VisualizationTask.LEVEL_DATA + 1;
-        hier.add(p, task);
-        hier.add(steep, task);
+        context.addVis(p, task);
+        context.addVis(steep, task);
       }
     }
   }
@@ -95,7 +95,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
 
   /**
    * Find the OPTICS clustering child of a cluster order.
-   * 
+   *
    * @param co Cluster order
    * @return OPTICS clustering
    */
@@ -110,10 +110,10 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
 
   /**
    * Instance
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.uses 
+   *
+   * @apiviz.uses
    *              de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult
    */
   public class Instance extends AbstractOPTICSVisualization {
@@ -134,7 +134,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task) {

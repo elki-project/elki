@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,15 +28,15 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 
 /**
  * Abstract base class for "simple" projections.
- * 
+ *
  * Simple projections use the given scaling and dimension selection only.
- * 
+ *
  * @author Erich Schubert
  */
 public abstract class AbstractSimpleProjection extends AbstractFullProjection {
   /**
    * Constructor.
-   * 
+   *
    * @param scales Scales to use
    */
   public AbstractSimpleProjection(LinearScale[] scales) {
@@ -79,7 +79,7 @@ public abstract class AbstractSimpleProjection extends AbstractFullProjection {
 
   /**
    * Flip the y axis.
-   * 
+   *
    * @param v Vector
    * @return modified v
    */
@@ -91,16 +91,16 @@ public abstract class AbstractSimpleProjection extends AbstractFullProjection {
   }
 
   /**
-   * Method to rearrange components
-   * 
+   * Method to rearrange components.
+   *
    * @param v Vector to rearrange
    * @return rearranged copy
    */
   protected abstract Vector rearrange(Vector v);
 
   /**
-   * Undo the rearrangement of components
-   * 
+   * Undo the rearrangement of components.
+   *
    * @param v Vector to undo the rearrangement
    * @return rearranged-undone copy
    */

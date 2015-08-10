@@ -1,30 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -36,12 +11,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -49,12 +22,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Renders PolygonsObject in the data set.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -77,30 +51,31 @@ public class PolygonVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<Relation<?>> results = ResultUtil.filterResults(hier, result, Relation.class);
-    for(Relation<?> rel : results) {
-      if(TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
+  public void processNewResult(VisualizerContext context, Object result) {
+    VisualizerUtil.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, Relation<?> rel, ScatterPlotProjector<?> p) {
+        if(!TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
+          return;
+        }
+        if(RelationUtil.dimensionality(p.getRelation()) != 2) {
+          return;
+        }
         // Assume that a 2d projector is using the same coordinates as the
         // polygons.
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(hier, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          if(RelationUtil.dimensionality(p.getRelation()) == 2) {
-            final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), this);
-            task.level = VisualizationTask.LEVEL_DATA - 10;
-            hier.add(rel, task);
-            hier.add(p, task);
-          }
-        }
+        final VisualizationTask task = new VisualizationTask(NAME, rel, rel, PolygonVisualization.this);
+        task.level = VisualizationTask.LEVEL_DATA - 10;
+        context.addVis(rel, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   /**
    * Instance
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has PolygonsObject - - visualizes
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
@@ -117,7 +92,7 @@ public class PolygonVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Task to visualize
      */
     public Instance(VisualizationTask task) {

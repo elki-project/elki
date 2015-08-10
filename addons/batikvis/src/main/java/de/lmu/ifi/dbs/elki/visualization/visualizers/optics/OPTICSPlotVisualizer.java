@@ -23,17 +23,14 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
@@ -42,12 +39,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Visualize an OPTICS result by constructing an OPTICS plot for it.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -65,13 +63,14 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(hier, result, OPTICSProjector.class);
-    for(OPTICSProjector p : ops) {
+  public void processNewResult(VisualizerContext context, Object result) {
+    Hierarchy.Iter<OPTICSProjector> it = VisualizerUtil.filter(context, result, OPTICSProjector.class);
+    for(; it.valid(); it.advance()) {
+      OPTICSProjector p = it.get();
       // Add plots, attach visualizer
-      final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+      final VisualizationTask task = new VisualizationTask(NAME, p.getResult(), null, this);
       task.level = VisualizationTask.LEVEL_DATA;
-      hier.add(p, task);
+      context.addVis(p, task);
     }
   }
 
@@ -88,13 +87,13 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Erich Schubert
    */
   public class Instance extends AbstractOPTICSVisualization {
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task) {

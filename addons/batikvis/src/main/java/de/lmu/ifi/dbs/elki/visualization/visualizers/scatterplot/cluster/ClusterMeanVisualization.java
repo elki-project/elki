@@ -1,29 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2011
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -35,15 +11,12 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -54,13 +27,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
  * Visualize the mean of a KMeans-Clustering
- * 
+ *
  * @author Heidi Kolb
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -77,7 +51,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param settings Settings
    */
   public ClusterMeanVisualization(Parameterizer settings) {
@@ -91,34 +65,30 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    // Find clusterings we can visualize:
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, result, Clustering.class);
-    for(Clustering<?> c : clusterings) {
-      if(c.getAllClusters().size() > 0) {
-        // Does the cluster have a model with cluster means?
-        if(testMeanModel(c)) {
-          for(Iter<Result> it = hier.iterParents(c); it.valid(); it.advance()) {
-            for(Iter<Result> it2 = hier.iterDescendants(it.get()); it2.valid(); it2.advance()) {
-              if(it2.get() instanceof ScatterPlotProjector) {
-                ScatterPlotProjector<?> p = (ScatterPlotProjector<?>) it2.get();
-                final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-                task.level = VisualizationTask.LEVEL_DATA + 1;
-                hier.add(c, task);
-                hier.add(p, task);
-              }
-            }
-          }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizerUtil.findNewSiblings(context, start, Clustering.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<Clustering<?>, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, Clustering<?> c, ScatterPlotProjector<?> p) {
+        if(c.getAllClusters().size() == 0) {
+          return;
         }
+        // Does the cluster have a model with cluster means?
+        if(!testMeanModel(c)) {
+          return;
+        }
+        final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), ClusterMeanVisualization.this);
+        task.level = VisualizationTask.LEVEL_DATA + 1;
+        context.addVis(c, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   /**
    * Instance.
-   * 
+   *
    * @author Heidi Kolb
-   * 
+   *
    * @apiviz.has MeanModel oneway - - visualizes
    * @apiviz.has MedoidModel oneway - - visualizes
    */
@@ -145,7 +115,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task) {
@@ -208,7 +178,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
@@ -240,11 +210,12 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
         }
       }
     }
+
   }
 
   /**
    * Test if the given clustering has a mean model.
-   * 
+   *
    * @param c Clustering to inspect
    * @return true when the clustering has a mean or medoid model.
    */
@@ -261,15 +232,15 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Option ID for visualization of cluster means.
-     * 
+     *
      * <pre>
      * -cluster.stars
      * </pre>
