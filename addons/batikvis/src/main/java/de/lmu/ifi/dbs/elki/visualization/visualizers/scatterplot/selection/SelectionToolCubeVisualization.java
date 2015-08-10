@@ -38,9 +38,9 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
@@ -87,16 +86,17 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewResultVis(context, start, SelectionResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<SelectionResult, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, //
+    new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
-      public void process(VisualizerContext context, SelectionResult selres, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), SelectionToolCubeVisualization.this);
+      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, context.getSelectionResult(), p.getRelation(), SelectionToolCubeVisualization.this);
         task.level = VisualizationTask.LEVEL_INTERACTIVE;
         task.tool = true;
         task.thumbnail = false;
         task.noexport = true;
         task.initDefaultVisibility(false);
-        context.addVis(selres, task);
+        context.addVis(context.getSelectionResult(), task);
         context.addVis(p, task);
       }
     });

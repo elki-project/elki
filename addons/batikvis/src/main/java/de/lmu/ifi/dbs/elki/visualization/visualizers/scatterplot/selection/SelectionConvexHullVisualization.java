@@ -78,7 +78,8 @@ public class SelectionConvexHullVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
+    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, //
+    new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context.getSelectionResult(), p.getRelation(), SelectionConvexHullVisualization.this);
