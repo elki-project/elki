@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
@@ -101,7 +101,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNewSiblings(context, start, AbstractMTree.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<AbstractMTree<?, ?, ?, ?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, start, AbstractMTree.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<AbstractMTree<?, ?, ?, ?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, AbstractMTree<?, ?, ?, ?> tree, ScatterPlotProjector<?> p) {
         if(!canVisualize(tree)) {

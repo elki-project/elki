@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
@@ -83,7 +83,7 @@ public class COPVectorVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNewResultVis(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewResultVis(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
         List<Relation<?>> rels = ResultUtil.filterResults(context.getHierarchy(), o, Relation.class);

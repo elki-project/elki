@@ -1,5 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers;
-
+package de.lmu.ifi.dbs.elki.visualization;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,99 +25,23 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 
 /**
- * Visualizer utilities.
+ * Tree - actually a forest - to manage visualizations.
  *
  * @author Erich Schubert
  *
- * @apiviz.uses VisualizationTask - - inspects
+ * @apiviz.uses Handler1
+ * @apiviz.uses Handler2
+ * @apiviz.uses Handler3
  */
-public final class VisualizerUtil {
+public class VisualizationTree extends HashMapHierarchy<Object> {
   /**
-   * Fake constructor: do not instantiate.
+   * Constructor.
    */
-  private VisualizerUtil() {
-    // Do not instantiate.
+  public VisualizationTree() {
+    super();
   }
-
-  /**
-   * Utility function to change Visualizer visibility.
-   *
-   * @param context Visualization context
-   * @param task Visualization task
-   * @param visibility Visibility value
-   */
-  public static void setVisible(VisualizerContext context, VisualizationTask task, boolean visibility) {
-    // Hide other tools
-    if(visibility && task.tool) {
-      Hierarchy<Object> vistree = context.getVisHierarchy();
-      for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
-        if(!(iter2.get() instanceof VisualizationTask)) {
-          continue;
-        }
-        VisualizationTask other = (VisualizationTask) iter2.get();
-        if(other != task && other.tool && other.visible) {
-          other.visible = false;
-          context.visChanged(other);
-        }
-      }
-    }
-    task.visible = visibility;
-    context.visChanged(task);
-  }
-
-  /**
-   * Filtered iteration over a stacked hierarchy.
-   *
-   * This is really messy because the visualization hierarchy is typed Object.
-   *
-   * @param context Visualization context
-   * @param clazz Type filter
-   * @param <O> Object type
-   * @return Iterator of results.
-   */
-  @SuppressWarnings("unchecked")
-  public static <O extends VisualizationItem> Hierarchy.Iter<O> filter(VisualizerContext context, Class<? super O> clazz) {
-    Hierarchy.Iter<Result> it1 = context.getHierarchy().iterAllSafe();
-    StackedIter<Object, Result> it2 = new StackedIter<>(it1, context.getVisHierarchy());
-    if(!it2.valid()) {
-      return HashMapHierarchy.emptyIterator();
-    }
-    return new FilteredIter<O>(it2, (Class<O>) clazz);
-  }
-
-  /**
-   * Filtered iteration over a stacked hierarchy.
-   *
-   * This is really messy because the visualization hierarchy is typed Object.
-   *
-   * @param context Visualization context
-   * @param start Starting object (in primary hierarchy!)
-   * @param clazz Type filter
-   * @param <O> Object type
-   * @return Iterator of results.
-   */
-  @SuppressWarnings("unchecked")
-  public static <O extends VisualizationItem> Hierarchy.Iter<O> filter(VisualizerContext context, Object start, Class<? super O> clazz) {
-    if(start instanceof Result) { // In first hierarchy.
-      Hierarchy.Iter<Result> it1 = context.getHierarchy().iterDescendantsSelf((Result) start);
-      StackedIter<Object, Result> it2 = new StackedIter<>(it1, context.getVisHierarchy());
-      if(!it2.valid()) {
-        return HashMapHierarchy.emptyIterator();
-      }
-      return new FilteredIter<O>(it2, (Class<O>) clazz);
-    }
-    Hierarchy.Iter<Object> it2 = context.getVisHierarchy().iterDescendants(start);
-    if(!it2.valid()) {
-      return HashMapHierarchy.emptyIterator();
-    }
-    return new FilteredIter<O>(it2, (Class<O>) clazz);
-  };
 
   /**
    * Filtered iterator.
@@ -126,6 +49,8 @@ public final class VisualizerUtil {
    * @author Erich Schubert
    *
    * @param <O> Object type
+   *
+   * @apiviz.exclude
    */
   public static class StackedIter<B, A extends B> implements Hierarchy.Iter<B> {
     /**
@@ -189,6 +114,8 @@ public final class VisualizerUtil {
    *
    * @author Erich Schubert
    *
+   * @apiviz.exclude
+   *
    * @param <O> Object type
    */
   public static class FilteredIter<O> implements Hierarchy.Iter<O> {
@@ -250,6 +177,111 @@ public final class VisualizerUtil {
       }
       current = null;
     }
+  }
+
+  /**
+   * Handler for a single result.
+   *
+   * @author Erich Schubert
+   *
+   * @param <A> Object type
+   */
+  public static interface Handler1<A> {
+    /**
+     * Process a new result.
+     *
+     * @param context Context
+     * @param result First result
+     */
+    void process(VisualizerContext context, A result);
+  }
+
+  /**
+   * Handler for two result.
+   *
+   * @author Erich Schubert
+   *
+   * @param <A> Object type
+   * @param <B> Object type
+   */
+  public static interface Handler2<A, B> {
+    /**
+     * Process a new result.
+     *
+     * @param context Context
+     * @param result First result
+     * @param result2 Second result
+     */
+    void process(VisualizerContext context, A result, B result2);
+  }
+
+  /**
+   * Handler for three result.
+   *
+   * @author Erich Schubert
+   *
+   * @param <A> Object type
+   * @param <B> Object type
+   * @param <C> Object type
+   */
+  public static interface Handler3<A, B, C> {
+    /**
+     * Process a new result.
+     *
+     * @param context Context
+     * @param result First result
+     * @param result2 Second result
+     * @param result3 Third result
+     */
+    void process(VisualizerContext context, A result, B result2, C result3);
+  }
+
+  /**
+   * Filtered iteration over a stacked hierarchy.
+   *
+   * This is really messy because the visualization hierarchy is typed Object.
+   *
+   * @param context Visualization context
+   * @param clazz Type filter
+   * @param <O> Object type
+   * @return Iterator of results.
+   */
+  @SuppressWarnings("unchecked")
+  public static <O extends VisualizationItem> Hierarchy.Iter<O> filter(VisualizerContext context, Class<? super O> clazz) {
+    Hierarchy.Iter<Result> it1 = context.getHierarchy().iterAll();
+    StackedIter<Object, Result> it2 = new StackedIter<>(it1, context.getVisHierarchy());
+    if(!it2.valid()) {
+      return HashMapHierarchy.emptyIterator();
+    }
+    return new FilteredIter<O>(it2, (Class<O>) clazz);
+  }
+
+  /**
+   * Filtered iteration over a stacked hierarchy.
+   *
+   * This is really messy because the visualization hierarchy is typed Object.
+   *
+   * @param context Visualization context
+   * @param start Starting object (in primary hierarchy!)
+   * @param clazz Type filter
+   * @param <O> Object type
+   * @return Iterator of results.
+   */
+  @SuppressWarnings("unchecked")
+  public static <O extends VisualizationItem> Hierarchy.Iter<O> filter(VisualizerContext context, Object start, Class<? super O> clazz) {
+    if(start instanceof Result) { // In first hierarchy.
+      Hierarchy.Iter<Result> it1 = context.getHierarchy().iterDescendantsSelf((Result) start);
+      StackedIter<Object, Result> it2 = new StackedIter<>(it1, context.getVisHierarchy());
+      if(!it2.valid()) {
+        return HashMapHierarchy.emptyIterator();
+      }
+      return new FilteredIter<O>(it2, (Class<O>) clazz);
+    }
+    Hierarchy.Iter<Object> it2 = context.getVisHierarchy().iterDescendants(start);
+    if(!it2.valid()) {
+      return HashMapHierarchy.emptyIterator();
+    }
+    return new FilteredIter<O>(it2, (Class<O>) clazz);
   }
 
   /**
@@ -318,7 +350,7 @@ public final class VisualizerUtil {
         if(!(type1.isInstance(o1))) {
           continue;
         }
-        Iter<Object> it2 = vistree.iterAllSafe();
+        Iter<Object> it2 = vistree.iterDescendantsSelf(context.getBaseResult());
         for(; it2.valid(); it2.advance()) {
           final Object o2 = it2.get();
           if(!(type2.isInstance(o2))) {
@@ -336,7 +368,7 @@ public final class VisualizerUtil {
         if(!(type2.isInstance(o2))) {
           continue;
         }
-        Iter<Result> it1 = context.getHierarchy().iterAllSafe();
+        Iter<Result> it1 = context.getHierarchy().iterAll();
         for(; it1.valid(); it1.advance()) {
           final Result o1 = it1.get();
           if(!(type1.isInstance(o1))) {
@@ -415,59 +447,28 @@ public final class VisualizerUtil {
   }
 
   /**
-   * Handler for a single result.
+   * Utility function to change Visualizer visibility.
    *
-   * @author Erich Schubert
-   *
-   * @param <A> Object type
+   * @param context Visualization context
+   * @param task Visualization task
+   * @param visibility Visibility value
    */
-  public static interface Handler1<A> {
-    /**
-     * Process a new result.
-     *
-     * @param context Context
-     * @param result First result
-     */
-    void process(VisualizerContext context, A result);
-  }
-
-  /**
-   * Handler for two result.
-   *
-   * @author Erich Schubert
-   *
-   * @param <A> Object type
-   * @param <B> Object type
-   */
-  public static interface Handler2<A, B> {
-    /**
-     * Process a new result.
-     *
-     * @param context Context
-     * @param result First result
-     * @param result2 Second result
-     */
-    void process(VisualizerContext context, A result, B result2);
-  }
-
-  /**
-   * Handler for three result.
-   *
-   * @author Erich Schubert
-   *
-   * @param <A> Object type
-   * @param <B> Object type
-   * @param <C> Object type
-   */
-  public static interface Handler3<A, B, C> {
-    /**
-     * Process a new result.
-     *
-     * @param context Context
-     * @param result First result
-     * @param result2 Second result
-     * @param result3 Third result
-     */
-    void process(VisualizerContext context, A result, B result2, C result3);
+  public static void setVisible(VisualizerContext context, VisualizationTask task, boolean visibility) {
+    // Hide other tools
+    if(visibility && task.tool) {
+      Hierarchy<Object> vistree = context.getVisHierarchy();
+      for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
+        if(!(iter2.get() instanceof VisualizationTask)) {
+          continue;
+        }
+        VisualizationTask other = (VisualizationTask) iter2.get();
+        if(other != task && other.tool && other.visible) {
+          other.visible = false;
+          context.visChanged(other);
+        }
+      }
+    }
+    task.visible = visibility;
+    context.visChanged(task);
   }
 }

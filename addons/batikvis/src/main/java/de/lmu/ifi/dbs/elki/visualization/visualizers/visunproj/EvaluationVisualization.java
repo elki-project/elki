@@ -14,7 +14,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
@@ -56,7 +56,7 @@ public class EvaluationVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, EvaluationResult.class, new VisualizerUtil.Handler1<EvaluationResult>() {
+    VisualizationTree.findNew(context, start, EvaluationResult.class, new VisualizationTree.Handler1<EvaluationResult>() {
       @Override
       public void process(VisualizerContext context, EvaluationResult sr) {
         final VisualizationTask task = new VisualizationTask(NAME, sr, null, EvaluationVisualization.this);

@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Renders a tool box on the left of the 2D visualization
@@ -81,7 +81,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, ScatterPlotProjector.class, new VisualizerUtil.Handler1<ScatterPlotProjector<?>>() {
+    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), ToolBox2DVisualization.this);
@@ -161,7 +161,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       deleteChildren(container);
 
       ArrayList<VisualizationTask> vis = new ArrayList<>();
-      Hierarchy.Iter<VisualizationTask> it = VisualizerUtil.filter(context, rel, VisualizationTask.class);
+      Hierarchy.Iter<VisualizationTask> it = VisualizationTree.filter(context, rel, VisualizationTask.class);
       for(; it.valid(); it.advance()) {
         VisualizationTask task = it.get();
         if(task.tool && !vis.contains(task)) {
@@ -273,7 +273,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       if(tool.visible) {
         context.setSelection(null);
       }
-      VisualizerUtil.setVisible(context, tool, true);
+      VisualizationTree.setVisible(context, tool, true);
     }
 
     @Override

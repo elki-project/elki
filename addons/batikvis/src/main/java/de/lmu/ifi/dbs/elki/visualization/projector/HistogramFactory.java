@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Produce one-dimensional projections.
@@ -59,7 +59,7 @@ public class HistogramFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, Relation.class, new VisualizerUtil.Handler1<Relation<?>>() {
+    VisualizationTree.findNew(context, start, Relation.class, new VisualizationTree.Handler1<Relation<?>>() {
       @Override
       public void process(VisualizerContext context, Relation<?> rel) {
         if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {

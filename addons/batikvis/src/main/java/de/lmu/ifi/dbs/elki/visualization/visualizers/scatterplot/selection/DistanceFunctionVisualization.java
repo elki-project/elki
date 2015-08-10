@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
@@ -74,8 +74,8 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNewSiblings(context, start, AbstractMaterializeKNNPreprocessor.class, ScatterPlotProjector.class, //
-    new VisualizerUtil.Handler2<AbstractMaterializeKNNPreprocessor<?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, start, AbstractMaterializeKNNPreprocessor.class, ScatterPlotProjector.class, //
+    new VisualizationTree.Handler2<AbstractMaterializeKNNPreprocessor<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, AbstractMaterializeKNNPreprocessor<?> kNN, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, kNN, p.getRelation(), DistanceFunctionVisualization.this);

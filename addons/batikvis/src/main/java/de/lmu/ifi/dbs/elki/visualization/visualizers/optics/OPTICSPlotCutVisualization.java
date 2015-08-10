@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualizes a cut in an OPTICS Plot to select an Epsilon value and generate a
@@ -72,7 +72,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    Hierarchy.Iter<OPTICSProjector> it = VisualizerUtil.filter(context, result, OPTICSProjector.class);
+    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
     for(; it.valid(); it.advance()) {
       OPTICSProjector p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, p.getResult(), null, this);

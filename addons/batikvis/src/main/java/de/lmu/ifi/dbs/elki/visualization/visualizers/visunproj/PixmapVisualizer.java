@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualize an arbitrary pixmap result.
@@ -61,7 +61,7 @@ public class PixmapVisualizer extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, PixmapResult.class, new VisualizerUtil.Handler1<PixmapResult>() {
+    VisualizationTree.findNew(context, start, PixmapResult.class, new VisualizationTree.Handler1<PixmapResult>() {
       @Override
       public void process(VisualizerContext context, PixmapResult pr) {
         // Add plots, attach visualizer

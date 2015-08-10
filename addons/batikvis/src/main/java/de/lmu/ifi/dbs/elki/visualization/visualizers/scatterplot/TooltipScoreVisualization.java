@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Generates a SVG-Element containing Tooltips. Tooltips remain invisible until
@@ -98,7 +98,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
   public void processNewResult(VisualizerContext context, Object result) {
     final ResultHierarchy hier = context.getHierarchy();
     // TODO: we can also visualize other scores!
-    VisualizerUtil.findNewResultVis(context, result, OutlierResult.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewResultVis(context, result, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), p.getRelation(), TooltipScoreVisualization.this);
@@ -108,7 +108,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
         context.addVis(p, task);
       }
     });
-    VisualizerUtil.findNewResultVis(context, result, DoubleRelation.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<DoubleRelation, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewResultVis(context, result, DoubleRelation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<DoubleRelation, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, DoubleRelation r, ScatterPlotProjector<?> p) {
         for(Iter<Result> it = hier.iterParents(r); it.valid(); it.advance()) {
@@ -123,7 +123,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
         context.addVis(p, task);
       }
     });
-    VisualizerUtil.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, Relation<?> r, ScatterPlotProjector<?> p) {
         if(r instanceof DoubleRelation) {

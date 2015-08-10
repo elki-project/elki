@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Handle the marker in an OPTICS plot.
@@ -88,7 +88,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    Hierarchy.Iter<OPTICSProjector> it = VisualizerUtil.filter(context, result, OPTICSProjector.class);
+    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
     for(; it.valid(); it.advance()) {
       OPTICSProjector p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, p.getResult(), null, this);

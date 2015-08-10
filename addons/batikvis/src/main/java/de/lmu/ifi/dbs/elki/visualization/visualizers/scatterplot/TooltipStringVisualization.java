@@ -17,7 +17,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Generates a SVG-Element containing Tooltips. Tooltips remain invisible until
@@ -65,7 +65,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    VisualizerUtil.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, Relation<?> rep, ScatterPlotProjector<?> p) {
         if(DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {

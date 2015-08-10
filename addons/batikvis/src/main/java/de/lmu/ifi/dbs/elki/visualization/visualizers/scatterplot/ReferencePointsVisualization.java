@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * The actual visualization instance, for a single projection
@@ -65,7 +65,7 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    VisualizerUtil.findNewResultVis(context, result, ReferencePointsResult.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<ReferencePointsResult<?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewResultVis(context, result, ReferencePointsResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<ReferencePointsResult<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ReferencePointsResult<?> rp, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, rp, p.getRelation(), ReferencePointsVisualization.this);

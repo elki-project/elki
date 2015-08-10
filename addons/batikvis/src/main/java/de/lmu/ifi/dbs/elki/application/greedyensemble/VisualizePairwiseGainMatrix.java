@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.SimpleSVGViewer;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SimilarityMatrixVisualizer;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
@@ -256,7 +256,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     SimilarityMatrixVisualizer factory = new SimilarityMatrixVisualizer();
     factory.processNewResult(context, database);
 
-    Hierarchy.Iter<VisualizationTask> it = VisualizerUtil.filter(context, VisualizationTask.class);
+    Hierarchy.Iter<VisualizationTask> it = VisualizationTree.filter(context, VisualizationTask.class);
     for(; it.valid(); it.advance()) {
       VisualizationTask task = it.get();
       if(task.getFactory() == factory) {

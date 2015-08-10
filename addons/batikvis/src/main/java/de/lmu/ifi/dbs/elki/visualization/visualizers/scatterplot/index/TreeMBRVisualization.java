@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
@@ -94,8 +94,8 @@ public class TreeMBRVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNewSiblings(context, start, AbstractRStarTree.class, ScatterPlotProjector.class, //
-    new VisualizerUtil.Handler2<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, start, AbstractRStarTree.class, ScatterPlotProjector.class, //
+    new VisualizationTree.Handler2<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, AbstractRStarTree<RStarTreeNode, SpatialEntry, ?> tree, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), TreeMBRVisualization.this);

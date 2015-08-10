@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Produce parallel axes projections.
@@ -46,7 +46,7 @@ public class ParallelPlotFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, Relation.class, new VisualizerUtil.Handler1<Relation<?>>() {
+    VisualizationTree.findNew(context, start, Relation.class, new VisualizationTree.Handler1<Relation<?>>() {
       @Override
       public void process(VisualizerContext context, Relation<?> rel) {
         // TODO: multi-relational parallel plots

@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualize the steep areas found in an OPTICS plot
@@ -69,7 +69,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    Hierarchy.Iter<OPTICSProjector> it = VisualizerUtil.filter(context, result, OPTICSProjector.class);
+    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
     for(; it.valid(); it.advance()) {
       OPTICSProjector p = it.get();
       final SteepAreaResult steep = findSteepAreaResult(p.getResult());

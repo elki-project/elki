@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
@@ -80,7 +80,7 @@ public class LineVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, ParallelPlotProjector.class, new VisualizerUtil.Handler1<ParallelPlotProjector<?>>() {
+    VisualizationTree.findNew(context, start, ParallelPlotProjector.class, new VisualizationTree.Handler1<ParallelPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, p.getRelation(), p.getRelation(), LineVisualization.this);

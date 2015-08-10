@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
@@ -109,8 +109,8 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, HistogramProjector.class, //
-    new VisualizerUtil.Handler1<HistogramProjector<?>>() {
+    VisualizationTree.findNew(context, start, HistogramProjector.class, //
+    new VisualizationTree.Handler1<HistogramProjector<?>>() {
       @Override
       public void process(VisualizerContext context, HistogramProjector<?> p) {
         // register self

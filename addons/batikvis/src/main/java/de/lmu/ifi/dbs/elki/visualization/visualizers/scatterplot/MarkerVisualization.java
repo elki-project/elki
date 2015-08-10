@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
@@ -75,8 +75,8 @@ public class MarkerVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, ScatterPlotProjector.class, //
-    new VisualizerUtil.Handler1<ScatterPlotProjector<?>>() {
+    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, //
+    new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context.getStyleResult(), p.getRelation(), MarkerVisualization.this);

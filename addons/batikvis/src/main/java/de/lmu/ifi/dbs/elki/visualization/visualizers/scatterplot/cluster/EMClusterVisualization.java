@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
@@ -94,7 +94,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNewSiblings(context, start, Clustering.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<Clustering<?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, start, Clustering.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Clustering<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, Clustering<?> c, ScatterPlotProjector<?> p) {
         if(c.getAllClusters().size() == 0) {

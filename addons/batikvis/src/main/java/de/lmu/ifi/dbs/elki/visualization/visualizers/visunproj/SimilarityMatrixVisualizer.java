@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualize a similarity matrix with object labels
@@ -66,7 +66,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, SimilarityMatrix.class, new VisualizerUtil.Handler1<SimilarityMatrix>() {
+    VisualizationTree.findNew(context, start, SimilarityMatrix.class, new VisualizationTree.Handler1<SimilarityMatrix>() {
       @Override
       public void process(VisualizerContext context, SimilarityMatrix pr) {
         // Add plots, attach visualizer

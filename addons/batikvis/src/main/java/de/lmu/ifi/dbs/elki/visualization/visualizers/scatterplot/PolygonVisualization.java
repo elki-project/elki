@@ -22,7 +22,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Renders PolygonsObject in the data set.
@@ -52,7 +52,7 @@ public class PolygonVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    VisualizerUtil.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, Relation<?> rel, ScatterPlotProjector<?> p) {
         if(!TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {

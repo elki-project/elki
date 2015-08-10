@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Pseudo-Visualizer, that lists the settings of the algorithm-
@@ -134,7 +134,7 @@ public class SettingsVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, SettingsResult.class, new VisualizerUtil.Handler1<SettingsResult>() {
+    VisualizationTree.findNew(context, start, SettingsResult.class, new VisualizationTree.Handler1<SettingsResult>() {
       @Override
       public void process(VisualizerContext context, SettingsResult sr) {
         final VisualizationTask task = new VisualizationTask(NAME, sr, null, SettingsVisualization.this);

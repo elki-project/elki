@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualize the clusters and cluster hierarchy found by OPTICS on the OPTICS
@@ -78,7 +78,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    Hierarchy.Iter<OPTICSProjector> it = VisualizerUtil.filter(context, result, OPTICSProjector.class);
+    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
     for(; it.valid(); it.advance()) {
       OPTICSProjector p = it.get();
       final Clustering<OPTICSModel> ocl = findOPTICSClustering(context.getHierarchy(), p.getResult());

@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.DetailViewSelectedEvent;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Swing window to manage a particular result visualization.
@@ -529,7 +529,7 @@ public class ResultWindow extends JFrame implements ResultListener {
           SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-              VisualizerUtil.setVisible(context, v, visItem.getState());
+              VisualizationTree.setVisible(context, v, visItem.getState());
             }
           });
         }
@@ -546,7 +546,7 @@ public class ResultWindow extends JFrame implements ResultListener {
           SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-              VisualizerUtil.setVisible(context, v, visItem.isSelected());
+              VisualizationTree.setVisible(context, v, visItem.isSelected());
             }
           });
         }

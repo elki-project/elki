@@ -1,12 +1,10 @@
 package de.lmu.ifi.dbs.elki.visualization;
 
-import java.util.ArrayList;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +23,7 @@ import java.util.ArrayList;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -48,21 +47,16 @@ import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 
 /**
  * Map to store context information for the visualizer. This can be any data
  * that should to be shared among plots, such as line colors, styles etc.
  *
  * @author Erich Schubert
- *
- *         TODO: remove this class
  *
  * @apiviz.landmark
  * @apiviz.composedOf StyleLibrary
@@ -80,9 +74,9 @@ public class VisualizerContext implements DataStoreListener, Result {
   private static final Logging LOG = Logging.getLogger(VisualizerContext.class);
 
   /**
-   * Visualization tree.
+   * Tree of visualizations.
    */
-  private HashMapHierarchy<Object> vistree = new HashMapHierarchy<>();
+  private VisualizationTree vistree = new VisualizationTree();
 
   /**
    * The full result object
@@ -95,14 +89,9 @@ public class VisualizerContext implements DataStoreListener, Result {
   private EventListenerList listenerList = new EventListenerList();
 
   /**
-   * Projectors to use
-   */
-  private Collection<ProjectorFactory> projectors;
-
-  /**
    * Factories to use
    */
-  private Collection<VisFactory> factories;
+  private Collection<VisualizationProcessor> factories;
 
   /**
    * Selection result
@@ -129,14 +118,12 @@ public class VisualizerContext implements DataStoreListener, Result {
    *
    * @param hier Result hierarchy
    * @param start Starting result
-   * @param projectors Projectors to use
    * @param factories Visualizer Factories to use
    */
-  public VisualizerContext(ResultHierarchy hier, Result start, Relation<?> relation, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories) {
+  public VisualizerContext(ResultHierarchy hier, Result start, Relation<?> relation, StyleLibrary stylelib, Collection<VisualizationProcessor> factories) {
     super();
     this.hier = hier;
     this.baseResult = start;
-    this.projectors = projectors;
     this.factories = factories;
 
     // Ensure that various common results needed by visualizers are
@@ -408,16 +395,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param item Item that has changed.
    */
   private void notifyFactories(Object item) {
-    for(ProjectorFactory p : projectors) {
-      try {
-        p.processNewResult(this, item);
-      }
-      catch(Throwable e) {
-        LOG.warning("ProjectorFactory " + p.getClass().getCanonicalName() + " failed:", e);
-      }
-    }
-    // Collect all visualizers.
-    for(VisFactory f : factories) {
+    for(VisualizationProcessor f : factories) {
       try {
         f.processNewResult(this, item);
       }
@@ -438,7 +416,7 @@ public class VisualizerContext implements DataStoreListener, Result {
     return out;
   }
 
-  public Hierarchy<Object> getVisHierarchy() {
+  public VisualizationTree getVisHierarchy() {
     return vistree;
   }
 }

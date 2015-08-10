@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
@@ -87,7 +87,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNewResultVis(context, start, SelectionResult.class, ScatterPlotProjector.class, new VisualizerUtil.Handler2<SelectionResult, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewResultVis(context, start, SelectionResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<SelectionResult, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, SelectionResult selres, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), SelectionToolCubeVisualization.this);

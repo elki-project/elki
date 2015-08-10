@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualizer, displaying the key for a clustering.
@@ -72,7 +72,7 @@ public class KeyVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, Clustering.class, new VisualizerUtil.Handler1<Clustering<?>>() {
+    VisualizationTree.findNew(context, start, Clustering.class, new VisualizationTree.Handler1<Clustering<?>>() {
       @Override
       public void process(VisualizerContext context, Clustering<?> c) {
         final int numc = c.getAllClusters().size();

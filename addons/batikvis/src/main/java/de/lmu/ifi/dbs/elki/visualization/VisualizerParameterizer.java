@@ -55,10 +55,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedPara
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
-import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
@@ -130,14 +128,9 @@ public class VisualizerParameterizer {
   private StyleLibrary stylelib;
 
   /**
-   * (Result-to-visualization) Adapters
+   * Projections and visualization factories.
    */
-  private Collection<VisFactory> factories;
-
-  /**
-   * Projectors to use.
-   */
-  private Collection<ProjectorFactory> projectors;
+  private Collection<VisualizationProcessor> factories;
 
   /**
    * Sample size
@@ -160,11 +153,10 @@ public class VisualizerParameterizer {
    * @param factories Factories to use
    * @param hideVisualizers Visualizer hiding pattern
    */
-  public VisualizerParameterizer(int samplesize, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories, Pattern hideVisualizers) {
+  public VisualizerParameterizer(int samplesize, StyleLibrary stylelib, Collection<VisualizationProcessor> factories, Pattern hideVisualizers) {
     super();
     this.samplesize = samplesize;
     this.stylelib = stylelib;
-    this.projectors = projectors;
     this.factories = factories;
   }
 
@@ -194,7 +186,7 @@ public class VisualizerParameterizer {
         ResultUtil.addChildResult(rel, sample);
       }
     }
-    return new VisualizerContext(hier, start, relation, stylelib, projectors, factories);
+    return new VisualizerContext(hier, start, relation, stylelib, factories);
   }
 
   /**
@@ -270,17 +262,15 @@ public class VisualizerParameterizer {
 
     protected Pattern enableVisualizers = null;
 
-    protected Collection<VisFactory> factories = null;
-
-    protected Collection<ProjectorFactory> projectors = null;
+    protected Collection<VisualizationProcessor> factories = null;
 
     protected int samplesize = -1;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter samplingP = new IntParameter(SAMPLING_ID, 10000);
-      samplingP.addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
+      IntParameter samplingP = new IntParameter(SAMPLING_ID, 10000) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
       if(config.grab(samplingP)) {
         samplesize = samplingP.intValue();
       }
@@ -301,38 +291,7 @@ public class VisualizerParameterizer {
         }
       }
       MergedParameterization merged = new MergedParameterization(config);
-      projectors = collectProjectorFactorys(merged, enableVisualizers);
-      factories = collectVisFactorys(merged, enableVisualizers);
-    }
-
-    /**
-     * Collect and instantiate all projector factories.
-     *
-     * @param config Parameterization
-     * @param filter Filter
-     * @return List of all adapters found.
-     */
-    private static <O> Collection<ProjectorFactory> collectProjectorFactorys(MergedParameterization config, Pattern filter) {
-      ArrayList<ProjectorFactory> factories = new ArrayList<>();
-      for(Class<?> c : ELKIServiceRegistry.findAllImplementations(ProjectorFactory.class)) {
-        if(filter != null && !filter.matcher(c.getCanonicalName()).find()) {
-          continue;
-        }
-        try {
-          config.rewind();
-          ProjectorFactory a = ClassGenericsUtil.tryInstantiate(ProjectorFactory.class, c, config);
-          factories.add(a);
-        }
-        catch(Throwable e) {
-          if(LOG.isDebugging()) {
-            LOG.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
-          }
-          else {
-            LOG.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
-          }
-        }
-      }
-      return factories;
+      factories = collectFactorys(merged, enableVisualizers);
     }
 
     /**
@@ -342,23 +301,23 @@ public class VisualizerParameterizer {
      * @param filter Filter
      * @return List of all adapters found.
      */
-    private static <O> Collection<VisFactory> collectVisFactorys(MergedParameterization config, Pattern filter) {
-      ArrayList<VisFactory> factories = new ArrayList<>();
-      for(Class<?> c : ELKIServiceRegistry.findAllImplementations(VisFactory.class)) {
+    private static <O> Collection<VisualizationProcessor> collectFactorys(MergedParameterization config, Pattern filter) {
+      ArrayList<VisualizationProcessor> factories = new ArrayList<>();
+      for(Class<?> c : ELKIServiceRegistry.findAllImplementations(VisualizationProcessor.class)) {
         if(filter != null && !filter.matcher(c.getCanonicalName()).find()) {
           continue;
         }
         try {
           config.rewind();
-          VisFactory a = ClassGenericsUtil.tryInstantiate(VisFactory.class, c, config);
+          VisualizationProcessor a = ClassGenericsUtil.tryInstantiate(VisualizationProcessor.class, c, config);
           factories.add(a);
         }
         catch(Throwable e) {
           if(LOG.isDebugging()) {
-            LOG.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
+            LOG.exception("Error instantiating visualization processor " + c.getName(), e.getCause());
           }
           else {
-            LOG.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
+            LOG.warning("Error instantiating visualization processor " + c.getName() + ": " + e.getMessage());
           }
         }
       }
@@ -367,7 +326,7 @@ public class VisualizerParameterizer {
 
     @Override
     protected VisualizerParameterizer makeInstance() {
-      return new VisualizerParameterizer(samplesize, stylelib, projectors, factories, enableVisualizers);
+      return new VisualizerParameterizer(samplesize, stylelib, factories, enableVisualizers);
     }
   }
 }

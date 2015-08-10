@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualizer to render a simple 2D curve such as a ROC curve.
@@ -157,7 +157,7 @@ public class XYPlotVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNew(context, start, XYPlot.class, new VisualizerUtil.Handler1<XYPlot>() {
+    VisualizationTree.findNew(context, start, XYPlot.class, new VisualizationTree.Handler1<XYPlot>() {
       @Override
       public void process(VisualizerContext context, XYPlot plot) {
         final VisualizationTask task = new VisualizationTask(NAME, plot, null, XYPlotVisualization.this);

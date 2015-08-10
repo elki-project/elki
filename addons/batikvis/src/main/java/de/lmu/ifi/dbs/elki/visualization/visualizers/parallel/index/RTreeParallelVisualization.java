@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index.TreeMBRVisualization;
 
@@ -93,8 +93,8 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNewSiblings(context, start, AbstractRStarTree.class, ParallelPlotProjector.class, //
-    new VisualizerUtil.Handler2<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>, ParallelPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, start, AbstractRStarTree.class, ParallelPlotProjector.class, //
+    new VisualizationTree.Handler2<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>, ParallelPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, AbstractRStarTree<RStarTreeNode, SpatialEntry, ?> tree, ParallelPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), RTreeParallelVisualization.this);

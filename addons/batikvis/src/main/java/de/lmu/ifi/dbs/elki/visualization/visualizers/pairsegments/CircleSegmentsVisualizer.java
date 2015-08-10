@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
@@ -127,7 +127,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
     List<Segments> segments = ResultUtil.filterResults(context.getHierarchy(), (Result) result, Segments.class);
     for(Segments segmentResult : segments) {
       SegmentsStylingPolicy policy;
-      Hierarchy.Iter<SegmentsStylingPolicy> it = VisualizerUtil.filter(context, result, SegmentsStylingPolicy.class);
+      Hierarchy.Iter<SegmentsStylingPolicy> it = VisualizationTree.filter(context, result, SegmentsStylingPolicy.class);
       if(it.valid()) {
         policy = it.get();
       }

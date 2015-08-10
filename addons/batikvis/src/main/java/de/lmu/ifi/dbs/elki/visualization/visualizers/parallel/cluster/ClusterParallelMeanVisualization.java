@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 
 /**
@@ -75,7 +75,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizerUtil.findNewSiblings(context, start, Clustering.class, ParallelPlotProjector.class, new VisualizerUtil.Handler2<Clustering<?>, ParallelPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, start, Clustering.class, ParallelPlotProjector.class, new VisualizationTree.Handler2<Clustering<?>, ParallelPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, Clustering<?> c, ParallelPlotProjector<?> p) {
         if(c.getAllClusters().size() == 0) {
