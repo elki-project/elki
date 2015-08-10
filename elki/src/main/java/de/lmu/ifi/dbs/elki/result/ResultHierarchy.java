@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarch
 
 /**
  * Class to store a hierarchy of result objects.
- * 
+ *
  * @author Erich Schubert
  */
 // TODO: add listener merging!
@@ -55,9 +55,9 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
   }
 
   @Override
-  public void add(Result parent, Result child) {
-    super.add(parent, child);
-    if(child instanceof HierarchicalResult) {
+  public boolean add(Result parent, Result child) {
+    boolean changed = super.add(parent, child);
+    if(changed && child instanceof HierarchicalResult) {
       HierarchicalResult hr = (HierarchicalResult) child;
       ModifiableHierarchy<Result> h = hr.getHierarchy();
       // Merge hierarchy
@@ -72,17 +72,19 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
       }
     }
     fireResultAdded(child, parent);
+    return changed;
   }
 
   @Override
-  public void remove(Result parent, Result child) {
-    super.remove(parent, child);
+  public boolean remove(Result parent, Result child) {
+    boolean changed = super.remove(parent, child);
     fireResultRemoved(child, parent);
+    return changed;
   }
 
   /**
    * Register a result listener.
-   * 
+   *
    * @param listener Result listener.
    */
   public void addResultListener(ResultListener listener) {
@@ -91,7 +93,7 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
 
   /**
    * Remove a result listener.
-   * 
+   *
    * @param listener Result listener.
    */
   public void removeResultListener(ResultListener listener) {
@@ -100,7 +102,7 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
 
   /**
    * Signal that a result has changed (public API)
-   * 
+   *
    * @param res Result that has changed.
    */
   public void resultChanged(Result res) {
@@ -109,7 +111,7 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
 
   /**
    * Informs all registered {@link ResultListener} that a new result was added.
-   * 
+   *
    * @param child New child result added
    * @param parent Parent result that was added to
    */
@@ -124,7 +126,7 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
 
   /**
    * Informs all registered {@link ResultListener} that a result has changed.
-   * 
+   *
    * @param current Result that has changed
    */
   private void fireResultChanged(Result current) {
@@ -139,7 +141,7 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
   /**
    * Informs all registered {@link ResultListener} that a new result has been
    * removed.
-   * 
+   *
    * @param child result that has been removed
    * @param parent Parent result that has been removed
    */

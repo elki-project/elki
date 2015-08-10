@@ -43,6 +43,14 @@ public interface Hierarchy<O> {
   int size();
 
   /**
+   * Check if an object is part of a hierarchy.
+   *
+   * @param object Object to check
+   * @return {@code true} if part of the hierarchy
+   */
+  boolean contains(O object);
+
+  /**
    * Get number of children
    *
    * @param self object to get number of children for
@@ -128,14 +136,6 @@ public interface Hierarchy<O> {
    * @return Iterator over all members.
    */
   Iter<O> iterAll();
-
-  /**
-   * Iterate over a snapshot all members (for safety against concurrent
-   * modifications).
-   *
-   * @return Iterator over all members.
-   */
-  Iter<O> iterAllSafe();
 
   /**
    * Iterator interface.

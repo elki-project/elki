@@ -1,55 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
 
-import java.util.ArrayList;
-
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-/*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
-
-Copyright (C) 2015
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 
 /**
  * Centralized hierarchy implementation, using a HashMap of Lists.
@@ -65,6 +17,17 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   final private HashMap<O, Rec<O>> graph;
 
   /**
+   * All elements, in insertion order (and will not fail badly if concurrent
+   * insertions happen).
+   */
+  Object[] elems = new Object[11];
+
+  /**
+   * Number of all elements.
+   */
+  int numelems = 0;
+
+  /**
    * Constructor.
    */
   public HashMapHierarchy() {
@@ -73,100 +36,115 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   }
 
   @Override
+  public boolean contains(O object) {
+    return graph.containsKey(object);
+  }
+
+  @Override
   public int size() {
     return graph.size();
   }
 
   @Override
-  public void add(O parent, O child) {
+  public boolean add(O parent, O child) {
+    boolean changed = false;
     // Add child to parent.
     {
-      Rec<O> rec = graph.get(parent);
+      Rec<O> rec = getRec(parent);
       if(rec == null) {
         rec = new Rec<>();
-        graph.put(parent, rec);
+        putRec(parent, rec);
       }
-      rec.addChild(child);
+      changed |= rec.addChild(child);
     }
     // Add child to parent
     {
-      Rec<O> rec = graph.get(child);
+      Rec<O> rec = getRec(child);
       if(rec == null) {
         rec = new Rec<>();
-        graph.put(child, rec);
+        putRec(child, rec);
       }
-      rec.addParent(parent);
+      changed |= rec.addParent(parent);
     }
+    return changed;
   }
 
   @Override
-  public void add(O entry) {
-    Rec<O> rec = graph.get(entry);
+  public boolean add(O entry) {
+    Rec<O> rec = getRec(entry);
     if(rec == null) {
       rec = new Rec<>();
-      graph.put(entry, rec);
+      putRec(entry, rec);
+      return true;
     }
+    return false;
   }
 
   @Override
-  public void remove(O parent, O child) {
+  public boolean remove(O parent, O child) {
+    boolean changed = false;
     // Remove child from parent.
     {
-      Rec<O> rec = graph.get(parent);
+      Rec<O> rec = getRec(parent);
       if(rec != null) {
-        rec.removeChild(child);
+        changed |= rec.removeChild(child);
       }
     }
     // Remove parent from child
     {
-      Rec<O> rec = graph.get(child);
+      Rec<O> rec = getRec(child);
       if(rec != null) {
-        rec.removeParent(parent);
+        changed |= rec.removeParent(parent);
       }
     }
-  }
-
-  @Override
-  public void remove(O entry) {
-    Rec<O> rec = graph.get(entry);
-    if(rec == null) {
-      return;
-    }
-    for(int i = 0; i < rec.nump; i++) {
-      graph.get(rec.parents[i]).removeChild(entry);
-      rec.parents[i] = null;
-    }
-    for(int i = 0; i < rec.numc; i++) {
-      graph.get(rec.children[i]).removeParent(entry);
-      rec.children[i] = null;
-    }
-    graph.remove(entry);
+    return changed;
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public void removeSubtree(O entry) {
-    Rec<O> rec = graph.get(entry);
+  public boolean remove(O entry) {
+    Rec<O> rec = getRec(entry);
     if(rec == null) {
-      return;
+      return false;
     }
     for(int i = 0; i < rec.nump; i++) {
-      graph.get(rec.parents[i]).removeChild(entry);
+      getRec((O) rec.parents[i]).removeChild(entry);
       rec.parents[i] = null;
     }
     for(int i = 0; i < rec.numc; i++) {
-      final Rec<O> crec = graph.get(rec.children[i]);
+      getRec((O) rec.children[i]).removeParent(entry);
+      rec.children[i] = null;
+    }
+    removeRec(entry);
+    return true;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public boolean removeSubtree(O entry) {
+    Rec<O> rec = getRec(entry);
+    if(rec == null) {
+      return false;
+    }
+    for(int i = 0; i < rec.nump; i++) {
+      getRec((O) rec.parents[i]).removeChild(entry);
+      rec.parents[i] = null;
+    }
+    for(int i = 0; i < rec.numc; i++) {
+      final Rec<O> crec = getRec((O) rec.children[i]);
       crec.removeParent(entry);
       if(crec.nump == 0) {
         removeSubtree((O) rec.children[i]);
       }
       rec.children[i] = null;
     }
+    removeRec(entry);
+    return true;
   }
 
   @Override
   public int numChildren(O obj) {
-    Rec<O> rec = graph.get(obj);
+    Rec<O> rec = getRec(obj);
     if(rec == null) {
       return 0;
     }
@@ -175,7 +153,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
   @Override
   public Iter<O> iterChildren(O obj) {
-    Rec<O> rec = graph.get(obj);
+    Rec<O> rec = getRec(obj);
     if(rec == null) {
       return emptyIterator();
     }
@@ -184,7 +162,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
   @Override
   public Iter<O> iterChildrenReverse(O obj) {
-    Rec<O> rec = graph.get(obj);
+    Rec<O> rec = getRec(obj);
     if(rec == null) {
       return emptyIterator();
     }
@@ -203,7 +181,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
   @Override
   public int numParents(O obj) {
-    Rec<O> rec = graph.get(obj);
+    Rec<O> rec = getRec(obj);
     if(rec == null) {
       return 0;
     }
@@ -212,7 +190,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
   @Override
   public Iter<O> iterParents(O obj) {
-    Rec<O> rec = graph.get(obj);
+    Rec<O> rec = getRec(obj);
     if(rec == null) {
       return emptyIterator();
     }
@@ -221,7 +199,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
   @Override
   public Iter<O> iterParentsReverse(O obj) {
-    Rec<O> rec = graph.get(obj);
+    Rec<O> rec = getRec(obj);
     if(rec == null) {
       return emptyIterator();
     }
@@ -240,12 +218,52 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
   @Override
   public Iter<O> iterAll() {
-    return new ItrAll(false);
+    return new ItrAll();
   }
 
-  @Override
-  public Iter<O> iterAllSafe() {
-    return new ItrAll(true);
+  /**
+   * Get a record.
+   *
+   * @param obj Key
+   * @return Record
+   */
+  private Rec<O> getRec(O obj) {
+    return graph.get(obj);
+  }
+
+  /**
+   * Put a record.
+   *
+   * @param obj Key
+   * @param rec Record
+   */
+  private void putRec(O obj, Rec<O> rec) {
+    graph.put(obj, rec);
+    for(int i = 0; i < numelems; ++i) {
+      if(obj == elems[i]) {
+        return;
+      }
+    }
+    if(elems.length == numelems) {
+      elems = Arrays.copyOf(elems, (elems.length << 1) + 1);
+    }
+    elems[numelems++] = obj;
+  }
+
+  /**
+   * Remove a record.
+   *
+   * @param obj Key
+   */
+  private void removeRec(O obj) {
+    graph.remove(obj);
+    for(int i = 0; i < numelems; ++i) {
+      if(obj == elems[i]) {
+        System.arraycopy(elems, i + 1, elems, i, --numelems - i);
+        elems[numelems] = null;
+        return;
+      }
+    }
   }
 
   /**
@@ -257,7 +275,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
    *
    * @param <O> object type
    */
-  private static class Rec<O> {
+  protected static class Rec<O> {
     /**
      * Number of parents, number of children.
      */
@@ -282,17 +300,18 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * Add a parent.
      *
      * @param parent Parent to add.
+     * @param {@code true} when changed
      */
-    void addParent(O parent) {
+    boolean addParent(O parent) {
       if(parents == EMPTY) {
         parents = new Object[1];
         parents[0] = parent;
         nump = 1;
-        return;
+        return true;
       }
       for(int i = 0; i < nump; i++) {
         if(parent.equals(parents[i])) {
-          return; // Exists already.
+          return false; // Exists already.
         }
       }
       if(parents.length == nump) {
@@ -300,73 +319,80 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
         parents = Arrays.copyOf(parents, newsize);
       }
       parents[nump++] = parent;
+      return true;
     }
 
     /**
      * Add a child.
      *
      * @param child Child to add
+     * @param {@code true} when changed
      */
-    void addChild(O child) {
+    boolean addChild(O child) {
       if(children == EMPTY) {
         children = new Object[5];
         children[0] = child;
         numc = 1;
-        return;
+        return true;
       }
       for(int i = 0; i < numc; i++) {
         if(child.equals(children[i])) {
-          return; // Exists already
+          return false; // Exists already
         }
       }
       if(children.length == numc) {
         children = Arrays.copyOf(children, (children.length << 1) + 1);
       }
       children[numc++] = child;
+      return true;
     }
 
     /**
      * Remove a parent.
      *
      * @param parent Parent to remove.
+     * @param {@code true} when changed
      */
-    void removeParent(O parent) {
+    boolean removeParent(O parent) {
       if(parents == EMPTY) {
-        return;
+        return false;
       }
       for(int i = 0; i < nump; i++) {
         if(parent.equals(parents[i])) {
           --nump;
           System.arraycopy(parents, i + 1, parents, i, nump - i);
           parents[nump] = null;
-          break;
+          if(nump == 0) {
+            parents = EMPTY;
+          }
+          return true;
         }
       }
-      if(nump == 0) {
-        parents = EMPTY;
-      }
+      return false;
     }
 
     /**
      * Remove a child.
      *
      * @param child Child to remove.
+     * @param {@code true} when changed
      */
-    void removeChild(O child) {
+    boolean removeChild(O child) {
       if(children == EMPTY) {
-        return;
+        return false;
       }
       for(int i = 0; i < numc; i++) {
         if(child.equals(children[i])) {
           --numc;
           System.arraycopy(children, i + 1, children, i, numc - i);
           children[numc] = null;
-          break;
+          if(numc == 0) {
+            children = EMPTY;
+          }
+          return true;
         }
       }
-      if(numc == 0) {
-        children = EMPTY;
-      }
+      return false;
     }
 
     /**
@@ -535,7 +561,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   }
 
   /**
-   * Iterator to collect into the descendants.
+   * Iterator over all descendants.
    *
    * @author Erich Schubert
    *
@@ -563,7 +589,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @param start Starting element.
      */
     ItrDesc(O start) {
-      childiter = iterChildren(start);
+      this(start, null);
     }
 
     /**
@@ -647,7 +673,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @param start Starting element.
      */
     ItrAnc(O start) {
-      parentiter = iterChildren(start);
+      this(start, null);
     }
 
     /**
@@ -657,7 +683,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * @param extra Additional element (cannot be {@code null}).
      */
     ItrAnc(O start, O extra) {
-      parentiter = iterChildren(start);
+      parentiter = iterParents(start);
       this.extra = extra;
     }
 
@@ -703,52 +729,28 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   }
 
   /**
-   * Iterator over all members of the hierarchy.
+   * Iterator over all known elements, by insertion order.
    *
    * @author Erich Schubert
-   *
-   * @apiviz.exclude
    */
-  private class ItrAll implements Iter<O> {
-    /**
-     * The true iterator.
-     */
-    final Iterator<O> iter;
-
-    /**
-     * Current object.
-     */
-    O cur = null;
-
-    /**
-     * Constructor.
-     *
-     * @param copy Do a copy of the key set.
-     */
-    ItrAll(boolean copy) {
-      iter = copy ? new ArrayList<>(graph.keySet()).iterator() : graph.keySet().iterator();
-      advance();
-    }
+  private class ItrAll implements Hierarchy.Iter<O> {
+    int pos;
 
     @Override
     public boolean valid() {
-      return cur != null;
+      return pos < numelems;
     }
 
-    @Override
-    public Iter<O> advance() {
-      if(iter.hasNext()) {
-        cur = iter.next();
-      }
-      else {
-        cur = null;
-      }
-      return this;
-    }
-
+    @SuppressWarnings("unchecked")
     @Override
     public O get() {
-      return cur;
+      return (O) elems[pos];
+    }
+
+    @Override
+    public ItrAll advance() {
+      ++pos;
+      return this;
     }
   }
 
