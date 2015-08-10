@@ -1,9 +1,9 @@
 package de.lmu.ifi.dbs.elki.math.geometry;
 
-import de.lmu.ifi.dbs.elki.datasource.parser.DoubleArray;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 
 /**
  * An XYCurve is an ordered collection of 2d points, meant for chart generation.

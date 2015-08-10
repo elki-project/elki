@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.datasource.parser;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  */
 
 import java.util.Arrays;
-
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
  * Array of double values.
@@ -145,7 +143,15 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
    * @param val Value to insert
    */
   public void insert(int pos, double val) {
-    System.arraycopy(data, pos, data, pos + 1, size - pos);
+    if(size == data.length) {
+      double[] oldd = data;
+      data = new double[size << 1];
+      System.arraycopy(oldd, 0, data, 0, pos);
+      System.arraycopy(oldd, pos, data, pos + 1, size - pos);
+    }
+    else {
+      System.arraycopy(data, pos, data, pos + 1, size - pos);
+    }
     data[pos] = val;
     size++;
   }

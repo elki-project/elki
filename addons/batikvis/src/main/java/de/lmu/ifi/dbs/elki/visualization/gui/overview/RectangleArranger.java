@@ -8,9 +8,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 
-import de.lmu.ifi.dbs.elki.datasource.parser.DoubleArray;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 
 /**
  * This is a rather naive rectangle arrangement class. It will try to place

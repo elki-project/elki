@@ -3,9 +3,9 @@ package de.lmu.ifi.dbs.elki.data;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import de.lmu.ifi.dbs.elki.datasource.parser.DoubleArray;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
