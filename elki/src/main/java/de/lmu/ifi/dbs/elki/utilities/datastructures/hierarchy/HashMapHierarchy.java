@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
 
+import java.util.ArrayList;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,12 +28,34 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+/*
+This file is part of ELKI:
+Environment for Developing KDD-Applications Supported by Index-Structures
+
+Copyright (C) 2015
+Ludwig-Maximilians-Universität München
+Lehr- und Forschungseinheit für Datenbanksysteme
+ELKI Development Team
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 /**
  * Centralized hierarchy implementation, using a HashMap of Lists.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type (arbitrary!)
  */
 public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
@@ -149,22 +173,20 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     return rec.numc;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Iter<O> iterChildren(O obj) {
     Rec<O> rec = graph.get(obj);
     if(rec == null) {
-      return (Iter<O>) EMPTY_ITERATOR;
+      return emptyIterator();
     }
     return rec.iterChildren();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Iter<O> iterChildrenReverse(O obj) {
     Rec<O> rec = graph.get(obj);
     if(rec == null) {
-      return (Iter<O>) EMPTY_ITERATOR;
+      return emptyIterator();
     }
     return rec.iterChildrenReverse();
   }
@@ -172,6 +194,11 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   @Override
   public Iter<O> iterDescendants(O obj) {
     return new ItrDesc(obj);
+  }
+
+  @Override
+  public Iter<O> iterDescendantsSelf(O obj) {
+    return new ItrDesc(obj, obj);
   }
 
   @Override
@@ -183,22 +210,20 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     return rec.nump;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Iter<O> iterParents(O obj) {
     Rec<O> rec = graph.get(obj);
     if(rec == null) {
-      return (Iter<O>) EMPTY_ITERATOR;
+      return emptyIterator();
     }
     return rec.iterParents();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Iter<O> iterParentsReverse(O obj) {
     Rec<O> rec = graph.get(obj);
     if(rec == null) {
-      return (Iter<O>) EMPTY_ITERATOR;
+      return emptyIterator();
     }
     return rec.iterParentsReverse();
   }
@@ -209,17 +234,27 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
   }
 
   @Override
+  public Iter<O> iterAncestorsSelf(O obj) {
+    return new ItrAnc(obj, obj);
+  }
+
+  @Override
   public Iter<O> iterAll() {
-    return new ItrAll();
+    return new ItrAll(false);
+  }
+
+  @Override
+  public Iter<O> iterAllSafe() {
+    return new ItrAll(true);
   }
 
   /**
    * Hierarchy pointers for an object.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> object type
    */
   private static class Rec<O> {
@@ -245,7 +280,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Add a parent.
-     * 
+     *
      * @param parent Parent to add.
      */
     void addParent(O parent) {
@@ -269,7 +304,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Add a child.
-     * 
+     *
      * @param child Child to add
      */
     void addChild(O child) {
@@ -292,7 +327,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Remove a parent.
-     * 
+     *
      * @param parent Parent to remove.
      */
     void removeParent(O parent) {
@@ -314,7 +349,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Remove a child.
-     * 
+     *
      * @param child Child to remove.
      */
     void removeChild(O child) {
@@ -336,7 +371,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Iterate over parents.
-     * 
+     *
      * @return Iterator for parents.
      */
     @SuppressWarnings("unchecked")
@@ -349,7 +384,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Iterate over parents.
-     * 
+     *
      * @return Iterator for parents.
      */
     @SuppressWarnings("unchecked")
@@ -362,7 +397,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Iterate over parents.
-     * 
+     *
      * @return Iterator for parents.
      */
     @SuppressWarnings("unchecked")
@@ -375,7 +410,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Iterate over parents.
-     * 
+     *
      * @return Iterator for parents.
      */
     @SuppressWarnings("unchecked")
@@ -388,9 +423,9 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Parent iterator.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     class ItrParents implements Iter<O> {
@@ -416,9 +451,9 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Parent iterator.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     class ItrParentsReverse implements Iter<O> {
@@ -444,9 +479,9 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Child iterator.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     class ItrChildren implements Iter<O> {
@@ -472,9 +507,9 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Child iterator.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     class ItrChildrenReverse implements Iter<O> {
@@ -501,9 +536,9 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
   /**
    * Iterator to collect into the descendants.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class ItrDesc implements Iter<O> {
@@ -518,21 +553,41 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     Iter<O> subiter = null;
 
     /**
-     * Starting element.
-     * 
-     * @param start
+     * Additional object to return as first result.
+     */
+    O extra = null;
+
+    /**
+     * Constructor for descendants-only.
+     *
+     * @param start Starting element.
      */
     ItrDesc(O start) {
       childiter = iterChildren(start);
     }
 
+    /**
+     * Constructor with additional element.
+     *
+     * @param start Starting element.
+     * @param extra Additional element (cannot be {@code null}).
+     */
+    ItrDesc(O start, O extra) {
+      childiter = iterChildren(start);
+      this.extra = extra;
+    }
+
     @Override
     public boolean valid() {
-      return childiter.valid() || (subiter != null && subiter.valid());
+      return extra != null || childiter.valid() || (subiter != null && subiter.valid());
     }
 
     @Override
     public Iter<O> advance() {
+      if(extra != null) {
+        extra = null;
+        return this;
+      }
       if(subiter == null) { // Not yet descended
         assert(childiter.valid());
         subiter = iterDescendants(childiter.get());
@@ -551,22 +606,23 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     @Override
     public O get() {
+      if(extra != null) {
+        return extra;
+      }
       if(subiter != null) {
         assert(subiter.valid());
         return subiter.get();
       }
-      else {
-        assert(childiter.valid());
-        return childiter.get();
-      }
+      assert(childiter.valid());
+      return childiter.get();
     }
   }
 
   /**
    * Iterator over all Ancestors.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class ItrAnc implements Iter<O> {
@@ -581,21 +637,41 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     Iter<O> subiter = null;
 
     /**
-     * Starting element.
-     * 
-     * @param start
+     * Additional object to return as first result.
+     */
+    O extra = null;
+
+    /**
+     * Constructor for descendants-only.
+     *
+     * @param start Starting element.
      */
     ItrAnc(O start) {
-      parentiter = iterParents(start);
+      parentiter = iterChildren(start);
+    }
+
+    /**
+     * Constructor with additional element.
+     *
+     * @param start Starting element.
+     * @param extra Additional element (cannot be {@code null}).
+     */
+    ItrAnc(O start, O extra) {
+      parentiter = iterChildren(start);
+      this.extra = extra;
     }
 
     @Override
     public boolean valid() {
-      return parentiter.valid() || (subiter != null && subiter.valid());
+      return extra != null || parentiter.valid() || (subiter != null && subiter.valid());
     }
 
     @Override
     public Iter<O> advance() {
+      if(extra != null) {
+        extra = null;
+        return this;
+      }
       if(subiter == null) { // Not yet descended
         assert(parentiter.valid());
         subiter = iterAncestors(parentiter.get());
@@ -614,22 +690,23 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     @Override
     public O get() {
+      if(extra != null) {
+        return extra;
+      }
       if(subiter != null) {
         assert(subiter.valid());
         return subiter.get();
       }
-      else {
-        assert(parentiter.valid());
-        return parentiter.get();
-      }
+      assert(parentiter.valid());
+      return parentiter.get();
     }
   }
 
   /**
    * Iterator over all members of the hierarchy.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class ItrAll implements Iter<O> {
@@ -645,9 +722,11 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
 
     /**
      * Constructor.
+     *
+     * @param copy Do a copy of the key set.
      */
-    ItrAll() {
-      iter = graph.keySet().iterator();
+    ItrAll(boolean copy) {
+      iter = copy ? new ArrayList<>(graph.keySet()).iterator() : graph.keySet().iterator();
       advance();
     }
 
@@ -671,6 +750,16 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
     public O get() {
       return cur;
     }
+  }
+
+  /**
+   * Get an empty hierarchy iterator.
+   *
+   * @return Empty iterator
+   */
+  @SuppressWarnings("unchecked")
+  public static <O> Hierarchy.Iter<O> emptyIterator() {
+    return (Iter<O>) EMPTY_ITERATOR;
   }
 
   /**
