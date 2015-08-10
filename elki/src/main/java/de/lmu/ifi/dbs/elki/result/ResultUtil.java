@@ -41,15 +41,15 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 
 /**
  * Utilities for handling result objects
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses Result oneway - - filters
  */
 public class ResultUtil {
   /**
    * Collect all Annotation results from a Result
-   * 
+   *
    * @param r Result
    * @return List of all annotation results
    */
@@ -67,7 +67,7 @@ public class ResultUtil {
 
   /**
    * Collect all ordering results from a Result
-   * 
+   *
    * @param r Result
    * @return List of ordering results
    */
@@ -85,7 +85,7 @@ public class ResultUtil {
 
   /**
    * Collect all clustering results from a Result
-   * 
+   *
    * @param r Result
    * @return List of clustering results
    */
@@ -103,7 +103,7 @@ public class ResultUtil {
 
   /**
    * Collect all collection results from a Result
-   * 
+   *
    * @param r Result
    * @return List of collection results
    */
@@ -121,7 +121,7 @@ public class ResultUtil {
 
   /**
    * Return all Iterable results
-   * 
+   *
    * @param r Result
    * @return List of iterable results
    */
@@ -139,7 +139,7 @@ public class ResultUtil {
 
   /**
    * Collect all outlier results from a Result
-   * 
+   *
    * @param r Result
    * @return List of outlier results
    */
@@ -157,7 +157,7 @@ public class ResultUtil {
 
   /**
    * Collect all settings results from a Result
-   * 
+   *
    * @param r Result
    * @return List of settings results
    */
@@ -175,7 +175,7 @@ public class ResultUtil {
 
   /**
    * Return only results of the given restriction class
-   * 
+   *
    * @param <C> Class type
    * @param hier Result hierarchy
    * @param r Starting position
@@ -184,7 +184,7 @@ public class ResultUtil {
    */
   // We can't ensure that restrictionClass matches C exactly.
   @SuppressWarnings("unchecked")
-  public static <C> ArrayList<C> filterResults(ResultHierarchy hier, Result r, Class<? super C> restrictionClass) {
+  public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Result r, Class<? super C> restrictionClass) {
     ArrayList<C> res = new ArrayList<>();
     if(restrictionClass.isInstance(r)) {
       res.add((C) restrictionClass.cast(r));
@@ -200,7 +200,7 @@ public class ResultUtil {
 
   /**
    * Return only results of the given restriction class
-   * 
+   *
    * @param <C> Class type
    * @param hier Result hierarchy
    * @param restrictionClass Class restriction
@@ -208,7 +208,7 @@ public class ResultUtil {
    */
   // We can't ensure that restrictionClass matches C exactly.
   @SuppressWarnings("unchecked")
-  public static <C> ArrayList<C> filterResults(ResultHierarchy hier, Class<? super C> restrictionClass) {
+  public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Class<? super C> restrictionClass) {
     ArrayList<C> res = new ArrayList<>();
     for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
       Result result = iter.get();
@@ -221,12 +221,11 @@ public class ResultUtil {
 
   /**
    * Ensure that the result contains at least one Clustering.
-   * 
-   * @param <O> Database type
+   *
    * @param db Database to process
    * @param result result
    */
-  public static <O> void ensureClusteringResult(final Database db, final Result result) {
+  public static void ensureClusteringResult(final Database db, final Result result) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(db.getHierarchy(), result, Clustering.class);
     if(clusterings.size() == 0) {
       ClusteringAlgorithm<Clustering<Model>> split = new ByLabelOrAllInOneClustering();
@@ -237,7 +236,7 @@ public class ResultUtil {
 
   /**
    * Ensure that there also is a selection container object.
-   * 
+   *
    * @param db Database
    * @return selection result
    */
@@ -253,7 +252,7 @@ public class ResultUtil {
 
   /**
    * Get the sampling result attached to a relation
-   * 
+   *
    * @param rel Relation
    * @return Sampling result.
    */
@@ -269,7 +268,7 @@ public class ResultUtil {
 
   /**
    * Get (or create) a scales result for a relation.
-   * 
+   *
    * @param rel Relation
    * @return associated scales result
    */
@@ -285,7 +284,7 @@ public class ResultUtil {
 
   /**
    * Add a child result.
-   * 
+   *
    * @param parent Parent
    * @param child Child
    */
@@ -295,7 +294,7 @@ public class ResultUtil {
 
   /**
    * Find the first database result in the tree.
-   * 
+   *
    * @param baseResult Result tree base.
    * @return Database
    */
@@ -306,7 +305,7 @@ public class ResultUtil {
 
   /**
    * Find the first database result in the tree.
-   * 
+   *
    * @param baseResult Result tree base.
    * @return Database
    */
@@ -317,7 +316,7 @@ public class ResultUtil {
 
   /**
    * Recursively remove a result and its children.
-   * 
+   *
    * @param hierarchy Result hierarchy
    * @param child Result to remove
    */
