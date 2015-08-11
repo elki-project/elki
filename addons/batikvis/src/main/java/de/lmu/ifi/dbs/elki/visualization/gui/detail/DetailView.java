@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -265,6 +266,19 @@ public class DetailView extends SVGPlot implements VisualizationListener {
     // Make sure we are affected:
     if(!(current instanceof VisualizationTask)) {
       return;
+    }
+    if(visi.proj != null) {
+      boolean include = false;
+      Hierarchy.Iter<Object> it = context.getVisHierarchy().iterAncestors(current);
+      for(; it.valid(); it.advance()) {
+        if(visi.proj == it.get()) {
+          include = true;
+          break;
+        }
+      }
+      if(!include) {
+        return; // Attached to different projection.
+      }
     }
     // Get the layer
     final VisualizationTask task = (VisualizationTask) current;

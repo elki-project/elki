@@ -125,9 +125,7 @@ public class BubbleVisualization extends AbstractVisFactory {
         }
         final VisualizationTask task = new VisualizationTask(NAME, o, p.getRelation(), BubbleVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
-        if(!vis) {
-          task.initDefaultVisibility(false);
-        }
+        task.initDefaultVisibility(vis);
         context.addVis(o, task);
         context.addVis(p, task);
       }

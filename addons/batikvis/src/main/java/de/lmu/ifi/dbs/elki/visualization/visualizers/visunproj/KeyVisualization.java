@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -42,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
@@ -54,7 +52,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * Visualizer, displaying the key for a clustering.
@@ -72,47 +71,47 @@ public class KeyVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, Clustering.class, new VisualizationTree.Handler1<Clustering<?>>() {
-      @Override
-      public void process(VisualizerContext context, Clustering<?> c) {
-        final int numc = c.getAllClusters().size();
-        final int topc = c.getToplevelClusters().size();
-        if(numc > 0) {
-          final VisualizationTask task = new VisualizationTask(NAME, c, null, KeyVisualization.this);
-          if(numc == topc) {
-            // FIXME: compute from labels?
-            final double maxwidth = 10.;
-            // Flat clustering.
-            final int cols = getPreferredColumns(1.0, 1.0, numc, maxwidth);
-            final int rows = (int) Math.ceil(numc / (double) cols);
-            final double ratio = cols * maxwidth / (2. + rows);
-            task.width = (ratio >= 1.) ? 1 : 1. / ratio;
-            task.height = (ratio >= 1.) ? 1. / ratio : 1;
-            if(numc > 100) {
-              task.width *= 2;
-              task.height *= 2;
-            }
-          }
-          else {
-            // Hierarchical clustering.
-            final int[] shape = findDepth(c);
-            final double maxwidth = 8.;
-            final double ratio = shape[0] * maxwidth / (2. + shape[1]);
-            task.width = (ratio >= 1.) ? 1 : 1. / ratio;
-            task.height = (ratio >= 1.) ? 1. / ratio : 1;
-            if(shape[0] * maxwidth > 20 || shape[1] > 18) {
-              task.width *= 2;
-              task.height *= 2;
-            }
-          }
-          task.level = VisualizationTask.LEVEL_STATIC;
-          if(numc < 20) {
-            task.nodetail = true;
-          }
-          context.addVis(c, task);
+    Hierarchy.Iter<Clustering<?>> it = VisualizationTree.filterResults(context, start, Clustering.class);
+    for(; it.valid(); it.advance()) {
+      Clustering<?> c = it.get();
+      final int numc = c.getAllClusters().size();
+      final int topc = c.getToplevelClusters().size();
+      if(numc <= 0) {
+        continue;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
+      if(numc == topc) {
+        // FIXME: compute from labels?
+        final double maxwidth = 10.;
+        // Flat clustering.
+        final int cols = getPreferredColumns(1.0, 1.0, numc, maxwidth);
+        final int rows = (int) Math.ceil(numc / (double) cols);
+        final double ratio = cols * maxwidth / (2. + rows);
+        task.width = (ratio >= 1.) ? 1 : 1. / ratio;
+        task.height = (ratio >= 1.) ? 1. / ratio : 1;
+        if(numc > 100) {
+          task.width *= 2;
+          task.height *= 2;
         }
       }
-    });
+      else {
+        // Hierarchical clustering.
+        final int[] shape = findDepth(c);
+        final double maxwidth = 8.;
+        final double ratio = shape[0] * maxwidth / (2. + shape[1]);
+        task.width = (ratio >= 1.) ? 1 : 1. / ratio;
+        task.height = (ratio >= 1.) ? 1. / ratio : 1;
+        if(shape[0] * maxwidth > 20 || shape[1] > 18) {
+          task.width *= 2;
+          task.height *= 2;
+        }
+      }
+      task.level = VisualizationTask.LEVEL_STATIC;
+      if(numc < 20) {
+        task.nodetail = true;
+      }
+      context.addVis(c, task);
+    }
   }
 
   private static <M extends Model> int[] findDepth(Clustering<M> c) {

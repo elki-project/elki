@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -75,16 +76,14 @@ public class SelectionLineVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, ParallelPlotProjector.class, //
-    new VisualizationTree.Handler1<ParallelPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context.getSelectionResult(), p.getRelation(), SelectionLineVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA - 1;
-        context.addVis(context.getSelectionResult(), task);
-        context.addVis(p, task);
-      }
-    });
+    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ParallelPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context.getSelectionResult(), p.getRelation(), SelectionLineVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA - 1;
+      context.addVis(context.getSelectionResult(), task);
+      context.addVis(p, task);
+    }
   }
 
   /**

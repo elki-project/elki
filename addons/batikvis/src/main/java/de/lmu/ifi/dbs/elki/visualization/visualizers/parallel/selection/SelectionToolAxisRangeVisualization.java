@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -83,20 +84,18 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, ParallelPlotProjector.class, //
-    new VisualizationTree.Handler1<ParallelPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context.getSelectionResult(), p.getRelation(), SelectionToolAxisRangeVisualization.this);
-        task.level = VisualizationTask.LEVEL_INTERACTIVE;
-        task.tool = true;
-        task.thumbnail = false;
-        task.noexport = true;
-        task.initDefaultVisibility(false);
-        context.addVis(context.getSelectionResult(), task);
-        context.addVis(p, task);
-      }
-    });
+    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ParallelPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context.getSelectionResult(), p.getRelation(), SelectionToolAxisRangeVisualization.this);
+      task.level = VisualizationTask.LEVEL_INTERACTIVE;
+      task.tool = true;
+      task.thumbnail = false;
+      task.noexport = true;
+      task.initDefaultVisibility(false);
+      context.addVis(context.getSelectionResult(), task);
+      context.addVis(p, task);
+    }
   }
 
   /**

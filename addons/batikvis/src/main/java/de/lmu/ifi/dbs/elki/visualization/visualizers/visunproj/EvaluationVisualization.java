@@ -1,11 +1,36 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2015
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -14,7 +39,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
@@ -56,16 +80,15 @@ public class EvaluationVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, EvaluationResult.class, new VisualizationTree.Handler1<EvaluationResult>() {
-      @Override
-      public void process(VisualizerContext context, EvaluationResult sr) {
-        final VisualizationTask task = new VisualizationTask(NAME, sr, null, EvaluationVisualization.this);
-        task.width = .5;
-        task.height = sr.numLines() * .05;
-        task.level = VisualizationTask.LEVEL_STATIC;
-        context.addVis(sr, task);
-      }
-    });
+    Hierarchy.Iter<EvaluationResult> it = VisualizationTree.filterResults(context, start, EvaluationResult.class);
+    for(; it.valid(); it.advance()) {
+      EvaluationResult sr = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, sr, null, EvaluationVisualization.this);
+      task.width = .5;
+      task.height = sr.numLines() * .05;
+      task.level = VisualizationTask.LEVEL_STATIC;
+      context.addVis(sr, task);
+    }
   }
 
   private double addBarChart(SVGPlot svgp, Element parent, double ypos, String label, double value, double minValue, double maxValue, double baseValue, boolean reversed) {

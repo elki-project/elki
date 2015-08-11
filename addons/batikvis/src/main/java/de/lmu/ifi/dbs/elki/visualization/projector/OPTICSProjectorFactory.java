@@ -24,8 +24,9 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  */
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
-import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 
 /**
  * Produce OPTICS plot projections
@@ -44,11 +45,10 @@ public class OPTICSProjectorFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, ClusterOrder.class, new VisualizationTree.Handler1<ClusterOrder>() {
-      @Override
-      public void process(VisualizerContext context, ClusterOrder co) {
-        context.addVis(co, new OPTICSProjector(co));
-      }
-    });
+    Hierarchy.Iter<ClusterOrder> it1 = VisualizationTree.filterResults(context, start, ClusterOrder.class);
+    for(; it1.valid(); it1.advance()) {
+      final ClusterOrder or = it1.get();
+      context.addVis(or, new OPTICSProjector(or));
+    }
   }
 }

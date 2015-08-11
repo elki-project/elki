@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -39,9 +39,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 /**
  * Trivial "visualizer" that displays a static label. The visualizer is meant to
  * be used for dimension labels in the overview.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  */
@@ -65,7 +65,7 @@ public class LabelVisualization extends AbstractVisFactory {
 
   /**
    * The actually used constructor - with a static label.
-   * 
+   *
    * @param label Label to use
    */
   public LabelVisualization(String label) {
@@ -74,7 +74,7 @@ public class LabelVisualization extends AbstractVisFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param label Label to use
    * @param rotated Rotated 90 deg to the left
    */

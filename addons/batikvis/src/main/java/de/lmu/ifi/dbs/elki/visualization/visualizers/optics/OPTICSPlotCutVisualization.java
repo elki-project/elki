@@ -192,7 +192,8 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
       }
 
       if(eventarea == null) {
-        eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, StyleLibrary.SCALE * 0.1, plotheight, this);
+        eventarea = new DragableArea(svgp, StyleLibrary.SCALE, -StyleLibrary.SCALE * 0.01, //
+        StyleLibrary.SCALE * 0.1, plotheight + StyleLibrary.SCALE * 0.02, this);
         layer.appendChild(eventarea.getElement());
       }
     }

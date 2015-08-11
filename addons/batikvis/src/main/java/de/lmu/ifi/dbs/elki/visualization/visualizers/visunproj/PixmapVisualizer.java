@@ -29,14 +29,15 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualize an arbitrary pixmap result.
@@ -61,17 +62,16 @@ public class PixmapVisualizer extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, PixmapResult.class, new VisualizationTree.Handler1<PixmapResult>() {
-      @Override
-      public void process(VisualizerContext context, PixmapResult pr) {
-        // Add plots, attach visualizer
-        final VisualizationTask task = new VisualizationTask(NAME, pr, null, PixmapVisualizer.this);
-        task.width = pr.getImage().getWidth() / (double) pr.getImage().getHeight();
-        task.height = 1.0;
-        task.level = VisualizationTask.LEVEL_STATIC;
-        context.addVis(pr, task);
-      }
-    });
+    Hierarchy.Iter<PixmapResult> it = VisualizationTree.filterResults(context, start, PixmapResult.class);
+    for(; it.valid(); it.advance()) {
+      PixmapResult pr = it.get();
+      // Add plots, attach visualizer
+      final VisualizationTask task = new VisualizationTask(NAME, pr, null, PixmapVisualizer.this);
+      task.width = pr.getImage().getWidth() / (double) pr.getImage().getHeight();
+      task.height = 1.0;
+      task.level = VisualizationTask.LEVEL_STATIC;
+      context.addVis(pr, task);
+    }
   }
 
   @Override

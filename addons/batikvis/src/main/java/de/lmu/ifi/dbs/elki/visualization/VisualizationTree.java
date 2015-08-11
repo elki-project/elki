@@ -158,6 +158,10 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
 
     @Override
     public FilteredIter<O> advance() {
+      if(!it.valid()) {
+        current = null;
+        return this;
+      }
       it.advance();
       next();
       return this;
@@ -277,11 +281,29 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
       }
       return new FilteredIter<O>(it2, (Class<O>) clazz);
     }
-    Hierarchy.Iter<Object> it2 = context.getVisHierarchy().iterDescendants(start);
+    Hierarchy.Iter<Object> it2 = context.getVisHierarchy().iterDescendantsSelf(start);
     if(!it2.valid()) {
       return HashMapHierarchy.emptyIterator();
     }
     return new FilteredIter<O>(it2, (Class<O>) clazz);
+  }
+
+  /**
+   * Filtered iteration over the primary result tree.
+   *
+   * @param context Visualization context
+   * @param start Starting object (in primary hierarchy!)
+   * @param clazz Type filter
+   * @param <O> Result type type
+   * @return Iterator of results.
+   */
+  @SuppressWarnings("unchecked")
+  public static <O extends Result> Hierarchy.Iter<O> filterResults(VisualizerContext context, Object start, Class<? super O> clazz) {
+    if(start instanceof Result) { // In first hierarchy.
+      Hierarchy.Iter<Result> it1 = context.getHierarchy().iterDescendantsSelf((Result) start);
+      return new FilteredIter<O>(it1, (Class<O>) clazz);
+    }
+    return HashMapHierarchy.emptyIterator();
   }
 
   /**
@@ -298,13 +320,9 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
   @SuppressWarnings("unchecked")
   public static <A> void findNew(VisualizerContext context, Object start, Class<? super A> type1, Handler1<A> handler) {
     final Hierarchy<Object> hier = context.getVisHierarchy();
-    // Starting object:
-    if(type1.isInstance(start)) {
-      handler.process(context, (A) start);
-    }
     // Children of start in first hierarchy:
     if(start instanceof Result) {
-      Hierarchy.Iter<Result> it1 = context.getHierarchy().iterDescendants((Result) start);
+      Hierarchy.Iter<Result> it1 = context.getHierarchy().iterDescendantsSelf((Result) start);
       for(; it1.valid(); it1.advance()) {
         final Result o1 = it1.get();
         if(!(type1.isInstance(o1))) {
@@ -315,7 +333,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
     }
     // Children of start in second hierarchy:
     if(start instanceof VisualizationItem) {
-      Iter<Object> it1 = hier.iterDescendants(start);
+      Iter<Object> it1 = hier.iterDescendantsSelf(start);
       for(; it1.valid(); it1.advance()) {
         final Object o1 = it1.get();
         if(!(type1.isInstance(o1))) {

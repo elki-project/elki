@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,10 +34,9 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -47,7 +45,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualize the clusters and cluster hierarchy found by OPTICS on the OPTICS
@@ -81,7 +78,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
     Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
     for(; it.valid(); it.advance()) {
       OPTICSProjector p = it.get();
-      final Clustering<OPTICSModel> ocl = findOPTICSClustering(context.getHierarchy(), p.getResult());
+      final Clustering<OPTICSModel> ocl = findOPTICSClustering(context, p.getResult());
       if(ocl != null) {
         final VisualizationTask task = new VisualizationTask(NAME, ocl, null, this);
         task.level = VisualizationTask.LEVEL_DATA;
@@ -106,14 +103,15 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   /**
    * Find the first OPTICS clustering child of a result.
    *
-   * @param hier Result hierarchy
-   * @param result Result to start searching at
+   * @param context Result context
+   * @param start Result to start searching at
    * @return OPTICS clustering
    */
   @SuppressWarnings("unchecked")
-  protected static Clustering<OPTICSModel> findOPTICSClustering(ResultHierarchy hier, Result result) {
-    Collection<Clustering<?>> cs = ResultUtil.filterResults(hier, result, Clustering.class);
-    for(Clustering<?> clus : cs) {
+  protected static Clustering<OPTICSModel> findOPTICSClustering(VisualizerContext context, Result start) {
+    Hierarchy.Iter<Clustering<?>> it1 = VisualizationTree.filterResults(context, start, Clustering.class);
+    for(; it1.valid(); it1.advance()) {
+      Clustering<?> clus = it1.get();
       if(clus.getToplevelClusters().size() == 0) {
         continue;
       }

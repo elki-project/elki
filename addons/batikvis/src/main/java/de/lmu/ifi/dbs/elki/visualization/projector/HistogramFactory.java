@@ -27,12 +27,13 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 
 /**
  * Produce one-dimensional projections.
@@ -59,18 +60,17 @@ public class HistogramFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, Relation.class, new VisualizationTree.Handler1<Relation<?>>() {
-      @Override
-      public void process(VisualizerContext context, Relation<?> rel) {
-        if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-          @SuppressWarnings("unchecked")
-          Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
-          final int dim = RelationUtil.dimensionality(vrel);
-          HistogramProjector<NumberVector> proj = new HistogramProjector<>(vrel, Math.min(dim, maxdim));
-          context.addVis(vrel, proj);
-        }
+    Hierarchy.Iter<Relation<?>> it1 = VisualizationTree.filterResults(context, start, Relation.class);
+    for(; it1.valid(); it1.advance()) {
+      Relation<?> rel = it1.get();
+      if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        @SuppressWarnings("unchecked")
+        Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
+        final int dim = RelationUtil.dimensionality(vrel);
+        HistogramProjector<NumberVector> proj = new HistogramProjector<>(vrel, Math.min(dim, maxdim));
+        context.addVis(vrel, proj);
       }
-    });
+    }
   }
 
   /**

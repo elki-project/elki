@@ -34,14 +34,15 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualize a similarity matrix with object labels
@@ -66,17 +67,16 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, SimilarityMatrix.class, new VisualizationTree.Handler1<SimilarityMatrix>() {
-      @Override
-      public void process(VisualizerContext context, SimilarityMatrix pr) {
-        // Add plots, attach visualizer
-        final VisualizationTask task = new VisualizationTask(NAME, pr, null, SimilarityMatrixVisualizer.this);
-        task.width = 1.0;
-        task.height = 1.0;
-        task.level = VisualizationTask.LEVEL_STATIC;
-        context.addVis(pr, task);
-      }
-    });
+    Hierarchy.Iter<SimilarityMatrix> it = VisualizationTree.filterResults(context, start, SimilarityMatrix.class);
+    for(; it.valid(); it.advance()) {
+      SimilarityMatrix pr = it.get();
+      // Add plots, attach visualizer
+      final VisualizationTask task = new VisualizationTask(NAME, pr, null, SimilarityMatrixVisualizer.this);
+      task.width = 1.0;
+      task.height = 1.0;
+      task.level = VisualizationTask.LEVEL_STATIC;
+      context.addVis(pr, task);
+    }
   }
 
   @Override

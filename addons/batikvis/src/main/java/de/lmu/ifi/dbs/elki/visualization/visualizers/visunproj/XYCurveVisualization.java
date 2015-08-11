@@ -33,7 +33,9 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -45,7 +47,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualizer to render a simple 2D curve such as a ROC curve.
@@ -184,16 +185,15 @@ public class XYCurveVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, XYCurve.class, new VisualizationTree.Handler1<XYCurve>() {
-      @Override
-      public void process(VisualizerContext context, XYCurve curve) {
-        final VisualizationTask task = new VisualizationTask(NAME, curve, null, XYCurveVisualization.this);
-        task.width = 1.0;
-        task.height = 1.0;
-        task.level = VisualizationTask.LEVEL_STATIC;
-        context.addVis(curve, task);
-      }
-    });
+    Hierarchy.Iter<XYCurve> it = VisualizationTree.filterResults(context, start, XYCurve.class);
+    for(; it.valid(); it.advance()) {
+      XYCurve curve = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, curve, null, XYCurveVisualization.this);
+      task.width = 1.0;
+      task.height = 1.0;
+      task.level = VisualizationTask.LEVEL_STATIC;
+      context.addVis(curve, task);
+    }
   }
 
   @Override

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,9 +29,11 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -39,7 +41,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Pseudo-Visualizer, that lists the settings of the algorithm-
@@ -134,17 +135,16 @@ public class SettingsVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, SettingsResult.class, new VisualizationTree.Handler1<SettingsResult>() {
-      @Override
-      public void process(VisualizerContext context, SettingsResult sr) {
-        final VisualizationTask task = new VisualizationTask(NAME, sr, null, SettingsVisualization.this);
-        task.width = 1.0;
-        task.height = 1.0;
-        task.level = VisualizationTask.LEVEL_STATIC;
-        task.initDefaultVisibility(false);
-        context.addVis(sr, task);
-      }
-    });
+    Hierarchy.Iter<SettingsResult> it = VisualizationTree.filterResults(context, start, SettingsResult.class);
+    for(; it.valid(); it.advance()) {
+      SettingsResult sr = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, sr, null, SettingsVisualization.this);
+      task.width = 1.0;
+      task.height = 1.0;
+      task.level = VisualizationTask.LEVEL_STATIC;
+      task.initDefaultVisibility(false);
+      context.addVis(sr, task);
+    }
   }
 
   @Override

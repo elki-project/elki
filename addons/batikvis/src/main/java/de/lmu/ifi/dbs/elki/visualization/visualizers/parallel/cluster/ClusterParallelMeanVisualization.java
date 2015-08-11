@@ -75,7 +75,8 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewSiblings(context, start, Clustering.class, ParallelPlotProjector.class, new VisualizationTree.Handler2<Clustering<?>, ParallelPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, start, Clustering.class, ParallelPlotProjector.class, //
+    new VisualizationTree.Handler2<Clustering<?>, ParallelPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, Clustering<?> c, ParallelPlotProjector<?> p) {
         if(c.getAllClusters().size() == 0) {

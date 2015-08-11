@@ -46,12 +46,12 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -60,7 +60,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
@@ -119,15 +118,12 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(VisualizerContext context, Object result) {
-    if (!(result instanceof Result)) {
-      return; // TODO: also activate on other results
-    }
-    // If no comparison result found abort
-    List<Segments> segments = ResultUtil.filterResults(context.getHierarchy(), (Result) result, Segments.class);
-    for(Segments segmentResult : segments) {
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<Segments> it1 = VisualizationTree.filterResults(context, start, Segments.class);
+    for(; it1.valid(); it1.advance()) {
+      Segments segmentResult = it1.get();
       SegmentsStylingPolicy policy;
-      Hierarchy.Iter<SegmentsStylingPolicy> it = VisualizationTree.filter(context, result, SegmentsStylingPolicy.class);
+      Hierarchy.Iter<SegmentsStylingPolicy> it = VisualizationTree.filter(context, segmentResult, SegmentsStylingPolicy.class);
       if(it.valid()) {
         policy = it.get();
       }

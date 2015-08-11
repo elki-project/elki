@@ -1,5 +1,28 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2015
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -8,6 +31,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -138,16 +162,15 @@ public class HistogramVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, HistogramResult.class, new VisualizationTree.Handler1<HistogramResult<?>>() {
-      @Override
-      public void process(VisualizerContext context, HistogramResult<?> histogram) {
-        final VisualizationTask task = new VisualizationTask(NAME, histogram, null, HistogramVisualization.this);
-        task.width = 2.0;
-        task.height = 1.0;
-        task.level = VisualizationTask.LEVEL_STATIC;
-        context.addVis(histogram, task);
-      }
-    });
+    Hierarchy.Iter<HistogramResult<?>> it = VisualizationTree.filterResults(context, start, HistogramResult.class);
+    for(; it.valid(); it.advance()) {
+      HistogramResult<?> histogram = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, histogram, null, HistogramVisualization.this);
+      task.width = 2.0;
+      task.height = 1.0;
+      task.level = VisualizationTask.LEVEL_STATIC;
+      context.addVis(histogram, task);
+    }
   }
 
   @Override

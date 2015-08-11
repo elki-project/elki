@@ -70,7 +70,8 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewSiblings(context, start, ClusterOrder.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<ClusterOrder, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, start, ClusterOrder.class, ScatterPlotProjector.class, //
+    new VisualizationTree.Handler2<ClusterOrder, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ClusterOrder co, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, co, p.getRelation(), ClusterOrderVisualization.this);

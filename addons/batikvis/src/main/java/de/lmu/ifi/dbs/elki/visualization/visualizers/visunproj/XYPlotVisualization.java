@@ -30,7 +30,9 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.XYPlot;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
@@ -42,7 +44,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Visualizer to render a simple 2D curve such as a ROC curve.
@@ -157,16 +158,15 @@ public class XYPlotVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, XYPlot.class, new VisualizationTree.Handler1<XYPlot>() {
-      @Override
-      public void process(VisualizerContext context, XYPlot plot) {
-        final VisualizationTask task = new VisualizationTask(NAME, plot, null, XYPlotVisualization.this);
-        task.width = 1.0;
-        task.height = 1.0;
-        task.level = VisualizationTask.LEVEL_STATIC;
-        context.addVis(plot, task);
-      }
-    });
+    Hierarchy.Iter<XYPlot> it = VisualizationTree.filterResults(context, start, XYPlot.class);
+    for(; it.valid(); it.advance()) {
+      XYPlot plot = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, plot, null, XYPlotVisualization.this);
+      task.width = 1.0;
+      task.height = 1.0;
+      task.level = VisualizationTask.LEVEL_STATIC;
+      context.addVis(plot, task);
+    }
   }
 
   @Override
