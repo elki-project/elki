@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segment;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segments;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -49,7 +48,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * @author Sascha Goldhofer
  * @author Erich Schubert
  */
-public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
+public class SegmentsStylingPolicy implements ClassStylingPolicy {
   /**
    * The segments we use for visualization
    */
@@ -319,12 +318,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
   }
 
   @Override
-  public String getLongName() {
+  public String getMenuName() {
     return "Pair segments styling policy";
-  }
-
-  @Override
-  public String getShortName() {
-    return "pairsegments-styling";
   }
 }

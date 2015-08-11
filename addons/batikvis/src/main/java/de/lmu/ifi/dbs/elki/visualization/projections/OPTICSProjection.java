@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
  *
  * @author Erich Schubert
  */
-public class OPTICSProjection extends AbstractHierarchicalResult implements Projection {
+public class OPTICSProjection implements Projection {
   /**
    * The projector we were generated from.
    */
@@ -53,13 +52,8 @@ public class OPTICSProjection extends AbstractHierarchicalResult implements Proj
   }
 
   @Override
-  public String getLongName() {
+  public String getMenuName() {
     return "OPTICS Plot Projection";
-  }
-
-  @Override
-  public String getShortName() {
-    return "OPTICSproj";
   }
 
   @Override

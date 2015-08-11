@@ -107,13 +107,8 @@ public class HistogramProjector<V extends NumberVector> implements Projector {
   }
 
   @Override
-  public String getLongName() {
+  public String getMenuName() {
     return "Axis plot";
-  }
-
-  @Override
-  public String getShortName() {
-    return "axisplot";
   }
 
   /**

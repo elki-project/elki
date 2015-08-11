@@ -61,13 +61,8 @@ public class OPTICSProjector implements Projector {
   }
 
   @Override
-  public String getLongName() {
-    return "OPTICS projection";
-  }
-
-  @Override
-  public String getShortName() {
-    return "optics";
+  public String getMenuName() {
+    return "OPTICS Plot Projection";
   }
 
   @Override

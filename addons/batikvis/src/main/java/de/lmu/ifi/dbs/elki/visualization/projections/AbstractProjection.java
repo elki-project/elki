@@ -63,12 +63,7 @@ public abstract class AbstractProjection implements Projection {
   }
 
   @Override
-  public String getLongName() {
+  public String getMenuName() {
     return "Projection";
-  }
-
-  @Override
-  public String getShortName() {
-    return "projection";
   }
 }

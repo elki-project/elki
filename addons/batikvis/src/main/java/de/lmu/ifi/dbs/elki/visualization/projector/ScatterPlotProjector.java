@@ -165,13 +165,8 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
   }
 
   @Override
-  public String getLongName() {
+  public String getMenuName() {
     return "Scatterplot";
-  }
-
-  @Override
-  public String getShortName() {
-    return "scatterplot";
   }
 
   /**

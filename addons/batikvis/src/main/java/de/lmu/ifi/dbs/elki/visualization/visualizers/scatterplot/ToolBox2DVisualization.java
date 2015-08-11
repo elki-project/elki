@@ -186,7 +186,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       for(int i = 0; i < vis.size(); i++) {
         VisualizationTask v = vis.get(i);
         toolTags[i] = svgp.svgRect(x, y, width, height);
-        String name = v.getLongName();
+        String name = v.getMenuName();
         // Split
         List<String> lines = FormatUtil.splitAtLastBlank(name, 8);
         // Generate label objects.

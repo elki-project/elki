@@ -80,13 +80,8 @@ public class ParallelPlotProjector<V extends NumberVector> implements Projector 
   }
 
   @Override
-  public String getLongName() {
+  public String getMenuName() {
     return "Parallelplot";
-  }
-
-  @Override
-  public String getShortName() {
-    return "parallelplot";
   }
 
   /**

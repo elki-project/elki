@@ -29,8 +29,10 @@ package de.lmu.ifi.dbs.elki.visualization;
  * @author Erich Schubert
  */
 public interface VisualizationItem {
-
-  String getLongName();
-
-  String getShortName();
+  /**
+   * Name to display in the menu. May be {@code null} or empty string.
+   *
+   * @return Menu name.
+   */
+  String getMenuName();
 }

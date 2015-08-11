@@ -161,12 +161,7 @@ public class ClusterStylingPolicy implements ClassStylingPolicy {
   }
 
   @Override
-  public String getLongName() {
+  public String getMenuName() {
     return clustering.getLongName();
-  }
-
-  @Override
-  public String getShortName() {
-    return clustering.getShortName();
   }
 }

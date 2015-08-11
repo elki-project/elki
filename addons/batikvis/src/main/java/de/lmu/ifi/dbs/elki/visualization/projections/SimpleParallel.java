@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2012
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,19 +25,18 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 /**
  * Simple parallel projection
- * 
+ *
  * Scaled space: reordered, scaled and inverted. Lower dimensionality! [0:1]
  * Render space: not used here; no recentering needed.
- * 
+ *
  * @author Robert Rödler
  * @author Erich Schubert
  */
-public class SimpleParallel extends BasicResult implements ProjectionParallel {
+public class SimpleParallel implements ProjectionParallel {
   /**
    * Number of visible dimensions
    */
@@ -65,18 +64,18 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
 
   /**
    * Flag for inverted dimensions
-   * 
+   *
    * TODO: handle inversions via scales?
    */
   final static byte FLAG_INVERTED = 2;
 
   /**
    * Constructor.
-   * 
+   *
    * @param scales Scales to use
    */
   public SimpleParallel(LinearScale[] scales) {
-    super("Parallel projection", "parallel-projection");
+    super();
     this.scales = scales;
     visDims = scales.length;
     flags = new byte[scales.length];
@@ -283,5 +282,10 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   @Override
   public int getInputDimensionality() {
     return scales.length;
+  }
+
+  @Override
+  public String getMenuName() {
+    return "Parallel Coordinates";
   }
 }

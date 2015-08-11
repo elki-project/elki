@@ -225,7 +225,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         nam = ((Result) r).getLongName();
       }
       else if(r instanceof VisualizationItem) {
-        nam = ((VisualizationItem) r).getLongName();
+        nam = ((VisualizationItem) r).getMenuName();
       }
       else {
         return false;
@@ -510,7 +510,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
     JMenuItem item;
 
     // Currently enabled?
-    final String name = v.getLongName();
+    final String name = v.getMenuName();
     boolean enabled = v.visible;
     boolean istool = v.tool;
     if(!istool) {

@@ -141,7 +141,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   /**
    * The result we are attached to
    */
-  Result result;
+  Object result;
 
   /**
    * The main representation
@@ -167,7 +167,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
    * @param relation Relation to use
    * @param factory Factory
    */
-  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> relation, VisFactory factory) {
+  public VisualizationTask(String name, VisualizerContext context, Object result, Relation<?> relation, VisFactory factory) {
     super();
     this.name = name;
     this.context = context;
@@ -195,7 +195,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   }
 
   @SuppressWarnings("unchecked")
-  public <R extends Result> R getResult() {
+  public <R> R getResult() {
     return (R) result;
   }
 
@@ -215,12 +215,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   }
 
   @Override
-  public String getLongName() {
-    return name;
-  }
-
-  @Override
-  public String getShortName() {
+  public String getMenuName() {
     return name;
   }
 
@@ -231,8 +226,8 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
       return this.level - other.level;
     }
     // sort by name otherwise.
-    String name1 = this.getShortName();
-    String name2 = other.getShortName();
+    String name1 = this.getMenuName();
+    String name2 = other.getMenuName();
     if(name1 != null && name2 != null && name1 != name2) {
       return name1.compareTo(name2);
     }
@@ -243,8 +238,8 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("VisTask: ").append(factory.getClass().getName()).append(' ');
-    if(result != null) {
-      buf.append("Result: ").append(result.getLongName()).append(' ');
+    if(result != null && result instanceof Result) {
+      buf.append("Result: ").append(((Result) result).getLongName()).append(' ');
     }
     buf.append(super.toString());
     return buf.toString();
