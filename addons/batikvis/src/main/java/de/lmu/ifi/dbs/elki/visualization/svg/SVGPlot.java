@@ -100,10 +100,10 @@ public class SVGPlot {
   /**
    * DOM implementations to try.
    */
-  private static final String[] BATIK_DOMS = {//
-  "org.apache.batik.anim.dom.SVGDOMImplementation", // Batik 1.8
-  "org.apache.batik.dom.svg.SVGDOMImplementation", // Batik 1.7
-  "com.sun.org.apache.xerces.internal.dom.DOMImplementationImpl", // Untested
+  private static final String[] BATIK_DOMS = { //
+      "org.apache.batik.anim.dom.SVGDOMImplementation", // Batik 1.8
+      "org.apache.batik.dom.svg.SVGDOMImplementation", // Batik 1.7
+      "com.sun.org.apache.xerces.internal.dom.DOMImplementationImpl", // Untested
   };
 
   // Locate a usable DOM implementation.

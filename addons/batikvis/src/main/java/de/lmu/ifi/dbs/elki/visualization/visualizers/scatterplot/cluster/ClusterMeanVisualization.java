@@ -1,5 +1,28 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
 
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2015
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -16,19 +39,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
+import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualize the mean of a KMeans-Clustering
@@ -45,18 +70,19 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
   private static final String NAME = "Cluster Means";
 
   /**
-   * Settings
+   * Draw stars
    */
-  protected Parameterizer settings;
+  protected boolean stars;
 
   /**
    * Constructor.
    *
-   * @param settings Settings
+   * @param stars Draw starts
    */
-  public ClusterMeanVisualization(Parameterizer settings) {
+  public ClusterMeanVisualization(boolean stars) {
     super();
-    this.settings = settings;
+    this.stars = stars;
+    this.thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
@@ -66,19 +92,13 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewSiblings(context, start, Clustering.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Clustering<?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, //
+    new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
-      public void process(VisualizerContext context, Clustering<?> c, ScatterPlotProjector<?> p) {
-        if(c.getAllClusters().size() == 0) {
-          return;
-        }
-        // Does the cluster have a model with cluster means?
-        if(!testMeanModel(c)) {
-          return;
-        }
-        final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), ClusterMeanVisualization.this);
+      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, context.getStyleResult(), p.getRelation(), ClusterMeanVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA + 1;
-        context.addVis(c, task);
+        context.addVis(context.getStyleResult(), task);
         context.addVis(p, task);
       }
     });
@@ -109,28 +129,45 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
     private static final String CSS_MEAN_STAR = "mean-star";
 
     /**
-     * Clustering to visualize.
-     */
-    Clustering<Model> clustering;
-
-    /**
      * Constructor.
      *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task) {
       super(task);
-      this.clustering = task.getResult();
       incrementalRedraw();
     }
 
     @Override
     protected void redraw() {
-      addCSSClasses(svgp);
+      final StylingPolicy spol = context.getStyleResult().getStylingPolicy();
+      if(!(spol instanceof ClusterStylingPolicy)) {
+        return;
+      }
+      @SuppressWarnings("unchecked")
+      Clustering<Model> clustering = (Clustering<Model>) ((ClusterStylingPolicy) spol).getClustering();
+      if(clustering.getAllClusters().size() == 0) {
+        return;
+      }
 
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
-      MarkerLibrary ml = style.markers();
-      double marker_size = style.getSize(StyleLibrary.MARKERPLOT);
+      StyleLibrary slib = context.getStyleResult().getStyleLibrary();
+      ColorLibrary colors = slib.getColorSet(StyleLibrary.PLOT);
+      MarkerLibrary ml = slib.markers();
+      double marker_size = slib.getSize(StyleLibrary.MARKERPLOT);
+
+      // Small crosses for mean:
+      if(!svgp.getCSSClassManager().contains(CSS_MEAN_CENTER)) {
+        CSSClass center = new CSSClass(this, CSS_MEAN_CENTER);
+        center.setStatement(SVGConstants.CSS_STROKE_PROPERTY, slib.getTextColor(StyleLibrary.DEFAULT));
+        center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, slib.getLineWidth(StyleLibrary.AXIS_TICK) * .5);
+        svgp.addCSSClassOrLogError(center);
+      }
+      // Markers for the mean:
+      if(!svgp.getCSSClassManager().contains(CSS_MEAN)) {
+        CSSClass center = new CSSClass(this, CSS_MEAN);
+        center.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.7");
+        svgp.addCSSClassOrLogError(center);
+      }
 
       Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
       for(int cnum = 0; ci.hasNext(); cnum++) {
@@ -162,72 +199,28 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
         layer.appendChild(meanMarkerCenter);
         layer.appendChild(meanMarkerCenter2);
 
-        if(settings.stars) {
+        if(stars) {
+          if(!svgp.getCSSClassManager().contains(CSS_MEAN_STAR + "_" + cnum)) {
+            CSSClass center = new CSSClass(this, CSS_MEAN_STAR + "_" + cnum);
+            center.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(cnum));
+            center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, slib.getLineWidth(StyleLibrary.PLOT));
+            center.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.7");
+            svgp.addCSSClassOrLogError(center);
+          }
+
           SVGPath star = new SVGPath();
           for(DBIDIter id = clus.getIDs().iter(); id.valid(); id.advance()) {
             double[] obj = proj.fastProjectDataToRenderSpace(rel.get(id));
-            star.moveTo(mean);
-            star.drawTo(obj);
+            star.moveTo(obj);
+            star.drawTo(mean);
           }
           Element stare = star.makeElement(svgp);
           SVGUtil.setCSSClass(stare, CSS_MEAN_STAR + "_" + cnum);
           layer.appendChild(stare);
         }
       }
+      svgp.updateStyleElement();
     }
-
-    /**
-     * Adds the required CSS-Classes
-     *
-     * @param svgp SVG-Plot
-     */
-    private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
-      if(!svgp.getCSSClassManager().contains(CSS_MEAN_CENTER)) {
-        CSSClass center = new CSSClass(this, CSS_MEAN_CENTER);
-        center.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getTextColor(StyleLibrary.DEFAULT));
-        center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.AXIS_TICK) * .5);
-        svgp.addCSSClassOrLogError(center);
-      }
-      if(!svgp.getCSSClassManager().contains(CSS_MEAN)) {
-        CSSClass center = new CSSClass(this, CSS_MEAN);
-        center.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.7");
-        svgp.addCSSClassOrLogError(center);
-      }
-      if(settings.stars) {
-        ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
-
-        Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
-        for(int cnum = 0; ci.hasNext(); cnum++) {
-          ci.next();
-          if(!svgp.getCSSClassManager().contains(CSS_MEAN_STAR + "_" + cnum)) {
-            CSSClass center = new CSSClass(this, CSS_MEAN_STAR + "_" + cnum);
-            center.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(cnum));
-            center.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
-            center.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.7");
-            svgp.addCSSClassOrLogError(center);
-          }
-        }
-      }
-    }
-
-  }
-
-  /**
-   * Test if the given clustering has a mean model.
-   *
-   * @param c Clustering to inspect
-   * @return true when the clustering has a mean or medoid model.
-   */
-  private static boolean testMeanModel(Clustering<?> c) {
-    Model firstmodel = c.getAllClusters().get(0).getModel();
-    if(firstmodel instanceof MeanModel) {
-      return true;
-    }
-    if(firstmodel instanceof MedoidModel) {
-      return true;
-    }
-    return false;
   }
 
   /**
@@ -263,7 +256,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
 
     @Override
     protected ClusterMeanVisualization makeInstance() {
-      return new ClusterMeanVisualization(this);
+      return new ClusterMeanVisualization(stars);
     }
   }
 }

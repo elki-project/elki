@@ -31,10 +31,10 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -43,18 +43,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
+import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.VoronoiDraw;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer drawing Voronoi cells for k-means clusterings.
@@ -87,28 +90,31 @@ public class VoronoiVisualization extends AbstractVisFactory {
     /**
      * Draw Voronoi cells.
      */
-    VORONOI, /**
-              * Draw Delaunay triangulation.
-              */
-    DELAUNAY, /**
-               * Draw both Delaunay and Voronoi.
-               */
+    VORONOI, //
+    /**
+     * Draw Delaunay triangulation.
+     */
+    DELAUNAY, //
+    /**
+     * Draw both Delaunay and Voronoi.
+     */
     V_AND_D
   }
 
   /**
-   * Settings.
+   * Visualization mode.
    */
-  private Parameterizer settings;
+  private Mode mode;
 
   /**
    * Constructor.
    *
-   * @param settings Drawing mode
+   * @param mode Visualization mod
    */
-  public VoronoiVisualization(Parameterizer settings) {
+  public VoronoiVisualization(Mode mode) {
     super();
-    this.settings = settings;
+    this.mode = mode;
+    this.thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
@@ -118,38 +124,15 @@ public class VoronoiVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewSiblings(context, start, Clustering.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Clustering<?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
-      public void process(VisualizerContext context, Clustering<?> c, ScatterPlotProjector<?> p) {
-        if(c.getAllClusters().size() == 0) {
-          return;
-        }
-        if(!testMeanModel(c) || RelationUtil.dimensionality(p.getRelation()) != 2) {
-          return;
-        }
-        final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), VoronoiVisualization.this);
+      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, context.getStyleResult(), p.getRelation(), VoronoiVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA + 3;
         context.addVis(p, task);
-        context.addVis(c, task);
+        context.addVis(context.getStyleResult(), task);
       }
     });
-  }
-
-  /**
-   * Test if the given clustering has a mean model.
-   *
-   * @param c Clustering to inspect
-   * @return true when the clustering has a mean or medoid model.
-   */
-  private static boolean testMeanModel(Clustering<?> c) {
-    Model firstmodel = c.getAllClusters().get(0).getModel();
-    if(firstmodel instanceof MeanModel) {
-      return true;
-    }
-    if(firstmodel instanceof MedoidModel) {
-      return true;
-    }
-    return false;
   }
 
   /**
@@ -163,11 +146,6 @@ public class VoronoiVisualization extends AbstractVisFactory {
    */
   public class Instance extends AbstractScatterplotVisualization {
     /**
-     * The result we work on.
-     */
-    Clustering<Model> clustering;
-
-    /**
      * The Voronoi diagram.
      */
     Element voronoi;
@@ -179,46 +157,60 @@ public class VoronoiVisualization extends AbstractVisFactory {
      */
     public Instance(VisualizationTask task) {
       super(task);
-      this.clustering = task.getResult();
       incrementalRedraw();
     }
 
     @Override
     protected void redraw() {
-      addCSSClasses(svgp);
-      final List<Cluster<Model>> clusters = clustering.getAllClusters();
-
-      if(clusters.size() < 2) {
+      final StylingPolicy spol = context.getStyleResult().getStylingPolicy();
+      if(!(spol instanceof ClusterStylingPolicy)) {
+        return;
+      }
+      @SuppressWarnings("unchecked")
+      Clustering<Model> clustering = (Clustering<Model>) ((ClusterStylingPolicy) spol).getClustering();
+      if(clustering.getAllClusters().size() <= 1) {
         return;
       }
 
+      addCSSClasses(svgp);
+      final List<Cluster<Model>> clusters = clustering.getAllClusters();
+
       // Collect cluster means
-      if(clusters.size() == 2) {
-        ArrayList<double[]> means = new ArrayList<>(clusters.size());
-        {
-          for(Cluster<Model> clus : clusters) {
-            Model model = clus.getModel();
-            double[] mean;
-            if(model instanceof MeanModel) {
-              MeanModel mmodel = (MeanModel) model;
-              mean = mmodel.getMean().getArrayRef();
-            }
-            else if(model instanceof MedoidModel) {
-              MedoidModel mmodel = (MedoidModel) model;
-              mean = rel.get(mmodel.getMedoid()).getColumnVector().getArrayRef();
-            }
-            else {
-              continue;
-            }
-            means.add(mean);
+      ArrayList<Vector> vmeans = new ArrayList<>(clusters.size());
+      ArrayList<double[]> means = new ArrayList<>(clusters.size());
+      {
+        for(Cluster<Model> clus : clusters) {
+          Model model = clus.getModel();
+          Vector mean;
+          if(model instanceof EMModel) {
+            continue; // Does not make much sense
           }
+          else if(model instanceof MeanModel) {
+            MeanModel mmodel = (MeanModel) model;
+            mean = mmodel.getMean().getColumnVector();
+          }
+          else if(model instanceof MedoidModel) {
+            MedoidModel mmodel = (MedoidModel) model;
+            mean = rel.get(mmodel.getMedoid()).getColumnVector();
+          }
+          else {
+            continue;
+          }
+          vmeans.add(mean);
+          means.add(mean.getArrayRef());
         }
-        if(settings.mode == Mode.VORONOI || settings.mode == Mode.V_AND_D) {
+      }
+
+      if(means.size() < 2) {
+        return; // Cannot visualize
+      }
+      if(means.size() == 2) {
+        if(mode == Mode.VORONOI || mode == Mode.V_AND_D) {
           Element path = VoronoiDraw.drawFakeVoronoi(proj, means).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);
           layer.appendChild(path);
         }
-        if(settings.mode == Mode.DELAUNAY || settings.mode == Mode.V_AND_D) {
+        if(mode == Mode.DELAUNAY || mode == Mode.V_AND_D) {
           Element path = new SVGPath(proj.fastProjectDataToRenderSpace(means.get(0)))//
           .drawTo(proj.fastProjectDataToRenderSpace(means.get(1))).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);
@@ -226,35 +218,14 @@ public class VoronoiVisualization extends AbstractVisFactory {
         }
       }
       else {
-        ArrayList<Vector> vmeans = new ArrayList<>(clusters.size());
-        ArrayList<double[]> means = new ArrayList<>(clusters.size());
-        {
-          for(Cluster<Model> clus : clusters) {
-            Model model = clus.getModel();
-            Vector mean;
-            if(model instanceof MeanModel) {
-              MeanModel mmodel = (MeanModel) model;
-              mean = mmodel.getMean().getColumnVector();
-            }
-            else if(model instanceof MedoidModel) {
-              MedoidModel mmodel = (MedoidModel) model;
-              mean = rel.get(mmodel.getMedoid()).getColumnVector();
-            }
-            else {
-              continue;
-            }
-            vmeans.add(mean);
-            means.add(mean.getArrayRef());
-          }
-        }
         // Compute Delaunay Triangulation
         ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(vmeans).getDelaunay();
-        if(settings.mode == Mode.VORONOI || settings.mode == Mode.V_AND_D) {
+        if(mode == Mode.VORONOI || mode == Mode.V_AND_D) {
           Element path = VoronoiDraw.drawVoronoi(proj, delaunay, means).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);
           layer.appendChild(path);
         }
-        if(settings.mode == Mode.DELAUNAY || settings.mode == Mode.V_AND_D) {
+        if(mode == Mode.DELAUNAY || mode == Mode.V_AND_D) {
           Element path = VoronoiDraw.drawDelaunay(proj, delaunay, means).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);
           layer.appendChild(path);
@@ -316,7 +287,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
 
     @Override
     protected VoronoiVisualization makeInstance() {
-      return new VoronoiVisualization(this);
+      return new VoronoiVisualization(mode);
     }
   }
 }
