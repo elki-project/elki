@@ -78,7 +78,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "EM Cluster Visualization";
+  private static final String NAME = "EM Cluster Models";
 
   /**
    * Constants for quantiles of standard deviation

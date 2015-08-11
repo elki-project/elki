@@ -51,6 +51,8 @@ import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuAction;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuToggle;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -231,39 +233,36 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         return false;
       }
       JMenu submenu = new JMenu((nam != null) ? nam : "unnamed");
-      boolean nochildren = true;
+      boolean children = false;
       // Add menus for any child results
       if(r instanceof Result) {
         for(Hierarchy.Iter<Result> iter = hier.iterChildren((Result) r); iter.valid(); iter.advance()) {
-          if(recursiveBuildMenu(submenu, iter.get(), hier, vistree)) {
-            nochildren = false;
-          }
+          children |= recursiveBuildMenu(submenu, iter.get(), hier, vistree);
         }
       }
       // Add visualizers:
       for(Hierarchy.Iter<Object> iter = vistree.iterChildren(r); iter.valid(); iter.advance()) {
-        if(recursiveBuildMenu(submenu, iter.get(), hier, vistree)) {
-          nochildren = false;
-        }
+        children |= recursiveBuildMenu(submenu, iter.get(), hier, vistree);
       }
 
       // Item for the visualizer
       JMenuItem item = makeMenuItemForVisualizer(r);
-      if(nochildren) {
-        if(item != null) {
-          parent.add(item);
+      if(item == null) {
+        if(children) {
+          parent.add(submenu);
         }
         else {
-          return false;
+          return false; // No menu.
         }
       }
       else {
-        if(item != null) {
-          submenu.add(item, 0);
+        if(children) {
+          submenu.add(item, 0); // Prepend
         }
-        parent.add(submenu);
+        else {
+          parent.add(item);
+        }
       }
-
       return true;
     }
 
@@ -503,7 +502,41 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
   }
 
   private JMenuItem makeMenuItemForVisualizer(Object r) {
-    if(!VisualizationTask.class.isInstance(r)) {
+    if(r instanceof VisualizationMenuAction) {
+      final VisualizationMenuAction action = (VisualizationMenuAction) r;
+      JMenuItem visItem = new JCheckBoxMenuItem(action.getMenuName());
+      visItem.addItemListener(new ItemListener() {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+          // We need SwingUtilities to avoid a deadlock!
+          SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+              action.activate();
+            }
+          });
+        }
+      });
+      return visItem;
+    }
+    if(r instanceof VisualizationMenuToggle) {
+      final VisualizationMenuToggle toggle = (VisualizationMenuToggle) r;
+      final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(toggle.getMenuName(), toggle.active());
+      visItem.addItemListener(new ItemListener() {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+          // We need SwingUtilities to avoid a deadlock!
+          SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+              toggle.toggle();
+            }
+          });
+        }
+      });
+      return visItem;
+    }
+    if(!(r instanceof VisualizationTask)) {
       return null;
     }
     final VisualizationTask v = (VisualizationTask) r;
