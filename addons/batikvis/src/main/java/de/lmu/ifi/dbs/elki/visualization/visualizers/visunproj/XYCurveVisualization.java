@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -81,18 +82,17 @@ public class XYCurveVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
     VisualizerContext context = task.getContext();
-    SVGPlot svgp = task.getPlot();
     XYCurve curve = task.getResult();
 
-    setupCSS(context, svgp);
+    setupCSS(context, plot);
     final StyleLibrary style = context.getStyleResult().getStyleLibrary();
     final double sizex = StyleLibrary.SCALE;
-    final double sizey = StyleLibrary.SCALE * task.getHeight() / task.getWidth();
+    final double sizey = StyleLibrary.SCALE * height / width;
     final double margin = style.getSize(StyleLibrary.MARGIN);
-    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
+    Element layer = SVGUtil.svgElement(plot.getDocument(), SVGConstants.SVG_G_TAG);
+    final String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     // determine scaling
@@ -105,23 +105,23 @@ public class XYCurveVisualization extends AbstractVisFactory {
       final double y = 1 - scaley.getScaled(iterator.getY());
       path.drawTo(sizex * x, sizey * y);
     }
-    Element line = path.makeElement(svgp);
+    Element line = path.makeElement(plot);
     line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, SERIESID);
 
     // add axes
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scaley, 0, sizey, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scalex, 0, sizey, sizex, sizey, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, style);
+      SVGSimpleLinearAxis.drawAxis(plot, layer, scaley, 0, sizey, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
+      SVGSimpleLinearAxis.drawAxis(plot, layer, scalex, 0, sizey, sizex, sizey, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, style);
     }
     catch(CSSNamingConflict e) {
       LoggingUtil.exception(e);
     }
     // Add axis labels
     {
-      Element labelx = svgp.svgText(sizex * .5, sizey + margin * .9, curve.getLabelx());
+      Element labelx = plot.svgText(sizex * .5, sizey + margin * .9, curve.getLabelx());
       SVGUtil.setCSSClass(labelx, CSS_AXIS_LABEL);
       layer.appendChild(labelx);
-      Element labely = svgp.svgText(margin * -.8, sizey * .5, curve.getLabely());
+      Element labely = plot.svgText(margin * -.8, sizey * .5, curve.getLabely());
       SVGUtil.setCSSClass(labely, CSS_AXIS_LABEL);
       SVGUtil.setAtt(labely, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90," + FormatUtil.NF6.format(margin * -.8) + "," + FormatUtil.NF6.format(sizey * .5) + ")");
       layer.appendChild(labely);
@@ -132,12 +132,12 @@ public class XYCurveVisualization extends AbstractVisFactory {
       double rocauc = ((ROCResult) curve).getAUC();
       String lt = OutlierROCCurve.ROCAUC_LABEL + ": " + FormatUtil.NF.format(rocauc);
       if(rocauc <= 0.5) {
-        Element auclbl = svgp.svgText(sizex * 0.5, sizey * 0.10, lt);
+        Element auclbl = plot.svgText(sizex * 0.5, sizey * 0.10, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
         layer.appendChild(auclbl);
       }
       else {
-        Element auclbl = svgp.svgText(sizex * 0.5, sizey * 0.95, lt);
+        Element auclbl = plot.svgText(sizex * 0.5, sizey * 0.95, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
         layer.appendChild(auclbl);
       }
@@ -146,19 +146,19 @@ public class XYCurveVisualization extends AbstractVisFactory {
       double prauc = ((PRCurve) curve).getAUC();
       String lt = PRCurve.PRAUC_LABEL + ": " + FormatUtil.NF.format(prauc);
       if(prauc <= 0.5) {
-        Element auclbl = svgp.svgText(sizex * 0.5, sizey * 0.10, lt);
+        Element auclbl = plot.svgText(sizex * 0.5, sizey * 0.10, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
         layer.appendChild(auclbl);
       }
       else {
-        Element auclbl = svgp.svgText(sizex * 0.5, sizey * 0.95, lt);
+        Element auclbl = plot.svgText(sizex * 0.5, sizey * 0.95, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);
         layer.appendChild(auclbl);
       }
     }
 
     layer.appendChild(line);
-    return new StaticVisualizationInstance(task, layer);
+    return new StaticVisualizationInstance(task, plot, width, height, layer);
   }
 
   /**
@@ -188,9 +188,9 @@ public class XYCurveVisualization extends AbstractVisFactory {
     Hierarchy.Iter<XYCurve> it = VisualizationTree.filterResults(context, start, XYCurve.class);
     for(; it.valid(); it.advance()) {
       XYCurve curve = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, curve, null, XYCurveVisualization.this);
-      task.width = 1.0;
-      task.height = 1.0;
+      final VisualizationTask task = new VisualizationTask(NAME, context, curve, null, XYCurveVisualization.this);
+      task.reqwidth = 1.0;
+      task.reqheight = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
       context.addVis(curve, task);
     }

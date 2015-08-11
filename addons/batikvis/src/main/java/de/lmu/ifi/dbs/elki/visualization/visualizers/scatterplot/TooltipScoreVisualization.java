@@ -43,14 +43,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Generates a SVG-Element containing Tooltips. Tooltips remain invisible until
@@ -90,8 +91,8 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -101,7 +102,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
     VisualizationTree.findNewResultVis(context, result, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, o.getScores(), p.getRelation(), TooltipScoreVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, o.getScores(), p.getRelation(), TooltipScoreVisualization.this);
         task.tool = true;
         task.initDefaultVisibility(false);
         context.addVis(o.getScores(), task);
@@ -116,7 +117,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
             return; // Handled by above case already.
           }
         }
-        final VisualizationTask task = new VisualizationTask(NAME, r, p.getRelation(), TooltipScoreVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, r, p.getRelation(), TooltipScoreVisualization.this);
         task.tool = true;
         task.initDefaultVisibility(false);
         context.addVis(r, task);
@@ -132,7 +133,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
         if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation()) && !TypeUtil.INTEGER.isAssignableFromType(r.getDataTypeInformation())) {
           return;
         }
-        final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, r, p.getRelation(), TooltipScoreVisualization.this);
+        final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, context, r, p.getRelation(), TooltipScoreVisualization.this);
         task.tool = true;
         task.initDefaultVisibility(false);
         context.addVis(r, task);
@@ -163,8 +164,8 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
      *
      * @param task Task
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
       final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       this.fontsize = 3 * style.getTextSize(StyleLibrary.PLOT);

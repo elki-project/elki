@@ -25,9 +25,6 @@ package de.lmu.ifi.dbs.elki.visualization;
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 
 /**
@@ -41,7 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
  * @apiviz.has VisFactory
  * @apiviz.has Projection oneway - 0:1
  */
-public class VisualizationTask implements VisualizationItem, Cloneable, Comparable<VisualizationTask> {
+public class VisualizationTask implements VisualizationItem, Comparable<VisualizationTask> {
   /**
    * Constant for using thumbnail
    */
@@ -152,75 +149,36 @@ public class VisualizationTask implements VisualizationItem, Cloneable, Comparab
   Result result;
 
   /**
-   * The current projection
-   */
-  Projection proj;
-
-  /**
    * The main representation
    */
   Relation<?> relation;
 
   /**
-   * The plot to draw onto
+   * Width request
    */
-  SVGPlot svgp;
+  public double reqwidth;
 
   /**
-   * Width
+   * Height request
    */
-  public double width;
-
-  /**
-   * Height
-   */
-  public double height;
-
-  /**
-   * Thumbnail size
-   */
-  public int thumbsize;
+  public double reqheight;
 
   /**
    * Visualization task.
    *
    * @param name Name
+   * @param context Visualization context
    * @param result Result
    * @param relation Relation to use
    * @param factory Factory
    */
-  public VisualizationTask(String name, Result result, Relation<?> relation, VisFactory factory) {
-    super();
-    this.name = name;
-    this.result = result;
-    this.relation = relation;
-    this.factory = factory;
-  }
-
-  /**
-   * Constructor
-   *
-   * @param name Name
-   * @param context Context
-   * @param result Result
-   * @param relation Representation
-   * @param factory Factory
-   * @param proj Projection
-   * @param svgp Plot
-   * @param width Width
-   * @param height Height
-   */
-  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> relation, VisFactory factory, Projection proj, SVGPlot svgp, double width, double height) {
+  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> relation, VisFactory factory) {
     super();
     this.name = name;
     this.context = context;
     this.result = result;
-    this.factory = factory;
-    this.proj = proj;
     this.relation = relation;
-    this.svgp = svgp;
-    this.width = width;
-    this.height = height;
+    this.factory = factory;
   }
 
   /**
@@ -247,25 +205,8 @@ public class VisualizationTask implements VisualizationItem, Cloneable, Comparab
   }
 
   @SuppressWarnings("unchecked")
-  public <P extends Projection> P getProj() {
-    return (P) proj;
-  }
-
-  @SuppressWarnings("unchecked")
   public <R extends Relation<?>> R getRelation() {
     return (R) relation;
-  }
-
-  public SVGPlot getPlot() {
-    return svgp;
-  }
-
-  public double getWidth() {
-    return width;
-  }
-
-  public double getHeight() {
-    return height;
   }
 
   /**
@@ -276,48 +217,6 @@ public class VisualizationTask implements VisualizationItem, Cloneable, Comparab
   public void initDefaultVisibility(boolean vis) {
     visible = vis;
     default_visibility = vis;
-  }
-
-  @Override
-  public VisualizationTask clone() {
-    try {
-      return (VisualizationTask) super.clone();
-    } catch (CloneNotSupportedException e) {
-      throw new AbortException("Cloneable interface was removed.", e);
-    }
-  }
-
-  /**
-   * Special clone operation that replaces the target plot.
-   *
-   * @param newplot Replacement plot to use
-   * @param context Visualizer context
-   * @return clone with different plot
-   */
-  public VisualizationTask clone(SVGPlot newplot, VisualizerContext context) {
-    VisualizationTask obj = this.clone();
-    obj.svgp = newplot;
-    obj.context = context;
-    return obj;
-  }
-
-  /**
-   * Special clone operation to set projection and size.
-   *
-   * @param plot new plot
-   * @param p Projection to use
-   * @param width Width
-   * @param height Height
-   * @return clone with different plot
-   */
-  public VisualizationTask clone(SVGPlot plot, VisualizerContext context, Projection p, double width, double height) {
-    VisualizationTask obj = this.clone();
-    obj.svgp = plot;
-    obj.context = context;
-    obj.proj = p;
-    obj.width = width;
-    obj.height = height;
-    return obj;
   }
 
   @Override
@@ -333,13 +232,13 @@ public class VisualizationTask implements VisualizationItem, Cloneable, Comparab
   @Override
   public int compareTo(VisualizationTask other) {
     // sort by levels first
-    if (this.level != other.level) {
+    if(this.level != other.level) {
       return this.level - other.level;
     }
     // sort by name otherwise.
     String name1 = this.getShortName();
     String name2 = other.getShortName();
-    if (name1 != null && name2 != null && name1 != name2) {
+    if(name1 != null && name2 != null && name1 != name2) {
       return name1.compareTo(name2);
     }
     return 0;
@@ -349,11 +248,8 @@ public class VisualizationTask implements VisualizationItem, Cloneable, Comparab
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("VisTask: ").append(factory.getClass().getName()).append(' ');
-    if (result != null) {
+    if(result != null) {
       buf.append("Result: ").append(result.getLongName()).append(' ');
-    }
-    if (proj != null) {
-      buf.append("Proj: ").append(proj.toString()).append(' ');
     }
     buf.append(super.toString());
     return buf.toString();

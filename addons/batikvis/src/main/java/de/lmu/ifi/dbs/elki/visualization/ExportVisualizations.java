@@ -149,7 +149,7 @@ public class ExportVisualizations implements ResultHandler {
     // Projected visualizations
     Hierarchy<Object> vistree = context.getVisHierarchy();
     for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
-      if (!(iter2.get() instanceof Projector)) {
+      if(!(iter2.get() instanceof Projector)) {
         continue;
       }
       Projector proj = (Projector) iter2.get();
@@ -160,7 +160,7 @@ public class ExportVisualizations implements ResultHandler {
       }
     }
     for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
-      if (!(iter2.get() instanceof VisualizationTask)) {
+      if(!(iter2.get() instanceof VisualizationTask)) {
         continue;
       }
       VisualizationTask task = (VisualizationTask) iter2.get();
@@ -205,7 +205,7 @@ public class ExportVisualizations implements ResultHandler {
         continue;
       }
       try {
-        Visualization v = task.getFactory().makeVisualization(task.clone(svgp, context, item.proj, width, height));
+        Visualization v = task.getFactory().makeVisualization(task, svgp, width, height, item.proj);
         layers.add(v);
       }
       catch(Exception e) {

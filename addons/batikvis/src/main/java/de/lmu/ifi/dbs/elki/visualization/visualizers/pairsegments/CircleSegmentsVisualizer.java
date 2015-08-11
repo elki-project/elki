@@ -54,8 +54,10 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGCheckbox;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -113,8 +115,8 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -132,9 +134,9 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
         context.addVis(segmentResult, policy);
       }
       // create task for visualization
-      final VisualizationTask task = new VisualizationTask(NAME, policy, null, this);
-      task.width = 2.0;
-      task.height = 2.0;
+      final VisualizationTask task = new VisualizationTask(NAME, context, policy, null, this);
+      task.reqwidth = 2.0;
+      task.reqheight = 2.0;
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
       context.addVis(segmentResult, task);
     }
@@ -252,8 +254,8 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
     /**
      * Constructor
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height);
       policy = task.getResult();
       segments = policy.segments;
       // FIXME: handle this more generally.
@@ -304,7 +306,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
       // Setup scaling for canvas: 0 to StyleLibrary.SCALE (usually 100 to avoid
       // a
       // Java drawing bug!)
-      String transform = SVGUtil.makeMarginTransform(task.width, task.height, StyleLibrary.SCALE, StyleLibrary.SCALE, 0) + "  translate(" + (StyleLibrary.SCALE * .5) + " " + (StyleLibrary.SCALE * .5) + ")";
+      String transform = SVGUtil.makeMarginTransform(task.reqwidth, task.reqheight, StyleLibrary.SCALE, StyleLibrary.SCALE, 0) + "  translate(" + (StyleLibrary.SCALE * .5) + " " + (StyleLibrary.SCALE * .5) + ")";
       visLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
       ctrlLayer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 

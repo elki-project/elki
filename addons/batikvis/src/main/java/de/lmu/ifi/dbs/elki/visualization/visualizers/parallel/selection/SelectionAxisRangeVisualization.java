@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -67,8 +68,8 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -76,7 +77,7 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
     Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ParallelPlotProjector<?> p = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, context.getSelectionResult(), p.getRelation(), SelectionAxisRangeVisualization.this);
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionAxisRangeVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA - 1;
       context.addVis(context.getSelectionResult(), task);
       context.addVis(p, task);
@@ -102,8 +103,8 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
      *
      * @param task Visualization task
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       addCSSClasses(svgp);
       context.addResultListener(this);
       incrementalRedraw();

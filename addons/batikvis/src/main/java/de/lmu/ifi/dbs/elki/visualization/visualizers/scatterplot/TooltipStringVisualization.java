@@ -10,14 +10,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Generates a SVG-Element containing Tooltips. Tooltips remain invisible until
@@ -59,8 +60,8 @@ public class TooltipStringVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -69,28 +70,28 @@ public class TooltipStringVisualization extends AbstractVisFactory {
       @Override
       public void process(VisualizerContext context, Relation<?> rep, ScatterPlotProjector<?> p) {
         if(DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          final VisualizationTask task = new VisualizationTask(NAME_ID, rep, p.getRelation(), TooltipStringVisualization.this);
+          final VisualizationTask task = new VisualizationTask(NAME_ID, context, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
           task.initDefaultVisibility(false);
           context.addVis(rep, task);
           context.addVis(p, task);
         }
         if(ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          final VisualizationTask task = new VisualizationTask(NAME_CLASS, rep, p.getRelation(), TooltipStringVisualization.this);
+          final VisualizationTask task = new VisualizationTask(NAME_CLASS, context, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
           task.initDefaultVisibility(false);
           context.addVis(rep, task);
           context.addVis(p, task);
         }
         if(LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          final VisualizationTask task = new VisualizationTask(NAME_LABEL, rep, p.getRelation(), TooltipStringVisualization.this);
+          final VisualizationTask task = new VisualizationTask(NAME_LABEL, context, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
           task.initDefaultVisibility(false);
           context.addVis(rep, task);
           context.addVis(p, task);
         }
         if(ExternalID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          final VisualizationTask task = new VisualizationTask(NAME_EID, rep, p.getRelation(), TooltipStringVisualization.this);
+          final VisualizationTask task = new VisualizationTask(NAME_EID, context, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
           task.initDefaultVisibility(false);
           context.addVis(rep, task);
@@ -124,8 +125,8 @@ public class TooltipStringVisualization extends AbstractVisFactory {
      *
      * @param task Task
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
       final StyleLibrary style = context.getStyleResult().getStyleLibrary();
       this.fontsize = 3 * style.getTextSize(StyleLibrary.PLOT);

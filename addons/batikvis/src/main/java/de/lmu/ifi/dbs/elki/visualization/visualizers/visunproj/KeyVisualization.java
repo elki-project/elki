@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
@@ -79,7 +80,7 @@ public class KeyVisualization extends AbstractVisFactory {
       if(numc <= 0) {
         continue;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
+      final VisualizationTask task = new VisualizationTask(NAME, context, c, null, this);
       if(numc == topc) {
         // FIXME: compute from labels?
         final double maxwidth = 10.;
@@ -87,11 +88,11 @@ public class KeyVisualization extends AbstractVisFactory {
         final int cols = getPreferredColumns(1.0, 1.0, numc, maxwidth);
         final int rows = (int) Math.ceil(numc / (double) cols);
         final double ratio = cols * maxwidth / (2. + rows);
-        task.width = (ratio >= 1.) ? 1 : 1. / ratio;
-        task.height = (ratio >= 1.) ? 1. / ratio : 1;
+        task.reqwidth = (ratio >= 1.) ? 1 : 1. / ratio;
+        task.reqheight = (ratio >= 1.) ? 1. / ratio : 1;
         if(numc > 100) {
-          task.width *= 2;
-          task.height *= 2;
+          task.reqwidth *= 2;
+          task.reqheight *= 2;
         }
       }
       else {
@@ -99,11 +100,11 @@ public class KeyVisualization extends AbstractVisFactory {
         final int[] shape = findDepth(c);
         final double maxwidth = 8.;
         final double ratio = shape[0] * maxwidth / (2. + shape[1]);
-        task.width = (ratio >= 1.) ? 1 : 1. / ratio;
-        task.height = (ratio >= 1.) ? 1. / ratio : 1;
+        task.reqwidth = (ratio >= 1.) ? 1 : 1. / ratio;
+        task.reqheight = (ratio >= 1.) ? 1. / ratio : 1;
         if(shape[0] * maxwidth > 20 || shape[1] > 18) {
-          task.width *= 2;
-          task.height *= 2;
+          task.reqwidth *= 2;
+          task.reqheight *= 2;
         }
       }
       task.level = VisualizationTask.LEVEL_STATIC;
@@ -154,8 +155,8 @@ public class KeyVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -196,8 +197,8 @@ public class KeyVisualization extends AbstractVisFactory {
      *
      * @param task Visualization task
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height);
       this.clustering = task.getResult();
       context.addResultListener(this);
     }
@@ -242,7 +243,7 @@ public class KeyVisualization extends AbstractVisFactory {
 
         // Flat clustering. Use multiple columns.
         final int numc = allcs.size();
-        final int cols = getPreferredColumns(task.getWidth(), task.getHeight(), numc, maxwidth);
+        final int cols = getPreferredColumns(getWidth(), getHeight(), numc, maxwidth);
         final int rows = (int) Math.ceil(numc / (double) cols);
         // We use a coordinate system based on rows, so columns are at
         // c*maxwidth
@@ -307,7 +308,7 @@ public class KeyVisualization extends AbstractVisFactory {
       }
 
       final double margin = style.getSize(StyleLibrary.MARGIN);
-      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), kwi, khe + extrarows, margin / StyleLibrary.SCALE);
+      final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), kwi, khe + extrarows, margin / StyleLibrary.SCALE);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     }
 

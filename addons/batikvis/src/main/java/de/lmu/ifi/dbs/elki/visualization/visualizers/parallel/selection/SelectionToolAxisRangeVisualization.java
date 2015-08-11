@@ -78,8 +78,8 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -87,7 +87,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
     Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ParallelPlotProjector<?> p = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, context.getSelectionResult(), p.getRelation(), SelectionToolAxisRangeVisualization.this);
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionToolAxisRangeVisualization.this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
       task.tool = true;
       task.thumbnail = false;
@@ -128,8 +128,8 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
      *
      * @param task Task
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       incrementalRedraw();
     }
 

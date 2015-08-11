@@ -103,8 +103,8 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance<DoubleVector>(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance<DoubleVector>(task, plot, width, height, proj);
   }
 
   @Override
@@ -114,7 +114,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
       @Override
       public void process(VisualizerContext context, HistogramProjector<?> p) {
         // register self
-        final VisualizationTask task = new VisualizationTask(CNAME, context.getStyleResult(), p.getRelation(), ColoredHistogramVisualizer.this);
+        final VisualizationTask task = new VisualizationTask(CNAME, context, context.getStyleResult(), p.getRelation(), ColoredHistogramVisualizer.this);
         task.level = VisualizationTask.LEVEL_DATA;
         context.addVis(context.getStyleResult(), task);
         context.addVis(p, task);
@@ -166,8 +166,8 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
      *
      * @param task Visualization task
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.relation = task.getRelation();
       this.style = task.getResult();
       this.sample = ResultUtil.getSamplingResult(relation);
@@ -184,10 +184,10 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
     protected void redraw() {
       double margin = style.getStyleLibrary().getSize(StyleLibrary.MARGIN);
       layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-      double xsize = Projection.SCALE * task.getWidth() / task.getHeight();
+      double xsize = Projection.SCALE * getWidth() / getHeight();
       double ysize = Projection.SCALE;
 
-      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), xsize, ysize, margin);
+      final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), xsize, ysize, margin);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
       // Styling policy

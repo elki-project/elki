@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -41,9 +42,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 
 /**
  * Default class to handle 2D projected visualizations.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has Projection2D
  */
@@ -65,21 +66,21 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
 
   /**
    * Constructor.
-   * 
+   *
    * @param task Visualization task
    */
-  public AbstractScatterplotVisualization(VisualizationTask task) {
-    super(task);
-    this.proj = task.getProj();
+  public AbstractScatterplotVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    super(task, plot, width, height);
+    this.proj = (Projection2D) proj;
     this.rel = task.getRelation();
     this.sample = ResultUtil.getSamplingResult(rel);
     final double margin = context.getStyleResult().getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());
+    this.layer = setupCanvas(svgp, this.proj, margin, getWidth(), getHeight());
   }
 
   /**
    * Utility function to setup a canvas element for the visualization.
-   * 
+   *
    * @param svgp Plot element
    * @param proj Projection to use
    * @param margin Margin to use
@@ -97,7 +98,7 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     return layer;
   }
-  
+
   @Override
   public void resultChanged(Result current) {
     super.resultChanged(current);

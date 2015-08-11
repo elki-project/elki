@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -75,8 +76,8 @@ public class COPVectorVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -90,7 +91,7 @@ public class COPVectorVisualization extends AbstractVisFactory {
           if(!rel.getShortName().equals(COP.COP_ERRORVEC)) {
             continue;
           }
-          final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), COPVectorVisualization.this);
+          final VisualizationTask task = new VisualizationTask(NAME, context, rel, p.getRelation(), COPVectorVisualization.this);
           task.level = VisualizationTask.LEVEL_DATA;
           context.addVis(o, task);
           context.addVis(p, task);
@@ -121,8 +122,8 @@ public class COPVectorVisualization extends AbstractVisFactory {
      *
      * @param task Visualization task
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
       context.addDataStoreListener(this);
       incrementalRedraw();

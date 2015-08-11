@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -38,10 +39,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 
 /**
  * Abstract base class for parallel visualizations.
- * 
+ *
  * @author Robert Rödler
  * @author Erich Schubert
- * 
+ *
  * @param <NV> Vector type in relation
  */
 public abstract class AbstractParallelVisualization<NV extends NumberVector> extends AbstractVisualization {
@@ -72,25 +73,25 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector> ext
 
   /**
    * Constructor.
-   * 
+   *
    * @param task Visualization task
    */
-  public AbstractParallelVisualization(VisualizationTask task) {
-    super(task);
-    this.proj = task.getProj();
+  public AbstractParallelVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    super(task, plot, width, height);
+    this.proj = (ProjectionParallel) proj;
     this.relation = task.getRelation();
-    
+
     margins = new double[] { 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE };
-    double ratio = (task.width * StyleLibrary.SCALE - margins[0] - margins[2]) / (task.height * StyleLibrary.SCALE - margins[1] - margins[3]);
+    double ratio = (task.reqwidth * StyleLibrary.SCALE - margins[0] - margins[2]) / (task.reqheight * StyleLibrary.SCALE - margins[1] - margins[3]);
     size = new double[] { ratio * StyleLibrary.SCALE, StyleLibrary.SCALE };
     recalcAxisPositions();
 
-    this.layer = setupCanvas(svgp, proj, task.getWidth(), task.getHeight());
+    this.layer = setupCanvas(svgp, this.proj, getWidth(), getHeight());
   }
 
   /**
    * Utility function to setup a canvas element for the visualization.
-   * 
+   *
    * @param svgp Plot element
    * @param proj Projection to use
    * @param width Width
@@ -106,7 +107,7 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector> ext
 
   /**
    * Get width of main canvas.
-   * 
+   *
    * @return Width
    */
   protected double getSizeX() {
@@ -127,7 +128,7 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector> ext
 
   /**
    * Distance between axes.
-   * 
+   *
    * @return Axis separation
    */
   protected double getAxisSep() {
@@ -143,7 +144,7 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector> ext
 
   /**
    * Get the position of visible axis d
-   * 
+   *
    * @param d Visible axis number
    * @return Position
    */

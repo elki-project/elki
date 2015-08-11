@@ -31,15 +31,16 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * The actual visualization instance, for a single projection
@@ -68,7 +69,7 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
     VisualizationTree.findNewResultVis(context, result, ReferencePointsResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<ReferencePointsResult<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ReferencePointsResult<?> rp, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, rp, p.getRelation(), ReferencePointsVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, rp, p.getRelation(), ReferencePointsVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
         context.addVis(rp, task);
         context.addVis(p, task);
@@ -77,8 +78,8 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   /**
@@ -107,8 +108,8 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
      *
      * @param task Visualization task
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
       incrementalRedraw();
     }

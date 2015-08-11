@@ -26,21 +26,22 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
  * Static visualization
- * 
+ *
  * @author Erich Schubert
  */
 public class StaticVisualizationInstance extends AbstractVisualization {
   /**
    * Unchanging precomputed visualization.
-   * 
+   *
    * @param task Task to visualize
    * @param element Element containing the resulting visualization
    */
-  public StaticVisualizationInstance(VisualizationTask task, Element element) {
-    super(task);
+  public StaticVisualizationInstance(VisualizationTask task, SVGPlot plot, double width, double height, Element element) {
+    super(task, plot, width, height);
     this.layer = element;
   }
 

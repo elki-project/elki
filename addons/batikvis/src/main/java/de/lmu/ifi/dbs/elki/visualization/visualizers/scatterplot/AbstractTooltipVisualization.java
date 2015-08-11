@@ -36,13 +36,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * General base class for a tooltip visualizer.
- * 
+ *
  * @author Erich Schubert
  */
 // TODO: can we improve performance by not adding as many hovers?
@@ -79,11 +80,11 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
 
   /**
    * Constructor.
-   * 
+   *
    * @param task Visualization task
    */
-  public AbstractTooltipVisualization(VisualizationTask task) {
-    super(task);
+  public AbstractTooltipVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    super(task, plot, width, height, proj);
     context.addDataStoreListener(this);
   }
 
@@ -118,7 +119,7 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
 
   /**
    * Make a tooltip Element for this id.
-   * 
+   *
    * @param id Id to make a tooltip for
    * @param x X position
    * @param y Y position
@@ -129,7 +130,7 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
 
   /**
    * Handle the hover events.
-   * 
+   *
    * @param evt Event.
    */
   protected void handleHoverEvent(Event evt) {
@@ -150,7 +151,7 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
 
   /**
    * Toggle the Tooltip of an element.
-   * 
+   *
    * @param elem Element
    * @param type Event type
    */
@@ -178,7 +179,7 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
 
   /**
    * Registers the Tooltip-CSS-Class at a SVGPlot.
-   * 
+   *
    * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
    */
   protected abstract void setupCSS(SVGPlot svgp);

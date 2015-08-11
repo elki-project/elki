@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
  * Abstract base class for visualizations.
- * 
+ *
  * @author Erich Schubert
  * @apiviz.excludeSubtypes
  */
@@ -66,15 +66,27 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   protected Element layer;
 
   /**
+   * Width
+   */
+  private double width;
+
+  /**
+   * Height
+   */
+  private double height;
+
+  /**
    * Constructor.
-   * 
+   *
    * @param task Visualization task
    */
-  public AbstractVisualization(VisualizationTask task) {
+  public AbstractVisualization(VisualizationTask task, SVGPlot plot, double width, double height) {
     super();
     this.task = task;
     this.context = task.getContext();
-    this.svgp = task.getPlot();
+    this.svgp = plot;
+    this.width = width;
+    this.height = height;
     this.layer = null;
     // Note: we do not auto-add listeners, as we don't know what kind of
     // listeners a visualizer needs, and the visualizer might need to do some initialization first
@@ -100,20 +112,20 @@ public abstract class AbstractVisualization implements Visualization, ResultList
 
   /**
    * Get the width
-   * 
+   *
    * @return the width
    */
   protected double getWidth() {
-    return task.getWidth();
+    return width;
   }
 
   /**
    * Get the height
-   * 
+   *
    * @return the height
    */
   protected double getHeight() {
-    return task.getHeight();
+    return height;
   }
 
   /**
@@ -135,7 +147,7 @@ public abstract class AbstractVisualization implements Visualization, ResultList
 
   /**
    * Redraw the visualization (maybe incremental).
-   * 
+   *
    * Optional - by default, it will do a full redraw, which often is faster!
    */
   protected void incrementalRedraw() {
@@ -176,9 +188,9 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   /**
    * Default implementation for
    * {@link de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener#contentChanged}
-   * 
+   *
    * Not enabled or used by default, but saves redundant code.
-   * 
+   *
    * @param e Data store event
    */
   public void contentChanged(DataStoreEvent e) {

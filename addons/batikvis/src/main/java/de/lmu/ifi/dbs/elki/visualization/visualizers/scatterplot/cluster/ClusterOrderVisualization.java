@@ -31,14 +31,16 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
@@ -64,8 +66,8 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -74,7 +76,7 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
     new VisualizationTree.Handler2<ClusterOrder, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ClusterOrder co, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, co, p.getRelation(), ClusterOrderVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, co, p.getRelation(), ClusterOrderVisualization.this);
         task.initDefaultVisibility(false);
         task.level = VisualizationTask.LEVEL_DATA - 1;
         context.addVis(co, task);
@@ -102,8 +104,8 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
      */
     protected ClusterOrder result;
 
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       result = task.getResult();
       context.addDataStoreListener(this);
       incrementalRedraw();

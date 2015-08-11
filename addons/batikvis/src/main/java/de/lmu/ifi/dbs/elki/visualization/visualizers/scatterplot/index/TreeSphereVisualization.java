@@ -42,9 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -53,7 +55,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
@@ -107,7 +108,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
         if(!canVisualize(tree)) {
           return;
         }
-        final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), TreeSphereVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, p.getRelation(), TreeSphereVisualization.this);
         task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
         task.initDefaultVisibility(false);
         context.addVis((Result) tree, task);
@@ -117,8 +118,8 @@ public class TreeSphereVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance<MTreeNode<Object>, MTreeEntry>(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance<MTreeNode<Object>, MTreeEntry>(task, plot, width, height, proj);
   }
 
   /**
@@ -178,8 +179,8 @@ public class TreeSphereVisualization extends AbstractVisFactory {
      * @param task Task
      */
     @SuppressWarnings("unchecked")
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.tree = AbstractMTree.class.cast(task.getResult());
       this.p = getLPNormP(this.tree);
       incrementalRedraw();

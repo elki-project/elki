@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -71,14 +71,14 @@ public class HistogramProjector<V extends NumberVector> implements Projector {
     super();
     this.rel = rel;
     this.dmax = maxdim;
-    assert (maxdim <= RelationUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
+    assert(maxdim <= RelationUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
   }
 
   @Override
   public Collection<PlotItem> arrange(VisualizerContext context) {
     List<PlotItem> layout = new ArrayList<>(1 + dmax);
     List<VisualizationTask> tasks = context.getVisTasks(this);
-    if (tasks.size() > 0){
+    if(tasks.size() > 0) {
       final double xoff = (dmax > 1) ? .1 : 0.;
       final double hheight = .5;
       final double lheight = .1;
@@ -95,9 +95,9 @@ public class HistogramProjector<V extends NumberVector> implements Projector {
       for(int d1 = 0; d1 < dmax; d1++) {
         PlotItem it = new PlotItem(d1 + xoff, 0, 1., lheight, null);
         LabelVisualization lbl = new LabelVisualization(RelationUtil.getColumnLabel(rel, d1));
-        final VisualizationTask task = new VisualizationTask("", null, null, lbl);
-        task.height = lheight;
-        task.width = 1;
+        final VisualizationTask task = new VisualizationTask("", context, null, null, lbl);
+        task.reqheight = lheight;
+        task.reqwidth = 1;
         task.nodetail = true;
         it.tasks.add(task);
         master.subitems.add(it);

@@ -42,9 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -54,7 +56,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
@@ -101,17 +102,17 @@ public class BubbleVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
     if(settings.scaling != null && settings.scaling instanceof OutlierScalingFunction) {
       final OutlierResult outlierResult = task.getResult();
       ((OutlierScalingFunction) settings.scaling).prepare(outlierResult);
     }
-    return new Instance(task);
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewResultVis(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
         boolean vis = true;
@@ -123,7 +124,7 @@ public class BubbleVisualization extends AbstractVisFactory {
             break;
           }
         }
-        final VisualizationTask task = new VisualizationTask(NAME, o, p.getRelation(), BubbleVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, o, p.getRelation(), BubbleVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
         task.initDefaultVisibility(vis);
         context.addVis(o, task);
@@ -150,8 +151,8 @@ public class BubbleVisualization extends AbstractVisFactory {
      *
      * @param task Visualization task
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
       context.addDataStoreListener(this);
       context.addResultListener(this);

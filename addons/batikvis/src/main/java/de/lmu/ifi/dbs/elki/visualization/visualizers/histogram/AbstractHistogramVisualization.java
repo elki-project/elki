@@ -25,14 +25,16 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
 
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 
 /**
  * One-dimensional projected visualization.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has Projection1D
  */
@@ -44,14 +46,15 @@ public abstract class AbstractHistogramVisualization extends AbstractVisualizati
 
   /**
    * Constructor.
-   * 
+   *
    * @param task Visualization task
    */
-  public AbstractHistogramVisualization(VisualizationTask task) {
-    super(task);
-    this.proj = task.getProj();
+  public AbstractHistogramVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    super(task, plot, width, height);
+    assert(proj instanceof Projection1D) : "Visualizer attached to wrong projection!";
+    this.proj = (Projection1D) proj;
   }
-  
+
   @Override
   public void resultChanged(Result current) {
     super.resultChanged(current);

@@ -33,7 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -66,17 +68,17 @@ public class PixmapVisualizer extends AbstractVisFactory {
     for(; it.valid(); it.advance()) {
       PixmapResult pr = it.get();
       // Add plots, attach visualizer
-      final VisualizationTask task = new VisualizationTask(NAME, pr, null, PixmapVisualizer.this);
-      task.width = pr.getImage().getWidth() / (double) pr.getImage().getHeight();
-      task.height = 1.0;
+      final VisualizationTask task = new VisualizationTask(NAME, context, pr, null, PixmapVisualizer.this);
+      task.reqwidth = pr.getImage().getWidth() / (double) pr.getImage().getHeight();
+      task.reqheight = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
       context.addVis(pr, task);
     }
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -103,8 +105,8 @@ public class PixmapVisualizer extends AbstractVisFactory {
      *
      * @param task Visualization task
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height);
       this.result = task.getResult();
     }
 
@@ -114,16 +116,16 @@ public class PixmapVisualizer extends AbstractVisFactory {
       double scale = StyleLibrary.SCALE;
 
       final double sizex = scale;
-      final double sizey = scale * task.getHeight() / task.getWidth();
+      final double sizey = scale * getHeight() / getWidth();
       final double margin = 0.0; // context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
       layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
+      final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), sizex, sizey, margin);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
       RenderedImage img = result.getImage();
       // is ratio, target ratio
       double iratio = img.getHeight() / img.getWidth();
-      double tratio = task.getHeight() / task.getWidth();
+      double tratio = getHeight() / getWidth();
       // We want to place a (iratio, 1.0) object on a (tratio, 1.0) screen.
       // Both dimensions must fit:
       double zoom = (iratio >= tratio) ? Math.min(tratio / iratio, 1.0) : Math.max(iratio / tratio, 1.0);

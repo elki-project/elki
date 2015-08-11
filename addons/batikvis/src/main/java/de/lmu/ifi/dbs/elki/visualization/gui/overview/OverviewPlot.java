@@ -215,11 +215,11 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
           continue nextTask;
         }
       }
-      if(task.getWidth() <= 0.0 || task.getHeight() <= 0.0) {
+      if(task.reqwidth <= 0.0 || task.reqheight <= 0.0) {
         LOG.warning("Task with improper size information: " + task);
         continue;
       }
-      PlotItem it = new PlotItem(task.getWidth(), task.getHeight(), null);
+      PlotItem it = new PlotItem(task.reqwidth, task.reqheight, null);
       it.tasks.add(task);
       plotmap.put(it.w, it.h, it);
     }
@@ -384,17 +384,14 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
    * @param parent Parent element to draw to
    */
   private Visualization embedOrThumbnail(final int thumbsize, PlotItem it, VisualizationTask task, Element parent) {
-    VisualizationTask thumbtask = task.clone(plot, context, it.proj, it.w, it.h);
     final Visualization vis;
     if(!single) {
-      thumbtask.thumbnail = true;
-      thumbtask.thumbsize = thumbsize;
-      vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
+      vis = task.getFactory().makeVisualizationOrThumbnail(task, plot, it.w, it.h, it.proj, thumbsize);
     }
     else {
-      vis = thumbtask.getFactory().makeVisualization(thumbtask);
+      vis = task.getFactory().makeVisualization(task, plot, it.w, it.h, it.proj);
     }
-    if(vis.getLayer() == null) {
+    if(vis == null || vis.getLayer() == null) {
       LoggingUtil.warning("Visualization returned empty layer: " + vis);
       return vis;
     }

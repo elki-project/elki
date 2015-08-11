@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -44,9 +45,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Thumbnail visualization.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses ThumbnailThread
  */
 public class ThumbnailVisualization extends AbstractVisualization implements ThumbnailThread.Listener, DataStoreListener {
@@ -102,22 +103,36 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   private BufferedImage thumb;
 
   /**
+   * Plot the thumbnail is in.
+   */
+  private SVGPlot plot;
+
+  /**
+   * Projection.
+   */
+  private Projection proj;
+
+  /**
    * Constructor.
-   * 
+   *
    * @param visFactory Visualizer Factory to use
    * @param task Task to use
+   * @param proj Projection
    * @param mask Event mask (for auto-updating)
+   * @param thumbsize Thumbnail size
    */
-  public ThumbnailVisualization(VisFactory visFactory, VisualizationTask task, int mask) {
-    super(task);
+  public ThumbnailVisualization(VisFactory visFactory, VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask, int thumbsize) {
+    super(task, plot, width, height);
     this.visFactory = visFactory;
-    this.tresolution = task.thumbsize;
-    this.layer = task.getPlot().svgElement(SVGConstants.SVG_G_TAG);
+    this.plot = plot;
+    this.proj = proj;
+    this.tresolution = thumbsize;
+    this.layer = plot.svgElement(SVGConstants.SVG_G_TAG);
     this.thumbid = -1;
     this.thumb = null;
     this.mask = mask;
     // Listen for database events only when needed.
-    if ((mask & ON_DATA) == ON_DATA) {
+    if((mask & ON_DATA) == ON_DATA) {
       context.addDataStoreListener(this);
     }
     // Listen for result changes, including the one we monitor
@@ -126,7 +141,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   @Override
   public void destroy() {
-    if (pendingThumbnail != null) {
+    if(pendingThumbnail != null) {
       ThumbnailThread.UNQUEUE(pendingThumbnail);
     }
     // TODO: remove image from registry?
@@ -136,7 +151,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   @Override
   public Element getLayer() {
-    if (thumbid < 0) {
+    if(thumbid < 0) {
       synchronizedRedraw();
     }
     return layer;
@@ -144,20 +159,21 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   /**
    * Redraw the visualization (maybe incremental).
-   * 
+   *
    * Optional - by default, it will do a full redraw, which often is faster!
    */
   @Override
   protected void incrementalRedraw() {
     final Element oldcontainer;
-    if (layer.hasChildNodes()) {
+    if(layer.hasChildNodes()) {
       oldcontainer = layer;
       layer = (Element) layer.cloneNode(false);
-    } else {
+    }
+    else {
       oldcontainer = null;
     }
     redraw();
-    if (oldcontainer != null && oldcontainer.getParentNode() != null) {
+    if(oldcontainer != null && oldcontainer.getParentNode() != null) {
       oldcontainer.getParentNode().replaceChild(layer, oldcontainer);
     }
   }
@@ -167,19 +183,24 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
    */
   @Override
   protected void redraw() {
-    if (thumbid < 0) {
+    if(!(getWidth() > 0 && getHeight() > 0)) {
+      LoggingUtil.warning("Thumbnail of zero size requested: " + visFactory);
+      return;
+    }
+    if(thumbid < 0) {
       // LoggingUtil.warning("Generating new thumbnail " + this);
-      layer.appendChild(SVGUtil.svgWaitIcon(task.getPlot().getDocument(), 0, 0, task.getWidth(), task.getHeight()));
-      if (pendingThumbnail == null) {
+      layer.appendChild(SVGUtil.svgWaitIcon(plot.getDocument(), 0, 0, getWidth(), getHeight()));
+      if(pendingThumbnail == null) {
         pendingThumbnail = ThumbnailThread.QUEUE(this);
       }
-    } else {
+    }
+    else {
       // LoggingUtil.warning("Injecting Thumbnail " + this);
-      Element i = task.getPlot().svgElement(SVGConstants.SVG_IMAGE_TAG);
+      Element i = plot.svgElement(SVGConstants.SVG_IMAGE_TAG);
       SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
       SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);
-      SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, task.getWidth());
-      SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, task.getHeight());
+      SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, getWidth());
+      SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, getHeight());
       i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, ThumbnailRegistryEntry.INTERNAL_PROTOCOL + ":" + thumbid);
       layer.appendChild(i);
     }
@@ -190,28 +211,28 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
     pendingThumbnail = null;
     try {
       SVGPlot plot = new SVGPlot();
-      plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + task.getWidth() + " " + task.getHeight());
+      plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + getWidth() + " " + getHeight());
 
       // Work on a clone
-      VisualizationTask clone = task.clone(plot, context);
-      clone.thumbnail = false;
-      Visualization vis = visFactory.makeVisualization(clone);
+      Visualization vis = visFactory.makeVisualization(task, plot, getWidth(), getHeight(), proj);
 
       plot.getRoot().appendChild(vis.getLayer());
       plot.updateStyleElement();
-      final int tw = (int) (task.getWidth() * tresolution);
-      final int th = (int) (task.getHeight() * tresolution);
+      final int tw = (int) (getWidth() * tresolution);
+      final int th = (int) (getHeight() * tresolution);
       thumb = plot.makeAWTImage(tw, th);
       thumbid = ThumbnailRegistryEntry.registerImage(thumb);
       // The visualization will not be used anymore.
       vis.destroy();
       synchronizedRedraw();
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       final Logging logger = Logging.getLogger(task.getFactory().getClass());
-      if (logger != null && logger.isDebugging()) {
-        logger.exception("Thumbnail failed.", e);
-      } else {
-        LoggingUtil.warning("Thumbnail for " + task.getFactory().getClass().getName() + " failed - enable debugging to see details.");
+      if(logger != null && logger.isDebugging()) {
+        logger.exception("Thumbnail for " + task.getFactory() + " failed.", e);
+      }
+      else {
+        LoggingUtil.warning("Thumbnail for " + task.getFactory() + " failed - enable debugging to see details.");
       }
       // TODO: hide the failed image?
     }
@@ -227,15 +248,15 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   @Override
   public void resultChanged(Result current) {
-    if ((mask & ON_SELECTION) == ON_SELECTION && current instanceof SelectionResult) {
+    if((mask & ON_SELECTION) == ON_SELECTION && current instanceof SelectionResult) {
       refreshThumbnail();
       return;
     }
-    if ((mask & ON_STYLE) == ON_STYLE && current instanceof StyleResult) {
+    if((mask & ON_STYLE) == ON_STYLE && current instanceof StyleResult) {
       refreshThumbnail();
       return;
     }
-    if (task.getProj() != null && (mask & NO_PROJECTION) != NO_PROJECTION && current == task.getProj()) {
+    if(proj != null && current == proj && (mask & NO_PROJECTION) != NO_PROJECTION) {
       refreshThumbnail();
       return;
     }

@@ -73,7 +73,7 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
     super();
     this.rel = rel;
     this.dmax = maxdim;
-    assert (maxdim <= RelationUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
+    assert(maxdim <= RelationUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
   }
 
   @Override
@@ -95,9 +95,9 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
         // Label at bottom
         {
           PlotItem it = new PlotItem(.1, 2., 2., .1, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 0)));
-          task.height = .1;
-          task.width = 2.;
+          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 0)));
+          task.reqheight = .1;
+          task.reqwidth = 2.;
           task.nodetail = true;
           it.tasks.add(task);
           master.subitems.add(it);
@@ -105,9 +105,9 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
         // Label on left
         {
           PlotItem it = new PlotItem(0, 0, .1, 2, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 1), true));
-          task.height = 2.;
-          task.width = .1;
+          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 1), true));
+          task.reqheight = 2.;
+          task.reqwidth = .1;
           task.nodetail = true;
           it.tasks.add(task);
           master.subitems.add(it);
@@ -140,9 +140,9 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
         // Labels at bottom
         for(int d1 = 0; d1 < dmax - 1; d1++) {
           PlotItem it = new PlotItem(d1 + .1, dmax - 1, 1., .1, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d1)));
-          task.height = .1;
-          task.width = 1;
+          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d1)));
+          task.reqheight = .1;
+          task.reqwidth = 1;
           task.nodetail = true;
           it.tasks.add(task);
           master.subitems.add(it);
@@ -150,9 +150,9 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
         // Labels on left
         for(int d2 = 1; d2 < dmax; d2++) {
           PlotItem it = new PlotItem(0, d2 - 1, .1, 1, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d2), true));
-          task.height = 1;
-          task.width = .1;
+          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d2), true));
+          task.reqheight = 1;
+          task.reqwidth = .1;
           task.nodetail = true;
           it.tasks.add(task);
           master.subitems.add(it);

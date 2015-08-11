@@ -34,11 +34,11 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 
 /**
  * Item to collect visualization tasks on a specific position on the plot map.
- * 
+ *
  * Note: this is a {@code LinkedList<VisualizationTask>}!
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf Projection
  * @apiviz.composedOf VisualizationTask
  * @apiviz.composedOf PlotItem
@@ -81,7 +81,7 @@ public class PlotItem {
 
   /**
    * Constructor.
-   * 
+   *
    * @param w Position: w
    * @param h Position: h
    * @param proj Projection
@@ -92,7 +92,7 @@ public class PlotItem {
 
   /**
    * Constructor.
-   * 
+   *
    * @param x Position: x
    * @param y Position: y
    * @param w Position: w
@@ -120,7 +120,7 @@ public class PlotItem {
 
   /**
    * Add a task to the item.
-   * 
+   *
    * @param task Task to add
    */
   public void add(VisualizationTask task) {
@@ -129,7 +129,7 @@ public class PlotItem {
 
   /**
    * Number of tasks in this item.
-   * 
+   *
    * @return Number of tasks.
    */
   public int taskSize() {
@@ -138,25 +138,30 @@ public class PlotItem {
 
   /**
    * Iterate (recursively) over all plot items, including itself.
-   * 
+   *
    * @return Iterator
    */
   public Iterator<PlotItem> itemIterator() {
     return new ItmItr();
   }
 
+  @Override
+  public String toString() {
+    return "PlotItem [x=" + x + ", y=" + y + ", w=" + w + ", h=" + h + ",proj=" + proj + "]";
+  }
+
   /**
    * Recursive iterator
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class ItmItr implements Iterator<PlotItem> {
     PlotItem next;
 
     Iterator<PlotItem> cur;
-    
+
     Iterator<PlotItem> sub;
 
     /**
@@ -174,7 +179,7 @@ public class PlotItem {
       if(next != null) {
         return true;
       }
-      if (cur != null && cur.hasNext()) {
+      if(cur != null && cur.hasNext()) {
         next = cur.next();
         return true;
       }

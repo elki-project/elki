@@ -51,12 +51,14 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
@@ -92,8 +94,8 @@ public class EMClusterVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Instance makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Instance makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -101,7 +103,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
     VisualizationTree.findNew(context, start, ScatterPlotProjector.class, new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context.getStyleResult(), p.getRelation(), EMClusterVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, context.getStyleResult(), p.getRelation(), EMClusterVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA + 3;
         context.addVis(context.getStyleResult(), task);
         context.addVis(p, task);
@@ -147,8 +149,8 @@ public class EMClusterVisualization extends AbstractVisFactory {
      *
      * @param task VisualizationTask
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       incrementalRedraw();
     }
 

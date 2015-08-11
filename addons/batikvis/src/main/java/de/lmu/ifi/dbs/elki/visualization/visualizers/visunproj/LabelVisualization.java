@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -90,10 +91,9 @@ public class LabelVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    SVGPlot svgp = task.getPlot();
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
     VisualizerContext context = task.getContext();
-    CSSClass cls = new CSSClass(svgp, "unmanaged");
+    CSSClass cls = new CSSClass(plot, "unmanaged");
     StyleLibrary style = context.getStyleResult().getStyleLibrary();
     double fontsize = style.getTextSize("overview.labels") / StyleLibrary.SCALE;
     cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(fontsize));
@@ -102,17 +102,17 @@ public class LabelVisualization extends AbstractVisFactory {
 
     Element layer;
     if(!rotated) {
-      layer = svgp.svgText(task.getWidth() * .5, task.getHeight() * .5 + .35 * fontsize, this.label);
+      layer = plot.svgText(width * .5, height * .5 + .35 * fontsize, this.label);
       SVGUtil.setAtt(layer, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
       SVGUtil.setAtt(layer, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
     }
     else {
-      layer = svgp.svgText(- task.getHeight() * .5, task.getWidth() * .5 + .35 * fontsize, this.label);
+      layer = plot.svgText(height * -.5, width * .5 + .35 * fontsize, this.label);
       SVGUtil.setAtt(layer, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
       SVGUtil.setAtt(layer, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90)");
     }
-    return new StaticVisualizationInstance(task, layer);
+    return new StaticVisualizationInstance(task, plot, width, height, layer);
   }
 
   @Override

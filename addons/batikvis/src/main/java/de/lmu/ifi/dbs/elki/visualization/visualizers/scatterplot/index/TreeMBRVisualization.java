@@ -39,9 +39,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -50,7 +52,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
@@ -88,8 +89,8 @@ public class TreeMBRVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance<RStarTreeNode, SpatialEntry>(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance<RStarTreeNode, SpatialEntry>(task, plot, width, height, proj);
   }
 
   @Override
@@ -98,7 +99,7 @@ public class TreeMBRVisualization extends AbstractVisFactory {
     new VisualizationTree.Handler2<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, AbstractRStarTree<RStarTreeNode, SpatialEntry, ?> tree, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), TreeMBRVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, p.getRelation(), TreeMBRVisualization.this);
         task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
         task.initDefaultVisibility(false);
         context.addVis((Result) tree, task);
@@ -131,8 +132,8 @@ public class TreeMBRVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     @SuppressWarnings("unchecked")
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.tree = AbstractRStarTree.class.cast(task.getResult());
       incrementalRedraw();
       context.addDataStoreListener(this);

@@ -102,8 +102,8 @@ public class ClusterHullVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -114,7 +114,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
     new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context.getStyleResult(), p.getRelation(), ClusterHullVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, context.getStyleResult(), p.getRelation(), ClusterHullVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
         task.initDefaultVisibility(false);
         context.addVis(context.getStyleResult(), task);
@@ -145,8 +145,8 @@ public class ClusterHullVisualization extends AbstractVisFactory {
      *
      * @param task VisualizationTask
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       incrementalRedraw();
     }
 

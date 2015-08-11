@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGScoreBar;
@@ -83,9 +84,9 @@ public class EvaluationVisualization extends AbstractVisFactory {
     Hierarchy.Iter<EvaluationResult> it = VisualizationTree.filterResults(context, start, EvaluationResult.class);
     for(; it.valid(); it.advance()) {
       EvaluationResult sr = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, sr, null, EvaluationVisualization.this);
-      task.width = .5;
-      task.height = sr.numLines() * .05;
+      final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, EvaluationVisualization.this);
+      task.reqwidth = .5;
+      task.reqheight = sr.numLines() * .05;
       task.level = VisualizationTask.LEVEL_STATIC;
       context.addVis(sr, task);
     }
@@ -112,23 +113,22 @@ public class EvaluationVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
+  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
     // TODO: make a utility class to wrap SVGPlot + parent layer + ypos.
     // TODO: use CSSClass and StyleLibrary
 
     double ypos = -.5; // Skip space before first header
-    SVGPlot svgp = task.getPlot();
-    Element parent = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    Element parent = plot.svgElement(SVGConstants.SVG_G_TAG);
     EvaluationResult sr = task.getResult();
 
     for(String header : sr.getHeaderLines()) {
-      ypos = addHeader(svgp, parent, ypos, header);
+      ypos = addHeader(plot, parent, ypos, header);
     }
 
     for(EvaluationResult.MeasurementGroup g : sr) {
-      ypos = addHeader(svgp, parent, ypos, g.getName());
+      ypos = addHeader(plot, parent, ypos, g.getName());
       for(EvaluationResult.Measurement m : g) {
-        ypos = addBarChart(svgp, parent, ypos, m.getName(), m.getVal(), m.getMin(), m.getMax(), m.getExp(), m.lowerIsBetter());
+        ypos = addBarChart(plot, parent, ypos, m.getName(), m.getVal(), m.getMin(), m.getMax(), m.getExp(), m.lowerIsBetter());
       }
     }
 
@@ -136,10 +136,10 @@ public class EvaluationVisualization extends AbstractVisFactory {
     double cols = 10;
     final StyleLibrary style = task.getContext().getStyleResult().getStyleLibrary();
     final double margin = style.getSize(StyleLibrary.MARGIN);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, ypos, margin / StyleLibrary.SCALE);
+    final String transform = SVGUtil.makeMarginTransform(width, height, cols, ypos, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(parent, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualizationInstance(task, parent);
+    return new StaticVisualizationInstance(task, plot, width, height, parent);
   }
 
   @Override
