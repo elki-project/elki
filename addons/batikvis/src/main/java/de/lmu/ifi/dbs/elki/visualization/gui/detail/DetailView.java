@@ -122,7 +122,7 @@ public class DetailView extends SVGPlot implements VisualizationListener {
   private void addBackground(VisualizerContext context) {
     // Make a background
     CSSClass cls = new CSSClass(this, "background");
-    cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleResult().getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE));
+    cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, context.getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE));
     Element bg = this.svgElement(SVGConstants.SVG_RECT_TAG);
     SVGUtil.setAtt(bg, SVGConstants.SVG_X_ATTRIBUTE, "0");
     SVGUtil.setAtt(bg, SVGConstants.SVG_Y_ATTRIBUTE, "0");

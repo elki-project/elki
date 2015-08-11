@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -68,14 +68,25 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
    * Constructor.
    *
    * @param task Visualization task
+   * @param mask Refresh mash
    */
-  public AbstractScatterplotVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-    super(task, plot, width, height);
+  public AbstractScatterplotVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask) {
+    super(task, plot, width, height, mask);
     this.proj = (Projection2D) proj;
     this.rel = task.getRelation();
-    this.sample = ResultUtil.getSamplingResult(rel);
-    final double margin = context.getStyleResult().getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    if((mask & ON_SAMPLE) == ON_SAMPLE) {
+      this.sample = ResultUtil.getSamplingResult(rel);
+    }
+    else {
+      this.sample = null;
+    }
+  }
+
+  @Override
+  protected void redraw() {
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     this.layer = setupCanvas(svgp, this.proj, margin, getWidth(), getHeight());
+    // TODO: override, and call super.
   }
 
   /**
@@ -102,8 +113,9 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
   @Override
   public void resultChanged(Result current) {
     super.resultChanged(current);
-    if(current == proj) {
+    if(proj != null && current == proj) {
       synchronizedRedraw();
+      return;
     }
   }
 }

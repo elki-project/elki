@@ -126,11 +126,11 @@ public class TooltipStringVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, ON_DATA | ON_SAMPLE);
       this.result = task.getResult();
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       this.fontsize = 3 * style.getTextSize(StyleLibrary.PLOT);
-      synchronizedRedraw();
+      addListeners();
     }
 
     @Override
@@ -156,7 +156,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
      */
     @Override
     protected void setupCSS(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       final double fontsize = style.getTextSize(StyleLibrary.PLOT);
       final String fontfamily = style.getFontFamily(StyleLibrary.PLOT);
 

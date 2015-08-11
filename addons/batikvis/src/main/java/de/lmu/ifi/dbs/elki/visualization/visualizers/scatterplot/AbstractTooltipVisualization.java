@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -83,15 +82,15 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
    *
    * @param task Visualization task
    */
-  public AbstractTooltipVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-    super(task, plot, width, height, proj);
-    context.addDataStoreListener(this);
+  public AbstractTooltipVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask) {
+    super(task, plot, width, height, proj, mask | ON_DATA | ON_SAMPLE);
   }
 
   @Override
   public void redraw() {
+    super.redraw();
     setupCSS(svgp);
-    final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    final StyleLibrary style = context.getStyleLibrary();
     double dotsize = style.getLineWidth(StyleLibrary.PLOT);
 
     for(DBIDIter id = sample.getSample().iter(); id.valid(); id.advance()) {
@@ -183,11 +182,4 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
    * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
    */
   protected abstract void setupCSS(SVGPlot svgp);
-
-  @Override
-  public void resultChanged(Result current) {
-    if(sample == current) {
-      synchronizedRedraw();
-    }
-  }
 }

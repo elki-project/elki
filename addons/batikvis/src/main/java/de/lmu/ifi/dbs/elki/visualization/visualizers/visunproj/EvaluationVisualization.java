@@ -134,7 +134,7 @@ public class EvaluationVisualization extends AbstractVisFactory {
 
     // scale vis
     double cols = 10;
-    final StyleLibrary style = task.getContext().getStyleResult().getStyleLibrary();
+    final StyleLibrary style = task.getContext().getStyleLibrary();
     final double margin = style.getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(width, height, cols, ypos, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(parent, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);

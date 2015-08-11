@@ -48,9 +48,10 @@ public abstract class AbstractHistogramVisualization extends AbstractVisualizati
    * Constructor.
    *
    * @param task Visualization task
+   * @param mask Refresh mask
    */
-  public AbstractHistogramVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-    super(task, plot, width, height);
+  public AbstractHistogramVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask) {
+    super(task, plot, width, height, mask);
     assert(proj instanceof Projection1D) : "Visualizer attached to wrong projection!";
     this.proj = (Projection1D) proj;
   }
@@ -58,8 +59,9 @@ public abstract class AbstractHistogramVisualization extends AbstractVisualizati
   @Override
   public void resultChanged(Result current) {
     super.resultChanged(current);
-    if(current == proj) {
+    if(proj != null && current == proj) {
       synchronizedRedraw();
+      return;
     }
   }
 }

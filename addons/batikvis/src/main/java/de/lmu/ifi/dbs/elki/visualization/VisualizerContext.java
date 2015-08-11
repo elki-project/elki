@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 
 /**
  * Map to store context information for the visualizer. This can be any data
@@ -99,9 +99,14 @@ public class VisualizerContext implements DataStoreListener, Result {
   private SelectionResult selection;
 
   /**
-   * Styling result
+   * Styling policy
    */
-  private StyleResult styleresult;
+  StylingPolicy stylepolicy;
+
+  /**
+   * Style library
+   */
+  StyleLibrary stylelibrary;
 
   /**
    * Starting point of the result tree, may be {@code null}.
@@ -180,17 +185,15 @@ public class VisualizerContext implements DataStoreListener, Result {
    */
   protected void makeStyleResult(StyleLibrary stylelib) {
     final Database db = ResultUtil.findDatabase(hier);
-    styleresult = new StyleResult();
-    styleresult.setStyleLibrary(stylelib);
+    stylelibrary = stylelib;
     List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(db);
     if(clusterings.size() > 0) {
-      styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0), stylelib));
+      stylepolicy = new ClusterStylingPolicy(clusterings.get(0), stylelib);
     }
     else {
       Clustering<Model> c = generateDefaultClustering();
-      styleresult.setStylingPolicy(new ClusterStylingPolicy(c, stylelib));
+      stylepolicy = new ClusterStylingPolicy(c, stylelib);
     }
-    hier.add(db, styleresult);
   }
 
   /**
@@ -203,12 +206,40 @@ public class VisualizerContext implements DataStoreListener, Result {
   }
 
   /**
-   * Get the style result.
+   * Get the active styling policy
    *
-   * @return Style result
+   * @return Styling policy
    */
-  public StyleResult getStyleResult() {
-    return styleresult;
+  public StylingPolicy getStylingPolicy() {
+    return stylepolicy;
+  }
+
+  /**
+   * Set the active styling policy
+   *
+   * @param policy new Styling policy
+   */
+  public void setStylingPolicy(StylingPolicy policy) {
+    this.stylepolicy = policy;
+    visChanged(policy);
+  }
+
+  /**
+   * Get the style library
+   *
+   * @return Style library
+   */
+  public StyleLibrary getStyleLibrary() {
+    return stylelibrary;
+  }
+
+  /**
+   * Get the style library
+   *
+   * @param library Style library
+   */
+  public void setStyleLibrary(StyleLibrary library) {
+    this.stylelibrary = library;
   }
 
   /**

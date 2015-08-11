@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -129,19 +128,13 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void resultChanged(Result current) {
-      if(sample == current) {
-        synchronizedRedraw();
-      }
+      super(task, plot, width, height, proj, ON_DATA | ON_SAMPLE | ON_SELECTION);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
+      super.redraw();
       addCSSClasses(svgp);
 
       rtag = svgp.svgElement(SVGConstants.SVG_G_TAG);
@@ -201,7 +194,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
       // Class for the rectangle to add eventListeners
       if(!svgp.getCSSClassManager().contains(CSS_ARROW)) {
         final CSSClass acls = new CSSClass(this, CSS_ARROW);
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         acls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));
         acls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.SELECTION_ACTIVE));
         acls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);

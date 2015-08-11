@@ -127,16 +127,8 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
     public static final String CSS_CUBEFRAME = "selectionCubeFrame";
 
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      addCSSClasses(svgp);
-      context.addResultListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      context.removeResultListener(this);
-      super.destroy();
+      super(task, plot, width, height, proj, ON_SELECTION);
+      addListeners();
     }
 
     /**
@@ -145,7 +137,7 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       // Class for the cube
       if(!svgp.getCSSClassManager().contains(CSS_CUBE)) {
         CSSClass cls = new CSSClass(this, CSS_CUBE);
@@ -214,6 +206,8 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
 
     @Override
     protected void redraw() {
+      super.redraw();
+      addCSSClasses(svgp);
       DBIDSelection selContext = context.getSelection();
       if(selContext instanceof RangeSelection) {
         setSVGRect(svgp, proj);

@@ -32,11 +32,15 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.result.SelectionResult;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -50,27 +54,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  *
  * @apiviz.uses ThumbnailThread
  */
-public class ThumbnailVisualization extends AbstractVisualization implements ThumbnailThread.Listener, DataStoreListener {
-  /**
-   * Constant to listen for data changes
-   */
-  public static final int ON_DATA = 1;
-
-  /**
-   * Constant to listen for selection changes
-   */
-  public static final int ON_SELECTION = 2;
-
-  /**
-   * Constant to listen for style result changes
-   */
-  public static final int ON_STYLE = 4;
-
-  /**
-   * Constant to <em>not</em> listen for projection changes
-   */
-  public static final int NO_PROJECTION = 8;
-
+public class ThumbnailVisualization extends AbstractVisualization implements ThumbnailThread.Listener, DataStoreListener, VisualizationListener {
   /**
    * Visualizer factory
    */
@@ -92,12 +76,6 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   protected int tresolution;
 
   /**
-   * The event mask. See {@link #ON_DATA}, {@link #ON_SELECTION},
-   * {@link #ON_STYLE}, {@link #NO_PROJECTION}
-   */
-  private int mask;
-
-  /**
    * Our thumbnail (keep a reference to prevent garbage collection!)
    */
   private BufferedImage thumb;
@@ -113,6 +91,11 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   private Projection proj;
 
   /**
+   * COPY of the mask. FIXME.
+   */
+  private int mask;
+
+  /**
    * Constructor.
    *
    * @param visFactory Visualizer Factory to use
@@ -122,7 +105,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
    * @param thumbsize Thumbnail size
    */
   public ThumbnailVisualization(VisFactory visFactory, VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask, int thumbsize) {
-    super(task, plot, width, height);
+    super(task, plot, width, height, mask);
     this.visFactory = visFactory;
     this.plot = plot;
     this.proj = proj;
@@ -131,12 +114,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
     this.thumbid = -1;
     this.thumb = null;
     this.mask = mask;
-    // Listen for database events only when needed.
-    if((mask & ON_DATA) == ON_DATA) {
-      context.addDataStoreListener(this);
-    }
-    // Listen for result changes, including the one we monitor
-    context.addResultListener(this);
+    addListeners();
   }
 
   @Override
@@ -145,8 +123,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       ThumbnailThread.UNQUEUE(pendingThumbnail);
     }
     // TODO: remove image from registry?
-    context.removeResultListener(this);
-    context.removeDataStoreListener(this);
+    super.destroy();
   }
 
   @Override
@@ -238,7 +215,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
     }
   }
 
-  protected void refreshThumbnail() {
+  private void refreshThumbnail() {
     // Discard an existing thumbnail
     thumbid = -1;
     thumb = null;
@@ -248,18 +225,26 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   @Override
   public void resultChanged(Result current) {
+    // Default is to redraw when the result we are attached to changed.
+    if(task.getResult() == current) {
+      refreshThumbnail();
+      return;
+    }
     if((mask & ON_SELECTION) == ON_SELECTION && current instanceof SelectionResult) {
       refreshThumbnail();
       return;
     }
-    if((mask & ON_STYLE) == ON_STYLE && current instanceof StyleResult) {
+    if((mask & ON_SAMPLE) == ON_SAMPLE && current instanceof SamplingResult) {
       refreshThumbnail();
       return;
     }
-    if(proj != null && current == proj && (mask & NO_PROJECTION) != NO_PROJECTION) {
+  }
+
+  @Override
+  public void visualizationChanged(VisualizationItem item) {
+    if((mask & ON_STYLE) == ON_STYLE && (item instanceof StylingPolicy || item instanceof StyleLibrary)) {
       refreshThumbnail();
       return;
     }
-    super.resultChanged(current);
   }
 }

@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -152,26 +151,18 @@ public class BubbleVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, ON_SAMPLE | ON_STYLE | ON_DATA);
       this.result = task.getResult();
-      context.addDataStoreListener(this);
-      context.addResultListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      super.destroy();
-      context.removeResultListener(this);
-      context.removeDataStoreListener(this);
+      addListeners();
     }
 
     @Override
     public void redraw() {
-      final StyleResult style = context.getStyleResult();
-      StylingPolicy stylepolicy = style.getStylingPolicy();
+      super.redraw();
+      StyleLibrary style = context.getStyleLibrary();
+      StylingPolicy stylepolicy = context.getStylingPolicy();
       // bubble size
-      final double bubble_size = style.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
+      final double bubble_size = style.getSize(StyleLibrary.BUBBLEPLOT);
       if(stylepolicy instanceof ClassStylingPolicy) {
         ClassStylingPolicy colors = (ClassStylingPolicy) stylepolicy;
         setupCSS(svgp, colors);
@@ -222,14 +213,6 @@ public class BubbleVisualization extends AbstractVisFactory {
       }
     }
 
-    @Override
-    public void resultChanged(Result current) {
-      super.resultChanged(current);
-      if(sample == current || context.getStyleResult() == current) {
-        synchronizedRedraw();
-      }
-    }
-
     /**
      * Registers the Bubble-CSS-Class at a SVGPlot.
      *
@@ -237,7 +220,7 @@ public class BubbleVisualization extends AbstractVisFactory {
      * @param policy Clustering to use
      */
     private void setupCSS(SVGPlot svgp, ClassStylingPolicy policy) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       // creating IDs manually because cluster often return a null-ID.

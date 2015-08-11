@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -132,13 +133,13 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      incrementalRedraw();
-      context.addResultListener(this);
+      super(task, plot, width, height, proj, 0);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
+      super.redraw();
       final int dim = proj.getInputDimensionality();
       addCSSClasses(svgp);
       controlsize = 0.025 * getSizeY();
@@ -260,7 +261,7 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       if(!svgp.getCSSClassManager().contains(SELECTAXISVISIBILITY)) {
         CSSClass cls = new CSSClass(this, SELECTAXISVISIBILITY);
         cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.1);

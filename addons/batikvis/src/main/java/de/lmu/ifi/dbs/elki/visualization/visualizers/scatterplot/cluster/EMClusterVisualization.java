@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -103,9 +103,8 @@ public class EMClusterVisualization extends AbstractVisFactory {
     VisualizationTree.findNew(context, start, ScatterPlotProjector.class, new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, context.getStyleResult(), p.getRelation(), EMClusterVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), EMClusterVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA + 3;
-        context.addVis(context.getStyleResult(), task);
         context.addVis(p, task);
       }
     });
@@ -150,13 +149,14 @@ public class EMClusterVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      incrementalRedraw();
+      super(task, plot, width, height, proj, ON_STYLE);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      final StylingPolicy spol = context.getStyleResult().getStylingPolicy();
+      super.redraw();
+      final StylingPolicy spol = context.getStylingPolicy();
       if(!(spol instanceof ClusterStylingPolicy)) {
         return;
       }
@@ -167,7 +167,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
         return;
       }
 
-      StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      StyleLibrary style = context.getStyleLibrary();
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       // PCARunner

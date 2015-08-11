@@ -140,22 +140,14 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, ON_DATA | ON_STYLE);
       this.clustering = task.getResult();
-      context.addDataStoreListener(this);
-      context.addResultListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      context.removeDataStoreListener(this);
-      context.removeResultListener(this);
-      super.destroy();
+      addListeners();
     }
 
     @Override
     protected void redraw() {
+      super.redraw();
       addCSSClasses(svgp);
 
       Iterator<Cluster<MeanModel>> ci = clustering.getAllClusters().iterator();
@@ -189,7 +181,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
      */
     private void addCSSClasses(SVGPlot svgp) {
       if(!svgp.getCSSClassManager().contains(CLUSTERMEAN)) {
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
         int clusterID = 0;
 

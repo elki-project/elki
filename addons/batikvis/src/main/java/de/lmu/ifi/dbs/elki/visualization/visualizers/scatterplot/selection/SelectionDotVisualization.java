@@ -108,21 +108,14 @@ public class SelectionDotVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      context.addResultListener(this);
-      context.addDataStoreListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      context.removeResultListener(this);
-      super.destroy();
+      super(task, plot, width, height, proj, ON_DATA | ON_SELECTION);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      super.redraw();
+      final StyleLibrary style = context.getStyleLibrary();
       addCSSClasses(svgp);
       final double size = style.getSize(StyleLibrary.SELECTION);
       DBIDSelection selContext = context.getSelection();
@@ -154,7 +147,7 @@ public class SelectionDotVisualization extends AbstractVisFactory {
       // Class for the dot markers
       if(!svgp.getCSSClassManager().contains(MARKER)) {
         CSSClass cls = new CSSClass(this, MARKER);
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
         cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
         svgp.addCSSClassOrLogError(cls);

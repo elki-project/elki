@@ -41,7 +41,7 @@ public class StaticVisualizationInstance extends AbstractVisualization {
    * @param element Element containing the resulting visualization
    */
   public StaticVisualizationInstance(VisualizationTask task, SVGPlot plot, double width, double height, Element element) {
-    super(task, plot, width, height);
+    super(task, plot, width, height, 0);
     this.layer = element;
   }
 

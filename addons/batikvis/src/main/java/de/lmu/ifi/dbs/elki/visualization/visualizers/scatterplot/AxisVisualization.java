@@ -102,13 +102,14 @@ public class AxisVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      incrementalRedraw();
+      super(task, plot, width, height, proj, 0);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      super.redraw();
+      final StyleLibrary style = context.getStyleLibrary();
       final int dim = RelationUtil.dimensionality(rel);
 
       // origin

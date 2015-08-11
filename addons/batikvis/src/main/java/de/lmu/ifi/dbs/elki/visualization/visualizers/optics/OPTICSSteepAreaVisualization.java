@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -115,8 +114,8 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses
-   *              de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult
+   * @apiviz.uses de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.
+   *              SteepAreaResult
    */
   public class Instance extends AbstractOPTICSVisualization {
     /**
@@ -140,10 +139,8 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, 0);
       this.areas = findSteepAreaResult(this.optics.getResult());
-      context.addResultListener(this);
-      incrementalRedraw();
     }
 
     @Override
@@ -183,7 +180,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
      */
     private void addCSSClasses() {
       // Class for the markers
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       if(!svgp.getCSSClassManager().contains(CSS_STEEP_DOWN)) {
         final CSSClass cls = new CSSClass(this, CSS_STEEP_DOWN);
         Color color = SVGUtil.stringToColor(style.getColor(StyleLibrary.PLOT));
@@ -206,15 +203,6 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
         cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * .5);
         svgp.addCSSClassOrLogError(cls);
       }
-    }
-
-    @Override
-    public void resultChanged(Result current) {
-      if(current instanceof SelectionResult) {
-        synchronizedRedraw();
-        return;
-      }
-      super.resultChanged(current);
     }
   }
 }

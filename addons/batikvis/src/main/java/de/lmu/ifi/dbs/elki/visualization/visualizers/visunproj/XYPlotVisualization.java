@@ -84,7 +84,7 @@ public class XYPlotVisualization extends AbstractVisFactory {
     XYPlot xyplot = task.getResult();
 
     setupCSS(context, plot, xyplot);
-    final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    final StyleLibrary style = context.getStyleLibrary();
     final double sizex = StyleLibrary.SCALE;
     final double sizey = StyleLibrary.SCALE * height / width;
     final double margin = style.getSize(StyleLibrary.MARGIN);
@@ -138,7 +138,7 @@ public class XYPlotVisualization extends AbstractVisFactory {
    * @param plot Plot to render
    */
   private void setupCSS(VisualizerContext context, SVGPlot svgp, XYPlot plot) {
-    StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    StyleLibrary style = context.getStyleLibrary();
     for(XYPlot.Curve curve : plot) {
       CSSClass csscls = new CSSClass(this, SERIESID + curve.getColor());
       // csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.2%");

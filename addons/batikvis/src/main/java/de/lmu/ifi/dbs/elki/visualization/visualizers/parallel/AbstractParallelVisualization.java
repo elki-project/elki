@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2012
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -76,16 +76,18 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector> ext
    *
    * @param task Visualization task
    */
-  public AbstractParallelVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-    super(task, plot, width, height);
+  public AbstractParallelVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask) {
+    super(task, plot, width, height, mask);
     this.proj = (ProjectionParallel) proj;
     this.relation = task.getRelation();
-
     margins = new double[] { 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE };
     double ratio = (task.reqwidth * StyleLibrary.SCALE - margins[0] - margins[2]) / (task.reqheight * StyleLibrary.SCALE - margins[1] - margins[3]);
     size = new double[] { ratio * StyleLibrary.SCALE, StyleLibrary.SCALE };
     recalcAxisPositions();
+  }
 
+  @Override
+  protected void redraw() {
     this.layer = setupCanvas(svgp, this.proj, getWidth(), getHeight());
   }
 
@@ -155,9 +157,10 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector> ext
   @Override
   public void resultChanged(Result current) {
     super.resultChanged(current);
-    if(current == proj) {
+    if(proj != null && current == proj) {
       recalcAxisPositions();
       synchronizedRedraw();
+      return;
     }
   }
 }

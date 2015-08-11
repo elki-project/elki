@@ -117,7 +117,6 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
    * @param <N> Tree node type
    * @param <E> Tree entry type
    */
-  // TODO: listen for tree changes instead of data changes?
   public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractParallelVisualization<NumberVector>implements DataStoreListener {
     /**
      * The tree we visualize
@@ -131,27 +130,17 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
      */
     @SuppressWarnings("unchecked")
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, ON_STYLE);
       this.tree = AbstractRStarTree.class.cast(task.getResult());
-      context.addDataStoreListener(this);
-      context.addResultListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      context.removeDataStoreListener(this);
-      context.removeResultListener(this);
-      super.destroy();
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      if(tree != null) {
-        addCSSClasses(svgp);
-        E root = tree.getRootEntry();
-        visualizeRTreeEntry(svgp, layer, proj, tree, root, 0, 0);
-      }
+      super.redraw();
+      addCSSClasses(svgp);
+      E root = tree.getRootEntry();
+      visualizeRTreeEntry(svgp, layer, proj, tree, root, 0, 0);
     }
 
     /**
@@ -160,7 +149,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       final ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       for(int i = 0; i < tree.getHeight(); i++) {

@@ -144,7 +144,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, 0);
     }
 
     @Override
@@ -276,7 +276,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      */
     private void addCSSClasses() {
       // Class for the epsilon-value
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       if(!svgp.getCSSClassManager().contains(CSS_EPSILON)) {
         final CSSClass label = new CSSClass(svgp, CSS_EPSILON);
         label.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));

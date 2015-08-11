@@ -113,14 +113,13 @@ public class SelectionConvexHullVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      context.addResultListener(this);
-      context.addDataStoreListener(this);
-      incrementalRedraw();
+      super(task, plot, width, height, proj, ON_DATA | ON_SELECTION);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
+      super.redraw();
       addCSSClasses(svgp);
       DBIDSelection selContext = context.getSelection();
       if(selContext != null) {
@@ -158,7 +157,7 @@ public class SelectionConvexHullVisualization extends AbstractVisFactory {
     private void addCSSClasses(SVGPlot svgp) {
       // Class for the dot markers
       if(!svgp.getCSSClassManager().contains(SELECTEDHULL)) {
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         CSSClass cls = new CSSClass(this, SELECTEDHULL);
         // cls = new CSSClass(this, CONVEXHULL);
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.SELECTION));

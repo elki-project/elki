@@ -76,7 +76,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
     VisualizationTree.findNew(context, start, ParallelPlotProjector.class, new VisualizationTree.Handler1<ParallelPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), ParallelAxisVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ParallelAxisVisualization.this);
         task.level = VisualizationTask.LEVEL_BACKGROUND;
         context.addVis(p, task);
       }
@@ -114,13 +114,13 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, 0);
       incrementalRedraw();
-      context.addResultListener(this);
     }
 
     @Override
     protected void redraw() {
+      super.redraw();
       addCSSClasses(svgp);
       final int dim = proj.getInputDimensionality();
       try {
@@ -130,7 +130,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
           }
           final int truedim = proj.getDimForVisibleAxis(vdim);
           final double axisX = getVisibleAxisX(vdim);
-          final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+          final StyleLibrary style = context.getStyleLibrary();
           if(!proj.isAxisInverted(vdim)) {
             SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, getSizeY(), axisX, 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, style);
           }
@@ -164,7 +164,7 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
      * @param svgp Plot to draw to
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       if(!svgp.getCSSClassManager().contains(AXIS_LABEL)) {
         CSSClass cls = new CSSClass(this, AXIS_LABEL);
         cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));

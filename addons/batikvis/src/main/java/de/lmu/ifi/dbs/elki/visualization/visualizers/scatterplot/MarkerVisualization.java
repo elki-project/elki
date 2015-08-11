@@ -27,7 +27,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -37,7 +36,6 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -67,7 +65,7 @@ public class MarkerVisualization extends AbstractVisFactory {
    */
   public MarkerVisualization() {
     super();
-    this.thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
+    this.thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE | ThumbnailVisualization.ON_SAMPLE;
   }
 
   @Override
@@ -81,9 +79,8 @@ public class MarkerVisualization extends AbstractVisFactory {
     new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, context.getStyleResult(), p.getRelation(), MarkerVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), MarkerVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
-        context.addVis(context.getStyleResult(), task);
         context.addVis(p, task);
       }
     });
@@ -96,7 +93,7 @@ public class MarkerVisualization extends AbstractVisFactory {
    *
    * @apiviz.uses StyleResult
    */
-  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+  public class Instance extends AbstractScatterplotVisualization {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -104,35 +101,22 @@ public class MarkerVisualization extends AbstractVisFactory {
     public static final String DOTMARKER = "dot";
 
     /**
-     * The result we visualize
-     */
-    private StyleResult style;
-
-    /**
      * Constructor.
      *
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      this.style = task.getResult();
-      context.addDataStoreListener(this);
-      context.addResultListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      super.destroy();
-      context.removeDataStoreListener(this);
-      context.removeResultListener(this);
+      super(task, plot, width, height, proj, ON_DATA | ON_STYLE | ON_SAMPLE);
+      addListeners();
     }
 
     @Override
     public void redraw() {
-      final MarkerLibrary ml = style.getStyleLibrary().markers();
-      final double marker_size = style.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
-      final StylingPolicy spol = style.getStylingPolicy();
+      super.redraw();
+      final StyleLibrary style = context.getStyleLibrary();
+      final MarkerLibrary ml = style.markers();
+      final double marker_size = style.getSize(StyleLibrary.MARKERPLOT);
+      final StylingPolicy spol = context.getStylingPolicy();
 
       if(spol instanceof ClassStylingPolicy) {
         ClassStylingPolicy cspol = (ClassStylingPolicy) spol;

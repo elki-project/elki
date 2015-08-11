@@ -133,15 +133,15 @@ public class TreeMBRVisualization extends AbstractVisFactory {
      */
     @SuppressWarnings("unchecked")
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, ON_DATA);
       this.tree = AbstractRStarTree.class.cast(task.getResult());
-      incrementalRedraw();
-      context.addDataStoreListener(this);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      super.redraw();
+      final StyleLibrary style = context.getStyleLibrary();
       int projdim = proj.getVisibleDimensions2D().cardinality();
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 

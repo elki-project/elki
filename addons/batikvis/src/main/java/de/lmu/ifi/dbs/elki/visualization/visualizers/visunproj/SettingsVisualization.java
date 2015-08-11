@@ -126,7 +126,7 @@ public class SettingsVisualization extends AbstractVisFactory {
 
     int cols = Math.max(30, (int) (i * height / width));
     int rows = i;
-    final double margin = context.getStyleResult().getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 

@@ -80,7 +80,7 @@ public class HistogramVisualization extends AbstractVisFactory {
     VisualizerContext context = task.getContext();
     HistogramResult<? extends NumberVector> curve = task.getResult();
 
-    final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    final StyleLibrary style = context.getStyleLibrary();
     final double sizex = StyleLibrary.SCALE;
     final double sizey = StyleLibrary.SCALE * height / width;
     final double margin = style.getSize(StyleLibrary.MARGIN);

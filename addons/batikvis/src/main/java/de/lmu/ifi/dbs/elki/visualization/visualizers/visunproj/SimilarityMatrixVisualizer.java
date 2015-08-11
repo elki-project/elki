@@ -111,13 +111,14 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height);
+      super(task, plot, width, height, 0);
       this.result = task.getResult();
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       final double sizex = StyleLibrary.SCALE;
       final double sizey = StyleLibrary.SCALE * getHeight() / getWidth();
       final double margin = style.getSize(StyleLibrary.MARGIN);

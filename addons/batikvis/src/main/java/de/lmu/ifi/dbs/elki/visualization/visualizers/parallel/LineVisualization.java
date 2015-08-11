@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -114,31 +113,15 @@ public class LineVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, ON_DATA | ON_STYLE | ON_SAMPLE);
       this.sample = ResultUtil.getSamplingResult(relation);
-      context.addResultListener(this);
-      context.addDataStoreListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      context.removeDataStoreListener(this);
-      context.removeResultListener(this);
-      super.destroy();
-    }
-
-    @Override
-    public void resultChanged(Result current) {
-      super.resultChanged(current);
-      if(current == sample || current == context.getStyleResult()) {
-        synchronizedRedraw();
-      }
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      StylingPolicy sp = context.getStyleResult().getStylingPolicy();
+      super.redraw();
+      StylingPolicy sp = context.getStylingPolicy();
       addCSSClasses(svgp, sp);
 
       if(sp instanceof ClassStylingPolicy) {
@@ -215,7 +198,7 @@ public class LineVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp, StylingPolicy sp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       final LineStyleLibrary lines = style.lines();
       final double width = .5 * style.getLineWidth(StyleLibrary.PLOT);
       if(sp instanceof ClassStylingPolicy) {

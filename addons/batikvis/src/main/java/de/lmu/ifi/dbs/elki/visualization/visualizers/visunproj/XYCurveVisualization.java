@@ -87,7 +87,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
     XYCurve curve = task.getResult();
 
     setupCSS(context, plot);
-    final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    final StyleLibrary style = context.getStyleLibrary();
     final double sizex = StyleLibrary.SCALE;
     final double sizey = StyleLibrary.SCALE * height / width;
     final double margin = style.getSize(StyleLibrary.MARGIN);
@@ -167,7 +167,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
    * @param svgp Plot
    */
   private void setupCSS(VisualizerContext context, SVGPlot svgp) {
-    StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    StyleLibrary style = context.getStyleLibrary();
     CSSClass csscls = new CSSClass(this, SERIESID);
     // csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.2%");
     csscls.setStatement(SVGConstants.SVG_FILL_ATTRIBUTE, SVGConstants.SVG_NONE_VALUE);

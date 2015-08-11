@@ -37,8 +37,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -145,9 +143,8 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      context.addResultListener(this);
-      incrementalRedraw();
+      super(task, plot, width, height, proj, ON_SELECTION);
+      addListeners();
     }
 
     @Override
@@ -353,15 +350,6 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
         rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
         svgp.addCSSClassOrLogError(rcls);
       }
-    }
-
-    @Override
-    public void resultChanged(Result current) {
-      if(current instanceof SelectionResult) {
-        synchronizedRedraw();
-        return;
-      }
-      super.resultChanged(current);
     }
   }
 }

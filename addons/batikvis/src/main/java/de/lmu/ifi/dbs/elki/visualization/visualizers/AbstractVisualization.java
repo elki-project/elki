@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,8 +29,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
+import de.lmu.ifi.dbs.elki.result.SamplingResult;
+import de.lmu.ifi.dbs.elki.result.SelectionResult;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
@@ -39,7 +45,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * @author Erich Schubert
  * @apiviz.excludeSubtypes
  */
-public abstract class AbstractVisualization implements Visualization, ResultListener {
+public abstract class AbstractVisualization implements Visualization, ResultListener, VisualizationListener, DataStoreListener {
   /**
    * The visualization task we do.
    */
@@ -76,11 +82,38 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   private double height;
 
   /**
+   * The event mask. See {@link #ON_DATA}, {@link #ON_SELECTION},
+   * {@link #ON_STYLE}.
+   */
+  private int mask;
+
+  /**
+   * Constant to listen for data changes
+   */
+  public static final int ON_DATA = 1;
+
+  /**
+   * Constant to listen for selection changes
+   */
+  public static final int ON_SELECTION = 2;
+
+  /**
+   * Constant to listen for style result changes
+   */
+  public static final int ON_STYLE = 4;
+
+  /**
+   * Constant to listen for sampling result changes
+   */
+  public static final int ON_SAMPLE = 8;
+
+  /**
    * Constructor.
    *
    * @param task Visualization task
+   * @param mask Refresh mask
    */
-  public AbstractVisualization(VisualizationTask task, SVGPlot plot, double width, double height) {
+  public AbstractVisualization(VisualizationTask task, SVGPlot plot, double width, double height, int mask) {
     super();
     this.task = task;
     this.context = task.getContext();
@@ -88,8 +121,25 @@ public abstract class AbstractVisualization implements Visualization, ResultList
     this.width = width;
     this.height = height;
     this.layer = null;
+    this.mask = mask;
     // Note: we do not auto-add listeners, as we don't know what kind of
-    // listeners a visualizer needs, and the visualizer might need to do some initialization first
+    // listeners a visualizer needs, and the visualizer might need to do some
+    // initialization first
+  }
+
+  /**
+   * Add the listeners according to the mask.
+   */
+  protected void addListeners() {
+    // Listen for result changes, including the one we monitor
+    context.addResultListener(this);
+    // Listen for database events only when needed.
+    if((mask & ON_DATA) == ON_DATA) {
+      context.addDataStoreListener(this);
+    }
+    if((mask & ON_STYLE) == ON_STYLE) {
+      context.addVisualizationListener(this);
+    }
   }
 
   @Override
@@ -97,7 +147,8 @@ public abstract class AbstractVisualization implements Visualization, ResultList
     // Always unregister listeners, as this is easy to forget otherwise
     // TODO: remove destroy() overrides that are redundant?
     context.removeResultListener(this);
-    if (this instanceof DataStoreListener) {
+    context.removeVisualizationListener(this);
+    if(this instanceof DataStoreListener) {
       context.removeDataStoreListener((DataStoreListener) this);
     }
   }
@@ -177,22 +228,33 @@ public abstract class AbstractVisualization implements Visualization, ResultList
     // Default is to redraw when the result we are attached to changed.
     if(task.getResult() == current) {
       synchronizedRedraw();
+      return;
+    }
+    if((mask & ON_SELECTION) == ON_SELECTION && current instanceof SelectionResult) {
+      synchronizedRedraw();
+      return;
+    }
+    if((mask & ON_SAMPLE) == ON_SAMPLE && current instanceof SamplingResult) {
+      synchronizedRedraw();
+      return;
     }
   }
 
   @Override
   public void resultRemoved(Result child, Result parent) {
     // Ignore by default.
+    // TODO: auto-remove if parent result is removed?
   }
 
-  /**
-   * Default implementation for
-   * {@link de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener#contentChanged}
-   *
-   * Not enabled or used by default, but saves redundant code.
-   *
-   * @param e Data store event
-   */
+  @Override
+  public void visualizationChanged(VisualizationItem item) {
+    if((mask & ON_STYLE) == ON_STYLE && (item instanceof StylingPolicy || item instanceof StyleLibrary)) {
+      synchronizedRedraw();
+      return;
+    }
+  }
+
+  @Override
   public void contentChanged(DataStoreEvent e) {
     synchronizedRedraw();
   }

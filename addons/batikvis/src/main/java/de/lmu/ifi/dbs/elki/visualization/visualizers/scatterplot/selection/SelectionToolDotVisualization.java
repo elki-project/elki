@@ -131,12 +131,13 @@ public class SelectionToolDotVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      incrementalRedraw();
+      super(task, plot, width, height, proj, ON_SELECTION);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
+      super.redraw();
       addCSSClasses(svgp);
 
       //
@@ -260,7 +261,7 @@ public class SelectionToolDotVisualization extends AbstractVisFactory {
       // Class for the range marking
       if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
         final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));
         rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION_ACTIVE));
         svgp.addCSSClassOrLogError(rcls);

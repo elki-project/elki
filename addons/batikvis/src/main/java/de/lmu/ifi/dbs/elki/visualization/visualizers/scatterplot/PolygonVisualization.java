@@ -98,21 +98,15 @@ public class PolygonVisualization extends AbstractVisFactory {
      * @param task Task to visualize
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, ON_STYLE);
       this.rep = task.getResult(); // Note: relation was used for projection
-      context.addDataStoreListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      super.destroy();
-      context.removeDataStoreListener(this);
+      addListeners();
     }
 
     @Override
     public void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      super.redraw();
+      final StyleLibrary style = context.getStyleLibrary();
       CSSClass css = new CSSClass(svgp, POLYS);
       // TODO: separate fill and line colors?
       css.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.POLYGONS));

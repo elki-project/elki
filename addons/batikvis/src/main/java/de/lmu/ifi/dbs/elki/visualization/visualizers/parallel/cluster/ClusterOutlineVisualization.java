@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -103,10 +102,9 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
     new VisualizationTree.Handler1<ParallelPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, context.getStyleResult(), p.getRelation(), ClusterOutlineVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterOutlineVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
         task.initDefaultVisibility(false);
-        context.addVis(context.getStyleResult(), task);
         context.addVis(p, task);
       }
     });
@@ -132,33 +130,19 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
     public static final String CLUSTERAREA = "Clusteroutline";
 
     /**
-     * The result we visualize
-     */
-    private StyleResult style;
-
-    /**
      * Constructor.
      *
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      this.style = task.getResult();
-      context.addDataStoreListener(this);
-      context.addResultListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      context.removeDataStoreListener(this);
-      context.removeResultListener(this);
-      super.destroy();
+      super(task, plot, width, height, proj, ON_DATA | ON_STYLE);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      final StylingPolicy spol = style.getStylingPolicy();
+      super.redraw();
+      final StylingPolicy spol = context.getStylingPolicy();
       if(!(spol instanceof ClusterStylingPolicy)) {
         return;
       }
@@ -253,7 +237,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
      * @param opac Opacity
      */
     private void addCSSClasses(SVGPlot svgp, int clusterID, double opac) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       CSSClass cls = new CSSClass(this, CLUSTERAREA + clusterID);

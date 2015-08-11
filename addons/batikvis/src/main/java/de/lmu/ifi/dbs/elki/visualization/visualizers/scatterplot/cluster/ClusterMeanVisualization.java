@@ -98,9 +98,8 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
     new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, context.getStyleResult(), p.getRelation(), ClusterMeanVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterMeanVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA + 1;
-        context.addVis(context.getStyleResult(), task);
         context.addVis(p, task);
       }
     });
@@ -136,13 +135,14 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      incrementalRedraw();
+      super(task, plot, width, height, proj, ON_STYLE);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      final StylingPolicy spol = context.getStyleResult().getStylingPolicy();
+      super.redraw();
+      final StylingPolicy spol = context.getStylingPolicy();
       if(!(spol instanceof ClusterStylingPolicy)) {
         return;
       }
@@ -152,7 +152,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
         return;
       }
 
-      StyleLibrary slib = context.getStyleResult().getStyleLibrary();
+      StyleLibrary slib = context.getStyleLibrary();
       ColorLibrary colors = slib.getColorSet(StyleLibrary.PLOT);
       MarkerLibrary ml = slib.markers();
       double marker_size = slib.getSize(StyleLibrary.MARKERPLOT);

@@ -99,7 +99,8 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, ON_STYLE);
+      addListeners();
     }
 
     @Override
@@ -125,7 +126,7 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
       double y1 = plotheight * opticsplot.scaleToPixel(scale.getMin()) / opticsplot.getHeight();
       double y2 = plotheight * opticsplot.scaleToPixel(scale.getMax()) / opticsplot.getHeight();
       try {
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, 0, y1, 0, y2, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
         SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, plotwidth, y1, plotwidth, y2, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, style);
       }

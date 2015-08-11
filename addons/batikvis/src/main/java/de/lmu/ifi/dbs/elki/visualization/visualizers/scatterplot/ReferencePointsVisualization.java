@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -109,14 +109,15 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, 0);
       this.result = task.getResult();
-      incrementalRedraw();
+      addListeners();
     }
 
     @Override
     public void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      super.redraw();
+      final StyleLibrary style = context.getStyleLibrary();
       setupCSS(svgp);
       Iterator<? extends NumberVector> iter = result.iterator();
 
@@ -136,7 +137,7 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
      * @param svgp the SVGPlot to register the -CSS-Class.
      */
     private void setupCSS(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       CSSClass refpoint = new CSSClass(svgp, REFPOINT);
       refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.REFERENCE_POINTS));
       svgp.addCSSClassOrLogError(refpoint);

@@ -114,10 +114,9 @@ public class ClusterHullVisualization extends AbstractVisFactory {
     new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, context.getStyleResult(), p.getRelation(), ClusterHullVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterHullVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
         task.initDefaultVisibility(false);
-        context.addVis(context.getStyleResult(), task);
         context.addVis(p, task);
       }
     });
@@ -146,13 +145,14 @@ public class ClusterHullVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      incrementalRedraw();
+      super(task, plot, width, height, proj, ON_DATA | ON_SAMPLE | ON_STYLE);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      final StylingPolicy spol = context.getStyleResult().getStylingPolicy();
+      super.redraw();
+      final StylingPolicy spol = context.getStylingPolicy();
       if(!(spol instanceof ClusterStylingPolicy)) {
         return;
       }
@@ -341,7 +341,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp, int clusterID, double opac) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       CSSClass cls = new CSSClass(this, CLUSTERHULL + clusterID);

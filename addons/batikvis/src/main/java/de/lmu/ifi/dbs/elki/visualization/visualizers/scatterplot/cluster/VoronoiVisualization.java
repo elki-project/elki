@@ -128,10 +128,9 @@ public class VoronoiVisualization extends AbstractVisFactory {
     VisualizationTree.findNew(context, start, ScatterPlotProjector.class, new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, context.getStyleResult(), p.getRelation(), VoronoiVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), VoronoiVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA + 3;
         context.addVis(p, task);
-        context.addVis(context.getStyleResult(), task);
       }
     });
   }
@@ -157,13 +156,14 @@ public class VoronoiVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      incrementalRedraw();
+      super(task, plot, width, height, proj, ON_STYLE);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      final StylingPolicy spol = context.getStyleResult().getStylingPolicy();
+      super.redraw();
+      final StylingPolicy spol = context.getStylingPolicy();
       if(!(spol instanceof ClusterStylingPolicy)) {
         return;
       }
@@ -242,7 +242,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
     private void addCSSClasses(SVGPlot svgp) {
       // Class for the distance markers
       if(!svgp.getCSSClassManager().contains(KMEANSBORDER)) {
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         CSSClass cls = new CSSClass(this, KMEANSBORDER);
         cls = new CSSClass(this, KMEANSBORDER);
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_BLACK_VALUE);

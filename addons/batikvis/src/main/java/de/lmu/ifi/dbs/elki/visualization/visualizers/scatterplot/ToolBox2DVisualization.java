@@ -33,9 +33,9 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -128,14 +128,13 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      // TODO: which result do we best attach to?
-      context.addResultListener(this);
-      incrementalRedraw();
+      super(task, plot, width, height, proj, 0);
+      context.addVisualizationListener(this);
     }
 
     @Override
     protected void redraw() {
+      super.redraw();
       addCSSClasses(svgp);
       container = svgp.svgElement(SVGConstants.SVG_G_TAG);
       buildToolBox();
@@ -237,7 +236,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       }
       // Class for the text of the tools
       if(!svgp.getCSSClassManager().contains(CSS_TOOL_CAPTION)) {
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         final CSSClass label = new CSSClass(svgp, CSS_TOOL_CAPTION);
         label.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));
         label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.AXIS_LABEL));
@@ -277,29 +276,10 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
     }
 
     @Override
-    public void resultAdded(Result child, Result parent) {
-      if(child instanceof VisualizationTask) {
-        VisualizationTask task = (VisualizationTask) child;
-        if(task.tool) {
-          synchronizedRedraw();
-        }
-      }
-    }
-
-    @Override
-    public void resultRemoved(Result child, Result parent) {
-      if(child instanceof VisualizationTask) {
-        VisualizationTask task = (VisualizationTask) child;
-        if(task.tool) {
-          synchronizedRedraw();
-        }
-      }
-    }
-
-    @Override
-    public void resultChanged(Result current) {
-      if(current instanceof VisualizationTask) {
-        VisualizationTask task = (VisualizationTask) current;
+    public void visualizationChanged(VisualizationItem item) {
+      super.visualizationChanged(item);
+      if(item instanceof VisualizationTask) {
+        VisualizationTask task = (VisualizationTask) item;
         if(task.tool) {
           synchronizedRedraw();
         }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -105,21 +105,15 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
     protected ClusterOrder result;
 
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, ON_DATA);
       result = task.getResult();
-      context.addDataStoreListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      super.destroy();
-      context.removeDataStoreListener(this);
+      addListeners();
     }
 
     @Override
     public void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      super.redraw();
+      final StyleLibrary style = context.getStyleLibrary();
       CSSClass cls = new CSSClass(this, CSSNAME);
       style.lines().formatCSSClass(cls, 0, style.getLineWidth(StyleLibrary.CLUSTERORDER));
 

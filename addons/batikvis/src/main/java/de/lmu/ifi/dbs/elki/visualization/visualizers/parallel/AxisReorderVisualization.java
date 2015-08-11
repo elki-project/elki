@@ -123,13 +123,13 @@ public class AxisReorderVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      incrementalRedraw();
-      context.addResultListener(this);
+      super(task, plot, width, height, proj, 0);
+      addListeners();
     }
 
     @Override
     protected void redraw() {
+      super.redraw();
       addCSSClasses(svgp);
       final int dim = proj.getVisibleDimensions();
 
@@ -263,7 +263,7 @@ public class AxisReorderVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       if(!svgp.getCSSClassManager().contains(SELECTDIMENSIONORDER)) {
         CSSClass cls = new CSSClass(this, SELECTDIMENSIONORDER);
         cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, 0.1);

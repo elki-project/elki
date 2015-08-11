@@ -61,9 +61,10 @@ public abstract class AbstractOPTICSVisualization extends AbstractVisualization 
    * Constructor.
    *
    * @param task Visualization task.
+   * @param mask Visualization mask
    */
-  public AbstractOPTICSVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-    super(task, plot, width, height);
+  public AbstractOPTICSVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask) {
+    super(task, plot, width, height, mask);
     this.optics = (OPTICSProjection) proj;
   }
 
@@ -73,7 +74,7 @@ public abstract class AbstractOPTICSVisualization extends AbstractVisualization 
   protected void makeLayerElement() {
     plotwidth = StyleLibrary.SCALE;
     plotheight = StyleLibrary.SCALE / optics.getOPTICSPlot(context).getRatio();
-    final double margin = context.getStyleResult().getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
     final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), plotwidth, plotheight, margin * .5, margin * .5, margin * 1.5, margin * .5);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);

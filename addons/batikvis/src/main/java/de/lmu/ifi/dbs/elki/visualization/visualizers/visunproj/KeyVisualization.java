@@ -34,7 +34,6 @@ import org.w3c.dom.events.EventTarget;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
@@ -198,28 +197,14 @@ public class KeyVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height);
+      super(task, plot, width, height, ON_STYLE);
       this.clustering = task.getResult();
-      context.addResultListener(this);
-    }
-
-    @Override
-    public void destroy() {
-      context.removeResultListener(this);
-      super.destroy();
-    }
-
-    @Override
-    public void resultChanged(Result current) {
-      super.resultChanged(current);
-      if(current == context.getStyleResult()) {
-        incrementalRedraw();
-      }
+      addListeners();
     }
 
     @Override
     protected void redraw() {
-      StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      StyleLibrary style = context.getStyleLibrary();
       MarkerLibrary ml = style.markers();
 
       final List<Cluster<Model>> allcs = clustering.getAllClusters();
@@ -282,7 +267,7 @@ public class KeyVisualization extends AbstractVisFactory {
 
       // Add a button to set style policy
       {
-        StylingPolicy sp = context.getStyleResult().getStylingPolicy();
+        StylingPolicy sp = context.getStylingPolicy();
         if(sp instanceof ClusterStylingPolicy && ((ClusterStylingPolicy) sp).getClustering() == clustering) {
           // Don't show the button when active. May confuse people more than the
           // disappearing button?
@@ -350,8 +335,7 @@ public class KeyVisualization extends AbstractVisFactory {
      * Trigger a style change.
      */
     protected void setStylePolicy() {
-      context.getStyleResult().setStylingPolicy(new ClusterStylingPolicy(clustering, context.getStyleResult().getStyleLibrary()));
-      context.getHierarchy().resultChanged(context.getStyleResult());
+      context.setStylingPolicy(new ClusterStylingPolicy(clustering, context.getStyleLibrary()));
     }
 
     /**
@@ -360,7 +344,7 @@ public class KeyVisualization extends AbstractVisFactory {
      * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
      */
     protected void setupCSS(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       final double fontsize = style.getTextSize(StyleLibrary.KEY);
       final String fontfamily = style.getFontFamily(StyleLibrary.KEY);
       final String color = style.getColor(StyleLibrary.KEY);

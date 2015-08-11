@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -123,20 +122,14 @@ public class COPVectorVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+      super(task, plot, width, height, proj, ON_DATA | ON_SAMPLE);
       this.result = task.getResult();
-      context.addDataStoreListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      super.destroy();
-      context.removeDataStoreListener(this);
+      addListeners();
     }
 
     @Override
     public void redraw() {
+      super.redraw();
       setupCSS(svgp);
       for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
         Vector evec = result.get(objId);
@@ -162,20 +155,13 @@ public class COPVectorVisualization extends AbstractVisFactory {
       }
     }
 
-    @Override
-    public void resultChanged(Result current) {
-      if(sample == current) {
-        synchronizedRedraw();
-      }
-    }
-
     /**
      * Registers the COP error vector-CSS-Class at a SVGPlot.
      *
      * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
      */
     private void setupCSS(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       CSSClass bubble = new CSSClass(svgp, VEC);
       bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 2);
 

@@ -104,10 +104,8 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
-      addCSSClasses(svgp);
-      context.addResultListener(this);
-      incrementalRedraw();
+      super(task, plot, width, height, proj, ON_SELECTION);
+      addListeners();
     }
 
     /**
@@ -116,7 +114,7 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       // Class for the cube
       if(!svgp.getCSSClassManager().contains(MARKER)) {
         CSSClass cls = new CSSClass(this, MARKER);
@@ -135,6 +133,8 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
 
     @Override
     protected void redraw() {
+      super.redraw();
+      addCSSClasses(svgp);
       DBIDSelection selContext = context.getSelection();
       if(!(selContext instanceof RangeSelection)) {
         return;
