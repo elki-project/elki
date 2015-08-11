@@ -323,6 +323,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
           layer.appendChild(elem);
         }
       }
+      svgp.updateStyleElement();
     }
 
     /**
