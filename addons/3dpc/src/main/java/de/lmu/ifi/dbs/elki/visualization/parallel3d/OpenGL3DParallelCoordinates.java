@@ -85,7 +85,8 @@ import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 
 /**
  * Simple JOGL2 based parallel coordinates visualization.
@@ -133,7 +134,6 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
   @Override
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     boolean nonefound = true;
-    StyleResult style = getStyleResult(hier);
     List<Relation<?>> rels = ResultUtil.getRelations(newResult);
     for(Relation<?> rel : rels) {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
@@ -143,7 +143,9 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       Relation<? extends O> vrel = (Relation<? extends O>) rel;
       ScalesResult scales = ResultUtil.getScalesResult(vrel);
       ProjectionParallel proj = new SimpleParallel(scales.getScales());
-      new Instance<>(vrel, proj, settings, style).run();
+      PropertiesBasedStyleLibrary stylelib = new PropertiesBasedStyleLibrary();
+      StylingPolicy stylepol = getStylePolicy(hier, stylelib);
+      new Instance<>(vrel, proj, settings, stylepol, stylelib).run();
       nonefound = false;
     }
     if(nonefound && hier.equals(newResult)) {
@@ -156,20 +158,12 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
    *
    * @return Style result
    */
-  public StyleResult getStyleResult(ResultHierarchy hier) {
-    ArrayList<StyleResult> styles = ResultUtil.filterResults(hier, StyleResult.class);
-    if(styles.size() > 0) {
-      return styles.get(0);
-    }
-    StyleResult styleresult = new StyleResult();
-    styleresult.setStyleLibrary(new PropertiesBasedStyleLibrary());
+  public StylingPolicy getStylePolicy(ResultHierarchy hier, StyleLibrary stylelib) {
     Database db = ResultUtil.findDatabase(hier);
     ResultUtil.ensureClusteringResult(db, db);
     List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(db);
     if(clusterings.size() > 0) {
-      styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0), styleresult.getStyleLibrary()));
-      hier.add(db, styleresult);
-      return styleresult;
+      return new ClusterStylingPolicy(clusterings.get(0), stylelib);
     }
     else {
       throw new AbortException("No clustering result generated?!?");
@@ -317,7 +311,12 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       /**
        * Style result
        */
-      StyleResult style;
+      StylingPolicy stylepol;
+
+      /**
+       * Style library
+       */
+      StyleLibrary stylelib;
 
       /**
        * Layout
@@ -355,13 +354,14 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
      * @param settings Settings
      * @param style Style result
      */
-    public Instance(Relation<? extends O> rel, ProjectionParallel proj, Settings<O> settings, StyleResult style) {
+    public Instance(Relation<? extends O> rel, ProjectionParallel proj, Settings<O> settings, StylingPolicy stylepol, StyleLibrary stylelib) {
       super();
 
       this.shared.dim = RelationUtil.dimensionality(rel);
       this.shared.rel = rel;
       this.shared.proj = proj;
-      this.shared.style = style;
+      this.shared.stylelib = stylelib;
+      this.shared.stylepol = stylepol;
       this.shared.settings = settings;
       // Labels:
       this.shared.labels = new String[this.shared.dim];
@@ -405,13 +405,13 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       // Init menu for SIGMOD demo. TODO: make more flexible.
       {
         ArrayList<String> options = menuOverlay.getOptions();
-        for (Class<?> clz : ELKIServiceRegistry.findAllImplementations(Layouter3DPC.class)) {
+        for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(Layouter3DPC.class)) {
           options.add(clz.getSimpleName());
         }
         if(options.size() > 0) {
           options.add(null); // Spacer.
         }
-        for (Class<?> clz : ELKIServiceRegistry.findAllImplementations(DimensionSimilarity.class)) {
+        for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(DimensionSimilarity.class)) {
           options.add(clz.getSimpleName());
         }
       }
@@ -439,7 +439,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
     protected void relayout(String parname) {
       try {
         final Class<?> layoutc = ELKIServiceRegistry.findImplementation(Layouter3DPC.class, parname);
-        if (layoutc != null) {
+        if(layoutc != null) {
           ListParameterization params = new ListParameterization();
           if(shared.settings.sim != null) {
             params.addParameter(SimilarityBasedLayouter3DPC.SIM_ID, shared.settings.sim);
@@ -456,7 +456,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       }
       try {
         final Class<?> simc = ELKIServiceRegistry.findImplementation(DimensionSimilarity.class, parname);
-        if (simc != null) {
+        if(simc != null) {
           shared.settings.sim = ClassGenericsUtil.tryInstantiate(DimensionSimilarity.class, simc, new EmptyParameterization());
           if(!(shared.settings.layout instanceof SimilarityBasedLayouter3DPC)) {
             ListParameterization params = new ListParameterization();
