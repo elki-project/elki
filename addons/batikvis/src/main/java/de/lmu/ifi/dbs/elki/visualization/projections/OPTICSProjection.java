@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 /**
  * OPTICS projection. This is not really needed, but a quick hack to have more
  * consistency in the visualizer API.
- * 
+ *
  * @author Erich Schubert
  */
 public class OPTICSProjection extends AbstractHierarchicalResult implements Projection {
@@ -44,7 +44,7 @@ public class OPTICSProjection extends AbstractHierarchicalResult implements Proj
 
   /**
    * Constructor.
-   * 
+   *
    * @param opticsProjector OPTICS projector
    */
   public OPTICSProjection(OPTICSProjector opticsProjector) {
@@ -54,7 +54,7 @@ public class OPTICSProjection extends AbstractHierarchicalResult implements Proj
 
   @Override
   public String getLongName() {
-    return "OPTICS projection";
+    return "OPTICS Plot Projection";
   }
 
   @Override
@@ -74,7 +74,7 @@ public class OPTICSProjection extends AbstractHierarchicalResult implements Proj
 
   /**
    * Get or produce the actual OPTICS plot.
-   * 
+   *
    * @param context Context to use
    * @return Plot
    */
@@ -84,7 +84,7 @@ public class OPTICSProjection extends AbstractHierarchicalResult implements Proj
 
   /**
    * Get the OPTICS cluster order.
-   * 
+   *
    * @return Cluster oder result.
    */
   public ClusterOrder getResult() {
