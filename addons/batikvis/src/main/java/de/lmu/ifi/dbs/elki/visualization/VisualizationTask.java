@@ -99,11 +99,6 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   public boolean tool = false;
 
   /**
-   * Indicate whether this task has options.
-   */
-  public boolean hasoptions = false;
-
-  /**
    * Background layer
    */
   public static final int LEVEL_BACKGROUND = 0;

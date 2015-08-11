@@ -46,12 +46,13 @@ import javax.swing.SwingUtilities;
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
@@ -60,7 +61,6 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.DetailViewSelectedEvent;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Swing window to manage a particular result visualization.
@@ -80,7 +80,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
  * @apiviz.uses DetailView oneway
  * @apiviz.uses DetailViewSelectedEvent oneway - - reacts to
  */
-public class ResultWindow extends JFrame implements ResultListener {
+public class ResultWindow extends JFrame implements ResultListener, VisualizationListener {
   /**
    * Serial version
    */
@@ -219,14 +219,7 @@ public class ResultWindow extends JFrame implements ResultListener {
     }
 
     private boolean recursiveBuildMenu(JComponent parent, Object r, ResultHierarchy hier, Hierarchy<Object> vistree) {
-      // Skip "adapter" results that do not have visualizers
-      if(r instanceof ResultAdapter) {
-        if(hier.numChildren((ResultAdapter) r) <= 0) {
-          return false;
-        }
-      }
       // Make a submenu for this element
-      boolean nochildren = true;
       final String nam;
       if(r instanceof Result) {
         nam = ((Result) r).getLongName();
@@ -237,8 +230,8 @@ public class ResultWindow extends JFrame implements ResultListener {
       else {
         return false;
       }
-      JMenu submenu;
-      submenu = new JMenu((nam != null) ? nam : "unnamed");
+      JMenu submenu = new JMenu((nam != null) ? nam : "unnamed");
+      boolean nochildren = true;
       // Add menus for any child results
       if(r instanceof Result) {
         for(Hierarchy.Iter<Result> iter = hier.iterChildren((Result) r); iter.valid(); iter.advance()) {
@@ -261,9 +254,7 @@ public class ResultWindow extends JFrame implements ResultListener {
           parent.add(item);
         }
         else {
-          JMenuItem noresults = new JMenuItem("no visualizers");
-          noresults.setEnabled(false);
-          submenu.add(noresults);
+          return false;
         }
       }
       else {
@@ -404,6 +395,7 @@ public class ResultWindow extends JFrame implements ResultListener {
     this.addComponentListener(listener);
 
     context.addResultListener(this);
+    context.addVisualizationListener(this);
 
     // update();
     menubar.updateVisualizerMenus();
@@ -412,6 +404,7 @@ public class ResultWindow extends JFrame implements ResultListener {
   @Override
   public void dispose() {
     context.removeResultListener(this);
+    context.removeVisualizationListener(this);
     svgCanvas.setPlot(null);
     overview.destroy();
     if(currentSubplot != null) {
@@ -553,16 +546,7 @@ public class ResultWindow extends JFrame implements ResultListener {
       });
       item = visItem;
     }
-    if(v.hasoptions) {
-      final JMenu menu = new JMenu(name);
-      menu.add(item);
-      // TODO: build a menu for the visualizer!
-      return menu;
-
-    }
-    else {
-      return item;
-    }
+    return item;
   }
 
   @Override
@@ -577,6 +561,11 @@ public class ResultWindow extends JFrame implements ResultListener {
 
   @Override
   public void resultRemoved(Result child, Result parent) {
+    menubar.updateVisualizerMenus();
+  }
+
+  @Override
+  public void visualizationChanged(VisualizationItem item) {
     menubar.updateVisualizerMenus();
   }
 }
