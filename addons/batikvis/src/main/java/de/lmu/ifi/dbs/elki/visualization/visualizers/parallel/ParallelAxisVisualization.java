@@ -31,6 +31,8 @@ import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -55,6 +57,11 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  */
 public class ParallelAxisVisualization extends AbstractVisFactory {
   /**
+   * Class logger
+   */
+  private static final Logging LOG = Logging.getLogger(ParallelAxisVisualization.class);
+
+  /**
    * A short name characterizing this Visualizer.
    */
   private static final String NAME = "Parallel Axes";
@@ -73,14 +80,13 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, ParallelPlotProjector.class, new VisualizationTree.Handler1<ParallelPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ParallelAxisVisualization.this);
-        task.level = VisualizationTask.LEVEL_BACKGROUND;
-        context.addVis(p, task);
-      }
-    });
+    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ParallelPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), this);
+      task.level = VisualizationTask.LEVEL_BACKGROUND;
+      context.addVis(p, task);
+    }
   }
 
   @Override
@@ -119,46 +125,50 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height, proj);
-      incrementalRedraw();
+      addListeners();
     }
 
     @Override
     protected void redraw() {
       super.redraw();
+      final StyleLibrary style = context.getStyleLibrary();
       addCSSClasses(svgp);
       final int dim = proj.getInputDimensionality();
-      try {
-        for(int i = 0, vdim = 0; i < dim; i++) {
-          if(!proj.isAxisVisible(i)) {
-            continue;
-          }
-          final int truedim = proj.getDimForVisibleAxis(vdim);
-          final double axisX = getVisibleAxisX(vdim);
-          final StyleLibrary style = context.getStyleLibrary();
+      for(int i = 0, vdim = 0; i < dim; i++) {
+        if(!proj.isAxisVisible(i)) {
+          continue;
+        }
+        final int truedim = proj.getDimForAxis(i);
+        final double axisX = getVisibleAxisX(vdim);
+        try {
           if(!proj.isAxisInverted(vdim)) {
             SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, getSizeY(), axisX, 0, SVGSimpleLinearAxis.LabelStyle.ENDLABEL, style);
           }
           else {
             SVGSimpleLinearAxis.drawAxis(svgp, layer, proj.getAxisScale(i), axisX, 0, axisX, getSizeY(), SVGSimpleLinearAxis.LabelStyle.ENDLABEL, style);
           }
-          // Get axis label
-          final String label = RelationUtil.getColumnLabel(relation, truedim);
-          // Add axis label
-          Element text = svgp.svgText(axisX, -.7 * getMarginTop(), label);
-          SVGUtil.setCSSClass(text, AXIS_LABEL);
+        }
+        catch(CSSNamingConflict e) {
+          LOG.warning("Conflict in CSS naming for axes.", e);
+          continue;
+        }
+        // Get axis label
+        final String label = RelationUtil.getColumnLabel(relation, truedim);
+        // Add axis label
+        Element text = svgp.svgText(axisX, -.7 * getMarginTop(), label);
+        SVGUtil.setCSSClass(text, AXIS_LABEL);
+        // TODO: find a reliable way for sizing axis labels.
+        if(dim > 10) {
           SVGUtil.setAtt(text, SVGConstants.SVG_TEXT_LENGTH_ATTRIBUTE, getAxisSep() * 0.95);
           SVGUtil.setAtt(text, SVGConstants.SVG_LENGTH_ADJUST_ATTRIBUTE, SVGConstants.SVG_SPACING_AND_GLYPHS_VALUE);
-          layer.appendChild(text);
-          // TODO: Split into background + clickable layer.
-          Element button = svgp.svgRect(axisX - getAxisSep() * .475, -getMarginTop(), .95 * getAxisSep(), .5 * getMarginTop());
-          SVGUtil.setCSSClass(button, INVERTEDAXIS);
-          addEventListener(button, truedim);
-          layer.appendChild(button);
-          vdim++;
         }
-      }
-      catch(CSSNamingConflict e) {
-        throw new RuntimeException("Conflict in CSS naming for axes.", e);
+        layer.appendChild(text);
+        // TODO: Split into background + clickable layer.
+        Element button = svgp.svgRect(axisX - getAxisSep() * .475, -getMarginTop(), .95 * getAxisSep(), .5 * getMarginTop());
+        SVGUtil.setCSSClass(button, INVERTEDAXIS);
+        addEventListener(button, truedim);
+        layer.appendChild(button);
+        vdim++;
       }
     }
 
@@ -189,14 +199,14 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
      * Add an event listener to the Element.
      *
      * @param tag Element to add the listener
-     * @param i Tool number for the Element
+     * @param truedim Tool number for the Element
      */
-    private void addEventListener(final Element tag, final int i) {
+    private void addEventListener(final Element tag, final int truedim) {
       EventTarget targ = (EventTarget) tag;
       targ.addEventListener(SVGConstants.SVG_EVENT_CLICK, new EventListener() {
         @Override
         public void handleEvent(Event evt) {
-          proj.toggleDimInverted(i);
+          proj.toggleDimInverted(truedim);
           context.visChanged(proj);
         }
       }, false);

@@ -30,6 +30,7 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -72,15 +73,14 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, ParallelPlotProjector.class, new VisualizationTree.Handler1<ParallelPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), AxisVisibilityVisualization.this);
-        task.level = VisualizationTask.LEVEL_INTERACTIVE;
-        task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
-        context.addVis(p, task);
-      }
-    });
+    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ParallelPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), AxisVisibilityVisualization.this);
+      task.level = VisualizationTask.LEVEL_INTERACTIVE;
+      task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
+      context.addVis(p, task);
+    }
   }
 
   /**

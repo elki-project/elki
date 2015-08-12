@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -96,19 +97,16 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    // We attach ourselves to the style library, not the clustering, so there is
-    // only one hull.
-    VisualizationTree.findNew(context, start, ParallelPlotProjector.class, //
-    new VisualizationTree.Handler1<ParallelPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterOutlineVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA - 1;
-        task.initDefaultVisibility(false);
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY);
-        context.addVis(p, task);
-      }
-    });
+    // We use the style library, not individual clusterings!
+    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ParallelPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterOutlineVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA - 1;
+      task.initDefaultVisibility(false);
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY);
+      context.addVis(p, task);
+    }
   }
 
   @Override

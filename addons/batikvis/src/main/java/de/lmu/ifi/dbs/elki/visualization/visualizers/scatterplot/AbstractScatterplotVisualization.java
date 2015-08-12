@@ -77,19 +77,14 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
     super(task, plot, width, height);
     this.proj = (Projection2D) proj;
     this.rel = task.getRelation();
-    if(task.updateOnAny(VisualizationTask.ON_SAMPLE)) {
-      this.sample = ResultUtil.getSamplingResult(rel);
-    }
-    else {
-      this.sample = null;
-    }
+    this.sample = task.updateOnAny(VisualizationTask.ON_SAMPLE) ? ResultUtil.getSamplingResult(rel) : null;
   }
 
   @Override
   protected void redraw() {
     final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     this.layer = setupCanvas(svgp, this.proj, margin, getWidth(), getHeight());
-    // TODO: override, and call super.
+    // Important note: you must override this, and call super.redraw()!
   }
 
   /**

@@ -107,12 +107,10 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   protected void addListeners() {
     // Listen for result changes, including the one we monitor
     context.addResultListener(this);
+    context.addVisualizationListener(this);
     // Listen for database events only when needed.
     if(task.updateOnAny(VisualizationTask.ON_DATA)) {
       context.addDataStoreListener(this);
-    }
-    if(task.updateOnAny(VisualizationTask.ON_STYLEPOLICY)) {
-      context.addVisualizationListener(this);
     }
   }
 
@@ -122,9 +120,7 @@ public abstract class AbstractVisualization implements Visualization, ResultList
     // TODO: remove destroy() overrides that are redundant?
     context.removeResultListener(this);
     context.removeVisualizationListener(this);
-    if(this instanceof DataStoreListener) {
-      context.removeDataStoreListener((DataStoreListener) this);
-    }
+    context.removeDataStoreListener((DataStoreListener) this);
   }
 
   @Override
@@ -222,6 +218,10 @@ public abstract class AbstractVisualization implements Visualization, ResultList
 
   @Override
   public void visualizationChanged(VisualizationItem item) {
+    if(task.getResult() == item) {
+      synchronizedRedraw();
+      return;
+    }
     if(task.updateOnAny(VisualizationTask.ON_STYLEPOLICY) && item instanceof StylingPolicy) {
       synchronizedRedraw();
       return;

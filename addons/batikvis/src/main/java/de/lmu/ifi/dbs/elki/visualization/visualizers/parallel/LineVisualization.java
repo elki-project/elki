@@ -30,10 +30,11 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -78,15 +79,14 @@ public class LineVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, ParallelPlotProjector.class, new VisualizationTree.Handler1<ParallelPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), LineVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA;
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY | VisualizationTask.ON_SAMPLE);
-        context.addVis(p, task);
-      }
-    });
+    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ParallelPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), LineVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA;
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY | VisualizationTask.ON_SAMPLE);
+      context.addVis(p, task);
+    }
   }
 
   /**
@@ -124,43 +124,61 @@ public class LineVisualization extends AbstractVisFactory {
     @Override
     protected void redraw() {
       super.redraw();
+      final DBIDs sam = sample.getSample();
       StylingPolicy sp = context.getStylingPolicy();
-      addCSSClasses(svgp, sp);
-
+      final StyleLibrary style = context.getStyleLibrary();
+      final LineStyleLibrary lines = style.lines();
+      final double width = style.getLineWidth(StyleLibrary.PLOT) * MathUtil.min(.5, 2. / MathUtil.log2(sam.size()));
       if(sp instanceof ClassStylingPolicy) {
-        final DBIDs sam = DBIDUtil.ensureSet(sample.getSample());
         ClassStylingPolicy csp = (ClassStylingPolicy) sp;
-        for(int c = csp.getMinStyle(); c < csp.getMaxStyle(); c++) {
-          String key = DATALINE + "_" + c;
-          for(DBIDIter iter = csp.iterateClass(c); iter.valid(); iter.advance()) {
-            if(!sam.contains(iter)) {
-              continue; // TODO: can we test more efficiently than this?
-            }
-            Element line = drawLine(iter);
-            if(line == null) {
-              continue;
-            }
-            SVGUtil.addCSSClass(line, key);
-            layer.appendChild(line);
+        final int min = csp.getMinStyle();
+        String[] keys = new String[csp.getMaxStyle() - min];
+        for(int c = min; c < csp.getMaxStyle(); c++) {
+          String key = keys[c - min] = DATALINE + "_" + c;
+          if(!svgp.getCSSClassManager().contains(key)) {
+            CSSClass cls = new CSSClass(this, key);
+            cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+            cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+            lines.formatCSSClass(cls, c, width);
+            svgp.addCSSClassOrLogError(cls);
           }
+        }
+        for(DBIDIter iter = sam.iter(); iter.valid(); iter.advance()) {
+          Element line = drawLine(iter);
+          if(line == null) {
+            continue;
+          }
+          SVGUtil.addCSSClass(line, keys[csp.getStyleForDBID(iter) + min]);
+          layer.appendChild(line);
         }
       }
       else {
-        DBIDIter ids = sample.getSample().iter();
-        if(ids == null || !ids.valid()) {
-          ids = relation.iterDBIDs();
+        // No classes available, but individually colored
+        if(!svgp.getCSSClassManager().contains(DATALINE)) {
+          CSSClass cls = new CSSClass(this, DATALINE);
+          cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+          cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
+          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+          lines.formatCSSClass(cls, -1, width);
+          svgp.addCSSClassOrLogError(cls);
         }
-        for(; ids.valid(); ids.advance()) {
-          Element line = drawLine(ids);
+        StringBuilder buf = new StringBuilder().append(SVGConstants.CSS_STROKE_PROPERTY).append(':');
+        final int prefix = buf.length();
+        for(DBIDIter iter = sam.iter(); iter.valid(); iter.advance()) {
+          Element line = drawLine(iter);
           if(line == null) {
             continue;
           }
           SVGUtil.addCSSClass(line, DATALINE);
           // assign color
-          line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, SVGConstants.CSS_STROKE_PROPERTY + ":" + SVGUtil.colorToString(sp.getColorForDBID(ids)));
+          buf.delete(prefix, buf.length());
+          buf.append(SVGUtil.colorToString(sp.getColorForDBID(iter)));
+          line.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, buf.toString());
           layer.appendChild(line);
         }
       }
+      svgp.updateStyleElement();
     }
 
     /**
@@ -193,43 +211,6 @@ public class LineVisualization extends AbstractVisFactory {
         return null; // Not enough data.
       }
       return path.makeElement(svgp);
-    }
-
-    /**
-     * Adds the required CSS-Classes
-     *
-     * @param svgp SVG-Plot
-     */
-    private void addCSSClasses(SVGPlot svgp, StylingPolicy sp) {
-      final StyleLibrary style = context.getStyleLibrary();
-      final LineStyleLibrary lines = style.lines();
-      final double width = .5 * style.getLineWidth(StyleLibrary.PLOT);
-      if(sp instanceof ClassStylingPolicy) {
-        ClassStylingPolicy csp = (ClassStylingPolicy) sp;
-        for(int i = csp.getMinStyle(); i < csp.getMaxStyle(); i++) {
-          String key = DATALINE + "_" + i;
-          if(!svgp.getCSSClassManager().contains(key)) {
-            CSSClass cls = new CSSClass(this, key);
-            cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-            cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-            cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-            lines.formatCSSClass(cls, i, width);
-            svgp.addCSSClassOrLogError(cls);
-          }
-        }
-      }
-      else {
-        // Class for the distance function
-        if(!svgp.getCSSClassManager().contains(DATALINE)) {
-          CSSClass cls = new CSSClass(this, DATALINE);
-          cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-          cls.setStatement(SVGConstants.CSS_STROKE_LINEJOIN_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
-          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
-          lines.formatCSSClass(cls, -1, width);
-          svgp.addCSSClassOrLogError(cls);
-        }
-      }
-      svgp.updateStyleElement();
     }
   }
 }
