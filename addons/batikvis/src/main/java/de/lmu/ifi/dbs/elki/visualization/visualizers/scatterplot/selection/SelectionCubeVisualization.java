@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -86,17 +87,15 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, //
-    new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionCubeVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA - 2;
-        task.addUpdateFlags(VisualizationTask.ON_SELECTION);
-        context.addVis(context.getSelectionResult(), task);
-        context.addVis(p, task);
-      }
-    });
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionCubeVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA - 2;
+      task.addUpdateFlags(VisualizationTask.ON_SELECTION);
+      context.addVis(context.getSelectionResult(), task);
+      context.addVis(p, task);
+    }
   }
 
   /**

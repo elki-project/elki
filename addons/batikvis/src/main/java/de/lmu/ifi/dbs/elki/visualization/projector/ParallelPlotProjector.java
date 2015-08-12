@@ -69,9 +69,9 @@ public class ParallelPlotProjector<V extends NumberVector> implements Projector 
     List<VisualizationTask> tasks = context.getVisTasks(this);
     if(tasks.size() > 0) {
       ScalesResult scales = ResultUtil.getScalesResult(rel);
-      ProjectionParallel proj = new SimpleParallel(scales.getScales());
+      ProjectionParallel proj = new SimpleParallel(this, scales.getScales());
 
-      final double width = Math.ceil(MathUtil.log2(scales.getScales().length - 1));
+      final double width = Math.max(.5, Math.ceil(MathUtil.log2(scales.getScales().length - 1)));
       final PlotItem it = new PlotItem(width, 1., proj);
       it.tasks = tasks;
       col.add(it);

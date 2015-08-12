@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
 /**
  * Abstract base class for "simple" projections.
@@ -37,10 +38,11 @@ public abstract class AbstractSimpleProjection extends AbstractFullProjection {
   /**
    * Constructor.
    *
+   * @param p Projector
    * @param scales Scales to use
    */
-  public AbstractSimpleProjection(LinearScale[] scales) {
-    super(scales);
+  public AbstractSimpleProjection(Projector p, LinearScale[] scales) {
+    super(p, scales);
   }
 
   @Override

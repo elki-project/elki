@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -73,16 +74,14 @@ public class MarkerVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, //
-    new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), MarkerVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA;
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
-        context.addVis(p, task);
-      }
-    });
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), MarkerVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA;
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
+      context.addVis(p, task);
+    }
   }
 
   /**

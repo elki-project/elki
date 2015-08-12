@@ -602,22 +602,11 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
 
   @Override
   public void resultAdded(Result child, Result parent) {
-    if(child instanceof VisualizationTask) {
-      reinitOnRefresh = true;
-    }
     lazyRefresh();
   }
 
   @Override
   public void resultChanged(Result current) {
-    if(current instanceof VisualizationTask) {
-      for(Hierarchy.Iter<Result> iter = context.getHierarchy().iterParents(current); iter.valid(); iter.advance()) {
-        if(iter.get() instanceof Projector) {
-          reinitOnRefresh = true;
-          break;
-        }
-      }
-    }
     lazyRefresh();
   }
 
@@ -629,7 +618,12 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
   @Override
   public void visualizationChanged(VisualizationItem child) {
     if(child instanceof VisualizationTask) {
-      reinitOnRefresh = true;
+      for(Hierarchy.Iter<Object> iter = context.getVisHierarchy().iterParents(child); iter.valid(); iter.advance()) {
+        if(iter.get() instanceof Projector) {
+          reinitOnRefresh = true;
+          break;
+        }
+      }
     }
     lazyRefresh();
   }

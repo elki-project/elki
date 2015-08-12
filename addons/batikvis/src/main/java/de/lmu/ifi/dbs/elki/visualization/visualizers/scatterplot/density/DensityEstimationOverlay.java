@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.KMLOutputHandler;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -77,16 +78,15 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), DensityEstimationOverlay.this);
-        task.level = VisualizationTask.LEVEL_DATA + 1;
-        task.addUpdateFlags(VisualizationTask.ON_DATA);
-        task.initDefaultVisibility(false);
-        context.addVis(p, task);
-      }
-    });
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), DensityEstimationOverlay.this);
+      task.level = VisualizationTask.LEVEL_DATA + 1;
+      task.addUpdateFlags(VisualizationTask.ON_DATA);
+      task.initDefaultVisibility(false);
+      context.addVis(p, task);
+    }
   }
 
   /**

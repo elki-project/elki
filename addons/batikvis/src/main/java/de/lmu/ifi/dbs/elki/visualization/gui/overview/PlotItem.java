@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 
+import java.util.ArrayList;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -106,6 +108,25 @@ public class PlotItem {
     this.w = w;
     this.h = h;
     this.proj = proj;
+  }
+
+  /**
+   * Clone constructor.
+   *
+   * @param vis Existing plot item.
+   */
+  public PlotItem(PlotItem vis) {
+    super();
+    this.x = vis.x;
+    this.y = vis.y;
+    this.w = vis.w;
+    this.h = vis.h;
+    this.proj = vis.proj;
+    this.tasks = new ArrayList<>(vis.tasks);
+    this.subitems = new ArrayList<>(vis.subitems.size());
+    for(PlotItem s : vis.subitems) {
+      this.subitems.add(new PlotItem(s));
+    }
   }
 
   /**

@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 /**
@@ -60,4 +61,11 @@ public interface Projection extends VisualizationItem {
    * @return Scale class
    */
   public LinearScale getScale(int d);
+
+  /**
+   * Projector used for generating this projection.
+   *
+   * @return Projector
+   */
+  public Projector getProjector();
 }

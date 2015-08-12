@@ -85,7 +85,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
     Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), ToolBox2DVisualization.this);
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ToolBox2DVisualization.this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
       task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT | VisualizationTask.FLAG_NO_EMBED);
       context.addVis(p, task);
@@ -162,7 +162,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       deleteChildren(container);
 
       ArrayList<VisualizationTask> vis = new ArrayList<>();
-      Hierarchy.Iter<VisualizationTask> it = VisualizationTree.filter(context, proj, VisualizationTask.class);
+      Hierarchy.Iter<VisualizationTask> it = VisualizationTree.filter(context, task.getResult(), VisualizationTask.class);
       for(; it.valid(); it.advance()) {
         VisualizationTask task = it.get();
         if(task.tool && !vis.contains(task)) {

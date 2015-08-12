@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -98,15 +99,14 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), EMClusterVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA + 3;
-        task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
-        context.addVis(p, task);
-      }
-    });
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), EMClusterVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA + 3;
+      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
+      context.addVis(p, task);
+    }
   }
 
   /**

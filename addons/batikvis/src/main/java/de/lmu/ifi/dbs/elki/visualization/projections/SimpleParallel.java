@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 /**
@@ -58,6 +59,11 @@ public class SimpleParallel implements ProjectionParallel {
   private LinearScale[] scales;
 
   /**
+   * Projector
+   */
+  private Projector p;
+
+  /**
    * Flag for visibility
    */
   final static byte FLAG_HIDDEN = 1;
@@ -72,10 +78,12 @@ public class SimpleParallel implements ProjectionParallel {
   /**
    * Constructor.
    *
+   * @param p Projector
    * @param scales Scales to use
    */
-  public SimpleParallel(LinearScale[] scales) {
+  public SimpleParallel(Projector p, LinearScale[] scales) {
     super();
+    this.p = p;
     this.scales = scales;
     visDims = scales.length;
     flags = new byte[scales.length];
@@ -181,10 +189,10 @@ public class SimpleParallel implements ProjectionParallel {
   @Override
   public int getDimForVisibleAxis(int pos) {
     for(int i = 0; i < scales.length; i++) {
-      if (isDimHidden(dimOrder[i])) {
+      if(isDimHidden(dimOrder[i])) {
         continue;
       }
-      if (pos == 0) {
+      if(pos == 0) {
         return dimOrder[i];
       }
       pos--;
@@ -287,5 +295,10 @@ public class SimpleParallel implements ProjectionParallel {
   @Override
   public String getMenuName() {
     return "Parallel Coordinates";
+  }
+
+  @Override
+  public Projector getProjector() {
+    return p;
   }
 }

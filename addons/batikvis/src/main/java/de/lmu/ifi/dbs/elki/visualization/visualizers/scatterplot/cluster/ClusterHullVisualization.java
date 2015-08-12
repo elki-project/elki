@@ -108,17 +108,15 @@ public class ClusterHullVisualization extends AbstractVisFactory {
   public void processNewResult(VisualizerContext context, Object start) {
     // We attach ourselves to the style library, not the clustering, so there is
     // only one hull.
-    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, //
-    new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterHullVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA - 1;
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
-        task.initDefaultVisibility(false);
-        context.addVis(p, task);
-      }
-    });
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterHullVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA - 1;
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
+      task.initDefaultVisibility(false);
+      context.addVis(p, task);
+    }
   }
 
   /**

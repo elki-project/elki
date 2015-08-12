@@ -99,10 +99,10 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
   public void processNewResult(VisualizerContext context, Object result) {
     final ResultHierarchy hier = context.getHierarchy();
     // TODO: we can also visualize other scores!
-    VisualizationTree.findNewResultVis(context, result, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, result, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, o.getScores(), p.getRelation(), TooltipScoreVisualization.this);
+        final VisualizationTask task = new VisualizationTask(o.getLongName() + NAME_GEN, context, o.getScores(), p.getRelation(), TooltipScoreVisualization.this);
         task.tool = true;
         task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
         task.initDefaultVisibility(false);
@@ -110,7 +110,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
         context.addVis(p, task);
       }
     });
-    VisualizationTree.findNewResultVis(context, result, DoubleRelation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<DoubleRelation, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, result, DoubleRelation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<DoubleRelation, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, DoubleRelation r, ScatterPlotProjector<?> p) {
         for(Iter<Result> it = hier.iterParents(r); it.valid(); it.advance()) {
@@ -118,7 +118,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
             return; // Handled by above case already.
           }
         }
-        final VisualizationTask task = new VisualizationTask(NAME, context, r, p.getRelation(), TooltipScoreVisualization.this);
+        final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, context, r, p.getRelation(), TooltipScoreVisualization.this);
         task.tool = true;
         task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
         task.initDefaultVisibility(false);
@@ -126,7 +126,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
         context.addVis(p, task);
       }
     });
-    VisualizationTree.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, Relation<?> r, ScatterPlotProjector<?> p) {
         if(r instanceof DoubleRelation) {

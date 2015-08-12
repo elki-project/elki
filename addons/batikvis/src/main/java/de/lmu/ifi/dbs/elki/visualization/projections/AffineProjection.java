@@ -31,14 +31,15 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
 /**
  * Affine projections are the most general class. They are initialized by an
  * arbitrary affine transformation matrix, and can thus represent any rotation
  * and scaling, even simple perspective projections.
- * 
+ *
  * However, this comes at the cost of a matrix multiplication.
- * 
+ *
  * @author Erich Schubert
  */
 public class AffineProjection extends AbstractFullProjection implements Projection2D {
@@ -54,18 +55,19 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
 
   /**
    * Constructor with a given database and axes.
-   * 
+   *
+   * @param p Projector
    * @param scales Scales to use
    * @param proj Projection to use
    */
-  public AffineProjection(LinearScale[] scales, AffineTransformation proj) {
-    super(scales);
+  public AffineProjection(Projector p, LinearScale[] scales, AffineTransformation proj) {
+    super(p, scales);
     this.proj = proj;
   }
 
   /**
    * Project a vector from scaled space to rendering space.
-   * 
+   *
    * @param v vector in scaled space
    * @return vector in rendering space
    */
@@ -76,7 +78,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
 
   /**
    * Project a vector from rendering space to scaled space.
-   * 
+   *
    * @param v vector in rendering space
    * @return vector in scaled space
    */
@@ -87,7 +89,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
 
   /**
    * Project a relative vector from scaled space to rendering space.
-   * 
+   *
    * @param v relative vector in scaled space
    * @return relative vector in rendering space
    */
@@ -98,7 +100,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
 
   /**
    * Project a relative vector from rendering space to scaled space.
-   * 
+   *
    * @param v relative vector in rendering space
    * @return relative vector in scaled space
    */
@@ -142,7 +144,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
 
   /**
    * Compute an transformation matrix to show only axis ax1 and ax2.
-   * 
+   *
    * @param dim Dimensionality
    * @param ax1 First axis
    * @param ax2 Second axis

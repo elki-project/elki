@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
 /**
  * OPTICS projection. This is not really needed, but a quick hack to have more
@@ -83,5 +84,10 @@ public class OPTICSProjection implements Projection {
    */
   public ClusterOrder getResult() {
     return projector.getResult();
+  }
+
+  @Override
+  public Projector getProjector() {
+    return projector;
   }
 }

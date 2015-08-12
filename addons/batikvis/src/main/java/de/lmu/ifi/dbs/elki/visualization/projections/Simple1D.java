@@ -26,10 +26,11 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
 /**
  * Dimension-selecting 1D projection.
- * 
+ *
  * @author Erich Schubert
  */
 public class Simple1D extends AbstractSimpleProjection implements Projection1D {
@@ -40,12 +41,13 @@ public class Simple1D extends AbstractSimpleProjection implements Projection1D {
 
   /**
    * Simple 1D projection using scaling only.
-   * 
+   *
+   * @param p Projector
    * @param scales Scales to use
    * @param dnum Dimension (starting at 0)
    */
-  public Simple1D(LinearScale[] scales, int dnum) {
-    super(scales);
+  public Simple1D(Projector p, LinearScale[] scales, int dnum) {
+    super(p, scales);
     this.dnum = dnum;
   }
 

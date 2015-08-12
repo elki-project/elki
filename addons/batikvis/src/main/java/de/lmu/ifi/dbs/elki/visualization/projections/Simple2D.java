@@ -28,10 +28,11 @@ import java.util.BitSet;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
 /**
  * Dimension-selecting 2D projection.
- * 
+ *
  * @author Erich Schubert
  */
 public class Simple2D extends AbstractSimpleProjection implements Projection2D {
@@ -47,13 +48,14 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
 
   /**
    * Constructor with a given database and axes.
-   * 
+   *
+   * @param p Projector
    * @param scales Scales to use
    * @param ax1 First axis
    * @param ax2 Second axis
    */
-  public Simple2D(LinearScale[] scales, int ax1, int ax2) {
-    super(scales);
+  public Simple2D(Projector p, LinearScale[] scales, int ax1, int ax2) {
+    super(p, scales);
     this.dim1 = ax1;
     this.dim2 = ax2;
   }

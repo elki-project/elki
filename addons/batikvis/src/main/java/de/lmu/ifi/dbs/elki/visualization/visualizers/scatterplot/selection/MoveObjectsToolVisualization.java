@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -82,20 +83,18 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
     if(!(db instanceof UpdatableDatabase)) {
       return;
     }
-    VisualizationTree.findNew(context, start, ScatterPlotProjector.class, //
-    new VisualizationTree.Handler1<ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), MoveObjectsToolVisualization.this);
-        task.level = VisualizationTask.LEVEL_INTERACTIVE;
-        task.tool = true;
-        task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_SELECTION);
-        task.initDefaultVisibility(false);
-        // baseResult.getHierarchy().add(p.getRelation(), task);
-        context.addVis(p, task);
-      }
-    });
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), MoveObjectsToolVisualization.this);
+      task.level = VisualizationTask.LEVEL_INTERACTIVE;
+      task.tool = true;
+      task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_SELECTION);
+      task.initDefaultVisibility(false);
+      // baseResult.getHierarchy().add(p.getRelation(), task);
+      context.addVis(p, task);
+    }
   }
 
   /**

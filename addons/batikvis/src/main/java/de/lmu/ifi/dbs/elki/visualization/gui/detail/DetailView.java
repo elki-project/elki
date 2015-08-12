@@ -98,7 +98,7 @@ public class DetailView extends SVGPlot implements VisualizationListener {
   public DetailView(VisualizerContext context, PlotItem vis, double ratio) {
     super();
     this.context = context;
-    this.visi = vis;
+    this.visi = new PlotItem(vis); // Clone!
     this.ratio = ratio;
 
     this.visi.sort();
@@ -128,6 +128,7 @@ public class DetailView extends SVGPlot implements VisualizationListener {
     SVGUtil.setAtt(bg, SVGConstants.SVG_Y_ATTRIBUTE, "0");
     SVGUtil.setAtt(bg, SVGConstants.SVG_WIDTH_ATTRIBUTE, "100%");
     SVGUtil.setAtt(bg, SVGConstants.SVG_HEIGHT_ATTRIBUTE, "100%");
+    SVGUtil.setAtt(bg, NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
     addCSSClassOrLogError(cls);
     SVGUtil.setCSSClass(bg, cls.getName());
 
@@ -268,11 +269,11 @@ public class DetailView extends SVGPlot implements VisualizationListener {
       return;
     }
     final VisualizationTask task = (VisualizationTask) current;
-    if(visi.proj != null) {
+    {
       boolean include = false;
       Hierarchy.Iter<Object> it = context.getVisHierarchy().iterAncestors(current);
       for(; it.valid(); it.advance()) {
-        if(visi.proj == it.get()) {
+        if(visi.proj.getProjector() == it.get() || layermap.containsKey(it.get())) {
           include = true;
           break;
         }
@@ -286,29 +287,24 @@ public class DetailView extends SVGPlot implements VisualizationListener {
     if(vis != null) {
       // Ensure visibility is as expected
       boolean isHidden = SVGConstants.CSS_HIDDEN_VALUE.equals(vis.getLayer().getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY));
-      if(task.visible) {
-        if(isHidden) {
-          this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_VISIBLE_VALUE));
-        }
+      if(task.visible && isHidden) {
+        this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_VISIBLE_VALUE));
       }
-      else {
-        if(!isHidden) {
-          this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE));
-        }
+      else if(!isHidden) {
+        this.scheduleUpdate(new AttributeModifier(vis.getLayer(), SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE));
       }
     }
     else {
       // Only materialize when becoming visible
       if(task.visible) {
-        // LoggingUtil.warning("Need to recreate a missing layer for " + task);
         vis = task.getFactory().makeVisualization(task, this, width, height, visi.proj);
         if(task.hasAnyFlags(VisualizationTask.FLAG_NO_EXPORT)) {
           vis.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
         }
         layermap.put(task, vis);
+        // FIXME: find insertion position!
         this.scheduleUpdate(new InsertVisualization(vis));
       }
     }
-    // FIXME: ensure layers are ordered correctly!
   }
 }

@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  */
 
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
 /**
  * Abstract base projection class.
@@ -37,12 +38,19 @@ public abstract class AbstractProjection implements Projection {
   final protected LinearScale[] scales;
 
   /**
+   * Projector used
+   */
+  final private Projector p;
+
+  /**
    * Constructor.
    *
+   * @param p Projector
    * @param scales Scales to use
    */
-  public AbstractProjection(LinearScale[] scales) {
+  public AbstractProjection(Projector p, LinearScale[] scales) {
     super();
+    this.p = p;
     this.scales = scales;
   }
 
@@ -65,5 +73,10 @@ public abstract class AbstractProjection implements Projection {
   @Override
   public String getMenuName() {
     return "Projection";
+  }
+
+  @Override
+  public Projector getProjector() {
+    return p;
   }
 }

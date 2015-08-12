@@ -87,7 +87,7 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
         // In 2d, make the plot twice as big.
         master = new PlotItem(2 + .1, 2 + .1, null);
         {
-          Projection2D proj = new Simple2D(scales.getScales(), 0, 1);
+          Projection2D proj = new Simple2D(this, scales.getScales(), 0, 1);
           PlotItem it = new PlotItem(.1, 0, 2., 2., proj);
           it.tasks = tasks;
           master.subitems.add(it);
@@ -119,7 +119,7 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
 
         for(int d1 = 0; d1 < dmax - 1; d1++) {
           for(int d2 = d1 + 1; d2 < dmax; d2++) {
-            Projection2D proj = new Simple2D(scales.getScales(), d1, d2);
+            Projection2D proj = new Simple2D(this, scales.getScales(), d1, d2);
             PlotItem it = new PlotItem(d1 + .1, d2 - 1, 1., 1., proj);
             it.tasks = tasks;
             master.subitems.add(it);
@@ -132,7 +132,7 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
           // Wanna try 4d? go ahead:
           // p.addRotation(0, 3, Math.PI / 180 * -20.);
           // p.addRotation(1, 3, Math.PI / 180 * 30.);
-          Projection2D proj = new AffineProjection(scales.getScales(), p);
+          Projection2D proj = new AffineProjection(this, scales.getScales(), p);
           PlotItem it = new PlotItem(sizeh + .1, 0, sizeh, sizeh, proj);
           it.tasks = tasks;
           master.subitems.add(it);
