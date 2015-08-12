@@ -60,7 +60,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @apiviz.has OutlierResult oneway - - visualizes
  */
 @Title("COP: Correlation Outlier Probability")
-@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", title = "Outlier Detection in Arbitrarily Oriented Subspaces", booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
+title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
+booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)", //
+url = "http://dx.doi.org/10.1109/ICDM.2012.21")
 public class COPVectorVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
@@ -81,7 +84,7 @@ public class COPVectorVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewResultVis(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
         Hierarchy.Iter<Relation<?>> it1 = VisualizationTree.filterResults(context, o, Relation.class);
