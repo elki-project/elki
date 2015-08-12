@@ -162,7 +162,6 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
         current = null;
         return this;
       }
-      it.advance();
       next();
       return this;
     }
