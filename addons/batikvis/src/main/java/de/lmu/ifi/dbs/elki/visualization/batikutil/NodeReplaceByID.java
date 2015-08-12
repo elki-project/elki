@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.batikutil;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,40 +28,48 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
- * Runnable wrapper to replace all children of a given node.
- * 
+ * This helper class will replace a node in an SVG plot. This is a Runnable to
+ * be put on the update queue.
+ *
  * @author Erich Schubert
- * 
  */
-public class NodeReplaceChild extends NodeAppendChild {
+public class NodeReplaceByID implements Runnable {
   /**
-   * Trivial constructor.
-   * 
-   * @param parent will become the parent of the appended Element.
-   * @param child the Element to be appended.
+   * Plot to work in.
    */
-  public NodeReplaceChild(Element parent, Element child) {
-    super(parent, child, null, null);
-  }
+  private SVGPlot plot;
 
   /**
-   * Full constructor.
-   * 
-   * @param parent Parent node to append the child to
-   * @param child Child element
-   * @param plot Plot to register the ID (may be {@code null})
-   * @param id ID to register (may be {@code null}, requires plot to be given)
+   * ID of element to replace.
    */
-  public NodeReplaceChild(Element parent, Element child, SVGPlot plot, String id) {
-    super(parent, child, plot, id);
+  private String id;
+
+  /**
+   * Replacement element.
+   */
+  private Element newe;
+
+  /**
+   * Setup a SVG node replacement.
+   *
+   * @param newe New element
+   * @param plot SVG plot to process
+   * @param id Node ID to replace
+   */
+  public NodeReplaceByID(Element newe, SVGPlot plot, String id) {
+    super();
+    this.newe = newe;
+    this.plot = plot;
+    this.id = id;
   }
 
   @Override
   public void run() {
-    // remove all existing children.
-    while (parent.hasChildNodes()) {
-      parent.removeChild(parent.getFirstChild());
+    Element olde = plot.getIdElement(id);
+    if(olde != null) {
+      olde.getParentNode().replaceChild(newe, olde);
+      plot.putIdElement(id, newe);
     }
-    super.run();
+    // Note: no warning if it is not possible!
   }
 }

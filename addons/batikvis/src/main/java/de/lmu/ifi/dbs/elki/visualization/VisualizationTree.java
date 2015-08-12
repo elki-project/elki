@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.visualization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
+
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -37,10 +39,49 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
  */
 public class VisualizationTree extends HashMapHierarchy<Object> {
   /**
+   * The event listeners for this context.
+   */
+  private ArrayList<VisualizationListener> vlistenerList = new ArrayList<>();
+
+  /**
    * Constructor.
    */
   public VisualizationTree() {
     super();
+  }
+
+  /**
+   * Add a listener.
+   *
+   * @param listener Listener to add
+   */
+  public void addVisualizationListener(VisualizationListener listener) {
+    for(int i = 0; i < vlistenerList.size(); i++) {
+      if(vlistenerList.get(i) == listener) {
+        return;
+      }
+    }
+    vlistenerList.add(listener);
+  }
+
+  /**
+   * Add a listener.
+   *
+   * @param listener Listener to remove
+   */
+  public void removeVisualizationListener(VisualizationListener listener) {
+    vlistenerList.remove(listener);
+  }
+
+  /**
+   * A visualization item has changed.
+   *
+   * @param item Item that has changed
+   */
+  public void visChanged(VisualizationItem item) {
+    for(int i = vlistenerList.size(); --i >= 0;) {
+      vlistenerList.get(i).visualizationChanged(item);
+    }
   }
 
   /**

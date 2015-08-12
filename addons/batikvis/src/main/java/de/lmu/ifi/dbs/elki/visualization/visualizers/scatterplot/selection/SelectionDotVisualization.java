@@ -28,7 +28,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
@@ -117,42 +116,32 @@ public class SelectionDotVisualization extends AbstractVisFactory {
     @Override
     protected void redraw() {
       super.redraw();
-      final StyleLibrary style = context.getStyleLibrary();
-      addCSSClasses(svgp);
-      final double size = style.getSize(StyleLibrary.SELECTION);
       DBIDSelection selContext = context.getSelection();
-      if(selContext != null) {
-        DBIDs selection = selContext.getSelectedIds();
-        for(DBIDIter iter = selection.iter(); iter.valid(); iter.advance()) {
-          try {
-            double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
-            if(v[0] != v[0] || v[1] != v[1]) {
-              continue; // NaN!
-            }
-            Element dot = svgp.svgCircle(v[0], v[1], size);
-            SVGUtil.addCSSClass(dot, MARKER);
-            layer.appendChild(dot);
-          }
-          catch(ObjectNotFoundException e) {
-            // ignore
-          }
-        }
+      if(selContext == null) {
+        return;
       }
-    }
-
-    /**
-     * Adds the required CSS-Classes
-     *
-     * @param svgp SVG-Plot
-     */
-    private void addCSSClasses(SVGPlot svgp) {
+      final StyleLibrary style = context.getStyleLibrary();
       // Class for the dot markers
       if(!svgp.getCSSClassManager().contains(MARKER)) {
         CSSClass cls = new CSSClass(this, MARKER);
-        final StyleLibrary style = context.getStyleLibrary();
         cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION));
         cls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION));
         svgp.addCSSClassOrLogError(cls);
+      }
+      final double size = style.getSize(StyleLibrary.SELECTION);
+      for(DBIDIter iter = selContext.getSelectedIds().iter(); iter.valid(); iter.advance()) {
+        try {
+          double[] v = proj.fastProjectDataToRenderSpace(rel.get(iter));
+          if(v[0] != v[0] || v[1] != v[1]) {
+            continue; // NaN!
+          }
+          Element dot = svgp.svgCircle(v[0], v[1], size);
+          SVGUtil.addCSSClass(dot, MARKER);
+          layer.appendChild(dot);
+        }
+        catch(ObjectNotFoundException e) {
+          // ignore
+        }
       }
     }
   }

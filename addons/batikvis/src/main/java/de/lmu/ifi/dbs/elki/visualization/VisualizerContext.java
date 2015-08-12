@@ -87,11 +87,6 @@ public class VisualizerContext implements DataStoreListener, Result {
   private ArrayList<DataStoreListener> listenerList = new ArrayList<>();
 
   /**
-   * The event listeners for this context.
-   */
-  private ArrayList<VisualizationListener> vlistenerList = new ArrayList<>();
-
-  /**
    * Factories to use
    */
   private Collection<VisualizationProcessor> factories;
@@ -322,6 +317,11 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @see #removeDataStoreListener
    */
   public void addDataStoreListener(DataStoreListener l) {
+    for(int i = 0; i < listenerList.size(); i++) {
+      if(listenerList.get(i) == l) {
+        return;
+      }
+    }
     listenerList.add(l);
   }
 
@@ -369,7 +369,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param listener Listener to add
    */
   public void addVisualizationListener(VisualizationListener listener) {
-    vlistenerList.add(listener);
+    vistree.addVisualizationListener(listener);
   }
 
   /**
@@ -378,7 +378,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param listener Listener to remove
    */
   public void removeVisualizationListener(VisualizationListener listener) {
-    vlistenerList.remove(listener);
+    vistree.removeVisualizationListener(listener);
   }
 
   @Override
@@ -418,9 +418,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param item Item that has changed
    */
   public void visChanged(VisualizationItem item) {
-    for(int i = 0; i < vlistenerList.size(); i++) {
-      vlistenerList.get(i).visualizationChanged(item);
-    }
+    vistree.visChanged(item);
   }
 
   /**
