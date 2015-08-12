@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.result;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.result;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import javax.swing.event.EventListenerList;
+import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
@@ -45,7 +45,7 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
   /**
    * Holds the listener.
    */
-  private EventListenerList listenerList = new EventListenerList();
+  private ArrayList<ResultListener> listenerList = new ArrayList<>();
 
   /**
    * Constructor.
@@ -88,7 +88,7 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
    * @param listener Result listener.
    */
   public void addResultListener(ResultListener listener) {
-    listenerList.add(ResultListener.class, listener);
+    listenerList.add(listener);
   }
 
   /**
@@ -97,7 +97,7 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
    * @param listener Result listener.
    */
   public void removeResultListener(ResultListener listener) {
-    listenerList.remove(ResultListener.class, listener);
+    listenerList.remove(listener);
   }
 
   /**
@@ -119,8 +119,8 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
     if(LOG.isDebugging()) {
       LOG.debug("Result added: " + child + " <- " + parent);
     }
-    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
-      l.resultAdded(child, parent);
+    for(int i = listenerList.size(); --i >= 0;) {
+      listenerList.get(i).resultAdded(child, parent);
     }
   }
 
@@ -133,8 +133,8 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
     if(LOG.isDebugging()) {
       LOG.debug("Result changed: " + current);
     }
-    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
-      l.resultChanged(current);
+    for(int i = listenerList.size(); --i >= 0;) {
+      listenerList.get(i).resultChanged(current);
     }
   }
 
@@ -149,8 +149,8 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
     if(LOG.isDebugging()) {
       LOG.debug("Result removed: " + child + " <- " + parent);
     }
-    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
-      l.resultRemoved(child, parent);
+    for(int i = listenerList.size(); --i >= 0;) {
+      listenerList.get(i).resultRemoved(child, parent);
     }
   }
 }
