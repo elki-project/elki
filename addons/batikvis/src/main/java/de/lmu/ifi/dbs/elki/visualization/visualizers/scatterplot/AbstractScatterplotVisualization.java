@@ -28,9 +28,9 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -114,9 +114,9 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
   }
 
   @Override
-  public void resultChanged(Result current) {
-    super.resultChanged(current);
-    if(proj != null && current == proj) {
+  public void visualizationChanged(VisualizationItem item) {
+    super.visualizationChanged(item);
+    if(item == proj) {
       synchronizedRedraw();
       return;
     }

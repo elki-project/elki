@@ -28,7 +28,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
@@ -159,9 +159,9 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector> ext
   }
 
   @Override
-  public void resultChanged(Result current) {
-    super.resultChanged(current);
-    if(proj != null && current == proj) {
+  public void visualizationChanged(VisualizationItem item) {
+    super.visualizationChanged(item);
+    if(item == proj) {
       recalcAxisPositions();
       synchronizedRedraw();
       return;
