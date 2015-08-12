@@ -153,6 +153,10 @@ public class VoronoiVisualization extends AbstractVisFactory {
      * Constructor.
      *
      * @param task VisualizationTask
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height, proj);

@@ -78,7 +78,7 @@ public class PixmapVisualizer extends AbstractVisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+    return new Instance(task, plot, width, height);
   }
 
   @Override
@@ -104,8 +104,12 @@ public class PixmapVisualizer extends AbstractVisFactory {
      * Constructor.
      *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    public Instance(VisualizationTask task, SVGPlot plot, double width, double height) {
       super(task, plot, width, height);
       this.result = task.getResult();
       addListeners();

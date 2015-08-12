@@ -94,6 +94,9 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
    *
    * @param visFactory Visualizer Factory to use
    * @param task Task to use
+   * @param plot Plot to draw to
+   * @param width Embedding width
+   * @param height Embedding height
    * @param proj Projection
    * @param thumbsize Thumbnail size
    */

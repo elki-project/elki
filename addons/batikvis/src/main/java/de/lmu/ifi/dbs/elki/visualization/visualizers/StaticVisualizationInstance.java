@@ -38,6 +38,9 @@ public class StaticVisualizationInstance extends AbstractVisualization {
    * Unchanging precomputed visualization.
    *
    * @param task Task to visualize
+   * @param plot Plot to draw to
+   * @param width Embedding width
+   * @param height Embedding height
    * @param element Element containing the resulting visualization
    */
   public StaticVisualizationInstance(VisualizationTask task, SVGPlot plot, double width, double height, Element element) {

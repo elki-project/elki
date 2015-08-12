@@ -77,9 +77,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * </p>
  *
  * <p>
- * Details on the experimental setup can be found at: <a
- * href="http://elki.dbs.ifi.lmu.de/wiki/Examples/ClusterEvaluation"
- * >wiki/Examples/ClusterEvaluation</a>
+ * Details on the experimental setup can be found at:
+ * <a href="http://elki.dbs.ifi.lmu.de/wiki/Examples/ClusterEvaluation" >wiki/
+ * Examples/ClusterEvaluation</a>
  * </p>
  *
  * @author Sascha Goldhofer
@@ -252,6 +252,12 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
     /**
      * Constructor
+     *
+     * @param task Task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height);

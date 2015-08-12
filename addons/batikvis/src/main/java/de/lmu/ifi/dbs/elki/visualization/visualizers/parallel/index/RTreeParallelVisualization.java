@@ -127,6 +127,10 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
      * Constructor.
      *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
     @SuppressWarnings("unchecked")
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
