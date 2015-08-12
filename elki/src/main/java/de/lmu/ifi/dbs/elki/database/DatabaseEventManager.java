@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.database;
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2014
+Copyright (C) 2015
 Ludwig-Maximilians-Universität München
 Lehr- und Forschungseinheit für Datenbanksysteme
 ELKI Development Team
@@ -22,13 +22,10 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.swing.event.EventListenerList;
+import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -43,9 +40,14 @@ import de.lmu.ifi.dbs.elki.result.ResultListener;
  */
 public class DatabaseEventManager {
   /**
-   * Holds the listener.
+   * Holds the listeners for data store changes
    */
-  private EventListenerList listenerList = new EventListenerList();
+  private List<DataStoreListener> dataListenerList = new ArrayList<>();
+
+  /**
+   * Holds the listeners for result changes.
+   */
+  private List<ResultListener> resultListenerList = new ArrayList<>();
 
   /**
    * Indicates whether DataStoreEvents should be accumulated and fired as one
@@ -56,7 +58,16 @@ public class DatabaseEventManager {
   /**
    * The type of the current DataStoreEvent to be accumulated.
    */
-  private DataStoreEvent.Type currentDataStoreEventType = null;
+  private Type currentDataStoreEventType = null;
+
+  /**
+   * Types for aggregation.
+   *
+   * @apiviz.exclude
+   */
+  private enum Type {
+    INSERT, REMOVE, UPDATE
+  };
 
   /**
    * The objects that were changed in the current DataStoreEvent.
@@ -86,16 +97,23 @@ public class DatabaseEventManager {
    * @see DataStoreEvent
    */
   public void flushDataStoreEvents() {
-    // inform listeners
-    Object[] listeners = listenerList.getListenerList();
-    Map<Type, DBIDs> objects = new HashMap<>();
-    objects.put(currentDataStoreEventType, DBIDUtil.makeUnmodifiable(dataStoreObjects));
-    DataStoreEvent e = new DataStoreEvent(this, objects);
+    DataStoreEvent e;
+    switch(currentDataStoreEventType){
+    case INSERT:
+      e = DataStoreEvent.insertionEvent(dataStoreObjects);
+      break;
+    case REMOVE:
+      e = DataStoreEvent.removalEvent(dataStoreObjects);
+      break;
+    case UPDATE:
+      e = DataStoreEvent.updateEvent(dataStoreObjects);
+      break;
+    default:
+      return;
+    }
 
-    for(int i = listeners.length - 2; i >= 0; i -= 2) {
-      if(listeners[i] == DataStoreListener.class) {
-        ((DataStoreListener) listeners[i + 1]).contentChanged(e);
-      }
+    for(int i = dataListenerList.size(); --i >= 0;) {
+      dataListenerList.get(i).contentChanged(e);
     }
     // reset
     accumulateDataStoreEvents = false;
@@ -113,7 +131,7 @@ public class DatabaseEventManager {
    * @see DataStoreEvent
    */
   public void addListener(DataStoreListener l) {
-    listenerList.add(DataStoreListener.class, l);
+    dataListenerList.add(l);
   }
 
   /**
@@ -126,7 +144,7 @@ public class DatabaseEventManager {
    * @see DataStoreEvent
    */
   public void removeListener(DataStoreListener l) {
-    listenerList.remove(DataStoreListener.class, l);
+    dataListenerList.remove(l);
   }
 
   /**
@@ -138,7 +156,7 @@ public class DatabaseEventManager {
    * @see Result
    */
   public void addListener(ResultListener l) {
-    listenerList.add(ResultListener.class, l);
+    resultListenerList.add(l);
   }
 
   /**
@@ -152,7 +170,7 @@ public class DatabaseEventManager {
    *
    */
   public void removeListener(ResultListener l) {
-    listenerList.remove(ResultListener.class, l);
+    resultListenerList.remove(l);
   }
 
   /**
@@ -164,7 +182,7 @@ public class DatabaseEventManager {
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
    */
   public void fireObjectsInserted(DBIDs insertions) {
-    fireObjectsChanged(insertions, DataStoreEvent.Type.INSERT);
+    fireObjectsChanged(insertions, Type.INSERT);
   }
 
   /**
@@ -176,7 +194,7 @@ public class DatabaseEventManager {
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
    */
   public void fireObjectInserted(DBIDRef insertion) {
-    fireObjectChanged(insertion, DataStoreEvent.Type.INSERT);
+    fireObjectChanged(insertion, Type.INSERT);
   }
 
   /**
@@ -188,7 +206,7 @@ public class DatabaseEventManager {
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#UPDATE
    */
   public void fireObjectsUpdated(DBIDs updates) {
-    fireObjectsChanged(updates, DataStoreEvent.Type.UPDATE);
+    fireObjectsChanged(updates, Type.UPDATE);
   }
 
   /**
@@ -200,7 +218,7 @@ public class DatabaseEventManager {
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
    */
   protected void fireObjectsRemoved(DBIDs deletions) {
-    fireObjectsChanged(deletions, DataStoreEvent.Type.DELETE);
+    fireObjectsChanged(deletions, Type.REMOVE);
   }
 
   /**
@@ -212,7 +230,7 @@ public class DatabaseEventManager {
    * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
    */
   protected void fireObjectRemoved(DBIDRef deletion) {
-    fireObjectChanged(deletion, DataStoreEvent.Type.DELETE);
+    fireObjectChanged(deletion, Type.REMOVE);
   }
 
   /**
@@ -228,7 +246,7 @@ public class DatabaseEventManager {
    * @param objects the objects that have been changed, i.e. inserted, deleted
    *        or updated
    */
-  private void fireObjectsChanged(DBIDs objects, DataStoreEvent.Type type) {
+  private void fireObjectsChanged(DBIDs objects, Type type) {
     // flush first
     if(currentDataStoreEventType != null && !currentDataStoreEventType.equals(type)) {
       flushDataStoreEvents();
@@ -239,19 +257,26 @@ public class DatabaseEventManager {
       }
       this.dataStoreObjects.addDBIDs(objects);
       currentDataStoreEventType = type;
+      return;
     }
-    else {
-      // inform listeners
-      Map<Type, DBIDs> os = new HashMap<>(1);
-      os.put(type, DBIDUtil.makeUnmodifiable(objects));
-      DataStoreEvent e = new DataStoreEvent(this, os);
+    // Execute immediately:
+    DataStoreEvent e;
+    switch(type){
+    case INSERT:
+      e = DataStoreEvent.insertionEvent(objects);
+      break;
+    case REMOVE:
+      e = DataStoreEvent.removalEvent(objects);
+      break;
+    case UPDATE:
+      e = DataStoreEvent.updateEvent(objects);
+      break;
+    default:
+      return;
+    }
 
-      Object[] listeners = listenerList.getListenerList();
-      for(int i = listeners.length - 2; i >= 0; i -= 2) {
-        if(listeners[i] == DataStoreListener.class) {
-          ((DataStoreListener) listeners[i + 1]).contentChanged(e);
-        }
-      }
+    for(int i = dataListenerList.size(); --i >= 0;) {
+      dataListenerList.get(i).contentChanged(e);
     }
   }
 
@@ -268,7 +293,7 @@ public class DatabaseEventManager {
    * @param object the object that has been changed, i.e. inserted, deleted or
    *        updated
    */
-  private void fireObjectChanged(DBIDRef object, DataStoreEvent.Type type) {
+  private void fireObjectChanged(DBIDRef object, Type type) {
     // flush first
     if(currentDataStoreEventType != null && !currentDataStoreEventType.equals(type)) {
       flushDataStoreEvents();
@@ -292,8 +317,8 @@ public class DatabaseEventManager {
    * @param parent Parent result that was added to
    */
   public void fireResultAdded(Result r, Result parent) {
-    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
-      l.resultAdded(r, parent);
+    for(int i = resultListenerList.size(); --i >= 0;) {
+      resultListenerList.get(i).resultAdded(r, parent);
     }
   }
 
@@ -305,9 +330,8 @@ public class DatabaseEventManager {
    * @param parent Parent result that has been removed
    */
   public void fireResultRemoved(Result r, Result parent) {
-    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
-      l.resultRemoved(r, parent);
+    for(int i = resultListenerList.size(); --i >= 0;) {
+      resultListenerList.get(i).resultRemoved(r, parent);
     }
   }
-
 }

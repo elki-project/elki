@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.swing.event.EventListenerList;
-
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -86,7 +84,12 @@ public class VisualizerContext implements DataStoreListener, Result {
   /**
    * The event listeners for this context.
    */
-  private EventListenerList listenerList = new EventListenerList();
+  private ArrayList<DataStoreListener> listenerList = new ArrayList<>();
+
+  /**
+   * The event listeners for this context.
+   */
+  private ArrayList<VisualizationListener> vlistenerList = new ArrayList<>();
 
   /**
    * Factories to use
@@ -319,7 +322,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @see #removeDataStoreListener
    */
   public void addDataStoreListener(DataStoreListener l) {
-    listenerList.add(DataStoreListener.class, l);
+    listenerList.add(l);
   }
 
   /**
@@ -329,7 +332,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @see #addDataStoreListener
    */
   public void removeDataStoreListener(DataStoreListener l) {
-    listenerList.remove(DataStoreListener.class, l);
+    listenerList.remove(l);
   }
 
   /**
@@ -337,7 +340,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    */
   @Override
   public void contentChanged(DataStoreEvent e) {
-    for(DataStoreListener listener : listenerList.getListeners(DataStoreListener.class)) {
+    for(DataStoreListener listener : listenerList) {
       listener.contentChanged(e);
     }
   }
@@ -366,7 +369,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param listener Listener to add
    */
   public void addVisualizationListener(VisualizationListener listener) {
-    listenerList.add(VisualizationListener.class, listener);
+    vlistenerList.add(listener);
   }
 
   /**
@@ -375,7 +378,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param listener Listener to remove
    */
   public void removeVisualizationListener(VisualizationListener listener) {
-    listenerList.remove(VisualizationListener.class, listener);
+    vlistenerList.remove(listener);
   }
 
   @Override
@@ -415,7 +418,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    */
   public void visChanged(VisualizationItem item) {
     notifyFactories(item);
-    for(VisualizationListener listener : listenerList.getListeners(VisualizationListener.class)) {
+    for(VisualizationListener listener : vlistenerList) {
       listener.visualizationChanged(item);
     }
   }

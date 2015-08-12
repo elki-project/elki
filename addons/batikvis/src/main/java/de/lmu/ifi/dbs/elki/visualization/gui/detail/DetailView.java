@@ -267,6 +267,7 @@ public class DetailView extends SVGPlot implements VisualizationListener {
     if(!(current instanceof VisualizationTask)) {
       return;
     }
+    final VisualizationTask task = (VisualizationTask) current;
     if(visi.proj != null) {
       boolean include = false;
       Hierarchy.Iter<Object> it = context.getVisHierarchy().iterAncestors(current);
@@ -281,7 +282,6 @@ public class DetailView extends SVGPlot implements VisualizationListener {
       }
     }
     // Get the layer
-    final VisualizationTask task = (VisualizationTask) current;
     Visualization vis = layermap.get(task);
     if(vis != null) {
       // Ensure visibility is as expected

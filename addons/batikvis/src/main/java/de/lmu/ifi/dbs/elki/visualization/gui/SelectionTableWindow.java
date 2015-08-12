@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.gui;
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2013
+Copyright (C) 2015
 Ludwig-Maximilians-Universität München
 Lehr- und Forschungseinheit für Datenbanksysteme
 ELKI Development Team
@@ -25,7 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Set;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -110,7 +109,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
   /**
    * The database we use
    */
-  Database database;
+  UpdatableDatabase database;
 
   /**
    * Class label representation
@@ -143,7 +142,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     }
 
     this.context = context;
-    this.database = ResultUtil.findDatabase(context.getHierarchy());
+    this.database = (UpdatableDatabase) ResultUtil.findDatabase(context.getHierarchy());
     // FIXME: re-add labels
     this.crep = null; //database.getClassLabelQuery();
     this.orep = null; //database.getObjectLabelQuery();
@@ -352,9 +351,8 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
 
   @Override
   public void contentChanged(DataStoreEvent e) {
-    // Use fully qualified names to avoid JDK7 bug.
-    Set<de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type> eventTypes = e.getTypes();
-    if(eventTypes.size() == 1 && eventTypes.iterator().next().equals(de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type.UPDATE)) {
+    if (e.getInserts().isEmpty() && e.getRemovals().isEmpty() && !e.getUpdates().isEmpty()) {
+      // Updates only.
       dotTableModel.fireTableDataChanged();
     }
     else {

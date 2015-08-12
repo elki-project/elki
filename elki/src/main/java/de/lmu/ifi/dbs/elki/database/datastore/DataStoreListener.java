@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,32 +23,30 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.EventListener;
-
 /**
  * Defines the interface for an object that listens to changes in a
  * {@link DataStore}.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.uses DataStoreEvent oneway - - listens
  * @apiviz.excludeSubtypes
- * 
+ *
  * @see DataStore
  * @see DataStoreEvent
  */
-public interface DataStoreListener extends EventListener {
+public interface DataStoreListener {
   /**
    * Invoked after objects of the datastore have been updated, inserted or
-   * removed in some way. 
-   * 
+   * removed in some way.
+   *
    * @param e the update event
    */
   void contentChanged(DataStoreEvent e);
 
   /**
    * Invoked after the data store has been destroyed.
-   * 
+   *
    * @param e the destroy event
    */
   //void dataStoreDestroyed(DataStoreEvent e);

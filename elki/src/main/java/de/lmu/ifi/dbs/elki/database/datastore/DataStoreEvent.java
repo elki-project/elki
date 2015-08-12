@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.database.datastore;
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2014
+Copyright (C) 2015
 Ludwig-Maximilians-Universität München
 Lehr- und Forschungseinheit für Datenbanksysteme
 ELKI Development Team
@@ -22,91 +22,103 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.util.EventObject;
-import java.util.Map;
-import java.util.Set;
-
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
  * Encapsulates information describing changes, i.e. updates, insertions, and /
  * or deletions in a {@link DataStore}, and used to notify all subscribed
  * {@link DataStoreListener} of the change.
- * 
- * @author Elke Achtert
+ *
+ * @author Erich Schubert
+ *
  * @see DataStore
  * @see DataStoreListener
  */
-public class DataStoreEvent extends EventObject {
+public class DataStoreEvent {
   /**
-   * Serialization ID since Java EventObjects are expected to be serializable.
+   * Insertions.
    */
-  private static final long serialVersionUID = 7183716156466324055L;
+  private DBIDs inserts;
 
   /**
-   * Available event types.
-   * 
-   * @apiviz.exclude
+   * Removals.
    */
-  public enum Type {
-    /**
-     * Identifies a change on existing objects.
-     */
-    UPDATE,
+  private DBIDs removals;
 
-    /**
-     * Identifies the insertion of new objects.
-     */
-    INSERT,
+  /**
+   * Updates.
+   */
+  private DBIDs updates;
 
-    /**
-     * Identifies the removal of objects.
-     */
-    DELETE
+  /**
+   * Constructor.
+   *
+   * @param inserts Insertions
+   * @param removals Removals
+   * @param updates Updates
+   */
+  public DataStoreEvent(DBIDs inserts, DBIDs removals, DBIDs updates) {
+    super();
+    this.inserts = inserts;
+    this.removals = inserts;
+    this.updates = inserts;
   }
 
   /**
-   * The objects that were changed in the {@link DataStore} mapped by the type
-   * of change.
+   * Insertion event.
+   *
+   * @param inserts Insertions
+   * @return Event
    */
-  // FIXME: instead of a (costly) map, use just three DBIDs references?
-  private final Map<Type, DBIDs> objects;
-
-  /**
-   * Used to create an event when objects have been updated in, inserted into,
-   * and / or removed from the specified {@link DataStore}.
-   * 
-   * @param source the object responsible for generating the event
-   * @param objects the objects that have been changed mapped by the type of
-   *        change
-   * @see Type#INSERT
-   * @see Type#DELETE
-   * @see Type#UPDATE
-   */
-  public DataStoreEvent(Object source, Map<Type, DBIDs> objects) {
-    super(source);
-    this.objects = objects;
+  public static DataStoreEvent insertionEvent(DBIDs inserts) {
+    return new DataStoreEvent(inserts, DBIDUtil.EMPTYDBIDS, DBIDUtil.EMPTYDBIDS);
   }
 
   /**
-   * Returns the types of change this event consists of.
-   * 
-   * @see Type#INSERT
-   * @see Type#DELETE
-   * @see Type#UPDATE
-   * 
-   * @return the types of this event
+   * Removal event.
+   *
+   * @param removals Removal
+   * @return Event
    */
-  public Set<Type> getTypes() {
-    return objects.keySet();
+  public static DataStoreEvent removalEvent(DBIDs removals) {
+    return new DataStoreEvent(DBIDUtil.EMPTYDBIDS, removals, DBIDUtil.EMPTYDBIDS);
   }
 
   /**
-   * Returns the objects that have been changed and the type of change.
-   * 
-   * @return the objects that have been changed
+   * Update event.
+   *
+   * @param updates Updates
+   * @return Event
    */
-  public Map<Type, DBIDs> getObjects() {
-    return objects;
+  public static DataStoreEvent updateEvent(DBIDs updates) {
+    return new DataStoreEvent(DBIDUtil.EMPTYDBIDS, DBIDUtil.EMPTYDBIDS, updates);
+  }
+
+  /**
+   * Get the inserted objects.
+   *
+   * @return Insertions
+   */
+  public DBIDs getInserts() {
+    return inserts;
+  }
+
+  /**
+   * Get the removed objects.
+   *
+   * @return Removals
+   */
+  public DBIDs getRemovals() {
+    return removals;
+  }
+
+  /**
+   * Get the updates objects.
+   *
+   * @return Updates
+   */
+  public DBIDs getUpdates() {
+    return updates;
   }
 }
