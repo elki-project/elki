@@ -34,9 +34,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 /**
  * Marker library achieving a larger number of styles by combining different
  * shapes with different colors. Uses object ID management by SVGPlot.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf ColorLibrary
  */
 public class PrettyMarkers implements MarkerLibrary {
@@ -67,7 +67,7 @@ public class PrettyMarkers implements MarkerLibrary {
 
   /**
    * Constructor
-   * 
+   *
    * @param prefix prefix to use.
    * @param style style library to use
    */
@@ -81,7 +81,7 @@ public class PrettyMarkers implements MarkerLibrary {
   /**
    * Constructor without prefix argument, will use {@link #DEFAULT_PREFIX} as
    * prefix.
-   * 
+   *
    * @param style Style library to use
    */
   public PrettyMarkers(StyleLibrary style) {
@@ -92,7 +92,7 @@ public class PrettyMarkers implements MarkerLibrary {
    * Draw an marker used in scatter plots. If you intend to use the markers
    * multiple times, you should consider using the {@link #useMarker} method
    * instead, which exploits the SVG features of symbol definition and use
-   * 
+   *
    * @param plot containing plot
    * @param parent parent node
    * @param x position
@@ -184,7 +184,7 @@ public class PrettyMarkers implements MarkerLibrary {
 
   /**
    * Plot a replacement marker when an object is to be plotted as "disabled", usually gray.
-   * 
+   *
    * @param plot Plot to draw to
    * @param parent Parent element
    * @param x X position
@@ -199,7 +199,7 @@ public class PrettyMarkers implements MarkerLibrary {
 
   /**
    * Plot a replacement marker when no color is set; usually black
-   * 
+   *
    * @param plot Plot to draw to
    * @param parent Parent element
    * @param x X position
@@ -218,8 +218,6 @@ public class PrettyMarkers implements MarkerLibrary {
     Element existing = plot.getIdElement(id);
     if(existing == null) {
       Element symbol = plot.svgElement(SVGConstants.SVG_SYMBOL_TAG);
-      SVGUtil.setAtt(symbol, SVGConstants.SVG_WIDTH_ATTRIBUTE, 4 * size);
-      SVGUtil.setAtt(symbol, SVGConstants.SVG_HEIGHT_ATTRIBUTE, 4 * size);
       SVGUtil.setAtt(symbol, SVGConstants.SVG_ID_ATTRIBUTE, id);
       plotMarker(plot, symbol, 2 * size, 2 * size, style, 2 * size);
       plot.getDefs().appendChild(symbol);
