@@ -71,7 +71,7 @@ public class ParallelPlotProjector<V extends NumberVector> implements Projector 
       ScalesResult scales = ResultUtil.getScalesResult(rel);
       ProjectionParallel proj = new SimpleParallel(scales.getScales());
 
-      final double width = Math.ceil(MathUtil.log2(scales.getScales().length));
+      final double width = Math.ceil(MathUtil.log2(scales.getScales().length - 1));
       final PlotItem it = new PlotItem(width, 1., proj);
       it.tasks = tasks;
       col.add(it);
