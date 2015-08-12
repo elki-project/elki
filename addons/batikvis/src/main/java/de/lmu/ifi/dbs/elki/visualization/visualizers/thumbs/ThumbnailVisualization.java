@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -91,21 +90,15 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   private Projection proj;
 
   /**
-   * COPY of the mask. FIXME.
-   */
-  private int mask;
-
-  /**
    * Constructor.
    *
    * @param visFactory Visualizer Factory to use
    * @param task Task to use
    * @param proj Projection
-   * @param mask Event mask (for auto-updating)
    * @param thumbsize Thumbnail size
    */
-  public ThumbnailVisualization(VisFactory visFactory, VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask, int thumbsize) {
-    super(task, plot, width, height, mask);
+  public ThumbnailVisualization(VisFactory visFactory, VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int thumbsize) {
+    super(task, plot, width, height);
     this.visFactory = visFactory;
     this.plot = plot;
     this.proj = proj;
@@ -113,7 +106,6 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
     this.layer = plot.svgElement(SVGConstants.SVG_G_TAG);
     this.thumbid = -1;
     this.thumb = null;
-    this.mask = mask;
     addListeners();
   }
 
@@ -230,11 +222,11 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       refreshThumbnail();
       return;
     }
-    if((mask & ON_SELECTION) == ON_SELECTION && current instanceof SelectionResult) {
+    if(task.updateOnAny(VisualizationTask.ON_SELECTION) && current instanceof SelectionResult) {
       refreshThumbnail();
       return;
     }
-    if((mask & ON_SAMPLE) == ON_SAMPLE && current instanceof SamplingResult) {
+    if(task.updateOnAny(VisualizationTask.ON_SAMPLE) && current instanceof SamplingResult) {
       refreshThumbnail();
       return;
     }
@@ -242,7 +234,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   @Override
   public void visualizationChanged(VisualizationItem item) {
-    if((mask & ON_STYLE) == ON_STYLE && (item instanceof StylingPolicy || item instanceof StyleLibrary)) {
+    if(task.updateOnAny(VisualizationTask.ON_STYLEPOLICY) && item instanceof StylingPolicy) {
       refreshThumbnail();
       return;
     }

@@ -51,13 +51,12 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * A simple density estimation visualization, based on a simple kernel-density
  * <em>in the projection, not the actual data!</em>
  *
- * TODO: Add sampling support
- *
  * @author Erich Schubert
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
+// TODO: Use sample only
 public class DensityEstimationOverlay extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
@@ -83,6 +82,7 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), DensityEstimationOverlay.this);
         task.level = VisualizationTask.LEVEL_DATA + 1;
+        task.addUpdateFlags(VisualizationTask.ON_DATA);
         task.initDefaultVisibility(false);
         context.addVis(p, task);
       }
@@ -113,7 +113,7 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

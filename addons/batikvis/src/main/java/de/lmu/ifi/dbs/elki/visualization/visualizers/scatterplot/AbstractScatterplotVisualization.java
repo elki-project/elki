@@ -68,13 +68,12 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
    * Constructor.
    *
    * @param task Visualization task
-   * @param mask Refresh mash
    */
-  public AbstractScatterplotVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask) {
-    super(task, plot, width, height, mask);
+  public AbstractScatterplotVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    super(task, plot, width, height);
     this.proj = (Projection2D) proj;
     this.rel = task.getRelation();
-    if((mask & ON_SAMPLE) == ON_SAMPLE) {
+    if(task.updateOnAny(VisualizationTask.ON_SAMPLE)) {
       this.sample = ResultUtil.getSamplingResult(rel);
     }
     else {

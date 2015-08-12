@@ -130,7 +130,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
      */
     @SuppressWarnings("unchecked")
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_STYLE);
+      super(task, plot, width, height, proj);
       this.tree = AbstractRStarTree.class.cast(task.getResult());
       addListeners();
     }

@@ -62,7 +62,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Generates a SVG-Element containing a histogram representing the distribution
@@ -98,7 +97,6 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
   public ColoredHistogramVisualizer(Parameterizer settings) {
     super();
     this.settings = settings;
-    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
@@ -115,6 +113,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
         // register self
         final VisualizationTask task = new VisualizationTask(CNAME, context, p, p.getRelation(), ColoredHistogramVisualizer.this);
         task.level = VisualizationTask.LEVEL_DATA;
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY);
         context.addVis(p, task);
       }
     });
@@ -157,9 +156,13 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
      * Constructor.
      *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA | ON_STYLE);
+      super(task, plot, width, height, proj);
       this.relation = task.getRelation();
       this.sample = ResultUtil.getSamplingResult(relation);
       addListeners();

@@ -201,7 +201,7 @@ public class ExportVisualizations implements ResultHandler {
     ArrayList<Visualization> layers = new ArrayList<>();
     for(Iterator<VisualizationTask> iter = item.tasks.iterator(); iter.hasNext();) {
       VisualizationTask task = iter.next();
-      if(task.nodetail || task.noexport || !task.visible) {
+      if(task.hasAnyFlags(VisualizationTask.FLAG_NO_DETAIL | VisualizationTask.FLAG_NO_EXPORT) || !task.visible) {
         continue;
       }
       try {

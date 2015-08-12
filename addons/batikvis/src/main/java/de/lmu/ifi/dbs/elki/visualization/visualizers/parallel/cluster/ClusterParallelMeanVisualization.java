@@ -86,6 +86,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
       ParallelPlotProjector<?> p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterParallelMeanVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA + 1;
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY);
       context.addVis(p, task);
     }
   }
@@ -115,7 +116,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA | ON_STYLE);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

@@ -98,7 +98,7 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
           final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 0)));
           task.reqheight = .1;
           task.reqwidth = 2.;
-          task.nodetail = true;
+          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
           it.tasks.add(task);
           master.subitems.add(it);
         }
@@ -108,7 +108,7 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
           final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 1), true));
           task.reqheight = 2.;
           task.reqwidth = .1;
-          task.nodetail = true;
+          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
           it.tasks.add(task);
           master.subitems.add(it);
         }
@@ -143,7 +143,7 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
           final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d1)));
           task.reqheight = .1;
           task.reqwidth = 1;
-          task.nodetail = true;
+          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
           it.tasks.add(task);
           master.subitems.add(it);
         }
@@ -153,7 +153,7 @@ public class ScatterPlotProjector<V extends NumberVector> implements Projector {
           final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d2), true));
           task.reqheight = 1;
           task.reqwidth = .1;
-          task.nodetail = true;
+          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
           it.tasks.add(task);
           master.subitems.add(it);
         }

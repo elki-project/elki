@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -40,16 +40,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
  */
 public class VisualizationTask implements VisualizationItem, Comparable<VisualizationTask> {
   /**
-   * Constant for using thumbnail
-   */
-  public static final String THUMBNAIL = "thumbnail";
-
-  /**
-   * Thumbnail size
-   */
-  public static final String THUMBNAIL_RESOLUTION = "tres";
-
-  /**
    * Meta data key: Level for visualizer ordering
    *
    * Returns an integer indicating the "height" of this Visualizer. It is
@@ -69,24 +59,29 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   public boolean visible = true;
 
   /**
+   * Capabilities
+   */
+  private int flags;
+
+  /**
    * Flag to signal there is no thumbnail needed.
    */
-  public boolean thumbnail = true;
+  public static final int FLAG_NO_THUMBNAIL = 1;
 
   /**
    * Mark as not having a (sensible) detail view.
    */
-  public boolean nodetail = false;
+  public static final int FLAG_NO_DETAIL = 2;
 
   /**
    * Flag to signal the visualizer should not be exported.
    */
-  public boolean noexport = false;
+  public static final int FLAG_NO_EXPORT = 4;
 
   /**
    * Flag to signal the visualizer should not be embedded.
    */
-  public boolean noembed = false;
+  public static final int FLAG_NO_EMBED = 8;
 
   /**
    * Flag to signal default visibility of a visualizer.
@@ -122,6 +117,32 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
    * Active foreground layer (interactive elements)
    */
   public static final int LEVEL_INTERACTIVE = 1000;
+
+  /**
+   * The update event mask. See {@link #ON_DATA}, {@link #ON_SELECTION},
+   * {@link #ON_STYLEPOLICY}, {@link #ON_SAMPLE}.
+   */
+  public int updatemask;
+
+  /**
+   * Constant to listen for data changes
+   */
+  public static final int ON_DATA = 1;
+
+  /**
+   * Constant to listen for selection changes
+   */
+  public static final int ON_SELECTION = 2;
+
+  /**
+   * Constant to listen for style result changes
+   */
+  public static final int ON_STYLEPOLICY = 4;
+
+  /**
+   * Constant to listen for sampling result changes
+   */
+  public static final int ON_SAMPLE = 8;
 
   /**
    * Name
@@ -255,5 +276,43 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   public boolean equals(Object o) {
     // Also don't inherit equals based on list contents!
     return (this == o);
+  }
+
+  /**
+   * Set (OR) the update flags.
+   *
+   * @param bits Bits to set
+   */
+  public void addUpdateFlags(int bits) {
+    updatemask |= bits;
+  }
+
+  /**
+   * Update if any oft these bits is set.
+   *
+   * @param bits Bits to check.
+   * @return
+   */
+  public boolean updateOnAny(int bits) {
+    return (updatemask & bits) != 0;
+  }
+
+  /**
+   * Update if any oft these flags is set.
+   *
+   * @param bits Bits to check.
+   * @return
+   */
+  public boolean hasAnyFlags(int bits) {
+    return (flags & bits) != 0;
+  }
+
+  /**
+   * Set a task flag.
+   *
+   * @param bits Flag to set
+   */
+  public void addFlags(int bits) {
+    flags |= bits;
   }
 }

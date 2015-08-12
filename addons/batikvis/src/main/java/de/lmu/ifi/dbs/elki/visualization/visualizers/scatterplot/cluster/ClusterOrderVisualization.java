@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
+// TODO: draw sample only?
 public class ClusterOrderVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
@@ -79,6 +80,7 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
         final VisualizationTask task = new VisualizationTask(NAME, context, co, p.getRelation(), ClusterOrderVisualization.this);
         task.initDefaultVisibility(false);
         task.level = VisualizationTask.LEVEL_DATA - 1;
+        task.addUpdateFlags(VisualizationTask.ON_DATA);
         context.addVis(co, task);
         context.addVis(p, task);
       }
@@ -105,7 +107,7 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
     protected ClusterOrder result;
 
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA);
+      super(task, plot, width, height, proj);
       result = task.getResult();
       addListeners();
     }

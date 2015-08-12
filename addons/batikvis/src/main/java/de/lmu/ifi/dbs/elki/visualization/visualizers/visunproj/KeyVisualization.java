@@ -107,8 +107,9 @@ public class KeyVisualization extends AbstractVisFactory {
         }
       }
       task.level = VisualizationTask.LEVEL_STATIC;
+      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
       if(numc < 20) {
-        task.nodetail = true;
+        task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
       }
       context.addVis(c, task);
     }
@@ -197,7 +198,7 @@ public class KeyVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, ON_STYLE);
+      super(task, plot, width, height);
       this.clustering = task.getResult();
       addListeners();
     }

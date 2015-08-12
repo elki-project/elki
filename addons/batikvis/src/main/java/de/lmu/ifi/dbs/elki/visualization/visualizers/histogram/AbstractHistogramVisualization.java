@@ -48,10 +48,13 @@ public abstract class AbstractHistogramVisualization extends AbstractVisualizati
    * Constructor.
    *
    * @param task Visualization task
-   * @param mask Refresh mask
+   * @param plot Plot to draw to
+   * @param width Embedding width
+   * @param height Embedding height
+   * @param proj Projection
    */
-  public AbstractHistogramVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask) {
-    super(task, plot, width, height, mask);
+  public AbstractHistogramVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    super(task, plot, width, height);
     assert(proj instanceof Projection1D) : "Visualizer attached to wrong projection!";
     this.proj = (Projection1D) proj;
   }

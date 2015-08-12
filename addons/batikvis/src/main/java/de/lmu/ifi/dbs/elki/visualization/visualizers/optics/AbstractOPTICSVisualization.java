@@ -61,10 +61,9 @@ public abstract class AbstractOPTICSVisualization extends AbstractVisualization 
    * Constructor.
    *
    * @param task Visualization task.
-   * @param mask Visualization mask
    */
-  public AbstractOPTICSVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask) {
-    super(task, plot, width, height, mask);
+  public AbstractOPTICSVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    super(task, plot, width, height);
     this.optics = (OPTICSProjection) proj;
   }
 

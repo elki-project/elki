@@ -58,7 +58,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.VoronoiDraw;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer drawing Voronoi cells for k-means clusterings.
@@ -115,7 +114,6 @@ public class VoronoiVisualization extends AbstractVisFactory {
   public VoronoiVisualization(Mode mode) {
     super();
     this.mode = mode;
-    this.thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
@@ -130,6 +128,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), VoronoiVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA + 3;
+        task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
         context.addVis(p, task);
       }
     });
@@ -156,7 +155,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_STYLE);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

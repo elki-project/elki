@@ -67,7 +67,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer for generating an SVG-Element containing the convex hull / alpha
@@ -98,7 +97,6 @@ public class ClusterHullVisualization extends AbstractVisFactory {
   public ClusterHullVisualization(Parameterizer settings) {
     super();
     this.settings = settings;
-    this.thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
@@ -116,6 +114,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterHullVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
         task.initDefaultVisibility(false);
         context.addVis(p, task);
       }
@@ -145,7 +144,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA | ON_SAMPLE | ON_STYLE);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

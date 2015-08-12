@@ -98,7 +98,7 @@ public class HistogramProjector<V extends NumberVector> implements Projector {
         final VisualizationTask task = new VisualizationTask("", context, null, null, lbl);
         task.reqheight = lheight;
         task.reqwidth = 1;
-        task.nodetail = true;
+        task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
         it.tasks.add(task);
         master.subitems.add(it);
       }

@@ -57,7 +57,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualize the mean of a KMeans-Clustering
@@ -86,7 +85,6 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
   public ClusterMeanVisualization(boolean stars) {
     super();
     this.stars = stars;
-    this.thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
@@ -101,6 +99,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
       ScatterPlotProjector<?> p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterMeanVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA + 1;
+      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
       context.addVis(p, task);
       VisualizationMenuToggle togg = new VisualizationMenuToggle() {
         @Override
@@ -153,7 +152,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_STYLE);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

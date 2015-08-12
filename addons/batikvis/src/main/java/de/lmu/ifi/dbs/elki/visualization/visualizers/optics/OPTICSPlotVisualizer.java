@@ -72,6 +72,7 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
       // Add plots, attach visualizer
       final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
       task.level = VisualizationTask.LEVEL_DATA;
+      // FIXME: task.setUpdates(VisualizationTask.ON_STYLEPOLICY);
       context.addVis(p, task);
     }
   }
@@ -99,7 +100,7 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_STYLE);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

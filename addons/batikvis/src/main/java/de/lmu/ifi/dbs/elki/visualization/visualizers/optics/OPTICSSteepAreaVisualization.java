@@ -139,7 +139,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, 0);
+      super(task, plot, width, height, proj);
       this.areas = findSteepAreaResult(this.optics.getResult());
     }
 

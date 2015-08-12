@@ -105,6 +105,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
         final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterOutlineVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
         task.initDefaultVisibility(false);
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY);
         context.addVis(p, task);
       }
     });
@@ -135,7 +136,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA | ON_STYLE);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

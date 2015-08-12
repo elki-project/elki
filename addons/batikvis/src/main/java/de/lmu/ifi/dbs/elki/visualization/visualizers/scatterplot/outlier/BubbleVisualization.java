@@ -56,7 +56,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Generates a SVG-Element containing bubbles. A Bubble is a circle visualizing
@@ -97,7 +96,6 @@ public class BubbleVisualization extends AbstractVisFactory {
   public BubbleVisualization(Parameterizer settings) {
     super();
     this.settings = settings;
-    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
@@ -125,6 +123,7 @@ public class BubbleVisualization extends AbstractVisFactory {
         }
         final VisualizationTask task = new VisualizationTask(NAME, context, o, p.getRelation(), BubbleVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
         task.initDefaultVisibility(vis);
         context.addVis(o, task);
         context.addVis(p, task);
@@ -151,7 +150,7 @@ public class BubbleVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_SAMPLE | ON_STYLE | ON_DATA);
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
       addListeners();
     }

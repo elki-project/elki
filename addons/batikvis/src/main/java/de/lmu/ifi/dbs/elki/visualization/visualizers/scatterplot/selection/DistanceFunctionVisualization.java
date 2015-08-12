@@ -60,7 +60,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Factory for visualizers to generate an SVG-Element containing dots as markers
@@ -86,7 +85,6 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
    */
   public DistanceFunctionVisualization() {
     super();
-    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
   }
 
   @Override
@@ -102,6 +100,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
       public void process(VisualizerContext context, AbstractMaterializeKNNPreprocessor<?> kNN, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context, kNN, p.getRelation(), DistanceFunctionVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_SELECTION);
         context.addVis(kNN, task);
         context.addVis(p, task);
       }
@@ -253,7 +252,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_SAMPLE | ON_DATA | ON_SELECTION);
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
       addListeners();
     }

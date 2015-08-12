@@ -93,6 +93,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
       OPTICSProjector p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
+      task.addUpdateFlags(VisualizationTask.ON_SELECTION);
       context.addVis(p, task);
     }
   }
@@ -143,7 +144,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_SELECTION);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

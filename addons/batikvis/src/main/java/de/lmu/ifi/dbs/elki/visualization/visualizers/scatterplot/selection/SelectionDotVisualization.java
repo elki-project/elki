@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer for generating an SVG-Element containing dots as markers
@@ -65,7 +64,6 @@ public class SelectionDotVisualization extends AbstractVisFactory {
    */
   public SelectionDotVisualization() {
     super();
-    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
   }
 
   @Override
@@ -81,6 +79,7 @@ public class SelectionDotVisualization extends AbstractVisFactory {
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionDotVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SELECTION);
         context.addVis(context.getSelectionResult(), task);
         context.addVis(p, task);
       }
@@ -108,7 +107,7 @@ public class SelectionDotVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA | ON_SELECTION);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

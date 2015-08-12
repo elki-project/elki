@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Generates data lines.
@@ -70,7 +69,6 @@ public class LineVisualization extends AbstractVisFactory {
    */
   public LineVisualization() {
     super();
-    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
@@ -85,6 +83,7 @@ public class LineVisualization extends AbstractVisFactory {
       public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), LineVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY | VisualizationTask.ON_SAMPLE);
         context.addVis(p, task);
       }
     });
@@ -113,7 +112,7 @@ public class LineVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA | ON_STYLE | ON_SAMPLE);
+      super(task, plot, width, height, proj);
       this.sample = ResultUtil.getSamplingResult(relation);
       addListeners();
     }

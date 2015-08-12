@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer for generating SVG-Elements representing the selected objects
@@ -67,7 +66,6 @@ public class SelectionLineVisualization extends AbstractVisFactory {
    */
   public SelectionLineVisualization() {
     super();
-    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
   }
 
   @Override
@@ -82,6 +80,7 @@ public class SelectionLineVisualization extends AbstractVisFactory {
       ParallelPlotProjector<?> p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionLineVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA - 1;
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SELECTION);
       context.addVis(context.getSelectionResult(), task);
       context.addVis(p, task);
     }
@@ -106,7 +105,7 @@ public class SelectionLineVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_SELECTION | ON_DATA);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

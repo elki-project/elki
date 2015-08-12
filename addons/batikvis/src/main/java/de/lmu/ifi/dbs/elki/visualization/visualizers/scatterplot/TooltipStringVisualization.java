@@ -1,5 +1,28 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
 
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2015
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -72,6 +95,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
         if(DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
           final VisualizationTask task = new VisualizationTask(NAME_ID, context, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
+          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
           task.initDefaultVisibility(false);
           context.addVis(rep, task);
           context.addVis(p, task);
@@ -79,6 +103,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
         if(ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
           final VisualizationTask task = new VisualizationTask(NAME_CLASS, context, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
+          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
           task.initDefaultVisibility(false);
           context.addVis(rep, task);
           context.addVis(p, task);
@@ -86,6 +111,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
         if(LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
           final VisualizationTask task = new VisualizationTask(NAME_LABEL, context, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
+          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
           task.initDefaultVisibility(false);
           context.addVis(rep, task);
           context.addVis(p, task);
@@ -93,6 +119,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
         if(ExternalID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
           final VisualizationTask task = new VisualizationTask(NAME_EID, context, rep, p.getRelation(), TooltipStringVisualization.this);
           task.tool = true;
+          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
           task.initDefaultVisibility(false);
           context.addVis(rep, task);
           context.addVis(p, task);
@@ -126,7 +153,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA | ON_SAMPLE);
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
       final StyleLibrary style = context.getStyleLibrary();
       this.fontsize = 3 * style.getTextSize(StyleLibrary.PLOT);
@@ -136,16 +163,8 @@ public class TooltipStringVisualization extends AbstractVisFactory {
     @Override
     protected Element makeTooltip(DBIDRef id, double x, double y, double dotsize) {
       final Object data = result.get(id);
-      String label;
-      if(data == null) {
-        label = "null";
-      }
-      else {
-        label = data.toString();
-      }
-      if(label == "" || label == null) {
-        label = "null";
-      }
+      String label = (data == null) ? "null" : data.toString();
+      label = (label == "" || label == null) ? "null" : label;
       return svgp.svgText(x + dotsize, y + fontsize * 0.07, label);
     }
 

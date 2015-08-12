@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualize e.g. a clustering using different markers for different clusters.
@@ -65,7 +64,6 @@ public class MarkerVisualization extends AbstractVisFactory {
    */
   public MarkerVisualization() {
     super();
-    this.thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE | ThumbnailVisualization.ON_SAMPLE;
   }
 
   @Override
@@ -81,6 +79,7 @@ public class MarkerVisualization extends AbstractVisFactory {
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), MarkerVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
         context.addVis(p, task);
       }
     });
@@ -106,7 +105,7 @@ public class MarkerVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA | ON_STYLE | ON_SAMPLE);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

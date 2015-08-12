@@ -82,8 +82,8 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
    *
    * @param task Visualization task
    */
-  public AbstractTooltipVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask) {
-    super(task, plot, width, height, proj, mask | ON_DATA | ON_SAMPLE);
+  public AbstractTooltipVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    super(task, plot, width, height, proj);
   }
 
   @Override

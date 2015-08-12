@@ -87,9 +87,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       ScatterPlotProjector<?> p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), ToolBox2DVisualization.this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      task.thumbnail = false;
-      task.noexport = true;
-      task.noembed = true;
+      task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT | VisualizationTask.FLAG_NO_EMBED);
       context.addVis(p, task);
     }
   }
@@ -128,7 +126,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, 0);
+      super(task, plot, width, height, proj);
       context.addVisualizationListener(this);
     }
 

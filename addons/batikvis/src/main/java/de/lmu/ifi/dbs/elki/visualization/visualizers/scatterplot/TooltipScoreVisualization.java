@@ -104,6 +104,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
       public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context, o.getScores(), p.getRelation(), TooltipScoreVisualization.this);
         task.tool = true;
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
         task.initDefaultVisibility(false);
         context.addVis(o.getScores(), task);
         context.addVis(p, task);
@@ -119,6 +120,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
         }
         final VisualizationTask task = new VisualizationTask(NAME, context, r, p.getRelation(), TooltipScoreVisualization.this);
         task.tool = true;
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
         task.initDefaultVisibility(false);
         context.addVis(r, task);
         context.addVis(p, task);
@@ -135,6 +137,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
         }
         final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, context, r, p.getRelation(), TooltipScoreVisualization.this);
         task.tool = true;
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
         task.initDefaultVisibility(false);
         context.addVis(r, task);
         context.addVis(p, task);
@@ -165,7 +168,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA | ON_SAMPLE);
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
       final StyleLibrary style = context.getStyleLibrary();
       this.fontsize = 3 * style.getTextSize(StyleLibrary.PLOT);

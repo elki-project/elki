@@ -48,7 +48,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer for generating an SVG-Element containing a cube as marker
@@ -78,7 +77,6 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
   public SelectionCubeVisualization(Parameterizer settings) {
     super();
     this.settings = settings;
-    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
   }
 
   @Override
@@ -94,6 +92,7 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
       public void process(VisualizerContext context, ScatterPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionCubeVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA - 2;
+        task.addUpdateFlags(VisualizationTask.ON_SELECTION);
         context.addVis(context.getSelectionResult(), task);
         context.addVis(p, task);
       }
@@ -127,7 +126,7 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
     public static final String CSS_CUBEFRAME = "selectionCubeFrame";
 
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_SELECTION);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

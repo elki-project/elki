@@ -62,7 +62,6 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer to draw circle segments of clusterings and enable interactive
@@ -111,7 +110,6 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
    */
   public CircleSegmentsVisualizer() {
     super();
-    this.thumbmask |= ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
@@ -138,6 +136,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
       task.reqwidth = 2.0;
       task.reqheight = 2.0;
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
+      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
       context.addVis(segmentResult, task);
     }
   }
@@ -255,7 +254,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
      * Constructor
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, ON_STYLE);
+      super(task, plot, width, height);
       policy = task.getResult();
       segments = policy.segments;
       // FIXME: handle this more generally.

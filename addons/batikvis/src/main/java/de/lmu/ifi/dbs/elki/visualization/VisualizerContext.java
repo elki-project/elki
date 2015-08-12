@@ -340,8 +340,8 @@ public class VisualizerContext implements DataStoreListener, Result {
    */
   @Override
   public void contentChanged(DataStoreEvent e) {
-    for(DataStoreListener listener : listenerList) {
-      listener.contentChanged(e);
+    for(int i = 0; i < listenerList.size(); i++) {
+      listenerList.get(i).contentChanged(e);
     }
   }
 
@@ -408,6 +408,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    */
   public void addVis(Object parent, VisualizationItem vis) {
     vistree.add(parent, vis);
+    notifyFactories(vis);
     visChanged(vis);
   }
 
@@ -417,9 +418,8 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param item Item that has changed
    */
   public void visChanged(VisualizationItem item) {
-    notifyFactories(item);
-    for(VisualizationListener listener : vlistenerList) {
-      listener.visualizationChanged(item);
+    for(int i = 0; i < vlistenerList.size(); i++) {
+      vlistenerList.get(i).visualizationChanged(item);
     }
   }
 

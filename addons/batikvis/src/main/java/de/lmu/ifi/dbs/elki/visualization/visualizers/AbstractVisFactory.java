@@ -1,12 +1,10 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +23,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -40,11 +39,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  */
 public abstract class AbstractVisFactory implements VisFactory {
   /**
-   * Mask for redrawing thumbnails
-   */
-  protected int thumbmask = 0;
-
-  /**
    * Constructor.
    */
   protected AbstractVisFactory() {
@@ -58,7 +52,7 @@ public abstract class AbstractVisFactory implements VisFactory {
       return null;
     }
     if(allowThumbnails(task)) {
-      return new ThumbnailVisualization(this, task, plot, width, height, proj, thumbmask, thumbsize);
+      return new ThumbnailVisualization(this, task, plot, width, height, proj, thumbsize);
     }
     return makeVisualization(task, plot, width, height, proj);
   }

@@ -286,7 +286,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
           if(!visibleInOverview(task)) {
             continue;
           }
-          hasDetails |= !task.nodetail;
+          hasDetails |= !task.hasAnyFlags(VisualizationTask.FLAG_NO_DETAIL);
           Pair<Element, Visualization> pair = oldlayers.remove(it, task);
           if(pair == null) {
             pair = new Pair<>(null, null);
@@ -395,7 +395,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
       LoggingUtil.warning("Visualization returned empty layer: " + vis);
       return vis;
     }
-    if(task.noexport) {
+    if(task.hasAnyFlags(VisualizationTask.FLAG_NO_EXPORT)) {
       vis.getLayer().setAttribute(SVGPlot.NO_EXPORT_ATTRIBUTE, SVGPlot.NO_EXPORT_ATTRIBUTE);
     }
     parent.appendChild(vis.getLayer());
@@ -467,11 +467,9 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
    */
   protected boolean visibleInOverview(VisualizationTask task) {
     if(single) {
-      return task.visible && !task.noembed;
+      return task.visible && !task.hasAnyFlags(VisualizationTask.FLAG_NO_EMBED);
     }
-    else {
-      return task.visible && task.thumbnail;
-    }
+    return task.visible && !task.hasAnyFlags(VisualizationTask.FLAG_NO_THUMBNAIL);
   }
 
   /**
@@ -604,7 +602,6 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
 
   @Override
   public void resultAdded(Result child, Result parent) {
-    LOG.debug("result added: " + child);
     if(child instanceof VisualizationTask) {
       reinitOnRefresh = true;
     }
@@ -613,7 +610,6 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
 
   @Override
   public void resultChanged(Result current) {
-    LOG.debug("result changed: " + current);
     if(current instanceof VisualizationTask) {
       for(Hierarchy.Iter<Result> iter = context.getHierarchy().iterParents(current); iter.valid(); iter.advance()) {
         if(iter.get() instanceof Projector) {
@@ -627,13 +623,11 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
 
   @Override
   public void resultRemoved(Result child, Result parent) {
-    LOG.debug("result removed: " + child);
     lazyRefresh();
   }
 
   @Override
   public void visualizationChanged(VisualizationItem child) {
-    LOG.debug("Visualization changed: " + child);
     if(child instanceof VisualizationTask) {
       reinitOnRefresh = true;
     }

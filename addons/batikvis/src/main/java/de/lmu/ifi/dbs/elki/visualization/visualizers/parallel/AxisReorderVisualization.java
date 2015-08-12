@@ -77,8 +77,7 @@ public class AxisReorderVisualization extends AbstractVisFactory {
       public void process(VisualizerContext context, ParallelPlotProjector<?> p) {
         final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), AxisReorderVisualization.this);
         task.level = VisualizationTask.LEVEL_INTERACTIVE;
-        task.noexport = true;
-        task.thumbnail = false;
+        task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
         context.addVis(p, task);
       }
     });
@@ -123,7 +122,7 @@ public class AxisReorderVisualization extends AbstractVisFactory {
      * @param task VisualizationTask
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, 0);
+      super(task, plot, width, height, proj);
       addListeners();
     }
 

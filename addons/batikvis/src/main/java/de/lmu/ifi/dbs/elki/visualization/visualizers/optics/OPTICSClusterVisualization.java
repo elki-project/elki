@@ -85,6 +85,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
         final VisualizationTask task = new VisualizationTask(NAME, context, ocl, null, this);
         task.level = VisualizationTask.LEVEL_DATA;
         context.addVis(p, task);
+        // TODO: use and react to style policy!
       }
     }
     // TODO: also run when a new clustering is added, instead of just new
@@ -155,7 +156,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_STYLE);
+      super(task, plot, width, height, proj);
       this.clus = task.getResult();
       addListeners();
     }

@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
@@ -82,38 +81,14 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   private double height;
 
   /**
-   * The event mask. See {@link #ON_DATA}, {@link #ON_SELECTION},
-   * {@link #ON_STYLE}.
-   */
-  private int mask;
-
-  /**
-   * Constant to listen for data changes
-   */
-  public static final int ON_DATA = 1;
-
-  /**
-   * Constant to listen for selection changes
-   */
-  public static final int ON_SELECTION = 2;
-
-  /**
-   * Constant to listen for style result changes
-   */
-  public static final int ON_STYLE = 4;
-
-  /**
-   * Constant to listen for sampling result changes
-   */
-  public static final int ON_SAMPLE = 8;
-
-  /**
    * Constructor.
    *
    * @param task Visualization task
-   * @param mask Refresh mask
+   * @param plot Plot to draw to
+   * @param width Embedding width
+   * @param height Embedding height
    */
-  public AbstractVisualization(VisualizationTask task, SVGPlot plot, double width, double height, int mask) {
+  public AbstractVisualization(VisualizationTask task, SVGPlot plot, double width, double height) {
     super();
     this.task = task;
     this.context = task.getContext();
@@ -121,7 +96,6 @@ public abstract class AbstractVisualization implements Visualization, ResultList
     this.width = width;
     this.height = height;
     this.layer = null;
-    this.mask = mask;
     // Note: we do not auto-add listeners, as we don't know what kind of
     // listeners a visualizer needs, and the visualizer might need to do some
     // initialization first
@@ -134,10 +108,10 @@ public abstract class AbstractVisualization implements Visualization, ResultList
     // Listen for result changes, including the one we monitor
     context.addResultListener(this);
     // Listen for database events only when needed.
-    if((mask & ON_DATA) == ON_DATA) {
+    if(task.updateOnAny(VisualizationTask.ON_DATA)) {
       context.addDataStoreListener(this);
     }
-    if((mask & ON_STYLE) == ON_STYLE) {
+    if(task.updateOnAny(VisualizationTask.ON_STYLEPOLICY)) {
       context.addVisualizationListener(this);
     }
   }
@@ -230,11 +204,11 @@ public abstract class AbstractVisualization implements Visualization, ResultList
       synchronizedRedraw();
       return;
     }
-    if((mask & ON_SELECTION) == ON_SELECTION && current instanceof SelectionResult) {
+    if(task.updateOnAny(VisualizationTask.ON_SELECTION) && current instanceof SelectionResult) {
       synchronizedRedraw();
       return;
     }
-    if((mask & ON_SAMPLE) == ON_SAMPLE && current instanceof SamplingResult) {
+    if(task.updateOnAny(VisualizationTask.ON_SAMPLE) && current instanceof SamplingResult) {
       synchronizedRedraw();
       return;
     }
@@ -248,7 +222,7 @@ public abstract class AbstractVisualization implements Visualization, ResultList
 
   @Override
   public void visualizationChanged(VisualizationItem item) {
-    if((mask & ON_STYLE) == ON_STYLE && (item instanceof StylingPolicy || item instanceof StyleLibrary)) {
+    if(task.updateOnAny(VisualizationTask.ON_STYLEPOLICY) && item instanceof StylingPolicy) {
       synchronizedRedraw();
       return;
     }

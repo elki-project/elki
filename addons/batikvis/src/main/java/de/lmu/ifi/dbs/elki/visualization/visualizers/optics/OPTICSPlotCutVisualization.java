@@ -144,7 +144,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, 0);
+      super(task, plot, width, height, proj);
     }
 
     @Override

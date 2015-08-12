@@ -149,7 +149,7 @@ public class DetailView extends SVGPlot implements VisualizationListener {
       if(task.visible) {
         try {
           Visualization v = task.getFactory().makeVisualization(task, this, width, height, visi.proj);
-          if(task.noexport) {
+          if(task.hasAnyFlags(VisualizationTask.FLAG_NO_EXPORT)) {
             v.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
           }
           layers.add(v);
@@ -302,7 +302,7 @@ public class DetailView extends SVGPlot implements VisualizationListener {
       if(task.visible) {
         // LoggingUtil.warning("Need to recreate a missing layer for " + task);
         vis = task.getFactory().makeVisualization(task, this, width, height, visi.proj);
-        if(task.noexport) {
+        if(task.hasAnyFlags(VisualizationTask.FLAG_NO_EXPORT)) {
           vis.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
         }
         layermap.put(task, vis);

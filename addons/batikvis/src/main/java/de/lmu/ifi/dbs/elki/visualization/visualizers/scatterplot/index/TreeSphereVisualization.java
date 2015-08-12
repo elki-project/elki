@@ -180,7 +180,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
      */
     @SuppressWarnings("unchecked")
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA);
+      super(task, plot, width, height, proj);
       this.tree = AbstractMTree.class.cast(task.getResult());
       this.p = getLPNormP(this.tree);
       addListeners();

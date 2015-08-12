@@ -93,8 +93,8 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
         final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionToolCubeVisualization.this);
         task.level = VisualizationTask.LEVEL_INTERACTIVE;
         task.tool = true;
-        task.thumbnail = false;
-        task.noexport = true;
+        task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
+        task.addUpdateFlags(VisualizationTask.ON_SELECTION);
         task.initDefaultVisibility(false);
         context.addVis(context.getSelectionResult(), task);
         context.addVis(p, task);
@@ -138,7 +138,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
      * @param task Task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_SELECTION);
+      super(task, plot, width, height, proj);
       this.dim = RelationUtil.dimensionality(rel);
       addListeners();
     }

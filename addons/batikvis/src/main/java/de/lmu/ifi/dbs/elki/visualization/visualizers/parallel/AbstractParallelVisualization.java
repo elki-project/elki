@@ -76,8 +76,8 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector> ext
    *
    * @param task Visualization task
    */
-  public AbstractParallelVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int mask) {
-    super(task, plot, width, height, mask);
+  public AbstractParallelVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    super(task, plot, width, height);
     this.proj = (ProjectionParallel) proj;
     this.relation = task.getRelation();
     margins = new double[] { 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE };

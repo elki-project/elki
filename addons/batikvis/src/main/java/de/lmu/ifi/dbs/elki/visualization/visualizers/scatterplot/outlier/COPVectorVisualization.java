@@ -92,6 +92,7 @@ public class COPVectorVisualization extends AbstractVisFactory {
           }
           final VisualizationTask task = new VisualizationTask(NAME, context, rel, p.getRelation(), COPVectorVisualization.this);
           task.level = VisualizationTask.LEVEL_DATA;
+          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
           context.addVis(o, task);
           context.addVis(p, task);
         }
@@ -122,7 +123,7 @@ public class COPVectorVisualization extends AbstractVisFactory {
      * @param task Visualization task
      */
     public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj, ON_DATA | ON_SAMPLE);
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
       addListeners();
     }
