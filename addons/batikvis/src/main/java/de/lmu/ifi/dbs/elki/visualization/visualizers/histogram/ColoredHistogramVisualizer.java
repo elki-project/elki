@@ -87,7 +87,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
   /**
    * Number of bins to use in histogram.
    */
-  private static final int DEFAULT_BINS = 50;
+  private static final int DEFAULT_BINS = 80;
 
   /**
    * Constructor.
@@ -375,7 +375,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
      * Parameter to specify the number of bins to use in histogram.
      *
      * <p>
-     * Key: {@code -projhistogram.bins} Default: 20
+     * Key: {@code -projhistogram.bins} Default: 80
      * </p>
      */
     public static final OptionID HISTOGRAM_BINS_ID = new OptionID("projhistogram.bins", "Number of bins in the distribution histogram");
