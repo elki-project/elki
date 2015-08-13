@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
@@ -31,9 +30,9 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 /**
  * Class to handle updates to an SVG plot, in particular when used in an Apache
  * Batik UI.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has Runnable
  * @apiviz.uses UpdateSynchronizer
  */
@@ -46,7 +45,7 @@ public class UpdateRunner {
   /**
    * The queue of pending updates
    */
-  final private Queue<Runnable> queue = new ConcurrentLinkedQueue<>();
+  final private ConcurrentLinkedQueue<Runnable> queue = new ConcurrentLinkedQueue<>();
 
   /**
    * Synchronizer that can block events from being executed right away.
@@ -55,7 +54,7 @@ public class UpdateRunner {
 
   /**
    * Construct a new update handler
-   * 
+   *
    * @param sync Object to synchronize on
    */
   protected UpdateRunner(Object sync) {
@@ -64,16 +63,18 @@ public class UpdateRunner {
 
   /**
    * Add a new update to run at any appropriate time.
-   * 
+   *
    * @param r New runnable to perform the update
    */
   public void invokeLater(Runnable r) {
     queue.add(r);
-    if(synchronizer == null) {
-      runQueue();
-    }
-    else {
-      synchronizer.activate();
+    synchronized(this) {
+      if(synchronizer == null) {
+        runQueue();
+      }
+      else {
+        synchronizer.activate();
+      }
     }
   }
 
@@ -112,7 +113,7 @@ public class UpdateRunner {
 
   /**
    * Check whether the queue is empty.
-   * 
+   *
    * @return queue status
    */
   public boolean isEmpty() {
@@ -121,7 +122,7 @@ public class UpdateRunner {
 
   /**
    * Set a new update synchronizer.
-   * 
+   *
    * @param newsync Update synchronizer
    */
   public synchronized void synchronizeWith(UpdateSynchronizer newsync) {
@@ -141,7 +142,7 @@ public class UpdateRunner {
 
   /**
    * Remove an update synchronizer
-   * 
+   *
    * @param oldsync Update synchronizer to remove
    */
   public synchronized void unsynchronizeWith(UpdateSynchronizer oldsync) {

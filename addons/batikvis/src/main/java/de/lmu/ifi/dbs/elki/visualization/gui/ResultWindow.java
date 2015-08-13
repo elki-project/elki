@@ -143,7 +143,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
 
       // setup buttons
       if(!single) {
-        overviewItem = new JMenuItem("Overview");
+        overviewItem = new JMenuItem("Open Overview");
         overviewItem.setMnemonic(KeyEvent.VK_O);
         overviewItem.setEnabled(false);
         overviewItem.addActionListener(new ActionListener() {
@@ -155,7 +155,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         filemenu.add(overviewItem);
       }
 
-      exportItem = new JMenuItem("Export");
+      exportItem = new JMenuItem("Export Plot");
       exportItem.setMnemonic(KeyEvent.VK_E);
       exportItem.setEnabled(false);
       exportItem.addActionListener(new ActionListener() {
@@ -422,9 +422,9 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         if(e instanceof DetailViewSelectedEvent) {
           showSubplot((DetailViewSelectedEvent) e);
         }
-        if(OverviewPlot.OVERVIEW_REFRESHED.equals(e.getActionCommand())) {
+        if(OverviewPlot.OVERVIEW_REFRESHED == e.getActionCommand()) {
           if(currentSubplot == null) {
-            svgCanvas.setPlot(overview.getPlot());
+            showOverview();
           }
         }
       }
@@ -447,7 +447,6 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       }
     };
     this.overview.initialize(listener.getCurrentRatio());
-
     this.addComponentListener(listener);
 
     context.addResultListener(this);

@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGEffects;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
@@ -245,6 +246,10 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
    * Refresh the overview plot.
    */
   private void reinitialize() {
+    // Detach existing elements:
+    for(Pair<Element, Visualization> pair : vistoelem.values()) {
+      SVGUtil.removeFromParent(pair.first);
+    }
     initializePlot();
     plotmap = arrangeVisualizations(ratio, 1.0);
     double s = plotmap.relativeFill();
@@ -257,10 +262,6 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
     final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
     // TODO: cancel pending thumbnail requests!
 
-    // Detach existing elements:
-    for(Pair<Element, Visualization> pair : vistoelem.values()) {
-      SVGUtil.removeFromParent(pair.first);
-    }
     // Replace the layer map
     LayerMap oldlayers = vistoelem;
     vistoelem = new LayerMap();
@@ -324,8 +325,9 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
     plot.updateStyleElement();
 
     // Notify listeners.
+    final ActionEvent ev = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, OVERVIEW_REFRESHED);
     for(ActionListener actionListener : actionListeners) {
-      actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, OVERVIEW_REFRESHED));
+      actionListener.actionPerformed(ev);
     }
   }
 
@@ -620,7 +622,8 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
   public void visualizationChanged(VisualizationItem child) {
     if(child instanceof VisualizationTask) {
       for(Hierarchy.Iter<Object> iter = context.getVisHierarchy().iterParents(child); iter.valid(); iter.advance()) {
-        if(iter.get() instanceof Projector) {
+        final Object o = iter.get();
+        if(o instanceof Projector || o instanceof StaticVisualizationInstance) {
           reinitOnRefresh = true;
           break;
         }
