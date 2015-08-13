@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -87,13 +88,13 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
   public Clustering<?> run(final Database database, final Relation<UncertainObject> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final DBIDs ids = relation.getDBIDs();
-    final WritableDataStore<NumberVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
+    final WritableDataStore<DoubleVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, DoubleVector.class);
     for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       store.put(iter, relation.get(iter).getMean());
     }
 
-    final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
-    final Relation<NumberVector> sample = new MaterializedRelation<>(t, ids, "means", store);
+    final SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim, dim, DoubleVector.VARIABLE_SERIALIZER);
+    final Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, "means", store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);
     KMeansLloyd<NumberVector> kmeans = new KMeansLloyd<NumberVector>(EuclideanDistanceFunction.STATIC, this.k, this.maxiter, this.initializer);
     return kmeans.run(d);
@@ -112,17 +113,17 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
   // FIXME: add Parameterizer, to allow using this in the GUI.
   public static class Parameterizer extends AbstractParameterizer {
     private KMeansInitialization<? super NumberVector> initializer;
-    
+
     private int k;
-    
+
     private int maxiter;
-    
+
     public static final OptionID INIT_ID = new OptionID("ukmeans.initialization", "Method to choose the initial means.");
-    
+
     public final static OptionID K_ID = new OptionID("ukmeans.k","The number of clusters to find.");
-    
+
     public final static OptionID MAXITER_ID = new OptionID("ukmeans.maxiter","The maximum number of iterations to do. 0 means no limit.");
-    
+
     @Override
     public void makeOptions(Parameterization config) {
       super.makeOptions(config);ObjectParameter<KMeansInitialization<? super NumberVector>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
@@ -140,11 +141,11 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
         k = kP.getValue();
       }
     }
-    
+
     @Override
     protected UKMeans makeInstance() {
       return new UKMeans(k, maxiter, initializer);
     }
-    
+
   }
 }
