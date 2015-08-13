@@ -177,6 +177,11 @@ public class VoronoiVisualization extends AbstractVisFactory {
         return;
       }
 
+      final int dim = proj.getInputDimensionality();
+      if(dim != 2) {
+        return;
+      }
+
       addCSSClasses(svgp);
       final List<Cluster<Model>> clusters = clustering.getAllClusters();
 
@@ -193,10 +198,16 @@ public class VoronoiVisualization extends AbstractVisFactory {
           else if(model instanceof MeanModel) {
             MeanModel mmodel = (MeanModel) model;
             mean = mmodel.getMean().getColumnVector();
+            if(mean.getDimensionality() != dim) {
+              continue;
+            }
           }
           else if(model instanceof MedoidModel) {
             MedoidModel mmodel = (MedoidModel) model;
             mean = rel.get(mmodel.getMedoid()).getColumnVector();
+            if(mean.getDimensionality() != dim) {
+              continue;
+            }
           }
           else {
             continue;
