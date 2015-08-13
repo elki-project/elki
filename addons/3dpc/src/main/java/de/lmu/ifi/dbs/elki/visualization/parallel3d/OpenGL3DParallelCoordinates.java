@@ -142,7 +142,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       @SuppressWarnings("unchecked")
       Relation<? extends O> vrel = (Relation<? extends O>) rel;
       ScalesResult scales = ResultUtil.getScalesResult(vrel);
-      ProjectionParallel proj = new SimpleParallel(scales.getScales());
+      ProjectionParallel proj = new SimpleParallel(null, scales.getScales());
       PropertiesBasedStyleLibrary stylelib = new PropertiesBasedStyleLibrary();
       StylingPolicy stylepol = getStylePolicy(hier, stylelib);
       new Instance<>(vrel, proj, settings, stylepol, stylelib).run();
