@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  */
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -121,7 +120,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
 
         @Override
         public boolean enabled() {
-          final StyleLibrary sl = context.getStyleLibrary();
+          final StylingPolicy sl = context.getStylingPolicy();
           if(!(sl instanceof ClusterStylingPolicy)) {
             return false;
           }
@@ -129,9 +128,8 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
           if(c == null) {
             return false;
           }
-          List<? extends Cluster<?>> cs = c.getAllClusters();
-          if(cs.size() > 0) {
-            Model model = cs.iterator().next().getModel();
+          for(Cluster<?> cl : c.getAllClusters()) {
+            Model model = cl.getModel();
             if(model instanceof MeanModel || model instanceof MedoidModel) {
               return true;
             }

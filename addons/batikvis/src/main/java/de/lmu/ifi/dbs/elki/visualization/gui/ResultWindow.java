@@ -41,7 +41,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.SwingUtilities;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -264,6 +263,64 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         }
       }
       return true;
+    }
+
+    private JMenuItem makeMenuItemForVisualizer(Object r) {
+      if(r instanceof VisualizationMenuAction) {
+        final VisualizationMenuAction action = (VisualizationMenuAction) r;
+        JMenuItem visItem = new JMenuItem(action.getMenuName());
+        visItem.setEnabled(action.enabled());
+        visItem.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            action.activate();
+          }
+        });
+        return visItem;
+      }
+      if(r instanceof VisualizationMenuToggle) {
+        final VisualizationMenuToggle toggle = (VisualizationMenuToggle) r;
+        final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(toggle.getMenuName(), toggle.active());
+        visItem.setEnabled(toggle.enabled());
+        visItem.addItemListener(new ItemListener() {
+          @Override
+          public void itemStateChanged(ItemEvent e) {
+            toggle.toggle();
+          }
+        });
+        return visItem;
+      }
+      if(!(r instanceof VisualizationTask)) {
+        return null;
+      }
+      final VisualizationTask v = (VisualizationTask) r;
+      JMenuItem item;
+
+      // Currently enabled?
+      final String name = v.getMenuName();
+      boolean enabled = v.visible;
+      boolean istool = v.tool;
+      if(!istool) {
+        final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
+        visItem.addItemListener(new ItemListener() {
+          @Override
+          public void itemStateChanged(ItemEvent e) {
+            VisualizationTree.setVisible(context, v, visItem.getState());
+          }
+        });
+        item = visItem;
+      }
+      else {
+        final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
+        visItem.addItemListener(new ItemListener() {
+          @Override
+          public void itemStateChanged(ItemEvent e) {
+            VisualizationTree.setVisible(context, v, visItem.isSelected());
+          }
+        });
+        item = visItem;
+      }
+      return item;
     }
 
     /**
@@ -499,89 +556,6 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
     if(currentSubplot == null) {
       ResultWindow.this.overview.setRatio(newratio);
     }
-  }
-
-  private JMenuItem makeMenuItemForVisualizer(Object r) {
-    if(r instanceof VisualizationMenuAction) {
-      final VisualizationMenuAction action = (VisualizationMenuAction) r;
-      JMenuItem visItem = new JCheckBoxMenuItem(action.getMenuName());
-      visItem.setEnabled(action.enabled());
-      visItem.addItemListener(new ItemListener() {
-        @Override
-        public void itemStateChanged(ItemEvent e) {
-          // We need SwingUtilities to avoid a deadlock!
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              action.activate();
-            }
-          });
-        }
-      });
-      return visItem;
-    }
-    if(r instanceof VisualizationMenuToggle) {
-      final VisualizationMenuToggle toggle = (VisualizationMenuToggle) r;
-      final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(toggle.getMenuName(), toggle.active());
-      visItem.setEnabled(toggle.enabled());
-      visItem.addItemListener(new ItemListener() {
-        @Override
-        public void itemStateChanged(ItemEvent e) {
-          // We need SwingUtilities to avoid a deadlock!
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              toggle.toggle();
-            }
-          });
-        }
-      });
-      return visItem;
-    }
-    if(!(r instanceof VisualizationTask)) {
-      return null;
-    }
-    final VisualizationTask v = (VisualizationTask) r;
-    JMenuItem item;
-
-    // Currently enabled?
-    final String name = v.getMenuName();
-    boolean enabled = v.visible;
-    boolean istool = v.tool;
-    if(!istool) {
-      final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
-      visItem.addItemListener(new ItemListener() {
-        @Override
-        public void itemStateChanged(ItemEvent e) {
-          // We need SwingUtilities to avoid a deadlock!
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              VisualizationTree.setVisible(context, v, visItem.getState());
-            }
-          });
-        }
-      });
-      item = visItem;
-    }
-    else {
-      final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
-      visItem.addItemListener(new ItemListener() {
-
-        @Override
-        public void itemStateChanged(ItemEvent e) {
-          // We need SwingUtilities to avoid a deadlock!
-          SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-              VisualizationTree.setVisible(context, v, visItem.isSelected());
-            }
-          });
-        }
-      });
-      item = visItem;
-    }
-    return item;
   }
 
   @Override

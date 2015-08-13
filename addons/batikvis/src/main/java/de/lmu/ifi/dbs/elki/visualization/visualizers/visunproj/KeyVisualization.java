@@ -27,9 +27,6 @@ import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -45,9 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGButton;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -151,8 +146,8 @@ public class KeyVisualization extends AbstractVisFactory {
     // FIXME: do we really need to do this three-step computation?
     // Number of rows we'd use in a squared layout:
     final double rows = Math.ceil(Math.pow(numc * maxwidth, height / (width + height)));
-    // Given this number of rows (plus two for header), use this many columns:
-    return (int) Math.ceil(numc / (rows + 2));
+    // Given this number of rows (plus one for header), use this many columns:
+    return (int) Math.ceil(numc / (rows + 1));
   }
 
   @Override
@@ -224,7 +219,6 @@ public class KeyVisualization extends AbstractVisFactory {
         layer.appendChild(label);
       }
 
-      final int extrarows = 2;
       double kwi, khe;
       if(allcs.size() == topcs.size()) {
         // Maximum width (compared to height) of labels - guess.
@@ -270,35 +264,8 @@ public class KeyVisualization extends AbstractVisFactory {
         khe = size.second;
       }
 
-      // Add a button to set style policy
-      {
-        StylingPolicy sp = context.getStylingPolicy();
-        if(sp instanceof ClusterStylingPolicy && ((ClusterStylingPolicy) sp).getClustering() == clustering) {
-          // Don't show the button when active. May confuse people more than the
-          // disappearing button?
-
-          // SVGButton button = new SVGButton(.1, rows + 1.1, 3.8, .7, .2);
-          // button.setTitle("Active style", "darkgray");
-          // layer.appendChild(button.render(svgp));
-        }
-        else {
-          SVGButton button = new SVGButton(.1, khe + 1.1, 3.8, .7, .2);
-          button.setTitle("Set style", "black");
-          Element elem = button.render(svgp);
-          // Attach listener
-          EventTarget etr = (EventTarget) elem;
-          etr.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new EventListener() {
-            @Override
-            public void handleEvent(Event evt) {
-              setStylePolicy();
-            }
-          }, false);
-          layer.appendChild(elem);
-        }
-      }
-
       final double margin = style.getSize(StyleLibrary.MARGIN);
-      final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), kwi, khe + extrarows, margin / StyleLibrary.SCALE);
+      final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), kwi, khe, margin / StyleLibrary.SCALE);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     }
 
