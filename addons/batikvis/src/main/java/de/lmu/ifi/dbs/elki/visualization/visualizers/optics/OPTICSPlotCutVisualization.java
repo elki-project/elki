@@ -39,12 +39,12 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSCut;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -84,7 +84,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     return new Instance(task, plot, width, height, proj);
   }
 
@@ -147,17 +147,17 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height, proj);
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
       incrementalRedraw();
     }
 
     @Override
-    protected void incrementalRedraw() {
+    public void incrementalRedraw() {
       if(layer == null) {
         makeLayerElement();
         addCSSClasses();
@@ -239,7 +239,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
     public boolean startDrag(SVGPoint start, Event evt) {
       epsilon = getEpsilonFromY(plotheight - start.getY());
       // opvis.unsetEpsilonExcept(this);
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return true;
     }
 
@@ -249,7 +249,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
         epsilon = getEpsilonFromY(plotheight - end.getY());
       }
       // opvis.unsetEpsilonExcept(this);
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return true;
     }
 
@@ -264,7 +264,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
         Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, epsilon);
         order.addChildResult(cl);
       }
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return true;
     }
 

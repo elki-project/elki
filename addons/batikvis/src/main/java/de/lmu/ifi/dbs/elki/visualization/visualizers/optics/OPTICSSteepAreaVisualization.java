@@ -38,11 +38,11 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -84,7 +84,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     return new Instance(task, plot, width, height, proj);
   }
 
@@ -142,13 +142,13 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height, proj);
       this.areas = findSteepAreaResult(this.optics.getResult());
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
       makeLayerElement();
       addCSSClasses();
 

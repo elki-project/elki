@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -78,7 +79,7 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     return new Instance(task, plot, width, height, proj);
   }
 
@@ -112,15 +113,15 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height, proj);
       this.result = task.getResult();
       addListeners();
     }
 
     @Override
-    public void redraw() {
-      super.redraw();
+    public void fullRedraw() {
+      setupCanvas();
       final StyleLibrary style = context.getStyleLibrary();
       setupCSS(svgp);
       Iterator<? extends NumberVector> iter = result.iterator();

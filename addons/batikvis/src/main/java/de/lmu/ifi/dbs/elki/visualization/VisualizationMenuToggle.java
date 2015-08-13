@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization;
 
 /**
  * Toggle action.
- * 
+ *
  * @author Erich Schubert
  */
 public interface VisualizationMenuToggle extends VisualizationItem {
@@ -40,4 +40,11 @@ public interface VisualizationMenuToggle extends VisualizationItem {
    * @return {@code true} when selected.
    */
   boolean active();
+
+  /**
+   * Indicate if the menu option is enabled or greyed out.
+   *
+   * @return {@code true} when enabled.
+   */
+  boolean enabled();
 }

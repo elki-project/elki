@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.SimpleSVGViewer;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SimilarityMatrixVisualizer;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
@@ -273,7 +273,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
    * @param task Visualization task
    */
   private void showVisualization(VisualizerContext context, SimilarityMatrixVisualizer factory, VisualizationTask task) {
-    SVGPlot plot = new SVGPlot();
+    VisualizationPlot plot = new VisualizationPlot();
     Visualization vis = factory.makeVisualization(task, plot, 1.0, 1.0, null);
     plot.getRoot().appendChild(vis.getLayer());
     plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");

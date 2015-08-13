@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  */
 
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -45,6 +46,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
@@ -52,7 +54,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
@@ -88,7 +89,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     return new Instance(task, plot, width, height, proj);
   }
 
@@ -116,6 +117,26 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
         @Override
         public boolean active() {
           return stars;
+        }
+
+        @Override
+        public boolean enabled() {
+          final StyleLibrary sl = context.getStyleLibrary();
+          if(!(sl instanceof ClusterStylingPolicy)) {
+            return false;
+          }
+          Clustering<?> c = ((ClusterStylingPolicy) sl).getClustering();
+          if(c == null) {
+            return false;
+          }
+          List<? extends Cluster<?>> cs = c.getAllClusters();
+          if(cs.size() > 0) {
+            Model model = cs.iterator().next().getModel();
+            if(model instanceof MeanModel || model instanceof MedoidModel) {
+              return true;
+            }
+          }
+          return false;
         }
       };
       context.addVis(p, togg);
@@ -155,14 +176,14 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height, proj);
       addListeners();
     }
 
     @Override
-    protected void redraw() {
-      super.redraw();
+    public void fullRedraw() {
+      setupCanvas();
       final StylingPolicy spol = context.getStylingPolicy();
       if(!(spol instanceof ClusterStylingPolicy)) {
         return;

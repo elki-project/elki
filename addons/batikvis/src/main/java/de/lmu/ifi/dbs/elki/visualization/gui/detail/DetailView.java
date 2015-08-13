@@ -38,16 +38,15 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGEffects;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
@@ -61,7 +60,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @apiviz.uses VisualizerContext
  * @apiviz.uses VisualizationTask
  */
-public class DetailView extends SVGPlot implements ResultListener, VisualizationListener {
+public class DetailView extends VisualizationPlot implements ResultListener, VisualizationListener {
   /**
    * Class logger
    */
@@ -83,9 +82,14 @@ public class DetailView extends SVGPlot implements ResultListener, Visualization
   VisualizerContext context;
 
   /**
-   * Map from visualizers to layers
+   * Map from tasks to visualizations.
    */
-  Map<VisualizationTask, Pair<Visualization, Element>> layermap = new HashMap<>();
+  Map<VisualizationTask, Visualization> taskmap = new HashMap<>();
+
+  /**
+   * Map from visualizations to SVG layers.
+   */
+  Map<Visualization, Element> layermap = new HashMap<>();
 
   /**
    * The created width
@@ -101,11 +105,6 @@ public class DetailView extends SVGPlot implements ResultListener, Visualization
    * Pending refresh, for lazy refreshing
    */
   AtomicReference<Runnable> pendingRefresh = new AtomicReference<>(null);
-
-  /**
-   * Reinitialize on refresh
-   */
-  private boolean reinitOnRefresh = false;
 
   /**
    * Constructor.
@@ -127,7 +126,7 @@ public class DetailView extends SVGPlot implements ResultListener, Visualization
     SVGEffects.addShadowFilter(this);
     SVGEffects.addLightGradient(this);
 
-    reinitialize();
+    initialize();
     context.addVisualizationListener(this);
     context.addResultListener(this);
     // FIXME: add datastore listener, too?
@@ -156,9 +155,7 @@ public class DetailView extends SVGPlot implements ResultListener, Visualization
     getRoot().appendChild(bg);
   }
 
-  private void reinitialize() {
-    destroyVisualizations();
-
+  private void initialize() {
     // Try to keep the area approximately 1.0
     width = Math.sqrt(getRatio());
     height = 1.0 / width;
@@ -171,7 +168,8 @@ public class DetailView extends SVGPlot implements ResultListener, Visualization
         Visualization v = instantiateVisualization(task);
         if(v != null) {
           layers.add(v);
-          layermap.put(task, new Pair<>(v, v.getLayer()));
+          taskmap.put(task, v);
+          layermap.put(v, v.getLayer());
         }
       }
     }
@@ -191,7 +189,6 @@ public class DetailView extends SVGPlot implements ResultListener, Visualization
     getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
 
     updateStyleElement();
-    reinitOnRefresh = false;
   }
 
   /**
@@ -199,53 +196,53 @@ public class DetailView extends SVGPlot implements ResultListener, Visualization
    */
   private synchronized void refresh() {
     pendingRefresh.set(null); // Clear
-    if(reinitOnRefresh) {
-      LOG.debugFine("Reinitialize in thread " + Thread.currentThread().getName());
-      reinitialize();
-      reinitOnRefresh = false;
-      return;
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("Refresh in thread " + Thread.currentThread().getName());
     }
-    LOG.debugFine("Refresh in thread " + Thread.currentThread().getName());
     boolean updateStyle = false;
-    Iterator<Map.Entry<VisualizationTask, Pair<Visualization, Element>>> it = layermap.entrySet().iterator();
+    Iterator<Map.Entry<VisualizationTask, Visualization>> it = taskmap.entrySet().iterator();
     while(it.hasNext()) {
-      Entry<VisualizationTask, Pair<Visualization, Element>> ent = it.next();
+      Entry<VisualizationTask, Visualization> ent = it.next();
       VisualizationTask task = ent.getKey();
-      Pair<Visualization, Element> pair = ent.getValue();
-      if(pair.first == null) {
-        pair.first = instantiateVisualization(task);
+      Visualization vis = ent.getValue();
+      if(vis == null) {
+        vis = instantiateVisualization(task);
+        ent.setValue(vis);
       }
-      Element layer = pair.first.getLayer();
-      if(pair.second == layer) { // Unchanged:
-        // Ensure visibility is as expected
-        boolean isHidden = SVGConstants.CSS_HIDDEN_VALUE.equals(layer.getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY));
-        if(task.visible && isHidden) {
+      Element prevlayer = layermap.get(vis);
+      Element layer = vis.getLayer();
+      if(prevlayer == layer) { // Unchanged:
+        // Current visibility ("not hidden")
+        boolean isVisible = !SVGConstants.CSS_HIDDEN_VALUE.equals(layer.getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY));
+        if(task.visible != isVisible) {
           // scheduleUpdate(new AttributeModifier(
-          layer.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_VISIBLE_VALUE);
-        }
-        else if(!task.visible && !isHidden) {
-          // scheduleUpdate(new AttributeModifier(
-          layer.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, SVGConstants.CSS_HIDDEN_VALUE);
+          layer.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, //
+          task.visible ? SVGConstants.CSS_VISIBLE_VALUE : SVGConstants.CSS_HIDDEN_VALUE);
         }
       }
       else {
         if(task.hasAnyFlags(VisualizationTask.FLAG_NO_EXPORT)) {
           layer.setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
         }
-        if(pair.second == null) {
-          LOG.warning("New layer: " + task);
+        if(prevlayer == null) {
+          if(LOG.isDebuggingFine()) {
+            LOG.debugFine("New layer: " + task);
+          }
           // Insert new!
+          // TODO: insert position!
           getRoot().appendChild(layer);
         }
         else {
-          LOG.warning("Updated layer: " + task);
+          if(LOG.isDebuggingFine()) {
+            LOG.debugFine("Updated layer: " + task);
+          }
           // Replace
-          final Node parent = pair.second.getParentNode();
+          final Node parent = prevlayer.getParentNode();
           if(parent != null) {
-            parent.replaceChild(layer, pair.second);
+            parent.replaceChild(/* new! */ layer, /* old */ prevlayer);
           }
         }
-        pair.second = layer;
+        layermap.put(vis, layer);
         updateStyle = true;
       }
     }
@@ -269,7 +266,7 @@ public class DetailView extends SVGPlot implements ResultListener, Visualization
       return v;
     }
     catch(Exception e) {
-      if(Logging.getLogger(task.getFactory().getClass()).isDebugging()) {
+      if(LOG.isDebugging()) {
         LOG.warning("Visualizer " + task.getFactory().getClass().getName() + " failed.", e);
       }
       else {
@@ -289,20 +286,22 @@ public class DetailView extends SVGPlot implements ResultListener, Visualization
   }
 
   private void destroyVisualizations() {
-    for(Entry<VisualizationTask, Pair<Visualization, Element>> v : layermap.entrySet()) {
-      Element layer = v.getValue().second;
+    for(Entry<Visualization, Element> v : layermap.entrySet()) {
+      Element layer = v.getValue();
       if(layer != null) {
         Node parent = layer.getParentNode();
         if(parent != null) {
           parent.removeChild(layer);
         }
       }
-      Visualization vis = v.getValue().first;
+    }
+    for(Entry<VisualizationTask, Visualization> v : taskmap.entrySet()) {
+      Visualization vis = v.getValue();
       if(vis != null) {
         vis.destroy();
       }
     }
-    layermap.clear();
+    taskmap.clear();
   }
 
   @Override
@@ -368,11 +367,13 @@ public class DetailView extends SVGPlot implements ResultListener, Visualization
       return;
     }
     final VisualizationTask task = (VisualizationTask) current;
-    {
+    // Get the layer
+    Visualization vis = taskmap.get(task);
+    if(vis == null) { // Unknown only.
       boolean include = false;
       Hierarchy.Iter<Object> it = context.getVisHierarchy().iterAncestors(current);
       for(; it.valid(); it.advance()) {
-        if(visi.proj.getProjector() == it.get() || layermap.containsKey(it.get())) {
+        if(visi.proj.getProjector() == it.get() || taskmap.containsKey(it.get())) {
           include = true;
           break;
         }
@@ -381,17 +382,45 @@ public class DetailView extends SVGPlot implements ResultListener, Visualization
         return; // Attached to different projection.
       }
     }
-    // Get the layer
-    Pair<Visualization, Element> pair = layermap.get(task);
-    if(pair == null) {
-      layermap.put(task, new Pair<Visualization, Element>(null, null));
+    if(vis == null) { // New visualization
+      taskmap.put(task, null);
       lazyRefresh();
     }
     else {
-      final Element layer = pair.first.getLayer();
-      if(pair.second == layer) {
+      Element prevlayer = layermap.get(vis);
+      Element layer = vis.getLayer();
+      if(prevlayer != layer) {
         lazyRefresh();
       }
+      else {
+        boolean isVisible = !SVGConstants.CSS_HIDDEN_VALUE.equals(layer.getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY));
+        if(task.visible != isVisible) {
+          lazyRefresh(); // Visibility has changed.
+        }
+      }
+    }
+  }
+
+  @Override
+  protected void redraw() {
+    boolean active = false;
+    while(!updateQueue.isEmpty()) {
+      Visualization vis = updateQueue.pop();
+      if(!active) {
+        Element prev = layermap.get(vis);
+        vis.incrementalRedraw();
+        final boolean changed = prev != vis.getLayer();
+        if(LOG.isDebuggingFine() && changed) {
+          LOG.debugFine("Visualization " + vis + " changed.");
+        }
+        active |= changed;
+      }
+      else {
+        vis.incrementalRedraw();
+      }
+    }
+    if(active || true) {
+      refresh();
     }
   }
 }

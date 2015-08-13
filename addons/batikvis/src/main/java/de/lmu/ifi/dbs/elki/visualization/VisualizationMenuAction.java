@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization;
 
 /**
  * Visualizer actions.
- * 
+ *
  * @author Erich Schubert
  */
 public interface VisualizationMenuAction extends VisualizationItem {
@@ -33,4 +33,11 @@ public interface VisualizationMenuAction extends VisualizationItem {
    * Menu item was activated.
    */
   void activate();
+
+  /**
+   * Indicate if the menu option is enabled or greyed out.
+   *
+   * @return {@code true} when enabled.
+   */
+  boolean enabled();
 }

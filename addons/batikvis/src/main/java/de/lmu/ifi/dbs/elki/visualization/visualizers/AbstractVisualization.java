@@ -35,13 +35,14 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
  * Abstract base class for visualizations.
  *
  * @author Erich Schubert
+ *
  * @apiviz.excludeSubtypes
  */
 public abstract class AbstractVisualization implements Visualization, ResultListener, VisualizationListener, DataStoreListener {
@@ -58,12 +59,7 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   /**
    * The plot we are attached to
    */
-  protected final SVGPlot svgp;
-
-  /**
-   * Pending redraw
-   */
-  protected Runnable pendingRedraw = null;
+  protected final VisualizationPlot svgp;
 
   /**
    * Layer storage
@@ -88,7 +84,7 @@ public abstract class AbstractVisualization implements Visualization, ResultList
    * @param width Embedding width
    * @param height Embedding height
    */
-  public AbstractVisualization(VisualizationTask task, SVGPlot plot, double width, double height) {
+  public AbstractVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height) {
     super();
     this.task = task;
     this.context = task.getContext();
@@ -150,43 +146,26 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   }
 
   /**
-   * Trigger a redraw, but avoid excessive redraws.
-   */
-  protected final void synchronizedRedraw() {
-    Runnable pr = new Runnable() {
-      @Override
-      public void run() {
-        if(AbstractVisualization.this.pendingRedraw == this) {
-          AbstractVisualization.this.pendingRedraw = null;
-          AbstractVisualization.this.incrementalRedraw();
-        }
-      }
-    };
-    pendingRedraw = pr;
-    svgp.scheduleUpdate(pr);
-  }
-
-  /**
    * Redraw the visualization (maybe incremental).
    *
    * Optional - by default, it will do a full redraw, which often is faster!
    */
-  protected void incrementalRedraw() {
+  @Override
+  public void incrementalRedraw() {
     Element oldcontainer = null;
     if(layer != null && layer.hasChildNodes()) {
       oldcontainer = layer;
+      // Shallow clone:
       layer = (Element) layer.cloneNode(false);
     }
-    redraw();
+    fullRedraw();
     if(oldcontainer != null && oldcontainer.getParentNode() != null) {
       oldcontainer.getParentNode().replaceChild(layer, oldcontainer);
     }
   }
 
-  /**
-   * Perform a full redraw.
-   */
-  protected abstract void redraw();
+  @Override
+  public abstract void fullRedraw();
 
   @Override
   public void resultAdded(Result child, Result parent) {
@@ -197,15 +176,15 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   public void resultChanged(Result current) {
     // Default is to redraw when the result we are attached to changed.
     if(task.getResult() == current) {
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return;
     }
     if(task.updateOnAny(VisualizationTask.ON_SELECTION) && current instanceof SelectionResult) {
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return;
     }
     if(task.updateOnAny(VisualizationTask.ON_SAMPLE) && current instanceof SamplingResult) {
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return;
     }
   }
@@ -219,17 +198,17 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   @Override
   public void visualizationChanged(VisualizationItem item) {
     if(task.getResult() == item) {
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return;
     }
     if(task.updateOnAny(VisualizationTask.ON_STYLEPOLICY) && item instanceof StylingPolicy) {
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return;
     }
   }
 
   @Override
   public void contentChanged(DataStoreEvent e) {
-    synchronizedRedraw();
+    svgp.requestRedraw(this.task, this);
   }
 }

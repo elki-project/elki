@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 
 /**
  * Static visualization
@@ -43,18 +43,18 @@ public class StaticVisualizationInstance extends AbstractVisualization {
    * @param height Embedding height
    * @param element Element containing the resulting visualization
    */
-  public StaticVisualizationInstance(VisualizationTask task, SVGPlot plot, double width, double height, Element element) {
+  public StaticVisualizationInstance(VisualizationTask task, VisualizationPlot plot, double width, double height, Element element) {
     super(task, plot, width, height);
     this.layer = element;
   }
 
   @Override
-  protected void incrementalRedraw() {
+  public void incrementalRedraw() {
     // Do nothing - we keep our static layer
   }
 
   @Override
-  protected void redraw() {
+  public void fullRedraw() {
     // Do nothing - we keep our static layer
   }
 }

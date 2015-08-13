@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
@@ -76,7 +77,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     return new Instance(task, plot, width, height, proj);
   }
 
@@ -129,14 +130,14 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height, proj);
       context.addVisualizationListener(this);
     }
 
     @Override
-    protected void redraw() {
-      super.redraw();
+    public void fullRedraw() {
+      setupCanvas();
       addCSSClasses(svgp);
       container = svgp.svgElement(SVGConstants.SVG_G_TAG);
       buildToolBox();
@@ -283,7 +284,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       if(item instanceof VisualizationTask) {
         VisualizationTask task = (VisualizationTask) item;
         if(task.tool) {
-          synchronizedRedraw();
+          svgp.requestRedraw(this.task, this);
         }
       }
     }

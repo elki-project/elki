@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
@@ -88,7 +89,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     return new Instance<RStarTreeNode, SpatialEntry>(task, plot, width, height, proj);
   }
 
@@ -133,15 +134,15 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
      * @param proj Projection
      */
     @SuppressWarnings("unchecked")
-    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height, proj);
       this.tree = AbstractRStarTree.class.cast(task.getResult());
       addListeners();
     }
 
     @Override
-    protected void redraw() {
-      super.redraw();
+    public void fullRedraw() {
+      super.fullRedraw();
       addCSSClasses(svgp);
       E root = tree.getRootEntry();
       visualizeRTreeEntry(svgp, layer, proj, tree, root, 0, 0);

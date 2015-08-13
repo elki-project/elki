@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -80,7 +81,7 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector> ext
    * @param height Embedding height
    * @param proj Projection
    */
-  public AbstractParallelVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+  public AbstractParallelVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     super(task, plot, width, height);
     this.proj = (ProjectionParallel) proj;
     this.relation = task.getRelation();
@@ -91,7 +92,7 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector> ext
   }
 
   @Override
-  protected void redraw() {
+  public void fullRedraw() {
     this.layer = setupCanvas(svgp, this.proj, getWidth(), getHeight());
   }
 
@@ -163,7 +164,7 @@ public abstract class AbstractParallelVisualization<NV extends NumberVector> ext
     super.visualizationChanged(item);
     if(item == proj) {
       recalcAxisPositions();
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return;
     }
   }

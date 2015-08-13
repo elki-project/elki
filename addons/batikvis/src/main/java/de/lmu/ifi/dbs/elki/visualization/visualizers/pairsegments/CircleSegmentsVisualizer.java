@@ -54,10 +54,10 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGCheckbox;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -113,7 +113,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     return new Instance(task, plot, width, height, proj);
   }
 
@@ -259,7 +259,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height);
       policy = task.getResult();
       segments = policy.segments;
@@ -271,7 +271,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
     public void toggleUnclusteredPairs(boolean show) {
       noIncrementalRedraw = true;
       showUnclusteredPairs = show;
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
     }
 
     @Override
@@ -286,7 +286,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
     }
 
     @Override
-    protected void incrementalRedraw() {
+    public void incrementalRedraw() {
       if(noIncrementalRedraw) {
         super.incrementalRedraw();
       }
@@ -296,7 +296,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
     }
 
     @Override
-    public void redraw() {
+    public void fullRedraw() {
       LOG.debug("Full redraw");
       noIncrementalRedraw = false; // Done that.
 

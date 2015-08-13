@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -89,7 +90,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
   /**
    * The SVG plot object.
    */
-  private SVGPlot plot;
+  private VisualizationPlot plot;
 
   /**
    * Map of coordinates to plots.
@@ -335,7 +336,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
     if(plot != null) {
       plot.dispose();
     }
-    plot = new SVGPlot();
+    plot = new VisualizationPlot();
     { // Add a background element:
       CSSClass cls = new CSSClass(this, "background");
       final String bgcol = context.getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE);

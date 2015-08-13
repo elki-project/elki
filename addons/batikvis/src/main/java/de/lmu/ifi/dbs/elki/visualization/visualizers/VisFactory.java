@@ -3,8 +3,8 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProcessor;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
  * Defines the requirements for a visualizer. <br>
@@ -39,7 +39,7 @@ public interface VisFactory extends VisualizationProcessor {
    * @param proj Projection
    * @return Visualization
    */
-  Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj);
+  Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj);
 
   /**
    * Produce a visualization instance for the given task that may use thumbnails
@@ -52,5 +52,5 @@ public interface VisFactory extends VisualizationProcessor {
    * @param thumbsize Thumbnail size
    * @return Visualization
    */
-  Visualization makeVisualizationOrThumbnail(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int thumbsize);
+  Visualization makeVisualizationOrThumbnail(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj, int thumbsize);
 }

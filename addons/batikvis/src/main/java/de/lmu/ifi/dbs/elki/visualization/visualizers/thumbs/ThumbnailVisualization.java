@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -100,7 +101,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
    * @param proj Projection
    * @param thumbsize Thumbnail size
    */
-  public ThumbnailVisualization(VisFactory visFactory, VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int thumbsize) {
+  public ThumbnailVisualization(VisFactory visFactory, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj, int thumbsize) {
     super(task, plot, width, height);
     this.visFactory = visFactory;
     this.plot = plot;
@@ -124,37 +125,16 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   @Override
   public Element getLayer() {
     if(thumbid < 0) {
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
     }
     return layer;
-  }
-
-  /**
-   * Redraw the visualization (maybe incremental).
-   *
-   * Optional - by default, it will do a full redraw, which often is faster!
-   */
-  @Override
-  protected void incrementalRedraw() {
-    final Element oldcontainer;
-    if(layer.hasChildNodes()) {
-      oldcontainer = layer;
-      layer = (Element) layer.cloneNode(false);
-    }
-    else {
-      oldcontainer = null;
-    }
-    redraw();
-    if(oldcontainer != null && oldcontainer.getParentNode() != null) {
-      oldcontainer.getParentNode().replaceChild(layer, oldcontainer);
-    }
   }
 
   /**
    * Perform a full redraw.
    */
   @Override
-  protected void redraw() {
+  public void fullRedraw() {
     if(!(getWidth() > 0 && getHeight() > 0)) {
       LoggingUtil.warning("Thumbnail of zero size requested: " + visFactory);
       return;
@@ -165,24 +145,23 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       if(pendingThumbnail == null) {
         pendingThumbnail = ThumbnailThread.QUEUE(this);
       }
+      return;
     }
-    else {
-      // LoggingUtil.warning("Injecting Thumbnail " + this);
-      Element i = plot.svgElement(SVGConstants.SVG_IMAGE_TAG);
-      SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
-      SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);
-      SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, getWidth());
-      SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, getHeight());
-      i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, ThumbnailRegistryEntry.INTERNAL_PROTOCOL + ":" + thumbid);
-      layer.appendChild(i);
-    }
+    // LoggingUtil.warning("Injecting Thumbnail " + this);
+    Element i = plot.svgElement(SVGConstants.SVG_IMAGE_TAG);
+    SVGUtil.setAtt(i, SVGConstants.SVG_X_ATTRIBUTE, 0);
+    SVGUtil.setAtt(i, SVGConstants.SVG_Y_ATTRIBUTE, 0);
+    SVGUtil.setAtt(i, SVGConstants.SVG_WIDTH_ATTRIBUTE, getWidth());
+    SVGUtil.setAtt(i, SVGConstants.SVG_HEIGHT_ATTRIBUTE, getHeight());
+    i.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, ThumbnailRegistryEntry.INTERNAL_PROTOCOL + ":" + thumbid);
+    layer.appendChild(i);
   }
 
   @Override
   public synchronized void doThumbnail() {
     pendingThumbnail = null;
     try {
-      SVGPlot plot = new SVGPlot();
+      VisualizationPlot plot = new VisualizationPlot();
       plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + getWidth() + " " + getHeight());
 
       // Work on a clone
@@ -196,7 +175,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       thumbid = ThumbnailRegistryEntry.registerImage(thumb);
       // The visualization will not be used anymore.
       vis.destroy();
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
     }
     catch(Exception e) {
       final Logging logger = Logging.getLogger(task.getFactory().getClass());
@@ -215,7 +194,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
     thumbid = -1;
     thumb = null;
     // TODO: also purge from ThumbnailRegistryEntry?
-    synchronizedRedraw();
+    svgp.requestRedraw(this.task, this);
   }
 
   @Override

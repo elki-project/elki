@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -86,13 +87,13 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
    * @param height Embedding height
    * @param proj Projection
    */
-  public AbstractTooltipVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+  public AbstractTooltipVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     super(task, plot, width, height, proj);
   }
 
   @Override
-  public void redraw() {
-    super.redraw();
+  public void fullRedraw() {
+    setupCanvas();
     setupCSS(svgp);
     final StyleLibrary style = context.getStyleLibrary();
     double dotsize = style.getLineWidth(StyleLibrary.PLOT);

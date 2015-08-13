@@ -25,9 +25,9 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
 
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 
 /**
@@ -53,7 +53,7 @@ public abstract class AbstractHistogramVisualization extends AbstractVisualizati
    * @param height Embedding height
    * @param proj Projection
    */
-  public AbstractHistogramVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+  public AbstractHistogramVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     super(task, plot, width, height);
     assert(proj instanceof Projection1D) : "Visualizer attached to wrong projection!";
     this.proj = (Projection1D) proj;
@@ -63,7 +63,7 @@ public abstract class AbstractHistogramVisualization extends AbstractVisualizati
   public void resultChanged(Result current) {
     super.resultChanged(current);
     if(proj != null && current == proj) {
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return;
     }
   }

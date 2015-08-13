@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -155,7 +156,7 @@ public class KeyVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     return new Instance(task, plot, width, height);
   }
 
@@ -200,14 +201,14 @@ public class KeyVisualization extends AbstractVisFactory {
      * @param width Embedding width
      * @param height Embedding height
      */
-    public Instance(VisualizationTask task, SVGPlot plot, double width, double height) {
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height) {
       super(task, plot, width, height);
       this.clustering = task.getResult();
       addListeners();
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
       StyleLibrary style = context.getStyleLibrary();
       MarkerLibrary ml = style.markers();
 

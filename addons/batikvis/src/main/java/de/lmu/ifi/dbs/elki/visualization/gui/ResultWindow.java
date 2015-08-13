@@ -505,6 +505,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
     if(r instanceof VisualizationMenuAction) {
       final VisualizationMenuAction action = (VisualizationMenuAction) r;
       JMenuItem visItem = new JCheckBoxMenuItem(action.getMenuName());
+      visItem.setEnabled(action.enabled());
       visItem.addItemListener(new ItemListener() {
         @Override
         public void itemStateChanged(ItemEvent e) {
@@ -522,6 +523,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
     if(r instanceof VisualizationMenuToggle) {
       final VisualizationMenuToggle toggle = (VisualizationMenuToggle) r;
       final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(toggle.getMenuName(), toggle.active());
+      visItem.setEnabled(toggle.enabled());
       visItem.addItemListener(new ItemListener() {
         @Override
         public void itemStateChanged(ItemEvent e) {

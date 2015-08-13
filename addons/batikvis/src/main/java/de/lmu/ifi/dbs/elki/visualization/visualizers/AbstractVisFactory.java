@@ -25,8 +25,8 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
@@ -46,7 +46,7 @@ public abstract class AbstractVisFactory implements VisFactory {
   }
 
   @Override
-  public Visualization makeVisualizationOrThumbnail(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj, int thumbsize) {
+  public Visualization makeVisualizationOrThumbnail(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj, int thumbsize) {
     if(width <= 0 || height <= 0) {
       LoggingUtil.warning("Cannot generate visualization of 0 size.", new Throwable());
       return null;
@@ -58,7 +58,7 @@ public abstract class AbstractVisFactory implements VisFactory {
   }
 
   @Override
-  abstract public Visualization makeVisualization(VisualizationTask task, SVGPlot plot, double width, double height, Projection proj);
+  abstract public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj);
 
   /**
    * Test whether to do a thumbnail or a full rendering.
