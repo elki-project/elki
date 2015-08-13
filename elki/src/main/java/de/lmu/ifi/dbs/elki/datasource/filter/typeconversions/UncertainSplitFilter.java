@@ -63,7 +63,7 @@ public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector,
         j = 0;
       }
     }
-    return new UniformDiscreteUO(samples, RandomFactory.DEFAULT);
+    return new UniformDiscreteUO(samples);
   }
 
   @Override

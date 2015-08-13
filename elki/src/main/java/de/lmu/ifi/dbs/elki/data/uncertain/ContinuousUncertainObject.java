@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
 
+import java.util.Random;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -28,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction.ProbabilityDensityFunction;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.UncertainifyFilter;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -47,7 +48,6 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> 
    * Constructor.
    */
   public ContinuousUncertainObject() {
-    this.rand = (new RandomFactory(null)).getRandom();
   }
 
   /**
@@ -67,21 +67,9 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> 
    * @param probabilityDensityFunction
    */
   public ContinuousUncertainObject(SpatialComparable bounds, F probabilityDensityFunction) {
-    this(bounds, probabilityDensityFunction, RandomFactory.DEFAULT);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param bounds
-   * @param probabilityDensityFunction
-   * @param randomFactory
-   */
-  public ContinuousUncertainObject(SpatialComparable bounds, F probabilityDensityFunction, RandomFactory randomFactory) {
     this.bounds = bounds;
     this.dimensions = bounds.getDimensionality();
     this.probabilityDensityFunction = probabilityDensityFunction;
-    this.rand = randomFactory.getRandom();
   }
 
   /**
@@ -92,26 +80,13 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> 
    * @param probabilityDensityFunction
    */
   public ContinuousUncertainObject(double[] min, double[] max, F probabilityDensityFunction) {
-    this(min, max, probabilityDensityFunction, RandomFactory.DEFAULT);
-  }
-
-  /**
-   * Constructor.
-   *
-   * @param min
-   * @param max
-   * @param probabilityDensityFunction
-   * @param randomFactory
-   */
-  public ContinuousUncertainObject(double[] min, double[] max, F probabilityDensityFunction, RandomFactory randomFactory) {
     this.bounds = new HyperBoundingBox(min, max);
     this.dimensions = min.length;
     this.probabilityDensityFunction = probabilityDensityFunction;
-    this.rand = randomFactory.getRandom();
   }
 
   @Override
-  public DoubleVector drawSample() {
+  public DoubleVector drawSample(Random rand) {
     return probabilityDensityFunction.drawValue(bounds, rand);
   }
 

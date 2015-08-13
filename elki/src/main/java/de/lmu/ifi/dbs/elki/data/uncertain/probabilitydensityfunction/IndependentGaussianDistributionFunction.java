@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.ContinuousUncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
-import de.lmu.ifi.dbs.elki.data.uncertain.UncertainUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.UncertainifyFilter;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -94,27 +93,28 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
    * @param variances
    * @param weights
    */
-  public IndependentGaussianDistributionFunction(List<DoubleVector> means, List<DoubleVector> variances, int[] weights) {
+  public IndependentGaussianDistributionFunction(List<DoubleVector> means, List<DoubleVector> variances, double[] weights) {
     if(means.size() != variances.size() || (weights != null && variances.size() != weights.length)) {
-      throw new IllegalArgumentException("[W: ]\tSize of 'means' and 'variances' has to be the same, also Dimensionality of weights.");
+      throw new IllegalArgumentException("Size of 'means' and 'variances' has to be the same, also Dimensionality of weights.");
     }
     for(int i = 0; i < means.size(); i++) {
       if(variances.get(i).getDimensionality() != means.get(i).getDimensionality()) {
-        throw new IllegalArgumentException("[W: ]\tDimensionality of contained DoubleVectors for 'means' and 'variances' hast to be the same.");
+        throw new IllegalArgumentException("Dimensionality of contained DoubleVectors for 'means' and 'variances' hast to be the same.");
       }
     }
     if(weights == null) {
-      this.weights = new int[means.size()];
-      final int c = weightMax / means.size();
+      weights = this.weights = new double[means.size()];
+      final double c = 1. / weights.length;
       for(int i = 0; i < means.size(); i++) {
-        this.weights[i] = c;
+        weights[i] = c;
       }
+      weightSum = 1.;
     }
     else {
       this.weights = weights;
-      this.weightMax = 0;
+      weightSum = 0.;
       for(int i = 0; i < weights.length; i++) {
-        this.weightMax += weights[i];
+        weightSum += weights[i];
       }
     }
 
@@ -124,47 +124,38 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
 
   @Override
   public DoubleVector drawValue(SpatialComparable bounds, Random rand) {
-    int index = 0;
     final double[] values = new double[bounds.getDimensionality()];
-
-    for(int j = 0; j < UncertainObject.DEFAULT_TRY_LIMIT; j++) {
-      if(weights.length > 1) {
-        index = UncertainUtil.drawIndexFromIntegerWeights(rand, weights, weightMax);
-      }
-      boolean inBounds = index < weights.length;
-      if(!inBounds) {
-        continue;
+    sampling: for(int j = 0; j < UncertainObject.DEFAULT_TRY_LIMIT; j++) {
+      double r = rand.nextDouble() * weightSum;
+      int index = weights.length;
+      while(--index > 0 && r < weights[index]) {
+        r -= weights[index];
       }
       for(int i = 0; i < values.length; i++) {
-        values[i] = means.get(index).doubleValue(i) + rand.nextGaussian() * variances.get(index).doubleValue(i);
-        inBounds &= values[i] <= bounds.getMax(i) && values[i] >= bounds.getMin(i);
+        double v = values[i] = means.get(index).doubleValue(i) + rand.nextGaussian() * variances.get(index).doubleValue(i);
+        if(v > bounds.getMax(i) || v < bounds.getMin(i)) {
+          continue sampling;
+        }
       }
-      if(inBounds) {
-        return new DoubleVector(values);
-      }
+      return new DoubleVector(values);
     }
-
     return AbstractGaussianDistributionFunction.noSample;
   }
 
   @Override
   public DoubleVector getMean(SpatialComparable bounds) {
     double[] meanVals = new double[bounds.getDimensionality()];
-    int sumWeights = 0;
-
     for(int i = 0; i < means.size(); i++) {
       for(int j = 0; j < bounds.getDimensionality(); j++) {
         meanVals[j] += means.get(i).getValues()[j] * weights[i];
-        sumWeights += weights[i];
       }
     }
 
-    if(sumWeights > 0) {
+    if(weightSum > 0) {
       for(int j = 0; j < bounds.getDimensionality(); j++) {
-        meanVals[j] /= sumWeights;
+        meanVals[j] /= weightSum;
       }
     }
-
     return new DoubleVector(meanVals);
   }
 
@@ -179,9 +170,9 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
     final int multiplicity = urand.nextInt((multMax - multMin) + 1) + multMin;
     final List<DoubleVector> means = new ArrayList<DoubleVector>();
     final List<DoubleVector> variances = new ArrayList<DoubleVector>();
-    int[] weights;
-    weights = UncertainUtil.calculateRandomIntegerWeights(multiplicity, weightMax, urand);
+    double[] weights = new double[multiplicity];
     for(int h = 0; h < multiplicity; h++) {
+      weights[h] = urand.nextDouble();
       final double[] imeans = new double[dim];
       final double[] ivariances = new double[dim];
       final double minBound = (urand.nextDouble() * (maxMin - minMin)) + minMin;
@@ -316,41 +307,41 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
     @Override
     protected void makeOptions(final Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter pDevMin = new DoubleParameter(Parameterizer.STDDEV_MIN_ID, UncertainObject.DEFAULT_STDDEV);
+      DoubleParameter pDevMin = new DoubleParameter(Parameterizer.STDDEV_MIN_ID);
       if(config.grab(pDevMin)) {
-        this.stddevMin = pDevMin.getValue();
+        stddevMin = pDevMin.doubleValue();
       }
-      final DoubleParameter pDevMax = new DoubleParameter(Parameterizer.STDDEV_MAX_ID, UncertainObject.DEFAULT_STDDEV);
+      DoubleParameter pDevMax = new DoubleParameter(Parameterizer.STDDEV_MAX_ID);
       if(config.grab(pDevMax)) {
-        this.stddevMax = pDevMax.getValue();
+        stddevMax = pDevMax.doubleValue();
       }
-      final DoubleParameter pMinMin = new DoubleParameter(Parameterizer.MIN_MIN_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
+      DoubleParameter pMinMin = new DoubleParameter(Parameterizer.MIN_MIN_ID);
       if(config.grab(pMinMin)) {
-        this.minMin = pMinMin.getValue();
+        minMin = pMinMin.doubleValue();
       }
-      final DoubleParameter pMaxMin = new DoubleParameter(Parameterizer.MAX_MIN_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
+      DoubleParameter pMaxMin = new DoubleParameter(Parameterizer.MAX_MIN_ID);
       if(config.grab(pMaxMin)) {
-        this.maxMin = pMaxMin.getValue();
+        maxMin = pMaxMin.doubleValue();
       }
-      final DoubleParameter pMinMax = new DoubleParameter(Parameterizer.MIN_MAX_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
+      DoubleParameter pMinMax = new DoubleParameter(Parameterizer.MIN_MAX_ID);
       if(config.grab(pMinMax)) {
-        this.minMax = pMinMax.getValue();
+        minMax = pMinMax.doubleValue();
       }
-      final DoubleParameter pMaxMax = new DoubleParameter(Parameterizer.MAX_MAX_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN);
+      DoubleParameter pMaxMax = new DoubleParameter(Parameterizer.MAX_MAX_ID);
       if(config.grab(pMaxMax)) {
-        this.maxMax = pMaxMax.getValue();
+        maxMax = pMaxMax.doubleValue();
       }
-      final IntParameter pMultMin = new IntParameter(Parameterizer.MULT_MIN_ID, UncertainObject.DEFAULT_MULTIPLICITY);
+      IntParameter pMultMin = new IntParameter(Parameterizer.MULT_MIN_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
       if(config.grab(pMultMin)) {
-        this.multMin = pMultMin.getValue();
+        multMin = pMultMin.intValue();
       }
-      final IntParameter pMultMax = new IntParameter(Parameterizer.MULT_MAX_ID, UncertainObject.DEFAULT_MULTIPLICITY);
+      IntParameter pMultMax = new IntParameter(Parameterizer.MULT_MAX_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
       if(config.grab(pMultMax)) {
-        this.multMax = pMultMax.getValue();
+        multMax = pMultMax.intValue();
       }
-      final RandomParameter pseed = new RandomParameter(Parameterizer.SEED_ID);
+      RandomParameter pseed = new RandomParameter(Parameterizer.SEED_ID);
       if(config.grab(pseed)) {
-        this.randFac = pseed.getValue();
+        randFac = pseed.getValue();
       }
     }
 

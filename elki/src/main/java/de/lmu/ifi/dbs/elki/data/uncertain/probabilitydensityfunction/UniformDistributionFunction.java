@@ -88,8 +88,8 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction<Unif
     double[] meanVals = new double[bounds.getDimensionality()];
 
     for(int i = 0; i < bounds.getDimensionality(); i++) {
-      if((bounds.getMax(i) - bounds.getMin(i)) < Double.POSITIVE_INFINITY) {
-        meanVals[i] = (bounds.getMax(i) - bounds.getMin(i)) * .5;
+      if((bounds.getMax(i) + bounds.getMin(i)) < Double.POSITIVE_INFINITY) {
+        meanVals[i] = (bounds.getMax(i) + bounds.getMin(i)) * .5;
       }
       else {
         meanVals[i] = 0;
@@ -128,7 +128,7 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction<Unif
       max[i] = v + (r.nextDouble() * difMax);
     }
 
-    return new ContinuousUncertainObject<>(min, max, this, new RandomFactory(r.nextLong()));
+    return new ContinuousUncertainObject<>(min, max, this);
   }
   
   /**

@@ -26,10 +26,9 @@ public class UniformDiscreteUO extends UncertainObject {
   private DoubleVector[] samples;
 
   // Constructor
-  public UniformDiscreteUO(DoubleVector[] samples, RandomFactory randomFactory) {
+  public UniformDiscreteUO(DoubleVector[] samples) {
     this.samples = samples;
     this.dimensions = samples[0].getDimensionality();
-    this.rand = randomFactory.getRandom();
     // Compute bounds:
     final double min[] = new double[this.dimensions];
     final double max[] = new double[this.dimensions];
@@ -49,7 +48,7 @@ public class UniformDiscreteUO extends UncertainObject {
   }
 
   @Override
-  public DoubleVector drawSample() {
+  public DoubleVector drawSample(Random rand) {
     // Since the probability is the same for each samplePoint and
     // precisely 1:samplePoints.size(), it should be fair enough
     // to simply draw a sample by returning the point at
@@ -69,7 +68,7 @@ public class UniformDiscreteUO extends UncertainObject {
     }
 
     for(int i = 0; i < this.dimensions; i++) {
-      meanVals[i] /= this.dimensions;
+      meanVals[i] /= samples.length;
     }
 
     return new DoubleVector(meanVals);
@@ -119,11 +118,11 @@ public class UniformDiscreteUO extends UncertainObject {
         double[] svec = new double[dim];
         for(int j = 0; j < dim; j++) {
           double gtv = adapter.getDouble(array, j);
-          svec[j] = gtv + drand.nextDouble() * difMax - drand.nextDouble() * difMin + randDev;
+          svec[j] = gtv + (drand.nextInt(2) == 0 ? drand.nextDouble() * difMax : drand.nextDouble() * -difMin) + randDev;
         }
         samples[i] = new DoubleVector(svec);
       }
-      return new UniformDiscreteUO(samples, new RandomFactory(drand.nextLong()));
+      return new UniformDiscreteUO(samples);
     }
 
     @Override
@@ -143,8 +142,6 @@ public class UniformDiscreteUO extends UncertainObject {
       protected int multMin, multMax;
 
       protected RandomFactory randFac;
-
-      protected double maxTotalProb;
 
       public static final OptionID MIN_MIN_ID = new OptionID("objects.lbound.min", "Minimum lower boundary.");
 
@@ -167,37 +164,33 @@ public class UniformDiscreteUO extends UncertainObject {
       @Override
       protected void makeOptions(final Parameterization config) {
         super.makeOptions(config);
-        final DoubleParameter pminMin = new DoubleParameter(Parameterizer.MIN_MIN_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION);
+        DoubleParameter pminMin = new DoubleParameter(Parameterizer.MIN_MIN_ID);
         if(config.grab(pminMin)) {
-          this.minMin = pminMin.getValue();
+          minMin = pminMin.doubleValue();
         }
-        final DoubleParameter pmaxMin = new DoubleParameter(Parameterizer.MAX_MIN_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION);
+        DoubleParameter pmaxMin = new DoubleParameter(Parameterizer.MAX_MIN_ID);
         if(config.grab(pmaxMin)) {
-          this.maxMin = pmaxMin.getValue();
+          maxMin = pmaxMin.doubleValue();
         }
-        final DoubleParameter pminMax = new DoubleParameter(Parameterizer.MIN_MAX_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION);
+        DoubleParameter pminMax = new DoubleParameter(Parameterizer.MIN_MAX_ID);
         if(config.grab(pminMax)) {
-          this.minMax = pminMax.getValue();
+          minMax = pminMax.doubleValue();
         }
-        final DoubleParameter pmaxMax = new DoubleParameter(Parameterizer.MAX_MAX_ID, UncertainObject.DEFAULT_MIN_MAX_DEVIATION);
+        DoubleParameter pmaxMax = new DoubleParameter(Parameterizer.MAX_MAX_ID);
         if(config.grab(pmaxMax)) {
-          this.maxMax = pmaxMax.getValue();
+          maxMax = pmaxMax.doubleValue();
         }
-        final IntParameter pmultMin = new IntParameter(Parameterizer.MULT_MIN_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
+        IntParameter pmultMin = new IntParameter(Parameterizer.MULT_MIN_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
         if(config.grab(pmultMin)) {
-          this.multMin = pmultMin.getValue();
+          multMin = pmultMin.intValue();
         }
-        final IntParameter pmultMax = new IntParameter(Parameterizer.MULT_MAX_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
+        IntParameter pmultMax = new IntParameter(Parameterizer.MULT_MAX_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
         if(config.grab(pmultMax)) {
-          this.multMax = pmultMax.getValue();
+          multMax = pmultMax.intValue();
         }
-        final RandomParameter pseed = new RandomParameter(Parameterizer.SEED_ID);
+        RandomParameter pseed = new RandomParameter(Parameterizer.SEED_ID);
         if(config.grab(pseed)) {
-          this.randFac = pseed.getValue();
-        }
-        final DoubleParameter maxProb = new DoubleParameter(Parameterizer.MAXIMUM_PROBABILITY_ID, UncertainObject.DEFAULT_MAX_TOTAL_PROBABILITY);
-        if(config.grab(maxProb)) {
-          this.maxTotalProb = maxProb.getValue();
+          randFac = pseed.getValue();
         }
       }
 

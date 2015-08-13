@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
  */
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
@@ -48,6 +49,7 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -55,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
 
 /**
@@ -99,15 +102,22 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
   private final int depth;
 
   /**
+   * Random factory for sampling.
+   */
+  private RandomFactory random;
+
+  /**
    * Constructor, quite trivial.
    *
-   * @param algorithm
-   * @param depth
+   * @param algorithm Primary clustering algorithm
+   * @param depth Number of samples
+   * @param metaAlgorithm Meta clustering algorithm
    */
-  public PWCClusteringAlgorithm(ClusteringAlgorithm<?> algorithm, int depth, ClusteringAlgorithm<?> metaAlgorithm) {
+  public PWCClusteringAlgorithm(ClusteringAlgorithm<?> algorithm, int depth, ClusteringAlgorithm<?> metaAlgorithm, RandomFactory random) {
     this.algorithm = algorithm;
     this.depth = depth;
     this.metaAlgorithm = metaAlgorithm;
+    this.random = random;
   }
 
   /**
@@ -124,6 +134,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
   public Clustering<?> run(final Database database, final Relation<? extends UncertainObject> relation) {
     final ArrayList<Clustering<?>> clusterings = new ArrayList<>();
     {
+      Random rand = random.getSingleThreadedRandom();
       final int dim = RelationUtil.dimensionality(relation);
       final DBIDs ids = relation.getDBIDs();
       // Add the uncertain model:
@@ -138,7 +149,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
       for(int i = 0; i < this.depth; i++) {
         final WritableDataStore<NumberVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
         for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          store.put(iter, relation.get(iter).drawSample());
+          store.put(iter, relation.get(iter).drawSample(rand));
         }
         clusterings.add(runClusteringAlgorithm(relation, ids, store, dim, "Sample " + i));
       }
@@ -174,7 +185,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
     final Relation<NumberVector> sample = new MaterializedRelation<>(t, ids, title, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);
-    Clustering<?> clusterResult = this.algorithm.run(d);
+    Clustering<?> clusterResult = algorithm.run(d);
     d.getHierarchy().remove(sample);
     d.getHierarchy().remove(clusterResult);
     database.getHierarchy().add(database, sample);
@@ -199,21 +210,6 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Field to store parameter value for depth.
-     */
-    protected int tryDepth;
-
-    /**
-     * Field to store the algorithm.
-     */
-    protected ClusteringAlgorithm<?> algorithm;
-
-    /**
-     * Field to store the inner algorithm for meta-clustering
-     */
-    protected ClusteringAlgorithm<?> metaAlgorithm;
-
-    /**
      * Parameter to hand an algorithm for creating the meta-clustering to our
      * instance of {@link PWCClusteringAlgorithm}.
      *
@@ -236,34 +232,63 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
      */
     public final static OptionID DEPTH_ID = new OptionID("uncert.depth", "Amount of sample-clusterings to be made.");
 
-    @Override
-    protected PWCClusteringAlgorithm makeInstance() {
-      return new PWCClusteringAlgorithm(this.algorithm, this.tryDepth, this.metaAlgorithm);
-    }
+    /**
+     * Parameter to specify the random generator.
+     */
+    public final static OptionID RANDOM_ID = new OptionID("uncert.random", "Random generator used for sampling.");
+
+    /**
+     * Field to store parameter value for depth.
+     */
+    protected int tryDepth;
+
+    /**
+     * Field to store the algorithm.
+     */
+    protected ClusteringAlgorithm<?> algorithm;
+
+    /**
+     * Field to store the inner algorithm for meta-clustering
+     */
+    protected ClusteringAlgorithm<?> metaAlgorithm;
+
+    /**
+     * Random factory for sampling.
+     */
+    protected RandomFactory random;
 
     @Override
     protected void makeOptions(final Parameterization config) {
       super.makeOptions(config);
-      final ClassParameter<ClusteringAlgorithm<?>> malgorithm = new ClassParameter<>(Parameterizer.META_ALGORITHM_ID, ClusteringAlgorithm.class);
+      ClassParameter<ClusteringAlgorithm<?>> malgorithm = new ClassParameter<>(Parameterizer.META_ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(malgorithm)) {
-        this.metaAlgorithm = malgorithm.instantiateClass(config);
-        if(this.metaAlgorithm != null && this.metaAlgorithm.getInputTypeRestriction().length > 0 && //
-        !this.metaAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.CLUSTERING)) {
+        metaAlgorithm = malgorithm.instantiateClass(config);
+        if(metaAlgorithm != null && metaAlgorithm.getInputTypeRestriction().length > 0 && //
+        !metaAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.CLUSTERING)) {
           config.reportError(new WrongParameterValueException(malgorithm, malgorithm.getValueAsString(), "The meta clustering algorithm (as configured) does not accept clustering results."));
         }
       }
-      final ClassParameter<ClusteringAlgorithm<?>> palgorithm = new ClassParameter<>(Parameterizer.ALGORITHM_ID, ClusteringAlgorithm.class);
+      ClassParameter<ClusteringAlgorithm<?>> palgorithm = new ClassParameter<>(Parameterizer.ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(palgorithm)) {
-        this.algorithm = palgorithm.instantiateClass(config);
-        if(this.algorithm != null && this.algorithm.getInputTypeRestriction().length > 0 && //
-        !this.algorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
-          config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + this.algorithm.getInputTypeRestriction()[0]));
+        algorithm = palgorithm.instantiateClass(config);
+        if(algorithm != null && algorithm.getInputTypeRestriction().length > 0 && //
+        !algorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
+          config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + algorithm.getInputTypeRestriction()[0]));
         }
       }
-      final IntParameter pdepth = new IntParameter(Parameterizer.DEPTH_ID, UncertainObject.DEFAULT_ENSEMBLE_DEPTH);
+      IntParameter pdepth = new IntParameter(Parameterizer.DEPTH_ID, UncertainObject.DEFAULT_ENSEMBLE_DEPTH);
       if(config.grab(pdepth)) {
-        this.tryDepth = pdepth.getValue();
+        tryDepth = pdepth.getValue();
       }
+      RandomParameter randomP = new RandomParameter(RANDOM_ID);
+      if(config.grab(randomP)) {
+        random = randomP.getValue();
+      }
+    }
+
+    @Override
+    protected PWCClusteringAlgorithm makeInstance() {
+      return new PWCClusteringAlgorithm(this.algorithm, this.tryDepth, this.metaAlgorithm, this.random);
     }
   }
 }

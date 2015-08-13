@@ -51,8 +51,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * @author Alexander Koos
  */
 public abstract class UncertainObject implements SpatialComparable, FeatureVector<Double> {
-  protected Random rand;
-
   protected SpatialComparable bounds;
 
   protected int dimensions;
@@ -63,25 +61,13 @@ public abstract class UncertainObject implements SpatialComparable, FeatureVecto
 
   public static final int PROBABILITY_SCALE = 10000;
 
-  public final static int DEFAULT_MIN_MAX_DEVIATION = 5;
-
-  public final static int DEFAULT_MIN_MAX_DEVIATION_GAUSSIAN = 3;
-
   public final static int DEFAULT_SAMPLE_SIZE = 10;
-
-  public final static int DEFAULT_STDDEV = 1;
-
-  public final static int DEFAULT_MULTIPLICITY = 1;
-
-  public final static int DEFAULT_PROBABILITY_SEED = 5;
-
-  public final static double DEFAULT_MAX_TOTAL_PROBABILITY = 1.0;
 
   public final static int DEFAULT_ENSEMBLE_DEPTH = 10;
 
   public final static int DEFAULT_TRY_LIMIT = 1000;
 
-  public abstract DoubleVector drawSample();
+  public abstract DoubleVector drawSample(Random rand);
 
   public abstract DoubleVector getMean();
 
@@ -111,7 +97,7 @@ public abstract class UncertainObject implements SpatialComparable, FeatureVecto
     boolean blur;
 
     @Override
-    public <A> UO newFeatureVector(A array, ArrayAdapter<? extends Double, A> adapter) {
+    final public <A> UO newFeatureVector(A array, ArrayAdapter<? extends Double, A> adapter) {
       if(adapter instanceof NumberArrayAdapter) {
         return newFeatureVector(array, (NumberArrayAdapter<?, A>) adapter);
       }

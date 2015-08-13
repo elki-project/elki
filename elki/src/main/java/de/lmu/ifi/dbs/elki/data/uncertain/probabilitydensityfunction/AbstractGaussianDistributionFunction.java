@@ -6,7 +6,6 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
@@ -79,10 +78,9 @@ public abstract class AbstractGaussianDistributionFunction<V, F extends Abstract
 
   protected List<V> variances;
 
-  protected int[] weights;
+  protected double[] weights;
 
-  protected int weightMax = UncertainObject.PROBABILITY_SCALE; // reset by constructor
-  // in case no bounded sample has been found
+  protected double weightSum;
 
   protected static DoubleVector noSample = new DoubleVector(new double[] { Double.NEGATIVE_INFINITY });
 
@@ -102,15 +100,15 @@ public abstract class AbstractGaussianDistributionFunction<V, F extends Abstract
     this.means.set(position, mean);
   }
 
-  public void setWeights(int[] weights) {
+  public void setWeights(double[] weights) {
     this.weights = weights;
   }
 
-  public int[] getWeights() {
+  public double[] getWeights() {
     return this.weights;
   }
 
-  public int getWeight(int position) {
+  public double getWeight(int position) {
     return this.weights[position];
   }
 
