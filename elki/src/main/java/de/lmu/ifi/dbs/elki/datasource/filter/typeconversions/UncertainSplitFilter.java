@@ -5,6 +5,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject.Factory;
 import de.lmu.ifi.dbs.elki.data.uncertain.UniformDiscreteUO;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -55,11 +56,11 @@ public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector,
     }
     final int num = dim / dims;
     final DoubleVector[] samples = new DoubleVector[num];
-    final double[] val = new double[dims];
+    final double[] buf = new double[dims];
     for(int i = 0, j = 0, k = 0; i < dim; i++) {
-      val[j++] = vec.doubleValue(i);
+      buf[j++] = vec.doubleValue(i);
       if(j == dims) {
-        samples[k++] = new DoubleVector(val);
+        samples[k++] = new DoubleVector(buf);
         j = 0;
       }
     }
@@ -77,7 +78,7 @@ public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector,
     if(dim % dims != 0) {
       throw new AbortException("Vector length " + dim + " not divisible by the number of dimensions " + dims);
     }
-    final UniformDiscreteUO.Factory factory = new UniformDiscreteUO.Factory(0, 0, 0, 0, RandomFactory.DEFAULT);
+    final Factory<UniformDiscreteUO> factory = new UniformDiscreteUO.Factory(0, 0, 0, 0, RandomFactory.DEFAULT);
     return new VectorFieldTypeInformation<UniformDiscreteUO>(factory, dim);
   }
 
