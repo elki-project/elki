@@ -23,6 +23,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.CorePredicate;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.NeighborPredicate;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -43,6 +46,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -64,34 +70,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @author Alexander Koos
  * @param <O> Object type
  */
-// FIXME add @Reference
-// FIXME: we CANNOT interherit from DBSCAN, because we operate on
-// UncertainObject, but need a distance function defined on Samples.
-// We can, however, implement the predicates of GeneralizedDBSCAN maybe?
-// OR: maybe we can just define an uncertain distance function to use?
-public class FDBSCAN<O extends UncertainObject> extends DBSCAN<O> {
+@Title("FDBSCAN: Density-based Clustering of Applications with Noise on fuzzy objects")
+@Description("Algorithm to find density-connected sets in a database consisting of uncertain/fuzzy objects based on the"
+    + " parameters 'minpts', 'epsilon', 'samplesize', and (if used) 'threshold'")
+@Reference(authors = "H.-P. Kriegel and M. Pfeifle", //
+title = "Density-based clustering of uncertain data", //
+booktitle = "KDD05", //
+url = "http://dx.doi.org/10.1145/1081870.1081955")
+public class FDBSCAN<O extends UncertainObject> extends GeneralizedDBSCAN {
   /**
    * The logger for this class.
    */
   private final static Logging LOG = Logging.getLogger(FDBSCAN.class);
-
-  /**
-   * The minimum probability that is needed for two fuzzy objects to be
-   * considered connected.
-   */
-  protected double threshold;
-
-  /**
-   * The amount of samples that are drawn from a fuzzy object and used to
-   * determine if they're density-connected or not.
-   */
-  protected int sampleSize;
-
-  /**
-   * The amount of density-connected samples that suffice for two fuzzy objects
-   * to be density-connected, stored to minimize necessary computation.
-   */
-  protected int constraint;
 
   /**
    *
@@ -106,20 +96,8 @@ public class FDBSCAN<O extends UncertainObject> extends DBSCAN<O> {
    * @param sampleSize The amount of samples that have to be drawn per fuzzy
    *        object.
    */
-  protected FDBSCAN(DistanceFunction<? super O> distanceFunction, double epsilon, double threshold, int minpts, int sampleSize) {
-    super(distanceFunction, epsilon, minpts);
-    this.threshold = threshold;
-    this.sampleSize = sampleSize;
-    // to reduce computational overhead, pre-compute the absolute necessary
-    // amount of found connections
-    //
-    // TODO: Maybe instead of getting the default floored value we should use
-    // Math.ceil to prevent us from using slightly lower boundaries for our
-    // probabilistic epsilon neighborhood?
-    // E.g. if we have a threshold of 0.5 and a sampleSize of 5, it would be
-    // sufficient to have 12 matches.
-    // 12 / 25 = 0.48, which is lower than the given 0.5.
-    this.constraint = (int) (sampleSize * sampleSize * threshold);
+  protected FDBSCAN(NeighborPredicate npred, CorePredicate cpred, boolean coremodel) {
+    super(npred, cpred, coremodel);
   }
 
   /**
@@ -347,42 +325,15 @@ public class FDBSCAN<O extends UncertainObject> extends DBSCAN<O> {
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends UncertainObject> extends DBSCAN.Parameterizer<O> {
-    /**
-     * The OptionID to retrieve the threshold as discussed in {@link FDBSCAN}
-     * from the user input. Must be a decimal value between 0 and 1, the default
-     * is 0.5 (50%) as discussed in the corresponding paper.
-     */
-    public static final OptionID THRESHOLD_ID = new OptionID("fdbscan.threshold", "The minimum part of the sampled distances claiming epsilon-neighborhood.");
-
-    /**
-     * The OptionID to retrieve the threshold as discussed in {@link FDBSCAN}
-     * from the user input. Must be an integer value greater than 0.
-     */
-    public static final OptionID SAMPLE_SIZE_ID = new OptionID("fdbscan.sampleSize", "How many samples should be drawn per uncertain object. Choose in regard to your uncertainty model.");
-
-    // TODO
-    protected double threshold;
-
-    // TODO
-    protected int sampleSize;
-
+  public static class Parameterizer extends GeneralizedDBSCAN.Parameterizer {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter thresholdP = new DoubleParameter(Parameterizer.THRESHOLD_ID, 0.5);
-      if(config.grab(thresholdP)) {
-        threshold = thresholdP.getValue();
-      }
-      IntParameter sampleP = new IntParameter(Parameterizer.SAMPLE_SIZE_ID, 5);
-      if(config.grab(sampleP)) {
-        sampleSize = sampleP.getValue();
-      }
     }
 
     @Override
-    protected FDBSCAN<O> makeInstance() {
-      return new FDBSCAN<>(distanceFunction, epsilon, threshold, minpts, sampleSize);
+    protected FDBSCAN<?> makeInstance() {
+      return new FDBSCAN<>(npred, corepred, coremodel);
     }
   }
 }
