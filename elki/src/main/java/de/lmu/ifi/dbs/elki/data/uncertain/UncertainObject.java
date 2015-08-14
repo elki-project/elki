@@ -53,8 +53,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 public abstract class UncertainObject implements SpatialComparable, FeatureVector<Double> {
   protected SpatialComparable bounds;
 
-  protected int dimensions;
-
   public static final double DEFAULT_MIN = Double.MIN_VALUE;
 
   public static final double DEFAULT_MAX = Double.MAX_VALUE;
@@ -83,7 +81,7 @@ public abstract class UncertainObject implements SpatialComparable, FeatureVecto
 
   @Override
   public int getDimensionality() {
-    return this.dimensions;
+    return this.bounds.getDimensionality();
   }
 
   /**

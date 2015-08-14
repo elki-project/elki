@@ -77,7 +77,7 @@ public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector,
     if(dim % dims != 0) {
       throw new AbortException("Vector length " + dim + " not divisible by the number of dimensions " + dims);
     }
-    final UniformDiscreteUO.Factory factory = new UniformDiscreteUO.Factory(0, 0, 0, 0, 0, 0, RandomFactory.DEFAULT);
+    final UniformDiscreteUO.Factory factory = new UniformDiscreteUO.Factory(0, 0, 0, 0, RandomFactory.DEFAULT);
     return new VectorFieldTypeInformation<UniformDiscreteUO>(factory, dim);
   }
 

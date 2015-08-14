@@ -68,7 +68,6 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> 
    */
   public ContinuousUncertainObject(SpatialComparable bounds, F probabilityDensityFunction) {
     this.bounds = bounds;
-    this.dimensions = bounds.getDimensionality();
     this.probabilityDensityFunction = probabilityDensityFunction;
   }
 
@@ -81,7 +80,6 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> 
    */
   public ContinuousUncertainObject(double[] min, double[] max, F probabilityDensityFunction) {
     this.bounds = new HyperBoundingBox(min, max);
-    this.dimensions = min.length;
     this.probabilityDensityFunction = probabilityDensityFunction;
   }
 

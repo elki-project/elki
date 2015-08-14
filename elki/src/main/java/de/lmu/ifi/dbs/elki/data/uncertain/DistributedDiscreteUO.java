@@ -45,17 +45,17 @@ public class DistributedDiscreteUO extends UncertainObject {
     this.weights = weights;
     this.weightSum = check;
 
-    this.dimensions = samplePoints[0].getDimensionality();
+    int dimensions = samplePoints[0].getDimensionality();
     // Compute bounds:
-    final double min[] = new double[this.dimensions];
-    final double max[] = new double[this.dimensions];
+    final double min[] = new double[dimensions];
+    final double max[] = new double[dimensions];
     DoubleVector first = this.samples[0];
-    for(int d = 0; d < this.dimensions; d++) {
+    for(int d = 0; d < dimensions; d++) {
       min[d] = max[d] = first.doubleValue(d);
     }
     for(int i = 1; i < this.samples.length; i++) {
       DoubleVector v = this.samples[i];
-      for(int d = 0; d < this.dimensions; d++) {
+      for(int d = 0; d < dimensions; d++) {
         final double c = v.doubleValue(d);
         min[d] = c < min[d] ? c : min[d];
         max[d] = c > max[d] ? c : max[d];
@@ -82,10 +82,11 @@ public class DistributedDiscreteUO extends UncertainObject {
 
   @Override
   public DoubleVector getMean() {
+    int dimensions = getDimensionality();
     double[] meanVals = new double[dimensions];
     for(int i = 0; i < samples.length; i++) {
       DoubleVector v = samples[i];
-      for(int d = 0; d < this.dimensions; d++) {
+      for(int d = 0; d < dimensions; d++) {
         meanVals[d] += v.doubleValue(d) * weights[i];
       }
     }
@@ -98,6 +99,7 @@ public class DistributedDiscreteUO extends UncertainObject {
   }
 
   protected void setBounds() {
+    int dimensions = getDimensionality();
     final double min[] = new double[dimensions];
     final double max[] = new double[dimensions];
     DoubleVector first = samples[0];
@@ -106,7 +108,7 @@ public class DistributedDiscreteUO extends UncertainObject {
     }
     for(int i = 1; i < samples.length; i++) {
       DoubleVector v = samples[i];
-      for(int d = 0; d < this.dimensions; d++) {
+      for(int d = 0; d < dimensions; d++) {
         final double c = v.doubleValue(d);
         min[d] = c < min[d] ? c : min[d];
         max[d] = c > max[d] ? c : max[d];

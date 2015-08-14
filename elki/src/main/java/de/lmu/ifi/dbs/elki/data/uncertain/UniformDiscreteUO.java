@@ -28,17 +28,17 @@ public class UniformDiscreteUO extends UncertainObject {
   // Constructor
   public UniformDiscreteUO(DoubleVector[] samples) {
     this.samples = samples;
-    this.dimensions = samples[0].getDimensionality();
+    int dimensions = samples[0].getDimensionality();
     // Compute bounds:
-    final double min[] = new double[this.dimensions];
-    final double max[] = new double[this.dimensions];
+    final double min[] = new double[dimensions];
+    final double max[] = new double[dimensions];
     DoubleVector first = this.samples[0];
-    for(int d = 0; d < this.dimensions; d++) {
+    for(int d = 0; d < dimensions; d++) {
       min[d] = max[d] = first.doubleValue(d);
     }
     for(int i = 1; i < this.samples.length; i++) {
       DoubleVector v = this.samples[i];
-      for(int d = 0; d < this.dimensions; d++) {
+      for(int d = 0; d < dimensions; d++) {
         final double c = v.doubleValue(d);
         min[d] = c < min[d] ? c : min[d];
         max[d] = c > max[d] ? c : max[d];
@@ -58,19 +58,19 @@ public class UniformDiscreteUO extends UncertainObject {
 
   @Override
   public DoubleVector getMean() {
-    double[] meanVals = new double[this.dimensions];
+    final int dimensions = getDimensionality();
+    double[] meanVals = new double[dimensions];
 
     for(DoubleVector sp : samples) {
       double[] vals = sp.getValues();
-      for(int i = 0; i < this.dimensions; i++) {
+      for(int i = 0; i < dimensions; i++) {
         meanVals[i] += vals[i];
       }
     }
 
-    for(int i = 0; i < this.dimensions; i++) {
+    for(int i = 0; i < dimensions; i++) {
       meanVals[i] /= samples.length;
     }
-
     return new DoubleVector(meanVals);
   }
 
@@ -81,9 +81,9 @@ public class UniformDiscreteUO extends UncertainObject {
   }
 
   public static class Factory extends UncertainObject.Factory<UniformDiscreteUO> {
-    private double minMin, maxMin, minMax, maxMax;
+    private double minDev, maxDev;
 
-    private int multMin, multMax;
+    private int minQuant, maxQuant;
 
     private Random drand;
 
@@ -96,29 +96,33 @@ public class UniformDiscreteUO extends UncertainObject {
     // under engineered approach, until everything is
     // fine and I can give more priority to beauty
     // than to functionality.
-    public Factory(double minMin, double maxMin, double minMax, double maxMax, int multMin, int multMax, RandomFactory randFac) {
-      this.minMin = minMin;
-      this.maxMin = maxMin;
-      this.minMax = minMax;
-      this.maxMax = maxMax;
-      this.multMin = multMin;
-      this.multMax = multMax;
+    public Factory(double minDev, double maxDev, int minQuant, int maxQuant, RandomFactory randFac) {
+      this.minDev = minDev;
+      this.maxDev = maxDev;
+      this.minQuant = minQuant;
+      this.maxQuant = maxQuant;
       this.drand = randFac.getRandom();
     }
 
     @Override
     public <A> UniformDiscreteUO newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
       final int dim = adapter.size(array);
-      final int distributionSize = drand.nextInt((int) (multMax - multMin) + 1) + (int) multMin;
+      final int distributionSize = drand.nextInt((maxQuant - minQuant) + 1) + (int) minQuant;
       DoubleVector[] samples = new DoubleVector[distributionSize];
-      double difMin = drand.nextDouble() * (maxMin - minMin) + minMin;
-      double difMax = drand.nextDouble() * (maxMax - minMax) + minMax;
-      double randDev = blur ? (drand.nextInt(2) == 0 ? drand.nextDouble() * -difMin : drand.nextDouble() * difMax) : 0;
+      double[] off = new double[dim], range = new double[dim];
+      for(int j = 0; j < dim; j++) {
+        off[j] = -1 * (drand.nextDouble() * (maxDev - minDev) + minDev);
+        range[j] = -off[j] + (drand.nextDouble() * (maxDev - minDev) + minDev);
+        if(blur) {
+          off[j] += range[j] * (drand.nextDouble() - .5);
+        }
+      }
+      // Produce samples:
       for(int i = 0; i < distributionSize; i++) {
         double[] svec = new double[dim];
         for(int j = 0; j < dim; j++) {
           double gtv = adapter.getDouble(array, j);
-          svec[j] = gtv + (drand.nextInt(2) == 0 ? drand.nextDouble() * difMax : drand.nextDouble() * -difMin) + randDev;
+          svec[j] = gtv + off[j] + drand.nextDouble() * range[j];
         }
         samples[i] = new DoubleVector(svec);
       }
@@ -137,23 +141,19 @@ public class UniformDiscreteUO extends UncertainObject {
 
     // TODO: remove redundancy with DistributedDiscreteUO.Parameterizer
     public static class Parameterizer extends AbstractParameterizer {
-      protected double minMin, maxMin, minMax, maxMax;
+      protected double minDev, maxDev;
 
-      protected int multMin, multMax;
+      protected int minQuant, maxQuant;
 
       protected RandomFactory randFac;
 
-      public static final OptionID MIN_MIN_ID = new OptionID("objects.lbound.min", "Minimum lower boundary.");
+      public static final OptionID MIN_MIN_ID = new OptionID("uo.uncertainty.min", "Minimum width of uncertain region.");
 
-      public static final OptionID MAX_MIN_ID = new OptionID("objects.lbound.max", "Maximum lower boundary.");
+      public static final OptionID MAX_MIN_ID = new OptionID("uo.uncertainty.max", "Maximum width of uncertain region.");
 
-      public static final OptionID MIN_MAX_ID = new OptionID("objects.ubound.min", "Minimum upper boundary.");
+      public static final OptionID MULT_MIN_ID = new OptionID("uo.quantity.min", "Minimum Points per uncertain object.");
 
-      public static final OptionID MAX_MAX_ID = new OptionID("objects.ubound.max", "Maximum upper boundary.");
-
-      public static final OptionID MULT_MIN_ID = new OptionID("uo.mult.min", "Minimum Points per uncertain object.");
-
-      public static final OptionID MULT_MAX_ID = new OptionID("uo.mult.max", "Maximum Points per uncertain object.");
+      public static final OptionID MULT_MAX_ID = new OptionID("uo.quantity.max", "Maximum Points per uncertain object.");
 
       public static final OptionID SEED_ID = new OptionID("uo.seed", "Seed for uncertainification.");
 
@@ -164,29 +164,25 @@ public class UniformDiscreteUO extends UncertainObject {
       @Override
       protected void makeOptions(final Parameterization config) {
         super.makeOptions(config);
-        DoubleParameter pminMin = new DoubleParameter(Parameterizer.MIN_MIN_ID);
-        if(config.grab(pminMin)) {
-          minMin = pminMin.doubleValue();
-        }
         DoubleParameter pmaxMin = new DoubleParameter(Parameterizer.MAX_MIN_ID);
         if(config.grab(pmaxMin)) {
-          maxMin = pmaxMin.doubleValue();
+          maxDev = pmaxMin.doubleValue();
         }
-        DoubleParameter pminMax = new DoubleParameter(Parameterizer.MIN_MAX_ID);
-        if(config.grab(pminMax)) {
-          minMax = pminMax.doubleValue();
-        }
-        DoubleParameter pmaxMax = new DoubleParameter(Parameterizer.MAX_MAX_ID);
-        if(config.grab(pmaxMax)) {
-          maxMax = pmaxMax.doubleValue();
-        }
-        IntParameter pmultMin = new IntParameter(Parameterizer.MULT_MIN_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
-        if(config.grab(pmultMin)) {
-          multMin = pmultMin.intValue();
+        DoubleParameter pminMin = new DoubleParameter(Parameterizer.MIN_MIN_ID, 0.);
+        if(config.grab(pminMin)) {
+          minDev = pminMin.doubleValue();
         }
         IntParameter pmultMax = new IntParameter(Parameterizer.MULT_MAX_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
         if(config.grab(pmultMax)) {
-          multMax = pmultMax.intValue();
+          maxQuant = pmultMax.intValue();
+        }
+        IntParameter pmultMin = new IntParameter(Parameterizer.MULT_MIN_ID) //
+        .setOptional(true);
+        if(config.grab(pmultMin)) {
+          minQuant = pmultMin.intValue();
+        }
+        else {
+          minQuant = maxQuant;
         }
         RandomParameter pseed = new RandomParameter(Parameterizer.SEED_ID);
         if(config.grab(pseed)) {
@@ -196,7 +192,7 @@ public class UniformDiscreteUO extends UncertainObject {
 
       @Override
       protected Factory makeInstance() {
-        return new Factory(minMin, maxMin, minMax, maxMax, multMin, multMax, randFac);
+        return new Factory(minDev, maxDev, minQuant, maxQuant, randFac);
       }
     }
   }
