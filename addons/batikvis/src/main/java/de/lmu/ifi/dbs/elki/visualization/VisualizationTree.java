@@ -163,12 +163,12 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
     /**
      * Class filter.
      */
-    Class<O> filter;
+    Class<? super O> filter;
 
     /**
      * Current object, if valid.
      */
-    O current;
+    Object current;
 
     /**
      * Iterator in primary hierarchy.
@@ -181,15 +181,16 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
      * @param it Iterator in primary hierarchy
      * @param clazz Class filter
      */
-    public FilteredIter(Hierarchy.Iter<?> it, Class<O> clazz) {
+    public FilteredIter(Hierarchy.Iter<?> it, Class<? super O> clazz) {
       this.it = it;
       this.filter = clazz;
       this.next();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public O get() {
-      return current;
+      return (O) current;
     }
 
     @Override

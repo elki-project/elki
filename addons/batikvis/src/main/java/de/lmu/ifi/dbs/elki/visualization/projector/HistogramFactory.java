@@ -61,15 +61,32 @@ public class HistogramFactory implements ProjectorFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     Hierarchy.Iter<Relation<?>> it1 = VisualizationTree.filterResults(context, start, Relation.class);
-    for(; it1.valid(); it1.advance()) {
+    candidate: for(; it1.valid(); it1.advance()) {
       Relation<?> rel = it1.get();
-      if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        @SuppressWarnings("unchecked")
-        Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
-        final int dim = RelationUtil.dimensionality(vrel);
-        HistogramProjector<NumberVector> proj = new HistogramProjector<>(vrel, Math.min(dim, maxdim));
-        context.addVis(vrel, proj);
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
       }
+      // Do not enable nested relations by default:
+      Hierarchy.Iter<Relation<?>> it2 = new VisualizationTree.FilteredIter<>(context.getHierarchy().iterAncestors(rel), Relation.class);
+      parent: for(; it2.valid(); it2.advance()) {
+        // Parent relation
+        final Relation<?> rel2 = (Relation<?>) it2.get();
+        if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel2.getDataTypeInformation())) {
+          continue parent;
+        }
+        // Only first child relation
+        Hierarchy.Iter<Relation<?>> it3 = new VisualizationTree.FilteredIter<>(context.getHierarchy().iterDescendants(rel2), Relation.class);
+        if(it3.valid() && it3.get() == rel) {
+          continue parent; // First child vector relation, this is ok.
+        }
+        // TODO: add Actions instead.
+        continue candidate;
+      }
+      @SuppressWarnings("unchecked")
+      Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
+      final int dim = RelationUtil.dimensionality(vrel);
+      HistogramProjector<NumberVector> proj = new HistogramProjector<>(vrel, Math.min(dim, maxdim));
+      context.addVis(vrel, proj);
     }
   }
 
