@@ -1,22 +1,35 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
 
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+
+import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /*
 This file is part of ELKI:
@@ -41,16 +54,45 @@ This file is part of ELKI:
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class FDBSCANNeighborPredicate<O extends NumberVector, U extends UncertainObject> extends EpsilonNeighborPredicate<O> {
+/**
+ * Density-based Clustering of Applications with Noise and Fuzzy objects
+ * (FDBSCAN) is an Algorithm to find sets in a fuzzy database that are
+ * density-connected with minimum probability.
+ *
+ * <p>
+ * Reference:<br>
+ * H.-P. Kriegel and M. Pfeifle:<br />
+ * Density-based clustering of uncertain data<br />
+ * In Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (SIGKDD),
+ * Chicago, IL, 2005.
+ * </p>
+ * 
+ * This class is a NeighborPredicate presenting this Algorithm in use with <code>{@link GeneralizedDBSCAN}</code>
+ *
+ * @author Alexander Koos
+ * @param <O> Object type
+ */
+@Title("FDBSCAN: Density-based Clustering of Applications with Noise on fuzzy objects")
+@Description("Algorithm to find density-connected sets in a database consisting of uncertain/fuzzy objects based on the"
+    + " parameters 'minpts', 'epsilon', 'samplesize', and (if used) 'threshold'")
+@Reference(authors = "H.-P. Kriegel and M. Pfeifle", //
+title = "Density-based clustering of uncertain data", //
+booktitle = "KDD05", //
+url = "http://dx.doi.org/10.1145/1081870.1081955")
+public class FDBSCANNeighborPredicate<U extends UncertainObject> extends EpsilonNeighborPredicate<DoubleVector> {
 
   private int sampleSize;
   
   private double threshold;
   
-  public FDBSCANNeighborPredicate(double epsilon, DistanceFunction<? super O> distFunc, int sampleSize, double threshold) {
+  private Random rand;  
+  
+  public FDBSCANNeighborPredicate(double epsilon, DistanceFunction<DoubleVector> distFunc, int sampleSize, double threshold, long seed) {
     super(epsilon, distFunc);
     this.sampleSize = sampleSize;
     this.threshold = threshold;
+    this.distFunc = distFunc;
+    this.rand = new Random(seed == 0l ? null : seed);
   }
   /**
    * 
@@ -61,7 +103,7 @@ public class FDBSCANNeighborPredicate<O extends NumberVector, U extends Uncertai
    * TODO: Why does it have to be DoubleDBIDs?
    * Took the implementation from EpsilonNeighborPredicate.Instance as inspiration...
    */
-  public static class Instance<O,U> implements NeighborPredicate.Instance<DoubleDBIDList> {
+  public static class Instance<U extends UncertainObject> implements NeighborPredicate.Instance<DoubleDBIDList> {
 
     private DoubleDBIDList ids;
     
@@ -73,16 +115,22 @@ public class FDBSCANNeighborPredicate<O extends NumberVector, U extends Uncertai
 
     private Relation<U> relation;
     
-    public Instance(double epsilon, DoubleDBIDList ids, int sampleSize, double threshold, Relation<U> relation) {
+    private DistanceQuery<DoubleVector> distQuery;
+    
+    private Random rand;
+    
+    public Instance(double epsilon, DoubleDBIDList ids, int sampleSize, double threshold, Relation<U> relation, DistanceQuery<DoubleVector> distQuery, Random rand) {
       super();
       this.ids = ids;
       this.epsilon = epsilon;
       this.sampleSize = sampleSize;
       this.threshold = threshold;
       this.relation = relation;
+      this.distQuery = distQuery;
+      this.rand = rand;
       // TODO: integrate distancefunction correctly
     }
-    
+
     @Override
     // FIXME: You can't accelerate me by using indices as I am!
     // Particularly useful would be spatial index-structures like
@@ -97,8 +145,8 @@ public class FDBSCANNeighborPredicate<O extends NumberVector, U extends Uncertai
     //
     // But I believe this to be too special to consider it in detail right now.
     public DoubleDBIDList getNeighbors(DBIDRef reference) {
-      UncertainObject referenceObject = (UncertainObject) relation.get(reference);
-    
+      U referenceObject = relation.get(reference);
+      ModifiableDoubleDBIDList resultList = DBIDUtil.newDistanceDBIDList();
       for(DBIDIter iter = iterDBIDs(ids); iter.valid(); iter.advance()) {
         if(DBIDUtil.equal(reference,iter)) {
           // No need to test the object itself
@@ -106,7 +154,7 @@ public class FDBSCANNeighborPredicate<O extends NumberVector, U extends Uncertai
         }
 
         boolean included = true;
-        UncertainObject comparisonObject = (UncertainObject) relation.get(iter);
+        U comparisonObject = relation.get(iter);
         for(int i = 0; i < referenceObject.getDimensionality(); i++) {
           if(included) {
             if(((referenceObject.getMax(i) - referenceObject.getMin(i)) < (epsilon * 2)) && referenceObject.getMin(i) <= comparisonObject.getMin(i) && referenceObject.getMax(i) >= comparisonObject.getMax(i)) { 
@@ -122,20 +170,29 @@ public class FDBSCANNeighborPredicate<O extends NumberVector, U extends Uncertai
           }
         }
         if(included) {
+          resultList.add(epsilon, iter);
+          continue;
         }
 
+        int count = 0;
         for(int i = 0; i < sampleSize; i++) {
-          // comparisonObject.drawSample
+          DoubleVector comparisonSample = comparisonObject.drawSample(rand);
           // nested loop because of cartesian product
           for(int j = 0; j < sampleSize; j++) {
-            // TODO: referenceObject.drawSample and check if they're epsilon-close
-            // Keep track of how many are epsilon-close
+            DoubleVector referenceSample = referenceObject.drawSample(rand);
+            if(isSampleDistanceLessThanOrEqualToEpsilon(comparisonSample, referenceSample)) {
+              // Keep track of how many are epsilon-close
+              count++;
+            }
           }
         }
-        // TODO: check if enough sample-pairings were epsilon-close
+        // check if enough sample-pairings were epsilon-close
         // If yes, add to neighborlist to return
+        if(count >= threshold * sampleSize * sampleSize) {
+          resultList.add(epsilon,iter);
+        }
       }
-      return null;
+      return resultList;
     }
 
     @Override
@@ -147,15 +204,20 @@ public class FDBSCANNeighborPredicate<O extends NumberVector, U extends Uncertai
     public DBIDIter iterDBIDs(DoubleDBIDList neighbors) {
       return neighbors.iter();
     }
+    
+    private boolean isSampleDistanceLessThanOrEqualToEpsilon(DoubleVector vector1, DoubleVector vector2) {
+      return epsilon <= distQuery.distance(vector1, vector2);
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   // FIXME: An elegant way to retrieve a relation containing uncertain objects from the database...
   public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
-    return (NeighborPredicate.Instance<T>) new Instance<>(epsilon, 
-        (DoubleDBIDList) database.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD).getDBIDs(), sampleSize, threshold, 
-        database.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD));
+    Relation<U> relation = database.getRelation(TypeUtil.UNCERTAIN_OBJECT);
+    return (NeighborPredicate.Instance<T>) new Instance<U>(epsilon, 
+        (DoubleDBIDList) relation.getDBIDs(), sampleSize, threshold, 
+        relation, QueryUtil.getDistanceQuery(database,distFunc), rand);
   }
 
   @Override
@@ -170,15 +232,21 @@ public class FDBSCANNeighborPredicate<O extends NumberVector, U extends Uncertai
     return null;
   }
   
-  public static class Parameterizer<O extends NumberVector, U extends UncertainObject> extends EpsilonNeighborPredicate.Parameterizer<O> {
+  public static class Parameterizer<U extends UncertainObject> extends EpsilonNeighborPredicate.Parameterizer<DoubleVector> {
 
     private int sampleSize;
     
     private double threshold;
     
+    private DistanceFunction<DoubleVector> distfun;
+    
+    private long seed;
+    
     public final static OptionID SAMPLE_SIZE_ID = new OptionID("","");
     
     public final static OptionID THRESHOLD_ID = new OptionID("","");
+    
+    public final static OptionID SEED_ID = new OptionID("","");
     
     @Override
     public void makeOptions(Parameterization config) {
@@ -191,11 +259,23 @@ public class FDBSCANNeighborPredicate<O extends NumberVector, U extends Uncertai
       if(config.grab(thresholdp)) {
         threshold = thresholdp.getValue();
       }
+      LongParameter seedp = new LongParameter(SEED_ID, 0);
+      if(config.grab(seedp)) {
+        seed = seedp.getValue();
+      }
+      ObjectParameter<DistanceFunction<DoubleVector>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      if(config.grab(distanceFunctionP)) {
+        distfun = distanceFunctionP.instantiateClass(config);
+      }
     }
     
     @Override
-    protected FDBSCANNeighborPredicate<O, U> makeInstance() {
-      return new FDBSCANNeighborPredicate<>(epsilon, distfun, sampleSize, threshold);
+    protected FDBSCANNeighborPredicate<U> makeInstance() {
+      return new FDBSCANNeighborPredicate<>(epsilon, distfun, sampleSize, threshold, seed);
+    }
+    
+    public static <F extends DistanceFunction<?>> ObjectParameter<F> makeParameterDistanceFunction(Class<?> defaultDistanceFunction, Class<?> restriction) {
+      return new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
     }
   }
 }
