@@ -214,7 +214,7 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
   @Override
   // FIXME: An elegant way to retrieve a relation containing uncertain objects from the database...
   public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
-    Relation<U> relation = database.getRelation(TypeUtil.UNCERTAIN_OBJECT);
+    Relation<U> relation = database.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     return (NeighborPredicate.Instance<T>) new Instance<U>(epsilon, 
         (DoubleDBIDList) relation.getDBIDs(), sampleSize, threshold, 
         relation, QueryUtil.getDistanceQuery(database,distFunc), rand);
