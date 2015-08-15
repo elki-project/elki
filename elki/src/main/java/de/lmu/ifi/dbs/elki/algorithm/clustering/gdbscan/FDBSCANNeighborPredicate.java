@@ -2,11 +2,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 
 import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -81,19 +79,38 @@ booktitle = "KDD05", //
 url = "http://dx.doi.org/10.1145/1081870.1081955")
 public class FDBSCANNeighborPredicate<U extends UncertainObject> extends EpsilonNeighborPredicate<DoubleVector> {
 
+  /**
+   * The size of samplesets that should be drawn for neighborcheck.
+   */
   private int sampleSize;
   
+  /**
+   * The relative amount of epsilon-close pairings determined by the neighborcheck.
+   */
   private double threshold;
   
+  /**
+   * The <code>Random</code> object to draw the samples with.
+   */
   private Random rand;  
   
+  /**
+   * 
+   * Constructor.
+   *
+   * @param epsilon
+   * @param distFunc
+   * @param sampleSize
+   * @param threshold
+   * @param seed
+   */
   public FDBSCANNeighborPredicate(double epsilon, DistanceFunction<DoubleVector> distFunc, int sampleSize, double threshold, long seed) {
     super(epsilon, distFunc);
     this.sampleSize = sampleSize;
     this.threshold = threshold;
-    this.distFunc = distFunc;
     this.rand = new Random(seed == 0l ? null : seed);
   }
+  
   /**
    * 
    * @author Alexander Koos
@@ -105,20 +122,53 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
    */
   public static class Instance<U extends UncertainObject> implements NeighborPredicate.Instance<DoubleDBIDList> {
 
+    /**
+     * The DBIDs to iterate over for neighborcheck.
+     */
     private DoubleDBIDList ids;
     
+    /**
+     * The epsilon distance a neighbor may have at most.
+     */
     private double epsilon;
     
+    /**
+     * The size of samplesets that should be drawn for neighborcheck.
+     */
     private int sampleSize;
     
+    /**
+     * The relative amount of epsilon-close pairings determined by the neighborcheck.
+     */
     private double threshold;
 
+    /**
+     * The relation holding the uncertain objects.
+     */
     private Relation<U> relation;
     
+    /**
+     * The distancequery to determine the distance of two samples.
+     */
     private DistanceQuery<DoubleVector> distQuery;
     
+    /**
+     * The <code>Random</code> object to draw the samples with.
+     */
     private Random rand;
     
+    /**
+     * 
+     * Constructor.
+     *
+     * @param epsilon
+     * @param ids
+     * @param sampleSize
+     * @param threshold
+     * @param relation
+     * @param distQuery
+     * @param rand
+     */
     public Instance(double epsilon, DoubleDBIDList ids, int sampleSize, double threshold, Relation<U> relation, DistanceQuery<DoubleVector> distQuery, Random rand) {
       super();
       this.ids = ids;
@@ -180,7 +230,7 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
           // nested loop because of cartesian product
           for(int j = 0; j < sampleSize; j++) {
             DoubleVector referenceSample = referenceObject.drawSample(rand);
-            if(isSampleDistanceLessThanOrEqualToEpsilon(comparisonSample, referenceSample)) {
+            if(epsilon <= distQuery.distance(comparisonSample, referenceSample)) {
               // Keep track of how many are epsilon-close
               count++;
             }
@@ -204,10 +254,6 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
     public DBIDIter iterDBIDs(DoubleDBIDList neighbors) {
       return neighbors.iter();
     }
-    
-    private boolean isSampleDistanceLessThanOrEqualToEpsilon(DoubleVector vector1, DoubleVector vector2) {
-      return epsilon <= distQuery.distance(vector1, vector2);
-    }
   }
 
   @SuppressWarnings("unchecked")
@@ -219,34 +265,53 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
         (DoubleDBIDList) relation.getDBIDs(), sampleSize, threshold, 
         relation, QueryUtil.getDistanceQuery(database,distFunc), rand);
   }
-
-  @Override
-  public TypeInformation getInputTypeRestriction() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public SimpleTypeInformation<?>[] getOutputType() {
-    // TODO Auto-generated method stub
-    return null;
-  }
   
+  // The methods to determine input and output type restrictions behave similar to the 
+  // superclasses implementation of these methods, therefor I left them out
+
+  /**
+   * Parametizer class.
+   * 
+   * @author Alexander Koos
+   *
+   * @param <U>
+   */
   public static class Parameterizer<U extends UncertainObject> extends EpsilonNeighborPredicate.Parameterizer<DoubleVector> {
 
+    /**
+     * The size of samplesets that should be drawn for neighborcheck.
+     */
     private int sampleSize;
     
+    /**
+     * The relative amount of epsilon-close pairings determined by the neighborcheck.
+     */
     private double threshold;
     
+    /**
+     * The <code>DistanceFunction</code> to determine the distance between two samples.
+     */
     private DistanceFunction<DoubleVector> distfun;
     
+    /**
+     * The seed for the <code>Random</code> object used to draw samples.
+     */
     private long seed;
     
-    public final static OptionID SAMPLE_SIZE_ID = new OptionID("","");
+    /**
+     * Number of samples per uncertain object.
+     */
+    public final static OptionID SAMPLE_SIZE_ID = new OptionID("fdbscan.samplesize","That many samples are drawn from each uncertain object to determine the epsilon-neighborhood.");
     
-    public final static OptionID THRESHOLD_ID = new OptionID("","");
+    /**
+     * Threshold for epsilon-neighborhood, defaults to 0.5.
+     */
+    public final static OptionID THRESHOLD_ID = new OptionID("fdbscan.threshold","That many pairings of samples of two uncertain objects have to be epsilon-close for neighborhood.");
     
-    public final static OptionID SEED_ID = new OptionID("","");
+    /**
+     * Seed for random sample draw.
+     */
+    public final static OptionID SEED_ID = new OptionID("fdbscan.seed","The seed for the random sample draws. 0 initializes the Random object with null.");
     
     @Override
     public void makeOptions(Parameterization config) {
@@ -274,6 +339,14 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
       return new FDBSCANNeighborPredicate<>(epsilon, distfun, sampleSize, threshold, seed);
     }
     
+    /**
+     * TODO: took this from an abstract implementation of DistanceBasedAlgorithms.
+     * Should this be kept this way or handled otherwise?
+     * 
+     * @param defaultDistanceFunction
+     * @param restriction
+     * @return
+     */
     public static <F extends DistanceFunction<?>> ObjectParameter<F> makeParameterDistanceFunction(Class<?> defaultDistanceFunction, Class<?> restriction) {
       return new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
     }
