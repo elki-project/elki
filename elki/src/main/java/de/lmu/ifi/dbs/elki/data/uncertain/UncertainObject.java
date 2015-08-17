@@ -47,11 +47,11 @@ public interface UncertainObject extends SpatialComparable, FeatureVector<Double
   DoubleVector drawSample(Random rand);
 
   /**
-   * Get the mean of the uncertain object.
+   * Get the center of mass of the uncertain object.
    *
-   * @return Mean
+   * @return Center of mass.
    */
-  DoubleVector getMean();
+  DoubleVector getCenterOfMass();
 
   /**
    * Vector factory for uncertain objects.

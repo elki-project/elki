@@ -141,7 +141,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
       {
         final WritableDataStore<DoubleVector> store1 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DoubleVector.class);
         for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          store1.put(iter, relation.get(iter).getMean());
+          store1.put(iter, relation.get(iter).getCenterOfMass());
         }
         runClusteringAlgorithm(relation, ids, store1, dim, "Uncertain Model: Center of Mass");
       }

@@ -78,7 +78,7 @@ public abstract class AbstractUncertainObject implements UncertainObject {
   }
 
   @Override
-  public abstract DoubleVector getMean();
+  public abstract DoubleVector getCenterOfMass();
 
   /**
    * Vector factory for uncertain objects.

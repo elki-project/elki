@@ -90,7 +90,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
     final DBIDs ids = relation.getDBIDs();
     final WritableDataStore<DoubleVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_STATIC | DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, DoubleVector.class);
     for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      store.put(iter, relation.get(iter).getMean());
+      store.put(iter, relation.get(iter).getCenterOfMass());
     }
 
     final SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim, dim, DoubleVector.VARIABLE_SERIALIZER);

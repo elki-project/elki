@@ -97,7 +97,7 @@ public class WeightedDiscreteUncertainObject extends AbstractDiscreteUncertainOb
   }
 
   @Override
-  public DoubleVector getMean() {
+  public DoubleVector getCenterOfMass() {
     final int dim = getDimensionality();
     // Weighted average.
     double[] meanVals = new double[dim];
