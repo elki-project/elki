@@ -102,7 +102,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new SimpleTypeInformation<>(UncertainObject.class));
+    return TypeUtil.array(TypeUtil.UNCERTAIN_OBJECT_FIELD);
   }
 
   @Override

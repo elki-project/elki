@@ -64,7 +64,7 @@ This file is part of ELKI:
  * In Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (SIGKDD),
  * Chicago, IL, 2005.
  * </p>
- * 
+ *
  * This class is a NeighborPredicate presenting this Algorithm in use with <code>{@link GeneralizedDBSCAN}</code>
  *
  * @author Alexander Koos
@@ -83,19 +83,19 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
    * The size of samplesets that should be drawn for neighborcheck.
    */
   private int sampleSize;
-  
+
   /**
    * The relative amount of epsilon-close pairings determined by the neighborcheck.
    */
   private double threshold;
-  
+
   /**
    * The <code>Random</code> object to draw the samples with.
    */
-  private Random rand;  
-  
+  private Random rand;
+
   /**
-   * 
+   *
    * Constructor.
    *
    * @param epsilon
@@ -110,9 +110,9 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
     this.threshold = threshold;
     this.rand = new Random(seed == 0l ? null : seed);
   }
-  
+
   /**
-   * 
+   *
    * @author Alexander Koos
    *
    */
@@ -126,17 +126,17 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
      * The DBIDs to iterate over for neighborcheck.
      */
     private DoubleDBIDList ids;
-    
+
     /**
      * The epsilon distance a neighbor may have at most.
      */
     private double epsilon;
-    
+
     /**
      * The size of samplesets that should be drawn for neighborcheck.
      */
     private int sampleSize;
-    
+
     /**
      * The relative amount of epsilon-close pairings determined by the neighborcheck.
      */
@@ -146,19 +146,19 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
      * The relation holding the uncertain objects.
      */
     private Relation<U> relation;
-    
+
     /**
      * The distancequery to determine the distance of two samples.
      */
     private DistanceQuery<DoubleVector> distQuery;
-    
+
     /**
      * The <code>Random</code> object to draw the samples with.
      */
     private Random rand;
-    
+
     /**
-     * 
+     *
      * Constructor.
      *
      * @param epsilon
@@ -207,13 +207,13 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
         U comparisonObject = relation.get(iter);
         for(int i = 0; i < referenceObject.getDimensionality(); i++) {
           if(included) {
-            if(((referenceObject.getMax(i) - referenceObject.getMin(i)) < (epsilon * 2)) && referenceObject.getMin(i) <= comparisonObject.getMin(i) && referenceObject.getMax(i) >= comparisonObject.getMax(i)) { 
+            if(((referenceObject.getMax(i) - referenceObject.getMin(i)) < (epsilon * 2)) && referenceObject.getMin(i) <= comparisonObject.getMin(i) && referenceObject.getMax(i) >= comparisonObject.getMax(i)) {
               // leave as marked as completely included
               continue;
             }
             // at least in one dimension it is not completely included
-            included = false;            
-          } 
+            included = false;
+          }
           if((referenceObject.getMin(i) - epsilon) > comparisonObject.getMax(i) || (referenceObject.getMax(i) + epsilon) < comparisonObject.getMin(i)) {
             // completely excluded
             continue;
@@ -258,20 +258,19 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
 
   @SuppressWarnings("unchecked")
   @Override
-  // FIXME: An elegant way to retrieve a relation containing uncertain objects from the database...
   public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
-    Relation<U> relation = database.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    return (NeighborPredicate.Instance<T>) new Instance<U>(epsilon, 
-        (DoubleDBIDList) relation.getDBIDs(), sampleSize, threshold, 
+    Relation<U> relation = database.getRelation(TypeUtil.UNCERTAIN_OBJECT_FIELD);
+    return (NeighborPredicate.Instance<T>) new Instance<U>(epsilon,
+        (DoubleDBIDList) relation.getDBIDs(), sampleSize, threshold,
         relation, QueryUtil.getDistanceQuery(database,distFunc), rand);
   }
-  
-  // The methods to determine input and output type restrictions behave similar to the 
+
+  // The methods to determine input and output type restrictions behave similar to the
   // superclasses implementation of these methods, therefor I left them out
 
   /**
    * Parametizer class.
-   * 
+   *
    * @author Alexander Koos
    *
    * @param <U>
@@ -282,37 +281,37 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
      * The size of samplesets that should be drawn for neighborcheck.
      */
     private int sampleSize;
-    
+
     /**
      * The relative amount of epsilon-close pairings determined by the neighborcheck.
      */
     private double threshold;
-    
+
     /**
      * The <code>DistanceFunction</code> to determine the distance between two samples.
      */
     private DistanceFunction<DoubleVector> distfun;
-    
+
     /**
      * The seed for the <code>Random</code> object used to draw samples.
      */
     private long seed;
-    
+
     /**
      * Number of samples per uncertain object.
      */
     public final static OptionID SAMPLE_SIZE_ID = new OptionID("fdbscan.samplesize","That many samples are drawn from each uncertain object to determine the epsilon-neighborhood.");
-    
+
     /**
      * Threshold for epsilon-neighborhood, defaults to 0.5.
      */
     public final static OptionID THRESHOLD_ID = new OptionID("fdbscan.threshold","That many pairings of samples of two uncertain objects have to be epsilon-close for neighborhood.");
-    
+
     /**
      * Seed for random sample draw.
      */
     public final static OptionID SEED_ID = new OptionID("fdbscan.seed","The seed for the random sample draws. 0 initializes the Random object with null.");
-    
+
     @Override
     public void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -333,16 +332,16 @@ public class FDBSCANNeighborPredicate<U extends UncertainObject> extends Epsilon
         distfun = distanceFunctionP.instantiateClass(config);
       }
     }
-    
+
     @Override
     protected FDBSCANNeighborPredicate<U> makeInstance() {
       return new FDBSCANNeighborPredicate<>(epsilon, distfun, sampleSize, threshold, seed);
     }
-    
+
     /**
      * TODO: took this from an abstract implementation of DistanceBasedAlgorithms.
      * Should this be kept this way or handled otherwise?
-     * 
+     *
      * @param defaultDistanceFunction
      * @param restriction
      * @return

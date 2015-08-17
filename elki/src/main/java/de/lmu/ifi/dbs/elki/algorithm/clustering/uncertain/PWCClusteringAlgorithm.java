@@ -29,7 +29,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -139,7 +139,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
       final DBIDs ids = relation.getDBIDs();
       // Add the uncertain model:
       {
-        final WritableDataStore<NumberVector> store1 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
+        final WritableDataStore<DoubleVector> store1 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DoubleVector.class);
         for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           store1.put(iter, relation.get(iter).getMean());
         }
@@ -147,7 +147,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
       }
       // Add samples:
       for(int i = 0; i < this.depth; i++) {
-        final WritableDataStore<NumberVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, NumberVector.class);
+        final WritableDataStore<DoubleVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DoubleVector.class);
         for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
           store.put(iter, relation.get(iter).drawSample(rand));
         }
@@ -181,9 +181,9 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    * @param title
    * @return
    */
-  protected Clustering<?> runClusteringAlgorithm(final HierarchicalResult database, final DBIDs ids, final WritableDataStore<NumberVector> store, final int dim, final String title) {
-    final SimpleTypeInformation<NumberVector> t = VectorFieldTypeInformation.typeRequest(NumberVector.class, dim, dim);
-    final Relation<NumberVector> sample = new MaterializedRelation<>(t, ids, title, store);
+  protected Clustering<?> runClusteringAlgorithm(final HierarchicalResult database, final DBIDs ids, final WritableDataStore<DoubleVector> store, final int dim, final String title) {
+    final SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
+    final Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);
     Clustering<?> clusterResult = algorithm.run(d);
     d.getHierarchy().remove(sample);
@@ -195,7 +195,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(new SimpleTypeInformation<>(UncertainObject.class));
+    return TypeUtil.array(TypeUtil.UNCERTAIN_OBJECT_FIELD);
   }
 
   @Override
@@ -218,7 +218,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
      * Parameter to hand an algorithm for creating the meta-clustering to our
      * instance of {@link PWCClusteringAlgorithm}.
      *
-     * It has to use a metric distancefunction to work on the
+     * It has to use a metric distance function to work on the
      * sample-clusterings.
      */
     public final static OptionID META_ALGORITHM_ID = new OptionID("algorithm.metaclustering", "Used Algorithm for Meta-Clustering.");
@@ -281,7 +281,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
           config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + algorithm.getInputTypeRestriction()[0]));
         }
       }
-      IntParameter pdepth = new IntParameter(Parameterizer.DEPTH_ID, DEFAULT_ENSEMBLE_DEPTH);
+      IntParameter pdepth = new IntParameter(DEPTH_ID, DEFAULT_ENSEMBLE_DEPTH);
       if(config.grab(pdepth)) {
         tryDepth = pdepth.getValue();
       }
