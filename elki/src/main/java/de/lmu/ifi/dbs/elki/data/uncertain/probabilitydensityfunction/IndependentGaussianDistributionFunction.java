@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.PWCClusteringAlgorithm
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.ContinuousUncertainObject;
-import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
+import de.lmu.ifi.dbs.elki.data.uncertain.AbstractUncertainObject;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.UncertainifyFilter;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
@@ -45,12 +45,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * ProbabilityDensityFunction class to model dimensional independent gaussian
  * distributions.
  *
- * Used for construction of {@link UncertainObject}, filtering with
+ * Used for construction of {@link AbstractUncertainObject}, filtering with
  * {@link UncertainifyFilter} and sampling with {@link PWCClusteringAlgorithm}.
  *
  * @author Alexander Koos
  */
-public class IndependentGaussianDistributionFunction extends AbstractGaussianDistributionFunction<DoubleVector, IndependentGaussianDistributionFunction> {
+public class IndependentGaussianDistributionFunction extends AbstractGaussianDistributionFunction<DoubleVector> {
   /**
    * Constructor.
    *
@@ -125,7 +125,7 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
   @Override
   public DoubleVector drawValue(SpatialComparable bounds, Random rand) {
     final double[] values = new double[bounds.getDimensionality()];
-    sampling: for(int j = 0; j < UncertainObject.DEFAULT_TRY_LIMIT; j++) {
+    sampling: for(int j = 0; j < AbstractUncertainObject.DEFAULT_TRY_LIMIT; j++) {
       double r = rand.nextDouble() * weightSum;
       int index = weights.length;
       while(--index > 0 && r < weights[index]) {
@@ -165,7 +165,7 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
   }
 
   @Override
-  public <A> ContinuousUncertainObject<IndependentGaussianDistributionFunction> uncertainify(A array, NumberArrayAdapter<?, A> adapter, boolean blur) {
+  public <A> ContinuousUncertainObject uncertainify(A array, NumberArrayAdapter<?, A> adapter, boolean blur) {
     final int dim = adapter.size(array);
     final int multiplicity = urand.nextInt((multMax - multMin) + 1) + multMin;
     final List<DoubleVector> means = new ArrayList<DoubleVector>();
@@ -181,7 +181,7 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
         ivariances[i] = (urand.nextDouble() * (maxDev - minDev)) + minDev;
         final double vi = adapter.getDouble(array, i);
         if(blur) {
-          for(int j = 0; j < UncertainObject.DEFAULT_TRY_LIMIT; j++) {
+          for(int j = 0; j < AbstractUncertainObject.DEFAULT_TRY_LIMIT; j++) {
             final double val = this.urand.nextGaussian() * ivariances[i] + vi;
             if(val >= vi - minBound && val <= vi + maxBound) {
               imeans[i] = val;
@@ -199,7 +199,7 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
       means.add(new DoubleVector(imeans));
       variances.add(new DoubleVector(ivariances));
     }
-    return new ContinuousUncertainObject<>(new IndependentGaussianDistributionFunction(means, variances, weights), dim);
+    return new ContinuousUncertainObject(new IndependentGaussianDistributionFunction(means, variances, weights), dim);
   }
 
   /**
@@ -331,11 +331,11 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
       if(config.grab(pMaxMax)) {
         maxMax = pMaxMax.doubleValue();
       }
-      IntParameter pMultMin = new IntParameter(Parameterizer.MULT_MIN_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
+      IntParameter pMultMin = new IntParameter(Parameterizer.MULT_MIN_ID, AbstractUncertainObject.Factory.Parameterizer.DEFAULT_SAMPLE_SIZE);
       if(config.grab(pMultMin)) {
         multMin = pMultMin.intValue();
       }
-      IntParameter pMultMax = new IntParameter(Parameterizer.MULT_MAX_ID, UncertainObject.DEFAULT_SAMPLE_SIZE);
+      IntParameter pMultMax = new IntParameter(Parameterizer.MULT_MAX_ID, AbstractUncertainObject.Factory.Parameterizer.DEFAULT_SAMPLE_SIZE);
       if(config.grab(pMultMax)) {
         multMax = pMultMax.intValue();
       }

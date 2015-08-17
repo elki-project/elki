@@ -32,84 +32,90 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
-public class DistributedDiscreteUO extends UncertainObject {
+/**
+ * Unweighted implementation of discrete uncertain objects.
+ *
+ * <ul>
+ * <li>Every object is represented by a finite number of discrete samples.</li>
+ * <li>Every sample has the same weight.</li>
+ * <li>Every sample is equally likely to be returned by {@link #drawSample}.
+ * </ul>
+ *
+ * @author Alexander Koos
+ * @author Erich Schubert
+ */
+public class UnweightedDiscreteUncertainObject extends AbstractUncertainObject {
+  /**
+   * Sample vectors.
+   */
   private DoubleVector[] samples;
 
-  private double[] weights;
-
-  private double weightSum;
-
-  // Constructor
-  public DistributedDiscreteUO(DoubleVector[] samples, double[] weights) {
+  /**
+   * Constructor.
+   *
+   * @param samples Samples
+   */
+  public UnweightedDiscreteUncertainObject(DoubleVector[] samples) {
     super();
     if(samples.length == 0) {
       throw new AbortException("Discrete Uncertain Objects must have at least one point.");
     }
-    double check = 0;
-    for(double weight : weights) {
-      if(!(weight > 0 && weight < Double.POSITIVE_INFINITY)) {
-        throw new IllegalArgumentException("Probabilities must be in positive and finite.");
-      }
-      check += weight;
-    }
     this.samples = samples;
     this.bounds = computeBounds(samples);
-    this.weights = weights;
-    this.weightSum = check;
   }
 
   @Override
   public DoubleVector drawSample(Random rand) {
-    // Weighted sampling:
-    double r = rand.nextDouble() * weightSum;
-    int index = weights.length;
-    while(--index >= 0 && r < weights[index]) {
-      r -= weights[index];
-    }
-    if(index < 0) { // Within rounding errors
-      index = rand.nextInt(samples.length);
-    }
-    return samples[index];
+    return samples[rand.nextInt(samples.length)];
   }
 
   @Override
   public DoubleVector getMean() {
     final int dim = getDimensionality();
-    // Weighted average.
+    // Unweighted average.
     double[] meanVals = new double[dim];
     for(int i = 0; i < samples.length; i++) {
-      DoubleVector v = samples[i];
+      DoubleVector vals = samples[i];
       for(int d = 0; d < dim; d++) {
-        meanVals[d] += v.doubleValue(d) * weights[i];
+        meanVals[d] += vals.doubleValue(d);
       }
     }
 
     for(int d = 0; d < dim; d++) {
-      meanVals[d] /= weightSum;
+      meanVals[d] /= samples.length;
     }
     return new DoubleVector(meanVals);
   }
 
-  public static class Factory extends UncertainObject.Factory<DistributedDiscreteUO> {
+  /**
+   * Factory class
+   *
+   * @author Alexander Koos
+   * @author Erich Schubert
+   */
+  public static class Factory extends AbstractUncertainObject.Factory<UnweightedDiscreteUncertainObject> {
     private double minDev, maxDev;
 
     private int minQuant, maxQuant;
 
     private Random rand;
 
-    // Constructor for uncertainifyFilter-use
-    //
-    // This one is basically constructing a Factory,
-    // one could argue that it would be better practice
-    // to actually implement such a factory, but for
-    // the time being I'll stick with this kind of
-    // under engineered approach, until everything is
-    // fine and I can give more priority to beauty
-    // than to functionality.
-    public Factory(double minDev, double maxDev, int minQuant, int maxQuant, RandomFactory rand) {
+    /**
+     * Constructor.
+     *
+     * @param minDev Minimum deviation
+     * @param maxDev Maximum deviation
+     * @param minQuant Minimum number of samples
+     * @param maxQuant Maximum number of samples
+     * @param symmetric Generate symmetric distributions only
+     * @param rand Random generator
+     */
+    public Factory(double minDev, double maxDev, int minQuant, int maxQuant, boolean symmetric, RandomFactory rand) {
+      super(symmetric);
       this.minDev = minDev;
       this.maxDev = maxDev;
       this.minQuant = minQuant;
@@ -118,13 +124,12 @@ public class DistributedDiscreteUO extends UncertainObject {
     }
 
     @Override
-    public <A> DistributedDiscreteUO newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
+    public <A> UnweightedDiscreteUncertainObject newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
       final int dim = adapter.size(array);
       final int distributionSize = rand.nextInt((maxQuant - minQuant) + 1) + (int) minQuant;
       DoubleVector[] samples = new DoubleVector[distributionSize];
-      double[] offrange = generateRandomRange(dim, minDev, maxDev, !blur, rand);
+      double[] offrange = generateRandomRange(dim, minDev, maxDev, symmetric, rand);
       // Produce samples:
-      double[] weights = new double[distributionSize];
       double[] buf = new double[dim];
       for(int i = 0; i < distributionSize; i++) {
         for(int j = 0, k = 0; j < dim; j++) {
@@ -133,27 +138,27 @@ public class DistributedDiscreteUO extends UncertainObject {
         }
         samples[i] = new DoubleVector(buf);
       }
-      return new DistributedDiscreteUO(samples, weights);
+      return new UnweightedDiscreteUncertainObject(samples);
     }
 
     @Override
-    public Class<? super DistributedDiscreteUO> getRestrictionClass() {
-      return DistributedDiscreteUO.class;
+    public Class<? super UnweightedDiscreteUncertainObject> getRestrictionClass() {
+      return UnweightedDiscreteUncertainObject.class;
     }
 
     @Override
-    public ByteBufferSerializer<DistributedDiscreteUO> getDefaultSerializer() {
-      return null; // TODO: not yet available
+    public ByteBufferSerializer<UnweightedDiscreteUncertainObject> getDefaultSerializer() {
+      return null; // TODO: Not yet available.
     }
 
-    public static class Parameterizer extends UncertainObject.Factory.Parameterizer {
+    public static class Parameterizer extends AbstractUncertainObject.Factory.Parameterizer {
       protected double minDev, maxDev;
 
       protected int minQuant, maxQuant;
 
       protected RandomFactory randFac;
 
-      protected double maxTotalProb;
+      boolean symmetric;
 
       @Override
       protected void makeOptions(final Parameterization config) {
@@ -178,6 +183,10 @@ public class DistributedDiscreteUO extends UncertainObject {
         else {
           minQuant = maxQuant;
         }
+        Flag symmetricF = new Flag(SYMMETRIC_ID);
+        if(config.grab(symmetricF)) {
+          symmetric = symmetricF.isTrue();
+        }
         RandomParameter pseed = new RandomParameter(SEED_ID);
         if(config.grab(pseed)) {
           randFac = pseed.getValue();
@@ -186,7 +195,7 @@ public class DistributedDiscreteUO extends UncertainObject {
 
       @Override
       protected Factory makeInstance() {
-        return new Factory(minDev, maxDev, minQuant, maxQuant, randFac);
+        return new Factory(minDev, maxDev, minQuant, maxQuant, symmetric, randFac);
       }
     }
   }

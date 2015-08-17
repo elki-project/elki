@@ -210,6 +210,11 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
+     * Default number of clusterings to run.
+     */
+    public final static int DEFAULT_ENSEMBLE_DEPTH = 10;
+
+    /**
      * Parameter to hand an algorithm for creating the meta-clustering to our
      * instance of {@link PWCClusteringAlgorithm}.
      *
@@ -276,7 +281,7 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
           config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + algorithm.getInputTypeRestriction()[0]));
         }
       }
-      IntParameter pdepth = new IntParameter(Parameterizer.DEPTH_ID, UncertainObject.DEFAULT_ENSEMBLE_DEPTH);
+      IntParameter pdepth = new IntParameter(Parameterizer.DEPTH_ID, DEFAULT_ENSEMBLE_DEPTH);
       if(config.grab(pdepth)) {
         tryDepth = pdepth.getValue();
       }

@@ -19,7 +19,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  *
  * @author Alexander Koos
  */
-public abstract class AbstractGaussianDistributionFunction<V, F extends AbstractGaussianDistributionFunction<V, F>> extends ProbabilityDensityFunction<F> {
+public abstract class AbstractGaussianDistributionFunction<V> extends ProbabilityDensityFunction {
 
   /**
    * Field to hold the value the randomly created variance shall have in

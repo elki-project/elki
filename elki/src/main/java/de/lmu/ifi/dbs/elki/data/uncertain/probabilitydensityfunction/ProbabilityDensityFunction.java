@@ -28,7 +28,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.ContinuousUncertainObject;
-import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
+import de.lmu.ifi.dbs.elki.data.uncertain.AbstractUncertainObject;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  *
  * @author Alexander Koos
  */
-public abstract class ProbabilityDensityFunction<F extends ProbabilityDensityFunction<F>> {
+public abstract class ProbabilityDensityFunction {
   /**
    * Used in methods for setting bounds to initialize the array used in search
    * for extreme points.
@@ -69,11 +69,11 @@ public abstract class ProbabilityDensityFunction<F extends ProbabilityDensityFun
   public abstract SpatialComparable getDefaultBounds(final int dimensions);
 
   /**
-   * Construct an {@link UncertainObject} from a given vector.
+   * Construct an {@link AbstractUncertainObject} from a given vector.
    *
    * @param vec Vector
    * @param blur TODO
    * @param <A> Input data type
    */
-  public abstract <A> ContinuousUncertainObject<F> uncertainify(A array, NumberArrayAdapter<?, A> adapter, boolean blur);
+  public abstract <A> ContinuousUncertainObject uncertainify(A array, NumberArrayAdapter<?, A> adapter, boolean blur);
 }

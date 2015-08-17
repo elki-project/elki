@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  *
  * @author Alexander Koos
  */
-public class UniformDistributionFunction extends ProbabilityDensityFunction<UniformDistributionFunction> {
+public class UniformDistributionFunction extends ProbabilityDensityFunction {
   /**
    * Field to hold the value the randomly created minimum and maximum deviation.
    */
@@ -111,7 +111,7 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction<Unif
   }
 
   @Override
-  public <A> ContinuousUncertainObject<UniformDistributionFunction> uncertainify(A array, NumberArrayAdapter<?, A> adapter, boolean blur) {
+  public <A> ContinuousUncertainObject uncertainify(A array, NumberArrayAdapter<?, A> adapter, boolean blur) {
     final int dim = adapter.size(array);
     final double[] min = new double[dim];
     final double[] max = new double[dim];
@@ -128,7 +128,7 @@ public class UniformDistributionFunction extends ProbabilityDensityFunction<Unif
       max[i] = v + (r.nextDouble() * difMax);
     }
 
-    return new ContinuousUncertainObject<>(min, max, this);
+    return new ContinuousUncertainObject(min, max, this);
   }
   
   /**

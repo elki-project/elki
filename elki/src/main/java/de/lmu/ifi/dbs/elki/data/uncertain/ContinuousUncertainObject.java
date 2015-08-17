@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
 
-import java.util.Random;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,6 +22,8 @@ import java.util.Random;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.Random;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.PWCClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
@@ -32,17 +32,24 @@ import de.lmu.ifi.dbs.elki.data.uncertain.probabilitydensityfunction.Probability
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.UncertainifyFilter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
-public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> extends UncertainObject {
+/**
+ * Continuous uncertain objects are determined by a distribution function, and
+ * can be sampled from repeatedly.
+ *
+ * @author Alexander Koos
+ * @author Erich Schubert
+ */
+public class ContinuousUncertainObject extends AbstractUncertainObject {
   /**
    * Field holding the probabilityDensityFunction this object will use for
    * drawing samples in {@link PWCClusteringAlgorithm}
    */
-  private F probabilityDensityFunction;
+  private ProbabilityDensityFunction probabilityDensityFunction;
 
   /**
    * Constructor.
@@ -56,7 +63,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> 
    * @param probabilityDensityFunction
    * @param dimensions
    */
-  public ContinuousUncertainObject(F probabilityDensityFunction, int dimensions) {
+  public ContinuousUncertainObject(ProbabilityDensityFunction probabilityDensityFunction, int dimensions) {
     this(probabilityDensityFunction.getDefaultBounds(dimensions), probabilityDensityFunction);
   }
 
@@ -66,7 +73,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> 
    * @param bounds
    * @param probabilityDensityFunction
    */
-  public ContinuousUncertainObject(SpatialComparable bounds, F probabilityDensityFunction) {
+  public ContinuousUncertainObject(SpatialComparable bounds, ProbabilityDensityFunction probabilityDensityFunction) {
     this.bounds = bounds;
     this.probabilityDensityFunction = probabilityDensityFunction;
   }
@@ -78,7 +85,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> 
    * @param max
    * @param probabilityDensityFunction
    */
-  public ContinuousUncertainObject(double[] min, double[] max, F probabilityDensityFunction) {
+  public ContinuousUncertainObject(double[] min, double[] max, ProbabilityDensityFunction probabilityDensityFunction) {
     this.bounds = new HyperBoundingBox(min, max);
     this.probabilityDensityFunction = probabilityDensityFunction;
   }
@@ -99,34 +106,35 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> 
     return (bounds.getMax(dimension) + bounds.getMin(dimension)) * .5;
   }
 
-  public static class Factory<F extends ProbabilityDensityFunction<F>> extends UncertainObject.Factory<ContinuousUncertainObject<F>> {
+  public static class Factory extends AbstractUncertainObject.Factory<ContinuousUncertainObject> {
     /**
      * Field holding the probabilityDensityFunction this object will use for
      * uncertainification in {@link UncertainifyFilter#filter}
      */
-    private F probabilityDensityFunction;
+    private ProbabilityDensityFunction probabilityDensityFunction;
 
     /**
      * Constructor for uncertainification.
      *
      * @param probabilityDensityFunction
      */
-    public Factory(F probabilityDensityFunction) {
+    public Factory(boolean symmetric, ProbabilityDensityFunction probabilityDensityFunction) {
+      super(symmetric);
       this.probabilityDensityFunction = probabilityDensityFunction;
     }
 
     @Override
-    public <A> ContinuousUncertainObject<F> newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
-      return probabilityDensityFunction.uncertainify(array, adapter, blur);
+    public <A> ContinuousUncertainObject newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
+      return probabilityDensityFunction.uncertainify(array, adapter, !symmetric);
     }
 
     @Override
-    public ByteBufferSerializer<ContinuousUncertainObject<F>> getDefaultSerializer() {
+    public ByteBufferSerializer<ContinuousUncertainObject> getDefaultSerializer() {
       return null; // FIXME: not yet available.
     }
 
     @Override
-    public Class<? super ContinuousUncertainObject<F>> getRestrictionClass() {
+    public Class<? super ContinuousUncertainObject> getRestrictionClass() {
       return ContinuousUncertainObject.class;
     }
 
@@ -135,7 +143,7 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> 
      *
      * @author Alexander Koos
      */
-    public static class Parameterizer<F extends ProbabilityDensityFunction<F>> extends AbstractParameterizer {
+    public static class Parameterizer extends AbstractUncertainObject.Factory.Parameterizer {
       /**
        * Parameter to specify the {@link ProbabilityDensityFunction} to be used
        * for uncertainification.
@@ -145,20 +153,29 @@ public class ContinuousUncertainObject<F extends ProbabilityDensityFunction<F>> 
       /**
        * Field to hold parameter value.
        */
-      protected F pdf;
+      protected ProbabilityDensityFunction pdf;
+
+      /**
+       *
+       */
+      protected boolean symmetric;
 
       @Override
       protected void makeOptions(final Parameterization config) {
         super.makeOptions(config);
-        final ObjectParameter<F> ppdf = new ObjectParameter<>(Parameterizer.PROBABILITY_DENSITY_FUNCTION_ID, ProbabilityDensityFunction.class);
+        final ObjectParameter<ProbabilityDensityFunction> ppdf = new ObjectParameter<>(PROBABILITY_DENSITY_FUNCTION_ID, ProbabilityDensityFunction.class);
         if(config.grab(ppdf)) {
           this.pdf = ppdf.instantiateClass(config);
+        }
+        Flag symmetricF = new Flag(SYMMETRIC_ID);
+        if(config.grab(symmetricF)) {
+          symmetric = symmetricF.isTrue();
         }
       }
 
       @Override
-      protected Factory<F> makeInstance() {
-        return new Factory<F>(pdf);
+      protected Factory makeInstance() {
+        return new Factory(symmetric, pdf);
       }
     }
   }
