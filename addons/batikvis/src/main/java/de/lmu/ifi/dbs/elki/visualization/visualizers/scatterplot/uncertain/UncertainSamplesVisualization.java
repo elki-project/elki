@@ -23,35 +23,35 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.uncertain;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Random;
+
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
-import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
-import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
+import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
- * Visualize uncertain objects by their bounding box.
+ * Visualize uncertain objects by multiple samples.
  *
  * Note: this is currently a hack. Our projection only applies to vector field
  * relations currently, and this visualizer activates if such a relation (e.g. a
@@ -63,16 +63,21 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
+public class UncertainSamplesVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Uncertain Bounding Boxes";
+  private static final String NAME = "Uncertain Samples";
+
+  /**
+   * Number of samples to draw for uncertain objects.
+   */
+  protected int samples = 10;
 
   /**
    * Constructor.
    */
-  public UncertainBoundingBoxVisualization() {
+  public UncertainSamplesVisualization() {
     super();
   }
 
@@ -121,12 +126,17 @@ public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
     /**
      * CSS class for uncertain bounding boxes.
      */
-    public static final String CSS_CLASS = "uncertainbb";
+    public static final String CSS_CLASS = "uncertain-sample";
 
     /**
      * The representation we visualize
      */
     final protected Relation<? extends UncertainObject> rel;
+
+    /**
+     * Random factory.
+     */
+    final protected RandomFactory random = RandomFactory.DEFAULT;
 
     /**
      * Constructor.
@@ -146,35 +156,29 @@ public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
     @Override
     public void fullRedraw() {
       setupCanvas();
-      final double opac = .1; // Opacity
       final StyleLibrary style = context.getStyleLibrary();
-      final double lw = .5 * style.getLineWidth(StyleLibrary.PLOT);
       final StylingPolicy spol = context.getStylingPolicy();
-      final ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
+      final double marker_size = style.getSize(StyleLibrary.MARKERPLOT) * .5;
+      final MarkerLibrary ml = style.markers();
+
+      Random rand = random.getSingleThreadedRandom();
 
       if(spol instanceof ClassStylingPolicy) {
         ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
         for(int cnum = cspol.getMinStyle(); cnum < cspol.getMaxStyle(); cnum++) {
-          String css = CSS_CLASS + "_" + cnum;
-          CSSClass cls = new CSSClass(this, css);
-          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, lw);
-
-          final String color = colors.getColor(cnum);
-          cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
-          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
-          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, opac);
-
-          svgp.addCSSClassOrLogError(cls);
-
           for(DBIDIter iter = cspol.iterateClass(cnum); iter.valid(); iter.advance()) {
             if(!sample.getSample().contains(iter)) {
               continue; // TODO: can we test more efficiently than this?
             }
             try {
-              final UncertainObject vec = rel.get(iter);
-              Element r = SVGHyperCube.drawFrame(svgp, proj, SpatialUtil.getMin(vec), SpatialUtil.getMax(vec));
-              SVGUtil.addCSSClass(r, css);
-              layer.appendChild(r);
+              final UncertainObject uo = rel.get(iter);
+              for(int i = 0; i < samples; i++) {
+                double[] v = proj.fastProjectDataToRenderSpace(uo.drawSample(rand));
+                if(v[0] != v[0] || v[1] != v[1]) {
+                  continue; // NaN!
+                }
+                ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
+              }
             }
             catch(ObjectNotFoundException e) {
               // ignore.
@@ -183,16 +187,19 @@ public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
         }
       }
       else {
-        final String STROKE = SVGConstants.CSS_STROKE_PROPERTY + ":";
+        final String FILL = SVGConstants.CSS_FILL_PROPERTY + ":";
         // Color-based styling.
         for(DBIDIter iter = sample.getSample().iter(); iter.valid(); iter.advance()) {
           try {
-            final UncertainObject vec = rel.get(iter);
-            Element r = SVGHyperCube.drawFrame(svgp, proj, SpatialUtil.getMin(vec), SpatialUtil.getMax(vec));
-            SVGUtil.addCSSClass(r, CSS_CLASS);
-            int col = spol.getColorForDBID(iter);
-            SVGUtil.setAtt(r, SVGConstants.SVG_STYLE_ATTRIBUTE, STROKE + SVGUtil.colorToString(col));
-            layer.appendChild(r);
+            final UncertainObject uo = rel.get(iter);
+            for(int i = 0; i < samples; i++) {
+              double[] v = proj.fastProjectDataToRenderSpace(uo.drawSample(rand));
+              Element dot = svgp.svgCircle(v[0], v[1], marker_size);
+              SVGUtil.addCSSClass(dot, CSS_CLASS);
+              int col = spol.getColorForDBID(iter);
+              SVGUtil.setAtt(dot, SVGConstants.SVG_STYLE_ATTRIBUTE, FILL + SVGUtil.colorToString(col));
+              layer.appendChild(dot);
+            }
           }
           catch(ObjectNotFoundException e) {
             // ignore.
