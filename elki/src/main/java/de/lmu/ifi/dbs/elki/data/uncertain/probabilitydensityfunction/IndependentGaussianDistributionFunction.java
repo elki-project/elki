@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.PWCClusteringAlgorithm
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.ContinuousUncertainObject;
+import de.lmu.ifi.dbs.elki.data.uncertain.AbstractDiscreteUncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.AbstractUncertainObject;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.UncertainifyFilter;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
@@ -331,11 +332,11 @@ public class IndependentGaussianDistributionFunction extends AbstractGaussianDis
       if(config.grab(pMaxMax)) {
         maxMax = pMaxMax.doubleValue();
       }
-      IntParameter pMultMin = new IntParameter(Parameterizer.MULT_MIN_ID, AbstractUncertainObject.Factory.Parameterizer.DEFAULT_SAMPLE_SIZE);
+      IntParameter pMultMin = new IntParameter(Parameterizer.MULT_MIN_ID, AbstractDiscreteUncertainObject.Factory.Parameterizer.DEFAULT_SAMPLE_SIZE);
       if(config.grab(pMultMin)) {
         multMin = pMultMin.intValue();
       }
-      IntParameter pMultMax = new IntParameter(Parameterizer.MULT_MAX_ID, AbstractUncertainObject.Factory.Parameterizer.DEFAULT_SAMPLE_SIZE);
+      IntParameter pMultMax = new IntParameter(Parameterizer.MULT_MAX_ID, AbstractDiscreteUncertainObject.Factory.Parameterizer.DEFAULT_SAMPLE_SIZE);
       if(config.grab(pMultMax)) {
         multMax = pMultMax.intValue();
       }

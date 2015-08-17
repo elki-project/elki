@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.data.uncertain;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
@@ -51,33 +50,6 @@ public abstract class AbstractUncertainObject implements UncertainObject {
    * Bounding box of the object.
    */
   protected SpatialComparable bounds;
-
-  /**
-   * Compute the bounding box for some samples.
-   *
-   * @param samples Samples
-   * @return Bounding box.
-   */
-  protected static HyperBoundingBox computeBounds(DoubleVector[] samples) {
-    assert(samples.length > 0) : "Cannot compute bounding box of empty set.";
-    // Compute bounds:
-    final int dimensions = samples[0].getDimensionality();
-    final double min[] = new double[dimensions];
-    final double max[] = new double[dimensions];
-    DoubleVector first = samples[0];
-    for(int d = 0; d < dimensions; d++) {
-      min[d] = max[d] = first.doubleValue(d);
-    }
-    for(int i = 1; i < samples.length; i++) {
-      DoubleVector v = samples[i];
-      for(int d = 0; d < dimensions; d++) {
-        final double c = v.doubleValue(d);
-        min[d] = c < min[d] ? c : min[d];
-        max[d] = c > max[d] ? c : max[d];
-      }
-    }
-    return new HyperBoundingBox(min, max);
-  }
 
   @Override
   public abstract DoubleVector drawSample(Random rand);
@@ -117,18 +89,10 @@ public abstract class AbstractUncertainObject implements UncertainObject {
    */
   public static abstract class Factory<UO extends UncertainObject> implements UncertainObject.Factory<UO> {
     /**
-     * Only generate symmetric distributions.
-     */
-    boolean symmetric;
-
-    /**
      * Constructor.
-     *
-     * @param symmetric Generate only symmetric distributions
      */
-    public Factory(boolean symmetric) {
+    public Factory() {
       super();
-      this.symmetric = symmetric;
     }
 
     /**
@@ -144,14 +108,14 @@ public abstract class AbstractUncertainObject implements UncertainObject {
     protected static double[] generateRandomRange(int dim, double minDev, double maxDev, boolean symmetric, Random drand) {
       double[] offrange = new double[dim << 1];
       if(symmetric) {
-        for(int j = 0; j < dim; j++) {
+        for(int i = 0, j = 0; i < dim; ++i) {
           double off = -1 * (drand.nextDouble() * (maxDev - minDev) + minDev);
           offrange[j++] = off;
           offrange[j++] = -2 * off;
         }
       }
       else {
-        for(int j = 0; j < dim; j++) {
+        for(int i = 0, j = 0; i < dim; ++i) {
           double off = -1 * (drand.nextDouble() * (maxDev - minDev) + minDev);
           double range = (drand.nextDouble() * (maxDev - minDev) + minDev) - /* negative: */ off;
           offrange[j++] = off;
@@ -198,18 +162,9 @@ public abstract class AbstractUncertainObject implements UncertainObject {
      * @apiviz.exclude
      */
     public abstract static class Parameterizer extends AbstractParameterizer {
-      /**
-       * Default sample size for generating finite representations.
-       */
-      public final static int DEFAULT_SAMPLE_SIZE = 10;
+      public static final OptionID DEV_MIN_ID = new OptionID("uo.uncertainty.min", "Minimum width of uncertain region.");
 
-      public static final OptionID MIN_MIN_ID = new OptionID("uo.uncertainty.min", "Minimum width of uncertain region.");
-
-      public static final OptionID MAX_MIN_ID = new OptionID("uo.uncertainty.max", "Maximum width of uncertain region.");
-
-      public static final OptionID MULT_MIN_ID = new OptionID("uo.quantity.min", "Minimum Points per uncertain object.");
-
-      public static final OptionID MULT_MAX_ID = new OptionID("uo.quantity.max", "Maximum Points per uncertain object.");
+      public static final OptionID DEV_MAX_ID = new OptionID("uo.uncertainty.max", "Maximum width of uncertain region.");
 
       public static final OptionID SEED_ID = new OptionID("uo.seed", "Seed for uncertainification.");
 

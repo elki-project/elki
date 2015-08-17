@@ -33,8 +33,6 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Weighted version of discrete uncertain objects.
@@ -49,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @author Alexander Koos
  * @author Erich Schubert
  */
-public class WeightedDiscreteUncertainObject extends AbstractUncertainObject {
+public class WeightedDiscreteUncertainObject extends AbstractDiscreteUncertainObject {
   /**
    * Samples
    */
@@ -122,21 +120,16 @@ public class WeightedDiscreteUncertainObject extends AbstractUncertainObject {
    * @author Alexander Koos
    * @author Erich Schubert
    */
-  public static class Factory extends AbstractUncertainObject.Factory<WeightedDiscreteUncertainObject> {
+  public static class Factory extends AbstractDiscreteUncertainObject.Factory<WeightedDiscreteUncertainObject> {
     /**
      * Minimum and maximum deviation.
      */
     private double minDev, maxDev;
 
     /**
-     * Minimum and maximum number of samples.
+     * Only generate symmetric distributions.
      */
-    private int minQuant, maxQuant;
-
-    /**
-     * Random generator.
-     */
-    private Random rand;
+    boolean symmetric;
 
     /**
      * Constructor.
@@ -149,12 +142,10 @@ public class WeightedDiscreteUncertainObject extends AbstractUncertainObject {
      * @param rand Random generator
      */
     public Factory(double minDev, double maxDev, int minQuant, int maxQuant, boolean symmetric, RandomFactory rand) {
-      super(symmetric);
+      super(minQuant, maxQuant, rand);
       this.minDev = minDev;
       this.maxDev = maxDev;
-      this.minQuant = minQuant;
-      this.maxQuant = maxQuant;
-      this.rand = rand.getRandom();
+      this.symmetric = symmetric;
     }
 
     @Override
@@ -194,47 +185,25 @@ public class WeightedDiscreteUncertainObject extends AbstractUncertainObject {
      *
      * @apiviz.exclude
      */
-    public static class Parameterizer extends AbstractUncertainObject.Factory.Parameterizer {
+    public static class Parameterizer extends AbstractDiscreteUncertainObject.Factory.Parameterizer {
       protected double minDev, maxDev;
-
-      protected int minQuant, maxQuant;
-
-      protected RandomFactory randFac;
-
-      protected double maxTotalProb;
 
       protected boolean symmetric;
 
       @Override
       protected void makeOptions(final Parameterization config) {
         super.makeOptions(config);
-        DoubleParameter pmaxMin = new DoubleParameter(MAX_MIN_ID);
+        DoubleParameter pmaxMin = new DoubleParameter(DEV_MAX_ID);
         if(config.grab(pmaxMin)) {
           maxDev = pmaxMin.doubleValue();
         }
-        DoubleParameter pminMin = new DoubleParameter(MIN_MIN_ID, 0.);
+        DoubleParameter pminMin = new DoubleParameter(DEV_MIN_ID, 0.);
         if(config.grab(pminMin)) {
           minDev = pminMin.doubleValue();
-        }
-        IntParameter pmultMax = new IntParameter(MULT_MAX_ID, DEFAULT_SAMPLE_SIZE);
-        if(config.grab(pmultMax)) {
-          maxQuant = pmultMax.intValue();
-        }
-        IntParameter pmultMin = new IntParameter(MULT_MIN_ID) //
-        .setOptional(true);
-        if(config.grab(pmultMin)) {
-          minQuant = pmultMin.intValue();
-        }
-        else {
-          minQuant = maxQuant;
         }
         Flag symmetricF = new Flag(SYMMETRIC_ID);
         if(config.grab(symmetricF)) {
           symmetric = symmetricF.isTrue();
-        }
-        RandomParameter pseed = new RandomParameter(SEED_ID);
-        if(config.grab(pseed)) {
-          randFac = pseed.getValue();
         }
       }
 

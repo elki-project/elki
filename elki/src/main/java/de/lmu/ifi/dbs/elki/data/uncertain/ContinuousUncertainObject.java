@@ -113,14 +113,17 @@ public class ContinuousUncertainObject extends AbstractUncertainObject {
      */
     private ProbabilityDensityFunction probabilityDensityFunction;
 
+    private boolean symmetric;
+
     /**
      * Constructor for uncertainification.
      *
      * @param probabilityDensityFunction
      */
     public Factory(boolean symmetric, ProbabilityDensityFunction probabilityDensityFunction) {
-      super(symmetric);
+      super();
       this.probabilityDensityFunction = probabilityDensityFunction;
+      this.symmetric = symmetric;
     }
 
     @Override
