@@ -1,5 +1,4 @@
-package de.lmu.ifi.dbs.elki.data.uncertain;
-
+package de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,33 +22,40 @@ package de.lmu.ifi.dbs.elki.data.uncertain;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Random;
-
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
- * Interface for uncertain objects.
- *
- * Uncertain objects <em>must</em> provide a bounding box in this model, and
- * have an option to randomly sample from the data.
+ * Vector factory for uncertain objects.
  *
  * @author Erich Schubert
+ *
+ * @param <UO> Object type
  */
-public interface UncertainObject extends SpatialComparable, FeatureVector<Double> {
+public interface Uncertainifier<UO extends UncertainObject> {
   /**
-   * Draw a random sampled instance.
+   * Generate a new uncertain object. This interface is specialized to numerical
+   * arrays.
    *
-   * @param rand Random generator
-   * @return Sampled object.
+   * The generics allow the use with primitive {@code double[]} arrays:
+   *
+   * <pre>
+   * UO obj = newFeatureVector(array, ArrayLikeUtil.DOUBLEARRAYADAPTER);
+   * </pre>
+   *
+   * @param array Array
+   * @param adapter Array type adapter
+   * @param <A> Array type
+   * @return Uncertain object
    */
-  DoubleVector drawSample(Random rand);
+  <A> UO newFeatureVector(A array, NumberArrayAdapter<?, A> adapter);
 
   /**
-   * Get the center of mass of the uncertain object.
+   * Get the vector factory used for type information and serialization (if
+   * supported).
    *
-   * @return Center of mass.
+   * @return Vector factory.
    */
-  DoubleVector getCenterOfMass();
+  FeatureVector.Factory<UO, ?> getFactory();
 }

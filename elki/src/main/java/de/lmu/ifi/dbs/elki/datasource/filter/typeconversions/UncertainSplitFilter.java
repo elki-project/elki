@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.uncertain.UnweightedDiscreteUncertainObject;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -100,8 +99,7 @@ public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector,
     if(dim % dims != 0) {
       throw new AbortException("Vector length " + dim + " not divisible by the number of dimensions " + dims);
     }
-    final UnweightedDiscreteUncertainObject.Factory factory = new UnweightedDiscreteUncertainObject.Factory(0, 0, 0, 0, false, RandomFactory.DEFAULT);
-    return new VectorFieldTypeInformation<UnweightedDiscreteUncertainObject>(factory, dim);
+    return new VectorFieldTypeInformation<UnweightedDiscreteUncertainObject>(UnweightedDiscreteUncertainObject.FACTORY, dim);
   }
 
   /**

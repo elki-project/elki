@@ -25,15 +25,10 @@ package de.lmu.ifi.dbs.elki.data.uncertain;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Continuous uncertain object model using a uniform distribution on the
@@ -43,6 +38,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @author Erich Schubert
  */
 public class UniformContinuousUncertainObject extends AbstractUncertainObject {
+  /**
+   * Vector factory.
+   */
+  public static final FeatureVector.Factory<UniformContinuousUncertainObject, ?> FACTORY = new Factory();
+
   /**
    * Constructor.
    *
@@ -77,120 +77,30 @@ public class UniformContinuousUncertainObject extends AbstractUncertainObject {
   }
 
   /**
-   * Factory class.
+   * Factory class for this data type. Not for public use, use
+   * {@link de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier.Uncertainifier} to
+   * derive uncertain objects from certain vectors.
+   *
+   * TODO: provide serialization functionality.
    *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
-  public static class Factory extends AbstractUncertainObject.Factory<UniformContinuousUncertainObject> {
-    /**
-     * Minimum and maximum allowed deviation.
-     */
-    double minDev, maxDev;
-
-    /**
-     * Generate symmetric distributions only.
-     */
-    boolean symmetric;
-
-    /**
-     * Random generator.
-     */
-    Random rand;
-
-    /**
-     * Constructor.
-     *
-     * @param minDev Minimum deviation
-     * @param maxDev Maximum deviation
-     * @param symmetric Generate symmetric distributions only
-     * @param rand Random generator
-     */
-    public Factory(double minDev, double maxDev, boolean symmetric, RandomFactory rand) {
-      super();
-      this.minDev = minDev;
-      this.maxDev = maxDev;
-      this.rand = rand.getRandom();
+  private static class Factory implements FeatureVector.Factory<UniformContinuousUncertainObject, Number> {
+    @Override
+    public <A> UniformContinuousUncertainObject newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
+      throw new UnsupportedOperationException();
     }
 
     @Override
-    public <A> UniformContinuousUncertainObject newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
-      final int dim = adapter.size(array);
-      double[] min = new double[dim], max = new double[dim];
-      if(symmetric) {
-        for(int i = 0; i < dim; ++i) {
-          double v = adapter.getDouble(array, i);
-          double width = rand.nextDouble() * (maxDev - minDev) + minDev;
-          min[i] = v - width;
-          max[i] = v + width;
-        }
-      }
-      else {
-        for(int i = 0; i < dim; ++i) {
-          double v = adapter.getDouble(array, i);
-          min[i] = v - (rand.nextDouble() * (maxDev - minDev) + minDev);
-          max[i] = v + (rand.nextDouble() * (maxDev - minDev) + minDev);
-        }
-      }
-      return new UniformContinuousUncertainObject(new HyperBoundingBox(min, max));
+    public ByteBufferSerializer<UniformContinuousUncertainObject> getDefaultSerializer() {
+      return null; // No serializer available.
     }
 
     @Override
     public Class<? super UniformContinuousUncertainObject> getRestrictionClass() {
       return UniformContinuousUncertainObject.class;
-    }
-
-    @Override
-    public ByteBufferSerializer<UniformContinuousUncertainObject> getDefaultSerializer() {
-      return null; // FIXME: not yet available.
-    }
-
-    /**
-     * Parameterizer class.
-     *
-     * @author Alexander Koos
-     * @author Erich Schubert
-     */
-    public final static class Parameterizer extends AbstractUncertainObject.Factory.Parameterizer {
-      /**
-       * Minimum and maximum allowed deviation.
-       */
-      protected double minDev, maxDev;
-
-      /**
-       * Field to hold random for uncertainification.
-       */
-      protected RandomFactory rand;
-
-      /**
-       * Generate symmetric distributions only.
-       */
-      protected boolean symmetric;
-
-      @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        final DoubleParameter pminDev = new DoubleParameter(DEV_MIN_ID, 0.);
-        if(config.grab(pminDev)) {
-          minDev = pminDev.getValue();
-        }
-        final DoubleParameter pmaxDev = new DoubleParameter(DEV_MAX_ID);
-        if(config.grab(pmaxDev)) {
-          maxDev = pmaxDev.getValue();
-        }
-        final RandomParameter pseed = new RandomParameter(SEED_ID);
-        if(config.grab(pseed)) {
-          rand = pseed.getValue();
-        }
-        Flag symmetricF = new Flag(SYMMETRIC_ID);
-        if(config.grab(symmetricF)) {
-          symmetric = symmetricF.isTrue();
-        }
-      }
-
-      @Override
-      protected Factory makeInstance() {
-        return new Factory(minDev, maxDev, symmetric, rand);
-      }
     }
   }
 }

@@ -25,17 +25,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Gaussian model for uncertain objects, sampled from a 3-sigma bounding box.
@@ -48,6 +42,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @author Erich Schubert
  */
 public class SimpleGaussianContinuousUncertainObject extends AbstractUncertainObject {
+  /**
+   * Vector factory.
+   */
+  public static final FeatureVector.Factory<SimpleGaussianContinuousUncertainObject, ?> FACTORY = new Factory();
+
   /**
    * Scaling factor from bounding box width to standard deviations. Bounding box
    * is 6 standard deviations in width (three on each side)!
@@ -97,132 +96,30 @@ public class SimpleGaussianContinuousUncertainObject extends AbstractUncertainOb
   }
 
   /**
-   * Vector factory
+   * Factory class for this data type. Not for public use, use
+   * {@link de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier.Uncertainifier} to
+   * derive uncertain objects from certain vectors.
+   *
+   * TODO: provide serialization functionality.
    *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
-  public static class Factory extends AbstractUncertainObject.Factory<SimpleGaussianContinuousUncertainObject> {
-    /**
-     * Minimum and maximum allowed deviation.
-     */
-    double minDev, maxDev;
-
-    /**
-     * Generate symmetric distributions only.
-     */
-    boolean symmetric;
-
-    /**
-     * Random generator.
-     */
-    Random rand;
-
-    /**
-     * Constructor.
-     *
-     * @param minDev Minimum deviation
-     * @param maxDev Maximum deviation
-     * @param symmetric Generate symmetric distributions only
-     * @param rand Random generator
-     */
-    public Factory(double minDev, double maxDev, boolean symmetric, RandomFactory rand) {
-      super();
-      this.minDev = minDev;
-      this.maxDev = maxDev;
-      this.rand = rand.getRandom();
+  private static class Factory implements FeatureVector.Factory<SimpleGaussianContinuousUncertainObject, Number> {
+    @Override
+    public <A> SimpleGaussianContinuousUncertainObject newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
+      throw new UnsupportedOperationException();
     }
 
     @Override
-    public <A> SimpleGaussianContinuousUncertainObject newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
-      final int dim = adapter.size(array);
-      double[] min = new double[dim], max = new double[dim];
-      if(symmetric) {
-        for(int i = 0; i < dim; ++i) {
-          double v = adapter.getDouble(array, i);
-          double width = rand.nextDouble() * (maxDev - minDev) + minDev;
-          min[i] = v - width;
-          max[i] = v + width;
-        }
-      }
-      else {
-        for(int i = 0; i < dim; ++i) {
-          // Choose standard deviation
-          final double s = rand.nextDouble() * (maxDev - minDev) + minDev;
-          // Assume our center is off by a standard deviation of s.
-          double v = adapter.getDouble(array, i) + rand.nextGaussian() * s;
-          min[i] = v - s;
-          max[i] = v + s;
-        }
-      }
-      return new SimpleGaussianContinuousUncertainObject(new HyperBoundingBox(min, max));
+    public ByteBufferSerializer<SimpleGaussianContinuousUncertainObject> getDefaultSerializer() {
+      return null; // No serializer available.
     }
 
     @Override
     public Class<? super SimpleGaussianContinuousUncertainObject> getRestrictionClass() {
       return SimpleGaussianContinuousUncertainObject.class;
-    }
-
-    @Override
-    public ByteBufferSerializer<SimpleGaussianContinuousUncertainObject> getDefaultSerializer() {
-      return null; // TODO: not available
-    }
-
-    /**
-     * Parameterizer class.
-     *
-     * @author Erich Schubert
-     */
-    public static class Parameterizer extends AbstractUncertainObject.Factory.Parameterizer {
-      /**
-       * Parameter for minimum 3-sigma deviation.
-       */
-      public static final OptionID DEV_MIN_ID = new OptionID("uo.uncertainty.min3sigma", "Minimum 3-sigma deviation of uncertain region.");
-
-      /**
-       * Parameter for maximum 3-sigma deviation.
-       */
-      public static final OptionID DEV_MAX_ID = new OptionID("uo.uncertainty.max3sigma", "Maximum 3-sigma deviation of uncertain region.");
-
-      /**
-       * Minimum and maximum allowed deviation.
-       */
-      protected double minDev, maxDev;
-
-      /**
-       * Field to hold random for uncertainification.
-       */
-      protected RandomFactory rand;
-
-      /**
-       * Generate symmetric distributions only.
-       */
-      protected boolean symmetric;
-
-      @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        final DoubleParameter pminDev = new DoubleParameter(DEV_MIN_ID, 0.);
-        if(config.grab(pminDev)) {
-          minDev = pminDev.getValue();
-        }
-        final DoubleParameter pmaxDev = new DoubleParameter(DEV_MAX_ID);
-        if(config.grab(pmaxDev)) {
-          maxDev = pmaxDev.getValue();
-        }
-        final RandomParameter pseed = new RandomParameter(SEED_ID);
-        if(config.grab(pseed)) {
-          rand = pseed.getValue();
-        }
-        Flag symmetricF = new Flag(SYMMETRIC_ID);
-        if(config.grab(symmetricF)) {
-          symmetric = symmetricF.isTrue();
-        }
-      }
-
-      @Override
-      protected Factory makeInstance() {
-        return new Factory(minDev, maxDev, symmetric, rand);
-      }
     }
   }
 }

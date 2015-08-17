@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
+import de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier.Uncertainifier;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
@@ -60,14 +61,14 @@ public class UncertainifyFilter<UO extends UncertainObject> extends AbstractConv
    * uncertainified and how the the sampling is made in the
    * {@link de.lmu.ifi.dbs.elki.workflow.AlgorithmStep}.
    */
-  private UncertainObject.Factory<UO> uncertainityModel;
+  private Uncertainifier<UO> uncertainityModel;
 
   /**
    * Constructor.
    *
    * @param uoModel
    */
-  public UncertainifyFilter(UncertainObject.Factory<UO> uoModel) {
+  public UncertainifyFilter(Uncertainifier<UO> uoModel) {
     this.uncertainityModel = uoModel;
   }
 
@@ -89,7 +90,7 @@ public class UncertainifyFilter<UO extends UncertainObject> extends AbstractConv
   @Override
   protected SimpleTypeInformation<UO> convertedType(SimpleTypeInformation<NumberVector> in) {
     final int dim = ((VectorFieldTypeInformation<NumberVector>) in).getDimensionality();
-    return new VectorFieldTypeInformation<UO>(uncertainityModel, dim);
+    return new VectorFieldTypeInformation<UO>(uncertainityModel.getFactory(), dim);
   }
 
   /**
@@ -110,12 +111,12 @@ public class UncertainifyFilter<UO extends UncertainObject> extends AbstractConv
     /**
      * Field to hold the uncertainityModel
      */
-    protected UncertainObject.Factory<UO> uncertainityModel;
+    protected Uncertainifier<UO> uncertainityModel;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final ObjectParameter<UncertainObject.Factory<UO>> uoModel = new ObjectParameter<>(UNCERTAINITY_MODEL_ID, UncertainObject.Factory.class);
+      final ObjectParameter<Uncertainifier<UO>> uoModel = new ObjectParameter<>(UNCERTAINITY_MODEL_ID, Uncertainifier.class);
       if(config.grab(uoModel)) {
         uncertainityModel = uoModel.instantiateClass(config);
       }

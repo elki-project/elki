@@ -26,13 +26,10 @@ package de.lmu.ifi.dbs.elki.data.uncertain;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Unweighted implementation of discrete uncertain objects.
@@ -47,6 +44,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @author Erich Schubert
  */
 public class UnweightedDiscreteUncertainObject extends AbstractDiscreteUncertainObject {
+  /**
+   * Vector factory.
+   */
+  public static final FeatureVector.Factory<UnweightedDiscreteUncertainObject, ?> FACTORY = new Factory();
+
   /**
    * Sample vectors.
    */
@@ -90,93 +92,30 @@ public class UnweightedDiscreteUncertainObject extends AbstractDiscreteUncertain
   }
 
   /**
-   * Factory class
+   * Factory class for this data type. Not for public use, use
+   * {@link de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier.Uncertainifier} to
+   * derive uncertain objects from certain vectors.
    *
-   * @author Alexander Koos
+   * TODO: provide serialization functionality.
+   *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
-  public static class Factory extends AbstractDiscreteUncertainObject.Factory<UnweightedDiscreteUncertainObject> {
-    /**
-     * Minimum and maximum deviations.
-     */
-    public double minDev, maxDev;
-
-    /**
-     * Only generate symmetric distributions.
-     */
-    boolean symmetric;
-
-    /**
-     * Constructor.
-     *
-     * @param minDev Minimum deviation
-     * @param maxDev Maximum deviation
-     * @param minQuant Minimum number of samples
-     * @param maxQuant Maximum number of samples
-     * @param symmetric Generate symmetric distributions only
-     * @param rand Random generator
-     */
-    public Factory(double minDev, double maxDev, int minQuant, int maxQuant, boolean symmetric, RandomFactory rand) {
-      super(minQuant, maxQuant, rand);
-      this.minDev = minDev;
-      this.maxDev = maxDev;
-      this.symmetric = symmetric;
+  private static class Factory implements FeatureVector.Factory<UnweightedDiscreteUncertainObject, Number> {
+    @Override
+    public <A> UnweightedDiscreteUncertainObject newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
+      throw new UnsupportedOperationException();
     }
 
     @Override
-    public <A> UnweightedDiscreteUncertainObject newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
-      final int dim = adapter.size(array);
-      final int distributionSize = rand.nextInt((maxQuant - minQuant) + 1) + (int) minQuant;
-      DoubleVector[] samples = new DoubleVector[distributionSize];
-      double[] offrange = generateRandomRange(dim, minDev, maxDev, symmetric, rand);
-      // Produce samples:
-      double[] buf = new double[dim];
-      for(int i = 0; i < distributionSize; i++) {
-        for(int j = 0, k = 0; j < dim; j++) {
-          double gtv = adapter.getDouble(array, j);
-          buf[j] = gtv + offrange[k++] + rand.nextDouble() * offrange[k++];
-        }
-        samples[i] = new DoubleVector(buf);
-      }
-      return new UnweightedDiscreteUncertainObject(samples);
+    public ByteBufferSerializer<UnweightedDiscreteUncertainObject> getDefaultSerializer() {
+      return null; // No serializer available.
     }
 
     @Override
     public Class<? super UnweightedDiscreteUncertainObject> getRestrictionClass() {
       return UnweightedDiscreteUncertainObject.class;
-    }
-
-    @Override
-    public ByteBufferSerializer<UnweightedDiscreteUncertainObject> getDefaultSerializer() {
-      return null; // TODO: Not yet available.
-    }
-
-    public static class Parameterizer extends AbstractDiscreteUncertainObject.Factory.Parameterizer {
-      protected double minDev, maxDev;
-
-      boolean symmetric;
-
-      @Override
-      protected void makeOptions(final Parameterization config) {
-        super.makeOptions(config);
-        DoubleParameter pmaxDev = new DoubleParameter(DEV_MAX_ID);
-        if(config.grab(pmaxDev)) {
-          maxDev = pmaxDev.doubleValue();
-        }
-        DoubleParameter pminDev = new DoubleParameter(DEV_MIN_ID, 0.);
-        if(config.grab(pminDev)) {
-          minDev = pminDev.doubleValue();
-        }
-        Flag symmetricF = new Flag(SYMMETRIC_ID);
-        if(config.grab(symmetricF)) {
-          symmetric = symmetricF.isTrue();
-        }
-      }
-
-      @Override
-      protected Factory makeInstance() {
-        return new Factory(minDev, maxDev, minQuant, maxQuant, symmetric, randFac);
-      }
     }
   }
 }

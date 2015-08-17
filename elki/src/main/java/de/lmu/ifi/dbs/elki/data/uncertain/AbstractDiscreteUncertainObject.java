@@ -22,15 +22,8 @@ package de.lmu.ifi.dbs.elki.data.uncertain;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Random;
-
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Discrete uncertain objects are based a finite number of samples.
@@ -63,88 +56,5 @@ public abstract class AbstractDiscreteUncertainObject extends AbstractUncertainO
       }
     }
     return new HyperBoundingBox(min, max);
-  }
-
-  /**
-   * Factory class for discrete uncertain objects.
-   *
-   * @author Erich Schubert
-   *
-   * @param <UO> Uncertain object type.
-   */
-  public abstract static class Factory<UO extends UncertainObject> extends AbstractUncertainObject.Factory<UO> {
-    /**
-     * Minimum and maximum number of samples.
-     */
-    protected int minQuant, maxQuant;
-
-    /**
-     * Random generator.
-     */
-    protected Random rand;
-
-    /**
-     * Constructor.
-     *
-     * @param minQuant Minimum number of samples
-     * @param maxQuant Maximum number of samples
-     * @param rand Random generator
-     */
-    public Factory(int minQuant, int maxQuant, RandomFactory rand) {
-      super();
-      this.minQuant = minQuant;
-      this.maxQuant = maxQuant;
-      this.rand = rand.getRandom();
-    }
-
-    /**
-     * Parameterizer.
-     *
-     * @author Erich Schubert
-     *
-     * @apiviz.exclude
-     */
-    public static abstract class Parameterizer extends AbstractUncertainObject.Factory.Parameterizer {
-      /**
-       * Default sample size for generating finite representations.
-       */
-      public final static int DEFAULT_SAMPLE_SIZE = 10;
-
-      /**
-       * Maximum quantity of generated samples.
-       */
-      public static final OptionID MULT_MAX_ID = new OptionID("uo.quantity.max", "Maximum points per uncertain object.");
-
-      /**
-       * Minimum quantity of generated samples.
-       */
-      public static final OptionID MULT_MIN_ID = new OptionID("uo.quantity.min", "Minimum points per uncertain object (defaults to maximum.");
-
-      /**
-       * Minimum and maximum number of samples.
-       */
-      protected int minQuant, maxQuant;
-
-      /**
-       * Random generator.
-       */
-      protected RandomFactory randFac;
-
-      @Override
-      protected void makeOptions(Parameterization config) {
-        super.makeOptions(config);
-        RandomParameter pseed = new RandomParameter(SEED_ID);
-        if(config.grab(pseed)) {
-          randFac = pseed.getValue();
-        }
-        IntParameter pmultMax = new IntParameter(MULT_MAX_ID, DEFAULT_SAMPLE_SIZE);
-        if(config.grab(pmultMax)) {
-          maxQuant = pmultMax.intValue();
-        }
-        IntParameter pmultMin = new IntParameter(MULT_MIN_ID) //
-        .setOptional(true);
-        minQuant = config.grab(pmultMin) ? pmultMin.intValue() : maxQuant;
-      }
-    }
   }
 }
