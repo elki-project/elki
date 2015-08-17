@@ -22,14 +22,13 @@ package de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Random;
-
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Factory class for discrete uncertain objects.
@@ -38,29 +37,29 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  *
  * @param <UO> Uncertain object type.
  */
-public abstract class AbstractDiscreteUncertainifier<UO extends UncertainObject> extends AbstractUncertainifier<UO> {
+public abstract class AbstractDiscreteUncertainifier<UO extends UncertainObject> implements Uncertainifier<UO> {
+  /**
+   * Inner class for generating uncertain instances.
+   */
+  protected Uncertainifier<?> inner;
+
   /**
    * Minimum and maximum number of samples.
    */
   protected int minQuant, maxQuant;
 
   /**
-   * Random generator.
-   */
-  protected Random rand;
-
-  /**
    * Constructor.
    *
+   * @param inner Inner uncertainifier
    * @param minQuant Minimum number of samples
    * @param maxQuant Maximum number of samples
-   * @param rand Random generator
    */
-  public AbstractDiscreteUncertainifier(int minQuant, int maxQuant, RandomFactory rand) {
+  public AbstractDiscreteUncertainifier(Uncertainifier<?> inner, int minQuant, int maxQuant) {
     super();
+    this.inner = inner;
     this.minQuant = minQuant;
     this.maxQuant = maxQuant;
-    this.rand = rand.getRandom();
   }
 
   /**
@@ -70,11 +69,16 @@ public abstract class AbstractDiscreteUncertainifier<UO extends UncertainObject>
    *
    * @apiviz.exclude
    */
-  public static abstract class Parameterizer extends AbstractUncertainifier.Parameterizer {
+  public static abstract class Parameterizer extends AbstractParameterizer {
     /**
      * Default sample size for generating finite representations.
      */
     public final static int DEFAULT_SAMPLE_SIZE = 10;
+
+    /**
+     * Class to use for generating the uncertain instances.
+     */
+    public static final OptionID INNER_ID = new OptionID("uo.discrete.generator", "Class to generate the point distribution.");
 
     /**
      * Maximum quantity of generated samples.
@@ -87,21 +91,24 @@ public abstract class AbstractDiscreteUncertainifier<UO extends UncertainObject>
     public static final OptionID MULT_MIN_ID = new OptionID("uo.quantity.min", "Minimum points per uncertain object (defaults to maximum.");
 
     /**
+     * Inner class for generating uncertain instances.
+     */
+    protected Uncertainifier<?> inner;
+
+    /**
      * Minimum and maximum number of samples.
      */
     protected int minQuant, maxQuant;
 
-    /**
-     * Random generator.
-     */
-    protected RandomFactory randFac;
-
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      RandomParameter pseed = new RandomParameter(SEED_ID);
-      if(config.grab(pseed)) {
-        randFac = pseed.getValue();
+      ObjectParameter<Uncertainifier<?>> innerP = new ObjectParameter<>(INNER_ID, Uncertainifier.class);
+      if(config.grab(innerP)) {
+        inner = innerP.instantiateClass(config);
+        if(inner instanceof AbstractDiscreteUncertainifier) {
+          LoggingUtil.warning("Using a discrete uncertainifier inside a discrete uncertainifier is likely a configuration error, and is likely to produce too many duplicate points. Did you mean to use a uniform or gaussian distribution instead?");
+        }
       }
       IntParameter pmultMax = new IntParameter(MULT_MAX_ID, DEFAULT_SAMPLE_SIZE);
       if(config.grab(pmultMax)) {

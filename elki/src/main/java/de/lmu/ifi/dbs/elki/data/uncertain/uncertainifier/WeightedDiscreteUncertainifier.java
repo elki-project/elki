@@ -22,64 +22,48 @@ package de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.FeatureVector.Factory;
+import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.WeightedDiscreteUncertainObject;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
- * Factory to produce uncertain vectors.
+ * Class to generate weighted discrete uncertain objects.
  *
- * @author Alexander Koos
+ * This is a second-order generator: it requires the use of another generator to
+ * sample from (e.g. {@link UniformUncertainifier} or
+ * {@link SimpleGaussianUncertainifier}).
+ *
  * @author Erich Schubert
  */
 public class WeightedDiscreteUncertainifier extends AbstractDiscreteUncertainifier<WeightedDiscreteUncertainObject> {
   /**
-   * Minimum and maximum deviation.
-   */
-  private double minDev, maxDev;
-
-  /**
-   * Only generate symmetric distributions.
-   */
-  boolean symmetric;
-
-  /**
    * Constructor.
    *
-   * @param minDev Minimum deviation
-   * @param maxDev Maximum deviation
+   * @param inner Inner uncertainifier
    * @param minQuant Minimum number of samples
    * @param maxQuant Maximum number of samples
-   * @param symmetric Generate symmetric distributions only
-   * @param rand Random generator
    */
-  public WeightedDiscreteUncertainifier(double minDev, double maxDev, int minQuant, int maxQuant, boolean symmetric, RandomFactory rand) {
-    super(minQuant, maxQuant, rand);
-    this.minDev = minDev;
-    this.maxDev = maxDev;
-    this.symmetric = symmetric;
+  public WeightedDiscreteUncertainifier(Uncertainifier<?> inner, int minQuant, int maxQuant) {
+    super(inner, minQuant, maxQuant);
   }
 
   @Override
-  public <A> WeightedDiscreteUncertainObject newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
-    final int dim = adapter.size(array);
+  public <A> WeightedDiscreteUncertainObject newFeatureVector(Random rand, A array, NumberArrayAdapter<?, A> adapter) {
+    UncertainObject uo = inner.newFeatureVector(rand, array, adapter);
     final int distributionSize = rand.nextInt((maxQuant - minQuant) + 1) + (int) minQuant;
     DoubleVector[] samples = new DoubleVector[distributionSize];
-    double[] offrange = generateRandomRange(dim, minDev, maxDev, symmetric, rand);
-    // Produce samples:
     double[] weights = new double[distributionSize];
-    double[] buf = new double[dim];
     for(int i = 0; i < distributionSize; i++) {
-      for(int j = 0, k = 0; j < dim; j++) {
-        double gtv = adapter.getDouble(array, j);
-        buf[j] = gtv + offrange[k++] + rand.nextDouble() * offrange[k++];
+      samples[i] = uo.drawSample(rand);
+      double w = rand.nextDouble();
+      while(w <= 0.) { // Avoid zero weights.
+        w = rand.nextDouble();
       }
-      samples[i] = new DoubleVector(buf);
+      weights[i] = w;
     }
     return new WeightedDiscreteUncertainObject(samples, weights);
   }
@@ -92,36 +76,14 @@ public class WeightedDiscreteUncertainifier extends AbstractDiscreteUncertainifi
   /**
    * Parameterization class.
    *
-   * @author Alexander Koos
    * @author Erich Schubert
    *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDiscreteUncertainifier.Parameterizer {
-    protected double minDev, maxDev;
-
-    protected boolean symmetric;
-
-    @Override
-    protected void makeOptions(final Parameterization config) {
-      super.makeOptions(config);
-      DoubleParameter pmaxMin = new DoubleParameter(DEV_MAX_ID);
-      if(config.grab(pmaxMin)) {
-        maxDev = pmaxMin.doubleValue();
-      }
-      DoubleParameter pminMin = new DoubleParameter(DEV_MIN_ID, 0.);
-      if(config.grab(pminMin)) {
-        minDev = pminMin.doubleValue();
-      }
-      Flag symmetricF = new Flag(SYMMETRIC_ID);
-      if(config.grab(symmetricF)) {
-        symmetric = symmetricF.isTrue();
-      }
-    }
-
     @Override
     protected WeightedDiscreteUncertainifier makeInstance() {
-      return new WeightedDiscreteUncertainifier(minDev, maxDev, minQuant, maxQuant, symmetric, randFac);
+      return new WeightedDiscreteUncertainifier(inner, minQuant, maxQuant);
     }
   }
 }

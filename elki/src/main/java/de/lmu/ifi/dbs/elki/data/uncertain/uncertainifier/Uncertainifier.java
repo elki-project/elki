@@ -22,9 +22,12 @@ package de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Random;
+
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
  * Vector factory for uncertain objects.
@@ -35,6 +38,12 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  */
 public interface Uncertainifier<UO extends UncertainObject> {
   /**
+   * Shared parameter: to force centering the uncertain region on the exact
+   * vector.
+   */
+  static final OptionID SYMMETRIC_ID = new OptionID("uo.symmetric", "Generate a symetric uncertain region, centered around the exact data.");
+
+  /**
    * Generate a new uncertain object. This interface is specialized to numerical
    * arrays.
    *
@@ -44,12 +53,13 @@ public interface Uncertainifier<UO extends UncertainObject> {
    * UO obj = newFeatureVector(array, ArrayLikeUtil.DOUBLEARRAYADAPTER);
    * </pre>
    *
+   * @param rand Random generator
    * @param array Array
    * @param adapter Array type adapter
    * @param <A> Array type
    * @return Uncertain object
    */
-  <A> UO newFeatureVector(A array, NumberArrayAdapter<?, A> adapter);
+  <A> UO newFeatureVector(Random rand, A array, NumberArrayAdapter<?, A> adapter);
 
   /**
    * Get the vector factory used for type information and serialization (if

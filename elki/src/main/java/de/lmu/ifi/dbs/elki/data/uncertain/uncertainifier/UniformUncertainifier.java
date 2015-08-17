@@ -24,22 +24,22 @@ package de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.FeatureVector.Factory;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.uncertain.UniformContinuousUncertainObject;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Factory class.
  *
  * @author Erich Schubert
  */
-public class UniformUncertainifier extends AbstractUncertainifier<UniformContinuousUncertainObject> {
+public class UniformUncertainifier implements Uncertainifier<UniformContinuousUncertainObject> {
   /**
    * Minimum and maximum allowed deviation.
    */
@@ -51,27 +51,20 @@ public class UniformUncertainifier extends AbstractUncertainifier<UniformContinu
   boolean symmetric;
 
   /**
-   * Random generator.
-   */
-  Random rand;
-
-  /**
    * Constructor.
    *
    * @param minDev Minimum deviation
    * @param maxDev Maximum deviation
    * @param symmetric Generate symmetric distributions only
-   * @param rand Random generator
    */
-  public UniformUncertainifier(double minDev, double maxDev, boolean symmetric, RandomFactory rand) {
+  public UniformUncertainifier(double minDev, double maxDev, boolean symmetric) {
     super();
     this.minDev = minDev;
     this.maxDev = maxDev;
-    this.rand = rand.getRandom();
   }
 
   @Override
-  public <A> UniformContinuousUncertainObject newFeatureVector(A array, NumberArrayAdapter<?, A> adapter) {
+  public <A> UniformContinuousUncertainObject newFeatureVector(Random rand, A array, NumberArrayAdapter<?, A> adapter) {
     final int dim = adapter.size(array);
     double[] min = new double[dim], max = new double[dim];
     if(symmetric) {
@@ -103,16 +96,21 @@ public class UniformUncertainifier extends AbstractUncertainifier<UniformContinu
    * @author Alexander Koos
    * @author Erich Schubert
    */
-  public final static class Parameterizer extends AbstractUncertainifier.Parameterizer {
+  public final static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Minimum deviation of the generated bounding box.
+     */
+    public static final OptionID DEV_MIN_ID = new OptionID("uo.uncertainty.min", "Minimum deviation of uncertain bounding box.");
+
+    /**
+     * Maximum deviation of the generated bounding box.
+     */
+    public static final OptionID DEV_MAX_ID = new OptionID("uo.uncertainty.max", "Maximum deviation of uncertain bounding box.");
+
     /**
      * Minimum and maximum allowed deviation.
      */
     protected double minDev, maxDev;
-
-    /**
-     * Field to hold random for uncertainification.
-     */
-    protected RandomFactory rand;
 
     /**
      * Generate symmetric distributions only.
@@ -130,10 +128,6 @@ public class UniformUncertainifier extends AbstractUncertainifier<UniformContinu
       if(config.grab(pmaxDev)) {
         maxDev = pmaxDev.getValue();
       }
-      final RandomParameter pseed = new RandomParameter(SEED_ID);
-      if(config.grab(pseed)) {
-        rand = pseed.getValue();
-      }
       Flag symmetricF = new Flag(SYMMETRIC_ID);
       if(config.grab(symmetricF)) {
         symmetric = symmetricF.isTrue();
@@ -142,7 +136,7 @@ public class UniformUncertainifier extends AbstractUncertainifier<UniformContinu
 
     @Override
     protected UniformUncertainifier makeInstance() {
-      return new UniformUncertainifier(minDev, maxDev, symmetric, rand);
+      return new UniformUncertainifier(minDev, maxDev, symmetric);
     }
   }
 }

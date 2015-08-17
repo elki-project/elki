@@ -65,11 +65,6 @@ public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector,
   }
 
   @Override
-  protected Logging getLogger() {
-    return LOG;
-  }
-
-  @Override
   protected UnweightedDiscreteUncertainObject filterSingleObject(NumberVector vec) {
     final int dim = vec.getDimensionality();
     if(dim % dims != 0) {
@@ -100,6 +95,11 @@ public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector,
       throw new AbortException("Vector length " + dim + " not divisible by the number of dimensions " + dims);
     }
     return new VectorFieldTypeInformation<UnweightedDiscreteUncertainObject>(UnweightedDiscreteUncertainObject.FACTORY, dim);
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 
   /**
