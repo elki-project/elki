@@ -24,12 +24,14 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
  */
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM;
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -47,22 +49,30 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringAdjustedRandIndexSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringDistanceSimilarityFunction;
+import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -100,37 +110,51 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
   private static final Logging LOG = Logging.getLogger(RepresentativeUncertainClustering.class);
 
   /**
-   * The algorithm to be wrapped and run.
+   * Distance function for clusterings.
    */
-  private ClusteringAlgorithm<?> samplesAlgorithm;
+  protected ClusteringDistanceSimilarityFunction distance;
 
   /**
    * The algorithm for meta-clustering.
    */
-  private ClusteringAlgorithm<?> metaAlgorithm;
+  protected ClusteringAlgorithm<?> metaAlgorithm;
+
+  /**
+   * The algorithm to be wrapped and run.
+   */
+  protected ClusteringAlgorithm<?> samplesAlgorithm;
 
   /**
    * How many clusterings shall be made for aggregation.
    */
-  private int numsamples;
+  protected int numsamples;
 
   /**
    * Random factory for sampling.
    */
-  private RandomFactory random;
+  protected RandomFactory random;
+
+  /**
+   * Alpha parameter for confidence.
+   */
+  protected double alpha;
 
   /**
    * Constructor, quite trivial.
    *
-   * @param algorithm Primary clustering algorithm
-   * @param numsamples Number of samples
+   * @param distance Distance function for meta clustering
    * @param metaAlgorithm Meta clustering algorithm
+   * @param samplesAlgorithm Primary clustering algorithm
+   * @param numsamples Number of samples
+   * @param alpha Alpha confidence
    */
-  public RepresentativeUncertainClustering(ClusteringAlgorithm<?> algorithm, int numsamples, ClusteringAlgorithm<?> metaAlgorithm, RandomFactory random) {
-    this.samplesAlgorithm = algorithm;
+  public RepresentativeUncertainClustering(ClusteringDistanceSimilarityFunction distance, ClusteringAlgorithm<?> metaAlgorithm, ClusteringAlgorithm<?> samplesAlgorithm, int numsamples, RandomFactory random, double alpha) {
+    this.samplesAlgorithm = samplesAlgorithm;
     this.numsamples = numsamples;
     this.metaAlgorithm = metaAlgorithm;
+    this.distance = distance;
     this.random = random;
+    this.alpha = alpha;
   }
 
   /**
@@ -170,17 +194,82 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     // Step 2: perform the meta clustering (on samples only).
     DBIDRange rids = DBIDFactory.FACTORY.generateStaticDBIDRange(clusterings.size());
     WritableDataStore<Clustering<?>> datastore = DataStoreUtil.makeStorage(rids, DataStoreFactory.HINT_DB, Clustering.class);
-    Iterator<Clustering<?>> it2 = clusterings.iterator();
-    for(DBIDIter iter = rids.iter(); iter.valid(); iter.advance()) {
-      datastore.put(iter, it2.next());
+    {
+      Iterator<Clustering<?>> it2 = clusterings.iterator();
+      for(DBIDIter iter = rids.iter(); iter.valid(); iter.advance()) {
+        datastore.put(iter, it2.next());
+      }
     }
     assert(rids.size() == clusterings.size());
 
-    Relation<Clustering<?>> simRelation = new MaterializedRelation<Clustering<?>>(TypeUtil.CLUSTERING, rids, "Clusterings", datastore);
-    ProxyDatabase d = new ProxyDatabase(rids, simRelation);
+    // Build a relation, and a distance matrix.
+    Relation<Clustering<?>> crel = new MaterializedRelation<Clustering<?>>(TypeUtil.CLUSTERING, rids, "Clusterings", datastore);
+    PrecomputedDistanceMatrix<Clustering<?>> mat = new PrecomputedDistanceMatrix<>(crel, distance);
+    mat.initialize();
+    ProxyDatabase d = new ProxyDatabase(rids, crel);
+    d.getHierarchy().add(crel, mat);
     Clustering<?> c = metaAlgorithm.run(d);
-    d.getHierarchy().remove(d, c);
+    d.getHierarchy().remove(d, c); // Detach from database
+
+    // Evaluation
+    DistanceQuery<Clustering<?>> dq = mat.getDistanceQuery(distance);
+    List<? extends Cluster<?>> cl = c.getAllClusters();
+    for(Cluster<?> clus : cl) {
+      double besttau = Double.POSITIVE_INFINITY;
+      Clustering<?> bestc = null;
+      for(DBIDIter it1 = clus.getIDs().iter(); it1.valid(); it1.advance()) {
+        double tau = 0.;
+        Clustering<?> curc = crel.get(it1);
+        for(DBIDIter it2 = clus.getIDs().iter(); it2.valid(); it2.advance()) {
+          if(DBIDUtil.equal(it1, it2)) {
+            continue;
+          }
+          double di = dq.distance(curc, it2);
+          tau = di > tau ? di : tau;
+        }
+        // Cluster member with the least maximum distance.
+        if(tau < besttau) {
+          besttau = tau;
+          bestc = curc;
+        }
+      }
+      if(bestc == null) { // E.g. degenerate empty clusters
+        continue;
+      }
+      // Global tau:
+      double gtau = 0.;
+      for(DBIDIter it2 = crel.iterDBIDs(); it2.valid(); it2.advance()) {
+        double di = dq.distance(bestc, it2);
+        gtau = di > gtau ? di : gtau;
+      }
+      EvaluationResult psr = evaluate(bestc, gtau, besttau, clus.size(), crel.size());
+      database.getHierarchy().add(bestc, psr);
+    }
     return c;
+  }
+
+  /**
+   * Produce the evaluation result for a particular clustering.
+   *
+   * @param c Clustering
+   * @param gtau Global tau
+   * @param tau Cluster tau
+   * @param support Cluster size
+   * @param samples Total number of samples
+   * @return Evaluation result
+   */
+  protected EvaluationResult evaluate(Clustering<?> c, double gtau, double tau, int support, int samples) {
+    EvaluationResult res = new EvaluationResult("Possible-Worlds Evaluation", "representativeness");
+
+    final double z = NormalDistribution.standardNormalQuantile(alpha);
+    final double eprob = support / (double) samples;
+    final double cprob = Math.max(0., eprob - z * Math.sqrt((eprob * (1 - eprob)) / samples));
+
+    MeasurementGroup g = res.newGroup("Representativeness");
+    g.addMeasure("Global Tau", gtau, 0, 1, true);
+    g.addMeasure("Cluster Tau", tau, 0, 1, true);
+    g.addMeasure("Confidence", cprob, 0, 1, false);
+    return res;
   }
 
   /**
@@ -253,7 +342,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
      *
      * Has a default value.
      */
-    public final static OptionID DEPTH_ID = new OptionID("pwc.samples", "Number of clusterings to produce on samples.");
+    public final static OptionID SAMPLES_ID = new OptionID("pwc.samples", "Number of clusterings to produce on samples.");
 
     /**
      * Parameter to specify the random generator.
@@ -261,14 +350,14 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     public final static OptionID RANDOM_ID = new OptionID("pwc.random", "Random generator used for sampling.");
 
     /**
-     * Field to store parameter value for depth.
+     * Alpha parameter for confidence estimation.
      */
-    protected int tryDepth;
+    public static final OptionID ALPHA_ID = new OptionID("pwc.alpha", "Alpha threshold for estimating the confidence probability.");
 
     /**
-     * Field to store the algorithm.
+     * Distance (dissimilarity) for clusterinogs.
      */
-    protected ClusteringAlgorithm<?> algorithm;
+    protected ClusteringDistanceSimilarityFunction distance;
 
     /**
      * Field to store the inner algorithm for meta-clustering
@@ -276,14 +365,29 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     protected ClusteringAlgorithm<?> metaAlgorithm;
 
     /**
+     * Field to store the algorithm.
+     */
+    protected ClusteringAlgorithm<?> samplesAlgorithm;
+
+    /**
+     * Field to store parameter the number of samples.
+     */
+    protected int numsamples;
+
+    /**
      * Random factory for sampling.
      */
     protected RandomFactory random;
 
+    /**
+     * Alpha parameter for confidence.
+     */
+    protected double alpha;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ClusteringDistanceSimilarityFunction distance = ClusteringAdjustedRandIndexSimilarityFunction.STATIC;
+      distance = ClusteringAdjustedRandIndexSimilarityFunction.STATIC;
       ObjectParameter<ClusteringDistanceSimilarityFunction> simP = new ObjectParameter<>(CLUSTERDISTANCE_ID, ClusteringDistanceSimilarityFunction.class, ClusteringAdjustedRandIndexSimilarityFunction.class);
       if(config.grab(simP)) {
         distance = simP.instantiateClass(config);
@@ -302,25 +406,31 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       }
       ObjectParameter<ClusteringAlgorithm<?>> palgorithm = new ObjectParameter<>(ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(palgorithm)) {
-        algorithm = palgorithm.instantiateClass(config);
-        if(algorithm != null && algorithm.getInputTypeRestriction().length > 0 && //
-        !algorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
-          config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + algorithm.getInputTypeRestriction()[0]));
+        samplesAlgorithm = palgorithm.instantiateClass(config);
+        if(samplesAlgorithm != null && samplesAlgorithm.getInputTypeRestriction().length > 0 && //
+        !samplesAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
+          config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + samplesAlgorithm.getInputTypeRestriction()[0]));
         }
       }
-      IntParameter pdepth = new IntParameter(DEPTH_ID, DEFAULT_ENSEMBLE_DEPTH);
+      IntParameter pdepth = new IntParameter(SAMPLES_ID, DEFAULT_ENSEMBLE_DEPTH);
       if(config.grab(pdepth)) {
-        tryDepth = pdepth.getValue();
+        numsamples = pdepth.getValue();
       }
       RandomParameter randomP = new RandomParameter(RANDOM_ID);
       if(config.grab(randomP)) {
         random = randomP.getValue();
       }
+      DoubleParameter palpha = new DoubleParameter(ALPHA_ID, 0.95) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
+      .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+      if(config.grab(palpha)) {
+        alpha = palpha.doubleValue();
+      }
     }
 
     @Override
     protected RepresentativeUncertainClustering makeInstance() {
-      return new RepresentativeUncertainClustering(algorithm, tryDepth, metaAlgorithm, random);
+      return new RepresentativeUncertainClustering(distance, metaAlgorithm, samplesAlgorithm, numsamples, random, alpha);
     }
   }
 }
