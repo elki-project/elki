@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,43 +23,60 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.Cluster;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Measure the similarity of clusters via the intersection size.
+ * Measure the similarity of clusters via the BCubed F1 Index.
+ *
+ * Reference:
+ * <p>
+ * Bagga, A. and Baldwin, B.<br />
+ * Entity-based cross-document coreferencing using the Vector Space Model<br />
+ * Proc. COLING '98 Proceedings of the 17th international conference on
+ * Computational linguistics
+ * </p>
  *
  * @author Erich Schubert
  */
-public class ClusterIntersectionSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Cluster<?>> implements PrimitiveDistanceFunction<Cluster<?>> {
+@Reference(authors = "Bagga, A. and Baldwin, B.", //
+title = "Entity-based cross-document coreferencing using the Vector Space Model", //
+booktitle = "Proc. COLING '98 Proceedings of the 17th international conference on Computational linguistics", //
+url = "http://dx.doi.org/10.3115/980451.980859")
+public class ClusteringBCubedF1SimilarityFunction extends AbstractPrimitiveSimilarityFunction<Clustering<?>>implements ClusteringSimilarityFunction, PrimitiveDistanceFunction<Clustering<?>>, NormalizedSimilarityFunction<Clustering<?>> {
   /**
    * Static instance.
    */
-  public static final ClusterIntersectionSimilarityFunction STATIC = new ClusterIntersectionSimilarityFunction();
+  public static final ClusteringBCubedF1SimilarityFunction STATIC = new ClusteringBCubedF1SimilarityFunction();
 
   /**
    * Constructor - use the static instance {@link #STATIC}!
    */
-  public ClusterIntersectionSimilarityFunction() {
+  public ClusteringBCubedF1SimilarityFunction() {
     super();
   }
 
   @Override
-  public double similarity(Cluster<?> o1, Cluster<?> o2) {
-    return DBIDUtil.intersectionSize(o1.getIDs(), o2.getIDs());
+  public double similarity(Clustering<?> o1, Clustering<?> o2) {
+    ClusterContingencyTable ct = new ClusterContingencyTable(false, true);
+    ct.process(o1, o2);
+    return ct.getBCubed().f1Measure();
   }
 
   @Override
-  public double distance(Cluster<?> o1, Cluster<?> o2) {
-    int i = DBIDUtil.intersectionSize(o1.getIDs(), o2.getIDs());
-    return Math.max(o1.size(), o2.size()) - i;
+  public double distance(Clustering<?> o1, Clustering<?> o2) {
+    ClusterContingencyTable ct = new ClusterContingencyTable(false, true);
+    ct.process(o1, o2);
+    return 1. - ct.getBCubed().f1Measure();
   }
 
   @Override
@@ -68,13 +85,13 @@ public class ClusterIntersectionSimilarityFunction extends AbstractPrimitiveSimi
   }
 
   @Override
-  public <T extends Cluster<?>> DistanceSimilarityQuery<T> instantiate(Relation<T> relation) {
+  public <T extends Clustering<?>> DistanceSimilarityQuery<T> instantiate(Relation<T> relation) {
     return new PrimitiveDistanceSimilarityQuery<>(relation, this, this);
   }
 
   @Override
-  public SimpleTypeInformation<? super Cluster<?>> getInputTypeRestriction() {
-    return new SimpleTypeInformation<>(Cluster.class);
+  public SimpleTypeInformation<? super Clustering<?>> getInputTypeRestriction() {
+    return new SimpleTypeInformation<>(Clustering.class);
   }
 
   /**
@@ -86,7 +103,7 @@ public class ClusterIntersectionSimilarityFunction extends AbstractPrimitiveSimi
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected ClusterIntersectionSimilarityFunction makeInstance() {
+    protected ClusteringBCubedF1SimilarityFunction makeInstance() {
       return STATIC;
     }
   }

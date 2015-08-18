@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * BCubed measures.
- * 
+ *
  * Reference:
  * <p>
  * Bagga, A. and Baldwin, B.<br />
@@ -36,10 +36,13 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Proc. COLING '98 Proceedings of the 17th international conference on
  * Computational linguistics
  * </p>
- * 
+ *
  * @author Sascha Goldhofer
  */
-@Reference(authors = "Bagga, A. and Baldwin, B.", title = "Entity-based cross-document coreferencing using the Vector Space Model", booktitle = "Proc. COLING '98 Proceedings of the 17th international conference on Computational linguistics", url = "http://dx.doi.org/10.3115/980451.980859")
+@Reference(authors = "Bagga, A. and Baldwin, B.", //
+title = "Entity-based cross-document coreferencing using the Vector Space Model", //
+booktitle = "Proc. COLING '98 Proceedings of the 17th international conference on Computational linguistics", //
+url = "http://dx.doi.org/10.3115/980451.980859")
 public class BCubed {
   /**
    * Result cache
@@ -48,7 +51,7 @@ public class BCubed {
 
   /**
    * Constructor.
-   * 
+   *
    * @param table Contingency table
    */
   protected BCubed(ClusterContingencyTable table) {
@@ -75,7 +78,7 @@ public class BCubed {
 
   /**
    * Get the BCubed Precision (first clustering) (normalized, 0 = unequal)
-   * 
+   *
    * @return BCubed Precision
    */
   public double precision() {
@@ -84,7 +87,7 @@ public class BCubed {
 
   /**
    * Get the BCubed Recall (first clustering) (normalized, 0 = unequal)
-   * 
+   *
    * @return BCubed Recall
    */
   public double recall() {
@@ -93,7 +96,7 @@ public class BCubed {
 
   /**
    * Get the BCubed F1-Measure
-   * 
+   *
    * @return BCubed F1-Measure
    */
   public double f1Measure() {

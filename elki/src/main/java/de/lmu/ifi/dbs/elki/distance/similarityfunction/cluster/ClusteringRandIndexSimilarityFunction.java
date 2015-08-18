@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,43 +23,58 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.Cluster;
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Measure the similarity of clusters via the intersection size.
+ * Measure the similarity of clusters via the Rand Index.
+ *
+ * Reference:
+ * <p>
+ * Rand, W. M.<br />
+ * Objective Criteria for the Evaluation of Clustering Methods<br />
+ * Journal of the American Statistical Association, Vol. 66 Issue 336
+ * </p>
  *
  * @author Erich Schubert
  */
-public class ClusterIntersectionSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Cluster<?>> implements PrimitiveDistanceFunction<Cluster<?>> {
+@Reference(authors = "Rand, W. M.", //
+title = "Objective Criteria for the Evaluation of Clustering Methods", //
+booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", //
+url = "http://www.jstor.org/stable/10.2307/2284239")
+public class ClusteringRandIndexSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Clustering<?>>implements ClusteringSimilarityFunction, PrimitiveDistanceFunction<Clustering<?>> {
   /**
    * Static instance.
    */
-  public static final ClusterIntersectionSimilarityFunction STATIC = new ClusterIntersectionSimilarityFunction();
+  public static final ClusteringRandIndexSimilarityFunction STATIC = new ClusteringRandIndexSimilarityFunction();
 
   /**
    * Constructor - use the static instance {@link #STATIC}!
    */
-  public ClusterIntersectionSimilarityFunction() {
+  public ClusteringRandIndexSimilarityFunction() {
     super();
   }
 
   @Override
-  public double similarity(Cluster<?> o1, Cluster<?> o2) {
-    return DBIDUtil.intersectionSize(o1.getIDs(), o2.getIDs());
+  public double similarity(Clustering<?> o1, Clustering<?> o2) {
+    ClusterContingencyTable ct = new ClusterContingencyTable(false, true);
+    ct.process(o1, o2);
+    return ct.getPaircount().randIndex();
   }
 
   @Override
-  public double distance(Cluster<?> o1, Cluster<?> o2) {
-    int i = DBIDUtil.intersectionSize(o1.getIDs(), o2.getIDs());
-    return Math.max(o1.size(), o2.size()) - i;
+  public double distance(Clustering<?> o1, Clustering<?> o2) {
+    ClusterContingencyTable ct = new ClusterContingencyTable(false, true);
+    ct.process(o1, o2);
+    return 1. - ct.getPaircount().randIndex();
   }
 
   @Override
@@ -68,13 +83,13 @@ public class ClusterIntersectionSimilarityFunction extends AbstractPrimitiveSimi
   }
 
   @Override
-  public <T extends Cluster<?>> DistanceSimilarityQuery<T> instantiate(Relation<T> relation) {
+  public <T extends Clustering<?>> DistanceSimilarityQuery<T> instantiate(Relation<T> relation) {
     return new PrimitiveDistanceSimilarityQuery<>(relation, this, this);
   }
 
   @Override
-  public SimpleTypeInformation<? super Cluster<?>> getInputTypeRestriction() {
-    return new SimpleTypeInformation<>(Cluster.class);
+  public SimpleTypeInformation<? super Clustering<?>> getInputTypeRestriction() {
+    return new SimpleTypeInformation<>(Clustering.class);
   }
 
   /**
@@ -86,7 +101,7 @@ public class ClusterIntersectionSimilarityFunction extends AbstractPrimitiveSimi
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected ClusterIntersectionSimilarityFunction makeInstance() {
+    protected ClusteringRandIndexSimilarityFunction makeInstance() {
       return STATIC;
     }
   }
