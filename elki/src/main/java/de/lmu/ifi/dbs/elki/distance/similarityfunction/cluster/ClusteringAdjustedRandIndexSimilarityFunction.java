@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,15 +30,16 @@ import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQu
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Measure the similarity of clusters via the Adjusted Rand Index.
- * 
+ *
  * @author Erich Schubert
  */
-public class ClusteringAdjustedRandIndexSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Clustering<?>> implements PrimitiveDistanceFunction<Clustering<?>> {
+public class ClusteringAdjustedRandIndexSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Clustering<?>>implements PrimitiveDistanceFunction<Clustering<?>>, NormalizedSimilarityFunction<Clustering<?>> {
   /**
    * Static instance.
    */
@@ -82,7 +83,7 @@ public class ClusteringAdjustedRandIndexSimilarityFunction extends AbstractPrimi
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude

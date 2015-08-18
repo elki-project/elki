@@ -32,16 +32,14 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.PWCPrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringSimilarityFunction;
 import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.APIViolationException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -57,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Alexander Koos
  *
  */
-public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> extends AutomaticEvaluation {
+public class PWCClusteringEvaluation<F extends ClusteringSimilarityFunction> extends AutomaticEvaluation {
   // Table values from literature.
   public final static double[] alphaMap = new double[] { //
       0.05, 1.65, //
@@ -67,18 +65,41 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
 
   private final F simFunc;
 
-  private final double alpha;
+  private final double z;
 
-  public PWCClusteringEvaluation(final F simFunc, final double alpha) {
+  public PWCClusteringEvaluation(F simFunc, double alpha) {
     this.simFunc = simFunc;
-    this.alpha = alpha;
-    if(alpha < 0 || alpha > 1) {
-      throw new APIViolationException("Confidence level alpha has to be in [0,1].");
+    this.z = getAlphaQuantile(alpha);
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    Database db = ResultUtil.findDatabase(hier);
+    // FIXME: only process *new* results.
+    for(Relation<?> r : db.getRelations()) {
+      if(r.getDataTypeInformation().isAssignableFromType(new SimpleTypeInformation<>(Clustering.class))) {
+        Relation<Clustering<Model>> rel = (Relation<Clustering<Model>>) r;
+        List<Clustering<Model>> clusterings = new ArrayList<Clustering<Model>>();
+        for(DBIDIter iter = rel.iterDBIDs(); iter.valid(); iter.advance()) {
+          clusterings.add(rel.get(iter));
+        }
+        for(Clustering<Model> c : clusterings) {
+          autoEvaluateClusterings(hier, c);
+        }
+
+        evaluateMetaClustering(hier, newResult);
+      }
     }
   }
 
-  private double clusteringDistance(final Clustering<Model> c1, final Clustering<Model> c2) {
-    return this.simFunc.similarity(c1, c2);
+  private static double getAlphaQuantile(final double alpha) {
+    for(int i = 0; i < alphaMap.length; i += 2) {
+      if(alphaMap[i] == alpha) {
+        return alphaMap[i + 1];
+      }
+    }
+    throw new AbortException("Currently, only alpha 0.05, 0.01, 0.005 are available.");
   }
 
   @SuppressWarnings("unchecked")
@@ -105,12 +126,11 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
         }
       }
     }
-    for(final Clustering<Model> cs : clusterings1) {
-      for(final Cluster<Model> cs2 : cs.getAllClusters()) {
-        final DBIDs ids = cs2.getIDs();
-        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+    for(Clustering<Model> cs : clusterings1) {
+      for(Cluster<Model> cs2 : cs.getAllClusters()) {
+        for(DBIDIter iter = cs2.getIDs().iter(); iter.valid(); iter.advance()) {
           for(int i = 0; i < db.getBundle(iter).metaLength(); i++) {
-            final Object b = db.getBundle(iter).data(i);
+            Object b = db.getBundle(iter).data(i);
             if(b != null && b.getClass().equals(Clustering.class)) {
               clusteringsAll.add((Clustering<Model>) b);
             }
@@ -118,14 +138,13 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
         }
       }
     }
-    for(final Clustering<Model> cs : clusterings1) {
-      final List<Cluster<Model>> clusterings2 = new ArrayList<Cluster<Model>>();
+    for(Clustering<Model> cs : clusterings1) {
+      List<Cluster<Model>> clusterings2 = new ArrayList<Cluster<Model>>();
       clusterings2.addAll(cs.getAllClusters());
 
-      for(final Cluster<Model> cs2 : clusterings2) {
-        final List<Clustering<Model>> clusterings = new ArrayList<Clustering<Model>>();
-        final DBIDs ids = cs2.getIDs();
-        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      for(Cluster<Model> cs2 : clusterings2) {
+        List<Clustering<Model>> clusterings = new ArrayList<Clustering<Model>>();
+        for(DBIDIter iter = cs2.getIDs().iter(); iter.valid(); iter.advance()) {
           for(int i = 0; i < db.getBundle(iter).metaLength(); i++) {
             final Object b = db.getBundle(iter).data(i);
             if(b != null && b.getClass().equals(Clustering.class)) {
@@ -137,8 +156,8 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
           continue;
         }
         refClusterings.addAll(clusterings);
-        final double[] similaritySum = new double[clusterings.size()];
-        final double[] tau = new double[clusterings.size()];
+        double[] similaritySum = new double[clusterings.size()];
+        double[] tau = new double[clusterings.size()];
         {
           int i = 0;
           for(final Clustering<Model> c : clusterings) {
@@ -152,7 +171,7 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
             }
             double currentSumOfDists = 0;
             for(int j = 0; j < i; j++) {
-              double res = this.clusteringDistance(c, clusterings.get(j));
+              double res = simFunc.similarity(c, clusterings.get(j));
               similaritySum[j] += res;
               currentSumOfDists += res;
               res = 1 - res;
@@ -187,7 +206,7 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
         }
         double tauAll = -1;
         for(final Clustering<Model> c : clusteringsAll) {
-          final double res = 1 - this.clusteringDistance(c, clusterings.get(bestIndex));
+          final double res = 1 - simFunc.similarity(c, clusterings.get(bestIndex));
           if(tauAll < res) {
             tauAll = res;
           }
@@ -195,76 +214,39 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
         bestClusterings.add(new Pair<Clustering<Model>, Pair<Double, Double>>(clusterings.get(bestIndex), new Pair<Double, Double>(tauAll, tau[bestIndex])));
       }
     }
-    for(final Pair<Clustering<Model>, Pair<Double, Double>> c : bestClusterings) {
-      final PWCScoreResult psr = new PWCScoreResult(this.alpha, refClusterings, c.getFirst(), c.getSecond().getFirst(), c.getSecond().getSecond(), this.simFunc);
+    for(Pair<Clustering<Model>, Pair<Double, Double>> c : bestClusterings) {
+      PWCScoreResult psr = new PWCScoreResult(z, refClusterings, c.getFirst(), c.getSecond().getFirst(), c.getSecond().getSecond(), simFunc);
       db.getHierarchy().add(c.getFirst(), psr);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public void processNewResult(final HierarchicalResult baseResult, final Result newResult) {
-    if(newResult.getClass().equals(EvaluateClustering.ScoreResult.class) || ResultUtil.findDatabase(newResult) == null) {
-      return;
-    }
-    final Database db = ResultUtil.findDatabase(baseResult);
-    for(final Relation<?> r : db.getRelations()) {
-      if(r.getDataTypeInformation().isAssignableFromType(new SimpleTypeInformation<>(Clustering.class))) {
-        final Relation<Clustering<Model>> rel = (Relation<Clustering<Model>>) r;
-        final List<Clustering<Model>> clusterings = new ArrayList<Clustering<Model>>();
-        for(final DBIDIter iter = rel.iterDBIDs(); iter.valid(); iter.advance()) {
-          clusterings.add(rel.get(iter));
-        }
-        for(final Clustering<Model> c : clusterings) {
-          this.autoEvaluateClusterings(baseResult, c);
-        }
-
-        this.evaluateMetaClustering(newResult);
-      }
     }
   }
 
   public static class PWCScoreResult extends EvaluationResult {
 
-    public PWCScoreResult(final double alpha, final List<Clustering<Model>> crs, final Clustering<Model> c, final double tauAll, final double tau, final PWCPrimitiveSimilarityFunction f) {
+    public PWCScoreResult(double z, List<Clustering<Model>> crs, Clustering<Model> c, double tauAll, double tau, ClusteringSimilarityFunction f) {
       super("Possible-Worlds-Clustering Score", "PWC Score");
 
-      final double eprob = this.probabilityEstimator(c, tau, crs, f);
-      final double z = this.getAlphaQuantile(alpha);
+      final double eprob = probabilityEstimator(c, tau, crs, f);
       final double cprob = Math.abs(eprob - z * Math.sqrt((eprob * (1 - eprob)) / crs.size()));
 
-      final MeasurementGroup g = this.newGroup("PWC Measures");
+      final MeasurementGroup g = newGroup("PWC Measures");
       g.addMeasure("Tau-All-Reference-Measure", tauAll, 0, 1, true);
       g.addMeasure("Tau-Measure", tau, 0, 1, true);
       g.addMeasure("Confidence-Probability", cprob, 0, 1, false);
     }
 
-    private double getAlphaQuantile(final double alpha) {
-      for(int i = 0; i < alphaMap.length; i += 2) {
-        if(alphaMap[i] == alpha) {
-          return alphaMap[i + 1];
-        }
-      }
-      throw new AbortException("Currently, only alpha 0.05, 0.01, 0.005 are available.");
-    }
-
-    private double probabilityEstimator(final Clustering<Model> c, final double tau, final List<Clustering<Model>> crs, final PWCPrimitiveSimilarityFunction f) {
+    private double probabilityEstimator(Clustering<Model> c, double tau, List<Clustering<Model>> crs, ClusteringSimilarityFunction f) {
+      final double itau = 1 - tau;
       double x = 0;
-      for(final Clustering<Model> c1 : crs) {
-        x += (1 - f.getMetricScale((new ClusterContingencyTable(true, true) {
-          {
-            this.process(c1, c);
-          };
-        }).getPaircount())) <= tau ? 1 : 0;
+      for(Clustering<Model> c1 : crs) {
+        x += (f.similarity(c, c1) >= itau) ? 1 : 0;
       }
       return x / crs.size();
     }
-
   }
 
   public static class Parameterizer extends AbstractParameterizer {
 
-    private PWCPrimitiveSimilarityFunction simFunc;
+    private ClusteringSimilarityFunction simFunc;
 
     private double alpha;
 
@@ -273,22 +255,21 @@ public class PWCClusteringEvaluation<F extends PWCPrimitiveSimilarityFunction> e
     public static final OptionID ALPHA_ID = new OptionID("mce.alpha", "Used to compute the confidence probability.");
 
     @Override
-    protected PWCClusteringEvaluation<PWCPrimitiveSimilarityFunction> makeInstance() {
-      return new PWCClusteringEvaluation<>(this.simFunc, this.alpha);
+    protected void makeOptions(final Parameterization config) {
+      super.makeOptions(config);
+      ClassParameter<ClusteringSimilarityFunction> pSimFunc = new ClassParameter<>(SIMILARITY_FUNCTION_ID, ClusteringSimilarityFunction.class);
+      if(config.grab(pSimFunc)) {
+        simFunc = pSimFunc.instantiateClass(config);
+      }
+      DoubleParameter palpha = new DoubleParameter(ALPHA_ID, 0.05);
+      if(config.grab(palpha)) {
+        alpha = palpha.doubleValue();
+      }
     }
 
     @Override
-    protected void makeOptions(final Parameterization config) {
-      super.makeOptions(config);
-      final ClassParameter<PWCPrimitiveSimilarityFunction> pSimFunc = new ClassParameter<>(Parameterizer.SIMILARITY_FUNCTION_ID, PWCPrimitiveSimilarityFunction.class);
-      if(config.grab(pSimFunc)) {
-        this.simFunc = pSimFunc.instantiateClass(config);
-      }
-      final DoubleParameter palpha = new DoubleParameter(Parameterizer.ALPHA_ID, 0.05);
-      if(config.grab(palpha)) {
-        this.alpha = palpha.doubleValue();
-      }
+    protected PWCClusteringEvaluation<ClusteringSimilarityFunction> makeInstance() {
+      return new PWCClusteringEvaluation<>(this.simFunc, this.alpha);
     }
-
   }
 }

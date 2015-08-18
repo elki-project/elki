@@ -1,9 +1,4 @@
-package de.lmu.ifi.dbs.elki.distance.similarityfunction;
-
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.PairCounting;
-
+package de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -27,7 +22,14 @@ import de.lmu.ifi.dbs.elki.evaluation.clustering.PairCounting;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public abstract class PWCPrimitiveSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Clustering<Model>> {
+import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 
-  public abstract double getMetricScale(PairCounting pairCounting);
+/**
+ * Similarity measure for clusterings.
+ *
+ * @author Erich Schubert
+ */
+public interface ClusteringSimilarityFunction extends PrimitiveSimilarityFunction<Clustering<?>> {
+
 }
