@@ -27,7 +27,9 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -77,7 +79,11 @@ public class MarkerVisualization extends AbstractVisFactory {
     Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), MarkerVisualization.this);
+      final Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, rel, MarkerVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA;
       task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
       context.addVis(p, task);

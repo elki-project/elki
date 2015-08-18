@@ -24,7 +24,9 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -71,31 +73,41 @@ public class ScatterPlotFactory implements ProjectorFactory {
     Hierarchy.Iter<Relation<?>> it = VisualizationTree.filterResults(context, start, Relation.class);
     candidate: for(; it.valid(); it.advance()) {
       Relation<?> rel = it.get();
-      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+      final int dim = dimensionality(rel);
+      if(dim < 1) {
         continue;
       }
       // Do not enable nested relations by default:
       Hierarchy.Iter<Relation<?>> it2 = new VisualizationTree.FilteredIter<>(context.getHierarchy().iterAncestors(rel), Relation.class);
-      parent: for(; it2.valid(); it2.advance()) {
+      for(; it2.valid(); it2.advance()) {
         // Parent relation
         final Relation<?> rel2 = (Relation<?>) it2.get();
-        if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel2.getDataTypeInformation())) {
-          continue parent;
+        final int odim = dimensionality(rel2);
+        if(odim == dim) {
+          continue candidate;
         }
-        // Only first child relation
-        Hierarchy.Iter<Relation<?>> it3 = new VisualizationTree.FilteredIter<>(context.getHierarchy().iterDescendants(rel2), Relation.class);
-        if(it3.valid() && it3.get() == rel) {
-          continue parent; // First child vector relation, this is ok.
-        }
-        // TODO: add Actions instead.
-        continue candidate;
+        // TODO: add Actions instead?
       }
       @SuppressWarnings("unchecked")
-      Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
-      final int dim = RelationUtil.dimensionality(vrel);
-      ScatterPlotProjector<NumberVector> proj = new ScatterPlotProjector<>(vrel, Math.min(maxdim, dim));
+      Relation<SpatialComparable> vrel = (Relation<SpatialComparable>) rel;
+      ScatterPlotProjector<SpatialComparable> proj = new ScatterPlotProjector<>(vrel, Math.min(maxdim, dim));
       context.addVis(vrel, proj);
     }
+  }
+
+  private int dimensionality(Relation<?> rel) {
+    if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+      @SuppressWarnings("unchecked")
+      Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
+      return RelationUtil.dimensionality(vrel);
+    }
+    if(TypeUtil.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+      @SuppressWarnings("unchecked")
+      Relation<UncertainObject> vrel = (Relation<UncertainObject>) rel;
+      return RelationUtil.dimensionality(vrel);
+    }
+    // TODO: allow other spatial objects of fixed dimensionality!
+    return 0;
   }
 
   /**

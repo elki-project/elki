@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,7 +26,8 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -52,12 +53,12 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
 /**
  * Class for using an m-tree as database index.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type
  */
-public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
+public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>, DynamicIndex {
   /**
    * The relation indexed.
    */
@@ -70,7 +71,7 @@ public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation indexed
    * @param pagefile Page file
    * @param settings Tree settings
@@ -98,8 +99,12 @@ public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O
     int distanceSize = ByteArrayUtil.SIZE_DOUBLE; // exampleLeaf.getParentDistance().externalizableSize();
 
     // FIXME: simulate a proper feature size!
-    @SuppressWarnings("unchecked")
-    int featuresize = 8 * RelationUtil.dimensionality((Relation<? extends FeatureVector<?>>) relation);
+    int featuresize = 0;
+    if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(relation.getDataTypeInformation())) {
+      @SuppressWarnings("unchecked")
+      Relation<? extends SpatialComparable> vrel = (Relation<? extends SpatialComparable>) relation;
+      featuresize = 8 * RelationUtil.dimensionality(vrel);
+    }
     if(featuresize <= 0) {
       getLogger().warning("Relation does not have a dimensionality -- simulating M-tree as external index!");
       featuresize = 0;
@@ -174,7 +179,7 @@ public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O
   /**
    * Throws an UnsupportedOperationException since deletion of objects is not
    * yet supported by an M-Tree.
-   * 
+   *
    * @throws UnsupportedOperationException thrown, since deletions aren't
    *         implemented yet.
    */
@@ -186,7 +191,7 @@ public class MTreeIndex<O> extends MTree<O> implements RangeIndex<O>, KNNIndex<O
   /**
    * Throws an UnsupportedOperationException since deletion of objects is not
    * yet supported by an M-Tree.
-   * 
+   *
    * @throws UnsupportedOperationException thrown, since deletions aren't
    *         implemented yet.
    */

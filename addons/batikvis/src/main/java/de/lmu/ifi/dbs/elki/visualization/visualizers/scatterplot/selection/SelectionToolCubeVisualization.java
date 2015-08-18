@@ -31,9 +31,11 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
@@ -57,6 +59,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
 
 /**
  * Tool-Visualization for the tool to select ranges.
+ *
+ * TODO: support non-point spatial data
  *
  * @author Heidi Kolb
  *
@@ -91,7 +95,11 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
     Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionToolCubeVisualization.this);
+      final Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionToolCubeVisualization.this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
       task.tool = true;
       task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisualizatio
  *
  * @param <V> Vector type
  */
-public class ScatterPlotProjector<V extends NumberVector> implements Projector {
+public class ScatterPlotProjector<V extends SpatialComparable> implements Projector {
   /**
    * Relation we project.
    */

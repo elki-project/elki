@@ -57,7 +57,7 @@ public class SelectionDotVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Selection";
+  private static final String NAME = "Selection Markers";
 
   /**
    * Constructor

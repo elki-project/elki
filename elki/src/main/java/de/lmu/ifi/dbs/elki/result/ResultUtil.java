@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.result;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,8 +31,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -272,7 +272,7 @@ public class ResultUtil {
    * @param rel Relation
    * @return associated scales result
    */
-  public static ScalesResult getScalesResult(final Relation<? extends NumberVector> rel) {
+  public static ScalesResult getScalesResult(final Relation<? extends SpatialComparable> rel) {
     Collection<ScalesResult> scas = ResultUtil.filterResults(rel.getHierarchy(), rel, ScalesResult.class);
     if(scas.size() == 0) {
       final ScalesResult newsca = new ScalesResult(rel);

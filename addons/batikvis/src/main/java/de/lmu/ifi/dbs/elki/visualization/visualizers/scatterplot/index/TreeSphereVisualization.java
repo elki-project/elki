@@ -27,8 +27,10 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
@@ -106,10 +108,11 @@ public class TreeSphereVisualization extends AbstractVisFactory {
     VisualizationTree.findNewSiblings(context, start, AbstractMTree.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<AbstractMTree<?, ?, ?, ?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, AbstractMTree<?, ?, ?, ?> tree, ScatterPlotProjector<?> p) {
-        if(!canVisualize(tree)) {
+        Relation<?> rel = p.getRelation();
+        if(!canVisualize(rel, tree)) {
           return;
         }
-        final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, p.getRelation(), TreeSphereVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, tree, rel, TreeSphereVisualization.this);
         task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
         task.initDefaultVisibility(false);
         context.addVis((Result) tree, task);
@@ -142,10 +145,14 @@ public class TreeSphereVisualization extends AbstractVisFactory {
   /**
    * Test for a visualizable index in the context's database.
    *
+   * @param rel Vector relation
    * @param tree Tree to visualize
    * @return whether the tree is visualizable
    */
-  public static boolean canVisualize(AbstractMTree<?, ?, ?, ?> tree) {
+  public static boolean canVisualize(Relation<?> rel, AbstractMTree<?, ?, ?, ?> tree) {
+    if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+      return false;
+    }
     return getLPNormP(tree) > 0;
   }
 

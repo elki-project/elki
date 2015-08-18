@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
@@ -233,6 +234,11 @@ public final class TypeUtil {
    * Uncertain objects.
    */
   public static final VectorFieldTypeInformation<UncertainObject> UNCERTAIN_OBJECT_FIELD = VectorFieldTypeInformation.typeRequest(UncertainObject.class);
+
+  /**
+   * Spatial objects.
+   */
+  public static final SimpleTypeInformation<SpatialComparable> SPATIAL_OBJECT = new SimpleTypeInformation<>(SpatialComparable.class);
 
   /**
    * Make a type array easily.

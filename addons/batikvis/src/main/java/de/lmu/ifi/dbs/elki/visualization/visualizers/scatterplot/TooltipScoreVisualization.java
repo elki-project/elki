@@ -103,7 +103,11 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
     VisualizationTree.findNewSiblings(context, result, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(o.getLongName() + NAME_GEN, context, o.getScores(), p.getRelation(), TooltipScoreVisualization.this);
+        final Relation<?> rel = p.getRelation();
+        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+          return;
+        }
+        final VisualizationTask task = new VisualizationTask(o.getLongName() + NAME_GEN, context, o.getScores(), rel, TooltipScoreVisualization.this);
         task.tool = true;
         task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
         task.initDefaultVisibility(false);
@@ -119,7 +123,11 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
             return; // Handled by above case already.
           }
         }
-        final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, context, r, p.getRelation(), TooltipScoreVisualization.this);
+        final Relation<?> rel = p.getRelation();
+        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+          return;
+        }
+        final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, context, r, rel, TooltipScoreVisualization.this);
         task.tool = true;
         task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
         task.initDefaultVisibility(false);
@@ -136,7 +144,11 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
         if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation()) && !TypeUtil.INTEGER.isAssignableFromType(r.getDataTypeInformation())) {
           return;
         }
-        final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, context, r, p.getRelation(), TooltipScoreVisualization.this);
+        final Relation<?> rel = p.getRelation();
+        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+          return;
+        }
+        final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, context, r, rel, TooltipScoreVisualization.this);
         task.tool = true;
         task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
         task.initDefaultVisibility(false);

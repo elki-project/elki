@@ -29,7 +29,9 @@ import java.util.Comparator;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.KMLOutputHandler;
@@ -81,7 +83,11 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
     Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), DensityEstimationOverlay.this);
+      final Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, context, rel, p.getRelation(), DensityEstimationOverlay.this);
       task.level = VisualizationTask.LEVEL_DATA + 1;
       task.addUpdateFlags(VisualizationTask.ON_DATA);
       task.initDefaultVisibility(false);

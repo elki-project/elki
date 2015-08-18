@@ -29,6 +29,8 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -70,7 +72,11 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
     VisualizationTree.findNewResultVis(context, result, ReferencePointsResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<ReferencePointsResult<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ReferencePointsResult<?> rp, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, rp, p.getRelation(), ReferencePointsVisualization.this);
+        final Relation<?> rel = p.getRelation();
+        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+          return;
+        }
+        final VisualizationTask task = new VisualizationTask(NAME, context, rp, rel, ReferencePointsVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
         context.addVis(rp, task);
         context.addVis(p, task);

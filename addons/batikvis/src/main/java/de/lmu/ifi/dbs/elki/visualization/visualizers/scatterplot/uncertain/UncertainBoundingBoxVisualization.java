@@ -90,22 +90,10 @@ public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
       if(TypeUtil.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r.getDataTypeInformation())) {
         final VisualizationTask task = new VisualizationTask(NAME, context, p, r, this);
         task.level = VisualizationTask.LEVEL_DATA;
-        task.initDefaultVisibility(false);
+        //task.initDefaultVisibility(false);
         task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
         context.addVis(p, task);
         continue;
-      }
-      Hierarchy.Iter<Relation<?>> it2 = new VisualizationTree.FilteredIter<Relation<?>>(context.getHierarchy().iterParents(r), Relation.class);
-      for(; it2.valid(); it2.advance()) {
-        Relation<?> r2 = it2.get();
-        if(TypeUtil.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r2.getDataTypeInformation())) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, p, r2, this);
-          task.level = VisualizationTask.LEVEL_DATA;
-          task.initDefaultVisibility(false);
-          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
-          context.addVis(p, task);
-          continue;
-        }
       }
     }
   }

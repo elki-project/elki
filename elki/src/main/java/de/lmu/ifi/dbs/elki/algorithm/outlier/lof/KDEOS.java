@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -68,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Generalized Outlier Detection with Flexible Kernel Density Estimates.
- * 
+ *
  * This is an outlier detection inspired by LOF, but using kernel density
  * estimation (KDE) from statistics. Unfortunately, for higher dimensional data,
  * kernel density estimation itself becomes difficult. At this point, the
@@ -79,11 +79,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * embedded into a higher data representation. Adjusting the kernel to account
  * for the representation seems to yield worse results than using a lower,
  * intrinsic, dimensionality.
- * 
+ *
  * If your data set has many duplicates, the <tt>kdeos.kernel.minbw</tt>
  * parameter sets a minimum kernel bandwidth, which may improve results in these
  * cases, as it prevents kernels from degenerating to single points.
- * 
+ *
  * Reference:
  * <p>
  * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
@@ -91,19 +91,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * In Proceedings of the 14th SIAM International Conference on Data Mining
  * (SDM), Philadelphia, PA, 2014.
  * </p>
- * 
+ *
  * @author Erich Schubert
  *
  * @apiviz.has KNNQuery
  * @apiviz.has KernelDensityFunction
- * 
+ *
  * @param <O> Object type
  */
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
 title = "Generalized Outlier Detection with Flexible Kernel Density Estimates", //
 booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM), Philadelphia, PA, 2014", //
 url = "http://dx.doi.org/10.1137/1.9781611973440.63")
-public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
+public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult>implements OutlierAlgorithm {
   /**
    * Class logger.
    */
@@ -141,7 +141,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param kmin Minimum number of neighbors
    * @param kmax Maximum number of neighbors
@@ -161,7 +161,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   /**
    * Run the KDEOS outlier detection algorithm.
-   * 
+   *
    * @param database Database to query
    * @param rel Relation to process
    * @return Outlier detection result
@@ -188,7 +188,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   /**
    * Perform the kernel density estimation step.
-   * 
+   *
    * @param rel Relation to query
    * @param knnq kNN query
    * @param ids IDs to process
@@ -238,7 +238,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
   /**
    * Ugly hack to allow using this implementation without having a well-defined
    * dimensionality.
-   * 
+   *
    * @param rel Data relation
    * @return Dimensionality
    */
@@ -249,9 +249,9 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
     }
     // Cast to vector field relation.
     @SuppressWarnings("unchecked")
-    final Relation<FeatureVector<?>> frel = (Relation<FeatureVector<?>>) rel;
+    final Relation<NumberVector> frel = (Relation<NumberVector>) rel;
     int dim = RelationUtil.dimensionality(frel);
-    if(dim < 0) {
+    if(dim < 1) {
       throw new AbortException("When using KDEOS with non-vectorspace data, the intrinsic dimensionality parameter must be set!");
     }
     return dim;
@@ -259,7 +259,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   /**
    * Compute the final KDEOS scores.
-   * 
+   *
    * @param knnq kNN query
    * @param ids IDs to process
    * @param densities Density estimates
@@ -288,7 +288,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
             scratch[k][i] = ndens[k];
           }
         }
-        assert (i == neighbors.size());
+        assert(i == neighbors.size());
       }
       // Compute means and stddevs for each k
       double score = 0.;
@@ -327,11 +327,11 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

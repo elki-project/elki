@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.result;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,16 +23,16 @@ package de.lmu.ifi.dbs.elki.result;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.math.scales.Scales;
 
 /**
  * Class to keep shared scales across visualizers.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf LinearScale
  */
 public class ScalesResult extends BasicResult {
@@ -43,16 +43,16 @@ public class ScalesResult extends BasicResult {
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to use
    */
-  public ScalesResult(Relation<? extends NumberVector> relation) {
+  public ScalesResult(Relation<? extends SpatialComparable> relation) {
     this(Scales.calcScales(relation));
   }
 
   /**
    * Constructor.
-   * 
+   *
    * @param scales Relation scales to use
    */
   public ScalesResult(LinearScale[] scales) {
@@ -62,7 +62,7 @@ public class ScalesResult extends BasicResult {
 
   /**
    * Get the scale for dimension dim (starting at 1!).
-   * 
+   *
    * @param dim Dimension
    * @return Scale
    */
@@ -72,10 +72,10 @@ public class ScalesResult extends BasicResult {
 
   /**
    * Set the scale for dimension dim (starting at 1!).
-   * 
+   *
    * Note: you still need to trigger an event. This is not done automatically,
    * as you might want to set more than one scale!
-   * 
+   *
    * @param dim Dimension
    * @param scale New scale
    */
@@ -85,7 +85,7 @@ public class ScalesResult extends BasicResult {
 
   /**
    * Get all scales. Note: you must not modify the array.
-   * 
+   *
    * @return Scales array.
    */
   public LinearScale[] getScales() {
