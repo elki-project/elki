@@ -63,6 +63,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Compute the nearest neighbors approximatively using space filling curves.
+ * This version does the bulk kNN-join operation, i.e. precomputes the k nearest
+ * neighbors for every object, then discards the curves. This is usually more
+ * memory intensive but faster than {@link SpacefillingKNNPreprocessor}.
  *
  * Reference:
  * <p>
@@ -112,7 +115,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to index.
    * @param distanceFunction Distance function
    * @param k k
@@ -263,9 +266,9 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
 
   /**
    * Index factory class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <V> Vector type
    */
   public static class Factory<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory<V> {
@@ -291,7 +294,7 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
 
     /**
      * Constructor.
-     * 
+     *
      * @param curvegen Curve generators
      * @param window Window multiplicator
      * @param variants Number of curve variants to generate
@@ -317,11 +320,11 @@ public class SpacefillingMaterializeKNNPreprocessor<O extends NumberVector> exte
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
-     * 
+     *
      * @param <V> Vector type
      */
     public static class Parameterizer<V extends NumberVector> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<V> {

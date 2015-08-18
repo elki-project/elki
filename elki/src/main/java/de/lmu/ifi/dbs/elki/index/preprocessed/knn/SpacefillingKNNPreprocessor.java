@@ -73,7 +73,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Compute the nearest neighbors approximatively using space filling curves.
- * 
+ * This version computes the data projections and stores, then queries this data
+ * on-demand. This usually needs less memory (except for very small neighborhood
+ * sizes k) than {@link SpacefillingMaterializeKNNPreprocessor}, but will also
+ * be slower.
+ *
  * Reference:
  * <p>
  * E. Schubert, A. Zimek, H.-P. Kriegel<br />
@@ -82,14 +86,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Proc. 20th International Conference on Database Systems for Advanced
  * Applications (DASFAA), Hanoi, Vietnam, 2015.
  * </p>
- * 
+ *
  * @author Erich Schubert
  */
 @Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
 title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
 booktitle = "Proc. 20th International Conference on Database Systems for Advanced Applications (DASFAA)", //
 url = "http://dx.doi.org/10.1007/978-3-319-18123-3_2")
-public class SpacefillingKNNPreprocessor<O extends NumberVector> extends AbstractIndex<O> implements KNNIndex<O> {
+public class SpacefillingKNNPreprocessor<O extends NumberVector> extends AbstractIndex<O>implements KNNIndex<O> {
   /**
    * Class logger
    */
@@ -142,7 +146,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to index.
    * @param curvegen Curve generators
    * @param window Window multiplicator
@@ -288,7 +292,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
 
   /**
    * Initialize an integer value range.
-   * 
+   *
    * @param start Starting value
    * @param end End value (exclusive)
    * @return Array of integers start..end, excluding end.
@@ -303,9 +307,9 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
 
   /**
    * Perform a random permutation of the array, in-place.
-   * 
+   *
    * Knuth / Fisher-Yates style shuffle
-   * 
+   *
    * @param existing Existing array
    * @param random Random generator.
    * @return Same array.
@@ -348,7 +352,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
 
   /**
    * KNN Query processor for space filling curves
-   * 
+   *
    * @author Erich Schubert
    */
   protected class SpaceFillingKNNQuery implements KNNQuery<O> {
@@ -359,7 +363,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
 
     /**
      * Constructor.
-     * 
+     *
      * @param distanceQuery Distance query to use for refinement
      */
     public SpaceFillingKNNQuery(DistanceQuery<O> distanceQuery) {
@@ -406,9 +410,9 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
 
   /**
    * Index factory class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <V> Vector type
    */
   public static class Factory<V extends NumberVector> implements IndexFactory<V, SpacefillingKNNPreprocessor<V>> {
@@ -444,7 +448,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
 
     /**
      * Constructor.
-     * 
+     *
      * @param curvegen Curve generators
      * @param window Window multiplicator
      * @param variants Number of curve variants to generate
@@ -474,9 +478,9 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer extends AbstractParameterizer {
