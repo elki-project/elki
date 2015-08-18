@@ -265,7 +265,7 @@ public class ELKIServiceRegistry {
         c = tryLoadClass(e.names[pos]);
         if(c == null) {
           LOG.warning("Failed to load class " + e.names[pos] + " for interface " + restrictionClass.getName());
-          e.clazzes[pos] = FAILED_LOAD;
+          c = FAILED_LOAD;
         }
         e.clazzes[pos] = c;
       }
