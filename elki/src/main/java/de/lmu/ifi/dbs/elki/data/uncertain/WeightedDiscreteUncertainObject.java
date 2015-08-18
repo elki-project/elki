@@ -28,6 +28,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 
@@ -41,9 +42,42 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * {@link #drawSample}.
  * </ul>
  *
+ * This is called the block independent-disjoint (BID model) in:
+ * <p>
+ * N. Dalvi, C. Ré, D. Suciu<br />
+ * Probabilistic databases: diamonds in the dirt<br />
+ * Communications of the ACM 52, 7
+ * </p>
+ *
+ * This is also known as the X-Tuple model in:
+ * <p>
+ * O. Benjelloun, A. D. Sarma, A. Halevy, J. Widom<br />
+ * ULDBs: Databases with uncertainty and lineage<br />
+ * In Proc. of the 32nd international conference on Very Large Data Bases (VLDB)
+ * </p>
+ *
+ * If only a single sample is provided, this can be used to model existential
+ * uncertainty as in:
+ * <p>
+ * N. Dalvi, D. Suciu<br />
+ * Efficient query evaluation on probabilistic databases.<br />
+ * The VLDB Journal, 16(4)
+ * </p>
+ * and:
+ * <p>
+ * T. Bernecker, H.-P. Kriegel, M. Renz, F. Verhein, A. Züfle<br />
+ * Probabilistic frequent itemset mining in uncertain databases.<br />
+ * In Proc. 15th ACM SIGKDD International Conference on Knowledge Discovery and
+ * Data Mining.
+ * </p>
+ *
  * @author Alexander Koos
  * @author Erich Schubert
  */
+@Reference(authors = "O. Benjelloun, A. D. Sarma, A. Halevy, J. Widom", //
+title = "ULDBs: Databases with uncertainty and lineage", //
+booktitle = "Proc. of the 32nd international conference on Very Large Data Bases (VLDB)", //
+url = "http://www.vldb.org/conf/2006/p953-benjelloun.pdf")
 public class WeightedDiscreteUncertainObject extends AbstractDiscreteUncertainObject {
   /**
    * Vector factory.
@@ -61,11 +95,11 @@ public class WeightedDiscreteUncertainObject extends AbstractDiscreteUncertainOb
   private double[] weights;
 
   /**
-   * Total sum of weights.
+   * Constructor.
+   *
+   * @param samples Samples
+   * @param weights Weights (must be in ]0:1] and sum up to at most 1).
    */
-  private double weightSum;
-
-  // Constructor
   public WeightedDiscreteUncertainObject(DoubleVector[] samples, double[] weights) {
     super();
     if(samples.length == 0) {
@@ -73,27 +107,35 @@ public class WeightedDiscreteUncertainObject extends AbstractDiscreteUncertainOb
     }
     double check = 0;
     for(double weight : weights) {
-      if(!(weight > 0 && weight < Double.POSITIVE_INFINITY)) {
-        throw new IllegalArgumentException("Probabilities must be in positive and finite.");
+      if(!(weight > 0 && weight < 1.)) {
+        throw new IllegalArgumentException("Probabilities must be in ]0:1].");
       }
       check += weight;
+    }
+    if(!(check > 0 && check < 1.)) {
+      throw new IllegalArgumentException("Probability totals must be in ]0:1].");
     }
     this.samples = samples;
     this.bounds = computeBounds(samples);
     this.weights = weights;
-    this.weightSum = check;
   }
 
   @Override
   public DoubleVector drawSample(Random rand) {
     // Weighted sampling:
-    double r = rand.nextDouble() * weightSum;
+    double r = rand.nextDouble();
     int index = weights.length;
     while(--index >= 0 && r < weights[index]) {
       r -= weights[index];
     }
-    if(index < 0) { // Within rounding errors
-      index = rand.nextInt(samples.length);
+    if(index < 0) {
+      if(r < Double.MIN_NORMAL * samples.length) {
+        // Within rounding errors, assume the total weight is exactly 1.
+        index = rand.nextInt(samples.length);
+      }
+      else {
+        return null;
+      }
     }
     return samples[index];
   }
@@ -103,11 +145,14 @@ public class WeightedDiscreteUncertainObject extends AbstractDiscreteUncertainOb
     final int dim = getDimensionality();
     // Weighted average.
     double[] meanVals = new double[dim];
+    double weightSum = 0.;
     for(int i = 0; i < samples.length; i++) {
       DoubleVector v = samples[i];
+      final double w = weights[i];
       for(int d = 0; d < dim; d++) {
-        meanVals[d] += v.doubleValue(d) * weights[i];
+        meanVals[d] += v.doubleValue(d) * w;
       }
+      weightSum += w;
     }
 
     for(int d = 0; d < dim; d++) {

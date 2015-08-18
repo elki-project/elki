@@ -34,6 +34,13 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * Continuous uncertain object model using a uniform distribution on the
  * bounding box.
  *
+ * This is a continuous version of the U-Model in:
+ * <p>
+ * L. Antova, T. Jansen, C. Koch, D. Olteanu<br />
+ * Fast and simple relational processing of uncertain data<br />
+ * In IEEE 24th International Conference on Data Engineering (ICDE) 2008.
+ * </p>
+ *
  * @author Alexander Koos
  * @author Erich Schubert
  */

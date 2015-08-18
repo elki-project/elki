@@ -28,6 +28,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 
@@ -40,9 +41,27 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * <li>Every sample is equally likely to be returned by {@link #drawSample}.
  * </ul>
  *
+ * This is called the block independent-disjoint (BID model) in:
+ * <p>
+ * N. Dalvi, C. Ré, D. Suciu<br />
+ * Probabilistic databases: diamonds in the dirt<br />
+ * Communications of the ACM 52, 7
+ * </p>
+ *
+ * This is also known as the X-Tuple model in:
+ * <p>
+ * O. Benjelloun, A. D. Sarma, A. Halevy, J. Widom<br />
+ * ULDBs: Databases with uncertainty and lineage<br />
+ * In Proc. of the 32nd international conference on Very Large Data Bases (VLDB)
+ * </p>
+ *
  * @author Alexander Koos
  * @author Erich Schubert
  */
+@Reference(authors = "N. Dalvi, C. Ré, D. Suciu", //
+title = "Probabilistic databases: diamonds in the dirt", //
+booktitle = "Communications of the ACM 52, 7", //
+url = "http://dx.doi.org/10.1145/1538788.1538810")
 public class UnweightedDiscreteUncertainObject extends AbstractDiscreteUncertainObject {
   /**
    * Vector factory.
