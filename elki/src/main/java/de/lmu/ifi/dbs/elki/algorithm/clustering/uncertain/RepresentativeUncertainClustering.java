@@ -27,7 +27,9 @@ import java.util.Iterator;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -38,6 +40,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -48,58 +51,68 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringAdjustedRandIndexSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringDistanceSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
-import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
 
 /**
- * This classes purpose is to wrap and use a "normal" clustering algorithm in a
- * way for dealing with uncertain data of some kind.
+ * Representative clustering of uncertain data.
  *
- * The approach is to construct a data set of samples drawn from the uncertain
- * objects. That means that one or maybe no sample, but definitely not more than
- * one, is drawn from each uncertain object.
+ * This algorithm clusters uncertain data by repeatedly sampling a possible
+ * world, then running a traditional clustering algorithm on this sample.
  *
- * Afterwards the chosen clustering algorithm is run on this data set consisting
- * of discrete objects and the result is stored.
+ * The resulting "possible" clusterings are then clustered themselves, using a
+ * clustering similarity measure. This yields a number of representatives for
+ * the set of all possible worlds.
  *
- * The user has to specify how often this has to be repeated (for each round a
- * new sample data set is randomly drawn).
- *
- * In the end the stored clustering result are compared to each other by some
- * metric (TODO: refer elegantly to the paper) and the best one is forwarded to
- * the {@link EvaluationStep}.
+ * Reference:
+ * <p>
+ * Andreas Züfle, Tobias Emrich, Klaus Arthur Schmid, Nikos Mamoulis, Arthur
+ * Zimek, Mathias Renz<br />
+ * Representative clustering of uncertain data<br />
+ * In Proc. 20th ACM SIGKDD International Conference on Knowledge Discovery and
+ * Data Mining
+ * </p>
  *
  * @author Alexander Koos
+ * @author Erich Schubert
  */
-public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>> {
+@Reference(authors = "Andreas Züfle, Tobias Emrich, Klaus Arthur Schmid, Nikos Mamoulis, Arthur Zimek, Mathias Renz", //
+title = "Representative clustering of uncertain data", //
+booktitle = "Proc. 20th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining", //
+url = "http://dx.doi.org/10.1145/2623330.2623725")
+public class RepresentativeUncertainClustering extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * Initialize a Logger.
    */
-  private static final Logging LOG = Logging.getLogger(PWCClusteringAlgorithm.class);
+  private static final Logging LOG = Logging.getLogger(RepresentativeUncertainClustering.class);
 
   /**
    * The algorithm to be wrapped and run.
    */
-  private final ClusteringAlgorithm<?> algorithm;
+  private ClusteringAlgorithm<?> samplesAlgorithm;
 
   /**
    * The algorithm for meta-clustering.
    */
-  private final ClusteringAlgorithm<?> metaAlgorithm;
+  private ClusteringAlgorithm<?> metaAlgorithm;
 
   /**
-   * How many clusterings shall be made for comparison.
+   * How many clusterings shall be made for aggregation.
    */
-  private final int depth;
+  private int numsamples;
 
   /**
    * Random factory for sampling.
@@ -110,12 +123,12 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    * Constructor, quite trivial.
    *
    * @param algorithm Primary clustering algorithm
-   * @param depth Number of samples
+   * @param numsamples Number of samples
    * @param metaAlgorithm Meta clustering algorithm
    */
-  public PWCClusteringAlgorithm(ClusteringAlgorithm<?> algorithm, int depth, ClusteringAlgorithm<?> metaAlgorithm, RandomFactory random) {
-    this.algorithm = algorithm;
-    this.depth = depth;
+  public RepresentativeUncertainClustering(ClusteringAlgorithm<?> algorithm, int numsamples, ClusteringAlgorithm<?> metaAlgorithm, RandomFactory random) {
+    this.samplesAlgorithm = algorithm;
+    this.numsamples = numsamples;
     this.metaAlgorithm = metaAlgorithm;
     this.random = random;
   }
@@ -131,42 +144,41 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    * @param relation Data relation of uncertain objects
    * @return Clustering result
    */
-  public Clustering<?> run(final Database database, final Relation<? extends UncertainObject> relation) {
-    final ArrayList<Clustering<?>> clusterings = new ArrayList<>();
+  public Clustering<?> run(Database database, Relation<? extends UncertainObject> relation) {
+    ArrayList<Clustering<?>> clusterings = new ArrayList<>();
+    final int dim = RelationUtil.dimensionality(relation);
+    DBIDs ids = relation.getDBIDs();
+    // Add the center of mass result for comparison:
     {
-      Random rand = random.getSingleThreadedRandom();
-      final int dim = RelationUtil.dimensionality(relation);
-      final DBIDs ids = relation.getDBIDs();
-      // Add the uncertain model:
-      {
-        final WritableDataStore<DoubleVector> store1 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DoubleVector.class);
-        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          store1.put(iter, relation.get(iter).getCenterOfMass());
-        }
-        runClusteringAlgorithm(relation, ids, store1, dim, "Uncertain Model: Center of Mass");
+      WritableDataStore<DoubleVector> store1 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DoubleVector.class);
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        store1.put(iter, relation.get(iter).getCenterOfMass());
       }
-      // Add samples:
-      for(int i = 0; i < this.depth; i++) {
-        final WritableDataStore<DoubleVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DoubleVector.class);
-        for(final DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          store.put(iter, relation.get(iter).drawSample(rand));
-        }
-        clusterings.add(runClusteringAlgorithm(relation, ids, store, dim, "Sample " + i));
+      // Not added to "clusterings", so it does not get aggregated.
+      runClusteringAlgorithm(relation, ids, store1, dim, "Uncertain Model: Center of Mass");
+    }
+    // Step 1: Cluster sampled possible worlds:
+    Random rand = random.getSingleThreadedRandom();
+    for(int i = 0; i < numsamples; i++) {
+      WritableDataStore<DoubleVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DoubleVector.class);
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        store.put(iter, relation.get(iter).drawSample(rand));
       }
+      clusterings.add(runClusteringAlgorithm(relation, ids, store, dim, "Sample " + i));
     }
 
     // Step 2: perform the meta clustering (on samples only).
     DBIDRange rids = DBIDFactory.FACTORY.generateStaticDBIDRange(clusterings.size());
-    final WritableDataStore<Clustering<?>> datastore = DataStoreUtil.makeStorage(rids, DataStoreFactory.HINT_DB, Clustering.class);
+    WritableDataStore<Clustering<?>> datastore = DataStoreUtil.makeStorage(rids, DataStoreFactory.HINT_DB, Clustering.class);
     Iterator<Clustering<?>> it2 = clusterings.iterator();
-    for(final DBIDIter iter = rids.iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = rids.iter(); iter.valid(); iter.advance()) {
       datastore.put(iter, it2.next());
     }
     assert(rids.size() == clusterings.size());
 
-    final Relation<Clustering<?>> simRelation = new MaterializedRelation<Clustering<?>>(TypeUtil.CLUSTERING, rids, "Clusterings", datastore);
+    Relation<Clustering<?>> simRelation = new MaterializedRelation<Clustering<?>>(TypeUtil.CLUSTERING, rids, "Clusterings", datastore);
     ProxyDatabase d = new ProxyDatabase(rids, simRelation);
-    Clustering<?> c = this.metaAlgorithm.run(d);
+    Clustering<?> c = metaAlgorithm.run(d);
     d.getHierarchy().remove(d, c);
     return c;
   }
@@ -175,17 +187,17 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
    * Run a clustering algorithm on a single instance.
    *
    * @param database Database
-   * @param ids
-   * @param store
-   * @param dim
-   * @param title
-   * @return
+   * @param ids Object IDs to process
+   * @param store Input data
+   * @param dim Dimensionality
+   * @param title Title of relation
+   * @return Clustering result
    */
-  protected Clustering<?> runClusteringAlgorithm(final HierarchicalResult database, final DBIDs ids, final WritableDataStore<DoubleVector> store, final int dim, final String title) {
-    final SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
-    final Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
+  protected Clustering<?> runClusteringAlgorithm(HierarchicalResult database, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
+    SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
+    Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);
-    Clustering<?> clusterResult = algorithm.run(d);
+    Clustering<?> clusterResult = samplesAlgorithm.run(d);
     d.getHierarchy().remove(sample);
     d.getHierarchy().remove(clusterResult);
     database.getHierarchy().add(database, sample);
@@ -200,13 +212,14 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
 
   @Override
   protected Logging getLogger() {
-    return PWCClusteringAlgorithm.LOG;
+    return RepresentativeUncertainClustering.LOG;
   }
 
   /**
    * Parameterization class.
    *
    * @author Alexander Koos
+   * @author Erich Schubert
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
@@ -215,19 +228,24 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     public final static int DEFAULT_ENSEMBLE_DEPTH = 10;
 
     /**
+     * Distance function to measure the similarity of clusterings.
+     */
+    public final static OptionID CLUSTERDISTANCE_ID = new OptionID("pwc.distance", "Distance measure of clusterings.");
+
+    /**
      * Parameter to hand an algorithm for creating the meta-clustering to our
-     * instance of {@link PWCClusteringAlgorithm}.
+     * instance of {@link RepresentativeUncertainClustering}.
      *
      * It has to use a metric distance function to work on the
      * sample-clusterings.
      */
-    public final static OptionID META_ALGORITHM_ID = new OptionID("algorithm.metaclustering", "Used Algorithm for Meta-Clustering.");
+    public final static OptionID META_ALGORITHM_ID = new OptionID("pwc.metaclustering", "Algorithm used to aggregate clustering results. Must be a distance-based clustering algorithm.");
 
     /**
      * Parameter to hand an algorithm to be wrapped and run to our instance of
-     * {@link PWCClusteringAlgorithm}.
+     * {@link RepresentativeUncertainClustering}.
      */
-    public final static OptionID ALGORITHM_ID = new OptionID("algorithm.clustering", "Used Clustering Algorithm.");
+    public final static OptionID ALGORITHM_ID = new OptionID("pwc.clustering", "Clustering algorithm used on the samples.");
 
     /**
      * Parameter to specify the amount of clusterings that shall be created and
@@ -235,12 +253,12 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
      *
      * Has a default value.
      */
-    public final static OptionID DEPTH_ID = new OptionID("uncert.depth", "Amount of sample-clusterings to be made.");
+    public final static OptionID DEPTH_ID = new OptionID("pwc.samples", "Number of clusterings to produce on samples.");
 
     /**
      * Parameter to specify the random generator.
      */
-    public final static OptionID RANDOM_ID = new OptionID("uncert.random", "Random generator used for sampling.");
+    public final static OptionID RANDOM_ID = new OptionID("pwc.random", "Random generator used for sampling.");
 
     /**
      * Field to store parameter value for depth.
@@ -263,17 +281,26 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     protected RandomFactory random;
 
     @Override
-    protected void makeOptions(final Parameterization config) {
+    protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ClassParameter<ClusteringAlgorithm<?>> malgorithm = new ClassParameter<>(Parameterizer.META_ALGORITHM_ID, ClusteringAlgorithm.class);
-      if(config.grab(malgorithm)) {
-        metaAlgorithm = malgorithm.instantiateClass(config);
+      ClusteringDistanceSimilarityFunction distance = ClusteringAdjustedRandIndexSimilarityFunction.STATIC;
+      ObjectParameter<ClusteringDistanceSimilarityFunction> simP = new ObjectParameter<>(CLUSTERDISTANCE_ID, ClusteringDistanceSimilarityFunction.class, ClusteringAdjustedRandIndexSimilarityFunction.class);
+      if(config.grab(simP)) {
+        distance = simP.instantiateClass(config);
+      }
+      // Configure Distance function
+      ListParameterization predef = new ListParameterization();
+      predef.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, distance);
+      ChainedParameterization chain = new ChainedParameterization(predef, config);
+      ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, KMedoidsEM.class);
+      if(chain.grab(malgorithm)) {
+        metaAlgorithm = malgorithm.instantiateClass(chain);
         if(metaAlgorithm != null && metaAlgorithm.getInputTypeRestriction().length > 0 && //
         !metaAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.CLUSTERING)) {
           config.reportError(new WrongParameterValueException(malgorithm, malgorithm.getValueAsString(), "The meta clustering algorithm (as configured) does not accept clustering results."));
         }
       }
-      ClassParameter<ClusteringAlgorithm<?>> palgorithm = new ClassParameter<>(Parameterizer.ALGORITHM_ID, ClusteringAlgorithm.class);
+      ObjectParameter<ClusteringAlgorithm<?>> palgorithm = new ObjectParameter<>(ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(palgorithm)) {
         algorithm = palgorithm.instantiateClass(config);
         if(algorithm != null && algorithm.getInputTypeRestriction().length > 0 && //
@@ -292,8 +319,8 @@ public class PWCClusteringAlgorithm extends AbstractAlgorithm<Clustering<Model>>
     }
 
     @Override
-    protected PWCClusteringAlgorithm makeInstance() {
-      return new PWCClusteringAlgorithm(this.algorithm, this.tryDepth, this.metaAlgorithm, this.random);
+    protected RepresentativeUncertainClustering makeInstance() {
+      return new RepresentativeUncertainClustering(algorithm, tryDepth, metaAlgorithm, random);
     }
   }
 }
