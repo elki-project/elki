@@ -1,3 +1,4 @@
+de.lmu.ifi.dbs.elki.visualization.visualizers.actions.ClusterStyleAction
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AxisVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.MarkerVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.PolygonVisualization
