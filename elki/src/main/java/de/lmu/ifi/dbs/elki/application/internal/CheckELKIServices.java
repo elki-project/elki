@@ -235,6 +235,9 @@ public class CheckELKIServices {
   @SuppressWarnings("unchecked")
   private void checkAliases(Class<?> parent, String classname, String[] parts) {
     Class<?> c = ELKIServiceRegistry.findImplementation((Class<Object>) parent, classname);
+    if (c == null) {
+      return;
+    }
     Alias ann = c.getAnnotation(Alias.class);
     if(ann == null) {
       if(parts.length > 1) {
