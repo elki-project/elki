@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringDistanceSimilarityFunction;
 import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Alexander Koos
  *
  */
-public class PWCClusteringEvaluation<F extends ClusteringSimilarityFunction> extends AutomaticEvaluation {
+public class PWCClusteringEvaluation<F extends ClusteringDistanceSimilarityFunction> extends AutomaticEvaluation {
   // Table values from literature.
   public final static double[] alphaMap = new double[] { //
       0.05, 1.65, //
@@ -222,7 +222,7 @@ public class PWCClusteringEvaluation<F extends ClusteringSimilarityFunction> ext
 
   public static class PWCScoreResult extends EvaluationResult {
 
-    public PWCScoreResult(double z, List<Clustering<Model>> crs, Clustering<Model> c, double tauAll, double tau, ClusteringSimilarityFunction f) {
+    public PWCScoreResult(double z, List<Clustering<Model>> crs, Clustering<Model> c, double tauAll, double tau, ClusteringDistanceSimilarityFunction f) {
       super("Possible-Worlds-Clustering Score", "PWC Score");
 
       final double eprob = probabilityEstimator(c, tau, crs, f);
@@ -234,7 +234,7 @@ public class PWCClusteringEvaluation<F extends ClusteringSimilarityFunction> ext
       g.addMeasure("Confidence-Probability", cprob, 0, 1, false);
     }
 
-    private double probabilityEstimator(Clustering<Model> c, double tau, List<Clustering<Model>> crs, ClusteringSimilarityFunction f) {
+    private double probabilityEstimator(Clustering<Model> c, double tau, List<Clustering<Model>> crs, ClusteringDistanceSimilarityFunction f) {
       final double itau = 1 - tau;
       double x = 0;
       for(Clustering<Model> c1 : crs) {
@@ -246,7 +246,7 @@ public class PWCClusteringEvaluation<F extends ClusteringSimilarityFunction> ext
 
   public static class Parameterizer extends AbstractParameterizer {
 
-    private ClusteringSimilarityFunction simFunc;
+    private ClusteringDistanceSimilarityFunction simFunc;
 
     private double alpha;
 
@@ -257,7 +257,7 @@ public class PWCClusteringEvaluation<F extends ClusteringSimilarityFunction> ext
     @Override
     protected void makeOptions(final Parameterization config) {
       super.makeOptions(config);
-      ClassParameter<ClusteringSimilarityFunction> pSimFunc = new ClassParameter<>(SIMILARITY_FUNCTION_ID, ClusteringSimilarityFunction.class);
+      ClassParameter<ClusteringDistanceSimilarityFunction> pSimFunc = new ClassParameter<>(SIMILARITY_FUNCTION_ID, ClusteringDistanceSimilarityFunction.class);
       if(config.grab(pSimFunc)) {
         simFunc = pSimFunc.instantiateClass(config);
       }
@@ -268,7 +268,7 @@ public class PWCClusteringEvaluation<F extends ClusteringSimilarityFunction> ext
     }
 
     @Override
-    protected PWCClusteringEvaluation<ClusteringSimilarityFunction> makeInstance() {
+    protected PWCClusteringEvaluation<ClusteringDistanceSimilarityFunction> makeInstance() {
       return new PWCClusteringEvaluation<>(this.simFunc, this.alpha);
     }
   }

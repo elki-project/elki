@@ -23,13 +23,17 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster;
  */
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 
 /**
- * Similarity measure for clusterings.
+ * Distance and similarity measure for clusterings.
  *
  * @author Erich Schubert
  */
-public interface ClusteringSimilarityFunction extends PrimitiveSimilarityFunction<Clustering<?>> {
-
+public interface ClusteringDistanceSimilarityFunction extends PrimitiveSimilarityFunction<Clustering<?>>, PrimitiveDistanceFunction<Clustering<?>> {
+  @Override
+  <T extends Clustering<?>> DistanceSimilarityQuery<T> instantiate(Relation<T> relation);
 }

@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
@@ -52,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 title = "Entity-based cross-document coreferencing using the Vector Space Model", //
 booktitle = "Proc. COLING '98 Proceedings of the 17th international conference on Computational linguistics", //
 url = "http://dx.doi.org/10.3115/980451.980859")
-public class ClusteringBCubedF1SimilarityFunction extends AbstractPrimitiveSimilarityFunction<Clustering<?>>implements ClusteringSimilarityFunction, PrimitiveDistanceFunction<Clustering<?>>, NormalizedSimilarityFunction<Clustering<?>> {
+public class ClusteringBCubedF1SimilarityFunction extends AbstractPrimitiveSimilarityFunction<Clustering<?>>implements ClusteringDistanceSimilarityFunction, NormalizedSimilarityFunction<Clustering<?>> {
   /**
    * Static instance.
    */
