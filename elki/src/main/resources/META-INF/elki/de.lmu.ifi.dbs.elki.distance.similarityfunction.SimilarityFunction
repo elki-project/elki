@@ -12,5 +12,8 @@ de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.RationalQuadraticKernelFu
 de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusterIntersectionSimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusterJaccardSimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringAdjustedRandIndexSimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringRandIndexSimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringBCubedF1SimilarityFunction
+de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringFowlkesMallowsSimilarityFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.HellingerDistanceFunction hellinger bhattacharyya
 de.lmu.ifi.dbs.elki.distance.distancefunction.set.JaccardSimilarityDistanceFunction

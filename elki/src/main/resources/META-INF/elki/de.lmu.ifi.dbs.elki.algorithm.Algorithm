@@ -60,6 +60,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByModelClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.RepresentativeUncertainClustering
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.APRIORI
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.Eclat
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.FPGrowth

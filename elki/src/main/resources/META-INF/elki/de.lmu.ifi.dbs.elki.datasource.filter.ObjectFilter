@@ -6,6 +6,8 @@ de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ExternalIDFilter de.lmu.if
 de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.MultivariateTimeSeriesFilter
 de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.SparseVectorFieldFilter de.lmu.ifi.dbs.elki.datasource.filter.SparseVectorFieldFilter
 de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.SplitNumberVectorFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.SplitNumberVectorFilter
+de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.UncertainSplitFilter
+de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.UncertainifyFilter
 de.lmu.ifi.dbs.elki.datasource.filter.selection.ByLabelFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.ByLabelFilter
 de.lmu.ifi.dbs.elki.datasource.filter.selection.RandomSamplingStreamFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.RandomSamplingStreamFilter
 de.lmu.ifi.dbs.elki.datasource.filter.selection.ShuffleObjectsFilter de.lmu.ifi.dbs.elki.datasource.filter.ShuffleObjectsFilter
