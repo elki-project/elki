@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -40,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -52,7 +50,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
@@ -69,9 +66,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * </p>
  *
  * This class is a NeighborPredicate presenting this Algorithm in use with
- * <code>{@link GeneralizedDBSCAN}</code>
+ * <code>{@link GeneralizedDBSCAN}</code>.
+ *
+ * Only Euclidean distance is supported, because of the pruning strategy
+ * described in the original article.
  *
  * @author Alexander Koos
+ * @author Erich Schubert
  */
 @Title("FDBSCAN: Density-based Clustering of Applications with Noise on fuzzy objects")
 @Description("Algorithm to find density-connected sets in a database consisting of uncertain/fuzzy objects based on the" //
@@ -85,11 +86,6 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate {
    * Epsilon radius
    */
   protected double epsilon;
-
-  /**
-   * Distance function
-   */
-  protected NumberVectorDistanceFunction<?> distance;
 
   /**
    * The size of samplesets that should be drawn for neighborcheck.
@@ -108,19 +104,18 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate {
   protected RandomFactory rand;
 
   /**
-   *
    * Constructor.
    *
+   * FIXME: Dokumentation.
+   *
    * @param epsilon
-   * @param distance
    * @param sampleSize
    * @param threshold
    * @param seed
    */
-  public FDBSCANNeighborPredicate(double epsilon, NumberVectorDistanceFunction<?> distance, int sampleSize, double threshold, RandomFactory seed) {
+  public FDBSCANNeighborPredicate(double epsilon, int sampleSize, double threshold, RandomFactory seed) {
     super();
     this.epsilon = epsilon;
-    this.distance = distance;
     this.sampleSize = sampleSize;
     this.threshold = threshold;
     this.rand = seed;
@@ -159,11 +154,6 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate {
     private Relation<? extends UncertainObject> relation;
 
     /**
-     * The distance query to determine the distance of two samples.
-     */
-    private NumberVectorDistanceFunction<?> distance;
-
-    /**
      * The random generator to draw the samples with.
      */
     private Random rand;
@@ -172,59 +162,77 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate {
      *
      * Constructor.
      *
+     * FIXME: Dokumentation.
+     *
      * @param epsilon
      * @param ids
      * @param sampleSize
      * @param threshold
      * @param relation
-     * @param distance
      * @param rand
      */
-    public Instance(double epsilon, DoubleDBIDList ids, int sampleSize, double threshold, Relation<? extends UncertainObject> relation, NumberVectorDistanceFunction<?> distance, RandomFactory rand) {
+    public Instance(double epsilon, DoubleDBIDList ids, int sampleSize, double threshold, Relation<? extends UncertainObject> relation, RandomFactory rand) {
       super();
       this.ids = ids;
       this.epsilon = epsilon;
       this.sampleSize = sampleSize;
       this.threshold = threshold;
       this.relation = relation;
-      this.distance = distance;
       this.rand = rand.getRandom();
       // TODO: integrate distancefunction correctly
     }
 
     @Override
     public DBIDs getNeighbors(DBIDRef reference) {
+      final EuclideanDistanceFunction distance = EuclideanDistanceFunction.STATIC;
+
       UncertainObject referenceObject = relation.get(reference);
       ModifiableDBIDs resultList = DBIDUtil.newArray();
       final double thresSampleSample = threshold * sampleSize * sampleSize;
-      for(DBIDIter iter = iterDBIDs(ids); iter.valid(); iter.advance()) {
+      candidates: for(DBIDIter iter = iterDBIDs(ids); iter.valid(); iter.advance()) {
         if(DBIDUtil.equal(reference, iter)) {
-          continue; // FIXME: do not ignore the query point.
+          resultList.add(iter); // Always include the query point.
+          continue;
         }
 
         boolean included = true;
         UncertainObject comparisonObject = relation.get(iter);
-        for(int i = 0; i < referenceObject.getDimensionality(); i++) {
+        for(int d = 0; d < referenceObject.getDimensionality(); d++) {
           if(included) {
-            if(((referenceObject.getMax(i) - referenceObject.getMin(i)) < (epsilon * 2)) && referenceObject.getMin(i) <= comparisonObject.getMin(i) && referenceObject.getMax(i) >= comparisonObject.getMax(i)) {
+            // FIXME: stimmt die Formel? Warum epsilon * 2?!?
+            if(((referenceObject.getMax(d) - referenceObject.getMin(d)) < (epsilon * 2)) && referenceObject.getMin(d) <= comparisonObject.getMin(d) && referenceObject.getMax(d) >= comparisonObject.getMax(d)) {
               // leave as marked as completely included
               continue;
             }
             // at least in one dimension it is not completely included
             included = false;
           }
-          if((referenceObject.getMin(i) - epsilon) > comparisonObject.getMax(i) || (referenceObject.getMax(i) + epsilon) < comparisonObject.getMin(i)) {
+          // FIXME: stimmt die Formel?
+          if((referenceObject.getMin(d) - epsilon) > comparisonObject.getMax(d) || (referenceObject.getMax(d) + epsilon) < comparisonObject.getMin(d)) {
             // completely excluded
-            continue;
+            continue candidates;
           }
+          // FIXME: mindist, maxdist von unten integrieren!
         }
         if(included) {
           resultList.add(iter);
           continue;
         }
+        // FIXME: Die folgenden Zeilen sind ein hack, das würde wohl besser mit
+        // dem oben in eine Schleife integriert,.
+        double dmax = distance.maxDist(referenceObject, comparisonObject);
+        if(dmax <= epsilon) { // True positive.
+          resultList.add(iter);
+          continue;
+        }
+        double dmin = distance.minDist(referenceObject, comparisonObject);
+        if(dmin > epsilon) { // True negative.
+          continue;
+        }
 
         int count = 0;
         for(int i = 0; i < sampleSize; i++) {
+          // TODO: nur 1x sampeln pro query object!
           NumberVector comparisonSample = comparisonObject.drawSample(rand);
           // nested loop because of cartesian product
           for(int j = 0; j < sampleSize; j++) {
@@ -269,13 +277,14 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate {
   @Override
   public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
     Relation<? extends UncertainObject> relation = database.getRelation(TypeUtil.UNCERTAIN_OBJECT_FIELD);
-    return (NeighborPredicate.Instance<T>) new Instance(epsilon, (DoubleDBIDList) relation.getDBIDs(), sampleSize, threshold, relation, distance, rand);
+    return (NeighborPredicate.Instance<T>) new Instance(epsilon, (DoubleDBIDList) relation.getDBIDs(), sampleSize, threshold, relation, rand);
   }
 
   /**
    * Parameterizer class.
    *
    * @author Alexander Koos
+   * @author Erich Schubert
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
@@ -302,12 +311,6 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate {
     protected double epsilon;
 
     /**
-     * The <code>DistanceFunction</code> to determine the distance between two
-     * samples.
-     */
-    protected NumberVectorDistanceFunction<?> distance;
-
-    /**
      * The size of samplesets that should be drawn for neighborcheck.
      */
     protected int sampleSize;
@@ -331,10 +334,6 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate {
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.doubleValue();
       }
-      ObjectParameter<NumberVectorDistanceFunction<? super NumberVector>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
-      if(config.grab(distanceFunctionP)) {
-        distance = distanceFunctionP.instantiateClass(config);
-      }
       IntParameter sampleSizep = new IntParameter(SAMPLE_SIZE_ID) //
       .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(sampleSizep)) {
@@ -354,7 +353,7 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate {
 
     @Override
     protected FDBSCANNeighborPredicate makeInstance() {
-      return new FDBSCANNeighborPredicate(epsilon, distance, sampleSize, threshold, seed);
+      return new FDBSCANNeighborPredicate(epsilon, sampleSize, threshold, seed);
     }
   }
 }

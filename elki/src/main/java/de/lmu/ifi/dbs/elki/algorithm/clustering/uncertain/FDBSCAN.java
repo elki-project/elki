@@ -22,14 +22,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.FDBSCANNeighborPredicate;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.MinPtsCorePredicate;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -39,7 +35,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
@@ -71,14 +66,13 @@ public class FDBSCAN extends GeneralizedDBSCAN {
    * Constructor that initialized GeneralizedDBSCAN.
    *
    * @param epsilon Epsilon radius
-   * @param distance Distance function
    * @param sampleSize Sample size
    * @param threshold Threshold
    * @param seed Random generator
    * @param minpts MinPts
    */
-  public FDBSCAN(double epsilon, NumberVectorDistanceFunction<?> distance, int sampleSize, double threshold, RandomFactory seed, int minpts) {
-    super(new FDBSCANNeighborPredicate(epsilon, distance, sampleSize, threshold, seed), new MinPtsCorePredicate(minpts), false);
+  public FDBSCAN(double epsilon, int sampleSize, double threshold, RandomFactory seed, int minpts) {
+    super(new FDBSCANNeighborPredicate(epsilon, sampleSize, threshold, seed), new MinPtsCorePredicate(minpts), false);
   }
 
   /**
@@ -94,12 +88,6 @@ public class FDBSCAN extends GeneralizedDBSCAN {
      * Epsilon radius
      */
     protected double epsilon;
-
-    /**
-     * The <code>DistanceFunction</code> to determine the distance between two
-     * samples.
-     */
-    protected NumberVectorDistanceFunction<?> distance;
 
     /**
      * The size of samplesets that should be drawn for neighborcheck.
@@ -130,10 +118,6 @@ public class FDBSCAN extends GeneralizedDBSCAN {
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.doubleValue();
       }
-      ObjectParameter<NumberVectorDistanceFunction<? super NumberVector>> distanceFunctionP = new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, NumberVectorDistanceFunction.class, EuclideanDistanceFunction.class);
-      if(config.grab(distanceFunctionP)) {
-        distance = distanceFunctionP.instantiateClass(config);
-      }
       IntParameter minPtsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
       .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minPtsP)) {
@@ -158,7 +142,7 @@ public class FDBSCAN extends GeneralizedDBSCAN {
 
     @Override
     protected FDBSCAN makeInstance() {
-      return new FDBSCAN(epsilon, distance, sampleSize, threshold, seed, minPts);
+      return new FDBSCAN(epsilon, sampleSize, threshold, seed, minPts);
     }
   }
 }
