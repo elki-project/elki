@@ -65,12 +65,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Applications<br />
  * In: Data Mining and Knowledge Discovery, 1998.
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @author Arthur Zimek
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.has Instance
  * @apiviz.composedOf CorePredicate
  * @apiviz.composedOf NeighborPredicate
@@ -79,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 title = "Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications", //
 booktitle = "Data Mining and Knowledge Discovery", //
 url = "http://dx.doi.org/10.1023/A:1009745219419")
-public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>>implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Get a logger for this algorithm
    */
@@ -88,21 +88,21 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
   /**
    * The neighborhood predicate factory.
    */
-  NeighborPredicate npred;
+  protected NeighborPredicate npred;
 
   /**
    * The core predicate factory.
    */
-  CorePredicate corepred;
+  protected CorePredicate corepred;
 
   /**
    * Track which objects are "core" objects.
    */
-  boolean coremodel = false;
+  protected boolean coremodel = false;
 
   /**
    * Constructor for parameterized algorithm.
-   * 
+   *
    * @param npred Neighbor predicate.
    * @param corepred Core point predicate.
    * @param coremodel Keep track of core points.
@@ -136,9 +136,9 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
 
   /**
    * Instance for a particular data set.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.composedOf CorePredicate.Instance
    * @apiviz.composedOf NeighborPredicate.Instance
    */
@@ -156,21 +156,21 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     /**
      * The neighborhood predicate
      */
-    final NeighborPredicate.Instance<T> npred;
+    protected final NeighborPredicate.Instance<T> npred;
 
     /**
      * The core object property
      */
-    final CorePredicate.Instance<? super T> corepred;
+    protected final CorePredicate.Instance<? super T> corepred;
 
     /**
      * Track which objects are "core" objects.
      */
-    boolean coremodel = false;
+    protected boolean coremodel = false;
 
     /**
      * Full Constructor
-     * 
+     *
      * @param npred Neighborhood predicate
      * @param corepred Core object predicate
      * @param coremodel Keep track of core points.
@@ -184,7 +184,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
 
     /**
      * Run the actual GDBSCAN algorithm.
-     * 
+     *
      * @return Clustering result
      */
     public Clustering<Model> run() {
@@ -263,7 +263,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
 
     /**
      * Set-based expand cluster implementation.
-     * 
+     *
      * @param clusterid ID of the current cluster.
      * @param clusterids Current object to cluster mapping.
      * @param neighbors Neighbors acquired by initial getNeighbors call.
@@ -272,7 +272,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
      * @return cluster size
      */
     protected int expandCluster(final DBIDRef seed, final int clusterid, final WritableIntegerDataStore clusterids, final T neighbors, ArrayModifiableDBIDs activeSet, final FiniteProgress progress) {
-      assert (activeSet.size() == 0);
+      assert(activeSet.size() == 0);
       int clustersize = 1 + processCorePoint(seed, neighbors, clusterid, clusterids, activeSet);
       // run expandCluster as long as there is another seed
       final DBIDVar id = DBIDUtil.newVar();
@@ -291,7 +291,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
 
     /**
      * Process a single core point.
-     * 
+     *
      * @param seed Point to process
      * @param newneighbors New neighbors
      * @param clusterid Cluster to add to
@@ -320,41 +320,44 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Neighborhood predicate.
-     */
-    NeighborPredicate npred = null;
-
-    /**
-     * Core point predicate.
-     */
-    CorePredicate corepred = null;
-
-    /**
-     * Track which objects are "core" objects.
-     */
-    boolean coremodel = false;
-
-    /**
      * Parameter for neighborhood predicate.
      */
-    public static final OptionID NEIGHBORHOODPRED_ID = new OptionID("gdbscan.neighborhood", "Neighborhood predicate for GDBSCAN");
+    public static final OptionID NEIGHBORHOODPRED_ID = new OptionID("gdbscan.neighborhood", //
+    "Neighborhood predicate for Generalized DBSCAN");
 
     /**
      * Parameter for core predicate.
      */
-    public static final OptionID COREPRED_ID = new OptionID("gdbscan.core", "Core point predicate for GDBSCAN");
+    public static final OptionID COREPRED_ID = new OptionID("gdbscan.core", //
+    "Core point predicate for Generalized DBSCAN");
 
     /**
      * Flag to keep track of core points.
      */
-    public static final OptionID COREMODEL_ID = new OptionID("gdbscan.core-model", "Use a model that keeps track of core points. Needs more memory.");
+    public static final OptionID COREMODEL_ID = new OptionID("gdbscan.core-model", //
+    "Use a model that keeps track of core points. Needs more memory.");
+
+    /**
+     * Neighborhood predicate.
+     */
+    protected NeighborPredicate npred = null;
+
+    /**
+     * Core point predicate.
+     */
+    protected CorePredicate corepred = null;
+
+    /**
+     * Track which objects are "core" objects.
+     */
+    protected boolean coremodel = false;
 
     @Override
     protected void makeOptions(Parameterization config) {

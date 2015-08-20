@@ -76,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", //
 title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
 booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
-url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
+url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
 public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>>implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
@@ -149,6 +149,12 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
     return result;
   }
 
+  /**
+   * Run the DBSCAN algorithm
+   *
+   * @param relation Data relation
+   * @param rangeQuery Range query class
+   */
   protected void runDBSCAN(Relation<O> relation, RangeQuery<O> rangeQuery) {
     final int size = relation.size();
     FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
@@ -284,7 +290,8 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID);
+      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
