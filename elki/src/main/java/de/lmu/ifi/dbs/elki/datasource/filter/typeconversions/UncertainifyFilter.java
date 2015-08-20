@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.typeconversions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -31,13 +34,16 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.uncertainifier.Uncertainifier;
-import de.lmu.ifi.dbs.elki.datasource.filter.AbstractConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
@@ -50,11 +56,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * regarding uncertain data in some way.
  *
  * @author Alexander Koos
+ * @author Erich Schubert
  *
- * @param <UO> Uncertainty model
- * @param <U> Uncertain object type
+ * @param <UO> Uncertain object type
  */
-public class UncertainifyFilter<UO extends UncertainObject> extends AbstractConversionFilter<NumberVector, UO> {
+public class UncertainifyFilter<UO extends UncertainObject> implements ObjectFilter {
   /**
    * Class logger.
    */
@@ -66,6 +72,11 @@ public class UncertainifyFilter<UO extends UncertainObject> extends AbstractConv
   protected Uncertainifier<UO> generator;
 
   /**
+   * Flag to keep the original data.
+   */
+  protected boolean keep;
+
+  /**
    * Random generator.
    */
   protected Random rand;
@@ -74,32 +85,54 @@ public class UncertainifyFilter<UO extends UncertainObject> extends AbstractConv
    * Constructor.
    *
    * @param generator Generator for uncertain objects
+   * @param keep Flag to keep the original data
    * @param randf Random factory
    */
-  public UncertainifyFilter(Uncertainifier<UO> generator, RandomFactory randf) {
+  public UncertainifyFilter(Uncertainifier<UO> generator, boolean keep, RandomFactory randf) {
     this.generator = generator;
+    this.keep = keep;
     this.rand = randf.getSingleThreadedRandom();
   }
 
   @Override
-  protected UO filterSingleObject(NumberVector obj) {
-    return generator.newFeatureVector(rand, obj, ArrayLikeUtil.NUMBERVECTORADAPTER);
-  }
+  public MultipleObjectsBundle filter(MultipleObjectsBundle objects) {
+    if(objects.dataLength() == 0) {
+      return objects;
+    }
+    MultipleObjectsBundle bundle = new MultipleObjectsBundle();
 
-  @Override
-  protected SimpleTypeInformation<? super NumberVector> getInputTypeRestriction() {
-    return TypeUtil.NUMBER_VECTOR_FIELD;
-  }
+    for(int r = 0; r < objects.metaLength(); r++) {
+      SimpleTypeInformation<?> type = objects.meta(r);
+      @SuppressWarnings("unchecked")
+      final List<Object> column = (List<Object>) objects.getColumn(r);
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type)) {
+        bundle.appendColumn(type, column);
+        continue;
+      }
+      // Get the replacement type information
+      @SuppressWarnings("unchecked")
+      final VectorFieldTypeInformation<NumberVector> castType = (VectorFieldTypeInformation<NumberVector>) type;
+      final int dim = castType.getDimensionality();
 
-  @Override
-  protected SimpleTypeInformation<UO> convertedType(SimpleTypeInformation<NumberVector> in) {
-    final int dim = ((VectorFieldTypeInformation<NumberVector>) in).getDimensionality();
-    return new VectorFieldTypeInformation<UO>(generator.getFactory(), dim);
-  }
+      if(keep) {
+        bundle.appendColumn(type, column);
+      }
+      // Uncertain objects produced
+      final List<UO> uos = new ArrayList<>(column.size());
 
-  @Override
-  protected Logging getLogger() {
-    return LOG;
+      // Normalization scan
+      FiniteProgress nprog = LOG.isVerbose() ? new FiniteProgress("Derive uncertain objects", objects.dataLength(), LOG) : null;
+      for(int i = 0; i < objects.dataLength(); i++) {
+        final NumberVector obj = (NumberVector) column.get(i);
+        final UO normalizedObj = generator.newFeatureVector(rand, obj, ArrayLikeUtil.NUMBERVECTORADAPTER);
+        uos.add(normalizedObj);
+        LOG.incrementProcessed(nprog);
+      }
+      LOG.ensureCompleted(nprog);
+      // Add column with uncertain objects
+      bundle.appendColumn(new VectorFieldTypeInformation<UO>(generator.getFactory(), dim), uos);
+    }
+    return bundle;
   }
 
   /**
@@ -118,14 +151,26 @@ public class UncertainifyFilter<UO extends UncertainObject> extends AbstractConv
     "Generator to derive uncertain objects from certain vectors.");
 
     /**
+     * Flag to keep the original data.
+     */
+    public static final OptionID KEEP_ID = new OptionID("uofilter.keep", //
+    "Keep the original data as well.");
+
+    /**
      * Seed for random generation.
      */
-    public static final OptionID SEED_ID = new OptionID("uofilter.seed", "Seed for uncertainification.");
+    public static final OptionID SEED_ID = new OptionID("uofilter.seed", //
+    "Random seed for uncertainification.");
 
     /**
      * Field to hold the generator to produce uncertain objects.
      */
     protected Uncertainifier<UO> generator;
+
+    /**
+     * Flag to keep the original data.
+     */
+    protected boolean keep;
 
     /**
      * Random generator.
@@ -139,6 +184,10 @@ public class UncertainifyFilter<UO extends UncertainObject> extends AbstractConv
       if(config.grab(generatorP)) {
         generator = generatorP.instantiateClass(config);
       }
+      Flag keepF = new Flag(KEEP_ID);
+      if(config.grab(keepF)) {
+        keep = keepF.isTrue();
+      }
       RandomParameter randomP = new RandomParameter(SEED_ID);
       if(config.grab(randomP)) {
         rand = randomP.getValue();
@@ -147,7 +196,7 @@ public class UncertainifyFilter<UO extends UncertainObject> extends AbstractConv
 
     @Override
     protected UncertainifyFilter<UO> makeInstance() {
-      return new UncertainifyFilter<UO>(generator, rand);
+      return new UncertainifyFilter<UO>(generator, keep, rand);
     }
   }
 }
