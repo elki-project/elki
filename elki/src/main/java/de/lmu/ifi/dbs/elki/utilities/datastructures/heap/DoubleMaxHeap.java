@@ -107,7 +107,7 @@ public class DoubleMaxHeap implements DoubleHeap {
   public void add(double key, int max) {
     if (size < max) {
       add(key);
-    } else if (twoheap[0] >= key) {
+    } else if (twoheap[0] > key) {
       replaceTopElement(key);
     }
   }

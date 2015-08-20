@@ -120,7 +120,7 @@ public class DoubleLongMinHeap implements DoubleLongHeap {
   public void add(double key, long val, int max) {
     if (size < max) {
       add(key, val);
-    } else if (twoheap[0] <= key) {
+    } else if (twoheap[0] < key) {
       replaceTopElement(key, val);
     }
   }

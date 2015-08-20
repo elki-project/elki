@@ -107,7 +107,7 @@ public class IntegerMaxHeap implements IntegerHeap {
   public void add(int key, int max) {
     if (size < max) {
       add(key);
-    } else if (twoheap[0] >= key) {
+    } else if (twoheap[0] > key) {
       replaceTopElement(key);
     }
   }
