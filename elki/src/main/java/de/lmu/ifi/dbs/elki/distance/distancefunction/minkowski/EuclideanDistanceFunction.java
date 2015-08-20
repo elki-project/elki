@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Euclidean distance for {@link NumberVector}s.
- * 
+ *
  * @author Arthur Zimek
  */
 @Alias({ "euclidean", "euclid", "l2", "EuclideanDistanceFunction", "de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction" })
@@ -42,7 +42,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
 
   /**
    * Constructor - use {@link #STATIC} instead.
-   * 
+   *
    * @deprecated Use static instance!
    */
   @Deprecated
@@ -172,6 +172,36 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
     return Math.sqrt(agg);
   }
 
+  /**
+   * Maximum distance of two objects.
+   *
+   * @param mbr1 First object
+   * @param mbr2 Second object
+   */
+  public double maxDist(SpatialComparable mbr1, SpatialComparable mbr2) {
+    final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
+    final int mindim = (dim1 < dim2) ? dim1 : dim2;
+
+    double agg = 0.;
+    for(int d = 0; d < mindim; d++) {
+      double d1 = mbr1.getMax(d) - mbr2.getMin(d);
+      double d2 = mbr2.getMax(d) - mbr1.getMin(d);
+      double delta = d1 > d2 ? d1 : d2;
+      agg += delta * delta;
+    }
+    for(int d = mindim; d < dim1; d++) {
+      double d1 = Math.abs(mbr1.getMin(d)), d2 = Math.abs(mbr1.getMax(d));
+      double delta = d1 > d2 ? d1 : d2;
+      agg += delta * delta;
+    }
+    for(int d = mindim; d < dim2; d++) {
+      double d1 = Math.abs(mbr2.getMin(d)), d2 = Math.abs(mbr2.getMax(d));
+      double delta = d1 > d2 ? d1 : d2;
+      agg += delta * delta;
+    }
+    return Math.sqrt(agg);
+  }
+
   @Override
   public boolean isMetric() {
     return true;
@@ -198,9 +228,9 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
