@@ -1,5 +1,4 @@
 package de.lmu.ifi.dbs.elki.data.uncertain;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,35 +22,35 @@ package de.lmu.ifi.dbs.elki.data.uncertain;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Random;
-
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 
 /**
- * Interface for uncertain objects.
- *
- * Uncertain objects <em>must</em> provide a bounding box in this model, and
- * have an option to randomly sample from the data.
- *
- * TODO: Eventually allow float precision, too.
+ * Interface for discrete uncertain objects, that are represented by a finite
+ * (possibly weighted) number of samples.
  *
  * @author Erich Schubert
  */
-public interface UncertainObject extends SpatialComparable, FeatureVector<Double> {
+public interface DiscreteUncertainObject extends UncertainObject {
   /**
-   * Draw a random sampled instance.
+   * Get the number of samples available (or -1 for infinite).
    *
-   * @param rand Random generator
-   * @return Sampled object.
+   * @return Number of samples, negative indicates infinite.
    */
-  DoubleVector drawSample(Random rand);
+  int getNumberSamples();
 
   /**
-   * Get the center of mass of the uncertain object.
+   * Get the i'th vector.
    *
-   * @return Center of mass.
+   * @param i Index
+   * @return Vector
    */
-  DoubleVector getCenterOfMass();
+  DoubleVector getSample(int i);
+
+  /**
+   * Get the weight of the i'th vector.
+   *
+   * @param i Index
+   * @return Weight
+   */
+  double getWeight(int i);
 }

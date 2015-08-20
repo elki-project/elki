@@ -26,6 +26,8 @@ package de.lmu.ifi.dbs.elki.data.uncertain;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 
 /**
@@ -40,6 +42,33 @@ public abstract class AbstractUncertainObject implements UncertainObject {
    * Default retry limit for sampling, to guard against bad parameters.
    */
   public final static int DEFAULT_TRY_LIMIT = 1000;
+
+  /**
+   * Compute the bounding box for some samples.
+   *
+   * @param samples Samples
+   * @return Bounding box.
+   */
+  protected static HyperBoundingBox computeBounds(NumberVector[] samples) {
+    assert(samples.length > 0) : "Cannot compute bounding box of empty set.";
+    // Compute bounds:
+    final int dimensions = samples[0].getDimensionality();
+    final double min[] = new double[dimensions];
+    final double max[] = new double[dimensions];
+    NumberVector first = samples[0];
+    for(int d = 0; d < dimensions; d++) {
+      min[d] = max[d] = first.doubleValue(d);
+    }
+    for(int i = 1; i < samples.length; i++) {
+      NumberVector v = samples[i];
+      for(int d = 0; d < dimensions; d++) {
+        final double c = v.doubleValue(d);
+        min[d] = c < min[d] ? c : min[d];
+        max[d] = c > max[d] ? c : max[d];
+      }
+    }
+    return new HyperBoundingBox(min, max);
+  }
 
   /**
    * Bounding box of the object.

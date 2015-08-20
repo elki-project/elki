@@ -78,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 title = "ULDBs: Databases with uncertainty and lineage", //
 booktitle = "Proc. of the 32nd international conference on Very Large Data Bases (VLDB)", //
 url = "http://www.vldb.org/conf/2006/p953-benjelloun.pdf")
-public class WeightedDiscreteUncertainObject extends AbstractDiscreteUncertainObject {
+public class WeightedDiscreteUncertainObject extends AbstractUncertainObject implements DiscreteUncertainObject {
   /**
    * Vector factory.
    */
@@ -159,6 +159,21 @@ public class WeightedDiscreteUncertainObject extends AbstractDiscreteUncertainOb
       meanVals[d] /= weightSum;
     }
     return new DoubleVector(meanVals);
+  }
+
+  @Override
+  public int getNumberSamples() {
+    return samples.length;
+  }
+
+  @Override
+  public DoubleVector getSample(int i) {
+    return samples[i];
+  }
+
+  @Override
+  public double getWeight(int i) {
+    return weights[i];
   }
 
   /**

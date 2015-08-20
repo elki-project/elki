@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 title = "Probabilistic databases: diamonds in the dirt", //
 booktitle = "Communications of the ACM 52, 7", //
 url = "http://dx.doi.org/10.1145/1538788.1538810")
-public class UnweightedDiscreteUncertainObject extends AbstractDiscreteUncertainObject {
+public class UnweightedDiscreteUncertainObject extends AbstractUncertainObject implements DiscreteUncertainObject {
   /**
    * Vector factory.
    */
@@ -108,6 +108,21 @@ public class UnweightedDiscreteUncertainObject extends AbstractDiscreteUncertain
       meanVals[d] /= samples.length;
     }
     return new DoubleVector(meanVals);
+  }
+
+  @Override
+  public int getNumberSamples() {
+    return samples.length;
+  }
+
+  @Override
+  public DoubleVector getSample(int i) {
+    return samples[i];
+  }
+
+  @Override
+  public double getWeight(int i) {
+    return 1. / samples.length;
   }
 
   /**
