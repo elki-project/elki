@@ -149,15 +149,13 @@ public class VisualizerContext implements DataStoreListener, Result {
     }
     makeStyleResult(stylelib);
 
-    // result.getHierarchy().add(result, this);
-
     // Add visualizers.
     notifyFactories(db);
 
     // For proxying events.
     db.addDataStoreListener(this);
-    // Add a result listener. Don't expose these methods to avoid inappropriate
-    // use.
+    // Add a result listener.
+    // Don't expose these methods to avoid inappropriate use.
     addResultListener(new ResultListener() {
       @Override
       public void resultAdded(Result child, Result parent) {

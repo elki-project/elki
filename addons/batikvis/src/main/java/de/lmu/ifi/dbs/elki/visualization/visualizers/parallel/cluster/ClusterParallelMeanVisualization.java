@@ -103,7 +103,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
    * @author Robert Rödler
    *
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector>implements DataStoreListener {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -143,14 +143,14 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
       Iterator<Cluster<Model>> ci = clustering.getAllClusters().iterator();
       for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
         Model model = ci.next().getModel();
-        NumberVector mean;
+        NumberVector mean = null;
         if(model instanceof MeanModel) {
           mean = ((MeanModel) model).getMean();
         }
         else if(model instanceof MedoidModel) {
           mean = relation.get(((MedoidModel) model).getMedoid());
         }
-        else {
+        if(mean == null) {
           continue;
         }
         double[] pmean = proj.fastProjectDataToRenderSpace(mean);
