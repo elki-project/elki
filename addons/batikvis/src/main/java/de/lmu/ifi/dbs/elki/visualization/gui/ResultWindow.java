@@ -422,6 +422,11 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         if(e instanceof DetailViewSelectedEvent) {
           showSubplot((DetailViewSelectedEvent) e);
         }
+        if(OverviewPlot.OVERVIEW_REFRESHING == e.getActionCommand()) {
+          if(currentSubplot == null) {
+            showPlot(null);
+          }
+        }
         if(OverviewPlot.OVERVIEW_REFRESHED == e.getActionCommand()) {
           if(currentSubplot == null) {
             showOverview();
@@ -505,7 +510,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
    *
    * @param plot Plot to show.
    */
-  private void showPlot(SVGPlot plot) {
+  private void showPlot(final SVGPlot plot) {
     if(svgCanvas.getPlot() instanceof DetailView) {
       ((DetailView) svgCanvas.getPlot()).destroy();
     }
@@ -539,8 +544,6 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
   protected void update() {
     menubar.updateVisualizerMenus();
     if(currentSubplot != null) {
-      // FIXME: really need to refresh?
-      // currentSubplot.redraw();
       showPlot(currentSubplot);
     }
     overview.lazyRefresh();

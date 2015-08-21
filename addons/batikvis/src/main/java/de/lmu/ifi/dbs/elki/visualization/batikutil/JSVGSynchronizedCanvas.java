@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.visualization.batikutil;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.apache.batik.bridge.UpdateManager;
 import org.apache.batik.swing.JSVGCanvas;
 import org.w3c.dom.Document;
@@ -54,6 +56,11 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    * Current SVG plot.
    */
   private SVGPlot plot = null;
+
+  /**
+   * The latest attaching operation.
+   */
+  private final AtomicReference<Runnable> latest = new AtomicReference<>();
 
   /**
    * Constructor
@@ -92,23 +99,9 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    * @param newplot New plot to display. May be {@code null}!
    */
   public void setPlot(final SVGPlot newplot) {
-    final SVGPlot oldplot = this.plot;
-    this.plot = newplot;
-    if(newplot == null) {
-      super.setSVGDocument(null);
-      if(oldplot != null) {
-        scheduleDetach(oldplot);
-      }
-      return;
-    }
     synchronized(synchronizer) {
-      newplot.synchronizeWith(synchronizer);
-      super.setSVGDocument(newplot.getDocument());
-      super.setDisableInteractions(newplot.getDisableInteractions());
-      // We only know we're detached when the synchronizer has run again.
-      if(oldplot != null && oldplot != newplot) {
-        scheduleDetach(oldplot);
-      }
+      super.setSVGDocument(null);
+      scheduleDetach(this.plot, newplot);
     }
   }
 
@@ -117,24 +110,50 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    *
    * @param oldplot Plot to detach from.
    */
-  private void scheduleDetach(final SVGPlot oldplot) {
+  private void scheduleDetach(final SVGPlot oldplot, final SVGPlot newplot) {
     UpdateManager um = this.getUpdateManager();
-    if(um == null) {
-      return;
+    if(um != null) {
+      synchronized(um) {
+        if(um.isRunning()) {
+          // LoggingUtil.warning("Scheduling detach: " + this + " " + oldplot);
+          final Runnable detach = new Runnable() {
+            @Override
+            public void run() {
+              if(latest.compareAndSet(this, null)) {
+                detachPlot(oldplot);
+                attachPlot(newplot);
+              }
+            }
+          };
+          latest.set(detach);
+          um.getUpdateRunnableQueue().preemptLater(detach);
+          return;
+        }
+      }
     }
-    synchronized(um) {
-      if(um.isRunning()) {
-        // LoggingUtil.warning("Scheduling detach: " + this + " " + oldplot);
-        um.getUpdateRunnableQueue().preemptLater(new Runnable() {
-          @Override
-          public void run() {
-            detachPlot(oldplot);
-          }
-        });
-        return;
+    else {
+      if(oldplot != null) {
+        LoggingUtil.warning("No update manager?!?");
       }
     }
     detachPlot(oldplot);
+    attachPlot(newplot);
+  }
+
+  /**
+   * Attach to a new plot, and display.
+   *
+   * @param newplot Plot to attach to.
+   */
+  private void attachPlot(SVGPlot newplot) {
+    this.plot = newplot;
+    if(newplot == null) {
+      super.setSVGDocument(null);
+      return;
+    }
+    newplot.synchronizeWith(synchronizer);
+    super.setSVGDocument(newplot.getDocument());
+    super.setDisableInteractions(newplot.getDisableInteractions());
   }
 
   /**
@@ -142,12 +161,11 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    *
    * @param oldplot Plot to detach from.
    */
-  protected void detachPlot(SVGPlot oldplot) {
-    // LoggingUtil.warning("Detaching: " + this + " " + oldplot);
-    if(oldplot == plot) {
-      LoggingUtil.warning("Detaching from a plot I'm already attached to again?!?", new Throwable());
+  private void detachPlot(SVGPlot oldplot) {
+    if(oldplot == null) {
       return;
     }
+    this.plot = null;
     oldplot.unsynchronizeWith(JSVGSynchronizedCanvas.this.synchronizer);
   }
 }

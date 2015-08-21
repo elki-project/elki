@@ -1,5 +1,28 @@
 package de.lmu.ifi.dbs.elki.visualization.svg;
 
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2015
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import java.awt.Color;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -19,30 +42,6 @@ import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
@@ -504,7 +503,7 @@ public final class SVGUtil {
     setAtt(anim, SVGConstants.SVG_TYPE_ATTRIBUTE, SVGConstants.SVG_ROTATE_ATTRIBUTE);
     setAtt(anim, SVGConstants.SVG_FROM_ATTRIBUTE, "0 .5 .5");
     setAtt(anim, SVGConstants.SVG_TO_ATTRIBUTE, "360 .5 .5");
-    setAtt(anim, SVGConstants.SVG_BEGIN_ATTRIBUTE, Math.random() * 2 + "s");
+    setAtt(anim, SVGConstants.SVG_BEGIN_ATTRIBUTE, fmt(Math.random() * 2) + "s");
     setAtt(anim, SVGConstants.SVG_DUR_ATTRIBUTE, "2s");
     setAtt(anim, SVGConstants.SVG_REPEAT_COUNT_ATTRIBUTE, "indefinite");
     setAtt(anim, SVGConstants.SVG_FILL_ATTRIBUTE, "freeze");
