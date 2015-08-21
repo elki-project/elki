@@ -270,12 +270,6 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
       SVGUtil.removeFromParent(pair.first);
     }
     plotmap = arrangeVisualizations(ratio, 1.0);
-    double s = plotmap.relativeFill();
-    if(s < 0.9) {
-      s = (1 + s) * .5;
-      // Retry, sometimes this yields better results
-      plotmap = arrangeVisualizations(plotmap.getWidth() * s, plotmap.getHeight() * s);
-    }
 
     recalcViewbox();
     final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
