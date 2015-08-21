@@ -45,8 +45,6 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
  *
- * TODO: add indicator whether high values are better or low.
- *
  * TODO: add indication/warning when values are out-of-bounds.
  *
  * @author Erich Schubert
@@ -83,8 +81,14 @@ public class EvaluationVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     Hierarchy.Iter<EvaluationResult> it = VisualizationTree.filterResults(context, start, EvaluationResult.class);
-    for(; it.valid(); it.advance()) {
+    candidate: for(; it.valid(); it.advance()) {
       EvaluationResult sr = it.get();
+      Hierarchy.Iter<VisualizationTask> it2 = VisualizationTree.filter(context, sr, VisualizationTask.class);
+      for(; it2.valid(); it2.advance()) {
+        if(it2.get().getFactory() instanceof EvaluationVisualization) {
+          continue candidate;
+        }
+      }
       final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, EvaluationVisualization.this);
       task.reqwidth = .5;
       task.reqheight = sr.numLines() * .05;
