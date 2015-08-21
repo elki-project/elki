@@ -108,12 +108,12 @@ public class WeightedDiscreteUncertainObject extends AbstractUncertainObject imp
     double check = 0;
     for(double weight : weights) {
       if(!(weight > 0 && weight < 1.)) {
-        throw new IllegalArgumentException("Probabilities must be in ]0:1].");
+        throw new IllegalArgumentException("Probabilities must be in ]0:1], but is "+weight);
       }
       check += weight;
     }
-    if(!(check > 0 && check < 1.)) {
-      throw new IllegalArgumentException("Probability totals must be in ]0:1].");
+    if(!(check > 0 && check <= 1.0000001)) {
+      throw new IllegalArgumentException("Probability totals must be in ]0:1], but total is "+check);
     }
     this.samples = samples;
     this.bounds = computeBounds(samples);

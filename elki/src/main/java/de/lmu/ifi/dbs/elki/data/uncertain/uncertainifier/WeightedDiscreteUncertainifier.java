@@ -57,6 +57,7 @@ public class WeightedDiscreteUncertainifier extends AbstractDiscreteUncertainifi
     final int distributionSize = rand.nextInt((maxQuant - minQuant) + 1) + (int) minQuant;
     DoubleVector[] samples = new DoubleVector[distributionSize];
     double[] weights = new double[distributionSize];
+    double wsum = 0.;
     for(int i = 0; i < distributionSize; i++) {
       samples[i] = uo.drawSample(rand);
       double w = rand.nextDouble();
@@ -64,6 +65,12 @@ public class WeightedDiscreteUncertainifier extends AbstractDiscreteUncertainifi
         w = rand.nextDouble();
       }
       weights[i] = w;
+      wsum += w;
+    }
+    // Normalize to a total weight of 1:
+    assert(wsum > 0.);
+    for(int i = 0; i < distributionSize; i++) {
+      weights[i] /= wsum;
     }
     return new WeightedDiscreteUncertainObject(samples, weights);
   }
