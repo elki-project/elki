@@ -77,6 +77,16 @@ public final class SVGUtil {
   final public static String HOURGLASS_STYLE = "stroke: black; stroke-width: .01; fill: grey; opacity: .2";
 
   /**
+   * Throbber path.
+   */
+  final public static String THROBBER_PATH = "M.5,.25 a.25,.25 0 0 1 .1766,.42635 l-.0589 -.0589 a-.1766 -.1766 0 0 0 -.1178,-.2835 z";
+
+  /**
+   * Throbber style.
+   */
+  final public static String THROBBER_STYLE = "fill: #3d7fe6; opacity: .2";
+
+  /**
    * SVG color names conversion.
    */
   final private static TObjectIntHashMap<String> SVG_COLOR_NAMES;
@@ -483,11 +493,24 @@ public final class SVGUtil {
    * @return New element (currently a {@link SVGConstants#SVG_PATH_TAG})
    */
   public static Element svgWaitIcon(Document document, double x, double y, double w, double h) {
-    Element elem = SVGUtil.svgElement(document, SVGConstants.SVG_PATH_TAG);
-    setAtt(elem, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + x + " " + y + ") scale(" + w + " " + h + ")");
-    setAtt(elem, SVGConstants.SVG_D_ATTRIBUTE, HOURGLASS_PATH);
-    setStyle(elem, HOURGLASS_STYLE);
-    return elem;
+    Element g = SVGUtil.svgElement(document, SVGConstants.SVG_G_TAG);
+    setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + x + " " + y + ") scale(" + w + " " + h + ")");
+    Element thro = SVGUtil.svgElement(document, SVGConstants.SVG_PATH_TAG);
+    setAtt(thro, SVGConstants.SVG_D_ATTRIBUTE, THROBBER_PATH);
+    setStyle(thro, THROBBER_STYLE);
+    Element anim = SVGUtil.svgElement(document, SVGConstants.SVG_ANIMATE_TRANSFORM_TAG);
+    setAtt(anim, SVGConstants.SVG_ATTRIBUTE_NAME_ATTRIBUTE, SVGConstants.SVG_TRANSFORM_ATTRIBUTE);
+    setAtt(anim, SVGConstants.SVG_ATTRIBUTE_TYPE_ATTRIBUTE, "XML");
+    setAtt(anim, SVGConstants.SVG_TYPE_ATTRIBUTE, SVGConstants.SVG_ROTATE_ATTRIBUTE);
+    setAtt(anim, SVGConstants.SVG_FROM_ATTRIBUTE, "0 .5 .5");
+    setAtt(anim, SVGConstants.SVG_TO_ATTRIBUTE, "360 .5 .5");
+    setAtt(anim, SVGConstants.SVG_BEGIN_ATTRIBUTE, Math.random() * 2 + "s");
+    setAtt(anim, SVGConstants.SVG_DUR_ATTRIBUTE, "2s");
+    setAtt(anim, SVGConstants.SVG_REPEAT_COUNT_ATTRIBUTE, "indefinite");
+    setAtt(anim, SVGConstants.SVG_FILL_ATTRIBUTE, "freeze");
+    thro.appendChild(anim);
+    g.appendChild(thro);
+    return g;
   }
 
   /**
