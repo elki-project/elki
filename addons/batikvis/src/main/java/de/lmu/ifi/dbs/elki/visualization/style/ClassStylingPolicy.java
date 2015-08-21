@@ -30,45 +30,45 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * Styling policy that is based on <em>classes</em>, for example clusters or
  * labels. This allows for certain optimizations such as marker reuse, and thus
  * is preferred when possible.
- * 
+ *
  * @author Erich Schubert
  */
 public interface ClassStylingPolicy extends StylingPolicy {
   /**
    * Get the style number for a particular object
-   * 
+   *
    * @param id Object ID
    * @return Style number
    */
-  public int getStyleForDBID(DBIDRef id);
+  int getStyleForDBID(DBIDRef id);
 
   /**
    * Get the minimum style in use.
-   * 
+   *
    * @return Style number
    */
-  public int getMinStyle();
+  int getMinStyle();
 
   /**
    * Get the maximum style in use.
-   * 
+   *
    * @return Style number
    */
-  public int getMaxStyle();
-  
+  int getMaxStyle();
+
   /**
    * Iterate over all objects from a given class.
-   * 
+   *
    * @param cnum Class number
    * @return Iterator over object IDs
    */
-  public DBIDIter iterateClass(int cnum);
+  DBIDIter iterateClass(int cnum);
 
   /**
    * Get the number of elements in the styling class.
-   * 
+   *
    * @param cnum Class number
    * @return Size of class.
    */
-  public int classSize(int cnum);
+  int classSize(int cnum);
 }
