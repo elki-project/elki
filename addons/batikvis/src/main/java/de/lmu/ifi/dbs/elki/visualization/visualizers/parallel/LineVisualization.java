@@ -145,11 +145,15 @@ public class LineVisualization extends AbstractVisFactory {
           }
         }
         for(DBIDIter iter = sam.iter(); iter.valid(); iter.advance()) {
+          final int c = csp.getStyleForDBID(iter) + min;
+          if(c < 0) {
+            continue; // No style. Display differently?
+          }
           Element line = drawLine(iter);
           if(line == null) {
             continue;
           }
-          SVGUtil.addCSSClass(line, keys[csp.getStyleForDBID(iter) + min]);
+          SVGUtil.addCSSClass(line, keys[c]);
           layer.appendChild(line);
         }
       }
