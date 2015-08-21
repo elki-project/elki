@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,12 +31,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -50,19 +50,22 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Implementation of the efficient Single-Link Algorithm SLINK of R. Sibson.
- * 
+ *
+ * This is probably the fastest exact single-link algorithm currently in use.
+ *
  * Reference:
  * <p>
  * R. Sibson:<br />
- * SLINK: An optimally efficient algorithm for the single-link cluster method.<br/>
+ * SLINK: An optimally efficient algorithm for the single-link cluster method.
+ * <br/>
  * In: The Computer Journal 16 (1973), No. 1, p. 30-34.
  * </p>
- * 
+ *
  * @author Elke Achtert
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has SingleLinkageMethod
- * 
+ *
  * @param <O> the type of DatabaseObject the algorithm is applied on
  */
 @Title("SLINK: Single Link Clustering")
@@ -72,7 +75,7 @@ title = "SLINK: An optimally efficient algorithm for the single-link cluster met
 booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", //
 url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
 @Alias(value = { "de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK", "clustering.SLINK", "SLINK", "single-link", "single-linkage" })
-public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult>implements HierarchicalClusteringAlgorithm {
   /**
    * The logger for this class.
    */
@@ -80,7 +83,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    */
   public SLINK(DistanceFunction<? super O> distanceFunction) {
@@ -89,7 +92,7 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
 
   /**
    * Performs the SLINK algorithm on the given database.
-   * 
+   *
    * @param database Database to process
    * @param relation Data relation to use
    */
@@ -100,38 +103,42 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     // Temporary storage for m.
     WritableDoubleDataStore m = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
 
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running SLINK", ids.size(), LOG) : null;
-    // has to be an array for monotonicity reasons!
-    ModifiableDBIDs processedIDs = DBIDUtil.newArray(ids.size());
+    final Logging log = getLogger(); // To allow CLINK logger override
 
+    FiniteProgress progress = log.isVerbose() ? new FiniteProgress("Running SLINK", ids.size(), log) : null;
+    ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
+
+    // First element is trivial/special:
+    DBIDArrayIter id = aids.iter(), it = aids.iter();
+    // Step 1: initialize
+    for(; id.valid(); id.advance()) {
+      // P(n+1) = n+1:
+      pi.put(id, id);
+      // L(n+1) = infinity already.
+    }
+    // First element is finished already (start at seek(1) below!)
+    log.incrementProcessed(progress);
+
+    // Optimized branch
     if(getDistanceFunction() instanceof PrimitiveDistanceFunction) {
       PrimitiveDistanceFunction<? super O> distf = (PrimitiveDistanceFunction<? super O>) getDistanceFunction();
-      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        step1(id, pi, lambda);
-        step2primitive(id, processedIDs, relation, distf, m);
-        step3(id, pi, lambda, processedIDs, m);
-        step4(id, pi, lambda, processedIDs);
-
-        processedIDs.add(id);
-
-        LOG.incrementProcessed(progress);
+      for(id.seek(1); id.valid(); id.advance()) {
+        step2primitive(id, it, id.getOffset(), relation, distf, m);
+        process(id, aids, it, id.getOffset(), pi, lambda, m); // SLINK or CLINK
+        log.incrementProcessed(progress);
       }
     }
     else {
+      // Fallback branch
       DistanceQuery<O> distQ = database.getDistanceQuery(relation, getDistanceFunction());
-      for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        step1(id, pi, lambda);
-        step2(id, processedIDs, distQ, m);
-        step3(id, pi, lambda, processedIDs, m);
-        step4(id, pi, lambda, processedIDs);
-
-        processedIDs.add(id);
-
-        LOG.incrementProcessed(progress);
+      for(id.seek(1); id.valid(); id.advance()) {
+        step2(id, it, id.getOffset(), distQ, m);
+        process(id, aids, it, id.getOffset(), pi, lambda, m); // SLINK or CLINK
+        log.incrementProcessed(progress);
       }
     }
 
-    LOG.ensureCompleted(progress);
+    log.ensureCompleted(progress);
     // We don't need m anymore.
     m.destroy();
     m = null;
@@ -140,33 +147,18 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
   }
 
   /**
-   * First step: Initialize P(id) = id, L(id) = infinity.
-   * 
-   * @param id the id of the object to be inserted into the pointer
-   *        representation
-   * @param pi Pi data store
-   * @param lambda Lambda data store
-   */
-  private void step1(DBIDRef id, WritableDBIDDataStore pi, WritableDoubleDataStore lambda) {
-    // P(n+1) = n+1:
-    pi.put(id, id);
-    // L(n+1) = infinity
-    // Initialized already.
-    // lambda.putDouble(id, Double.POSITIVE_INFINITY);
-  }
-
-  /**
    * Second step: Determine the pairwise distances from all objects in the
    * pointer representation to the new object with the specified id.
-   * 
+   *
    * @param id the id of the object to be inserted into the pointer
    *        representation
-   * @param processedIDs the already processed ids
+   * @param it Array iterator
+   * @param n Last object
    * @param distQuery Distance query
    * @param m Data store
    */
-  private void step2(DBIDRef id, DBIDs processedIDs, DistanceQuery<? super O> distQuery, WritableDoubleDataStore m) {
-    for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
+  private void step2(DBIDRef id, DBIDArrayIter it, int n, DistanceQuery<? super O> distQuery, WritableDoubleDataStore m) {
+    for(it.seek(0); it.getOffset() < n; it.advance()) {
       // M(i) = dist(i, n+1)
       m.putDouble(it, distQuery.distance(it, id));
     }
@@ -175,39 +167,57 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
   /**
    * Second step: Determine the pairwise distances from all objects in the
    * pointer representation to the new object with the specified id.
-   * 
+   *
    * @param id the id of the object to be inserted into the pointer
    *        representation
-   * @param processedIDs the already processed ids
+   * @param it Array iterator
+   * @param n Last object
    * @param m Data store
    * @param relation Data relation
    * @param distFunc Distance function to use
    */
-  private void step2primitive(DBIDRef id, DBIDs processedIDs, Relation<? extends O> relation, PrimitiveDistanceFunction<? super O> distFunc, WritableDoubleDataStore m) {
+  private void step2primitive(DBIDRef id, DBIDArrayIter it, int n, Relation<? extends O> relation, PrimitiveDistanceFunction<? super O> distFunc, WritableDoubleDataStore m) {
     O newObj = relation.get(id);
-    for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
+    for(it.seek(0); it.getOffset() < n; it.advance()) {
       // M(i) = dist(i, n+1)
       m.putDouble(it, distFunc.distance(relation.get(it), newObj));
     }
   }
 
   /**
+   * SLINK main loop.
+   *
+   * @param id Current object
+   * @param ids All objects
+   * @param it Array iterator
+   * @param n Last object to process at this run
+   * @param pi Parent
+   * @param lambda Height
+   * @param m Distance
+   */
+  protected void process(DBIDRef id, ArrayDBIDs ids, DBIDArrayIter it, int n, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDoubleDataStore m) {
+    slinkstep3(id, it, n, pi, lambda, m);
+    slinkstep4(id, it, n, pi, lambda);
+  }
+
+  /**
    * Third step: Determine the values for P and L
-   * 
+   *
    * @param id the id of the object to be inserted into the pointer
    *        representation
+   * @param it array iterator
+   * @param n Last object to process at this run
    * @param pi Pi data store
    * @param lambda Lambda data store
-   * @param processedIDs the already processed ids
    * @param m Data store
    */
-  private void step3(DBIDRef id, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, DBIDs processedIDs, WritableDoubleDataStore m) {
+  private void slinkstep3(DBIDRef id, DBIDArrayIter it, int n, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDoubleDataStore m) {
     DBIDVar p_i = DBIDUtil.newVar();
     // for i = 1..n
-    for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
+    for(it.seek(0); it.getOffset() < n; it.advance()) {
       double l_i = lambda.doubleValue(it);
       double m_i = m.doubleValue(it);
-      pi.assignVar(it, p_i); // p_i = pi(it)
+      p_i.from(pi, it); // p_i = pi(it)
       double mp_i = m.doubleValue(p_i);
 
       // if L(i) >= M(i)
@@ -234,18 +244,19 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
 
   /**
    * Fourth step: Actualize the clusters if necessary
-   * 
+   *
    * @param id the id of the current object
+   * @param it array iterator
+   * @param n Last object to process at this run
    * @param pi Pi data store
    * @param lambda Lambda data store
-   * @param processedIDs the already processed ids
    */
-  private void step4(DBIDRef id, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, DBIDs processedIDs) {
+  private void slinkstep4(DBIDRef id, DBIDArrayIter it, int n, WritableDBIDDataStore pi, WritableDoubleDataStore lambda) {
     DBIDVar p_i = DBIDUtil.newVar();
     // for i = 1..n
-    for(DBIDIter it = processedIDs.iter(); it.valid(); it.advance()) {
+    for(it.seek(0); it.getOffset() < n; it.advance()) {
       double l_i = lambda.doubleValue(it);
-      pi.assignVar(it, p_i); // p_i = pi(it)
+      p_i.from(pi, it); // p_i = pi(it)
       double lp_i = lambda.doubleValue(p_i);
 
       // if L(i) >= L(P(i))
@@ -268,9 +279,9 @@ public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

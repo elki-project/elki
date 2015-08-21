@@ -36,37 +36,34 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
- * Performs a full SLINK run, and compares the result with a clustering derived
- * from the data set labels. This test ensures that SLINK's performance doesn't
+ * Performs a full CLINK run, and compares the result with a clustering derived
+ * from the data set labels. This test ensures that CLINK's performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
  *
- * @author Katharina Rausch
  * @author Erich Schubert
  */
-public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
-  // TODO: add a test for a non-single-link dataset?
-
+public class TestCLINKResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
-   * Run SLINK with fixed parameters and compare the result to a golden
+   * Run CLINK with fixed parameters and compare the result to a golden
    * standard.
    */
   @Test
-  public void testSLINKResults() {
+  public void testCLINKResults() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
-    params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, SLINK.class);
+    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 2);
+    params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, CLINK.class);
     ExtractFlatClusteringFromHierarchy slink = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
     testParameterizationOk(params);
 
     // run SLINK on database
     Result result = slink.run(db);
     Clustering<?> clustering = findSingleClustering(result);
-    testFMeasure(db, clustering, 0.6829722);
-    testClusterSizes(clustering, new int[] { 9, 200, 429 });
+    testFMeasure(db, clustering, 0.5147426);
+    testClusterSizes(clustering, new int[] { 131, 507 });
   }
 }
