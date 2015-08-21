@@ -61,9 +61,11 @@ import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -169,6 +171,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
    * @return Clustering result
    */
   public Clustering<?> run(Database database, Relation<? extends UncertainObject> relation) {
+    ResultHierarchy hierarchy = database.getHierarchy();
     ArrayList<Clustering<?>> clusterings = new ArrayList<>();
     final int dim = RelationUtil.dimensionality(relation);
     DBIDs ids = relation.getDBIDs();
@@ -179,8 +182,12 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
         store1.put(iter, relation.get(iter).getCenterOfMass());
       }
       // Not added to "clusterings", so it does not get aggregated.
-      runClusteringAlgorithm(relation, ids, store1, dim, "Uncertain Model: Center of Mass");
+      runClusteringAlgorithm(hierarchy, relation, ids, store1, dim, "Uncertain Model: Center of Mass");
     }
+    // To collect samples
+    Result samples = new BasicResult("Samples", "samples");
+    hierarchy.add(relation, samples);
+
     // Step 1: Cluster sampled possible worlds:
     Random rand = random.getSingleThreadedRandom();
     for(int i = 0; i < numsamples; i++) {
@@ -188,7 +195,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         store.put(iter, relation.get(iter).drawSample(rand));
       }
-      clusterings.add(runClusteringAlgorithm(relation, ids, store, dim, "Sample " + i));
+      clusterings.add(runClusteringAlgorithm(hierarchy, samples, ids, store, dim, "Sample " + i));
     }
 
     // Step 2: perform the meta clustering (on samples only).
@@ -212,6 +219,9 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     d.getHierarchy().remove(d, c); // Detach from database
 
     // Evaluation
+    Result reps = new BasicResult("Representants", "representative");
+    hierarchy.add(relation, reps);
+
     DistanceQuery<Clustering<?>> dq = mat.getDistanceQuery(distance);
     List<? extends Cluster<?>> cl = c.getAllClusters();
     for(Cluster<?> clus : cl) {
@@ -243,7 +253,8 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
         gtau = di > gtau ? di : gtau;
       }
       EvaluationResult psr = evaluate(bestc, gtau, besttau, clus.size(), crel.size());
-      database.getHierarchy().add(bestc, psr);
+      hierarchy.add(bestc, psr);
+      hierarchy.add(reps, bestc);
     }
     return c;
   }
@@ -275,22 +286,22 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
   /**
    * Run a clustering algorithm on a single instance.
    *
-   * @param database Database
+   * @param parent Parent result to attach to
    * @param ids Object IDs to process
    * @param store Input data
    * @param dim Dimensionality
    * @param title Title of relation
    * @return Clustering result
    */
-  protected Clustering<?> runClusteringAlgorithm(HierarchicalResult database, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
+  protected Clustering<?> runClusteringAlgorithm(ResultHierarchy hierarchy, Result parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
     SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
     Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);
     Clustering<?> clusterResult = samplesAlgorithm.run(d);
     d.getHierarchy().remove(sample);
     d.getHierarchy().remove(clusterResult);
-    database.getHierarchy().add(database, sample);
-    database.getHierarchy().add(sample, clusterResult);
+    hierarchy.add(parent, sample);
+    hierarchy.add(sample, clusterResult);
     return clusterResult;
   }
 
