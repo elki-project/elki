@@ -28,7 +28,9 @@ import java.util.Random;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.uncertain.DiscreteUncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -158,7 +160,8 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
       setupCanvas();
       final StyleLibrary style = context.getStyleLibrary();
       final StylingPolicy spol = context.getStylingPolicy();
-      final double marker_size = style.getSize(StyleLibrary.MARKERPLOT) * .5;
+      final double size = style.getSize(StyleLibrary.MARKERPLOT);
+      final double ssize = size / Math.sqrt(samples);
       final MarkerLibrary ml = style.markers();
 
       Random rand = random.getSingleThreadedRandom();
@@ -172,12 +175,11 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
             }
             try {
               final UncertainObject uo = rel.get(iter);
-              for(int i = 0; i < samples; i++) {
-                double[] v = proj.fastProjectDataToRenderSpace(uo.drawSample(rand));
-                if(v[0] != v[0] || v[1] != v[1]) {
-                  continue; // NaN!
-                }
-                ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
+              if(uo instanceof DiscreteUncertainObject) {
+                drawDiscete((DiscreteUncertainObject) uo, ml, cnum, size);
+              }
+              else {
+                drawContinuous(uo, ml, cnum, ssize, rand);
               }
             }
             catch(ObjectNotFoundException e) {
@@ -187,24 +189,111 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
         }
       }
       else {
-        final String FILL = SVGConstants.CSS_FILL_PROPERTY + ":";
         // Color-based styling.
         for(DBIDIter iter = sample.getSample().iter(); iter.valid(); iter.advance()) {
           try {
+            final int col = spol.getColorForDBID(iter);
             final UncertainObject uo = rel.get(iter);
-            for(int i = 0; i < samples; i++) {
-              double[] v = proj.fastProjectDataToRenderSpace(uo.drawSample(rand));
-              Element dot = svgp.svgCircle(v[0], v[1], marker_size);
-              SVGUtil.addCSSClass(dot, CSS_CLASS);
-              int col = spol.getColorForDBID(iter);
-              SVGUtil.setAtt(dot, SVGConstants.SVG_STYLE_ATTRIBUTE, FILL + SVGUtil.colorToString(col));
-              layer.appendChild(dot);
+            if(uo instanceof DiscreteUncertainObject) {
+              drawDiscreteDefault((DiscreteUncertainObject) uo, col, size);
+            }
+            else {
+              drawContinuousDefault(uo, col, size, rand);
             }
           }
           catch(ObjectNotFoundException e) {
             // ignore.
           }
         }
+      }
+    }
+
+    /**
+     * Visualize a discrete uncertain object
+     *
+     * @param uo Uncertain object
+     * @param ml Marker library
+     * @param cnum Cluster number
+     * @param size Size
+     */
+    private void drawDiscete(DiscreteUncertainObject uo, MarkerLibrary ml, int cnum, double size) {
+      final int e = uo.getNumberSamples();
+      final double ssize = size * Math.sqrt(e);
+      for(int i = 0; i < e; i++) {
+        final NumberVector s = uo.getSample(i);
+        if(s == null) {
+          continue;
+        }
+        double[] v = proj.fastProjectDataToRenderSpace(s);
+        if(v[0] != v[0] || v[1] != v[1]) {
+          continue; // NaN!
+        }
+        ml.useMarker(svgp, layer, v[0], v[1], cnum, uo.getWeight(i) * ssize);
+      }
+    }
+
+    /**
+     * Visualize random samples
+     *
+     * @param uo Uncertain object
+     * @param ml Marker library
+     * @param cnum Cluster number
+     * @param size Marker size
+     * @param rand Random generator
+     */
+    private void drawContinuous(UncertainObject uo, MarkerLibrary ml, int cnum, double size, Random rand) {
+      for(int i = 0; i < samples; i++) {
+        double[] v = proj.fastProjectDataToRenderSpace(uo.drawSample(rand));
+        if(v[0] != v[0] || v[1] != v[1]) {
+          continue; // NaN!
+        }
+        ml.useMarker(svgp, layer, v[0], v[1], cnum, size);
+      }
+    }
+
+    /**
+     * String constant.
+     */
+    private final static String FILL = SVGConstants.CSS_FILL_PROPERTY + ":";
+
+    /**
+     * Visualize discrete object
+     *
+     * @param uo Uncertain object
+     * @param col Color
+     * @param size Size
+     */
+    private void drawDiscreteDefault(DiscreteUncertainObject uo, int col, double size) {
+      final int e = uo.getNumberSamples();
+      final double ssize = size * Math.sqrt(e);
+      for(int i = 0; i < e; i++) {
+        final NumberVector s = uo.getSample(i);
+        if(s == null) {
+          continue;
+        }
+        double[] v = proj.fastProjectDataToRenderSpace(s);
+        Element dot = svgp.svgCircle(v[0], v[1], ssize * uo.getWeight(i));
+        SVGUtil.addCSSClass(dot, CSS_CLASS);
+        SVGUtil.setAtt(dot, SVGConstants.SVG_STYLE_ATTRIBUTE, FILL + SVGUtil.colorToString(col));
+        layer.appendChild(dot);
+      }
+    }
+
+    /**
+     * Visualize random samples
+     *
+     * @param uo Uncertain object
+     * @param col Color
+     * @param size Size
+     * @param rand Random generator
+     */
+    private void drawContinuousDefault(UncertainObject uo, int col, double size, Random rand) {
+      for(int i = 0; i < samples; i++) {
+        double[] v = proj.fastProjectDataToRenderSpace(uo.drawSample(rand));
+        Element dot = svgp.svgCircle(v[0], v[1], size);
+        SVGUtil.addCSSClass(dot, CSS_CLASS);
+        SVGUtil.setAtt(dot, SVGConstants.SVG_STYLE_ATTRIBUTE, FILL + SVGUtil.colorToString(col));
+        layer.appendChild(dot);
       }
     }
   }
