@@ -105,32 +105,39 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     }
     
-    //Intialisieren der Means
+    //Intialisieren der means
     List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
     
     //initialisieren vom Heap
     minHeap = new DoubleMinHeap();
     
     // Setup cluster assignment store
+    //TODO hier müss es möglich sein auch die Distance zu speichern
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
     }
+    
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
     double[] varsum = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
-    int heapsize = relation.size();
+    
+    //5% der Punkte werden nicnht betrachtet
+    //TODO über Gui wert abfangen
+    int heapsize = relation.size()/20;
+    
     int iteration = 0;
     for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
-      boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum, heapsize/20);
+      boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum, heapsize);
       logVarstat(varstat, varsum);
       // Stop if no cluster assignment changed.
       if(!changed) {
         break;
       }
+      //TODO Punkte aus der Relation nehmen welche nicht beachtet werden
       // Recompute means.
       means = means(clusters, means, relation);
     }
@@ -178,7 +185,11 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double mindist = Double.POSITIVE_INFINITY;
+      
+      //fv ist der aktuelle Pkt
       V fv = relation.get(iditer);
+      
+      //Index des Clusterpunktes
       int minIndex = 0;
       for(int i = 0; i < k; i++) {
         double dist = df.distance(fv, means.get(i));
@@ -197,6 +208,20 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     return changed;
   }
   
+  protected boolean updateAssignment(DBIDIter iditer, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, int newA) {
+    final int oldA = assignment.intValue(iditer);
+    if(oldA == newA) {
+      return false;
+    }
+    //zuweisung des Punktes an den neuen Cluster
+    clusters.get(newA).add(iditer);
+    assignment.putInt(iditer, newA);
+    if(oldA >= 0) {
+      clusters.get(oldA).remove(iditer);
+    }
+    return true;
+  }
+  
   /**
    * Parameterization class.
    * 
@@ -211,8 +236,8 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     }
 
     @Override
-    protected KMeansLloyd<V> makeInstance() {
-      return new KMeansLloyd<>(distanceFunction, k, maxiter, initializer);
+    protected KMeansLloydMM<V> makeInstance() {
+      return new KMeansLloydMM<>(distanceFunction, k, maxiter, initializer);
     }
   }
 }
