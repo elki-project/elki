@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -41,7 +42,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -192,7 +192,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
      * @param y2 y-value of the second dimension
      * @param ranges Ranges to update
      */
-    private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, DoubleDoublePair[] ranges) {
+    private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, ModifiableHyperBoundingBox ranges) {
       BitSet actDim = proj.getVisibleDimensions2D();
       double[] v1 = new double[dim];
       double[] v2 = new double[dim];
@@ -205,7 +205,8 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
       double[] nv2 = proj.fastProjectRenderToDataSpace(v2);
 
       for(int d = actDim.nextSetBit(0); d >= 0; d = actDim.nextSetBit(d + 1)) {
-        ranges[d] = new DoubleDoublePair(Math.min(nv1[d], nv2[d]), Math.max(nv1[d], nv2[d]));
+        ranges.setMin(d, Math.min(nv1[d], nv2[d]));
+        ranges.setMax(d, Math.max(nv1[d], nv2[d]));
       }
     }
 
@@ -255,7 +256,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
       else {
         selection = DBIDUtil.newHashSet();
       }
-      DoubleDoublePair[] ranges;
+      ModifiableHyperBoundingBox ranges;
 
       double x1 = Math.min(p1.getX(), p2.getX());
       double x2 = Math.max(p1.getX(), p2.getX());
@@ -266,7 +267,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
         ranges = ((RangeSelection) selContext).getRanges();
       }
       else {
-        ranges = new DoubleDoublePair[dim];
+        ranges = new ModifiableHyperBoundingBox(dim, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
       }
       updateSelectionRectKoordinates(x1, x2, y1, y2, ranges);
 
@@ -274,8 +275,10 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
       candidates: for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
         NumberVector dbTupel = rel.get(iditer);
         for(int i = 0; i < dim; i++) {
-          if(ranges != null && ranges[i] != null) {
-            if(dbTupel.doubleValue(i) < ranges[i].first || dbTupel.doubleValue(i) > ranges[i].second) {
+          final double min = ranges.getMin(i), max = ranges.getMax(i);
+          if(max < Double.POSITIVE_INFINITY || min > Double.NEGATIVE_INFINITY) {
+            final double v = dbTupel.doubleValue(i);
+            if(v < min || v > max) {
               continue candidates;
             }
           }

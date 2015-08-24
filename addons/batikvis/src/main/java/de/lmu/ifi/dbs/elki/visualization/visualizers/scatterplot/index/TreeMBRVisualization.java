@@ -27,7 +27,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -189,11 +188,11 @@ public class TreeMBRVisualization extends AbstractVisFactory {
       SpatialComparable mbr = entry;
 
       if(settings.fill) {
-        Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, SpatialUtil.getMin(mbr), SpatialUtil.getMax(mbr));
+        Element r = SVGHyperCube.drawFilled(svgp, INDEX + depth, proj, mbr);
         layer.appendChild(r);
       }
       else {
-        Element r = SVGHyperCube.drawFrame(svgp, proj, SpatialUtil.getMin(mbr), SpatialUtil.getMax(mbr));
+        Element r = SVGHyperCube.drawFrame(svgp, proj, mbr);
         SVGUtil.setCSSClass(r, INDEX + depth);
         layer.appendChild(r);
       }

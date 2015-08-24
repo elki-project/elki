@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -184,28 +183,14 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
     private void setSVGRect(SVGPlot svgp, Projection2D proj) {
       DBIDSelection selContext = context.getSelection();
       if(selContext instanceof RangeSelection) {
-        DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
-        int dim = RelationUtil.dimensionality(rel);
-
-        double[] min = new double[dim];
-        double[] max = new double[dim];
-        for(int d = 0; d < dim; d++) {
-          if(ranges != null && ranges[d] != null) {
-            min[d] = ranges[d].first;
-            max[d] = ranges[d].second;
-          }
-          else {
-            min[d] = proj.getScale(d).getMin();
-            max[d] = proj.getScale(d).getMax();
-          }
-        }
+        HyperBoundingBox ranges = ((RangeSelection) selContext).getRanges();
         if(settings.nofill) {
-          Element r = SVGHyperCube.drawFrame(svgp, proj, min, max);
+          Element r = SVGHyperCube.drawFrame(svgp, proj, ranges);
           SVGUtil.setCSSClass(r, CSS_CUBEFRAME);
           layer.appendChild(r);
         }
         else {
-          Element r = SVGHyperCube.drawFilled(svgp, CSS_CUBE, proj, min, max);
+          Element r = SVGHyperCube.drawFilled(svgp, CSS_CUBE, proj, ranges);
           layer.appendChild(r);
         }
 

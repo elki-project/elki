@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.uncertain;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -90,7 +89,7 @@ public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
       if(TypeUtil.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r.getDataTypeInformation())) {
         final VisualizationTask task = new VisualizationTask(NAME, context, p, r, this);
         task.level = VisualizationTask.LEVEL_DATA;
-        //task.initDefaultVisibility(false);
+        // task.initDefaultVisibility(false);
         task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
         context.addVis(p, task);
         continue;
@@ -136,7 +135,7 @@ public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
       setupCanvas();
       final double opac = .1; // Opacity
       final StyleLibrary style = context.getStyleLibrary();
-      final double lw = .5 * style.getLineWidth(StyleLibrary.PLOT);
+      final double lw = .25 * style.getLineWidth(StyleLibrary.PLOT);
       final StylingPolicy spol = context.getStylingPolicy();
       final ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
@@ -144,10 +143,10 @@ public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
         ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
         for(int cnum = cspol.getMinStyle(); cnum < cspol.getMaxStyle(); cnum++) {
           String css = CSS_CLASS + "_" + cnum;
+          final String color = colors.getColor(cnum);
           CSSClass cls = new CSSClass(this, css);
           cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, lw);
-
-          final String color = colors.getColor(cnum);
+          cls.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
           cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
           cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
           cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, opac);
@@ -159,8 +158,8 @@ public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
               continue; // TODO: can we test more efficiently than this?
             }
             try {
-              final UncertainObject vec = rel.get(iter);
-              Element r = SVGHyperCube.drawFrame(svgp, proj, SpatialUtil.getMin(vec), SpatialUtil.getMax(vec));
+              final UncertainObject mbr = rel.get(iter);
+              Element r = SVGHyperCube.drawFrame(svgp, proj, mbr);
               SVGUtil.addCSSClass(r, css);
               layer.appendChild(r);
             }
@@ -175,8 +174,8 @@ public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
         // Color-based styling.
         for(DBIDIter iter = sample.getSample().iter(); iter.valid(); iter.advance()) {
           try {
-            final UncertainObject vec = rel.get(iter);
-            Element r = SVGHyperCube.drawFrame(svgp, proj, SpatialUtil.getMin(vec), SpatialUtil.getMax(vec));
+            final UncertainObject mbr = rel.get(iter);
+            Element r = SVGHyperCube.drawFrame(svgp, proj, mbr);
             SVGUtil.addCSSClass(r, CSS_CLASS);
             int col = spol.getColorForDBID(iter);
             SVGUtil.setAtt(r, SVGConstants.SVG_STYLE_ATTRIBUTE, STROKE + SVGUtil.colorToString(col));
