@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,13 +23,14 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
  * MBR class allowing modifications (as opposed to {@link HyperBoundingBox}).
- * 
+ *
  * @author Marisa Thoma
  */
 public class ModifiableHyperBoundingBox extends HyperBoundingBox {
@@ -46,12 +47,8 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
   }
 
   /**
-   * Uses the references to the fields in <code>hbb</code> as <code>min</code>,
-   * <code>max</code> fields. Thus, this constructor indirectly provides a way
-   * to modify the fields of a {@link HyperBoundingBox}.
-   * 
-   * FIXME: that isn't really nice and should be handled with care.
-   * 
+   * Derive a bounding box from a spatial object.
+   *
    * @param hbb existing hyperboundingbox
    */
   public ModifiableHyperBoundingBox(SpatialComparable hbb) {
@@ -60,7 +57,7 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
 
   /**
    * Creates a ModifiableHyperBoundingBox for the given hyper points.
-   * 
+   *
    * @param min - the coordinates of the minimum hyper point
    * @param max - the coordinates of the maximum hyper point
    */
@@ -73,9 +70,24 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
   }
 
   /**
+   * Create a ModifiableHyperBoundingBox with given min and max.
+   *
+   * @param dim Dimensionality
+   * @param min Minimum in each dimension
+   * @param max Maximum in each dimension
+   */
+  public ModifiableHyperBoundingBox(int dim, double min, double max) {
+    super();
+    this.min = new double[dim];
+    this.max = new double[dim];
+    Arrays.fill(this.min, min);
+    Arrays.fill(this.max, max);
+  }
+
+  /**
    * Set the maximum bound in dimension <code>dimension</code> to value
    * <code>value</code>.
-   * 
+   *
    * @param dimension the dimension for which the coordinate should be set,
    *        where 1 &le; dimension &le; <code>this.getDimensionality()</code>
    * @param value the coordinate to set as upper bound for dimension
@@ -88,19 +100,19 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
   /**
    * Set the minimum bound in dimension <code>dimension</code> to value
    * <code>value</code>.
-   * 
+   *
    * @param dimension the dimension for which the lower bound should be set,
    *        where 1 &le; dimension &le; <code>this.getDimensionality()</code>
    * @param value the coordinate to set as lower bound for dimension
    *        <code>dimension</code>
    */
   public void setMin(int dimension, double value) {
-    max[dimension] = value;
+    min[dimension] = value;
   }
 
   /**
    * Returns a reference to the minimum hyper point.
-   * 
+   *
    * @return the minimum hyper point
    */
   public double[] getMinRef() {
@@ -109,7 +121,7 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
 
   /**
    * Returns the reference to the maximum hyper point.
-   * 
+   *
    * @return the maximum hyper point
    */
   public double[] getMaxRef() {
@@ -118,13 +130,13 @@ public class ModifiableHyperBoundingBox extends HyperBoundingBox {
 
   /**
    * Extend the bounding box by some other spatial object.
-   * 
+   *
    * @param obj Spatial object to extend with
    * @return true when the MBR changed.
    */
   public boolean extend(SpatialComparable obj) {
     final int dim = min.length;
-    assert (!LoggingConfiguration.DEBUG || (obj.getDimensionality() == dim));
+    assert(!LoggingConfiguration.DEBUG || (obj.getDimensionality() == dim));
     boolean extended = false;
     for(int i = 0; i < dim; i++) {
       final double omin = obj.getMin(i);
