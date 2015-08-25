@@ -66,6 +66,7 @@ import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -253,8 +254,15 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
         gtau = di > gtau ? di : gtau;
       }
       EvaluationResult psr = evaluate(bestc, gtau, besttau, clus.size(), crel.size());
+      // FIXME: Sort by support?
       hierarchy.add(bestc, psr);
-      hierarchy.add(reps, bestc);
+      // Attach parent relation (= sample) to the representative samples.
+      Hierarchy.Iter<Result> it = hierarchy.iterParents(bestc);
+      for(; it.valid(); it.advance()) {
+        if(it.get() instanceof Relation) {
+          hierarchy.add(reps, it.get());
+        }
+      }
     }
     return c;
   }
