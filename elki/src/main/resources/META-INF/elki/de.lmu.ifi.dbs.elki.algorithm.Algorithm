@@ -63,6 +63,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.FDBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.UKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.RepresentativeUncertainClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.CenterOfMassMetaClustering
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.APRIORI
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.Eclat
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.FPGrowth

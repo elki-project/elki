@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringAdjuste
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringDistanceSimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
@@ -77,6 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedPara
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -108,7 +110,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 title = "Representative clustering of uncertain data", //
 booktitle = "Proc. 20th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining", //
 url = "http://dx.doi.org/10.1145/2623330.2623725")
-public class RepresentativeUncertainClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
+public class RepresentativeUncertainClustering extends AbstractAlgorithm<Clustering<Model>>implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Initialize a Logger.
    */
@@ -145,6 +147,11 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
   protected double alpha;
 
   /**
+   * Keep all samples (not only the representative results)
+   */
+  protected boolean keep;
+
+  /**
    * Constructor, quite trivial.
    *
    * @param distance Distance function for meta clustering
@@ -152,14 +159,16 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
    * @param samplesAlgorithm Primary clustering algorithm
    * @param numsamples Number of samples
    * @param alpha Alpha confidence
+   * @param keep Keep all samples (not only the representative results).
    */
-  public RepresentativeUncertainClustering(ClusteringDistanceSimilarityFunction distance, ClusteringAlgorithm<?> metaAlgorithm, ClusteringAlgorithm<?> samplesAlgorithm, int numsamples, RandomFactory random, double alpha) {
+  public RepresentativeUncertainClustering(ClusteringDistanceSimilarityFunction distance, ClusteringAlgorithm<?> metaAlgorithm, ClusteringAlgorithm<?> samplesAlgorithm, int numsamples, RandomFactory random, double alpha, boolean keep) {
     this.samplesAlgorithm = samplesAlgorithm;
     this.numsamples = numsamples;
     this.metaAlgorithm = metaAlgorithm;
     this.distance = distance;
     this.random = random;
     this.alpha = alpha;
+    this.keep = keep;
   }
 
   /**
@@ -178,28 +187,21 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     ArrayList<Clustering<?>> clusterings = new ArrayList<>();
     final int dim = RelationUtil.dimensionality(relation);
     DBIDs ids = relation.getDBIDs();
-    // Add the center of mass result for comparison:
-    {
-      WritableDataStore<DoubleVector> store1 = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DoubleVector.class);
-      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        store1.put(iter, relation.get(iter).getCenterOfMass());
-      }
-      // Not added to "clusterings", so it does not get aggregated.
-      runClusteringAlgorithm(hierarchy, relation, ids, store1, dim, "Uncertain Model: Center of Mass");
-    }
     // To collect samples
     Result samples = new BasicResult("Samples", "samples");
-    hierarchy.add(relation, samples);
 
     // Step 1: Cluster sampled possible worlds:
     Random rand = random.getSingleThreadedRandom();
+    FiniteProgress sampleP = LOG.isVerbose() ? new FiniteProgress("Clustering samples", numsamples, LOG) : null;
     for(int i = 0; i < numsamples; i++) {
       WritableDataStore<DoubleVector> store = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_DB, DoubleVector.class);
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         store.put(iter, relation.get(iter).drawSample(rand));
       }
       clusterings.add(runClusteringAlgorithm(hierarchy, samples, ids, store, dim, "Sample " + i));
+      LOG.incrementProcessed(sampleP);
     }
+    LOG.ensureCompleted(sampleP);
 
     // Step 2: perform the meta clustering (on samples only).
     DBIDRange rids = DBIDFactory.FACTORY.generateStaticDBIDRange(clusterings.size());
@@ -258,6 +260,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       }
       final double cprob = computeConfidence(clus.size(), crel.size());
 
+      // Build an evaluation result
       EvaluationResult res = new EvaluationResult("Possible-Worlds Evaluation", "representativeness");
       MeasurementGroup g = res.newGroup("Representativeness");
       g.addMeasure("Global Tau", gtau, 0, 1, true);
@@ -277,6 +280,13 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
           hierarchy.add(reps, it.get());
         }
       }
+    }
+    // Add the random samples below the representative results only:
+    if(keep) {
+      hierarchy.add(relation, samples);
+    }
+    else {
+      hierarchy.removeSubtree(samples);
     }
     return c;
   }
@@ -361,10 +371,13 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     /**
      * Parameter to specify the amount of clusterings that shall be created and
      * compared.
-     *
-     * Has a default value.
      */
     public final static OptionID SAMPLES_ID = new OptionID("pwc.samples", "Number of clusterings to produce on samples.");
+
+    /**
+     * Flag to keep all samples.
+     */
+    public final static OptionID KEEP_SAMPLES_ID = new OptionID("pwc.samples.keep", "Retain all sampled relations, not only the representative results.");
 
     /**
      * Parameter to specify the random generator.
@@ -406,6 +419,11 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
      */
     protected double alpha;
 
+    /**
+     * Keep all samples (not only the representative results).
+     */
+    protected boolean keep;
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -438,6 +456,10 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       if(config.grab(pdepth)) {
         numsamples = pdepth.getValue();
       }
+      Flag keepF = new Flag(KEEP_SAMPLES_ID);
+      if(config.grab(keepF)) {
+        keep = keepF.isTrue();
+      }
       RandomParameter randomP = new RandomParameter(RANDOM_ID);
       if(config.grab(randomP)) {
         random = randomP.getValue();
@@ -452,7 +474,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
 
     @Override
     protected RepresentativeUncertainClustering makeInstance() {
-      return new RepresentativeUncertainClustering(distance, metaAlgorithm, samplesAlgorithm, numsamples, random, alpha);
+      return new RepresentativeUncertainClustering(distance, metaAlgorithm, samplesAlgorithm, numsamples, random, alpha, keep);
     }
   }
 }

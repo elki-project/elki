@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -55,10 +56,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * Any Wrapper class that makes use of these flags may extend this class. Beware
  * to make correct use of parameter settings via optionHandler as commented with
  * constructor and methods.
- * 
+ *
  * @author Elke Achtert
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses LoggingConfiguration oneway
  * @apiviz.excludeSubtypes
  */
@@ -101,6 +102,10 @@ public abstract class AbstractApplication {
   /**
    * Information for citation and version.
    */
+  @Reference(authors = "Erich Schubert, Alexander Koos, Tobias Emrich, Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek", //
+  title = "A Framework for Clustering Uncertain Data", //
+  booktitle = "Proceedings of the VLDB Endowment, 8(12)", //
+  url = "http://www.vldb.org/pvldb/vol8/p1976-schubert.pdf")
   public static final String REFERENCE = "ELKI Release 0.7.0 (2015, August) published in:" + NEWLINE + NEWLINE //
   + "Erich Schubert, Alexander Koos, Tobias Emrich," + NEWLINE //
   + "Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek:" + NEWLINE //
@@ -116,9 +121,9 @@ public abstract class AbstractApplication {
 
   /**
    * Generic command line invocation.
-   * 
+   *
    * Refactored to have a central place for outermost exception handling.
-   * 
+   *
    * @param cls Application class to run.
    * @param args the arguments to run this application with
    */
@@ -196,7 +201,7 @@ public abstract class AbstractApplication {
 
   /**
    * Returns a usage message, explaining all known options
-   * 
+   *
    * @param options Options to show in usage.
    * @return a usage message explaining all known options
    */
@@ -217,7 +222,7 @@ public abstract class AbstractApplication {
 
   /**
    * Print an error message for the given error.
-   * 
+   *
    * @param e Error Exception.
    */
   protected static void printErrorMessage(Exception e) {
@@ -249,7 +254,7 @@ public abstract class AbstractApplication {
 
   /**
    * Runs the application.
-   * 
+   *
    * @throws UnableToComplyException if an error occurs during running the
    *         application
    */
@@ -257,9 +262,9 @@ public abstract class AbstractApplication {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
@@ -321,7 +326,7 @@ public abstract class AbstractApplication {
 
     /**
      * Get the output file parameter.
-     * 
+     *
      * @param config Options
      * @return Output file
      */
@@ -331,7 +336,7 @@ public abstract class AbstractApplication {
 
     /**
      * Get the output file parameter.
-     * 
+     *
      * @param config Options
      * @param description Short description
      * @return Output file
@@ -347,7 +352,7 @@ public abstract class AbstractApplication {
 
     /**
      * Get the input file parameter.
-     * 
+     *
      * @param config Options
      * @return Input file
      */
@@ -357,7 +362,7 @@ public abstract class AbstractApplication {
 
     /**
      * Get the input file parameter
-     * 
+     *
      * @param config Options
      * @param description Description
      * @return Input file
