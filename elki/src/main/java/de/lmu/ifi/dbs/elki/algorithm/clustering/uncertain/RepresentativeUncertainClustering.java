@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
@@ -79,6 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 
 /**
  * Representative clustering of uncertain data.
@@ -225,6 +227,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
 
     DistanceQuery<Clustering<?>> dq = mat.getDistanceQuery(distance);
     List<? extends Cluster<?>> cl = c.getAllClusters();
+    List<DoubleObjPair<Clustering<?>>> evaluated = new ArrayList<>(cl.size());
     for(Cluster<?> clus : cl) {
       double besttau = Double.POSITIVE_INFINITY;
       Clustering<?> bestc = null;
@@ -253,11 +256,22 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
         double di = dq.distance(bestc, it2);
         gtau = di > gtau ? di : gtau;
       }
-      EvaluationResult psr = evaluate(bestc, gtau, besttau, clus.size(), crel.size());
-      // FIXME: Sort by support?
-      hierarchy.add(bestc, psr);
+      final double cprob = computeConfidence(clus.size(), crel.size());
+
+      EvaluationResult res = new EvaluationResult("Possible-Worlds Evaluation", "representativeness");
+      MeasurementGroup g = res.newGroup("Representativeness");
+      g.addMeasure("Global Tau", gtau, 0, 1, true);
+      g.addMeasure("Cluster Tau", besttau, 0, 1, true);
+      g.addMeasure("Confidence", cprob, 0, 1, false);
+      hierarchy.add(bestc, res);
+
+      evaluated.add(new DoubleObjPair<Clustering<?>>(cprob, bestc));
+    }
+    // Sort evaluated results by confidence:
+    Collections.sort(evaluated, Collections.reverseOrder());
+    for(DoubleObjPair<Clustering<?>> pair : evaluated) {
       // Attach parent relation (= sample) to the representative samples.
-      Hierarchy.Iter<Result> it = hierarchy.iterParents(bestc);
+      Hierarchy.Iter<Result> it = hierarchy.iterParents(pair.second);
       for(; it.valid(); it.advance()) {
         if(it.get() instanceof Relation) {
           hierarchy.add(reps, it.get());
@@ -268,27 +282,16 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
   }
 
   /**
-   * Produce the evaluation result for a particular clustering.
+   * Estimate the confidence probability of a clustering.
    *
-   * @param c Clustering
-   * @param gtau Global tau
-   * @param tau Cluster tau
-   * @param support Cluster size
-   * @param samples Total number of samples
-   * @return Evaluation result
+   * @param support Number of supporting samples
+   * @param samples Total samples
+   * @return Probability
    */
-  protected EvaluationResult evaluate(Clustering<?> c, double gtau, double tau, int support, int samples) {
-    EvaluationResult res = new EvaluationResult("Possible-Worlds Evaluation", "representativeness");
-
+  private double computeConfidence(int support, int samples) {
     final double z = NormalDistribution.standardNormalQuantile(alpha);
     final double eprob = support / (double) samples;
-    final double cprob = Math.max(0., eprob - z * Math.sqrt((eprob * (1 - eprob)) / samples));
-
-    MeasurementGroup g = res.newGroup("Representativeness");
-    g.addMeasure("Global Tau", gtau, 0, 1, true);
-    g.addMeasure("Cluster Tau", tau, 0, 1, true);
-    g.addMeasure("Confidence", cprob, 0, 1, false);
-    return res;
+    return Math.max(0., eprob - z * Math.sqrt((eprob * (1 - eprob)) / samples));
   }
 
   /**
