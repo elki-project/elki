@@ -128,22 +128,17 @@ public class MarkerVisualization extends AbstractVisFactory {
 
       if(spol instanceof ClassStylingPolicy) {
         ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
-        for(int cnum = cspol.getMinStyle(); cnum < cspol.getMaxStyle(); cnum++) {
-          for(DBIDIter iter = cspol.iterateClass(cnum); iter.valid(); iter.advance()) {
-            if(!sample.getSample().contains(iter)) {
-              continue; // TODO: can we test more efficiently than this?
+        for(DBIDIter iter = sample.getSample().iter(); iter.valid(); iter.advance()) {
+          try {
+            final NumberVector vec = rel.get(iter);
+            double[] v = proj.fastProjectDataToRenderSpace(vec);
+            if(v[0] != v[0] || v[1] != v[1]) {
+              continue; // NaN!
             }
-            try {
-              final NumberVector vec = rel.get(iter);
-              double[] v = proj.fastProjectDataToRenderSpace(vec);
-              if(v[0] != v[0] || v[1] != v[1]) {
-                continue; // NaN!
-              }
-              ml.useMarker(svgp, layer, v[0], v[1], cnum, marker_size);
-            }
-            catch(ObjectNotFoundException e) {
-              // ignore.
-            }
+            ml.useMarker(svgp, layer, v[0], v[1], cspol.getStyleForDBID(iter), marker_size);
+          }
+          catch(ObjectNotFoundException e) {
+            // ignore.
           }
         }
       }
