@@ -67,6 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedP
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.UnParameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
@@ -126,12 +127,12 @@ public class DocumentParameters {
       LOG.warning("Second file name doesn't end with .html!");
       System.exit(1);
     }
-    if(args.length > 2 && !args[2].endsWith(".wiki")) {
-      LOG.warning("Third file name doesn't end with .wiki!");
+    if(args.length > 2 && !args[2].endsWith(".trac")) {
+      LOG.warning("Third file name doesn't end with .trac!");
       System.exit(1);
     }
-    if(args.length > 3 && !args[3].endsWith(".wiki")) {
-      LOG.warning("Fourth file name doesn't end with .wiki!");
+    if(args.length > 3 && !args[3].endsWith(".trac")) {
+      LOG.warning("Fourth file name doesn't end with .trac!");
       System.exit(1);
     }
     File byclsname = new File(args[0]);
@@ -525,7 +526,12 @@ public class DocumentParameters {
         appendDefaultValueIfSet(htmldoc, opt, elemdd);
         // known values?
         if(opt instanceof ClassParameter<?>) {
-          appendKnownImplementationsIfNonempty(htmldoc, (ClassParameter<?>) opt, elemdd);
+          Class<?> restriction = ((ClassParameter<?>) opt).getRestrictionClass();
+          appendKnownImplementationsIfNonempty(htmldoc, restriction, elemdd);
+        }
+        else if(opt instanceof ClassListParameter<?>) {
+          Class<?> restriction = ((ClassListParameter<?>) opt).getRestrictionClass();
+          appendKnownImplementationsIfNonempty(htmldoc, restriction, elemdd);
         }
         classdl.appendChild(elemdd);
       }
@@ -638,9 +644,12 @@ public class DocumentParameters {
         // known values?
         if(FULL_WIKI_OUTPUT) {
           if(opt instanceof ClassParameter<?>) {
-            if(((ClassParameter<?>) opt).getKnownImplementations().size() > 0) {
-              appendKnownImplementationsWiki(out, (ClassParameter<?>) opt);
-            }
+            Class<?> restriction = ((ClassParameter<?>) opt).getRestrictionClass();
+            appendKnownImplementationsWiki(out, restriction);
+          }
+          else if(opt instanceof ClassListParameter<?>) {
+            Class<?> restriction = ((ClassListParameter<?>) opt).getRestrictionClass();
+            appendKnownImplementationsWiki(out, restriction);
           }
         }
       }
@@ -741,12 +750,24 @@ public class DocumentParameters {
       // class restriction?
       Class<?> superclass = null;
       if(firstopt instanceof ClassParameter<?>) {
-        // Find superclass heuristically
         superclass = ((ClassParameter<?>) firstopt).getRestrictionClass();
+      }
+      else if(firstopt instanceof ClassListParameter<?>) {
+        superclass = ((ClassListParameter<?>) firstopt).getRestrictionClass();
+      }
+      if(superclass != null) {
         for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
-          ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
-          if(!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
-            superclass = cls.getRestrictionClass();
+          if(clinst.getFirst() instanceof ClassParameter) {
+            ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
+            if(!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
+              superclass = cls.getRestrictionClass();
+            }
+          }
+          if(clinst.getFirst() instanceof ClassListParameter) {
+            ClassListParameter<?> cls = (ClassListParameter<?>) clinst.getFirst();
+            if(!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
+              superclass = cls.getRestrictionClass();
+            }
           }
         }
         appendClassRestriction(htmldoc, superclass, optdd);
@@ -754,8 +775,8 @@ public class DocumentParameters {
       // default value?
       appendDefaultValueIfSet(htmldoc, firstopt, optdd);
       // known values?
-      if(firstopt instanceof ClassParameter<?>) {
-        appendKnownImplementationsIfNonempty(htmldoc, (ClassParameter<?>) firstopt, optdd);
+      if(superclass != null) {
+        appendKnownImplementationsIfNonempty(htmldoc, superclass, optdd);
       }
       maindl.appendChild(optdd);
       // nested definition list for options
@@ -805,6 +826,7 @@ public class DocumentParameters {
       }
     }
     return htmldoc;
+
   }
 
   private static void makeByOptOverviewWiki(Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt, WikiStream out) {
@@ -844,10 +866,8 @@ public class DocumentParameters {
       }
       if(FULL_WIKI_OUTPUT) {
         // known values?
-        if(firstopt instanceof ClassParameter<?>) {
-          if(((ClassParameter<?>) firstopt).getKnownImplementations().size() > 0) {
-            appendKnownImplementationsWiki(out, (ClassParameter<?>) firstopt);
-          }
+        if(superclass != null) {
+          appendKnownImplementationsWiki(out, superclass);
         }
         // List of classes that use this parameter
         out.println("Used by:");
@@ -941,9 +961,9 @@ public class DocumentParameters {
     out.println();
   }
 
-  private static void appendKnownImplementationsIfNonempty(Document htmldoc, ClassParameter<?> opt, Element elemdd) {
-    if(opt.getRestrictionClass() != Object.class) {
-      List<Class<?>> iter = opt.getKnownImplementations();
+  private static void appendKnownImplementationsIfNonempty(Document htmldoc, Class<?> restriction, Element elemdd) {
+    if(restriction != Object.class) {
+      List<Class<?>> iter = ELKIServiceRegistry.findAllImplementations(restriction);
       if(!iter.isEmpty()) {
         Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
         p.appendChild(htmldoc.createTextNode(HEADER_KNOWN_IMPLEMENTATIONS));
@@ -953,7 +973,7 @@ public class DocumentParameters {
           Element li = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
           Element defa = htmldoc.createElement(HTMLUtil.HTML_A_TAG);
           defa.setAttribute(HTMLUtil.HTML_HREF_ATTRIBUTE, linkForClassName(c.getName()));
-          defa.setTextContent(ClassParameter.canonicalClassName(c, opt.getRestrictionClass()));
+          defa.setTextContent(ClassParameter.canonicalClassName(c, restriction));
           li.appendChild(defa);
           ul.appendChild(li);
         }
@@ -971,13 +991,16 @@ public class DocumentParameters {
     }
   }
 
-  private static void appendKnownImplementationsWiki(WikiStream out, ClassParameter<?> opt) {
+  private static void appendKnownImplementationsWiki(WikiStream out, Class<?> restriction) {
+    List<Class<?>> implementations = ELKIServiceRegistry.findAllImplementations(restriction);
+    if(implementations.size() == 0) {
+      return;
+    }
     out.println(HEADER_KNOWN_IMPLEMENTATIONS);
-    List<Class<?>> implementations = opt.getKnownImplementations();
     out.indent++;
     for(Class<?> c : implementations) {
       out.printitem("* ");
-      out.javadocLink(c, opt.getRestrictionClass());
+      out.javadocLink(c, restriction);
       out.println();
     }
     out.indent--;
