@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.internal;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,10 +32,13 @@ import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -83,7 +86,7 @@ public class DocumentReferences {
       System.exit(1);
     }
 
-    List<Pair<Reference, List<Object>>> refs = sortedReferences();
+    List<Pair<Reference, TreeSet<Object>>> refs = sortedReferences();
     try {
       File references = new File(args[0]);
       FileOutputStream reffo = new FileOutputStream(references);
@@ -115,7 +118,7 @@ public class DocumentReferences {
     }
   }
 
-  private static Document documentReferences(List<Pair<Reference, List<Object>>> refs) {
+  private static Document documentReferences(List<Pair<Reference, TreeSet<Object>>> refs) {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
@@ -170,7 +173,7 @@ public class DocumentReferences {
     // Main definition list
     Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
     body.appendChild(maindl);
-    for(Pair<Reference, List<Object>> pair : refs) {
+    for(Pair<Reference, TreeSet<Object>> pair : refs) {
       // DT = definition term
       Element classdt = htmldoc.createElement(HTMLUtil.HTML_DT_TAG);
       // Anchor for references
@@ -235,6 +238,9 @@ public class DocumentReferences {
         if(ref.booktitle().length() > 0) {
           Element booktitlediv = htmldoc.createElement(HTMLUtil.HTML_DIV_TAG);
           booktitlediv.setTextContent("In: " + ref.booktitle());
+          if(ref.booktitle().startsWith("Online:")) {
+            booktitlediv.setTextContent(ref.booktitle());
+          }
           classdd.appendChild(booktitlediv);
         }
         // URL
@@ -251,8 +257,8 @@ public class DocumentReferences {
     return htmldoc;
   }
 
-  private static void documentReferencesWiki(List<Pair<Reference, List<Object>>> refs, PrintStream refstreamW) {
-    for(Pair<Reference, List<Object>> pair : refs) {
+  private static void documentReferencesWiki(List<Pair<Reference, TreeSet<Object>>> refs, PrintStream refstreamW) {
+    for(Pair<Reference, TreeSet<Object>> pair : refs) {
       // JavaDoc links for relevant classes and packages.
       {
         boolean first = true;
@@ -295,7 +301,8 @@ public class DocumentReferences {
         refstreamW.println(indent + "'''" + ref.title() + "'''" + " [[br]]");
         // Booktitle
         if(ref.booktitle().length() > 0) {
-          refstreamW.println(indent + "In: " + ref.booktitle() + " [[br]]");
+          String prefix = ref.booktitle().startsWith("Online:") ? "" : "In: ";
+          refstreamW.println(indent + prefix + ref.booktitle() + " [[br]]");
         }
         // URL
         if(ref.url().length() > 0) {
@@ -307,9 +314,9 @@ public class DocumentReferences {
     }
   }
 
-  private static List<Pair<Reference, List<Object>>> sortedReferences() {
-    List<Pair<Reference, List<Object>>> refs = new ArrayList<>();
-    Map<Reference, List<Object>> map = new HashMap<>();
+  private static List<Pair<Reference, TreeSet<Object>>> sortedReferences() {
+    List<Pair<Reference, TreeSet<Object>>> refs = new ArrayList<>();
+    Map<Reference, TreeSet<Object>> map = new HashMap<>();
 
     HashSet<Package> packages = new HashSet<>();
     for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, true, false)) {
@@ -318,10 +325,30 @@ public class DocumentReferences {
         inspectPackage(cls.getPackage(), refs, map);
       }
     }
+    // Sort references by first class.
+    Collections.sort(refs, new Comparator<Pair<Reference, TreeSet<Object>>>() {
+      @Override
+      public int compare(Pair<Reference, TreeSet<Object>> p1, Pair<Reference, TreeSet<Object>> p2) {
+        final Object o1 = p1.second.first(), o2 = p2.second.first();
+        return COMPARATOR.compare(o1, o2);
+      }
+    });
     return refs;
   }
 
-  private static void inspectClass(final Class<?> cls, List<Pair<Reference, List<Object>>> refs, Map<Reference, List<Object>> map) {
+  /**
+   * Comparator for sorting the list of classes for each reference.
+   */
+  private static final Comparator<Object> COMPARATOR = new Comparator<Object>() {
+    @Override
+    public int compare(Object o1, Object o2) {
+      String n1 = (o1 instanceof Class) ? ((Class<?>) o1).getName() : ((Package) o1).getName();
+      String n2 = (o2 instanceof Class) ? ((Class<?>) o2).getName() : ((Package) o2).getName();
+      return n1.compareTo(n2);
+    }
+  };
+
+  private static void inspectClass(final Class<?> cls, List<Pair<Reference, TreeSet<Object>>> refs, Map<Reference, TreeSet<Object>> map) {
     if(cls.getSimpleName().equals("package-info")) {
       return;
     }
@@ -357,17 +384,17 @@ public class DocumentReferences {
     }
   }
 
-  private static void addReference(Object cls, Reference ref, List<Pair<Reference, List<Object>>> refs, Map<Reference, List<Object>> map) {
-    List<Object> list = map.get(ref);
+  private static void addReference(Object cls, Reference ref, List<Pair<Reference, TreeSet<Object>>> refs, Map<Reference, TreeSet<Object>> map) {
+    TreeSet<Object> list = map.get(ref);
     if(list == null) {
-      list = new ArrayList<>(3);
+      list = new TreeSet<>(COMPARATOR);
       map.put(ref, list);
       refs.add(new Pair<>(ref, list));
     }
     list.add(cls);
   }
 
-  private static void inspectPackage(Package p, List<Pair<Reference, List<Object>>> refs, Map<Reference, List<Object>> map) {
+  private static void inspectPackage(Package p, List<Pair<Reference, TreeSet<Object>>> refs, Map<Reference, TreeSet<Object>> map) {
     if(p.isAnnotationPresent(Reference.class)) {
       Reference ref = p.getAnnotation(Reference.class);
       addReference(p, ref, refs, map);
