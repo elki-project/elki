@@ -108,7 +108,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 title = "Representative clustering of uncertain data", //
 booktitle = "Proc. 20th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining", //
 url = "http://dx.doi.org/10.1145/2623330.2623725")
-public class RepresentativeUncertainClustering extends AbstractAlgorithm<Clustering<Model>> {
+public class RepresentativeUncertainClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Initialize a Logger.
    */

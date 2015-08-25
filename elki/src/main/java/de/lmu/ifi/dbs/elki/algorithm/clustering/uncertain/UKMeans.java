@@ -1,14 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
-import de.lmu.ifi.dbs.elki.data.Cluster;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -31,10 +22,19 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.uncertain.DiscreteUncertainObject;
@@ -63,12 +63,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
-public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
+// FIXME: JavaDoc
+// FIXME: Reference?
+public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implements ClusteringAlgorithm<Clustering<KMeansModel>> {
   /**
    * CLass logger.
    */
   protected static final Logging LOG = Logging.getLogger(UKMeans.class);
-  
+
   /**
    * Key for statistics logging.
    */
@@ -88,7 +90,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
    * Method to choose initial means.
    */
   protected KMeansInitialization<? super NumberVector> initializer;
-  
+
   /**
    * Our Random factory
    */
@@ -110,7 +112,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
 
   /**
    * Run the clustering.
-   * 
+   *
    * @param database the Database
    * @param relation the Relation
    * @return
@@ -123,13 +125,13 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     }
-    
+
     DBIDs sampleids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
     List<Vector> means = new ArrayList<>(k);
     for(DBIDIter iter = sampleids.iter(); iter.valid(); iter.advance()) {
       means.add(new Vector(ArrayLikeUtil.toPrimitiveDoubleArray(relation.get(iter).getCenterOfMass())));
     }
-    
+
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -137,7 +139,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
     }
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
     double[] varsum = new double[k];
-    
+
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("UK-Means iteration", LOG) : null;
     DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
     int iteration = 0;
@@ -156,7 +158,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
     if(LOG.isStatistics()) {
       LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
     }
-    
+
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("Uk-Means Clustering", "ukmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
@@ -169,9 +171,10 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
     }
     return result;
   }
-  
+
   /**
    * Get expected distance between a Vector and an uncertain object
+   *
    * @param rep A vector, e.g. a cluster representative
    * @param uo A discrete uncertain object
    * @return The distance
@@ -179,21 +182,21 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
   protected double getExpectedRepDistance(Vector rep, DiscreteUncertainObject uo) {
     int counter = 0;
     double avgDist = 0.0;
-    
+
     EuclideanDistanceFunction euclidean = EuclideanDistanceFunction.STATIC;
-    
-    for (int i=0; i < uo.getNumberSamples(); i++) {
-        avgDist += euclidean.distance(rep, uo.getSample(i));
-        counter++;
+
+    for(int i = 0; i < uo.getNumberSamples(); i++) {
+      avgDist += euclidean.distance(rep, uo.getSample(i));
+      counter++;
     }
-    
-    return avgDist/counter;
+
+    return avgDist / counter;
   }
-  
+
   /**
    * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
    * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
-   * 
+   *
    * @param relation the database to cluster
    * @param means a list of k means
    * @param clusters cluster assignment
@@ -221,7 +224,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
     }
     return changed;
   }
-  
+
   protected boolean updateAssignment(DBIDIter iditer, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, int newA) {
     final int oldA = assignment.intValue(iditer);
     if(oldA == newA) {
@@ -234,10 +237,10 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
     }
     return true;
   }
-  
+
   /**
    * Returns the mean vectors of the given clusters in the given database.
-   * 
+   *
    * @param clusters the clusters to compute the means
    * @param means the recent means
    * @param database the database containing the vectors
@@ -271,7 +274,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
     }
     return newMeans;
   }
-  
+
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(TypeUtil.UNCERTAIN_OBJECT_FIELD);
@@ -281,10 +284,10 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
   protected Logging getLogger() {
     return UKMeans.LOG;
   }
-  
+
   /**
    * Log statistics on the variance sum.
-   * 
+   *
    * @param varstat Statistics log instance
    * @param varsum Variance sum per cluster
    */
@@ -306,20 +309,21 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
     protected int k;
 
     protected int maxiter;
-    
+
     protected RandomFactory rnd;
 
     public static final OptionID INIT_ID = new OptionID("ukmeans.initialization", "Method to choose the initial means.");
 
-    public final static OptionID K_ID = new OptionID("ukmeans.k","The number of clusters to find.");
+    public final static OptionID K_ID = new OptionID("ukmeans.k", "The number of clusters to find.");
 
-    public final static OptionID MAXITER_ID = new OptionID("ukmeans.maxiter","The maximum number of iterations to do. 0 means no limit.");
-    
-    public final static OptionID RANDOM_ID = new OptionID("ukmeans.rnd","The Random Factory");
+    public final static OptionID MAXITER_ID = new OptionID("ukmeans.maxiter", "The maximum number of iterations to do. 0 means no limit.");
+
+    public final static OptionID RANDOM_ID = new OptionID("ukmeans.rnd", "The Random Factory");
 
     @Override
     public void makeOptions(Parameterization config) {
-      super.makeOptions(config);ObjectParameter<KMeansInitialization<? super NumberVector>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
+      super.makeOptions(config);
+      ObjectParameter<KMeansInitialization<? super NumberVector>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
       if(config.grab(initialP)) {
         initializer = initialP.instantiateClass(config);
       }
@@ -333,9 +337,9 @@ public class UKMeans extends AbstractAlgorithm<Clustering<Model>> {
       if(config.grab(kP)) {
         k = kP.getValue();
       }
-      
+
       RandomParameter rndP = new RandomParameter(RANDOM_ID);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         rnd = rndP.getValue();
       }
     }
