@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * find density-connected sets in a database.
  * <p>
  * Reference: <br>
- * M. Ester, H.-P. Kriegel, J. Sander, and X. Xu:<br />
+ * M. Ester, H.-P. Kriegel, J. Sander, X. Xu<br />
  * A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases
  * with Noise<br />
  * In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96),
@@ -73,7 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("DBSCAN: Density-Based Clustering of Applications with Noise")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minpts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
-@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", //
+@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, X. Xu", //
 title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
 booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
 url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
