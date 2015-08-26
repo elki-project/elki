@@ -31,10 +31,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
@@ -134,6 +135,11 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
     private JMenu visualizersMenu;
 
     /**
+     * Simplify the menu.
+     */
+    protected boolean simplify = true;
+
+    /**
      * Constructor.
      */
     public DynamicMenu() {
@@ -205,21 +211,26 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       ResultHierarchy hier = context.getHierarchy();
       Hierarchy<Object> vistree = context.getVisHierarchy();
       Result start = context.getBaseResult();
+      ArrayList<JMenuItem> items = new ArrayList<>();
       if(start == null) {
         for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
           if(hier.numParents(iter.get()) == 0) {
-            recursiveBuildMenu(menubar, iter.get(), hier, vistree);
+            recursiveBuildMenu(items, iter.get(), hier, vistree);
           }
         }
       }
       else {
         for(Hierarchy.Iter<Result> iter = hier.iterChildren(start); iter.valid(); iter.advance()) {
-          recursiveBuildMenu(menubar, iter.get(), hier, vistree);
+          recursiveBuildMenu(items, iter.get(), hier, vistree);
         }
+      }
+      // Add all items.
+      for(JMenuItem item : items) {
+        menubar.add(item);
       }
     }
 
-    private boolean recursiveBuildMenu(JComponent parent, Object r, ResultHierarchy hier, Hierarchy<Object> vistree) {
+    private void recursiveBuildMenu(Collection<JMenuItem> items, Object r, ResultHierarchy hier, Hierarchy<Object> vistree) {
       // Make a submenu for this element
       final String nam;
       if(r instanceof Result) {
@@ -229,40 +240,47 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         nam = ((VisualizationItem) r).getMenuName();
       }
       else {
-        return false;
+        return;
       }
-      JMenu submenu = new JMenu((nam != null) ? nam : "unnamed");
-      boolean children = false;
+      ArrayList<JMenuItem> subitems = new ArrayList<>();
       // Add menus for any child results
       if(r instanceof Result) {
         for(Hierarchy.Iter<Result> iter = hier.iterChildren((Result) r); iter.valid(); iter.advance()) {
-          children |= recursiveBuildMenu(submenu, iter.get(), hier, vistree);
+          recursiveBuildMenu(subitems, iter.get(), hier, vistree);
         }
       }
       // Add visualizers:
       for(Hierarchy.Iter<Object> iter = vistree.iterChildren(r); iter.valid(); iter.advance()) {
-        children |= recursiveBuildMenu(submenu, iter.get(), hier, vistree);
+        recursiveBuildMenu(subitems, iter.get(), hier, vistree);
       }
 
       // Item for the visualizer
       JMenuItem item = makeMenuItemForVisualizer(r);
-      if(item == null) {
-        if(children) {
-          parent.add(submenu);
+      final int numchild = subitems.size();
+      if(numchild == 0) {
+        if(item != null) {
+          items.add(item);
         }
-        else {
-          return false; // No menu.
+        return;
+      }
+      if(simplify && numchild == 1) {
+        JMenuItem a = subitems.get(0);
+        if(a instanceof JMenu) {
+          if(nam != null) {
+            a.setText(nam + " " + a.getText());
+          }
+          items.add(a);
+          return;
         }
       }
-      else {
-        if(children) {
-          submenu.add(item, 0); // Prepend
-        }
-        else {
-          parent.add(item);
-        }
+      JMenu submenu = new JMenu((nam != null) ? nam : "unnamed");
+      if(item != null) {
+        submenu.add(item);
       }
-      return true;
+      for(JMenuItem subitem : subitems) {
+        submenu.add(subitem);
+      }
+      items.add(submenu);
     }
 
     private JMenuItem makeMenuItemForVisualizer(Object r) {
