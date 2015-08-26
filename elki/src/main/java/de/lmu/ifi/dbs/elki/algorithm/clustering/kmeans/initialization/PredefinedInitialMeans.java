@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector.Factory;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.VectorListParamet
 
 /**
  * Run k-means with prespecified initial means.
- * 
+ *
  * @author Erich Schubert
  */
 public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberVector> {
@@ -73,9 +73,9 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
 
   /**
    * Set the initial means.
-   * 
+   *
    * Important notice: Use with care - the means are <em>not copied</em>!
-   * 
+   *
    * @param initialMeans initial means.
    */
   public void setInitialMeans(List<? extends NumberVector> initialMeans) {
@@ -84,9 +84,9 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
 
   /**
    * Set the initial means.
-   * 
+   *
    * Important notice: Use with care - the means are <em>not copied</em>!
-   * 
+   *
    * @param initialMeans initial means.
    */
   public void setInitialClusters(List<? extends Cluster<? extends MeanModel>> initialMeans) {
@@ -99,9 +99,9 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
 
   /**
    * Set the initial means.
-   * 
+   *
    * Important notice: Use with care - the means are <em>not copied</em>!
-   * 
+   *
    * @param initialMeans initial means.
    */
   public void setInitialMeans(double[][] initialMeans) {
@@ -113,7 +113,7 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
   }
 
   @Override
-  public <T extends NumberVector, O extends NumberVector> List<O> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, Factory<O> factory) {
+  public <T extends NumberVector, O extends NumberVector> List<O> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, Factory<O> factory) {
     if(k != initialMeans.size()) {
       throw new AbortException("Predefined initial means contained " + initialMeans.size() + " means, algorithm requested " + k + " means instead.");
     }
@@ -128,7 +128,7 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude

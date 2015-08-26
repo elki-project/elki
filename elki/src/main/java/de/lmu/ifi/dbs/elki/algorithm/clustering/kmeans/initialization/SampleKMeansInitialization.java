@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
@@ -82,7 +81,7 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
   }
 
   @Override
-  public <T extends V, O extends NumberVector> List<O> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<O> factory) {
+  public <T extends V, O extends NumberVector> List<O> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<O> factory) {
     final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), rate, rnd);
 
     // Ugly cast, sorry

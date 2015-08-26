@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,20 +30,20 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 
 /**
  * Initialize k-means by generating random vectors (within the data sets value
  * range).
- * 
+ *
  * @author Erich Schubert
  */
 public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<NumberVector> {
   /**
    * Constructor.
-   * 
+   *
    * @param rnd Random generator.
    */
   public RandomlyGeneratedInitialMeans(RandomFactory rnd) {
@@ -51,7 +51,7 @@ public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
     final int dim = RelationUtil.dimensionality(relation);
     double[][] minmax = RelationUtil.computeMinMax(relation);
     double[] min = minmax[0], scale = minmax[1];
@@ -73,9 +73,9 @@ public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractKMeansInitialization.Parameterizer {

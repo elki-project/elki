@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -38,24 +38,24 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 
 /**
  * K-Means initialization by repeatedly choosing the farthest point (by the
  * <em>sum</em> of distances to previous objects).
- * 
+ *
  * Note: this is less random than other initializations, so running multiple
  * times will be more likely to return the same local minima.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type for kmedoids and kmedians
  */
 public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans<O> {
   /**
    * Constructor.
-   * 
+   *
    * @param rnd Random generator.
    * @param dropfirst Flag to discard the first vector.
    */
@@ -64,7 +64,7 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
   }
 
   @Override
-  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
     // Get a distance query
     DistanceQuery<T> distQ = database.getDistanceQuery(relation, distanceFunction);
 
@@ -158,9 +158,9 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V> extends FarthestPointsInitialMeans.Parameterizer<V> {

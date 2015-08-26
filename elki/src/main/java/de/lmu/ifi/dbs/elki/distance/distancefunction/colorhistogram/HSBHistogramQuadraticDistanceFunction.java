@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
@@ -39,14 +37,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 /**
  * Distance function for HSB color histograms based on a quadratic form and
  * color similarity.
- * 
+ *
  * The matrix is filled according to:
  * <p>
  * VisualSEEk: a fully automated content-based image query system<br />
  * Smith, J.R. and Chang, S.F.<br />
  * Proceedings of the fourth ACM international conference on Multimedia 1997
  * </p>
- * 
+ *
  * @author Erich Schubert
  */
 @Reference(authors = "J. R. Smith, S. F. Chang", title = "VisualSEEk: a fully automated content-based image query system", booktitle = "Proceedings of the fourth ACM international conference on Multimedia 1997", url = "http://dx.doi.org/10.1145/244130.244151")
@@ -58,7 +56,7 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
 
   /**
    * Constructor.
-   * 
+   *
    * @param quanth Hue bins
    * @param quants Saturation bins
    * @param quantb Brightness bins
@@ -69,7 +67,7 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
 
   /**
    * Compute the weight matrix for HSB similarity.
-   * 
+   *
    * @param quanth H bins
    * @param quants S bins
    * @param quantb B bins
@@ -120,9 +118,9 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

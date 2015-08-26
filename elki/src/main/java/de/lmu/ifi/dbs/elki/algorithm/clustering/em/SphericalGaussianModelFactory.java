@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,26 +31,26 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Factory for EM with multivariate gaussian models using diagonal matrixes.
- * 
+ *
  * These models have individual variances, but no covariance, so this
  * corresponds to the {@code 'VVI'} model in Mclust (R).
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has SphericalGaussianModel
- * 
+ *
  * @param <V> vector type
  */
 public class SphericalGaussianModelFactory<V extends NumberVector> extends AbstractEMModelFactory<V, EMModel> {
   /**
    * Constructor.
-   * 
+   *
    * @param initializer Class for choosing the inital seeds.
    */
   public SphericalGaussianModelFactory(KMeansInitialization<V> initializer) {
@@ -58,7 +58,7 @@ public class SphericalGaussianModelFactory<V extends NumberVector> extends Abstr
   }
 
   @Override
-  public List<SphericalGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> df) {
+  public List<SphericalGaussianModel> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistanceFunction<? super V> df) {
     final List<Vector> initialMeans = initializer.chooseInitialMeans(database, relation, k, df, Vector.FACTORY);
     assert (initialMeans.size() == k);
     final int dimensionality = initialMeans.get(0).getDimensionality();
@@ -72,11 +72,11 @@ public class SphericalGaussianModelFactory<V extends NumberVector> extends Abstr
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <V> Vector type
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractEMModelFactory.Parameterizer<V> {
