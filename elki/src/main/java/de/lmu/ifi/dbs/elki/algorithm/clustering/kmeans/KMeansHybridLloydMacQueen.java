@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
@@ -50,11 +50,11 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 /**
  * A hybrid k-means algorithm, alternating between MacQueen-style incremental
  * processing and Lloyd-Style batch steps.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KMeansModel
- * 
+ *
  * @param <V> vector datatype
  */
 public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
@@ -70,13 +70,13 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansHybridLloydMacQueen(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMeansHybridLloydMacQueen(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -147,9 +147,9 @@ public class KMeansHybridLloydMacQueen<V extends NumberVector> extends AbstractK
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {

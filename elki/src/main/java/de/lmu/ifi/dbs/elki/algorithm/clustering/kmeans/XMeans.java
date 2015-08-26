@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 /**
  * X-means: Extending K-means with Efficient Estimation on the Number of
  * Clusters.
- * 
+ *
  * Note: this implementation does currently <em>not</em> use a k-d-tree for
  * acceleration. Also note that k_max is not a hard threshold - the algorithm
  * can return up to 2*k_max clusters!
@@ -74,10 +74,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * In: Proceedings of the 17th International Conference on Machine Learning
  * (ICML 2000)
  * </p>
- * 
+ *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
- * 
+ *
  * @param <V> Vector type
  * @param <M> Model type
  */
@@ -133,7 +133,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    *        splitting step
    * @param random Random factory
    */
-  public XMeans(PrimitiveDistanceFunction<? super NumberVector> distanceFunction, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization<? super V> initializer, PredefinedInitialMeans splitInitializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
+  public XMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization<? super V> initializer, PredefinedInitialMeans splitInitializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
     super(distanceFunction, k_min, maxiter, initializer);
     this.k_min = k_min;
     this.k_max = k_max;
@@ -146,7 +146,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
   /**
    * Run the algorithm on a database and relation.
-   * 
+   *
    * @param database Database to process
    * @param relation Data relation
    * @return Clustering result.
@@ -213,7 +213,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
   /**
    * Conditionally splits the clusters based on the information criterion.
-   * 
+   *
    * @param parentCluster Cluster to split
    * @param database Database
    * @param relation Data relation
@@ -251,7 +251,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
   /**
    * Split an existing centroid into two initial centers.
-   * 
+   *
    * @param parentCluster Existing cluster
    * @param relation Data relation
    * @return List of new centroids
@@ -291,12 +291,12 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Tibor Goldschwendt
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <V> Vector type
    * @param <M> Model type of inner algorithm
    */

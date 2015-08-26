@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
@@ -59,15 +60,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract base class for k-means implementations.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf KMeansInitialization
- * 
+ *
  * @param <V> Vector type
  * @param <M> Cluster model type
  */
-public abstract class AbstractKMeans<V extends NumberVector, M extends Model> extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector, Clustering<M>> implements KMeans<V, M>, ClusteringAlgorithm<Clustering<M>> {
+public abstract class AbstractKMeans<V extends NumberVector, M extends Model> extends AbstractNumberVectorDistanceBasedAlgorithm<V, Clustering<M>> implements KMeans<V, M>, ClusteringAlgorithm<Clustering<M>> {
   /**
    * Number of cluster centers to initialize.
    */
@@ -85,13 +86,13 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Function to generate the initial means
    */
-  public AbstractKMeans(PrimitiveDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public AbstractKMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction);
     this.k = k;
     this.maxiter = maxiter;
@@ -101,7 +102,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   /**
    * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
    * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
-   * 
+   *
    * @param relation the database to cluster
    * @param means a list of k means
    * @param clusters cluster assignment
@@ -113,7 +114,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     assert(k == means.size());
     boolean changed = false;
     Arrays.fill(varsum, 0.);
-    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    final NumberVectorDistanceFunction<?> df = getDistanceFunction();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double mindist = Double.POSITIVE_INFINITY;
       V fv = relation.get(iditer);
@@ -151,7 +152,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
   /**
    * Returns the mean vectors of the given clusters in the given database.
-   * 
+   *
    * @param clusters the clusters to compute the means
    * @param means the recent means
    * @param database the database containing the vectors
@@ -189,7 +190,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
   /**
    * Returns the median vectors of the given clusters in the given database.
-   * 
+   *
    * @param clusters the clusters to compute the means
    * @param medians the recent medians
    * @param database the database containing the vectors
@@ -220,7 +221,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
   /**
    * Compute an incremental update for the mean.
-   * 
+   *
    * @param mean Mean to update
    * @param vec Object vector
    * @param newsize (New) size of cluster
@@ -236,7 +237,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
   /**
    * Perform a MacQueen style iteration.
-   * 
+   *
    * @param relation Relation
    * @param means Means
    * @param clusters Clusters
@@ -249,7 +250,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     Arrays.fill(varsum, 0.);
 
     // Raw distance function
-    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    final NumberVectorDistanceFunction<?> df = getDistanceFunction();
 
     // Incremental update
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -271,7 +272,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
   /**
    * Try to update the cluster assignment.
-   * 
+   *
    * @param clusters Current clusters
    * @param means Means to update
    * @param minIndex Cluster to assign to
@@ -305,13 +306,13 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   }
 
   @Override
-  public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public void setDistanceFunction(NumberVectorDistanceFunction<? super V> distanceFunction) {
     this.distanceFunction = distanceFunction;
   }
 
   /**
    * Log statistics on the variance sum.
-   * 
+   *
    * @param varstat Statistics log instance
    * @param varsum Variance sum per cluster
    */
@@ -329,12 +330,12 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
-  public abstract static class Parameterizer<V extends NumberVector> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector> {
+  public abstract static class Parameterizer<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<V> {
     /**
      * k Parameter.
      */
@@ -360,7 +361,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
     /**
      * Get the k parameter.
-     * 
+     *
      * @param config Parameterization
      */
     protected void getParameterK(Parameterization config) {
@@ -373,11 +374,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
     /**
      * Get the distance function parameter.
-     * 
+     *
      * @param config Parameterization
      */
     protected void getParameterDistanceFunction(Parameterization config) {
-      ObjectParameter<PrimitiveDistanceFunction<NumberVector>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction<? super V>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
         if(!(distanceFunction instanceof EuclideanDistanceFunction) && !(distanceFunction instanceof SquaredEuclideanDistanceFunction)) {
@@ -388,7 +389,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
     /**
      * Get the initialization method parameter.
-     * 
+     *
      * @param config Parameterization
      */
     protected void getParameterInitialization(Parameterization config) {
@@ -400,7 +401,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
     /**
      * Get the max iterations parameter.
-     * 
+     *
      * @param config Parameterization
      */
     protected void getParameterMaxIter(Parameterization config) {
@@ -413,7 +414,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
 
     /**
      * Get class logger.
-     * 
+     *
      * @return Logger
      */
     abstract protected Logging getLogger();

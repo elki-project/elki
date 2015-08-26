@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -54,18 +54,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 
 /**
  * Hamerly's fast k-means by exploiting the triangle inequality.
- * 
+ *
  * <p>
  * Reference:<br />
  * G. Hamerly<br/>
  * Making k-means even faster<br/>
  * Proc. 2010 SIAM International Conference on Data Mining
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KMeansModel
- * 
+ *
  * @param <V> vector datatype
  */
 @Reference(authors = "G. Hamerly", //
@@ -85,13 +85,13 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansHamerly(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMeansHamerly(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -186,7 +186,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
 
   /**
    * Recompute the separation of cluster means.
-   * 
+   *
    * @param means Means
    * @param sep Output array
    */
@@ -213,7 +213,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
   /**
    * Reassign objects, but only if their bounds indicate it is necessary to do
    * so.
-   * 
+   *
    * @param relation Data
    * @param means Current means
    * @param newmean New means (must have the same coordinates as the current
@@ -226,7 +226,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    */
   private int initialAssignToNearestCluster(Relation<V> relation, List<Vector> means, List<Vector> sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDoubleDataStore lower) {
     assert (k == means.size());
-    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
     boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       V fv = relation.get(it);
@@ -265,7 +265,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
   /**
    * Reassign objects, but only if their bounds indicate it is necessary to do
    * so.
-   * 
+   *
    * @param relation Data
    * @param means Current means
    * @param newmean New means (must have the same coordinates as the current
@@ -280,7 +280,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
   private int assignToNearestCluster(Relation<V> relation, List<Vector> means, List<Vector> sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] sep, WritableDoubleDataStore upper, WritableDoubleDataStore lower) {
     assert (k == means.size());
     int changed = 0;
-    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
     boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       final int cur = assignment.intValue(it);
@@ -339,7 +339,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
 
   /**
    * Maximum distance moved.
-   * 
+   *
    * @param means Old means
    * @param newmeans New means
    * @param dists Distances moved
@@ -362,7 +362,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
 
   /**
    * Update the bounds for k-means.
-   * 
+   *
    * @param relation Relation
    * @param assignment Cluster assignment
    * @param upper Upper bounds
@@ -385,9 +385,9 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {

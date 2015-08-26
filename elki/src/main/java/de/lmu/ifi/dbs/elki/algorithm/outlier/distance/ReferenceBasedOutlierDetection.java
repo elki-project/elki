@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 import java.util.Collection;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractPrimitiveDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
@@ -67,21 +67,21 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
 /**
  * Reference-Based Outlier Detection algorithm, an algorithm that computes kNN
  * distances approximately, using reference points.
- * 
+ *
  * kNN distances are approximated by the difference in distance from a reference
  * point. For this approximation to be of high quality, triangle inequality is
  * required; but the algorithm can also process non-metric distances.
- * 
+ *
  * Reference:
  * <p>
  * Y. Pei, O. R. Zaiane, Y. Gao<br />
  * An Efficient Reference-Based Approach to Outlier Detection in Large Datasets<br />
  * In: Proc. IEEE Int. Conf. on Data Mining (ICDM'06), Hong Kong, China, 2006
  * </p>
- * 
+ *
  * @author Lisa Reichert
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf ReferencePointsHeuristic
  */
 @Title("An Efficient Reference-based Approach to Outlier Detection in Large Datasets")
@@ -91,7 +91,7 @@ title = "An Efficient Reference-based Approach to Outlier Detection in Large Dat
 booktitle = "Proc. 6th IEEE Int. Conf. on Data Mining (ICDM '06)", //
 url = "http://dx.doi.org/10.1109/ICDM.2006.17")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection" })
-public class ReferenceBasedOutlierDetection extends AbstractPrimitiveDistanceBasedAlgorithm<NumberVector, OutlierResult> implements OutlierAlgorithm {
+public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistanceBasedAlgorithm<NumberVector, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -109,12 +109,12 @@ public class ReferenceBasedOutlierDetection extends AbstractPrimitiveDistanceBas
 
   /**
    * Constructor with parameters.
-   * 
+   *
    * @param k k Parameter
    * @param distanceFunction distance function
    * @param refp Reference points heuristic
    */
-  public ReferenceBasedOutlierDetection(int k, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, ReferencePointsHeuristic refp) {
+  public ReferenceBasedOutlierDetection(int k, NumberVectorDistanceFunction<? super NumberVector> distanceFunction, ReferencePointsHeuristic refp) {
     super(distanceFunction);
     this.k = k;
     this.refp = refp;
@@ -122,7 +122,7 @@ public class ReferenceBasedOutlierDetection extends AbstractPrimitiveDistanceBas
 
   /**
    * Run the algorithm on the given relation.
-   * 
+   *
    * @param database Database
    * @param relation Relation to process
    * @return Outlier result
@@ -173,7 +173,7 @@ public class ReferenceBasedOutlierDetection extends AbstractPrimitiveDistanceBas
   /**
    * Computes for each object the distance to one reference point. (one
    * dimensional representation of the data set)
-   * 
+   *
    * @param refPoint Reference Point Feature Vector
    * @param database database to work on
    * @param distFunc Distance function to use
@@ -191,7 +191,7 @@ public class ReferenceBasedOutlierDetection extends AbstractPrimitiveDistanceBas
 
   /**
    * Update the density estimates for each object.
-   * 
+   *
    * @param rbod_score Density storage
    * @param referenceDists Distances from current reference point
    */
@@ -215,7 +215,7 @@ public class ReferenceBasedOutlierDetection extends AbstractPrimitiveDistanceBas
    * search the NN of an object are those objects that have a similar distance
    * to a reference point. The k- nearest neighbors of an object are those
    * objects that lay close to the object in the reference distance vector)
-   * 
+   *
    * @param referenceDists vector of the reference distances
    * @param iter Iterator to this list (will be reused)
    * @param index index of the current object
@@ -275,12 +275,12 @@ public class ReferenceBasedOutlierDetection extends AbstractPrimitiveDistanceBas
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
-  public static class Parameterizer extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<NumberVector> {
+  public static class Parameterizer extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<NumberVector> {
     /**
      * Parameter for the reference points heuristic.
      */

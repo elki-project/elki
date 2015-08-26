@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Dependency derivator computes quantitatively linear dependencies among
  * attributes of a given dataset based on a linear correlation PCA.
  * </p>
- * 
+ *
  * <p>
  * Reference: <br>
  * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek: Deriving
@@ -69,14 +69,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * In Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06),
  * Philadelphia, PA 2006.
  * </p>
- * 
+ *
  * @author Arthur Zimek
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
 @Title("Dependency Derivator: Deriving numerical inter-dependencies on data")
 @Description("Derives an equality-system describing dependencies between attributes in a correlation-cluster")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", title = "Deriving Quantitative Dependencies for Correlation Clusters", booktitle = "Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.", url = "http://dx.doi.org/10.1145/1150402.1150408")
-public class DependencyDerivator<V extends NumberVector> extends AbstractPrimitiveDistanceBasedAlgorithm<V, CorrelationAnalysisSolution<V>> {
+public class DependencyDerivator<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm<V, CorrelationAnalysisSolution<V>> {
   /**
    * The logger for this class.
    */
@@ -125,14 +125,14 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractPrimiti
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param nf Number format
    * @param pca PCA runner
    * @param sampleSize sample size
    * @param randomsample flag for random sampling
    */
-  public DependencyDerivator(PrimitiveDistanceFunction<V> distanceFunction, NumberFormat nf, PCAFilteredRunner pca, int sampleSize, boolean randomsample) {
+  public DependencyDerivator(NumberVectorDistanceFunction<? super V> distanceFunction, NumberFormat nf, PCAFilteredRunner pca, int sampleSize, boolean randomsample) {
     super(distanceFunction);
     this.nf = nf;
     this.pca = pca;
@@ -143,7 +143,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractPrimiti
   /**
    * Computes quantitatively linear dependencies among the attributes of the
    * given database based on a linear correlation PCA.
-   * 
+   *
    * @param database the database to run this DependencyDerivator on
    * @param relation the relation to use
    * @return the CorrelationAnalysisSolution computed by this
@@ -176,7 +176,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractPrimiti
   /**
    * Runs the pca on the given set of IDs. The centroid is computed from the
    * given ids.
-   * 
+   *
    * @param db the database
    * @param ids the set of ids
    * @return a matrix of equations describing the dependencies
@@ -187,7 +187,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractPrimiti
 
   /**
    * Runs the pca on the given set of IDs and for the given centroid.
-   * 
+   *
    * @param db the database
    * @param ids the set of ids
    * @param centroid the centroid
@@ -273,12 +273,12 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractPrimiti
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm.Parameterizer<V> {
     /**
      * Output accuracy.
      */

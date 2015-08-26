@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Base class for evaluating clusterings by information criteria (such as AIC or
  * BIC). Provides helper functions (e.g. max likelihood calculation) to its
  * subclasses.
- * 
+ *
  * The use of information-theoretic criteria for evaluating k-means was
  * popularized by X-means:
  * <p>
@@ -55,14 +55,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * In: Proceedings of the 17th International Conference on Machine Learning
  * (ICML 2000)
  * </p>
- * 
+ *
  * A different version of logLikelihood is derived in:
  * <p>
  * Q. Zhao, M. Xu, P. Fränti:<br />
  * Knee Point Detection on Bayesian Information Criterion<br />
  * 20th IEEE International Conference on Tools with Artificial Intelligence
  * </p>
- * 
+ *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
  */
@@ -74,7 +74,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
   /**
    * Compute the number of points in a given set of clusters (which may be
    * <i>less</i> than the complete data set for X-means!)
-   * 
+   *
    * @param clustering Clustering to analyze
    * @return Number of points
    */
@@ -88,16 +88,17 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
 
   /**
    * Variance contribution of a single cluster.
-   * 
+   *
    * If possible, this information is reused from the clustering process (when a
    * KMeansModel is returned).
-   * 
+   *
    * @param cluster Cluster to access
    * @param distanceFunction Distance function
    * @param relation Data relation
+   * @param <V> Vector type
    * @return Cluster variance
    */
-  public static double varianceOfCluster(Cluster<? extends MeanModel> cluster, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<? extends NumberVector> relation) {
+  public static <V extends NumberVector> double varianceOfCluster(Cluster<? extends MeanModel> cluster, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
     MeanModel model = cluster.getModel();
     if(model instanceof KMeansModel) {
       return ((KMeansModel) model).getVarianceContribution();
@@ -117,19 +118,20 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
 
   /**
    * Computes log likelihood of an entire clustering.
-   * 
+   *
    * Version as used in the X-means publication.
-   * 
+   *
    * @param relation Data relation
    * @param clustering Clustering
    * @param distanceFunction Distance function
+   * @param <V> Vector type
    * @return Log Likelihood.
    */
   @Reference(authors = "D. Pelleg, A. Moore", //
   booktitle = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
   title = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
   url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
-  public static double logLikelihood(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public static <V extends NumberVector> double logLikelihood(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // dimensionality of data points
     final int dim = RelationUtil.dimensionality(relation);
@@ -172,19 +174,20 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
 
   /**
    * Computes log likelihood of an entire clustering.
-   * 
+   *
    * Version as used by Zhao et al.
-   * 
+   *
    * @param relation Data relation
    * @param clustering Clustering
    * @param distanceFunction Distance function
+   * @param <V> Vector type
    * @return Log Likelihood.
    */
   @Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
   title = "Knee Point Detection on Bayesian Information Criterion", //
   booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
   url = "http://dx.doi.org/10.1109/ICTAI.2008.154")
-  public static double logLikelihoodAlternate(Relation<? extends NumberVector> relation, Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public static <V extends NumberVector> double logLikelihoodAlternate(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // dimensionality of data points
     final int dim = RelationUtil.dimensionality(relation);
@@ -221,7 +224,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
 
   /**
    * Compute the number of free parameters.
-   * 
+   *
    * @param relation Data relation (for dimensionality)
    * @param clustering Set of clusters
    * @return Number of free parameters

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -46,11 +46,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 
 /**
  * Pseudo-k-Means variations, that assigns each object to the nearest center.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KMeansModel
- * 
+ *
  * @param <V> vector datatype
  */
 public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
@@ -66,12 +66,12 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param initializer Initialization method
    */
-  public SingleAssignmentKMeans(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, KMeansInitialization<? super V> initializer) {
+  public SingleAssignmentKMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, -1, initializer);
   }
 
@@ -111,9 +111,9 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {

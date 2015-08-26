@@ -4,7 +4,7 @@ package tutorial.clustering;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -63,18 +63,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * K-means variation that produces equally sized clusters.
- * 
+ *
  * Note that this is a rather obvious variation, and one cannot expect very good
  * results from this algorithm. K-means already is quite primitive, and putting
  * in the size constraint will likely not make the results much better (in
  * particular, it will even less be able to make sense of outliers!)
- * 
+ *
  * There is no reference for this algorithm. If you want to cite it, please cite
  * the latest ELKI release as given on the ELKI web page:
  * http://elki.dbs.ifi.lmu.de/wiki/Releases
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <V> Vector type
  */
 public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMeans<V, MeanModel> {
@@ -85,19 +85,19 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param k K parameter
    * @param maxiter Maximum number of iterations
    * @param initializer
    */
-  public SameSizeKMeansAlgorithm(PrimitiveDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public SameSizeKMeansAlgorithm(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
   /**
    * Run k-means with cluster size constraints.
-   * 
+   *
    * @param database Database
    * @param relation relation to use
    * @return result
@@ -134,13 +134,13 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
   /**
    * Initialize the metadata storage.
-   * 
+   *
    * @param relation Relation to process
    * @param means Mean vectors
    * @return Initialized storage
    */
   protected WritableDataStore<Meta> initializeMeta(Relation<V> relation, List<? extends NumberVector> means) {
-    PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
     // The actual storage
     final WritableDataStore<Meta> metas = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Meta.class);
     // Build the metadata, track the two nearest cluster centers.
@@ -221,13 +221,13 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * Compute the distances of each object to all means. Update
    * {@link Meta#secondary} to point to the best cluster number except the
    * current cluster assignment
-   * 
+   *
    * @param relation Data relation
    * @param means Means
    * @param metas Metadata storage
    * @param df Distance function
    */
-  protected void updateDistances(Relation<V> relation, List<Vector> means, final WritableDataStore<Meta> metas, PrimitiveDistanceFunction<? super NumberVector> df) {
+  protected void updateDistances(Relation<V> relation, List<Vector> means, final WritableDataStore<Meta> metas, NumberVectorDistanceFunction<? super V> df) {
     for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       Meta c = metas.get(id);
       V fv = relation.get(id);
@@ -247,7 +247,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
   /**
    * Perform k-means style iterations to improve the clustering result.
-   * 
+   *
    * @param relation Data relation
    * @param means Means list
    * @param clusters Cluster list
@@ -257,7 +257,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    */
   protected List<Vector> refineResult(Relation<V> relation, List<Vector> means, List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
     // This is a safe cast - see constructor.
-    PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
     // Our desired cluster size:
     final int minsize = tids.size() / k; // rounded down
     final int maxsize = (tids.size() + k - 1) / k; // rounded up
@@ -346,7 +346,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
   /**
    * Transfer a single element from one cluster to another.
-   * 
+   *
    * @param metas Meta storage
    * @param meta Meta of current object
    * @param src Source cluster
@@ -363,9 +363,9 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
   /**
    * Object metadata.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class Meta {
@@ -383,7 +383,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
     /**
      * Constructor.
-     * 
+     *
      * @param k
      */
     protected Meta(int k) {
@@ -396,7 +396,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     /**
      * Priority / badness: difference between best and worst. (Assuming that
      * "secondary" is the worst).
-     * 
+     *
      * @return Priority
      */
     protected double priority() {
@@ -405,7 +405,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
     /**
      * Gain from switching to cluster i.
-     * 
+     *
      * @param i Target cluster
      * @return Gain
      */
@@ -416,9 +416,9 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
   /**
    * Sort a list of integers (= cluster numbers) by the distances.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public class PreferenceComparator implements IntegerComparator {
@@ -434,7 +434,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
     /**
      * Set the meta to sort by
-     * 
+     *
      * @param c Meta to sort by
      * @return The comparator
      */
@@ -451,9 +451,9 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
@@ -475,12 +475,12 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     /**
      * Distance function
      */
-    protected PrimitiveDistanceFunction<? super NumberVector> distanceFunction;
+    protected NumberVectorDistanceFunction<? super V> distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<PrimitiveDistanceFunction<? super NumberVector>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, PrimitiveDistanceFunction.class);
+      ObjectParameter<NumberVectorDistanceFunction<? super V>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, NumberVectorDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
         if(!(distanceFunction instanceof EuclideanDistanceFunction) && !(distanceFunction instanceof SquaredEuclideanDistanceFunction)) {

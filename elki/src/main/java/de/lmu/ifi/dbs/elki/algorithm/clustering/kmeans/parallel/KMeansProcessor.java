@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.parallel.Executor;
@@ -39,9 +39,9 @@ import de.lmu.ifi.dbs.elki.parallel.processor.Processor;
 
 /**
  * Parallel k-means implementation.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has Instance
  */
 public class KMeansProcessor<V extends NumberVector> implements Processor {
@@ -53,7 +53,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
   /**
    * Distance function.
    */
-  PrimitiveDistanceFunction<? super NumberVector> distance;
+  NumberVectorDistanceFunction<? super V> distance;
 
   /**
    * Assignment storage.
@@ -87,13 +87,13 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Data relation
    * @param distance Distance function
    * @param assignment Cluster assignment
    * @param varsum Variance sums
    */
-  public KMeansProcessor(Relation<V> relation, PrimitiveDistanceFunction<? super NumberVector> distance, WritableIntegerDataStore assignment, double[] varsum) {
+  public KMeansProcessor(Relation<V> relation, NumberVectorDistanceFunction<? super V> distance, WritableIntegerDataStore assignment, double[] varsum) {
     super();
     this.distance = distance;
     this.relation = relation;
@@ -103,7 +103,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
 
   /**
    * Get the "has changed" value.
-   * 
+   *
    * @return Changed flag.
    */
   public boolean changed() {
@@ -112,7 +112,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
 
   /**
    * Initialize for a new iteration.
-   * 
+   *
    * @param means New means.
    */
   public void nextIteration(List<Vector> means) {
@@ -126,14 +126,14 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
   }
 
   @Override
-  public Instance instantiate(Executor exectutor) {
-    return new Instance(relation, distance, assignment, means);
+  public Instance<V> instantiate(Executor exectutor) {
+    return new Instance<>(relation, distance, assignment, means);
   }
 
   @Override
   public void cleanup(Processor.Instance inst) {
     @SuppressWarnings("unchecked")
-    Instance instance = (Instance) inst;
+    Instance<V> instance = (Instance<V>) inst;
     synchronized(this) {
       changed |= instance.changed;
       for(int i = 0; i < centroids.length; i++) {
@@ -156,7 +156,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
 
   /**
    * Get the new means.
-   * 
+   *
    * @return New means
    */
   public List<Vector> getMeans() {
@@ -173,10 +173,10 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
 
   /**
    * Instance to process part of the data set, for a single iteration.
-   * 
+   *
    * @author Erich Schubert
    */
-  public class Instance implements Processor.Instance {
+  public static class Instance<V extends NumberVector> implements Processor.Instance {
     /**
      * Data relation.
      */
@@ -185,7 +185,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
     /**
      * Distance function.
      */
-    private PrimitiveDistanceFunction<? super NumberVector> distance;
+    private NumberVectorDistanceFunction<? super V> distance;
 
     /**
      * Cluster assignment storage.
@@ -219,13 +219,13 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
 
     /**
      * Constructor.
-     * 
+     *
      * @param relation Data relation
      * @param distance Distance function
      * @param assignment Current assignment
      * @param means Previous mean vectors
      */
-    public Instance(Relation<V> relation, PrimitiveDistanceFunction<? super NumberVector> distance, WritableIntegerDataStore assignment, List<? extends NumberVector> means) {
+    public Instance(Relation<V> relation, NumberVectorDistanceFunction<? super V> distance, WritableIntegerDataStore assignment, List<? extends NumberVector> means) {
       super();
       this.relation = relation;
       this.distance = distance;

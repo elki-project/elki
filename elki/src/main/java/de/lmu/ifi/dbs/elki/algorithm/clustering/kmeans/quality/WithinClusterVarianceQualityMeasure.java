@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
 
 /*
- This file is part of ELKI: Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,17 +28,17 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 
 /**
  * Class for computing the variance in a clustering result (sum-of-squares).
- * 
+ *
  * @author Stephan Baier
  * @author Erich Schubert
  */
 public class WithinClusterVarianceQualityMeasure extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
     double variance = 0.;
     for(Cluster<? extends MeanModel> cluster : clustering.getAllClusters()) {
       variance += varianceOfCluster(cluster, distanceFunction, relation);

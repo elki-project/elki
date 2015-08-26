@@ -339,7 +339,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractPrimitiveDistanceBasedAlgorithm.Parameterizer<V> {
+  public static class Parameterizer<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**
      * Parameter that specifies the k-nearest neighbors to be assigned, must be an
      * integer greater than 0. Default value: 1.

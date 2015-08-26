@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 /*
- This file is part of ELKI: Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -44,14 +46,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Run K-Means multiple times, and keep the best run.
- * 
+ *
  * @author Stephan Baier
  * @author Erich Schubert
- * 
+ *
  * @param <V> Vector type
  * @param <M> Model type
  */
-public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements KMeans<V, M> {
+public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>>implements KMeans<V, M> {
   /**
    * The logger for this class.
    */
@@ -74,7 +76,7 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
 
   /**
    * Constructor.
-   * 
+   *
    * @param trials Number of trials to do.
    * @param innerkMeans K-Means variant to actually use.
    * @param qualityMeasure Quality measure
@@ -92,7 +94,7 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
       throw new AbortException("K-Means results can only be evaluated for primitive distance functions, got: " + innerkMeans.getDistanceFunction().getClass());
     }
     @SuppressWarnings("unchecked")
-    final PrimitiveDistanceFunction<? super NumberVector> df = (PrimitiveDistanceFunction<? super NumberVector>) innerkMeans.getDistanceFunction();
+    final NumberVectorDistanceFunction<? super NumberVector> df = (NumberVectorDistanceFunction<? super NumberVector>) innerkMeans.getDistanceFunction();
 
     Clustering<M> bestResult = null;
     double bestCost = Double.NaN;
@@ -132,7 +134,7 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
   }
 
   @Override
-  public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public void setDistanceFunction(NumberVectorDistanceFunction<? super V> distanceFunction) {
     innerkMeans.setDistanceFunction(distanceFunction);
   }
 
@@ -143,12 +145,12 @@ public class BestOfMultipleKMeans<V extends NumberVector, M extends MeanModel> e
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Stephan Baier
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <V> Vector type
    * @param <M> Model type
    */
