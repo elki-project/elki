@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -158,20 +159,25 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
         Cluster<Model> clus = ci.next();
         Model model = clus.getModel();
         double[] mean = null;
-        if(model instanceof MeanModel) {
-          MeanModel mmodel = (MeanModel) model;
-          mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
-        }
-        else if(model instanceof MedoidModel) {
-          MedoidModel mmodel = (MedoidModel) model;
-          NumberVector v = rel.get(mmodel.getMedoid());
-          if(v == null) {
+        try {
+          if(model instanceof MeanModel) {
+            MeanModel mmodel = (MeanModel) model;
+            mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
+          }
+          else if(model instanceof MedoidModel) {
+            MedoidModel mmodel = (MedoidModel) model;
+            NumberVector v = rel.get(mmodel.getMedoid());
+            if(v == null) {
+              continue;
+            }
+            mean = proj.fastProjectDataToRenderSpace(v);
+          }
+          else {
             continue;
           }
-          mean = proj.fastProjectDataToRenderSpace(v);
         }
-        else {
-          continue;
+        catch(ObjectNotFoundException e) {
+          continue; // Element not found.
         }
 
         // add a greater Marker for the mean

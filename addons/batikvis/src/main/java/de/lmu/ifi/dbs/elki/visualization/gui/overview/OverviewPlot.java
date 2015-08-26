@@ -280,12 +280,8 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
     vistoelem = new LayerMap();
 
     // Redo main layers
-    if(plotlayer != null) {
-      plotlayer.getParentNode().removeChild(plotlayer);
-    }
-    if(hoverlayer != null) {
-      hoverlayer.getParentNode().removeChild(hoverlayer);
-    }
+    SVGUtil.removeFromParent(plotlayer);
+    SVGUtil.removeFromParent(hoverlayer);
     plotlayer = plot.svgElement(SVGConstants.SVG_G_TAG);
     hoverlayer = plot.svgElement(SVGConstants.SVG_G_TAG);
     hoverlayer.setAttribute(SVGPlot.NO_EXPORT_ATTRIBUTE, SVGPlot.NO_EXPORT_ATTRIBUTE);

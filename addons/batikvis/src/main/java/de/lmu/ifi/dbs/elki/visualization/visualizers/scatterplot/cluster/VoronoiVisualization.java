@@ -31,14 +31,14 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.EMModel;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
+import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -192,25 +192,27 @@ public class VoronoiVisualization extends AbstractVisFactory {
         for(Cluster<Model> clus : clusters) {
           Model model = clus.getModel();
           Vector mean;
-          if(model instanceof EMModel) {
-            continue; // Does not make much sense
-          }
-          else if(model instanceof MeanModel) {
-            MeanModel mmodel = (MeanModel) model;
-            mean = mmodel.getMean().getColumnVector();
-            if(mean.getDimensionality() != dim) {
+          try {
+            if(model instanceof KMeansModel) {
+              KMeansModel mmodel = (KMeansModel) model;
+              mean = mmodel.getMean().getColumnVector();
+              if(mean.getDimensionality() != dim) {
+                continue;
+              }
+            }
+            else if(model instanceof MedoidModel) {
+              MedoidModel mmodel = (MedoidModel) model;
+              mean = rel.get(mmodel.getMedoid()).getColumnVector();
+              if(mean.getDimensionality() != dim) {
+                continue;
+              }
+            }
+            else {
               continue;
             }
           }
-          else if(model instanceof MedoidModel) {
-            MedoidModel mmodel = (MedoidModel) model;
-            mean = rel.get(mmodel.getMedoid()).getColumnVector();
-            if(mean.getDimensionality() != dim) {
-              continue;
-            }
-          }
-          else {
-            continue;
+          catch(ObjectNotFoundException e) {
+            continue; // Element not found.
           }
           vmeans.add(mean);
           means.add(mean.getArrayRef());

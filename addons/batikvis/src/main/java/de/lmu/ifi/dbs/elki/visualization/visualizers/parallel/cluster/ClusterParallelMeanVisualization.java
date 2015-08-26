@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -144,11 +145,16 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
       for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
         Model model = ci.next().getModel();
         NumberVector mean = null;
-        if(model instanceof MeanModel) {
-          mean = ((MeanModel) model).getMean();
+        try {
+          if(model instanceof MeanModel) {
+            mean = ((MeanModel) model).getMean();
+          }
+          else if(model instanceof MedoidModel) {
+            mean = relation.get(((MedoidModel) model).getMedoid());
+          }
         }
-        else if(model instanceof MedoidModel) {
-          mean = relation.get(((MedoidModel) model).getMedoid());
+        catch(ObjectNotFoundException e) {
+          continue; // Element not found.
         }
         if(mean == null) {
           continue;

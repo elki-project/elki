@@ -26,14 +26,16 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 
 /**
  * A class to answer representation queries using the stored Array.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
- * 
+ *
  * @param <T> Representation object typ
  */
 public class ArrayStore<T> implements WritableDataStore<T> {
@@ -49,7 +51,7 @@ public class ArrayStore<T> implements WritableDataStore<T> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param data Data array
    * @param idmap DBID to offset mapping
    */
@@ -62,7 +64,11 @@ public class ArrayStore<T> implements WritableDataStore<T> {
   @SuppressWarnings("unchecked")
   @Override
   public T get(DBIDRef id) {
-    return (T) data[idmap.mapDBIDToOffset(id)];
+    final int off = idmap.mapDBIDToOffset(id);
+    if(off < 0 || off >= data.length) {
+      throw new ObjectNotFoundException(DBIDUtil.deref(id));
+    }
+    return (T) data[off];
   }
 
   @Override
