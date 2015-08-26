@@ -68,19 +68,13 @@ public class HistogramFactory implements ProjectorFactory {
       }
       // Do not enable nested relations by default:
       Hierarchy.Iter<Relation<?>> it2 = new VisualizationTree.FilteredIter<>(context.getHierarchy().iterAncestors(rel), Relation.class);
-      parent: for(; it2.valid(); it2.advance()) {
+      for(; it2.valid(); it2.advance()) {
         // Parent relation
         final Relation<?> rel2 = (Relation<?>) it2.get();
-        if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel2.getDataTypeInformation())) {
-          continue parent;
-        }
-        // Only first child relation
-        Hierarchy.Iter<Relation<?>> it3 = new VisualizationTree.FilteredIter<>(context.getHierarchy().iterDescendants(rel2), Relation.class);
-        if(it3.valid() && it3.get() == rel) {
-          continue parent; // First child vector relation, this is ok.
+        if(TypeUtil.SPATIAL_OBJECT.isAssignableFromType(rel2.getDataTypeInformation())) {
+          continue candidate;
         }
         // TODO: add Actions instead.
-        continue candidate;
       }
       @SuppressWarnings("unchecked")
       Relation<NumberVector> vrel = (Relation<NumberVector>) rel;

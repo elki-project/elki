@@ -84,9 +84,9 @@ public class ScatterPlotFactory implements ProjectorFactory {
         final Relation<?> rel2 = (Relation<?>) it2.get();
         final int odim = dimensionality(rel2);
         if(odim == dim) {
+          // TODO: add Actions instead?
           continue candidate;
         }
-        // TODO: add Actions instead?
       }
       @SuppressWarnings("unchecked")
       Relation<SpatialComparable> vrel = (Relation<SpatialComparable>) rel;

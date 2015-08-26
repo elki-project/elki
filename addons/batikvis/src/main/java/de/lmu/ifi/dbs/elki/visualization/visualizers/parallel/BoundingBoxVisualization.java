@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -54,23 +54,24 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
- * Generates data lines.
+ * Draw spatial objects (except vectors!)
  *
- * @author Robert Rödler
+ * @author Erich Schubert
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-public class LineVisualization extends AbstractVisFactory {
+// TODO: draw filled instead?
+public class BoundingBoxVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  public static final String NAME = "Data lines";
+  public static final String NAME = "Spatial objects";
 
   /**
    * Constructor.
    */
-  public LineVisualization() {
+  public BoundingBoxVisualization() {
     super();
   }
 
@@ -85,10 +86,13 @@ public class LineVisualization extends AbstractVisFactory {
     for(; it.valid(); it.advance()) {
       ParallelPlotProjector<?> p = it.get();
       final Relation<?> rel = p.getRelation();
-      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+      if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         continue;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), LineVisualization.this);
+      if(!TypeUtil.SPATIAL_OBJECT.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), BoundingBoxVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA;
       task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY | VisualizationTask.ON_SAMPLE);
       context.addVis(p, task);
@@ -100,12 +104,12 @@ public class LineVisualization extends AbstractVisFactory {
    *
    * @author Robert Rödler
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector>implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<SpatialComparable>implements DataStoreListener {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
      */
-    public static final String DATALINE = "Dataline";
+    public static final String DATALINE = "Databox";
 
     /**
      * Sample we visualize.
@@ -134,7 +138,7 @@ public class LineVisualization extends AbstractVisFactory {
       StylingPolicy sp = context.getStylingPolicy();
       final StyleLibrary style = context.getStyleLibrary();
       final LineStyleLibrary lines = style.lines();
-      final double width = style.getLineWidth(StyleLibrary.PLOT) * MathUtil.min(.5, 2. / MathUtil.log2(sam.size()));
+      final double width = .5 * style.getLineWidth(StyleLibrary.PLOT) * MathUtil.min(.5, 2. / MathUtil.log2(sam.size()));
       if(sp instanceof ClassStylingPolicy) {
         ClassStylingPolicy csp = (ClassStylingPolicy) sp;
         final int min = csp.getMinStyle();
@@ -199,23 +203,47 @@ public class LineVisualization extends AbstractVisFactory {
      */
     private Element drawLine(DBIDRef iter) {
       SVGPath path = new SVGPath();
-      double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
+      final SpatialComparable obj = relation.get(iter);
+      final int dims = proj.getVisibleDimensions();
       boolean drawn = false;
       int valid = 0; /* run length of valid values */
-      for(int i = 0; i < yPos.length; i++) {
+      double prevpos = Double.NaN;
+      for(int i = 0; i < dims; i++) {
+        final int d = proj.getDimForAxis(i);
+        double minPos = proj.fastProjectDataToRenderSpace(obj.getMin(d), i);
         // NaN handling:
-        if(yPos[i] != yPos[i]) {
+        if(minPos != minPos) {
           valid = 0;
           continue;
         }
         ++valid;
         if(valid > 1) {
           if(valid == 2) {
-            path.moveTo(getVisibleAxisX(i - 1), yPos[i - 1]);
+            path.moveTo(getVisibleAxisX(d - 1), prevpos);
           }
-          path.lineTo(getVisibleAxisX(i), yPos[i]);
+          path.lineTo(getVisibleAxisX(d), minPos);
           drawn = true;
         }
+        prevpos = minPos;
+      }
+      valid = 0;
+      for(int i = dims - 1; i >= 0; i--) {
+        final int d = proj.getDimForAxis(i);
+        double maxPos = proj.fastProjectDataToRenderSpace(obj.getMax(d), i);
+        // NaN handling:
+        if(maxPos != maxPos) {
+          valid = 0;
+          continue;
+        }
+        ++valid;
+        if(valid > 1) {
+          if(valid == 2) {
+            path.moveTo(getVisibleAxisX(d + 1), prevpos);
+          }
+          path.lineTo(getVisibleAxisX(d), maxPos);
+          drawn = true;
+        }
+        prevpos = maxPos;
       }
       if(!drawn) {
         return null; // Not enough data.

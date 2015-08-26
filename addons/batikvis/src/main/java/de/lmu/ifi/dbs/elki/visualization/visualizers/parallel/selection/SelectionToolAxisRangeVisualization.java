@@ -30,9 +30,11 @@ import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
@@ -88,7 +90,11 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
     Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ParallelPlotProjector<?> p = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionToolAxisRangeVisualization.this);
+      Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionToolAxisRangeVisualization.this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
       task.tool = true;
       task.addUpdateFlags(VisualizationTask.ON_SELECTION);

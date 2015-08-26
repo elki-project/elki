@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -44,9 +43,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * @author Robert Rödler
  * @author Erich Schubert
  *
- * @param <NV> Vector type in relation
+ * @param <NV> Data type in relation
  */
-public abstract class AbstractParallelVisualization<NV extends NumberVector> extends AbstractVisualization {
+public abstract class AbstractParallelVisualization<NV> extends AbstractVisualization {
   /**
    * The current projection
    */

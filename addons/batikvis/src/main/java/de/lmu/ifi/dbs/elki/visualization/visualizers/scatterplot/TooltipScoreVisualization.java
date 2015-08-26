@@ -119,7 +119,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
       @Override
       public void process(VisualizerContext context, DoubleRelation r, ScatterPlotProjector<?> p) {
         for(Iter<Result> it = hier.iterParents(r); it.valid(); it.advance()) {
-          if(it instanceof OutlierResult) {
+          if(it.get() instanceof OutlierResult) {
             return; // Handled by above case already.
           }
         }
