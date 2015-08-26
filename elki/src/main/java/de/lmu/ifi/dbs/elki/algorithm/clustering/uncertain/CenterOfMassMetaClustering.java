@@ -66,12 +66,14 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * </p>
  *
  * @author Erich Schubert
+ *
+ * @param <C> Clustering result type (inherited from inner algorithm)
  */
 @Reference(authors = "Erich Schubert, Alexander Koos, Tobias Emrich, Andreas Züfle, Klaus Arthur Schmid, Arthur Zimek", //
 title = "A Framework for Clustering Uncertain Data", //
 booktitle = "Proceedings of the VLDB Endowment, 8(12)", //
 url = "http://www.vldb.org/pvldb/vol8/p1976-schubert.pdf")
-public class CenterOfMassMetaClustering extends AbstractAlgorithm<Clustering<?>>implements ClusteringAlgorithm<Clustering<?>> {
+public class CenterOfMassMetaClustering<C extends Clustering<?>> extends AbstractAlgorithm<C>implements ClusteringAlgorithm<C> {
   /**
    * Initialize a Logger.
    */
@@ -80,14 +82,14 @@ public class CenterOfMassMetaClustering extends AbstractAlgorithm<Clustering<?>>
   /**
    * The algorithm to be wrapped and run.
    */
-  protected ClusteringAlgorithm<?> inner;
+  protected ClusteringAlgorithm<C> inner;
 
   /**
    * Constructor, quite trivial.
    *
    * @param inner Primary clustering algorithm
    */
-  public CenterOfMassMetaClustering(ClusteringAlgorithm<?> inner) {
+  public CenterOfMassMetaClustering(ClusteringAlgorithm<C> inner) {
     this.inner = inner;
   }
 
@@ -102,7 +104,7 @@ public class CenterOfMassMetaClustering extends AbstractAlgorithm<Clustering<?>>
    * @param relation Data relation of uncertain objects
    * @return Clustering result
    */
-  public Clustering<?> run(Database database, Relation<? extends UncertainObject> relation) {
+  public C run(Database database, Relation<? extends UncertainObject> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     DBIDs ids = relation.getDBIDs();
     // Build a relation storing the center of mass:
@@ -123,11 +125,11 @@ public class CenterOfMassMetaClustering extends AbstractAlgorithm<Clustering<?>>
    * @param title Title of relation
    * @return Clustering result
    */
-  protected Clustering<?> runClusteringAlgorithm(ResultHierarchy hierarchy, Result parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
+  protected C runClusteringAlgorithm(ResultHierarchy hierarchy, Result parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
     SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
     Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);
-    Clustering<?> clusterResult = inner.run(d);
+    C clusterResult = inner.run(d);
     d.getHierarchy().remove(sample);
     d.getHierarchy().remove(clusterResult);
     hierarchy.add(parent, sample);
@@ -150,16 +152,16 @@ public class CenterOfMassMetaClustering extends AbstractAlgorithm<Clustering<?>>
    *
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractParameterizer {
+  public static class Parameterizer<C extends Clustering<?>> extends AbstractParameterizer {
     /**
      * Field to store the algorithm.
      */
-    protected ClusteringAlgorithm<?> inner;
+    protected ClusteringAlgorithm<C> inner;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<ClusteringAlgorithm<?>> palgorithm = new ObjectParameter<>(AlgorithmStep.Parameterizer.ALGORITHM_ID, ClusteringAlgorithm.class);
+      ObjectParameter<ClusteringAlgorithm<C>> palgorithm = new ObjectParameter<>(AlgorithmStep.Parameterizer.ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(palgorithm)) {
         inner = palgorithm.instantiateClass(config);
         if(inner != null && inner.getInputTypeRestriction().length > 0 && //
@@ -170,8 +172,8 @@ public class CenterOfMassMetaClustering extends AbstractAlgorithm<Clustering<?>>
     }
 
     @Override
-    protected CenterOfMassMetaClustering makeInstance() {
-      return new CenterOfMassMetaClustering(inner);
+    protected CenterOfMassMetaClustering<C> makeInstance() {
+      return new CenterOfMassMetaClustering<C>(inner);
     }
   }
 }
