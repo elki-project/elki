@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
  */
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.FDBSCANNeighborPredicate;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.MinPtsCorePredicate;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
