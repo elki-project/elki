@@ -28,8 +28,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -46,30 +45,27 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Uncertain K-Means clustering, using the average deviation from the center.
  *
- * Note: this method is, essentially, useless. It was shown to be equivalent to
- * doing regular K-means on the object centroids instead (see {@link CKMeans}
- * for the reference and an implemenation). This is only for completeness.
+ * Note: this method is, essentially, superficial. It was shown to be equivalent
+ * to doing regular K-means on the object centroids instead (see {@link CKMeans}
+ * for the reference and an implementation). This is only for completeness.
  *
  * Reference:
  * <p>
@@ -78,6 +74,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Proc. of the 10th Pacific-Asia Conference on Knowledge Discovery and Data
  * Mining (PAKDD 2006)
  * </p>
+ *
+ * @author Klaus Arthur Schmidt
  */
 @Reference(authors = "M. Chau, R. Cheng, B. Kao, J. Ng", //
 title = "Uncertain data mining: An example in clustering location data", //
@@ -105,11 +103,6 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
   protected int maxiter;
 
   /**
-   * Method to choose initial means.
-   */
-  protected KMeansInitialization<? super NumberVector> initializer;
-
-  /**
    * Our Random factory
    */
   protected RandomFactory rnd;
@@ -117,14 +110,13 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
   /**
    * Constructor.
    *
-   * @param k
-   * @param maxiter
-   * @param initializer
+   * @param k Number of clusters
+   * @param maxiter Maximum number of iterations
+   * @param rnd Random initialization
    */
-  public UKMeans(int k, int maxiter, KMeansInitialization<? super NumberVector> initializer, RandomFactory rnd) {
+  public UKMeans(int k, int maxiter, RandomFactory rnd) {
     this.k = k;
     this.maxiter = maxiter;
-    this.initializer = initializer;
     this.rnd = rnd;
   }
 
@@ -133,17 +125,13 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
    *
    * @param database the Database
    * @param relation the Relation
-   * @return
+   * @return Clustering result
    */
   public Clustering<?> run(final Database database, final Relation<DiscreteUncertainObject> relation) {
     if(relation.size() <= 0) {
       return new Clustering<>("Uk-Means Clustering", "ukmeans-clustering");
     }
-    // Choose initial means
-    if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
-    }
-
+    // Choose initial means randomly
     DBIDs sampleids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
     List<Vector> means = new ArrayList<>(k);
     for(DBIDIter iter = sampleids.iter(); iter.valid(); iter.advance()) {
@@ -191,27 +179,6 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
   }
 
   /**
-   * Get expected distance between a Vector and an uncertain object
-   *
-   * @param rep A vector, e.g. a cluster representative
-   * @param uo A discrete uncertain object
-   * @return The distance
-   */
-  protected double getExpectedRepDistance(Vector rep, DiscreteUncertainObject uo) {
-    int counter = 0;
-    double avgDist = 0.0;
-
-    EuclideanDistanceFunction euclidean = EuclideanDistanceFunction.STATIC;
-
-    for(int i = 0; i < uo.getNumberSamples(); i++) {
-      avgDist += euclidean.distance(rep, uo.getSample(i));
-      counter++;
-    }
-
-    return avgDist / counter;
-  }
-
-  /**
    * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
    * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
    *
@@ -243,6 +210,15 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
     return changed;
   }
 
+  /**
+   * Update the cluster assignment.
+   *
+   * @param iditer Object id
+   * @param clusters Cluster list
+   * @param assignment Assignment storage
+   * @param newA New assignment.
+   * @return {@code true} if the assignment has changed.
+   */
   protected boolean updateAssignment(DBIDIter iditer, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, int newA) {
     final int oldA = assignment.intValue(iditer);
     if(oldA == newA) {
@@ -254,6 +230,24 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
       clusters.get(oldA).remove(iditer);
     }
     return true;
+  }
+
+  /**
+   * Get expected distance between a Vector and an uncertain object
+   *
+   * @param rep A vector, e.g. a cluster representative
+   * @param uo A discrete uncertain object
+   * @return The distance
+   */
+  protected double getExpectedRepDistance(Vector rep, DiscreteUncertainObject uo) {
+    SquaredEuclideanDistanceFunction euclidean = SquaredEuclideanDistanceFunction.STATIC;
+    int counter = 0;
+    double sum = 0.0;
+    for(int i = 0; i < uo.getNumberSamples(); i++) {
+      sum += euclidean.distance(rep, uo.getSample(i));
+      counter++;
+    }
+    return sum / counter;
   }
 
   /**
@@ -272,12 +266,13 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
       if(list.size() > 0) {
         DBIDIter iter = list.iter();
         // Initialize with first.
-        mean = new Vector(ArrayLikeUtil.toPrimitiveDoubleArray(database.get(iter).getCenterOfMass()));
-        double[] raw = mean.getArrayRef();
+        final double[] raw = ArrayLikeUtil.toPrimitiveDoubleArray(database.get(iter).getCenterOfMass());
+        mean = new Vector(raw);
+        assert(raw == mean.getArrayRef());
         iter.advance();
         // Update with remaining instances
         for(; iter.valid(); iter.advance()) {
-          Vector vec = new Vector(ArrayLikeUtil.toPrimitiveDoubleArray(database.get(iter).getCenterOfMass()));
+          NumberVector vec = database.get(iter).getCenterOfMass();
           for(int j = 0; j < mean.getDimensionality(); j++) {
             raw[j] += vec.doubleValue(j);
           }
@@ -321,42 +316,41 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
     getLogger().statistics(varstat);
   }
 
+  /**
+   * Parameterization class.
+   *
+   * @author Alexander Koos
+   */
   public static class Parameterizer extends AbstractParameterizer {
-    protected KMeansInitialization<? super NumberVector> initializer;
-
+    /**
+     * Number of cluster centers to initialize.
+     */
     protected int k;
 
+    /**
+     * Maximum number of iterations
+     */
     protected int maxiter;
 
+    /**
+     * Our Random factory
+     */
     protected RandomFactory rnd;
-
-    public static final OptionID INIT_ID = new OptionID("ukmeans.initialization", "Method to choose the initial means.");
-
-    public final static OptionID K_ID = new OptionID("ukmeans.k", "The number of clusters to find.");
-
-    public final static OptionID MAXITER_ID = new OptionID("ukmeans.maxiter", "The maximum number of iterations to do. 0 means no limit.");
-
-    public final static OptionID RANDOM_ID = new OptionID("ukmeans.rnd", "The Random Factory");
 
     @Override
     public void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<KMeansInitialization<? super NumberVector>> initialP = new ObjectParameter<>(INIT_ID, KMeansInitialization.class, RandomlyChosenInitialMeans.class);
-      if(config.grab(initialP)) {
-        initializer = initialP.instantiateClass(config);
-      }
-      IntParameter maxiterP = new IntParameter(MAXITER_ID, 0);
-      maxiterP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
-      if(config.grab(maxiterP)) {
-        maxiter = maxiterP.getValue();
-      }
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter kP = new IntParameter(KMeans.K_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
-
-      RandomParameter rndP = new RandomParameter(RANDOM_ID);
+      IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID, 0) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+      if(config.grab(maxiterP)) {
+        maxiter = maxiterP.getValue();
+      }
+      RandomParameter rndP = new RandomParameter(KMeans.SEED_ID);
       if(config.grab(rndP)) {
         rnd = rndP.getValue();
       }
@@ -364,8 +358,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
 
     @Override
     protected UKMeans makeInstance() {
-      return new UKMeans(k, maxiter, initializer, rnd);
+      return new UKMeans(k, maxiter, rnd);
     }
-
   }
 }
