@@ -46,9 +46,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Evaluate a clustering result by comparing it to an existing cluster label.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.uses ClusterContingencyTable
  * @apiviz.has EvaluateClustering.ScoreResult oneway - - «create»
@@ -92,7 +92,7 @@ public class EvaluateClustering implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param referencealg Reference clustering
    * @param noiseSpecialHandling Noise handling flag
    * @param selfPairing Self-pairing flag
@@ -181,9 +181,9 @@ public class EvaluateClustering implements Evaluator {
 
   /**
    * Result object for outlier score judgements.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.composedOf ClusterContingencyTable
    */
   public static class ScoreResult extends EvaluationResult {
@@ -194,7 +194,7 @@ public class EvaluateClustering implements Evaluator {
 
     /**
      * Constructor.
-     * 
+     *
      * @param contmat score result
      */
     public ScoreResult(ClusterContingencyTable contmat) {
@@ -241,19 +241,24 @@ public class EvaluateClustering implements Evaluator {
 
     /**
      * Get the contingency table
-     * 
+     *
      * @return the contingency table
      */
     public ClusterContingencyTable getContingencyTable() {
       return contmat;
     }
+
+    @Override
+    public boolean visualizeSingleton() {
+      return true;
+    }
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

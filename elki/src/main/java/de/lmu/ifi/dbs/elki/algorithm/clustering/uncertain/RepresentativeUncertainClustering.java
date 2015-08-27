@@ -65,7 +65,6 @@ import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
-import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -261,12 +260,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       final double cprob = computeConfidence(clus.size(), crel.size());
 
       // Build an evaluation result
-      EvaluationResult res = new EvaluationResult("Possible-Worlds Evaluation", "representativeness");
-      MeasurementGroup g = res.newGroup("Representativeness");
-      g.addMeasure("Global Tau", gtau, 0, 1, true);
-      g.addMeasure("Cluster Tau", besttau, 0, 1, true);
-      g.addMeasure("Confidence", cprob, 0, 1, false);
-      hierarchy.add(bestc, res);
+      hierarchy.add(bestc, new RepresentativenessEvaluation(gtau, besttau, cprob));
 
       evaluated.add(new DoubleObjPair<Clustering<?>>(cprob, bestc));
     }
@@ -334,6 +328,35 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
   @Override
   protected Logging getLogger() {
     return RepresentativeUncertainClustering.LOG;
+  }
+
+  /**
+   * Representativeness evaluation result.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class RepresentativenessEvaluation extends EvaluationResult {
+    /**
+     * Constructor.
+     *
+     * @param gtau Global tau
+     * @param besttau Within cluster Tau
+     * @param cprob Confidence probability
+     */
+    public RepresentativenessEvaluation(double gtau, double besttau, double cprob) {
+      super("Possible-Worlds Evaluation", "representativeness");
+      MeasurementGroup g = newGroup("Representativeness");
+      g.addMeasure("Confidence", cprob, 0, 1, false);
+      g.addMeasure("Global Tau", gtau, 0, 1, true);
+      g.addMeasure("Cluster Tau", besttau, 0, 1, true);
+    }
+
+    @Override
+    public boolean visualizeSingleton() {
+      return true;
+    }
   }
 
   /**
