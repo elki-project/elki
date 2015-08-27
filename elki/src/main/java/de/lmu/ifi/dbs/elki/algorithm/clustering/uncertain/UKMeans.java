@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
@@ -53,8 +52,10 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -63,8 +64,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
-// FIXME: JavaDoc
-// FIXME: Reference?
+/**
+ * Uncertain K-Means clustering, using the average deviation from the center.
+ *
+ * Note: this method is, essentially, useless. It was shown to be equivalent to
+ * doing regular K-means on the object centroids instead (see {@link CKMeans}
+ * for the reference and an implemenation). This is only for completeness.
+ *
+ * Reference:
+ * <p>
+ * M. Chau, R. Cheng, B. Kao, J. Ng<br />
+ * Uncertain data mining: An example in clustering location data<br />
+ * Proc. of the 10th Pacific-Asia Conference on Knowledge Discovery and Data
+ * Mining (PAKDD 2006)
+ * </p>
+ */
+@Reference(authors = "M. Chau, R. Cheng, B. Kao, J. Ng", //
+title = "Uncertain data mining: An example in clustering location data", //
+booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006)", //
+url = "http://dx.doi.org/10.1007/11731139_24")
 public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implements ClusteringAlgorithm<Clustering<KMeansModel>> {
   /**
    * CLass logger.
