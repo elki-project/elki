@@ -178,9 +178,8 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
     this.context = context;
     this.single = single;
 
-    // register context listener
-    context.addResultListener(this);
-    context.addVisualizationListener(this);
+    // Important:
+    // You still need to call: initialize(ratio);
   }
 
   /**
@@ -248,7 +247,15 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
       ratio = 1.4;
     }
     this.ratio = ratio;
+    if(plot != null) {
+      LOG.warning("Already initialized.");
+      lazyRefresh();
+      return;
+    }
     reinitialize();
+    // register context listener
+    context.addResultListener(this);
+    context.addVisualizationListener(this);
   }
 
   /**
@@ -425,7 +432,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
   /**
    * Do a refresh (when visibilities have changed).
    */
-  void refresh() {
+  synchronized void refresh() {
     if(reinitOnRefresh) {
       LOG.debug("Reinitialize in thread " + Thread.currentThread().getName());
       reinitialize();
@@ -433,8 +440,10 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
       return;
     }
     synchronized(plot) {
-      LOG.debug("Incremental refresh");
       boolean refreshcss = false;
+      if(plotmap == null) {
+        LOG.warning("Plotmap is null", new Throwable());
+      }
       final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
       for(PlotItem pi : plotmap.keySet()) {
         for(Iterator<PlotItem> iter = pi.itemIterator(); iter.hasNext();) {

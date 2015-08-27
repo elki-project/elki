@@ -432,7 +432,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
 
     this.getContentPane().add(panel);
 
-    this.overview = new OverviewPlot(context, single);
+    overview = new OverviewPlot(context, single);
     // when a subplot is clicked, show the selected subplot.
     overview.addActionListener(new ActionListener() {
       @Override
@@ -455,27 +455,25 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
 
     // handle screen size
     Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-    this.overview.screenwidth = dim.width;
-    this.overview.screenheight = dim.height;
+    overview.screenwidth = dim.width;
+    overview.screenheight = dim.height;
 
     // Maximize.
     this.setSize(dim.width - 50, dim.height - 50);
     this.setExtendedState(JFrame.MAXIMIZED_BOTH);
 
     // resize listener
-    LazyCanvasResizer listener = new LazyCanvasResizer(this, 0.1) {
+    final LazyCanvasResizer listener = new LazyCanvasResizer(this, 0.1) {
       @Override
       public void executeResize(double newratio) {
         ResultWindow.this.handleResize(newratio);
       }
     };
-    this.overview.initialize(listener.getCurrentRatio());
     this.addComponentListener(listener);
 
     context.addResultListener(this);
     context.addVisualizationListener(this);
-
-    // update();
+    overview.initialize(listener.getCurrentRatio());
     menubar.updateVisualizerMenus();
   }
 

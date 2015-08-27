@@ -133,7 +133,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
     }
     else {
       if(oldplot != null) {
-        LoggingUtil.warning("No update manager?!?");
+        LoggingUtil.warning("No update manager, but a previous plot exists. Incorrectly initialized?");
       }
     }
     detachPlot(oldplot);
