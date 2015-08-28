@@ -56,7 +56,7 @@ public class ParallelPlotFactory implements ProjectorFactory {
       Relation<?> rel = it.get();
       // TODO: multi-relational parallel plots?
       final int dim = dimensionality(rel);
-      if(dim < 1) {
+      if(dim <= 1) {
         continue;
       }
       // Do not enable nested relations by default:
