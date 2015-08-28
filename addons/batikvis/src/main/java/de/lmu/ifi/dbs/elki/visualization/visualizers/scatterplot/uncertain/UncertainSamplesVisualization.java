@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.FilteredIter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -102,7 +103,7 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
         context.addVis(p, task);
         continue;
       }
-      Hierarchy.Iter<Relation<?>> it2 = new VisualizationTree.FilteredIter<Relation<?>>(context.getHierarchy().iterParents(r), Relation.class);
+      Hierarchy.Iter<Relation<?>> it2 = new FilteredIter<Relation<?>>(context.getHierarchy().iterParents(r), Relation.class);
       for(; it2.valid(); it2.advance()) {
         Relation<?> r2 = it2.get();
         if(TypeUtil.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r2.getDataTypeInformation())) {

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.FilteredIter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -78,7 +79,7 @@ public class ScatterPlotFactory implements ProjectorFactory {
         continue;
       }
       // Do not enable nested relations by default:
-      Hierarchy.Iter<Relation<?>> it2 = new VisualizationTree.FilteredIter<>(context.getHierarchy().iterAncestors(rel), Relation.class);
+      Hierarchy.Iter<Relation<?>> it2 = new FilteredIter<>(context.getHierarchy().iterAncestors(rel), Relation.class);
       for(; it2.valid(); it2.advance()) {
         // Parent relation
         final Relation<?> rel2 = (Relation<?>) it2.get();
