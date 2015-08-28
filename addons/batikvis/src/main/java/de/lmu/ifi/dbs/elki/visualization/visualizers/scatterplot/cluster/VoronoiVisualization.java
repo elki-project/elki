@@ -141,7 +141,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
    * @author Robert Rödler
    * @author Erich Schubert
    *
-   * @apiviz.has MeanModel oneway - - visualizes
+   * @apiviz.has KMeansModel oneway - - visualizes
    * @apiviz.has MedoidModel oneway - - visualizes
    */
   public class Instance extends AbstractScatterplotVisualization {

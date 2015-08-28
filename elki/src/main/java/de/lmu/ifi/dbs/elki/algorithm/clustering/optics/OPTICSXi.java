@@ -60,15 +60,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Class to handle OPTICS Xi extraction.
- * 
+ *
  * Note: this implementation includes an additional filter step that prunes
  * elements from a steep up area that don't have the predecessor in the cluster.
  * This removes a popular type of artifacts.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf OPTICSTypeAlgorithm oneway - «runs»
- * @apiviz.uses ClusterOrderResult oneway - «reads»
+ * @apiviz.uses ClusterOrder oneway - «reads»
  * @apiviz.has SteepAreaResult oneway - «produces»
  */
 @Alias({ "OPTICSXi", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi" })
@@ -100,7 +100,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
   /**
    * Constructor.
-   * 
+   *
    * @param optics OPTICS algorithm to use
    * @param xi Xi value
    * @param nocorrect Disable the predecessor correction
@@ -116,7 +116,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
   /**
    * Constructor.
-   * 
+   *
    * @param optics OPTICS algorithm to use
    * @param xi Xi value
    */
@@ -135,7 +135,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
   /**
    * Extract clusters from a cluster order result.
-   * 
+   *
    * @param clusterOrderResult cluster order result
    * @param relation Relation
    * @param ixi Parameter 1 - Xi
@@ -145,7 +145,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
   private Clustering<OPTICSModel> extractClusters(ClusterOrder clusterOrderResult, Relation<?> relation, double ixi, int minpts) {
     ArrayDBIDs clusterOrder = clusterOrderResult.ids;
     DoubleDataStore reach = clusterOrderResult.reachability;
-    
+
     DBIDArrayIter tmp = clusterOrder.iter();
     DBIDVar tmp2 = DBIDUtil.newVar();
     double mib = 0.0;
@@ -371,7 +371,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
   /**
    * Update the mib values of SteepDownAreas, and remove obsolete areas.
-   * 
+   *
    * @param mib Maximum in-between value
    * @param sdaset Set of steep down areas.
    */
@@ -403,9 +403,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
   /**
    * Position when scanning for steep areas
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private static class SteepScanPosition {
@@ -426,7 +426,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Constructor.
-     * 
+     *
      * @param co Cluster order
      */
     public SteepScanPosition(ClusterOrder co) {
@@ -451,7 +451,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Test whether there is a next value.
-     * 
+     *
      * @return end of cluster order
      */
     public boolean hasNext() {
@@ -460,7 +460,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Test for a steep up point.
-     * 
+     *
      * @param ixi steepness factor (1-xi)
      * @return truth value
      */
@@ -476,7 +476,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Test for a steep down area.
-     * 
+     *
      * @param ixi Steepness factor (1-xi)
      * @return truth value
      */
@@ -492,7 +492,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Get current reachability.
-     * 
+     *
      * @return Reachability
      */
     public double getReachability() {
@@ -501,7 +501,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Get current reachability.
-     * 
+     *
      * @return Reachability
      */
     public double getNextReachability() {
@@ -511,9 +511,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
   /**
    * Data structure to represent a steep-down-area for the xi method.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public abstract static class SteepArea {
@@ -534,7 +534,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Constructor.
-     * 
+     *
      * @param startindex Start index
      * @param endindex End index
      * @param maximum Maximum value
@@ -548,7 +548,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Start index
-     * 
+     *
      * @return the start index
      */
     public int getStartIndex() {
@@ -557,7 +557,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * End index
-     * 
+     *
      * @return the end index
      */
     public int getEndIndex() {
@@ -566,7 +566,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Get the start value = maximum value
-     * 
+     *
      * @return the starting value
      */
     public double getMaximum() {
@@ -577,9 +577,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
   /**
    * Data structure to represent a steep-down-area for the xi method.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class SteepDownArea extends SteepArea {
@@ -590,7 +590,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Constructor
-     * 
+     *
      * @param startindex Start index
      * @param endindex End index
      * @param startDouble Start value (= maximum)
@@ -603,7 +603,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Get the maximum in-between value
-     * 
+     *
      * @return the mib value
      */
     public double getMib() {
@@ -612,7 +612,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Update the maximum in-between value
-     * 
+     *
      * @param mib the mib to set
      */
     public void setMib(double mib) {
@@ -627,15 +627,15 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
   /**
    * Data structure to represent a steep-down-area for the xi method.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class SteepUpArea extends SteepArea {
     /**
      * Constructor
-     * 
+     *
      * @param startindex Starting index
      * @param endindex End index
      * @param endDouble End value (= maximum)
@@ -652,9 +652,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
   /**
    * Result containing the chi-steep areas.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has SteepArea
    */
   public static class SteepAreaResult implements IterableResult<SteepArea> {
@@ -665,7 +665,7 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
     /**
      * Constructor.
-     * 
+     *
      * @param areas Areas
      */
     public SteepAreaResult(Collection<SteepArea> areas) {
@@ -691,9 +691,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

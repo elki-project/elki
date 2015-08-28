@@ -447,6 +447,8 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
    *
    * @author Erich Schubert
    *
+   * @apiviz.has SimplifiedCoverTree
+   *
    * @param <O> Object type
    */
   public static class Factory<O> extends AbstractCoverTree.Factory<O, SimplifiedCoverTree<O>> {

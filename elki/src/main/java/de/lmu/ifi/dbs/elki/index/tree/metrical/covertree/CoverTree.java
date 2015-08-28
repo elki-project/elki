@@ -478,6 +478,8 @@ public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, 
    *
    * @author Erich Schubert
    *
+   * @apiviz.has CoverTree
+   *
    * @param <O> Object type
    */
   public static class Factory<O> extends AbstractCoverTree.Factory<O, CoverTree<O>> {

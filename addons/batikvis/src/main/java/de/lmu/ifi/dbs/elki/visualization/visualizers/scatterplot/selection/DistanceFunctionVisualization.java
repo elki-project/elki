@@ -233,9 +233,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
    * @author Robert Rödler
    * @author Erich Schubert
    *
-   * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has DBIDSelection oneway - - visualizes
-   *
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**

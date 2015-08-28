@@ -115,7 +115,6 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
    *
    * @author Heidi Kolb
    *
-   * @apiviz.has SelectionResult oneway - - updates
    * @apiviz.has RangeSelection oneway - - updates
    */
   public class Instance extends AbstractScatterplotVisualization implements DragableArea.DragListener {

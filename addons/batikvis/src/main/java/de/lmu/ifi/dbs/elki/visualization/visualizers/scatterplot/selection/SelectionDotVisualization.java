@@ -95,7 +95,6 @@ public class SelectionDotVisualization extends AbstractVisFactory {
    *
    * @author Heidi Kolb
    *
-   * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has DBIDSelection oneway - - visualizes
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {

@@ -80,7 +80,6 @@ import gnu.trove.map.hash.TIntObjectHashMap;
  *
  * @author Erich Schubert
  *
- * @apiviz.composedOf ClusteringVectorParser
  * @apiviz.composedOf CSVReaderFormat
  * @apiviz.has Clustering
  */

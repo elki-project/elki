@@ -110,7 +110,6 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
    *
    * @author Heidi Kolb
    *
-   * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has RangeSelection oneway - - visualizes
    * @apiviz.uses SVGHyperCube
    */

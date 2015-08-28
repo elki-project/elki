@@ -36,8 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  *
  * @param <UO> Object type
  *
- * @apiviz.has UncertainObject
- * @apiviz.uses NumberVector
+ * @apiviz.has UncertainObject oneway - - «produces»
+ * @apiviz.uses NumberArrayAdapter oneway - - «reads»
  */
 public interface Uncertainifier<UO extends UncertainObject> {
   /**

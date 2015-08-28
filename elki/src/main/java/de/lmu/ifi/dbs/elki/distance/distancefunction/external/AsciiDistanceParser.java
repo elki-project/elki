@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @author Erich Schubert
  *
  * @apiviz.uses CSVReaderFormat
- * @apiviz.composedOf TokenizerReader
+ * @apiviz.composedOf TokenizedReader
  * @apiviz.composedOf Tokenizer
  * @apiviz.uses DistanceCacheWriter
  */

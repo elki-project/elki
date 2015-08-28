@@ -114,7 +114,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses OPTICSXi.SteepAreaResult
+   * @apiviz.uses SteepAreaResult
    */
   public class Instance extends AbstractOPTICSVisualization {
     /**

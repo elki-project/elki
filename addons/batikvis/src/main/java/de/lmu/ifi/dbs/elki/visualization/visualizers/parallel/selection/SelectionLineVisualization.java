@@ -98,7 +98,7 @@ public class SelectionLineVisualization extends AbstractVisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has SelectionResult oneway - - visualizes
+   * @apiviz.has DBIDSelection oneway - - visualizes
    */
   public class Instance extends AbstractParallelVisualization<NumberVector>implements DataStoreListener {
     /**

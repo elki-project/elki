@@ -95,7 +95,6 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has RangeSelection oneway - - visualizes
    */
   public class Instance extends AbstractParallelVisualization<NumberVector> {

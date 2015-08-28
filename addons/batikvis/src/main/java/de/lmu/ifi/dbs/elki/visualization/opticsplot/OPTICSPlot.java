@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  * @author Erich Schubert
  *
  * @apiviz.composedOf LinearScale
- * @apiviz.has ClusterOrderResult oneway - - renders
+ * @apiviz.has ClusterOrder oneway - - renders
  */
 public class OPTICSPlot implements Result {
   /**

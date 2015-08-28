@@ -110,7 +110,6 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has SelectionResult oneway - - updates
    * @apiviz.has RangeSelection oneway - - updates
    */
   public class Instance extends AbstractParallelVisualization<NumberVector>implements DragableArea.DragListener {

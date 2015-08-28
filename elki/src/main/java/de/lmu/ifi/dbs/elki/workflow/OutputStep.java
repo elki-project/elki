@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.workflow;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  *
  * @author Erich Schubert
  *
- * @apiviz.uses HierarchicalResult
+ * @apiviz.uses ResultHierarchy
  * @apiviz.has ResultHandler
  */
 public class OutputStep implements WorkflowStep {

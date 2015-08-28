@@ -116,7 +116,6 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has SelectionResult oneway - - updates
    * @apiviz.has DBIDSelection oneway - - updates
    */
   public class Instance extends AbstractParallelVisualization<NumberVector>implements DragableArea.DragListener {

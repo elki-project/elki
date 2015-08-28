@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  *
  * @apiviz.landmark
  * @apiviz.has VisualizerContext oneway - - «create»
- * @apiviz.uses VisFactory oneway - n «configure»
+ * @apiviz.uses VisualizationProcessor oneway - n «configure»
  */
 public class VisualizerParameterizer {
   /**

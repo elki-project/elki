@@ -101,7 +101,6 @@ public class SelectionConvexHullVisualization extends AbstractVisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has DBIDSelection oneway - - visualizes
    * @apiviz.uses GrahamScanConvexHull2D
    */
