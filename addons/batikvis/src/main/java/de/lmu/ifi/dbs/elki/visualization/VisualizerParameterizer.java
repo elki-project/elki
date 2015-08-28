@@ -149,11 +149,9 @@ public class VisualizerParameterizer {
    *
    * @param samplesize
    * @param stylelib Style library
-   * @param projectors Projectors
    * @param factories Factories to use
-   * @param hideVisualizers Visualizer hiding pattern
    */
-  public VisualizerParameterizer(int samplesize, StyleLibrary stylelib, Collection<VisualizationProcessor> factories, Pattern hideVisualizers) {
+  public VisualizerParameterizer(int samplesize, StyleLibrary stylelib, Collection<VisualizationProcessor> factories) {
     super();
     this.samplesize = samplesize;
     this.stylelib = stylelib;
@@ -258,12 +256,24 @@ public class VisualizerParameterizer {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Style library
+     */
     protected StyleLibrary stylelib = null;
 
+    /**
+     * Pattern to enable visualizers
+     */
     protected Pattern enableVisualizers = null;
 
+    /**
+     * Visualizer factories
+     */
     protected Collection<VisualizationProcessor> factories = null;
 
+    /**
+     * Sampling size
+     */
     protected int samplesize = -1;
 
     @Override
@@ -326,7 +336,7 @@ public class VisualizerParameterizer {
 
     @Override
     protected VisualizerParameterizer makeInstance() {
-      return new VisualizerParameterizer(samplesize, stylelib, factories, enableVisualizers);
+      return new VisualizerParameterizer(samplesize, stylelib, factories);
     }
   }
 }

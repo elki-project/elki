@@ -103,7 +103,6 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
   /**
    * Joins in the given spatial database to each object its k-nearest neighbors.
    *
-   * @param database Database to process
    * @param relation Relation to process
    * @return result
    */

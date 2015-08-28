@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -36,10 +36,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * This filter assigns static DBIDs, based on the sequence the objects appear in
  * the bundle by adding a column of DBID type to the bundle.
- * 
+ *
  * @author Erich Schubert
- * 
- * @apiviz.has DBID oneway - - «produces»
+ *
+ * @apiviz.has DBIDRange oneway - - «produces»
  */
 public class FixedDBIDsFilter implements ObjectFilter {
   /**
@@ -54,7 +54,7 @@ public class FixedDBIDsFilter implements ObjectFilter {
 
   /**
    * Constructor.
-   * 
+   *
    * @param startid ID to start enumerating with.
    */
   public FixedDBIDsFilter(int startid) {
@@ -72,9 +72,9 @@ public class FixedDBIDsFilter implements ObjectFilter {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

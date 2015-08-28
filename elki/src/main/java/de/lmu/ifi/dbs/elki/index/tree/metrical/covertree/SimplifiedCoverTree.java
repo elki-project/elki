@@ -56,21 +56,24 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleObjectMinHeap;
  * data structure that is similar to the M-tree, but not as balanced and
  * disk-oriented. However, by not having these requirements it does not require
  * the expensive splitting procedures of M-tree.
- * 
+ *
  * This version does not store the distance to the parent, so it needs only
  * about 40% of the memory of {@link CoverTree} but does more distance
  * computations for search.
- * 
+ *
  * Reference:
  * <p>
  * A. Beygelzimer, S. Kakade, J. Langford<br />
  * Cover trees for nearest neighbor<br />
  * In Proc. 23rd International Conference on Machine Learning (ICML).
  * </p>
- * 
+ *
  * TODO: allow insertions and removals, as in the original publication.
- * 
+ *
  * @author Erich Schubert
+ *
+ * @apiviz.has CoverTreeRangeQuery
+ * @apiviz.has CoverTreeKNNQuery
  */
 public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, KNNIndex<O> {
   /**
@@ -97,8 +100,10 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
 
   /**
    * Node object.
-   * 
+   *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   private static final class Node {
     /**
@@ -147,7 +152,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
 
     /**
      * True, if the node is a leaf.
-     * 
+     *
      * @return {@code true}, if this is a leaf node.
      */
     public boolean isLeaf() {
@@ -171,7 +176,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
 
   /**
    * Bulk-load the index.
-   * 
+   *
    * @param ids IDs to load
    */
   public void bulkLoad(DBIDs ids) {
@@ -191,10 +196,10 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
 
   /**
    * Bulk-load the cover tree.
-   * 
+   *
    * This bulk-load is slightly simpler than the one used in the original
    * cover-tree source: We do not look back into the "far" set of candidates.
-   * 
+   *
    * @param cur Current routing object
    * @param maxScale Maximum scale
    * @param elems Candidates
@@ -259,7 +264,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
 
   /**
    * Collect some statistics on the tree.
-   * 
+   *
    * @param cur Current node
    * @param counts Counter set
    * @param depth Current depth
@@ -366,7 +371,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
 
   /**
    * KNN Query class.
-   * 
+   *
    * @author Erich Schubert
    */
   public class CoverTreeKNNQuery extends AbstractDistanceKNNQuery<O>implements KNNQuery<O> {
@@ -439,7 +444,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
 
   /**
    * Index factory.
-   * 
+   *
    * @author Erich Schubert
    *
    * @param <O> Object type
@@ -464,7 +469,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
      *
      * @apiviz.exclude

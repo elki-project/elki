@@ -231,7 +231,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
   /**
    * Process a single core point.
    *
-   * @param neighborhood Neighborhood
+   * @param neighbor Iterator over neighbors
    * @param currentCluster Current cluster
    * @param seeds Seed set
    */

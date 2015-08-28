@@ -98,7 +98,7 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has ClusterOrderResult oneway - - visualizes
+   * @apiviz.has ClusterOrder oneway - - visualizes
    */
   // TODO: listen for CLUSTER ORDER changes.
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {

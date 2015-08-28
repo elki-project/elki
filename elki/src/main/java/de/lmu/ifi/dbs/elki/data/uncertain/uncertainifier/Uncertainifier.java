@@ -30,11 +30,14 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
- * Vector factory for uncertain objects.
+ * Class to derive uncertain object from exact vectors.
  *
  * @author Erich Schubert
  *
  * @param <UO> Object type
+ *
+ * @apiviz.has UncertainObject
+ * @apiviz.uses NumberVector
  */
 public interface Uncertainifier<UO extends UncertainObject> {
   /**

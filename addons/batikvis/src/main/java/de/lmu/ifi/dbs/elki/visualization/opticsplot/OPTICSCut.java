@@ -35,10 +35,10 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 
 /**
  * Compute a partitioning from an OPTICS plot by doing a horizontal cut.
- * 
+ *
  * @author Heidi Kolb
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses ClusterOrderResult
  * @apiviz.uses OPTICSDistanceAdapter
  */
@@ -46,9 +46,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 public class OPTICSCut {
   /**
    * Compute an OPTICS cut clustering
-   * 
+   *
    * @param co Cluster order result
-   * @param adapter Distance adapter
    * @param epsilon Epsilon value for cut
    * @return New partitioning clustering
    */

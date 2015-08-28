@@ -216,8 +216,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    *
    * @param relation Data
    * @param means Current means
-   * @param newmean New means (must have the same coordinates as the current
-   *        means)
+   * @param sums Running sums of the new means
    * @param clusters Current clusters
    * @param assignment Cluster assignment
    * @param upper Upper bounds
@@ -268,8 +267,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
    *
    * @param relation Data
    * @param means Current means
-   * @param newmean New means (must have the same coordinates as the current
-   *        means)
+   * @param sums New means as running sums
    * @param clusters Current clusters
    * @param assignment Cluster assignment
    * @param sep Separation of means

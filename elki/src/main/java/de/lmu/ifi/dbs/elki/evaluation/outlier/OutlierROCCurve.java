@@ -66,7 +66,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @apiviz.landmark
  *
  * @apiviz.uses OutlierResult
- * @apiviz.uses ROC
  * @apiviz.has ROCResult oneway - - «create»
  */
 @Alias({ "ComputeROCCurve", "de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve" })

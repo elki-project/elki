@@ -235,7 +235,8 @@ public class SVGHyperCube {
    * Recursive helper for hypercube drawing.
    *
    * @param path path
-   * @param r_min starting corner
+   * @param minx starting corner
+   * @param miny starting corner
    * @param r_edges edge vectors
    * @param off recursion offset (to avoid multi-recursion)
    * @param b bit set of drawn edges
@@ -270,7 +271,8 @@ public class SVGHyperCube {
    * @param plot Plot
    * @param group Group element
    * @param cls CSS class
-   * @param r_min starting corner
+   * @param minx starting corner
+   * @param miny starting corner
    * @param r_edges edge vectors
    * @param off recursion offset (to avoid multi-recursion)
    * @param b bit set of drawn edges

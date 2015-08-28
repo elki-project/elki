@@ -54,15 +54,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Compute the Davies-Bouldin index of a data set.
- * 
+ *
  * Reference:
  * <p>
  * D. L. Davies and D. W. Bouldin<br />
  * A Cluster Separation Measure<br />
  * In: IEEE Transactions Pattern Analysis and Machine Intelligence PAMI-1(2)
  * </p>
- * 
+ *
  * @author Stephan Baier
+ *
+ * @apiviz.composedOf NoiseHandling
  */
 @Reference(authors = "D. L. Davies and D. W. Bouldin", //
 title = "A Cluster Separation Measure",//
@@ -91,9 +93,9 @@ public class EvaluateDaviesBouldin implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param distance Distance function
-   * @param mergenoise Flag to treat noise as clusters, not singletons
+   * @param noiseOpt Flag to control noise handling
    */
   public EvaluateDaviesBouldin(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOpt) {
     super();
@@ -103,7 +105,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
 
   /**
    * Evaluate a single clustering.
-   * 
+   *
    * @param db Database
    * @param rel Data relation
    * @param c Clustering
@@ -214,9 +216,9 @@ public class EvaluateDaviesBouldin implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Stephan Baier
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

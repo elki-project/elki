@@ -39,12 +39,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Factory for RdKNN R*-Trees.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
- * @apiviz.uses RdKNNTreeIndex oneway - - «create»
- * 
+ * @apiviz.uses RdKNNTree oneway - - «create»
+ *
  * @param <O> Object type
  */
 public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RdKNNNode, RdKNNEntry, RdKNNTree<O>, RdkNNSettings<O>> {
@@ -65,7 +65,7 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
 
   /**
    * Constructor.
-   * 
+   *
    * @param pageFileFactory Data storage
    * @param settings Settings class
    */
@@ -86,9 +86,9 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RdkNNSettings<O>> {

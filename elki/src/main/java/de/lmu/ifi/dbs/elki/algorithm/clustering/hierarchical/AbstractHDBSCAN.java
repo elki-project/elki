@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Abstract base class for HDBSCAN variations.
- * 
+ *
  * Reference:
  * <p>
  * R. J. G. B. Campello, D. Moulavi, and J. Sander<br />
@@ -64,8 +64,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining,
  * PAKDD
  * </p>
- * 
+ *
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf HDBSCANAdapter
+ * @apiviz.composedOf HeapMSTCollector
+ *
+ * @param <O> Input object type
+ * @param <R> Output result type
  */
 @Title("HDBSCAN: Hierarchical Density-Based Spatial Clustering of Applications with Noise")
 @Description("Density-Based Clustering Based on Hierarchical Density Estimates")
@@ -81,7 +87,7 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param minPts Minimum number of points for density
    */
@@ -92,7 +98,7 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
 
   /**
    * Compute the core distances for all objects.
-   * 
+   *
    * @param ids Objects
    * @param knnQ kNN query
    * @param minPts Minimum neighborhood size
@@ -112,7 +118,7 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
 
   /**
    * Class for processing the HDBSCAN G_mpts graph.
-   * 
+   *
    * @author Erich Schubert
    */
   protected static class HDBSCANAdapter implements PrimsMinimumSpanningTree.Adapter<ArrayDBIDs> {
@@ -169,7 +175,7 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
 
   /**
    * Class for collecting the minimum spanning tree edges into a heap.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class HeapMSTCollector implements PrimsMinimumSpanningTree.Collector {
@@ -213,9 +219,9 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
 
   /**
    * Convert spanning tree to a pointer representation.
-   * 
+   *
    * Note: the heap must use the correct encoding of indexes.
-   * 
+   *
    * @param ids IDs indexed
    * @param heap Heap
    * @param pi Parent array
@@ -291,11 +297,11 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public abstract static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

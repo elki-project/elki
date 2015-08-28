@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -37,9 +37,9 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 
 /**
  * A mathematical vector object, along with mathematical operations.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.landmark
  */
 public class Vector implements NumberVector {
@@ -65,7 +65,7 @@ public class Vector implements NumberVector {
 
   /**
    * Array for internal storage of elements.
-   * 
+   *
    * @serial internal array storage.
    */
   protected final double[] elements;
@@ -87,7 +87,7 @@ public class Vector implements NumberVector {
 
   /**
    * Construct a vector from a given array.
-   * 
+   *
    * @param values array of doubles
    */
   public Vector(final double... values) {
@@ -96,7 +96,7 @@ public class Vector implements NumberVector {
 
   /**
    * Constructor
-   * 
+   *
    * @param m the number of rows
    */
   public Vector(final int m) {
@@ -105,7 +105,7 @@ public class Vector implements NumberVector {
 
   /**
    * Returns a randomly created vector of length 1.0.
-   * 
+   *
    * @param dimensionality dimensionality
    * @return the dimensionality of the vector
    */
@@ -126,7 +126,7 @@ public class Vector implements NumberVector {
 
   /**
    * Returns the ith unit vector of the specified dimensionality.
-   * 
+   *
    * @param dimensionality the dimensionality of the vector
    * @param i the index
    * @return the ith unit vector of the specified dimensionality
@@ -139,7 +139,7 @@ public class Vector implements NumberVector {
 
   /**
    * Returns a copy of this vector.
-   * 
+   *
    * @return a copy of this vector
    */
   public final Vector copy() {
@@ -153,7 +153,7 @@ public class Vector implements NumberVector {
 
   /**
    * Access the internal two-dimensional array.
-   * 
+   *
    * @return Pointer to the two-dimensional array of matrix elements.
    */
   public final double[] getArrayRef() {
@@ -162,7 +162,7 @@ public class Vector implements NumberVector {
 
   /**
    * Copy the internal two-dimensional array.
-   * 
+   *
    * @return Two-dimensional array copy of matrix elements.
    */
   public final double[] getArrayCopy() {
@@ -171,7 +171,7 @@ public class Vector implements NumberVector {
 
   /**
    * Returns the dimensionality of this vector.
-   * 
+   *
    * @return the dimensionality of this vector
    */
   @Override
@@ -181,7 +181,7 @@ public class Vector implements NumberVector {
 
   /**
    * Returns the value at the specified row.
-   * 
+   *
    * @param i the row index
    * @return the value at row i
    */
@@ -191,10 +191,10 @@ public class Vector implements NumberVector {
 
   /**
    * Sets the value at the specified row.
-   * 
+   *
    * @param i the row index
    * @param value the value to be set
-   * 
+   *
    * @return the modified vector
    */
   public final Vector set(final int i, final double value) {
@@ -204,8 +204,8 @@ public class Vector implements NumberVector {
 
   /**
    * Copy the values of another vector into the current vector.
-   * 
-   * @param other Other vector
+   *
+   * @param v Other vector
    * @return This vector
    */
   public final Vector set(final Vector v) {
@@ -219,7 +219,7 @@ public class Vector implements NumberVector {
   /**
    * Returns a new vector which is the result of this vector plus the specified
    * vector.
-   * 
+   *
    * @param v the vector to be added
    * @return the resulting vector
    */
@@ -235,7 +235,7 @@ public class Vector implements NumberVector {
   /**
    * Returns a new vector which is the result of this vector plus the specified
    * vector times the given factor.
-   * 
+   *
    * @param v the vector to be added
    * @param s the scalar
    * @return the resulting vector
@@ -251,7 +251,7 @@ public class Vector implements NumberVector {
 
   /**
    * a = a + b.
-   * 
+   *
    * @param b another vector
    * @return a + b in this vector
    */
@@ -265,7 +265,7 @@ public class Vector implements NumberVector {
 
   /**
    * a = a + s * b.
-   * 
+   *
    * @param b another vector
    * @param s Scalar
    * @return a + s * b in this vector
@@ -280,7 +280,7 @@ public class Vector implements NumberVector {
 
   /**
    * Add a constant value to all dimensions.
-   * 
+   *
    * @param d Value to add
    * @return Modified vector
    */
@@ -293,7 +293,7 @@ public class Vector implements NumberVector {
 
   /**
    * Returns this vector minus the specified vector v.
-   * 
+   *
    * @param v the vector to be subtracted from this vector
    * @return this vector minus the specified vector v
    */
@@ -307,7 +307,7 @@ public class Vector implements NumberVector {
 
   /**
    * Returns this vector minus the specified vector v times s.
-   * 
+   *
    * @param v the vector to be subtracted from this vector
    * @param s the scaling factor
    * @return this vector minus the specified vector v
@@ -322,7 +322,7 @@ public class Vector implements NumberVector {
 
   /**
    * a = a - b.
-   * 
+   *
    * @param b another vector
    * @return a - b in this vector
    */
@@ -336,7 +336,7 @@ public class Vector implements NumberVector {
 
   /**
    * a = a - s * b.
-   * 
+   *
    * @param b another vector
    * @param s Scalar
    * @return a - s * b in this vector
@@ -351,7 +351,7 @@ public class Vector implements NumberVector {
 
   /**
    * Subtract a constant value from all dimensions.
-   * 
+   *
    * @param d Value to subtract
    * @return Modified vector
    */
@@ -365,7 +365,7 @@ public class Vector implements NumberVector {
   /**
    * Returns a new vector which is the result of this vector multiplied by the
    * specified scalar.
-   * 
+   *
    * @param s the scalar to be multiplied
    * @return the resulting vector
    */
@@ -379,7 +379,7 @@ public class Vector implements NumberVector {
 
   /**
    * Multiply a matrix by a scalar in place, A = s*A.
-   * 
+   *
    * @param s scalar
    * @return replace A by s*A
    */
@@ -392,7 +392,7 @@ public class Vector implements NumberVector {
 
   /**
    * Linear algebraic matrix multiplication, A * B.
-   * 
+   *
    * @param B another matrix
    * @return Matrix product, A * B
    */
@@ -409,7 +409,7 @@ public class Vector implements NumberVector {
 
   /**
    * Linear algebraic matrix multiplication, A<sup>T</sup> * B.
-   * 
+   *
    * @param B another matrix
    * @return Matrix product, A<sup>T</sup> * B
    */
@@ -429,7 +429,7 @@ public class Vector implements NumberVector {
 
   /**
    * Linear algebraic matrix multiplication, a<sup>T</sup> * B * c.
-   * 
+   *
    * @param B matrix
    * @param c vector on the right
    * @return Matrix product, a<sup>T</sup> * B * c
@@ -450,7 +450,7 @@ public class Vector implements NumberVector {
 
   /**
    * Linear algebraic matrix multiplication, A<sup>T</sup> * B.
-   * 
+   *
    * @param B another vector
    * @return Matrix product, A<sup>T</sup> * B
    */
@@ -465,7 +465,7 @@ public class Vector implements NumberVector {
 
   /**
    * Linear algebraic matrix multiplication, A * B^T.
-   * 
+   *
    * @param B another matrix
    * @return Matrix product, A * B^T
    */
@@ -482,7 +482,7 @@ public class Vector implements NumberVector {
 
   /**
    * Linear algebraic matrix multiplication, A * B^T.
-   * 
+   *
    * @param B another matrix
    * @return Matrix product, A * B^T
    */
@@ -498,7 +498,7 @@ public class Vector implements NumberVector {
 
   /**
    * Returns the squared length of this vector: v^T * v.
-   * 
+   *
    * @return the squared length of this vector
    */
   public final double squaredEuclideanLength() {
@@ -512,7 +512,7 @@ public class Vector implements NumberVector {
 
   /**
    * Returns the length of this vector.
-   * 
+   *
    * @return the length of this vector
    */
   public final double euclideanLength() {
@@ -526,7 +526,7 @@ public class Vector implements NumberVector {
 
   /**
    * Normalizes this vector to the length of 1.0.
-   * 
+   *
    * @return this vector
    */
   public final Vector normalize() {
@@ -542,7 +542,7 @@ public class Vector implements NumberVector {
   /**
    * Projects this row vector into the subspace formed by the specified matrix
    * v.
-   * 
+   *
    * @param v the subspace matrix
    * @return the projection of p into the subspace formed by v
    */
@@ -582,7 +582,7 @@ public class Vector implements NumberVector {
 
   /**
    * Returns a string representation of this vector.
-   * 
+   *
    * @return a string representation of this vector.
    */
   @Override
@@ -593,7 +593,7 @@ public class Vector implements NumberVector {
   /**
    * Returns a string representation of this vector without adding extra
    * whitespace.
-   * 
+   *
    * @return a string representation of this vector.
    */
   public final String toStringNoWhitespace() {
@@ -609,7 +609,7 @@ public class Vector implements NumberVector {
 
   /**
    * Rotate vector by 90 degrees.
-   * 
+   *
    * @return self, for operation chaining.
    */
   public Vector rotate90Equals() {
@@ -622,7 +622,7 @@ public class Vector implements NumberVector {
 
   /**
    * Cross product for 3d vectors, i.e. <code>this x other</code>
-   * 
+   *
    * @param other Other vector
    * @return Cross product of this vector and the other vector
    */
@@ -690,9 +690,9 @@ public class Vector implements NumberVector {
 
   /**
    * Vector factory for Vectors.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private static class Factory implements NumberVector.Factory<Vector> {
@@ -737,9 +737,9 @@ public class Vector implements NumberVector {
   /**
    * Serialization class for dense double vectors with up to 127 dimensions, by
    * using a byte for storing the dimensionality.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class SmallSerializer implements ByteBufferSerializer<Vector> {
@@ -775,9 +775,9 @@ public class Vector implements NumberVector {
    * Serialization class for dense double vectors with up to
    * {@link Short#MAX_VALUE} dimensions, by using a short for storing the
    * dimensionality.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class ShortSerializer implements ByteBufferSerializer<Vector> {
@@ -811,9 +811,9 @@ public class Vector implements NumberVector {
 
   /**
    * Serialization class for variable dimensionality by using VarInt encoding.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   protected static class VariableSerializer implements ByteBufferSerializer<Vector> {

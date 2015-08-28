@@ -58,12 +58,12 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  *
  * @apiviz.landmark
  * @apiviz.composedOf StyleLibrary
+ * @apiviz.composedOf StylingPolicy
  * @apiviz.composedOf SelectionResult
  * @apiviz.composedOf ResultHierarchy
- * @apiviz.composedOf EventListenerList
- * @apiviz.composedOf StyleResult
- * @apiviz.composedOf ProjectorFactory
- * @apiviz.composedOf VisFactory
+ * @apiviz.composedOf VisualizationTree
+ * @apiviz.composedOf DataStoreListener
+ * @apiviz.composedOf VisualizationProcessor
  */
 public class VisualizerContext implements DataStoreListener, Result {
   /**

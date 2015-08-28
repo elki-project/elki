@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * are in the set of normal objects and the set of anomalous objects is empty.
  * An iterative procedure then transfers objects from the ordinary set to the
  * anomalous set if the transfer increases the overall likelihood of the data.
- * 
+ *
  * Reference:
  * <p>
  * E. Eskin<br />
@@ -72,9 +72,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * In Proc. of the Seventeenth International Conference on Machine Learning
  * (ICML-2000).
  * </p>
- * 
+ *
  * @author Lisa Reichert
- * 
+ *
  * @param <V> Vector Type
  */
 @Title("Gaussian-Uniform Mixture Model Outlier Detection")
@@ -96,7 +96,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
   private static final double SINGULARITY_CHEAT = 1E-9;
 
   /**
-   * Holds the value of {@link #C_ID}.
+   * Holds the cutoff value.
    */
   private double c;
 
@@ -112,7 +112,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
 
   /**
    * Constructor with parameters.
-   * 
+   *
    * @param l l value
    * @param c c value
    */
@@ -125,7 +125,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param relation Data relation
    * @return Outlier result
    */
@@ -184,7 +184,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
 
   /**
    * Loglikelihood anomalous objects. Uniform distribution
-   * 
+   *
    * @param anomalousObjs
    * @return loglikelihood for anomalous objects
    */
@@ -195,7 +195,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
 
   /**
    * Computes the loglikelihood of all normal objects. Gaussian model
-   * 
+   *
    * @param objids Object IDs for 'normal' objects.
    * @param database Database
    * @return loglikelihood for normal objects
@@ -235,9 +235,9 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {

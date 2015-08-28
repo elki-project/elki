@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * {@link SimpleGaussianUncertainifier}).
  *
  * @author Erich Schubert
+ *
+ * @apiviz.has UnweightedDiscreteUncertainObject
  */
 public class UnweightedDiscreteUncertainifier extends AbstractDiscreteUncertainifier<UnweightedDiscreteUncertainObject> {
   /**
@@ -46,7 +48,6 @@ public class UnweightedDiscreteUncertainifier extends AbstractDiscreteUncertaini
    * @param inner Inner uncertainifier
    * @param minQuant Minimum number of samples
    * @param maxQuant Maximum number of samples
-   * @param symmetric Generate symmetric distributions only
    */
   public UnweightedDiscreteUncertainifier(Uncertainifier<?> inner, int minQuant, int maxQuant) {
     super(inner, minQuant, maxQuant);
@@ -72,6 +73,8 @@ public class UnweightedDiscreteUncertainifier extends AbstractDiscreteUncertaini
    * Parameterization class.
    *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDiscreteUncertainifier.Parameterizer {
     @Override

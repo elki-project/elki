@@ -104,6 +104,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  *
  * @author Alexander Koos
  * @author Erich Schubert
+ *
+ * @apiviz.has RepresentativenessEvaluation
  */
 @Reference(authors = "Andreas Züfle, Tobias Emrich, Klaus Arthur Schmid, Nikos Mamoulis, Arthur Zimek, Mathias Renz", //
 title = "Representative clustering of uncertain data", //
@@ -364,6 +366,8 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
    *
    * @author Alexander Koos
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

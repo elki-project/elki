@@ -46,18 +46,20 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * The OPTICS algorithm for density-based hierarchical clustering.
- * 
+ *
  * This implementation uses a heap.
- * 
+ *
  * Reference:
  * <p>
  * M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander:<br />
  * OPTICS: Ordering Points to Identify the Clustering Structure. <br/>
  * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).
  * </p>
- * 
+ *
  * @author Elke Achtert
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf Instance
  *
  * @param <O> the type of DatabaseObjects handled by the algorithm
  */
@@ -77,7 +79,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param epsilon Epsilon value
    * @param minpts Minpts value
@@ -145,7 +147,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
 
     /**
      * Process the data set.
-     * 
+     *
      * @return Cluster order result.
      */
     public ClusterOrder run() {
@@ -161,7 +163,7 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
 
     /**
      * OPTICS-function expandClusterOrder.
-     * 
+     *
      * @param objectID the currently processed object
      */
     protected void expandClusterOrder(DBIDRef objectID) {
@@ -200,9 +202,9 @@ public class OPTICSHeap<O> extends AbstractOPTICS<O> {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractOPTICS.Parameterizer<O> {

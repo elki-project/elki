@@ -34,8 +34,10 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 
-//FIXME: Elke: class description
 /**
+ * Class to manage database events such as insertions and removals.
+ *
+ * @author Elke Achtert
  * @apiviz.has ResultListener
  */
 public class DatabaseEventManager {
@@ -174,60 +176,54 @@ public class DatabaseEventManager {
   }
 
   /**
-   * Convenience method, calls {@code fireObjectsChanged(insertions,
-   * DataStoreEvent.Type.INSERT)}.
+   * Event when new objects are inserted.
    *
    * @param insertions the objects that have been inserted
-   * @see #fireObjectsChanged
-   * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
    */
   public void fireObjectsInserted(DBIDs insertions) {
     fireObjectsChanged(insertions, Type.INSERT);
   }
 
   /**
-   * Convenience method, calls {@code fireObjectChanged(insertion,
-   * DataStoreEvent.Type.INSERT)}.
+   * Event when a new object was inserted.
    *
-   * @param insertion the object that has been inserted
-   * @see #fireObjectsChanged
-   * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#INSERT
+   * @param insertion the object that was inserted
    */
   public void fireObjectInserted(DBIDRef insertion) {
     fireObjectChanged(insertion, Type.INSERT);
   }
 
   /**
-   * Convenience method, calls {@code fireObjectsChanged(updates,
-   * DataStoreEvent.Type.UPDATE)}.
+   * Event when objects have changed / were updated.
    *
    * @param updates the objects that have been updated
-   * @see #fireObjectsChanged
-   * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#UPDATE
    */
   public void fireObjectsUpdated(DBIDs updates) {
     fireObjectsChanged(updates, Type.UPDATE);
   }
 
   /**
-   * Convenience method, calls {@code fireObjectsChanged(deletions,
-   * DataStoreEvent.Type.DELETE)}.
+   * Event when an object was changed / updated.
+   *
+   * @param update the object that was updated
+   */
+  public void fireObjectsUpdated(DBIDRef update) {
+    fireObjectChanged(update, Type.UPDATE);
+  }
+
+  /**
+   * Event when objects were removed / deleted.
    *
    * @param deletions the objects that have been removed
-   * @see #fireObjectsChanged
-   * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
    */
   protected void fireObjectsRemoved(DBIDs deletions) {
     fireObjectsChanged(deletions, Type.REMOVE);
   }
 
   /**
-   * Convenience method, calls {@code fireObjectChanged(deletion,
-   * DataStoreEvent.Type.DELETE)}.
+   * Event when an objects was removed / deleted.
    *
-   * @param deletion the object that has been removed
-   * @see #fireObjectsChanged
-   * @see de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent.Type#DELETE
+   * @param deletion the object that has was removed
    */
   protected void fireObjectRemoved(DBIDRef deletion) {
     fireObjectChanged(deletion, Type.REMOVE);

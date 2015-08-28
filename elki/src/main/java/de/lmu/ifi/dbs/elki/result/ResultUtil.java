@@ -306,7 +306,7 @@ public class ResultUtil {
   /**
    * Find the first database result in the tree.
    *
-   * @param baseResult Result tree base.
+   * @param hier Result hierarchy.
    * @return Database
    */
   public static Database findDatabase(ResultHierarchy hier) {

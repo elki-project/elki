@@ -31,14 +31,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Perform a two-sample Anderson-Darling rank test, and standardize the
  * statistic according to Scholz and Stephens. Ties are handled as discussed in
  * Equation 7 of Scholz and Stephens.
- * 
+ *
  * To access the non-standardized A2 scores, use the function
  * {@link #unstandardized}.
- * 
+ *
  * Compared to the Cramer-van Mises test, the Anderson-Darling test puts more
  * weight on the tail of the distribution. This variant only uses the ranks.
- * 
- * 
+ *
+ *
  * References:
  * <p>
  * D. A. Darling<br />
@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * K-sample Anderson–Darling tests<br />
  * Journal of the American Statistical Association, 82(399)
  * </p>
- * 
+ *
  * @author Erich Schubert
  */
 @Reference(authors = "F. W. Scholz, and M. A. Stephens", //
@@ -104,7 +104,7 @@ public class StandardizedTwoSampleAndersonDarlingTest implements GoodnessOfFitTe
 
   /**
    * K-samples version of the Anderson-Darling test.
-   * 
+   *
    * @param samples Samples
    * @return A2 score
    */
@@ -135,7 +135,7 @@ public class StandardizedTwoSampleAndersonDarlingTest implements GoodnessOfFitTe
 
   /**
    * Compute the non-standardized A2 test statistic for the k-samples test.
-   * 
+   *
    * @param samples Samples
    * @return Test statistic
    */
@@ -146,9 +146,9 @@ public class StandardizedTwoSampleAndersonDarlingTest implements GoodnessOfFitTe
 
   /**
    * Compute the non-standardized A2 test statistic for the k-samples test.
-   * 
+   *
    * This is based on Scholz and Stephens, Equation 7.
-   * 
+   *
    * @param samples Samples
    * @param N total length
    * @return Test statistic
@@ -209,11 +209,11 @@ public class StandardizedTwoSampleAndersonDarlingTest implements GoodnessOfFitTe
 
   /**
    * Compute the non-standardized A2 test statistic for the k-samples test.
-   * 
+   *
    * This is based on Scholz and Stephens, Equation 7.
-   * 
-   * @param samples Samples
-   * @param N total length
+   *
+   * @param sample1 First sample
+   * @param sample2 Second sample
    * @return Test statistic
    */
   public double unstandardized(double[] sample1, double[] sample2) {
@@ -266,7 +266,7 @@ public class StandardizedTwoSampleAndersonDarlingTest implements GoodnessOfFitTe
 
   /**
    * Total length of a set of Samples.
-   * 
+   *
    * @param samples Samples
    * @return Sum of the lengths.
    */

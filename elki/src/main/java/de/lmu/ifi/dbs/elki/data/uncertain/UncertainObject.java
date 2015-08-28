@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  * TODO: Eventually allow float precision, too.
  *
  * @author Erich Schubert
+ *
+ * @apiviz.has DoubleVector oneway - «contains/produces»
  */
 public interface UncertainObject extends SpatialComparable, FeatureVector<Double> {
   /**

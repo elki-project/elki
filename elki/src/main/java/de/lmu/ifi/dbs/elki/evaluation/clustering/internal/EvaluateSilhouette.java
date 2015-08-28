@@ -80,7 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Compute the silhouette of a data set.
- * 
+ *
  * Reference:
  * <p>
  * P. J. Rousseeuw<br />
@@ -88,11 +88,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * analysis<br />
  * In: Journal of Computational and Applied Mathematics Volume 20, November 1987
  * </p>
- * 
+ *
  * TODO: keep all silhouette values, and allow visualization!
- * 
+ *
  * @author Erich Schubert
- * 
+ *
+ * @apiviz.composedOf NoiseHandling
+ *
  * @param <O> Object type
  */
 @Reference(authors = "P. J. Rousseeuw", //
@@ -127,7 +129,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param distance Distance function
    * @param noiseOption Handling of "noise" clusters.
    * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
@@ -141,7 +143,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, instead of breaking them
    *        into singletons.
@@ -152,7 +154,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
 
   /**
    * Evaluate a single clustering.
-   * 
+   *
    * @param db Database
    * @param rel Data relation
    * @param dq Distance query
@@ -263,9 +265,9 @@ public class EvaluateSilhouette<O> implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractParameterizer {

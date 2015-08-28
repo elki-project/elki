@@ -33,9 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
  *
  * @author Erich Schubert
  *
- * @apiviz.uses Handler1
- * @apiviz.uses Handler2
- * @apiviz.uses Handler3
+ * @apiviz.has Handler1
+ * @apiviz.has Handler2
+ * @apiviz.has Handler3
  */
 public class VisualizationTree extends HashMapHierarchy<Object> {
   /**
@@ -89,7 +89,8 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    *
    * @author Erich Schubert
    *
-   * @param <O> Object type
+   * @param <A> Input type
+   * @param <B> Return type
    *
    * @apiviz.exclude
    */

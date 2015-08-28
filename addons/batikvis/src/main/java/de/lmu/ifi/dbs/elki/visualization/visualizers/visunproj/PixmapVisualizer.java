@@ -107,7 +107,6 @@ public class PixmapVisualizer extends AbstractVisFactory {
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
-     * @param proj Projection
      */
     public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height) {
       super(task, plot, width, height);

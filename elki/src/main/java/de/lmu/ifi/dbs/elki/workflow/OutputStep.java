@@ -37,9 +37,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
 
 /**
  * The "output" step, where data is analyzed.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses HierarchicalResult
  * @apiviz.has ResultHandler
  */
@@ -51,7 +51,7 @@ public class OutputStep implements WorkflowStep {
 
   /**
    * Constructor.
-   * 
+   *
    * @param resulthandlers Result handlers to use
    */
   public OutputStep(List<ResultHandler> resulthandlers) {
@@ -61,9 +61,9 @@ public class OutputStep implements WorkflowStep {
 
   /**
    * Run the result handlers.
-   * 
+   *
    * @param hier Result to run on
-   * @param database Database
+   * @param db Database
    */
   public void runResultHandlers(ResultHierarchy hier, Database db) {
     // Run result handlers
@@ -102,9 +102,9 @@ public class OutputStep implements WorkflowStep {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -115,7 +115,7 @@ public class OutputStep implements WorkflowStep {
 
     /**
      * Parameter to specify the result handler classes.
-     * 
+     *
      * Key:
      * <p>
      * {@code -resulthandler}
@@ -125,7 +125,7 @@ public class OutputStep implements WorkflowStep {
 
     /**
      * OptionID for the application output file/folder.
-     * 
+     *
      * Key:
      * <p>
      * {@code -out}

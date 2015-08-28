@@ -122,7 +122,7 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses StyleResult
+   * @apiviz.uses StylingPolicy
    */
   public class Instance extends AbstractScatterplotVisualization {
     /**

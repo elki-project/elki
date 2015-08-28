@@ -58,6 +58,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @author Elke Achtert
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf DistanceCacheWriter
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external text file.")
@@ -79,7 +81,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
 
   /**
    * Constructor.
-   * 
+   *
    * @param parser Parser
    * @param matrixfile input file
    */
@@ -128,7 +130,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
 
   /**
    * Combine two integer ids into a long value.
-   * 
+   *
    * @param i1 First id
    * @param i2 Second id
    * @return Combined value
@@ -153,9 +155,9 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

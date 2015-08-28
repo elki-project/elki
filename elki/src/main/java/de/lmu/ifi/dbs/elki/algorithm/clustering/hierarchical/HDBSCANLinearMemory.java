@@ -47,24 +47,24 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Linear memory implementation of HDBSCAN clustering.
- * 
+ *
  * By not building a distance matrix, we can reduce memory usage to linear
  * memory only; but at the cost of roughly double the runtime (unless using
  * indexes) as we first need to compute all kNN distances (for core sizes), then
  * recompute distances when building the spanning tree.
- * 
+ *
  * This implementation follows the HDBSCAN publication more closely than
  * {@link SLINKHDBSCANLinearMemory}, by computing the minimum spanning tree
  * using Prim's algorithm (instead of SLINK; although the two are remarkably
  * similar). In order to produce the preferred internal format of hierarchical
- * clusterings (the compact pointer representation introduced in {@link #SLINK})
+ * clusterings (the compact pointer representation introduced in {@link SLINK})
  * we have to perform a postprocessing conversion.
- * 
+ *
  * This implementation does <em>not</em> include the cluster extraction
  * discussed as Step 4. This functionality should however already be provided by
  * {@link ExtractFlatClusteringFromHierarchy}. For this reason, we also do
  * <em>not include self-edges</em>.
- * 
+ *
  * Reference:
  * <p>
  * R. J. G. B. Campello, D. Moulavi, and J. Sander<br />
@@ -72,8 +72,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining,
  * PAKDD
  * </p>
- * 
+ *
  * @author Erich Schubert
+ *
+ * @param <O> Object type
  */
 @Title("HDBSCAN: Hierarchical Density-Based Spatial Clustering of Applications with Noise")
 @Description("Density-Based Clustering Based on Hierarchical Density Estimates")
@@ -89,7 +91,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param minPts Minimum number of points for density
    */
@@ -99,7 +101,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
@@ -142,11 +144,11 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractHDBSCAN.Parameterizer<O> {

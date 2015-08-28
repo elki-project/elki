@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * Factory class.
  *
  * @author Erich Schubert
+ *
+ * @apiviz.has UniformContinuousUncertainObject
  */
 public class UniformUncertainifier implements Uncertainifier<UniformContinuousUncertainObject> {
   /**
@@ -95,6 +97,8 @@ public class UniformUncertainifier implements Uncertainifier<UniformContinuousUn
    *
    * @author Alexander Koos
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public final static class Parameterizer extends AbstractParameterizer {
     /**

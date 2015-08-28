@@ -114,8 +114,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.uses de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.
-   *              SteepAreaResult
+   * @apiviz.uses OPTICSXi.SteepAreaResult
    */
   public class Instance extends AbstractOPTICSVisualization {
     /**

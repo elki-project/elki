@@ -68,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Compute the approximate k nearest neighbors using 1 dimensional projections.
- * 
+ *
  * This serves as a comparison method in:
  * <p>
  * E. Schubert, A. Zimek, H.-P. Kriegel<br />
@@ -77,8 +77,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Proc. 20th International Conference on Database Systems for Advanced
  * Applications (DASFAA), Hanoi, Vietnam, 2015.
  * </p>
- * 
+ *
  * @author Erich Schubert
+ * @apiviz.has NaiveProjectedKNNQuery
  */
 @Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
 title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
@@ -127,7 +128,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> extends Abstr
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to index.
    * @param window Window multiplicator.
    * @param projections Number of projections to use.
@@ -215,7 +216,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> extends Abstr
 
   /**
    * Initialize an integer value range.
-   * 
+   *
    * @param start Starting value
    * @param end End value (exclusive)
    * @return Array of integers start..end, excluding end.
@@ -230,10 +231,10 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> extends Abstr
 
   /**
    * Perform a random permutation of the array, in-place.
-   * 
+   *
    * Knuth / Fisher-Yates style shuffle
-   * 
-   * @param existing Existing array
+   *
+   * @param out Prefilled array to be modified.
    * @param random Random generator.
    * @return Same array.
    */
@@ -275,7 +276,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> extends Abstr
 
   /**
    * KNN Query processor for naive projections.
-   * 
+   *
    * @author Erich Schubert
    */
   protected class NaiveProjectedKNNQuery implements KNNQuery<O> {
@@ -286,7 +287,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> extends Abstr
 
     /**
      * Constructor.
-     * 
+     *
      * @param distanceQuery Distance query to use for refinement
      */
     public NaiveProjectedKNNQuery(DistanceQuery<O> distanceQuery) {
@@ -332,10 +333,12 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> extends Abstr
 
   /**
    * Index factory class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <V> Vector type
+   *
+   * @apiviz.has NaiveProjectedKNNPreprocessor
    */
   public static class Factory<V extends NumberVector> implements IndexFactory<V, NaiveProjectedKNNPreprocessor<V>> {
     /**
@@ -360,8 +363,7 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> extends Abstr
 
     /**
      * Constructor.
-     * 
-     * @param relation Relation to index.
+     *
      * @param window Window multiplicator.
      * @param projections Number of projections to use.
      * @param proj Projection family to use.
@@ -387,9 +389,9 @@ public class NaiveProjectedKNNPreprocessor<O extends NumberVector> extends Abstr
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer extends AbstractParameterizer {

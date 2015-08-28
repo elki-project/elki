@@ -49,23 +49,23 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * FP-Growth is an algorithm for mining the frequent itemsets by using a
- * compressed representation of the database called {@link #FPTree}.
- * 
+ * compressed representation of the database called {@link FPTree}.
+ *
  * FP-Growth first sorts items by the overall frequency, since having high
  * frequent items appear first in the tree leads to a much smaller tree since
  * frequent subsets will likely share the same path in the tree. FP-Growth is
  * beneficial when you have a lot of (near-) duplicate transactions, and are
  * using a not too high support threshold, as it only prunes single items, not
  * item combinations.
- * 
+ *
  * This implementation is in-memory only, and has not yet been carefully
  * optimized.
- * 
+ *
  * The worst case memory use probably is O(min(n*l,i^l)) where i is the number
  * of items, l the average itemset length, and n the number of items. The worst
  * case scenario is when every item is frequent, and every transaction is
  * unique. The resulting tree will then be larger than the original data.
- * 
+ *
  * Reference:
  * <p>
  * J. Han, J. Pei, Y. Yin<br />
@@ -73,8 +73,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * In proceedings of the 2000 ACM SIGMOD international conference on Management
  * of data.
  * </p>
- * 
+ *
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf FPTree
  */
 @Reference(authors = "J. Han, J. Pei, Y. Yin", //
 title = "Mining frequent patterns without candidate generation", //
@@ -104,7 +106,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Run the FP-Growth algorithm
-   * 
+   *
    * @param db Database to process
    * @param relation Bit vector relation
    * @return Frequent patterns found
@@ -185,7 +187,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Count the support of each 1-item.
-   * 
+   *
    * @param relation Data
    * @param dim Maximum dimensionality
    * @return Item counts
@@ -207,7 +209,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Build the actual FP-tree structure.
-   * 
+   *
    * @param relation Data
    * @param iidx Inverse index (dimension to item rank)
    * @param items Number of items
@@ -241,7 +243,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Build a forward map, item id (dimension) to frequency position
-   * 
+   *
    * @param counts Item counts
    * @param positions Position index (output)
    * @param minsupp Minimum support
@@ -277,7 +279,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * FP-Tree data structure
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.composedOf FPNode
@@ -305,7 +307,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
     /**
      * Insert an itemset into the tree.
-     * 
+     *
      * @param buf Buffer
      * @param i Start position in buffer
      * @param l End position in buffer
@@ -317,7 +319,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
     /**
      * Create a new node of the FP-tree, linking it into the header table.
-     * 
+     *
      * @param parent Parent node
      * @param label Node label
      * @return New node
@@ -334,7 +336,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
     /**
      * Extract itemsets ending in the given item.
-     * 
+     *
      * @param minsupp Minimum support
      * @param minlength Minimum length
      * @param maxlength Maximum length
@@ -354,7 +356,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
     /**
      * Extract itemsets ending in the given item.
-     * 
+     *
      * @param minsupp Minimum support
      * @param minlength Minimum length
      * @param maxlength Maximum length
@@ -441,7 +443,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
     /**
      * Extract itemsets from a linear tree.
-     * 
+     *
      * @param supp Current support
      * @param minsupp Minimum support
      * @param minlength Minimum length
@@ -479,15 +481,15 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
     /**
      * Interface for collecting frequent itemsets found.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static interface Collector {
       /**
        * Collect a single frequent itemset
-       * 
+       *
        * @param support Support of the itemset
        * @param buf Buffer
        * @param start First valid buffer position
@@ -508,7 +510,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * A single node of the FP tree.
-   * 
+   *
    * @author Erich Schubert
    */
   // FIXME: keep children sorted, and use binary search for faster construction?
@@ -553,7 +555,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
     /**
      * Insert an itemset into the tree.
-     * 
+     *
      * @param buf Itemset buffer
      * @param i Current index
      * @param l Length
@@ -594,7 +596,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
     /**
      * Debugging function: build a text representation of the tree.
-     * 
+     *
      * @param buf Output buffer
      * @param t Translator to user-understandable items
      */
@@ -609,7 +611,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
     /**
      * Debugging function: build a text representation of the tree.
-     * 
+     *
      * @param buf Output buffer
      * @param t Translator to user-understandable items
      * @param depth Current depth
@@ -645,15 +647,15 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
     /**
      * Translator class for tree printing.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static interface Translator {
       /**
        * Append a single item to a buffer.
-       * 
+       *
        * @param buf Buffer to append to
        * @param i Item number
        */
@@ -673,9 +675,9 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {

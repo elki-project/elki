@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.scores;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,13 +31,20 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 
 /**
  * Compute ranking/scoring based evaluation measures.
- * 
+ *
  * @author Erich Schubert
+ *
+ * @apiviz.has ScoreIter
+ * @apiviz.uses Predicate
+ * @apiviz.uses DoubleDBIDList
+ * @apiviz.uses Cluster
+ * @apiviz.uses DBIDs
+ * @apiviz.uses OutlierResult
  */
 public interface ScoreEvaluation {
   /**
    * Evaluate a given predicate and iterator.
-   * 
+   *
    * @param predicate Predicate (for positives)
    * @param iter Iterator
    * @return Score
@@ -47,7 +54,7 @@ public interface ScoreEvaluation {
 
   /**
    * Evaluate given a cluster (of positive elements) and a scoring list.
-   * 
+   *
    * @param clus Cluster object
    * @param nei Query result
    * @return Score
@@ -56,7 +63,7 @@ public interface ScoreEvaluation {
 
   /**
    * Evaluate given a list of positives and a scoring.
-   * 
+   *
    * @param ids Positive IDs, usually a set.
    * @param nei Query Result
    * @return Score
@@ -65,7 +72,7 @@ public interface ScoreEvaluation {
 
   /**
    * Evaluate given a set of positives and a scoring.
-   * 
+   *
    * @param ids Positive IDs, usually a set.
    * @param outlier Outlier detection result
    * @return Score
@@ -74,7 +81,7 @@ public interface ScoreEvaluation {
 
   /**
    * Expected score for a random result.
-   * 
+   *
    * @param pos Number of positive elements
    * @param all Total number of elements
    * @return Expected score
@@ -83,15 +90,15 @@ public interface ScoreEvaluation {
 
   /**
    * Iterator for comparing scores.
-   * 
+   *
    * @author Erich Schubert
    */
   public static interface ScoreIter extends Iter {
     /**
      * Test whether the score is the same as the previous objects score.
-     * 
+     *
      * When there is no previous result, implementations should return false!
-     * 
+     *
      * @return Boolean
      */
     boolean tiedToPrevious();
@@ -99,15 +106,15 @@ public interface ScoreEvaluation {
 
   /**
    * Predicate to test whether an object is a true positive or false positive.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <T> Data type
    */
   public static interface Predicate<T> {
     /**
      * Test a result.
-     * 
+     *
      * @param o Object to test
      * @return {@code true} when positive.
      */
@@ -115,7 +122,7 @@ public interface ScoreEvaluation {
 
     /**
      * Return the number of positive ids.
-     * 
+     *
      * @return Number of positive elements
      */
     int numPositive();

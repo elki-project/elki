@@ -67,20 +67,21 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 /**
  * Read an external clustering result from a file, such as produced by
  * {@link de.lmu.ifi.dbs.elki.result.ClusteringVectorDumper}.
- * 
+ *
  * The input format of this parser is text-based:
- * 
+ *
  * <pre>
  * # Optional comment
  * 1 1 1 2 2 2 -1 Example label
  * </pre>
- * 
+ *
  * Where non-negative numbers are cluster assignments, negative numbers are
  * considered noise clusters.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf ClusteringVectorParser
+ * @apiviz.composedOf CSVReaderFormat
  * @apiviz.has Clustering
  */
 @Description("Load clustering results from an external file. "//
@@ -104,7 +105,7 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
 
   /**
    * Constructor.
-   * 
+   *
    * @param file File to load
    */
   public ExternalClustering(File file) {
@@ -114,7 +115,7 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
 
   /**
    * Run the algorithm.
-   * 
+   *
    * @param database Database to use
    * @return Result
    */
@@ -158,7 +159,7 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
 
   /**
    * Build a clustering from the file result.
-   * 
+   *
    * @param database Database
    * @param r Result to attach to
    * @param assignment Cluster assignment
@@ -207,9 +208,9 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

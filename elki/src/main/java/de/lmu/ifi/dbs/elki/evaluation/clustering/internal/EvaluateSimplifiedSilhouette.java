@@ -54,12 +54,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Compute the simplified silhouette of a data set.
- * 
+ *
  * The simplified silhouette does not use pairwise distances, but distances to
  * centroids only.
- * 
+ *
  * @author Stephan Baier
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf NoiseHandling
  */
 public class EvaluateSimplifiedSilhouette implements Evaluator {
   /**
@@ -89,9 +91,9 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param distance Distance function
-   * @param mergenoise Flag to treat noise as clusters, not singletons
+   * @param noiseOpt Flag to control noise handling
    * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
   public EvaluateSimplifiedSilhouette(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOpt, boolean penalize) {
@@ -103,7 +105,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
 
   /**
    * Evaluate a single clustering.
-   * 
+   *
    * @param db Database
    * @param rel Data relation
    * @param c Clustering
@@ -205,7 +207,7 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
 
   /**
    * Compute centroids.
-   * 
+   *
    * @param rel Data relation
    * @param clusters Clusters
    * @param centroids Output array for centroids
@@ -249,9 +251,9 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

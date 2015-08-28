@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed.fastoptics;
 
-/* 
+/*
  Copyright (C) 2015
  Johannes Schneider, ABB Research, Switzerland, johannes.schneider@alumni.ethz.ch
 
@@ -66,10 +66,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Random Projections used for computing neighbors and density estimates.
- * 
+ *
  * This index is specialized for the algorithm
  * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.optics.FastOPTICS}
- * 
+ *
  * Reference:
  * <p>
  * Schneider, J., & Vlachos, M<br />
@@ -77,10 +77,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Proc. 22nd ACM international conference on Conference on Information &
  * Knowledge Management (CIKM)
  * </p>
- * 
+ *
  * This is based on the original code provided by Johannes Schneider, with
  * ELKIfications and optimizations by Erich Schubert.
- * 
+ *
  * TODO: implement one of the Index APIs?
  *
  * @author Johannes Schneider
@@ -153,11 +153,11 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
   /**
    * Create random projections, project points and put points into sets of size
    * about minSplitSize/2
-   * 
-   * @param points to process
-   * @param minimum size for which a point set is further partitioned (roughly
-   *        corresponds to minPts in OPTICS)
-   * @param indexes of points in point set that are projected, typically 0..N-1
+   *
+   * @param points points to process
+   * @param minSplitSize minimum size for which a point set is further
+   *        partitioned (roughly corresponds to minPts in OPTICS)
+   * @param ptList Points that are to be projected
    */
   public void computeSetsBounds(Relation<V> points, int minSplitSize, DBIDs ptList) {
     this.minSplitSize = minSplitSize;
@@ -237,9 +237,11 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
 
   /**
    * Recursively splits entire point set until the set is below a threshold
-   * 
-   * @param indexes of points in point set that are in the current set
-   * @param depth of projection (how many times point set has been split
+   *
+   * @param ind points that are in the current set
+   * @param begin Interval begin in the ind array
+   * @param end Interval end in the ind array
+   * @param dim depth of projection (how many times point set has been split
    *        already)
    */
   public void splitupNoSort(ArrayModifiableDBIDs ind, int begin, int end, int dim) {
@@ -276,7 +278,7 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
 
   /**
    * Split the data set randomly.
-   * 
+   *
    * @param ind Object index
    * @param begin Interval begin
    * @param end Interval end
@@ -314,7 +316,7 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
 
   /**
    * Split the data set by distances.
-   * 
+   *
    * @param ind Object index
    * @param begin Interval begin
    * @param end Interval end
@@ -362,7 +364,7 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
   /**
    * Compute list of neighbors for each point from sets resulting from
    * projection
-   * 
+   *
    * @return list of neighbors for each point
    */
   public DataStore<? extends DBIDs> getNeighs() {
@@ -397,7 +399,7 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
   /**
    * Compute for each point a density estimate as inverse of average distance to
    * a point in a projected set
-   * 
+   *
    * @return for each point average distance to point in a set
    */
   public DoubleDataStore computeAverageDistInSet() {
@@ -437,9 +439,9 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

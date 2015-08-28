@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * {@link SimpleGaussianUncertainifier}).
  *
  * @author Erich Schubert
+ *
+ * @apiviz.has WeightedDiscreteUncertainObject
  */
 public class WeightedDiscreteUncertainifier extends AbstractDiscreteUncertainifier<WeightedDiscreteUncertainObject> {
   /**

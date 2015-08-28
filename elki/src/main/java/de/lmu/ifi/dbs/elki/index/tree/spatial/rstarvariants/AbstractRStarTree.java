@@ -54,17 +54,17 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract superclass for index structures based on a R*-Tree.
- * 
+ *
  * Implementation Note: The restriction on NumberVector (as opposed to e.g.
  * FeatureVector) is intentional, because we have spatial requirements.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has AbstractRStarTreeNode oneway - - contains
  * @apiviz.composedOf AbstractRTreeSettings
  * @apiviz.composedOf Statistics
- * 
+ *
  * @param <N> Node type
  * @param <E> Entry type
  */
@@ -96,7 +96,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Constructor.
-   * 
+   *
    * @param pagefile Page file
    * @param settings Settings
    */
@@ -108,7 +108,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * Returns the path to the leaf entry in the specified subtree that represents
    * the data object with the specified mbr and id.
-   * 
+   *
    * @param subtree the subtree to be tested
    * @param mbr the mbr to look for
    * @param id the id to look for
@@ -154,7 +154,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Inserts the specified leaf entry into this R*-Tree.
-   * 
+   *
    * @param entry the leaf entry to be inserted
    */
   protected void insertLeafEntry(E entry) {
@@ -177,9 +177,9 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * Inserts the specified directory entry at the specified level into this
    * R*-Tree.
-   * 
+   *
    * @param entry the directory entry to be inserted
-   * @param level the level at which the directory entry is to be inserted
+   * @param depth the depth at which the directory entry is to be inserted
    */
   protected void insertDirectoryEntry(E entry, int depth) {
     lastInsertedEntry = entry;
@@ -199,7 +199,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Delete a leaf at a given path - deletions for non-leaves are not supported!
-   * 
+   *
    * @param deletionPath Path to delete
    */
   protected void deletePath(IndexTreePath<E> deletionPath) {
@@ -238,7 +238,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Initializes this R*-Tree from an existing persistent file.
-   * 
+   *
    * {@inheritDoc}
    */
   @Override
@@ -325,7 +325,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Test whether a bulk insert is still possible.
-   * 
+   *
    * @return Success code
    */
   public boolean canBulkLoad() {
@@ -334,7 +334,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Creates and returns the leaf nodes for bulk load.
-   * 
+   *
    * @param objects the objects to be inserted
    * @return the array of leaf nodes containing the objects
    */
@@ -372,14 +372,14 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * Performs a bulk load on this RTree with the specified data. Is called by
    * the constructor.
-   * 
+   *
    * @param entries Entries to bulk load
    */
   protected abstract void bulkLoad(List<E> entries);
 
   /**
    * Returns the height of this R*-Tree.
-   * 
+   *
    * @return the height of this R*-Tree
    */
   public final int getHeight() {
@@ -388,7 +388,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Sets the height of this R*-Tree.
-   * 
+   *
    * @param height the height to be set
    */
   protected void setHeight(int height) {
@@ -397,7 +397,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Computes the height of this RTree. Is called by the constructor.
-   * 
+   *
    * @return the height of this RTree
    */
   protected abstract int computeHeight();
@@ -405,7 +405,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * Returns true if in the specified node an overflow occurred, false
    * otherwise.
-   * 
+   *
    * @param node the node to be tested for overflow
    * @return true if in the specified node an overflow occurred, false otherwise
    */
@@ -414,7 +414,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * Returns true if in the specified node an underflow occurred, false
    * otherwise.
-   * 
+   *
    * @param node the node to be tested for underflow
    * @return true if in the specified node an underflow occurred, false
    *         otherwise
@@ -423,7 +423,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Creates a new directory entry representing the specified node.
-   * 
+   *
    * @param node the node to be represented by the new entry
    * @return the newly created directory entry
    */
@@ -432,7 +432,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * Creates a new root node that points to the two specified child nodes and
    * return the path to the new root.
-   * 
+   *
    * @param oldRoot the old root of this RTree
    * @param newNode the new split node
    * @return the path to the new root node that points to the two specified
@@ -475,7 +475,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * Test on whether or not any child of <code>node</code> contains
    * <code>mbr</code>. If there are several containing children, the child with
    * the minimum volume is chosen in order to get compact pages.
-   * 
+   *
    * @param node subtree
    * @param mbr MBR to test for
    * @return the child of <code>node</code> containing <code>mbr</code> with the
@@ -514,7 +514,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
   /**
    * Chooses the best path of the specified subtree for insertion of the given
    * mbr at the specified level.
-   * 
+   *
    * @param subtree the subtree to be tested for insertion
    * @param mbr the mbr to be inserted
    * @param depth Reinsertion depth, 1 indicates root level
@@ -560,7 +560,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
    * node and this is the first call of overflowTreatment in the given level
    * during insertion the specified node will be reinserted, otherwise the node
    * will be split.
-   * 
+   *
    * @param node the node where an overflow occurred
    * @param path the path to the specified node
    * @return the newly created split node in case of split, null in case of
@@ -575,7 +575,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Splits the specified node and returns the newly created split node.
-   * 
+   *
    * @param node the node to be split
    * @return the newly created split node
    */
@@ -604,7 +604,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Reinserts the specified node at the specified level.
-   * 
+   *
    * @param node the node to be reinserted
    * @param path the path to the node
    * @param offs the nodes indexes to reinsert
@@ -658,7 +658,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Adjusts the tree after insertion of some nodes.
-   * 
+   *
    * @param subtree the subtree to be adjusted
    */
   protected void adjustTree(IndexTreePath<E> subtree) {
@@ -728,7 +728,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Condenses the tree after deletion of some nodes.
-   * 
+   *
    * @param subtree the subtree to be condensed
    * @param stack the stack holding the nodes to be reinserted after the tree
    *        has been condensed
@@ -795,7 +795,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Determines the entries pointing to the leaf nodes of the specified subtree.
-   * 
+   *
    * @param node the subtree
    * @param result the result to store the ids in
    * @param currentLevel the level of the node in the R-Tree
@@ -836,9 +836,9 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Class for tracking some statistics.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.composedOf Counter
    */
   public class Statistics {
@@ -915,7 +915,7 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
 
   /**
    * Returns a string representation of this R*-Tree.
-   * 
+   *
    * @return a string representation of this R*-Tree
    */
   @Override

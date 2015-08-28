@@ -38,6 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * Vector factory
  *
  * @author Erich Schubert
+ *
+ * @apiviz.has SimpleGaussianContinuousUncertainObject
  */
 public class SimpleGaussianUncertainifier implements Uncertainifier<SimpleGaussianContinuousUncertainObject> {
   /**
@@ -97,6 +99,8 @@ public class SimpleGaussianUncertainifier implements Uncertainifier<SimpleGaussi
    * Parameterizer class.
    *
    * @author Erich Schubert
+   *
+   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**

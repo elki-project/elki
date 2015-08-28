@@ -31,14 +31,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Compute the similarity of dimensions using the SURFING score. The parameter k
  * for the k nearest neighbors is currently hard-coded to 10% of the set size.
- * 
+ *
  * Note that the complexity is roughly O(n n k), so this is a rather slow
  * method, and with k at 10% of n, is actually cubic: O(0.1 * n^3).
- * 
+ *
  * This version cannot use index support, as the API operates without database
  * attachment. However, it should be possible to implement some trivial
  * sorted-list indexes to get a reasonable speedup!
- * 
+ *
  * Reference:
  * <p>
  * Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek:<br />
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Proceedings of the 2013 ACM International Conference on Management of Data
  * (SIGMOD), New York City, NY, 2013.
  * </p>
- * 
+ *
  * Based on:
  * <p>
  * Christian Baumgartner, Claudia Plant, Karin Kailing, Hans-Peter Kriegel, and
@@ -54,13 +54,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Subspace Selection for Clustering High-Dimensional Data<br />
  * In IEEE International Conference on Data Mining, 2004.
  * </p>
- * 
+ *
  * TODO: make the subspace distance function and k parameterizable.
- * 
+ *
  * @author Robert Rödler
  * @author Erich Schubert
- * 
- * @apiviz.uses SubspaceEuclideanDistanceFunction
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
 title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //
@@ -119,9 +117,9 @@ public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

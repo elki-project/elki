@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -54,7 +54,6 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  * @apiviz.has RangeQuery oneway - - provides
  * @apiviz.has RKNNQuery oneway - - provides
  * @apiviz.has Relation oneway - - contains
- * @apiviz.has Index oneway - - manages
  * @apiviz.has DataStoreListener oneway - - invokes
  */
 public interface Database extends HierarchicalResult {

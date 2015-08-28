@@ -57,6 +57,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @author Elke Achtert
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf DistanceCacheWriter
  */
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external text file.")
@@ -78,7 +80,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
 
   /**
    * Constructor.
-   * 
+   *
    * @param parser Parser
    * @param matrixfile input file
    */
@@ -124,7 +126,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
 
   /**
    * Combine two integer ids into a long value.
-   * 
+   *
    * @param i1 First id
    * @param i2 Second id
    * @return Combined value
@@ -149,9 +151,9 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
