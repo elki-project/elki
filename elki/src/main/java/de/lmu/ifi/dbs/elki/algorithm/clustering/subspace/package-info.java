@@ -1,5 +1,5 @@
 /**
- * <p>Axis-parallel subspace clustering algorithms</p>
+ * <p>Axis-parallel subspace clustering algorithms.</p>
  * 
  * The clustering algorithms in this package are instances of both, projected clustering algorithms or
  * subspace clustering algorithms according to the classical but somewhat obsolete classification schema
