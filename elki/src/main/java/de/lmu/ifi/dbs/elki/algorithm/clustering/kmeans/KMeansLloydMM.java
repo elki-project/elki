@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
+import java.awt.image.DataBufferUShort;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -37,7 +39,10 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
@@ -117,8 +122,6 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     minHeap = new DoubleMinHeap();
     
     // Setup cluster assignment store
-    //TODO hier müss es möglich sein auch die Distance zu speichern
-    //modi
     List<ModifiableDoubleDBIDList> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
@@ -130,9 +133,10 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
     
-    //5% der Punkte werden nicnht betrachtet
+    //5% der Punkte werden nicht betrachtet
     //TODO über Gui wert abfangen
-    int heapsize = relation.size()/20;
+//    int heapsize = relation.size()/20;
+    int heapsize = 0;
     
     int iteration = 0;
     for(; maxiter <= 0 || iteration < maxiter; iteration++) {
@@ -143,9 +147,32 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       if(!changed) {
         break;
       }
-      //TODO Punkte aus der Relation nehmen welche nicht beachtet werden
+      
+      //Punkte aus der Relation nehmen welche nicht beachtet werden
+      List<ModifiableDBIDs> computingClusters = new ArrayList<>();
+      int k=0;
+      for(int i=0; i < clusters.size(); i++)
+      {
+        computingClusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
+        for(int j=0; j < clusters.get(i).size(); j++)
+        {
+          if(clusters.get(i).get(j).doubleValue()<= minHeap.peek())
+          {
+            computingClusters.get(i).add(clusters.get(i).get(j));
+          }else
+          { 
+            System.out.println("hab was gelöscht");
+            k++;
+          }
+              
+        }
+      }
+      System.out.println("punkt gelöscht insgesamt : " + k);
+      System.out.println("Nächste runde");
       // Recompute means.
-      means = means(clusters, means, relation);
+      means = means(computingClusters, means, relation);
+      computingClusters.clear();
+      minHeap.clear();
     }
     LOG.setCompleted(prog);
     if(LOG.isStatistics()) {
@@ -184,7 +211,7 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @param heapsize the size of the minheap
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<? extends V> relation, List<? extends NumberVector> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum, int heapsize) {
+  protected boolean assignToNearestCluster(Relation<? extends V> relation, List<? extends NumberVector> means, List<? extends ModifiableDoubleDBIDList> clusters, WritableIntegerDataStore assignment, double[] varsum, int heapsize) {
     assert(k == means.size());
     boolean changed = false;
     Arrays.fill(varsum, 0.);
@@ -210,24 +237,48 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       minHeap.add(mindist, heapsize);
       
       varsum[minIndex] += mindist;
-      changed |= updateAssignment(iditer, clusters, assignment, minIndex);
+      //TODO mit neuen distance
+      changed |= updateAssignmentWithDistance(iditer, clusters, assignment, minIndex, mindist);
     }
     return changed;
   }
   
-//  protected boolean updateAssignment(DBIDIter iditer, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, int newA) {
-//    final int oldA = assignment.intValue(iditer);
-//    if(oldA == newA) {
-//      return false;
-//    }
-//    //zuweisung des Punktes an den neuen Cluster
-//    clusters.get(newA).add(iditer);
-//    assignment.putInt(iditer, newA);
-//    if(oldA >= 0) {
-//      clusters.get(oldA).remove(iditer);
-//    }
-//    return true;
-//  }
+  
+  protected boolean updateAssignmentWithDistance(DBIDIter iditer, List<? extends ModifiableDoubleDBIDList> clusters, WritableIntegerDataStore assignment, int newA, double mindist) {
+    final int oldA = assignment.intValue(iditer);
+    
+    //falls keine veränderung der Cluster
+    if(oldA == newA) {
+      //Suche den index der DBID im Cluster
+      for(int i = 0; i < clusters.get(oldA).size(); i++)
+      {
+        if(DBIDUtil.equal(clusters.get(oldA).get(i), iditer))
+        {
+            //"update" die distance
+            clusters.get(oldA).remove(i);
+            clusters.get(oldA).add(mindist, iditer);
+        }
+      }
+      return false;
+    }
+    //zuweisung des Punktes an den neuen Cluster
+    clusters.get(newA).add(mindist, iditer);
+    assignment.putInt(iditer, newA);
+    if(oldA >= 0) {
+      for(int i = 0; i< clusters.get(oldA).size(); i++)
+      {
+        if(DBIDUtil.equal(clusters.get(oldA).get(i), iditer))
+        {
+          clusters.get(oldA).remove(i);
+        }
+      }
+    }
+    return true;
+  }
+  
+  
+  //*************************************************************************************//
+  
   
   /**
    * Parameterization class.
@@ -244,17 +295,16 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     protected Logging getLogger() {
       return LOG;
     }
-@Override
-protected void makeOptions(Parameterization config) {
-// TODO Auto-generated method stub
-super.makeOptions(config);
-DoubleParameter rateP = new DoubleParameter(RATE_ID, 0.05)//
-.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE)//
-.addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-if(config.grab(rateP)){
-  rate = rateP.doubleValue();
-}
-}
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      DoubleParameter rateP = new DoubleParameter(RATE_ID, 0.05)//
+      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE)//
+      .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+      if(config.grab(rateP)) {
+        rate = rateP.doubleValue();
+      }
+    }
 
     @Override
     protected KMeansLloydMM<V> makeInstance() {
