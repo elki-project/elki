@@ -1,7 +1,8 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.ph;
 
 import ch.ethz.globis.pht.PhTreeF;
-import ch.ethz.globis.pht.v8.PhTree8;
+import ch.ethz.globis.pht.PhTreeF.PhEntryF;
+import ch.ethz.globis.pht.PhTreeF.PhQueryF;
 
 /*
  This file is part of ELKI:
@@ -25,12 +26,10 @@ import ch.ethz.globis.pht.v8.PhTree8;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -52,18 +51,14 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseLPNormDista
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.DynamicIndex;
-import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Implementation of an in-memory PH-tree. 
@@ -255,6 +250,18 @@ public class MinimalisticMemoryPHTree<O extends NumberVector> extends AbstractIn
 
   /**
    * Range query for the ph-tree.
+   * 
+   * In a range query, we return all entries within a given distance of a given point.
+   * 
+   * For the PH-Tree, we perform a query on the bounding rectangle and then filter out all
+   * points that still violate the distance function.
+   * 
+   * TODO
+   * Unfortunately, this does not scale well with high dimensions because in high dimensions,
+   * cubes grow exponentially faster than spheres.
+   * As a solution we should pass in the distance function into the PH-query mechanism where
+   * it can be used to skip sub-trees that would fit into the rectangle but not into the given
+   * distance. 
    */
   public class PHTreeRangeQuery extends AbstractDistanceRangeQuery<O> {
     /**
@@ -262,6 +269,17 @@ public class MinimalisticMemoryPHTree<O extends NumberVector> extends AbstractIn
      */
     private Norm<? super O> norm;
 
+    /**
+     * Query instance.
+     */
+    private PhQueryF<DBID> query;
+
+    /**
+     * The query rectangle.
+     */
+    private final double[] min, max;
+
+    
     /**
      * Constructor.
      * 
@@ -271,63 +289,36 @@ public class MinimalisticMemoryPHTree<O extends NumberVector> extends AbstractIn
     public PHTreeRangeQuery(DistanceQuery<O> distanceQuery, Norm<? super O> norm) {
       super(distanceQuery);
       this.norm = norm;
+      this.min = new double[dims];
+      this.max = new double[dims];
     }
 
     @Override
     public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
-      //TODO this is wrong
-      for (double[] v: tree.nearestNeighbour(0, oToDouble(obj, new double[dims]))) {
-        DBID id = tree.get(v);
+      oToDouble(obj, min);
+      oToDouble(obj, max);
+      range = Math.abs(range);
+      for (int i = 0; i < min.length; i++) {
+        min[i] = obj.doubleValue(i) - range;
+        max[i] = obj.doubleValue(i) + range;
+      }
+      
+      if (query == null) {
+        query = tree.query(min, max);
+      } else {
+        query.reset(min, max);
+      }
+      
+      while (query.hasNext()) {
+        PhEntryF<DBID> e = query.nextEntry();
+        DBID id = e.getValue();
         O o2 = relation.get(id);
         double distance = norm.distance(obj, o2);
-        result.add(distance, id);
+        if (distance <= range) {
+          result.add(distance, id);
+        }
       }
-      //((PhTree8)tree).nearestNeighbour(0, dist, dims, key);
-      //kdRangeSearch(0, sorted.size(), 0, obj, result, sorted.iter(), range);
-    }
-
-    /**
-     * Perform a kNN search on the kd-tree.
-     * 
-     * @param left Subtree begin
-     * @param right Subtree end (exclusive)
-     * @param axis Current splitting axis
-     * @param query Query object
-     * @param res kNN heap
-     * @param iter Iterator variable (reduces memory footprint!)
-     * @param radius Query radius
-     */
-    private void kdRangeSearch(int left, int right, int axis, O query, ModifiableDoubleDBIDList res, DBIDArrayIter iter, double radius) {
-      // Look at current node:
-      final int middle = (left + right) >>> 1;
-        iter.seek(middle);
-        O split = relation.get(iter);
-        countObjectAccess();
-
-        // Distance to axis:
-        final double delta = split.doubleValue(axis) - query.doubleValue(axis);
-        final boolean onleft = (delta >= 0);
-        final boolean onright = (delta <= 0);
-        final boolean close = (Math.abs(delta) <= radius);
-
-        // Next axis:
-        final int next = (axis + 1) % dims;
-
-        // Current object:
-        if(close) {
-          double dist = norm.distance(query, split);
-          countDistanceComputation();
-          if(dist <= radius) {
-            iter.seek(middle);
-            res.add(dist, iter);
-          }
-        }
-        if(left < middle && (onleft || close)) {
-          kdRangeSearch(left, middle, next, query, res, iter, radius);
-        }
-        if(middle + 1 < right && (onright || close)) {
-          kdRangeSearch(middle + 1, right, next, query, res, iter, radius);
-        }
+      result.sort();
     }
   }
 

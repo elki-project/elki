@@ -5,10 +5,8 @@
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2014
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+Copyright (C) 2015
+ETH Zürich
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by

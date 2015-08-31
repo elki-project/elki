@@ -75,12 +75,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>ch.ethz.globis.pht</groupId>
-			<artifactId>phtree</artifactId>
-			<version>0.2.1-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
