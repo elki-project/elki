@@ -42,9 +42,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -55,11 +55,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 
 /**
  * Evaluate outlier scores by their ranking
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.uses OutlierResult
  * @apiviz.has EvaluationResult oneway - - «create»
  */
@@ -68,15 +68,6 @@ public class OutlierRankingEvaluation implements Evaluator {
    * The logger.
    */
   private static final Logging LOG = Logging.getLogger(OutlierRankingEvaluation.class);
-
-  /**
-   * The pattern to identify positive classes.
-   * 
-   * <p>
-   * Key: {@code -rocauc.positive}
-   * </p>
-   */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("outliereval.positive", "Class label for the 'positive' class.");
 
   /**
    * Stores the "positive" class.
@@ -90,7 +81,7 @@ public class OutlierRankingEvaluation implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param positive_class_name Positive class name pattern
    */
   public OutlierRankingEvaluation(Pattern positive_class_name) {
@@ -102,20 +93,36 @@ public class OutlierRankingEvaluation implements Evaluator {
     EvaluationResult res = new EvaluationResult("Evaluation of ranking", "ranking-evaluation");
     DBIDsTest test = new DBIDsTest(positiveids);
 
-    MeasurementGroup g = res.newGroup("Evaluation measures");
+    double rate = positiveids.size() / (double) size;
+    MeasurementGroup g = res.newGroup("Evaluation measures:");
     double rocauc = ROCEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("ROC AUC", rocauc, 0., 1. ,.5, false);
+    g.addMeasure("ROC AUC", rocauc, 0., 1., .5, false);
     double avep = AveragePrecisionEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("Average Precision", avep, 0., 1., 0., false);
+    g.addMeasure("Average Precision", avep, 0., 1., rate, false);
     double rprec = PrecisionAtKEvaluation.RPRECISION.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("R-Precision", rprec, 0., 1., 0., false);
+    g.addMeasure("R-Precision", rprec, 0., 1., rate, false);
     double maxf1 = MaximumF1Evaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("Maximum F1", maxf1, 0., 1., 0., false);
+    g.addMeasure("Maximum F1", maxf1, 0., 1., rate, false);
+
+    g = res.newGroup("Adjusted for chance:");
+    double adjauc = 2 * rocauc - 1;
+    g.addMeasure("Adjusted AUC", adjauc, 0., 1., 0., false);
+    double adjavep = (avep - rate) / (1 - rate);
+    g.addMeasure("Adjusted AveP", adjavep, 0., 1., 0., false);
+    double adjrprec = (rprec - rate) / (1 - rate);
+    g.addMeasure("Adjusted R-Prec", adjrprec, 0., 1., 0., false);
+    double adjmaxf1 = (maxf1 - rate) / (1 - rate);
+    g.addMeasure("Adjusted Max F1", adjmaxf1, 0., 1., 0., false);
+
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(key + ".rocauc", rocauc));
+      LOG.statistics(new DoubleStatistic(key + ".rocauc.adjusted", adjauc));
       LOG.statistics(new DoubleStatistic(key + ".precision.average", avep));
+      LOG.statistics(new DoubleStatistic(key + ".precision.average.adjusted", adjavep));
       LOG.statistics(new DoubleStatistic(key + ".precision.r", rprec));
+      LOG.statistics(new DoubleStatistic(key + ".precision.r.adjusted", adjrprec));
       LOG.statistics(new DoubleStatistic(key + ".f1.maximum", maxf1));
+      LOG.statistics(new DoubleStatistic(key + ".f1.maximum.adjusted", adjmaxf1));
     }
     return res;
   }
@@ -128,27 +135,43 @@ public class OutlierRankingEvaluation implements Evaluator {
     EvaluationResult res = new EvaluationResult("Evaluation of ranking", "ranking-evaluation");
     DBIDsTest test = new DBIDsTest(positiveids);
 
-    MeasurementGroup g = res.newGroup("Evaluation measures");
+    double rate = positiveids.size() / (double) size;
+    MeasurementGroup g = res.newGroup("Evaluation measures:");
     double rocauc = ROCEvaluation.STATIC.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("ROC AUC", rocauc, 0., 1. ,.5, false);
+    g.addMeasure("ROC AUC", rocauc, 0., 1., .5, false);
     double avep = AveragePrecisionEvaluation.STATIC.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("Average Precision", avep, 0., 1., 0., false);
+    g.addMeasure("Average Precision", avep, 0., 1., rate, false);
     double rprec = PrecisionAtKEvaluation.RPRECISION.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("R-Precision", rprec, 0., 1., 0., false);
+    g.addMeasure("R-Precision", rprec, 0., 1., rate, false);
     double maxf1 = MaximumF1Evaluation.STATIC.evaluate(test, new SimpleAdapter(order.iter()));
-    g.addMeasure("Maximum F1", maxf1, 0., 1., 0., false);
+    g.addMeasure("Maximum F1", maxf1, 0., 1., rate, false);
+
+    g = res.newGroup("Adjusted for chance:");
+    double adjauc = 2 * rocauc - 1;
+    g.addMeasure("Adjusted AUC", adjauc, 0., 1., 0., false);
+    double adjavep = (avep - rate) / (1 - rate);
+    g.addMeasure("Adjusted AveP", adjavep, 0., 1., 0., false);
+    double adjrprec = (rprec - rate) / (1 - rate);
+    g.addMeasure("Adjusted R-Prec", adjrprec, 0., 1., 0., false);
+    double adjmaxf1 = (maxf1 - rate) / (1 - rate);
+    g.addMeasure("Adjusted Max F1", adjmaxf1, 0., 1., 0., false);
+
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(key + ".rocauc", rocauc));
-      LOG.statistics(new DoubleStatistic(key + ".precision.average", rocauc));
-      LOG.statistics(new DoubleStatistic(key + ".precision.r", rocauc));
-      LOG.statistics(new DoubleStatistic(key + ".f1.maximum", rocauc));
+      LOG.statistics(new DoubleStatistic(key + ".rocauc.adjusted", adjauc));
+      LOG.statistics(new DoubleStatistic(key + ".precision.average", avep));
+      LOG.statistics(new DoubleStatistic(key + ".precision.average.adjusted", adjavep));
+      LOG.statistics(new DoubleStatistic(key + ".precision.r", rprec));
+      LOG.statistics(new DoubleStatistic(key + ".precision.r.adjusted", adjrprec));
+      LOG.statistics(new DoubleStatistic(key + ".f1.maximum", maxf1));
+      LOG.statistics(new DoubleStatistic(key + ".f1.maximum.adjusted", adjmaxf1));
     }
     return res;
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Database db = ResultUtil.findDatabase(baseResult);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Database db = ResultUtil.findDatabase(hier);
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
     if(positiveids.size() == 0) {
@@ -177,18 +200,28 @@ public class OutlierRankingEvaluation implements Evaluator {
 
     if(nonefound) {
       return;
-      // logger.warning("No results found to process with ROC curve analyzer. Got "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
+      // LOG.warning("No results found to process with ROC curve analyzer. Got
+      // "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
     }
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The pattern to identify positive classes.
+     *
+     * <p>
+     * Key: {@code -rocauc.positive}
+     * </p>
+     */
+    public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("outliereval.positive", "Class label for the 'positive' class.");
+
     /**
      * Pattern for positive class.
      */

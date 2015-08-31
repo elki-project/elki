@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,37 +23,34 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualize e.g. a clustering using different markers for different clusters.
  * This visualizer is not constraint to clusters. It can in fact visualize any
  * kind of result we have a style source for.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -68,37 +65,33 @@ public class MarkerVisualization extends AbstractVisFactory {
    */
   public MarkerVisualization() {
     super();
-    this.thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    // Find a style result to visualize:
-    Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
-    for(StyleResult c : styleres) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-        task.level = VisualizationTask.LEVEL_DATA;
-        baseResult.getHierarchy().add(c, task);
-        baseResult.getHierarchy().add(p, task);
-      }
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), MarkerVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA;
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
+      context.addVis(p, task);
     }
   }
 
   /**
    * Instance.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses StyleResult
    */
-  public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
+  public class Instance extends AbstractScatterplotVisualization {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -106,35 +99,26 @@ public class MarkerVisualization extends AbstractVisFactory {
     public static final String DOTMARKER = "dot";
 
     /**
-     * The result we visualize
-     */
-    private StyleResult style;
-
-    /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
-      this.style = task.getResult();
-      context.addDataStoreListener(this);
-      context.addResultListener(this);
-      incrementalRedraw();
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
+      addListeners();
     }
 
     @Override
-    public void destroy() {
-      super.destroy();
-      context.removeDataStoreListener(this);
-      context.removeResultListener(this);
-    }
-
-    @Override
-    public void redraw() {
-      final MarkerLibrary ml = style.getStyleLibrary().markers();
-      final double marker_size = style.getStyleLibrary().getSize(StyleLibrary.MARKERPLOT);
-      final StylingPolicy spol = style.getStylingPolicy();
+    public void fullRedraw() {
+      setupCanvas();
+      final StyleLibrary style = context.getStyleLibrary();
+      final MarkerLibrary ml = style.markers();
+      final double marker_size = style.getSize(StyleLibrary.MARKERPLOT);
+      final StylingPolicy spol = context.getStylingPolicy();
 
       if(spol instanceof ClassStylingPolicy) {
         ClassStylingPolicy cspol = (ClassStylingPolicy) spol;

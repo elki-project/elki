@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -98,7 +99,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
   public OutlierResult run(Database database) {
     Result innerresult = algorithm.run(database);
 
-    OutlierResult or = getOutlierResult(innerresult);
+    OutlierResult or = getOutlierResult(database.getHierarchy(), innerresult);
     final DoubleRelation scores = or.getScores();
     if(scaling instanceof OutlierScalingFunction) {
       ((OutlierScalingFunction) scaling).prepare(or);
@@ -124,11 +125,12 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
   /**
    * Find an OutlierResult to work with.
    * 
+   * @param hier Result hierarchy
    * @param result Result object
    * @return Iterator to work with
    */
-  private OutlierResult getOutlierResult(Result result) {
-    List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+  private OutlierResult getOutlierResult(ResultHierarchy hier, Result result) {
+    List<OutlierResult> ors = ResultUtil.filterResults(hier, result, OutlierResult.class);
     if(ors.size() > 0) {
       return ors.get(0);
     }

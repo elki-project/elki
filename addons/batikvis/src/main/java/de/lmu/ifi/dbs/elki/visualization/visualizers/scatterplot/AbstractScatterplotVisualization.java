@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,11 +28,13 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -41,9 +43,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 
 /**
  * Default class to handle 2D projected visualizations.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has Projection2D
  */
@@ -65,21 +67,34 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
 
   /**
    * Constructor.
-   * 
+   *
    * @param task Visualization task
+   * @param plot Plot to draw to
+   * @param width Embedding width
+   * @param height Embedding height
+   * @param proj Projection
    */
-  public AbstractScatterplotVisualization(VisualizationTask task) {
-    super(task);
-    this.proj = task.getProj();
+  public AbstractScatterplotVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    super(task, plot, width, height);
+    this.proj = (Projection2D) proj;
     this.rel = task.getRelation();
-    this.sample = ResultUtil.getSamplingResult(rel);
-    final double margin = context.getStyleResult().getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    this.layer = setupCanvas(svgp, proj, margin, task.getWidth(), task.getHeight());
+    this.sample = task.updateOnAny(VisualizationTask.ON_SAMPLE) ? ResultUtil.getSamplingResult(rel) : null;
+  }
+
+  /**
+   * Setup our canvas.
+   *
+   * @return Canvas
+   */
+  protected Element setupCanvas() {
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    this.layer = setupCanvas(svgp, this.proj, margin, getWidth(), getHeight());
+    return layer;
   }
 
   /**
    * Utility function to setup a canvas element for the visualization.
-   * 
+   *
    * @param svgp Plot element
    * @param proj Projection to use
    * @param margin Margin to use
@@ -97,12 +112,13 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     return layer;
   }
-  
+
   @Override
-  public void resultChanged(Result current) {
-    super.resultChanged(current);
-    if(current == proj) {
-      synchronizedRedraw();
+  public void visualizationChanged(VisualizationItem item) {
+    super.visualizationChanged(item);
+    if(item == proj) {
+      svgp.requestRedraw(this.task, this);
+      return;
     }
   }
 }

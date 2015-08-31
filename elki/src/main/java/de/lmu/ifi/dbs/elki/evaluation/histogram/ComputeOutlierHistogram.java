@@ -36,9 +36,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
@@ -249,9 +249,9 @@ public class ComputeOutlierHistogram implements Evaluator {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    final Database db = ResultUtil.findDatabase(baseResult);
-    List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    final Database db = ResultUtil.findDatabase(hier);
+    List<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
     if(ors == null || ors.size() <= 0) {
       // logger.warning("No outlier results found for "+ComputeOutlierHistogram.class.getSimpleName());
       return;

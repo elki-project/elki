@@ -28,15 +28,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * The WGS72 spheroid earth model, without height model.
- * 
- * 
+ *
+ *
  * Radius: 6378135.0 m
- * 
+ *
  * Flattening: 1 / 298.26
- * 
+ *
  * @author Erich Schubert
  */
-@Alias({ "WGS72", "WGS-72", "WGS72" })
+@Alias({ "WGS72", "WGS-72" })
 public class WGS72SpheroidEarthModel extends AbstractEarthModel {
   /**
    * Static instance.
@@ -67,9 +67,9 @@ public class WGS72SpheroidEarthModel extends AbstractEarthModel {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

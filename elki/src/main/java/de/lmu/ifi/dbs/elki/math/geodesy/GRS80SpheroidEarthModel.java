@@ -29,14 +29,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * The GRS 80 spheroid earth model, without height model (so not a geoid, just a
  * spheroid!)
- * 
+ *
  * Radius: 6378137.0 m
- * 
+ *
  * Flattening: 1 / 298.257222101
- * 
+ *
  * @author Erich Schubert
  */
-@Alias({ "grs80", "GRS-80", "GRS80" })
+@Alias({ "GRS-80", "GRS80" })
 public class GRS80SpheroidEarthModel extends AbstractEarthModel {
   /**
    * Static instance.
@@ -67,9 +67,9 @@ public class GRS80SpheroidEarthModel extends AbstractEarthModel {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

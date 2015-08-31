@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -47,7 +46,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <N> the type of AbstractMTreeNode used in the M-Tree
  * @param <E> the type of MetricalEntry used in the M-Tree
  */
-@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
+@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
+title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
+booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", //
+url = "http://www.vldb.org/conf/1997/P426.PDF")
 public class MLBDistSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> extends MTreeSplit<O, N, E> {
   /**
    * Creates a new split object.
@@ -69,25 +71,24 @@ public class MLBDistSplit<O, N extends AbstractMTreeNode<O, N, E>, E extends MTr
    */
   @Override
   public Assignments<E> split(AbstractMTree<O, N, E, ?> tree, N node) {
-    DBID firstPromoted = null;
-    DBID secondPromoted = null;
+    final int n = node.getNumEntries();
+    double[] distanceMatrix = computeDistanceMatrix(tree, node);
 
     // choose first and second routing object
-    double currentMaxDist = 0.;
-    for(int i = 0; i < node.getNumEntries(); i++) {
-      DBID id1 = node.getEntry(i).getRoutingObjectID();
-      for(int j = i + 1; j < node.getNumEntries(); j++) {
-        DBID id2 = node.getEntry(j).getRoutingObjectID();
-
-        double distance = tree.distance(id1, id2);
-        if(distance >= currentMaxDist) {
-          firstPromoted = id1;
-          secondPromoted = id2;
+    int besti = -1, bestj = -1;
+    double currentMaxDist = Double.NEGATIVE_INFINITY;
+    for(int i = 0; i < n; i++) {
+      int row = i * n;
+      for(int j = i + 1; j < n; j++) {
+        double distance = distanceMatrix[row + j];
+        if(distance > currentMaxDist) {
+          besti = i;
+          bestj = j;
           currentMaxDist = distance;
         }
       }
     }
 
-    return balancedPartition(tree, node, firstPromoted, secondPromoted);
+    return balancedPartition(tree, node, besti, bestj, distanceMatrix);
   }
 }

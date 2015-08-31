@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,19 +30,20 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -54,18 +55,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedPara
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
-import de.lmu.ifi.dbs.elki.visualization.projector.ProjectorFactory;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Utility class to determine the visualizers for a result class.
- * 
+ *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has VisualizerContext oneway - - «create»
  * @apiviz.uses VisFactory oneway - n «configure»
@@ -78,10 +77,10 @@ public class VisualizerParameterizer {
 
   /**
    * Parameter to get the style properties file.
-   * 
+   *
    * <p>
    * Key: -visualizer.stylesheet
-   * 
+   *
    * Default: default properties file <br>
    * included stylesheets:
    * <ul>
@@ -95,8 +94,6 @@ public class VisualizerParameterizer {
    * These are {@code *.properties} files in the package
    * {@link de.lmu.ifi.dbs.elki.visualization.style}.
    * </p>
-   * 
-   * 
    */
   public static final OptionID STYLELIB_ID = new OptionID("visualizer.stylesheet", "Style properties file to use, included properties: classic, default, greyscale, neon, presentation, print");
 
@@ -107,10 +104,10 @@ public class VisualizerParameterizer {
 
   /**
    * Parameter to enable visualizers
-   * 
+   *
    * <p>
    * Key: -vis.enable
-   * 
+   *
    * Default: ELKI core
    * </p>
    */
@@ -118,7 +115,7 @@ public class VisualizerParameterizer {
 
   /**
    * Parameter to set the sampling level
-   * 
+   *
    * <p>
    * Key: -vis.sampling
    * </p>
@@ -131,14 +128,9 @@ public class VisualizerParameterizer {
   private StyleLibrary stylelib;
 
   /**
-   * (Result-to-visualization) Adapters
+   * Projections and visualization factories.
    */
-  private Collection<VisFactory> factories;
-
-  /**
-   * Projectors to use.
-   */
-  private Collection<ProjectorFactory> projectors;
+  private Collection<VisualizationProcessor> factories;
 
   /**
    * Sample size
@@ -147,56 +139,59 @@ public class VisualizerParameterizer {
 
   /**
    * Random seed for sampling.
-   * 
+   *
    * FIXME: make parameterizable.
    */
   private RandomFactory rnd = RandomFactory.DEFAULT;
 
   /**
    * Constructor.
-   * 
+   *
    * @param samplesize
    * @param stylelib Style library
    * @param projectors Projectors
    * @param factories Factories to use
    * @param hideVisualizers Visualizer hiding pattern
    */
-  public VisualizerParameterizer(int samplesize, StyleLibrary stylelib, Collection<ProjectorFactory> projectors, Collection<VisFactory> factories, Pattern hideVisualizers) {
+  public VisualizerParameterizer(int samplesize, StyleLibrary stylelib, Collection<VisualizationProcessor> factories, Pattern hideVisualizers) {
     super();
     this.samplesize = samplesize;
     this.stylelib = stylelib;
-    this.projectors = projectors;
     this.factories = factories;
   }
 
   /**
    * Make a new visualization context
-   * 
-   * @param result Base result
+   *
+   * @param hier Result hierarchy
+   * @param start Starting result
    * @return New context
    */
-  public VisualizerContext newContext(HierarchicalResult result) {
-    if(samplesize > 0) {
-      Collection<Relation<?>> rels = ResultUtil.filterResults(result, Relation.class);
-      for(Relation<?> rel : rels) {
-        if(!ResultUtil.filterResults(rel, SamplingResult.class).isEmpty()) {
-          continue;
-        }
-        int size = rel.size();
-        if(size > samplesize) {
-          SamplingResult sample = new SamplingResult(rel);
-          sample.setSample(DBIDUtil.randomSample(sample.getSample(), samplesize, rnd));
-          ResultUtil.addChildResult(rel, sample);
-        }
+  public VisualizerContext newContext(ResultHierarchy hier, Result start) {
+    Relation<?> relation = null;
+    Collection<Relation<?>> rels = ResultUtil.filterResults(hier, Relation.class);
+    for(Relation<?> rel : rels) {
+      if(!TypeUtil.DBID.isAssignableFrom(rel.getDataTypeInformation()) && relation == null) {
+        relation = rel;
+      }
+      if(samplesize == 0) {
+        continue;
+      }
+      if(!ResultUtil.filterResults(hier, rel, SamplingResult.class).isEmpty()) {
+        continue;
+      }
+      if(rel.size() > samplesize) {
+        SamplingResult sample = new SamplingResult(rel);
+        sample.setSample(DBIDUtil.randomSample(sample.getSample(), samplesize, rnd));
+        ResultUtil.addChildResult(rel, sample);
       }
     }
-    VisualizerContext context = new VisualizerContext(result, stylelib, projectors, factories);
-    return context;
+    return new VisualizerContext(hier, start, relation, stylelib, factories);
   }
 
   /**
    * Try to automatically generate a title for this.
-   * 
+   *
    * @param db Database
    * @param result Result object
    * @return generated title
@@ -257,9 +252,9 @@ public class VisualizerParameterizer {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -267,17 +262,15 @@ public class VisualizerParameterizer {
 
     protected Pattern enableVisualizers = null;
 
-    protected Collection<VisFactory> factories = null;
-
-    protected Collection<ProjectorFactory> projectors = null;
+    protected Collection<VisualizationProcessor> factories = null;
 
     protected int samplesize = -1;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter samplingP = new IntParameter(SAMPLING_ID, 10000);
-      samplingP.addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
+      IntParameter samplingP = new IntParameter(SAMPLING_ID, 10000) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
       if(config.grab(samplingP)) {
         samplesize = samplingP.intValue();
       }
@@ -298,64 +291,33 @@ public class VisualizerParameterizer {
         }
       }
       MergedParameterization merged = new MergedParameterization(config);
-      projectors = collectProjectorFactorys(merged, enableVisualizers);
-      factories = collectVisFactorys(merged, enableVisualizers);
-    }
-
-    /**
-     * Collect and instantiate all projector factories.
-     * 
-     * @param config Parameterization
-     * @param filter Filter
-     * @return List of all adapters found.
-     */
-    private static <O> Collection<ProjectorFactory> collectProjectorFactorys(MergedParameterization config, Pattern filter) {
-      ArrayList<ProjectorFactory> factories = new ArrayList<>();
-      for(Class<?> c : InspectionUtil.cachedFindAllImplementations(ProjectorFactory.class)) {
-        if(filter != null && !filter.matcher(c.getCanonicalName()).find()) {
-          continue;
-        }
-        try {
-          config.rewind();
-          ProjectorFactory a = ClassGenericsUtil.tryInstantiate(ProjectorFactory.class, c, config);
-          factories.add(a);
-        }
-        catch(Throwable e) {
-          if(LOG.isDebugging()) {
-            LOG.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
-          }
-          else {
-            LOG.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
-          }
-        }
-      }
-      return factories;
+      factories = collectFactorys(merged, enableVisualizers);
     }
 
     /**
      * Collect and instantiate all visualizer factories.
-     * 
+     *
      * @param config Parameterization
      * @param filter Filter
      * @return List of all adapters found.
      */
-    private static <O> Collection<VisFactory> collectVisFactorys(MergedParameterization config, Pattern filter) {
-      ArrayList<VisFactory> factories = new ArrayList<>();
-      for(Class<?> c : InspectionUtil.cachedFindAllImplementations(VisFactory.class)) {
+    private static <O> Collection<VisualizationProcessor> collectFactorys(MergedParameterization config, Pattern filter) {
+      ArrayList<VisualizationProcessor> factories = new ArrayList<>();
+      for(Class<?> c : ELKIServiceRegistry.findAllImplementations(VisualizationProcessor.class)) {
         if(filter != null && !filter.matcher(c.getCanonicalName()).find()) {
           continue;
         }
         try {
           config.rewind();
-          VisFactory a = ClassGenericsUtil.tryInstantiate(VisFactory.class, c, config);
+          VisualizationProcessor a = ClassGenericsUtil.tryInstantiate(VisualizationProcessor.class, c, config);
           factories.add(a);
         }
         catch(Throwable e) {
           if(LOG.isDebugging()) {
-            LOG.exception("Error instantiating visualization factory " + c.getName(), e.getCause());
+            LOG.exception("Error instantiating visualization processor " + c.getName(), e.getCause());
           }
           else {
-            LOG.warning("Error instantiating visualization factory " + c.getName() + ": " + e.getMessage());
+            LOG.warning("Error instantiating visualization processor " + c.getName() + ": " + e.getMessage());
           }
         }
       }
@@ -364,7 +326,7 @@ public class VisualizerParameterizer {
 
     @Override
     protected VisualizerParameterizer makeInstance() {
-      return new VisualizerParameterizer(samplesize, stylelib, projectors, factories, enableVisualizers);
+      return new VisualizerParameterizer(samplesize, stylelib, factories, enableVisualizers);
     }
   }
 }

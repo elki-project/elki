@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  */
 
 import java.awt.image.RenderedImage;
-import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -32,13 +31,15 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -47,9 +48,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Visualize a similarity matrix with object labels
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -67,21 +68,22 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ComputeSimilarityMatrixImage.SimilarityMatrix> prs = ResultUtil.filterResults(result, ComputeSimilarityMatrixImage.SimilarityMatrix.class);
-    for(ComputeSimilarityMatrixImage.SimilarityMatrix pr : prs) {
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<SimilarityMatrix> it = VisualizationTree.filterResults(context, start, SimilarityMatrix.class);
+    for(; it.valid(); it.advance()) {
+      SimilarityMatrix pr = it.get();
       // Add plots, attach visualizer
-      final VisualizationTask task = new VisualizationTask(NAME, pr, null, this);
-      task.width = 1.0;
-      task.height = 1.0;
+      final VisualizationTask task = new VisualizationTask(NAME, context, pr, null, SimilarityMatrixVisualizer.this);
+      task.reqwidth = 1.0;
+      task.reqheight = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
-      baseResult.getHierarchy().add(pr, task);
+      context.addVis(pr, task);
     }
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height);
   }
 
   @Override
@@ -92,9 +94,9 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
 
   /**
    * Instance
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has SimilarityMatrix oneway - 1 visualizes
    */
   public class Instance extends AbstractVisualization {
@@ -105,28 +107,32 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height) {
+      super(task, plot, width, height);
       this.result = task.getResult();
+      addListeners();
     }
 
     @Override
-    protected void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    public void fullRedraw() {
+      final StyleLibrary style = context.getStyleLibrary();
       final double sizex = StyleLibrary.SCALE;
-      final double sizey = StyleLibrary.SCALE * task.getHeight() / task.getWidth();
+      final double sizey = StyleLibrary.SCALE * getHeight() / getWidth();
       final double margin = style.getSize(StyleLibrary.MARGIN);
       layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
+      final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), sizex, sizey, margin);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
       RenderedImage img = result.getImage();
       // is ratio, target ratio
       double iratio = img.getHeight() / img.getWidth();
-      double tratio = task.getHeight() / task.getWidth();
+      double tratio = getHeight() / getWidth();
       // We want to place a (iratio, 1.0) object on a (tratio, 1.0) screen.
       // Both dimensions must fit:
       double zoom = (iratio >= tratio) ? Math.min(tratio / iratio, 1.0) : Math.max(iratio / tratio, 1.0);
@@ -145,7 +151,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
       final double hlsize = StyleLibrary.SCALE * zoom * iratio / size;
       final double vlsize = StyleLibrary.SCALE * zoom / size;
       int i = 0;
-      Database database = ResultUtil.findDatabase(context.getResult());
+      Database database = ResultUtil.findDatabase(context.getHierarchy());
       final Relation<String> lrep = DatabaseUtil.guessObjectLabelRepresentation(database);
       for(DBIDIter id = result.getIDs().iter(); id.valid(); id.advance()) {
         String label = lrep.get(id);

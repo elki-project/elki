@@ -1,10 +1,9 @@
 package de.lmu.ifi.dbs.elki;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,30 +22,35 @@ package de.lmu.ifi.dbs.elki;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import junit.framework.JUnit4TestAdapter;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 
 /**
  * Build a test suite with all tests included with ELKI
- * 
+ *
  * @author Erich Schubert
  */
 public class AllTests extends TestSuite {
   /**
    * Build a test suite with all tests included in ELKI.
-   * 
+   *
    * @return Test suite
    */
   public static Test suite() {
     TestSuite suite = new TestSuite();
-    List<Class<?>> tests = InspectionUtil.findAllImplementations(TestCase.class, false, false);
-    tests.addAll(InspectionUtil.findAllImplementations(JUnit4Test.class, false, false));
-    for(Class<?> cls : tests) {
+    for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(TestCase.class, false, false)) {
+      if(cls == AllTests.class) {
+        continue;
+      }
+      Test test = new JUnit4TestAdapter(cls);
+      if(test != null) {
+        suite.addTest(test);
+      }
+    }
+    for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(JUnit4Test.class, false, false)) {
       if(cls == AllTests.class) {
         continue;
       }

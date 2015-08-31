@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.batikutil;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -33,9 +33,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 /**
  * An JSVGCanvas that allows easier synchronization of Updates for SVGPlot
  * objects.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf JSVGUpdateSynchronizer
  * @apiviz.has SVGPlot oneway - - displays
  */
@@ -66,7 +66,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
 
   /**
    * Get the currently displayed SVG plot.
-   * 
+   *
    * @return current SVG plot. May be {@code null}!
    */
   public SVGPlot getPlot() {
@@ -75,7 +75,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
 
   /**
    * Use {@link #setPlot} instead if you need synchronization!
-   * 
+   *
    * @deprecated Document cannot be synchronized - use {@link #setPlot} and a
    *             {@link SVGPlot} object!
    */
@@ -88,7 +88,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
 
   /**
    * Choose a new plot to display.
-   * 
+   *
    * @param newplot New plot to display. May be {@code null}!
    */
   public void setPlot(final SVGPlot newplot) {
@@ -101,18 +101,20 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
       }
       return;
     }
-    newplot.synchronizeWith(this.synchronizer);
-    super.setSVGDocument(newplot.getDocument());
-    super.setDisableInteractions(newplot.getDisableInteractions());
-    // We only know we're detached when the synchronizer has run again.
-    if(oldplot != null && oldplot != newplot) {
-      scheduleDetach(oldplot);
+    synchronized(synchronizer) {
+      newplot.synchronizeWith(synchronizer);
+      super.setSVGDocument(newplot.getDocument());
+      super.setDisableInteractions(newplot.getDisableInteractions());
+      // We only know we're detached when the synchronizer has run again.
+      if(oldplot != null && oldplot != newplot) {
+        scheduleDetach(oldplot);
+      }
     }
   }
 
   /**
    * Schedule a detach.
-   * 
+   *
    * @param oldplot Plot to detach from.
    */
   private void scheduleDetach(final SVGPlot oldplot) {
@@ -137,7 +139,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
 
   /**
    * Execute the detaching event.
-   * 
+   *
    * @param oldplot Plot to detach from.
    */
   protected void detachPlot(SVGPlot oldplot) {

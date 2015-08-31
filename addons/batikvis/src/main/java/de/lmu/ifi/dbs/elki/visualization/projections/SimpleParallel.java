@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2012
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,19 +25,19 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 /**
  * Simple parallel projection
- * 
+ *
  * Scaled space: reordered, scaled and inverted. Lower dimensionality! [0:1]
  * Render space: not used here; no recentering needed.
- * 
+ *
  * @author Robert Rödler
  * @author Erich Schubert
  */
-public class SimpleParallel extends BasicResult implements ProjectionParallel {
+public class SimpleParallel implements ProjectionParallel {
   /**
    * Number of visible dimensions
    */
@@ -59,24 +59,31 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   private LinearScale[] scales;
 
   /**
+   * Projector
+   */
+  private Projector p;
+
+  /**
    * Flag for visibility
    */
   final static byte FLAG_HIDDEN = 1;
 
   /**
    * Flag for inverted dimensions
-   * 
+   *
    * TODO: handle inversions via scales?
    */
   final static byte FLAG_INVERTED = 2;
 
   /**
    * Constructor.
-   * 
+   *
+   * @param p Projector
    * @param scales Scales to use
    */
-  public SimpleParallel(LinearScale[] scales) {
-    super("Parallel projection", "parallel-projection");
+  public SimpleParallel(Projector p, LinearScale[] scales) {
+    super();
+    this.p = p;
     this.scales = scales;
     visDims = scales.length;
     flags = new byte[scales.length];
@@ -182,10 +189,10 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   @Override
   public int getDimForVisibleAxis(int pos) {
     for(int i = 0; i < scales.length; i++) {
-      if (isDimHidden(dimOrder[i])) {
+      if(isDimHidden(dimOrder[i])) {
         continue;
       }
-      if (pos == 0) {
+      if(pos == 0) {
         return dimOrder[i];
       }
       pos--;
@@ -283,5 +290,15 @@ public class SimpleParallel extends BasicResult implements ProjectionParallel {
   @Override
   public int getInputDimensionality() {
     return scales.length;
+  }
+
+  @Override
+  public String getMenuName() {
+    return "Parallel Coordinates";
+  }
+
+  @Override
+  public Projector getProjector() {
+    return p;
   }
 }

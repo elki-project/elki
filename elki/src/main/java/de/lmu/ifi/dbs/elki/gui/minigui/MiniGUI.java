@@ -55,7 +55,6 @@ import javax.swing.event.TableModelListener;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
-import de.lmu.ifi.dbs.elki.application.ELKILauncher;
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.gui.GUIUtil;
 import de.lmu.ifi.dbs.elki.gui.util.DynamicParameters;
@@ -67,6 +66,7 @@ import de.lmu.ifi.dbs.elki.logging.CLISmartHandler;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -79,9 +79,9 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
  * Minimal GUI built around a table-based parameter editor.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf SettingsComboboxModel
  * @apiviz.composedOf LoggingStep
  * @apiviz.owns ParameterTable
@@ -362,7 +362,7 @@ public class MiniGUI extends AbstractApplication {
 
   /**
    * Do the actual setParameters invocation.
-   * 
+   *
    * @param params Parameters
    */
   protected void doSetParameters(List<String> params) {
@@ -461,7 +461,7 @@ public class MiniGUI extends AbstractApplication {
 
   /**
    * Report errors in a single error log record.
-   * 
+   *
    * @param config Parameterization
    */
   protected void reportErrors(SerializedParameterization config) {
@@ -489,7 +489,7 @@ public class MiniGUI extends AbstractApplication {
 
   /**
    * Main method that just spawns the UI.
-   * 
+   *
    * @param args command line parameters
    */
   public static void main(final String[] args) {
@@ -508,12 +508,10 @@ public class MiniGUI extends AbstractApplication {
             params = new ArrayList<>(Arrays.asList(args));
             // TODO: it would be nicer to use the Parameterization API for this!
             if(params.size() > 0) {
-              try {
-                gui.maincls = ELKILauncher.findMainClass(params.get(0));
+              Class<? extends AbstractApplication> c = ELKIServiceRegistry.findImplementation(AbstractApplication.class, params.get(0));
+              if(c != null) {
+                gui.maincls = c;
                 params.remove(0); // on success
-              }
-              catch(ClassNotFoundException e) {
-                // Ignore.
               }
             }
             if(params.remove("-minigui.last")) {
@@ -546,12 +544,12 @@ public class MiniGUI extends AbstractApplication {
 
   /**
    * Class to interface between the saved settings list and a JComboBox.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.composedOf de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile
    */
-  class SettingsComboboxModel extends AbstractListModel<String> implements ComboBoxModel<String> {
+  class SettingsComboboxModel extends AbstractListModel<String>implements ComboBoxModel<String> {
     /**
      * Serial version.
      */
@@ -569,7 +567,7 @@ public class MiniGUI extends AbstractApplication {
 
     /**
      * Constructor.
-     * 
+     *
      * @param store Store to access
      */
     public SettingsComboboxModel(SavedSettingsFile store) {

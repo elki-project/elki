@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,8 +24,8 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  */
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -33,7 +33,6 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -45,29 +44,33 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
+import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 /**
  * Visualizer for generating SVG-Elements containing ellipses for first, second
- * and third standard deviation
- * 
+ * and third standard deviation. In more than 2-dimensional data, the class
+ * tries to approximate the cluster extends.
+ *
  * @author Robert Rödler
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -75,7 +78,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "EM Cluster Visualization";
+  private static final String NAME = "EM Cluster Models";
 
   /**
    * Constants for quantiles of standard deviation
@@ -90,51 +93,27 @@ public class EMClusterVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Instance makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Instance makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    // Find clusterings we can visualize:
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-    for(Clustering<?> c : clusterings) {
-      if(c.getAllClusters().size() > 0) {
-        // Does the cluster have a model with cluster means?
-        Clustering<MeanModel> mcls = findMeanModel(c);
-        if(mcls != null) {
-          Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-          for(ScatterPlotProjector<?> p : ps) {
-            final VisualizationTask task = new VisualizationTask(NAME, c, p.getRelation(), this);
-            task.level = VisualizationTask.LEVEL_DATA + 3;
-            baseResult.getHierarchy().add(c, task);
-            baseResult.getHierarchy().add(p, task);
-          }
-        }
-      }
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), EMClusterVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA + 3;
+      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
+      context.addVis(p, task);
     }
-  }
-
-  /**
-   * Test if the given clustering has a mean model.
-   * 
-   * @param c Clustering to inspect
-   * @return the clustering cast to return a mean model, null otherwise.
-   */
-  @SuppressWarnings("unchecked")
-  private static Clustering<MeanModel> findMeanModel(Clustering<?> c) {
-    final Model firstModel = c.getAllClusters().get(0).getModel();
-    if(c.getAllClusters().get(0).getModel() instanceof MeanModel && firstModel instanceof EMModel) {
-      return (Clustering<MeanModel>) c;
-    }
-    return null;
   }
 
   /**
    * Instance.
-   * 
+   *
    * @author Robert Rödler
-   * 
+   *
    * @apiviz.has EMModel oneway - - visualizes
    * @apiviz.uses GrahamScanConvexHull2D
    */
@@ -148,10 +127,8 @@ public class EMClusterVisualization extends AbstractVisFactory {
     public static final String EMBORDER = "EMClusterBorder";
 
     /**
-     * The result we work on
+     * Kappa constant,
      */
-    Clustering<EMModel> clustering;
-
     private static final double KAPPA = SVGHyperSphere.EUCLIDEAN_KAPPA;
 
     /**
@@ -167,61 +144,101 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
     /**
      * Constructor
-     * 
+     *
      * @param task VisualizationTask
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
-      this.clustering = task.getResult();
-      incrementalRedraw();
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
+      addListeners();
     }
 
     @Override
-    protected void redraw() {
-      // set styles
-      addCSSClasses(svgp);
+    public void fullRedraw() {
+      setupCanvas();
+      final StylingPolicy spol = context.getStylingPolicy();
+      if(!(spol instanceof ClusterStylingPolicy)) {
+        return;
+      }
+      @SuppressWarnings("unchecked")
+      Clustering<Model> clustering = (Clustering<Model>) ((ClusterStylingPolicy) spol).getClustering();
+      List<Cluster<Model>> clusters = clustering.getAllClusters();
+      if(clusters.size() <= 1) {
+        return;
+      }
+
+      StyleLibrary style = context.getStyleLibrary();
+      ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       // PCARunner
       PCARunner pcarun = ClassGenericsUtil.parameterizeOrAbort(PCARunner.class, new EmptyParameterization());
 
-      Iterator<Cluster<EMModel>> ci = clustering.getAllClusters().iterator();
-      for(int cnum = 0; cnum < clustering.getAllClusters().size(); cnum++) {
-        Cluster<EMModel> clus = ci.next();
+      Iterator<Cluster<Model>> ci = clusters.iterator();
+      for(int cnum = 0; cnum < clusters.size(); cnum++) {
+        Cluster<Model> clus = ci.next();
         DBIDs ids = clus.getIDs();
+        if(ids.size() <= 0) {
+          continue;
+        }
+        if(!(clus.getModel() instanceof EMModel)) {
+          continue;
+        }
+        EMModel model = (EMModel) clus.getModel();
 
-        if(ids.size() > 0) {
-          Matrix covmat = clus.getModel().getCovarianceMatrix();
-          Vector centroid = clus.getModel().getMean();
-          Vector cent = new Vector(proj.fastProjectDataToRenderSpace(centroid));
+        // Add cluster style
+        final String sname = EMBORDER + "_" + cnum;
+        if(!svgp.getCSSClassManager().contains(sname)) {
+          CSSClass cls = new CSSClass(this, sname);
+          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * .5);
 
-          // Compute the eigenvectors
-          SortedEigenPairs eps = pcarun.processCovarMatrix(covmat).getEigenPairs();
+          String color = colors.getColor(cnum);
+          if(softBorder == 0) {
+            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
+          }
+          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
+          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.15);
 
-          Vector[] pc = new Vector[eps.size()];
-          for(int i = 0; i < eps.size(); i++) {
-            EigenPair ep = eps.getEigenPair(i);
-            Vector sev = ep.getEigenvector().times(Math.sqrt(ep.getEigenvalue()));
-            pc[i] = new Vector(proj.fastProjectRelativeDataToRenderSpace(sev.getArrayRef()));
-          }
-          if(drawStyle != 0 || eps.size() == 2) {
-            drawSphere2D(cnum, cent, pc);
-          }
-          else {
-            Polygon chres = makeHullComplex(pc);
-            drawHullLines(cnum, cent, chres);
-          }
+          svgp.addCSSClassOrLogError(cls);
+        }
+
+        Matrix covmat = model.getCovarianceMatrix();
+        Vector centroid = model.getMean();
+        Vector cent = new Vector(proj.fastProjectDataToRenderSpace(centroid));
+
+        // Compute the eigenvectors
+        SortedEigenPairs eps = pcarun.processCovarMatrix(covmat).getEigenPairs();
+        Vector[] pc = new Vector[eps.size()];
+        for(int i = 0; i < eps.size(); i++) {
+          EigenPair ep = eps.getEigenPair(i);
+          Vector sev = ep.getEigenvector().times(Math.sqrt(ep.getEigenvalue()));
+          pc[i] = new Vector(proj.fastProjectRelativeDataToRenderSpace(sev.getArrayRef()));
+        }
+        if(drawStyle != 0 || eps.size() == 2) {
+          drawSphere2D(sname, cent, pc);
+        }
+        else {
+          Polygon chres = makeHullComplex(pc);
+          drawHullLines(sname, cent, chres);
         }
       }
     }
 
-    protected void drawSphere2D(int cnum, Vector cent, Vector[] pc) {
+    /**
+     * Draw by approximating a sphere via cubic splines
+     *
+     * @param sname CSS class name
+     * @param cent center
+     * @param pc Principal components
+     */
+    protected void drawSphere2D(String sname, Vector cent, Vector[] pc) {
+      CSSClass cls = opacStyle == 1 ? new CSSClass(null, "temp") : null;
       for(int dim1 = 0; dim1 < pc.length - 1; dim1++) {
         for(int dim2 = dim1 + 1; dim2 < pc.length; dim2++) {
           for(int i = 1; i <= times; i++) {
             SVGPath path = new SVGPath();
-
-            Vector direction1 = pc[dim1].times(KAPPA * i);
-            Vector direction2 = pc[dim2].times(KAPPA * i);
 
             Vector p1 = cent.plusTimes(pc[dim1], i);
             Vector p2 = cent.plusTimes(pc[dim2], i);
@@ -229,16 +246,27 @@ public class EMClusterVisualization extends AbstractVisFactory {
             Vector p4 = cent.minusTimes(pc[dim2], i);
 
             path.moveTo(p1);
-            path.cubicTo(p1.plus(direction2), p2.plus(direction1), p2);
-            path.cubicTo(p2.minus(direction1), p3.plus(direction2), p3);
-            path.cubicTo(p3.minus(direction2), p4.minus(direction1), p4);
-            path.cubicTo(p4.plus(direction1), p1.minus(direction2), p1);
+            path.cubicTo(//
+            p1.plusTimes(pc[dim2], KAPPA * i), //
+            p2.plusTimes(pc[dim1], KAPPA * i), //
+            p2);
+            path.cubicTo(//
+            p2.minusTimes(pc[dim1], KAPPA * i), //
+            p3.plusTimes(pc[dim2], KAPPA * i), //
+            p3);
+            path.cubicTo(//
+            p3.minusTimes(pc[dim2], KAPPA * i), //
+            p4.minusTimes(pc[dim1], KAPPA * i), //
+            p4);
+            path.cubicTo(//
+            p4.plusTimes(pc[dim1], KAPPA * i), //
+            p1.minusTimes(pc[dim2], KAPPA * i), //
+            p1);
             path.close();
 
             Element ellipse = path.makeElement(svgp);
-            SVGUtil.addCSSClass(ellipse, EMBORDER + cnum);
-            if(opacStyle == 1) {
-              CSSClass cls = new CSSClass(null, "temp");
+            SVGUtil.addCSSClass(ellipse, sname);
+            if(cls != null) {
               double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
               cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
               SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
@@ -249,28 +277,41 @@ public class EMClusterVisualization extends AbstractVisFactory {
       }
     }
 
-    protected void drawHullLines(int cnum, Vector cent, Polygon chres) {
-      if(chres.size() > 1) {
-        for(int i = 1; i <= times; i++) {
-          SVGPath path = new SVGPath();
-          for(int p = 0; p < chres.size(); p++) {
-            Vector cur = cent.plusTimes(chres.get(p), i);
-            path.drawTo(cur);
-          }
-          path.close();
-          Element ellipse = path.makeElement(svgp);
-          SVGUtil.addCSSClass(ellipse, EMBORDER + cnum);
-          if(opacStyle == 1) {
-            CSSClass cls = new CSSClass(null, "temp");
-            double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
-            cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
-            SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
-          }
-          layer.appendChild(ellipse);
+    /**
+     * Approximate by convex hull.
+     *
+     * @param sname CSS name
+     * @param cent center
+     * @param chres Polygon around center
+     */
+    protected void drawHullLines(String sname, Vector cent, Polygon chres) {
+      if(chres.size() <= 1) {
+        return;
+      }
+      CSSClass cls = opacStyle == 1 ? new CSSClass(null, "temp") : null;
+      for(int i = 1; i <= times; i++) {
+        SVGPath path = new SVGPath();
+        for(int p = 0; p < chres.size(); p++) {
+          path.drawTo(cent.plusTimes(chres.get(p), i));
         }
+        path.close();
+        Element ellipse = path.makeElement(svgp);
+        SVGUtil.addCSSClass(ellipse, sname);
+        if(cls != null) {
+          double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
+          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
+          SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
+        }
+        layer.appendChild(ellipse);
       }
     }
 
+    /**
+     * Build a convex hull to approximate the sphere.
+     *
+     * @param pc Principal components
+     * @return Polygon
+     */
     protected Polygon makeHull(Vector[] pc) {
       GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
 
@@ -293,10 +334,15 @@ public class EMClusterVisualization extends AbstractVisFactory {
       hull.add(diag);
       hull.add(diag.times(-1));
 
-      Polygon chres = hull.getHull();
-      return chres;
+      return hull.getHull();
     }
 
+    /**
+     * Build a convex hull to approximate the sphere.
+     *
+     * @param pc Principal components
+     * @return Polygon
+     */
     protected Polygon makeHullComplex(Vector[] pc) {
       GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
 
@@ -333,11 +379,21 @@ public class EMClusterVisualization extends AbstractVisFactory {
       diag.timesEquals(1.0 / Math.sqrt(pc.length));
       hull.add(diag);
       hull.add(diag.times(-1));
-      Polygon chres = hull.getHull();
-      return chres;
+      return hull.getHull();
     }
 
-    protected void drawHullArc(int cnum, Vector cent, Polygon chres) {
+    /**
+     * Approximate the hull using arcs.
+     *
+     * @param sname CSS name
+     * @param cent Center
+     * @param chres Polygon
+     */
+    protected void drawHullArc(String sname, Vector cent, Polygon chres) {
+      if(chres.size() <= 1) {
+        return;
+      }
+      CSSClass cls = opacStyle == 1 ? new CSSClass(null, "temp") : null;
       for(int i = 1; i <= times; i++) {
         SVGPath path = new SVGPath();
 
@@ -363,9 +419,8 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
         Element ellipse = path.makeElement(svgp);
 
-        SVGUtil.addCSSClass(ellipse, EMBORDER + cnum);
-        if(opacStyle == 1) {
-          CSSClass cls = new CSSClass(null, "temp");
+        SVGUtil.addCSSClass(ellipse, sname);
+        if(cls != null) {
           double s = (i >= 1 && i <= sigma.length) ? sigma[i - 1] : 0.0;
           cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, s);
           SVGUtil.setAtt(ellipse, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
@@ -376,7 +431,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
     /**
      * Draw an arc to simulate the hyper ellipse.
-     * 
+     *
      * @param path Path to draw to
      * @param cent Center
      * @param pre Previous point
@@ -427,44 +482,6 @@ public class EMClusterVisualization extends AbstractVisFactory {
       // else {
       path.cubicTo(gPrev, gNext, sNext);
       // }
-    }
-
-    /**
-     * Adds the required CSS-Classes
-     * 
-     * @param svgp SVG-Plot
-     */
-    private void addCSSClasses(SVGPlot svgp) {
-      if(!svgp.getCSSClassManager().contains(EMBORDER)) {
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
-        ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
-        String color;
-        int clusterID = 0;
-
-        for(@SuppressWarnings("unused")
-        Cluster<?> cluster : clustering.getAllClusters()) {
-          CSSClass cls = new CSSClass(this, EMBORDER + clusterID);
-          cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * .5);
-
-          if(clustering.getAllClusters().size() == 1) {
-            color = "black";
-          }
-          else {
-            color = colors.getColor(clusterID);
-          }
-          if(softBorder == 0) {
-            cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
-          }
-          cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, color);
-          cls.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, 0.15);
-
-          svgp.addCSSClassOrLogError(cls);
-          if(opacStyle == 0) {
-            break;
-          }
-          clusterID++;
-        }
-      }
     }
   }
 }

@@ -47,18 +47,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * PAM initialization for k-means (and of course, PAM).
- * 
+ *
  * Reference:
  * <p>
  * Clustering my means of Medoids<br />
  * Kaufman, L. and Rousseeuw, P.J.<br />
  * in: Statistical Data Analysis Based on the L_1–Norm and Related Methods
  * </p>
- * 
- * TODO: enforce using a distance matrix?
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type for KMedoids initialization
  */
 @Reference(title = "Clustering my means of Medoids", //
@@ -98,11 +96,11 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
   public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
     ArrayModifiableDBIDs medids = DBIDUtil.newArray(k);
     DBIDVar bestid = DBIDUtil.newVar();
-    double best = Double.POSITIVE_INFINITY;
     WritableDoubleDataStore mindist = null;
 
     // First mean is chosen by having the smallest distance sum to all others.
     {
+      double best = Double.POSITIVE_INFINITY;
       WritableDoubleDataStore newd = null;
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Choosing initial mean", ids.size(), LOG) : null;
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -138,6 +136,7 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Choosing initial centers", k, LOG) : null;
     LOG.incrementProcessed(prog); // First one was just chosen.
     for(int i = 1; i < k; i++) {
+      double best = Double.POSITIVE_INFINITY;
       WritableDoubleDataStore bestd = null, newd = null;
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         if(medids.contains(iter)) {
@@ -162,8 +161,8 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
           newd = null;
         }
       }
-      if(bestid == null) {
-        throw new AbortException("No median found that improves the criterion function?!?");
+      if(bestd == null) {
+        throw new AbortException("No median found that improves the criterion function?!? Too many infinite distances.");
       }
       medids.add(bestid);
       if(newd != null) {
@@ -181,9 +180,9 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V> extends AbstractParameterizer {

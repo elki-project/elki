@@ -98,7 +98,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
       public IndexTreePath<E> nextElement() {
         synchronized(AbstractNode.this) {
           if(count < numEntries) {
-            return parentPath.pathByAddingChild(new TreeIndexPathComponent<>(entries[count], count++));
+            return new IndexTreePath<>(parentPath, entries[count], count++);
           }
         }
         throw new NoSuchElementException();

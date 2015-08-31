@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  */
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,9 +42,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.geometry.AlphaShape;
 import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
@@ -55,14 +51,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -70,15 +68,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer for generating an SVG-Element containing the convex hull / alpha
  * shape of each cluster.
- * 
+ *
  * @author Robert Rödler
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -95,43 +92,40 @@ public class ClusterHullVisualization extends AbstractVisFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param settings Settings
    */
   public ClusterHullVisualization(Parameterizer settings) {
     super();
     this.settings = settings;
-    this.thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(VisualizerContext context, Object start) {
     // We attach ourselves to the style library, not the clustering, so there is
     // only one hull.
-    Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
-    for(StyleResult s : styleres) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, s, p.getRelation(), this);
-        task.level = VisualizationTask.LEVEL_DATA - 1;
-        task.initDefaultVisibility(false);
-        baseResult.getHierarchy().add(s, task);
-        baseResult.getHierarchy().add(p, task);
-      }
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterHullVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA - 1;
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
+      task.initDefaultVisibility(false);
+      context.addVis(p, task);
     }
   }
 
   /**
    * Instance.
-   * 
+   *
    * @author Robert Rödler
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has Clustering oneway - - visualizes
    * @apiviz.uses GrahamScanConvexHull2D
    * @apiviz.uses AlphaShape
@@ -144,24 +138,23 @@ public class ClusterHullVisualization extends AbstractVisFactory {
     public static final String CLUSTERHULL = "cluster-hull";
 
     /**
-     * The result we visualize
-     */
-    private StyleResult style;
-
-    /**
      * Constructor
-     * 
+     *
      * @param task VisualizationTask
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
-      this.style = task.getResult();
-      incrementalRedraw();
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
+      addListeners();
     }
 
     @Override
-    protected void redraw() {
-      final StylingPolicy spol = style.getStylingPolicy();
+    public void fullRedraw() {
+      setupCanvas();
+      final StylingPolicy spol = context.getStylingPolicy();
       if(!(spol instanceof ClusterStylingPolicy)) {
         return;
       }
@@ -191,7 +184,8 @@ public class ClusterHullVisualization extends AbstractVisFactory {
         // This way, we draw each cluster only once.
         // Unfortunately, not depth ordered (TODO!)
         for(Cluster<Model> clu : clusters) {
-          DoubleObjPair<Polygon> pair = hullmap.get(clu), mpair = hullmap.get(clu.getModel());
+          DoubleObjPair<Polygon> pair = hullmap.get(clu),
+              mpair = hullmap.get(clu.getModel());
           // Plot the convex hull:
           if(pair != null && pair.second != null && pair.second.size() > 1) {
             SVGPath path = new SVGPath(pair.second);
@@ -255,7 +249,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
 
     /**
      * Recursively step through the clusters to build the hulls.
-     * 
+     *
      * @param clu Current cluster
      * @param hier Clustering hierarchy
      * @param hulls Hull map
@@ -321,7 +315,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
 
     /**
      * Recursively add a cluster and its children.
-     * 
+     *
      * @param hull Hull to add to
      * @param hier Cluster hierarchy
      * @param clus Current cluster
@@ -345,11 +339,11 @@ public class ClusterHullVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp, int clusterID, double opac) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       CSSClass cls = new CSSClass(this, CLUSTERHULL + clusterID);
@@ -366,15 +360,15 @@ public class ClusterHullVisualization extends AbstractVisFactory {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Alpha-Value for alpha-shapes
-     * 
+     *
      * <p>
      * Key: {@code -hull.alpha}
      * </p>

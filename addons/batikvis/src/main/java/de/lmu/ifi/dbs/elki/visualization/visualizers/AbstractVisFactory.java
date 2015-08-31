@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,23 +23,21 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Abstract superclass for Visualizers (aka: Visualization Factories).
- * 
+ *
  * @author Remigius Wojdanowski
- * 
+ *
  * @apiviz.uses ThumbnailVisualization oneway - - «create»
  * @apiviz.excludeSubtypes
  */
 public abstract class AbstractVisFactory implements VisFactory {
-  /**
-   * Mask for redrawing thumbnails
-   */
-  protected int thumbmask = 0;
-
   /**
    * Constructor.
    */
@@ -48,23 +46,26 @@ public abstract class AbstractVisFactory implements VisFactory {
   }
 
   @Override
-  public Visualization makeVisualizationOrThumbnail(VisualizationTask task) {
-    // Is this a thumbnail request?
-    if (task.thumbnail && allowThumbnails(task)) {
-      return new ThumbnailVisualization(this, task, thumbmask);
+  public Visualization makeVisualizationOrThumbnail(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj, int thumbsize) {
+    if(width <= 0 || height <= 0) {
+      LoggingUtil.warning("Cannot generate visualization of 0 size.", new Throwable());
+      return null;
     }
-    return makeVisualization(task);
+    if(allowThumbnails(task)) {
+      return new ThumbnailVisualization(this, task, plot, width, height, proj, thumbsize);
+    }
+    return makeVisualization(task, plot, width, height, proj);
   }
-  
+
   @Override
-  abstract public Visualization makeVisualization(VisualizationTask task);
+  abstract public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj);
 
   /**
    * Test whether to do a thumbnail or a full rendering.
-   * 
+   *
    * Override this with "false" to disable thumbnails!
-   * 
-   * @param task Task requested 
+   *
+   * @param task Task requested
    */
   public boolean allowThumbnails(VisualizationTask task) {
     return true;

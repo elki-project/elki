@@ -1,3 +1,4 @@
+de.lmu.ifi.dbs.elki.visualization.visualizers.actions.ClusterStyleAction
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AxisVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.MarkerVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.PolygonVisualization
@@ -38,6 +39,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments.CircleSegmentsVisuali
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.HistogramVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.EvaluationVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.XYCurveVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.XYPlotVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.PixmapVisualizer
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SimilarityMatrixVisualizer

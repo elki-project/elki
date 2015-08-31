@@ -243,9 +243,8 @@ public class Parallel3DRenderer<O extends NumberVector> {
 
   void renderTexture(GL2 gl, int edge) {
     assert (edge == completedTextures);
-    final StylingPolicy sp = shared.style.getStylingPolicy();
     // Setup color table:
-    prepareColors(sp);
+    prepareColors(shared.stylepol);
 
     // Setup buffer IDs:
     if (vbi[0] < 0) {
@@ -318,8 +317,8 @@ public class Parallel3DRenderer<O extends NumberVector> {
 
       gl.glLineWidth(shared.settings.linewidth);
 
-      if (sp instanceof ClassStylingPolicy) {
-        ClassStylingPolicy csp = (ClassStylingPolicy) sp;
+      if (shared.stylepol instanceof ClassStylingPolicy) {
+        ClassStylingPolicy csp = (ClassStylingPolicy) shared.stylepol;
         final int mincolor = csp.getMinStyle();
         ByteBuffer vbytebuffer = gl.glMapBuffer(GL.GL_ARRAY_BUFFER, GL2.GL_WRITE_ONLY);
         FloatBuffer vertices = vbytebuffer.order(ByteOrder.nativeOrder()).asFloatBuffer();
@@ -411,7 +410,7 @@ public class Parallel3DRenderer<O extends NumberVector> {
 
   private void prepareColors(final StylingPolicy sp) {
     if (colors == null) {
-      final ColorLibrary cols = shared.style.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+      final ColorLibrary cols = shared.stylelib.getColorSet(StyleLibrary.PLOT);
       if (sp instanceof ClassStylingPolicy) {
         ClassStylingPolicy csp = (ClassStylingPolicy) sp;
         final int maxStyle = csp.getMaxStyle();

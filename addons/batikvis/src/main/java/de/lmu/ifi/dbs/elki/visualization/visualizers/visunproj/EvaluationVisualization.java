@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,17 +23,17 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGScoreBar;
@@ -44,19 +44,18 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
- * 
+ *
  * TODO: add indicator whether high values are better or low.
- * 
+ *
  * TODO: add indication/warning when values are out-of-bounds.
- * 
+ *
  * @author Erich Schubert
  * @author Sascha Goldhofer
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»
- * @apiviz.has 
- *             de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering.ScoreResult
- *             oneway - - visualizes
+ * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering.
+ *             ScoreResult oneway - - visualizes
  */
 public class EvaluationVisualization extends AbstractVisFactory {
   /**
@@ -82,14 +81,15 @@ public class EvaluationVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    final ArrayList<EvaluationResult> srs = ResultUtil.filterResults(newResult, EvaluationResult.class);
-    for(EvaluationResult sr : srs) {
-      final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
-      task.width = .5;
-      task.height = sr.numLines() * .05;
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<EvaluationResult> it = VisualizationTree.filterResults(context, start, EvaluationResult.class);
+    for(; it.valid(); it.advance()) {
+      EvaluationResult sr = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, EvaluationVisualization.this);
+      task.reqwidth = .5;
+      task.reqheight = sr.numLines() * .05;
       task.level = VisualizationTask.LEVEL_STATIC;
-      baseResult.getHierarchy().add(sr, task);
+      context.addVis(sr, task);
     }
   }
 
@@ -114,34 +114,33 @@ public class EvaluationVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     // TODO: make a utility class to wrap SVGPlot + parent layer + ypos.
     // TODO: use CSSClass and StyleLibrary
 
     double ypos = -.5; // Skip space before first header
-    SVGPlot svgp = task.getPlot();
-    Element parent = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    Element parent = plot.svgElement(SVGConstants.SVG_G_TAG);
     EvaluationResult sr = task.getResult();
 
     for(String header : sr.getHeaderLines()) {
-      ypos = addHeader(svgp, parent, ypos, header);
+      ypos = addHeader(plot, parent, ypos, header);
     }
 
     for(EvaluationResult.MeasurementGroup g : sr) {
-      ypos = addHeader(svgp, parent, ypos, g.getName());
+      ypos = addHeader(plot, parent, ypos, g.getName());
       for(EvaluationResult.Measurement m : g) {
-        ypos = addBarChart(svgp, parent, ypos, m.getName(), m.getVal(), m.getMin(), m.getMax(), m.getExp(), m.lowerIsBetter());
+        ypos = addBarChart(plot, parent, ypos, m.getName(), m.getVal(), m.getMin(), m.getMax(), m.getExp(), m.lowerIsBetter());
       }
     }
 
     // scale vis
     double cols = 10;
-    final StyleLibrary style = task.getContext().getStyleResult().getStyleLibrary();
+    final StyleLibrary style = task.getContext().getStyleLibrary();
     final double margin = style.getSize(StyleLibrary.MARGIN);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, ypos, margin / StyleLibrary.SCALE);
+    final String transform = SVGUtil.makeMarginTransform(width, height, cols, ypos, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(parent, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualizationInstance(task, parent);
+    return new StaticVisualizationInstance(task, plot, width, height, parent);
   }
 
   @Override

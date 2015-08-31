@@ -39,31 +39,32 @@ import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGEffects;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Generate an overview plot for a set of visualizations.
- * 
+ *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has VisualizerContext
  * @apiviz.composedOf RectangleArranger
@@ -71,7 +72,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @apiviz.has DetailViewSelectedEvent
  * @apiviz.uses DetailView
  */
-public class OverviewPlot implements ResultListener {
+public class OverviewPlot implements ResultListener, VisualizationListener {
   /**
    * Our logging class
    */
@@ -90,7 +91,7 @@ public class OverviewPlot implements ResultListener {
   /**
    * The SVG plot object.
    */
-  private SVGPlot plot;
+  private VisualizationPlot plot;
 
   /**
    * Map of coordinates to plots.
@@ -159,34 +160,41 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Constructor.
-   * 
-   * @param result Result to visualize
+   *
    * @param context Visualizer context
    * @param single Single view mode
    */
-  public OverviewPlot(HierarchicalResult result, VisualizerContext context, boolean single) {
+  public OverviewPlot(VisualizerContext context, boolean single) {
     super();
     this.context = context;
     this.single = single;
 
     // register context listener
     context.addResultListener(this);
+    context.addVisualizationListener(this);
   }
 
   /**
    * Recompute the layout of visualizations.
-   * 
+   *
    * @param width Initial width
    * @param height Initial height
    * @return Arrangement
    */
   private RectangleArranger<PlotItem> arrangeVisualizations(double width, double height) {
+    if(!(width > 0. && height > 0.)) {
+      LOG.warning("No size information during arrange()", new Throwable());
+      return new RectangleArranger<>(1., 1.);
+    }
     RectangleArranger<PlotItem> plotmap = new RectangleArranger<>(width, height);
 
-    ArrayList<Projector> projectors = ResultUtil.filterResults(context.getResult(), Projector.class);
-    // Rectangle layout
-    for(Projector p : projectors) {
-      Collection<PlotItem> projs = p.arrange();
+    Hierarchy<Object> vistree = context.getVisHierarchy();
+    for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
+      if(!(iter2.get() instanceof Projector)) {
+        continue;
+      }
+      Projector p = (Projector) iter2.get();
+      Collection<PlotItem> projs = p.arrange(context);
       for(PlotItem it : projs) {
         if(it.w <= 0.0 || it.h <= 0.0) {
           LOG.warning("Plot item with improper size information: " + it);
@@ -196,22 +204,24 @@ public class OverviewPlot implements ResultListener {
       }
     }
 
-    ResultHierarchy hier = context.getHierarchy();
-    ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(context.getResult(), VisualizationTask.class);
-    nextTask: for(VisualizationTask task : tasks) {
+    nextTask: for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
+      if(!(iter2.get() instanceof VisualizationTask)) {
+        continue;
+      }
+      VisualizationTask task = (VisualizationTask) iter2.get();
       if(!task.visible) {
         continue;
       }
-      for(Hierarchy.Iter<Result> iter = hier.iterParents(task); iter.valid(); iter.advance()) {
+      for(Hierarchy.Iter<?> iter = vistree.iterParents(task); iter.valid(); iter.advance()) {
         if(iter.get() instanceof Projector) {
           continue nextTask;
         }
       }
-      if(task.getWidth() <= 0.0 || task.getHeight() <= 0.0) {
+      if(task.reqwidth <= 0.0 || task.reqheight <= 0.0) {
         LOG.warning("Task with improper size information: " + task);
         continue;
       }
-      PlotItem it = new PlotItem(task.getWidth(), task.getHeight(), null);
+      PlotItem it = new PlotItem(task.reqwidth, task.reqheight, null);
       it.tasks.add(task);
       plotmap.put(it.w, it.h, it);
     }
@@ -220,10 +230,14 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Initialize the plot.
-   * 
+   *
    * @param ratio Initial ratio
    */
   public void initialize(double ratio) {
+    if(!(ratio > 0 && ratio < Double.POSITIVE_INFINITY)) {
+      LOG.warning("Invalid ratio: " + ratio, new Throwable());
+      ratio = 1.4;
+    }
     this.ratio = ratio;
     reinitialize();
   }
@@ -232,6 +246,10 @@ public class OverviewPlot implements ResultListener {
    * Refresh the overview plot.
    */
   private void reinitialize() {
+    // Detach existing elements:
+    for(Pair<Element, Visualization> pair : vistoelem.values()) {
+      SVGUtil.removeFromParent(pair.first);
+    }
     initializePlot();
     plotmap = arrangeVisualizations(ratio, 1.0);
     double s = plotmap.relativeFill();
@@ -244,10 +262,6 @@ public class OverviewPlot implements ResultListener {
     final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
     // TODO: cancel pending thumbnail requests!
 
-    // Detach existing elements:
-    for(Pair<Element, Visualization> pair : vistoelem.values()) {
-      SVGUtil.removeFromParent(pair.first);
-    }
     // Replace the layer map
     LayerMap oldlayers = vistoelem;
     vistoelem = new LayerMap();
@@ -274,7 +288,7 @@ public class OverviewPlot implements ResultListener {
           if(!visibleInOverview(task)) {
             continue;
           }
-          hasDetails |= !task.nodetail;
+          hasDetails |= !task.hasAnyFlags(VisualizationTask.FLAG_NO_DETAIL);
           Pair<Element, Visualization> pair = oldlayers.remove(it, task);
           if(pair == null) {
             pair = new Pair<>(null, null);
@@ -311,8 +325,9 @@ public class OverviewPlot implements ResultListener {
     plot.updateStyleElement();
 
     // Notify listeners.
+    final ActionEvent ev = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, OVERVIEW_REFRESHED);
     for(ActionListener actionListener : actionListeners) {
-      actionListener.actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, OVERVIEW_REFRESHED));
+      actionListener.actionPerformed(ev);
     }
   }
 
@@ -323,10 +338,10 @@ public class OverviewPlot implements ResultListener {
     if(plot != null) {
       plot.dispose();
     }
-    plot = new SVGPlot();
+    plot = new VisualizationPlot();
     { // Add a background element:
       CSSClass cls = new CSSClass(this, "background");
-      final String bgcol = context.getStyleResult().getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE);
+      final String bgcol = context.getStyleLibrary().getBackgroundColor(StyleLibrary.PAGE);
       cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, bgcol);
       plot.addCSSClassOrLogError(cls);
       Element background = plot.svgElement(SVGConstants.SVG_RECT_TAG);
@@ -365,28 +380,25 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Produce thumbnail for a visualizer.
-   * 
+   *
    * @param thumbsize Thumbnail size
    * @param it Plot item
    * @param task Task
    * @param parent Parent element to draw to
    */
   private Visualization embedOrThumbnail(final int thumbsize, PlotItem it, VisualizationTask task, Element parent) {
-    VisualizationTask thumbtask = task.clone(plot, context, it.proj, it.w, it.h);
     final Visualization vis;
     if(!single) {
-      thumbtask.thumbnail = true;
-      thumbtask.thumbsize = thumbsize;
-      vis = thumbtask.getFactory().makeVisualizationOrThumbnail(thumbtask);
+      vis = task.getFactory().makeVisualizationOrThumbnail(task, plot, it.w, it.h, it.proj, thumbsize);
     }
     else {
-      vis = thumbtask.getFactory().makeVisualization(thumbtask);
+      vis = task.getFactory().makeVisualization(task, plot, it.w, it.h, it.proj);
     }
-    if(vis.getLayer() == null) {
+    if(vis == null || vis.getLayer() == null) {
       LoggingUtil.warning("Visualization returned empty layer: " + vis);
       return vis;
     }
-    if(task.noexport) {
+    if(task.hasAnyFlags(VisualizationTask.FLAG_NO_EXPORT)) {
       vis.getLayer().setAttribute(SVGPlot.NO_EXPORT_ATTRIBUTE, SVGPlot.NO_EXPORT_ATTRIBUTE);
     }
     parent.appendChild(vis.getLayer());
@@ -452,17 +464,15 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Test whether a task should be displayed in the overview plot.
-   * 
+   *
    * @param task Task to display
    * @return visibility
    */
   protected boolean visibleInOverview(VisualizationTask task) {
     if(single) {
-      return task.visible && !task.noembed;
+      return task.visible && !task.hasAnyFlags(VisualizationTask.FLAG_NO_EMBED);
     }
-    else {
-      return task.visible && task.thumbnail;
-    }
+    return task.visible && !task.hasAnyFlags(VisualizationTask.FLAG_NO_THUMBNAIL);
   }
 
   /**
@@ -479,7 +489,7 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Event triggered when a plot was selected.
-   * 
+   *
    * @param it Plot item selected
    * @return sub plot
    */
@@ -489,7 +499,7 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Adds an {@link ActionListener} to the plot.
-   * 
+   *
    * @param actionListener the {@link ActionListener} to be added
    */
   public void addActionListener(ActionListener actionListener) {
@@ -498,7 +508,7 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * When a subplot was selected, forward the event to listeners.
-   * 
+   *
    * @param it PlotItem selected
    */
   protected void triggerSubplotSelectEvent(PlotItem it) {
@@ -510,9 +520,9 @@ public class OverviewPlot implements ResultListener {
 
   /**
    * Event when a plot was selected.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public class SelectPlotEvent implements EventListener {
@@ -523,7 +533,7 @@ public class OverviewPlot implements ResultListener {
 
     /**
      * Constructor.
-     * 
+     *
      * @param it Item that was clicked
      */
     public SelectPlotEvent(PlotItem it) {
@@ -541,13 +551,14 @@ public class OverviewPlot implements ResultListener {
    * Destroy this overview plot.
    */
   public void destroy() {
+    context.removeVisualizationListener(this);
     context.removeResultListener(this);
     plot.dispose();
   }
 
   /**
    * Get the SVGPlot object.
-   * 
+   *
    * @return SVG plot
    */
   public SVGPlot getPlot() {
@@ -594,30 +605,30 @@ public class OverviewPlot implements ResultListener {
 
   @Override
   public void resultAdded(Result child, Result parent) {
-    LOG.debug("result added: " + child);
-    if(child instanceof VisualizationTask) {
-      reinitOnRefresh = true;
-    }
     lazyRefresh();
   }
 
   @Override
   public void resultChanged(Result current) {
-    LOG.debug("result changed: " + current);
-    if(current instanceof VisualizationTask) {
-      for(Hierarchy.Iter<Result> iter = context.getHierarchy().iterParents(current); iter.valid(); iter.advance()) {
-        if(iter.get() instanceof Projector) {
-          reinitOnRefresh = true;
-          break;
-        }
-      }
-    }
     lazyRefresh();
   }
 
   @Override
   public void resultRemoved(Result child, Result parent) {
-    LOG.debug("result removed: " + child);
+    lazyRefresh();
+  }
+
+  @Override
+  public void visualizationChanged(VisualizationItem child) {
+    if(child instanceof VisualizationTask) {
+      for(Hierarchy.Iter<Object> iter = context.getVisHierarchy().iterParents(child); iter.valid(); iter.advance()) {
+        final Object o = iter.get();
+        if(o instanceof Projector || o instanceof StaticVisualizationInstance) {
+          reinitOnRefresh = true;
+          break;
+        }
+      }
+    }
     lazyRefresh();
   }
 }

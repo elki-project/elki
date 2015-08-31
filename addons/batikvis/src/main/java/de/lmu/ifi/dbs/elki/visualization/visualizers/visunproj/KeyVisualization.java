@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,45 +23,39 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGButton;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * Visualizer, displaying the key for a clustering.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -72,71 +66,75 @@ public class KeyVisualization extends AbstractVisFactory {
   private static final String NAME = "Cluster Key";
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    // Find clusterings we can visualize:
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
-    for (Clustering<?> c : clusterings) {
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<Clustering<?>> it = VisualizationTree.filterResults(context, start, Clustering.class);
+    for(; it.valid(); it.advance()) {
+      Clustering<?> c = it.get();
       final int numc = c.getAllClusters().size();
       final int topc = c.getToplevelClusters().size();
-      if (numc > 0) {
-        final VisualizationTask task = new VisualizationTask(NAME, c, null, this);
-        if (numc == topc) {
-          // FIXME: compute from labels?
-          final double maxwidth = 10.;
-          // Flat clustering.
-          final int cols = getPreferredColumns(1.0, 1.0, numc, maxwidth);
-          final int rows = (int) Math.ceil(numc / (double) cols);
-          final double ratio = cols * maxwidth / (2. + rows);
-          task.width = (ratio >= 1.) ? 1 : 1. / ratio;
-          task.height = (ratio >= 1.) ? 1. / ratio : 1;
-          if (numc > 100) {
-            task.width *= 2;
-            task.height *= 2;
-          }
-        } else {
-          // Hierarchical clustering.
-          final int[] shape = findDepth(c);
-          final double maxwidth = 8.;
-          final double ratio = shape[0] * maxwidth / (2. + shape[1]);
-          task.width = (ratio >= 1.) ? 1 : 1. / ratio;
-          task.height = (ratio >= 1.) ? 1. / ratio : 1;
-          if (shape[0] * maxwidth > 20 || shape[1] > 18) {
-            task.width *= 2;
-            task.height *= 2;
-          }
-        }
-        task.level = VisualizationTask.LEVEL_STATIC;
-        if (numc < 20) {
-          task.nodetail = true;
-        }
-        baseResult.getHierarchy().add(c, task);
+      if(numc <= 0) {
+        continue;
       }
+      final VisualizationTask task = new VisualizationTask(NAME, context, c, null, this);
+      if(numc == topc) {
+        // FIXME: compute from labels?
+        final double maxwidth = 10.;
+        // Flat clustering.
+        final int cols = getPreferredColumns(1.0, 1.0, numc, maxwidth);
+        final int rows = (int) Math.ceil(numc / (double) cols);
+        final double ratio = cols * maxwidth / (2. + rows);
+        task.reqwidth = (ratio >= 1.) ? 1 : 1. / ratio;
+        task.reqheight = (ratio >= 1.) ? 1. / ratio : 1;
+        if(numc > 100) {
+          task.reqwidth *= 2;
+          task.reqheight *= 2;
+        }
+      }
+      else {
+        // Hierarchical clustering.
+        final int[] shape = findDepth(c);
+        final double maxwidth = 8.;
+        final double ratio = shape[0] * maxwidth / (2. + shape[1]);
+        task.reqwidth = (ratio >= 1.) ? 1 : 1. / ratio;
+        task.reqheight = (ratio >= 1.) ? 1. / ratio : 1;
+        if(shape[0] * maxwidth > 20 || shape[1] > 18) {
+          task.reqwidth *= 2;
+          task.reqheight *= 2;
+        }
+      }
+      task.level = VisualizationTask.LEVEL_STATIC;
+      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
+      if(numc < 20) {
+        task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
+      }
+      context.addVis(c, task);
     }
   }
 
   private static <M extends Model> int[] findDepth(Clustering<M> c) {
     final Hierarchy<Cluster<M>> hier = c.getClusterHierarchy();
     int[] size = { 0, 0 };
-    for (Iter<Cluster<M>> iter = c.iterToplevelClusters(); iter.valid(); iter.advance()) {
+    for(Iter<Cluster<M>> iter = c.iterToplevelClusters(); iter.valid(); iter.advance()) {
       findDepth(hier, iter.get(), size);
     }
     return size;
   }
 
   private static <M extends Model> void findDepth(Hierarchy<Cluster<M>> hier, Cluster<M> cluster, int[] size) {
-    if (hier.numChildren(cluster) > 0) {
-      for (Iter<Cluster<M>> iter = hier.iterChildren(cluster); iter.valid(); iter.advance()) {
+    if(hier.numChildren(cluster) > 0) {
+      for(Iter<Cluster<M>> iter = hier.iterChildren(cluster); iter.valid(); iter.advance()) {
         findDepth(hier, iter.get(), size);
       }
       size[0] += 1; // Depth
-    } else {
+    }
+    else {
       size[1] += 1; // Leaves
     }
   }
 
   /**
    * Compute the preferred number of columns.
-   * 
+   *
    * @param width Target width
    * @param height Target height
    * @param numc Number of clusters
@@ -148,13 +146,13 @@ public class KeyVisualization extends AbstractVisFactory {
     // FIXME: do we really need to do this three-step computation?
     // Number of rows we'd use in a squared layout:
     final double rows = Math.ceil(Math.pow(numc * maxwidth, height / (width + height)));
-    // Given this number of rows (plus two for header), use this many columns:
-    return (int) Math.ceil(numc / (rows + 2));
+    // Given this number of rows (plus one for header), use this many columns:
+    return (int) Math.ceil(numc / (rows + 1));
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height);
   }
 
   @Override
@@ -164,9 +162,9 @@ public class KeyVisualization extends AbstractVisFactory {
 
   /**
    * Instance
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has Clustering oneway - - visualizes
    */
   public class Instance extends AbstractVisualization {
@@ -192,32 +190,21 @@ public class KeyVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height) {
+      super(task, plot, width, height);
       this.clustering = task.getResult();
-      context.addResultListener(this);
+      addListeners();
     }
 
     @Override
-    public void destroy() {
-      context.removeResultListener(this);
-      super.destroy();
-    }
-
-    @Override
-    public void resultChanged(Result current) {
-      super.resultChanged(current);
-      if (current == context.getStyleResult()) {
-        incrementalRedraw();
-      }
-    }
-
-    @Override
-    protected void redraw() {
-      StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    public void fullRedraw() {
+      StyleLibrary style = context.getStyleLibrary();
       MarkerLibrary ml = style.markers();
 
       final List<Cluster<Model>> allcs = clustering.getAllClusters();
@@ -232,22 +219,21 @@ public class KeyVisualization extends AbstractVisFactory {
         layer.appendChild(label);
       }
 
-      final int extrarows = 2;
       double kwi, khe;
-      if (allcs.size() == topcs.size()) {
+      if(allcs.size() == topcs.size()) {
         // Maximum width (compared to height) of labels - guess.
         // FIXME: compute from labels?
         final double maxwidth = 10.;
 
         // Flat clustering. Use multiple columns.
         final int numc = allcs.size();
-        final int cols = getPreferredColumns(task.getWidth(), task.getHeight(), numc, maxwidth);
+        final int cols = getPreferredColumns(getWidth(), getHeight(), numc, maxwidth);
         final int rows = (int) Math.ceil(numc / (double) cols);
         // We use a coordinate system based on rows, so columns are at
         // c*maxwidth
 
         int i = 0;
-        for (Cluster<Model> c : allcs) {
+        for(Cluster<Model> c : allcs) {
           final int col = i / rows;
           final int row = i % rows;
           ml.useMarker(svgp, layer, 0.3 + maxwidth * col, row + 1.5, i, 0.3);
@@ -258,52 +244,28 @@ public class KeyVisualization extends AbstractVisFactory {
         }
         kwi = cols * maxwidth;
         khe = rows;
-      } else {
+      }
+      else {
         // For consistent keying:
         TObjectIntMap<Cluster<Model>> cnum = new TObjectIntHashMap<>(allcs.size());
         int i = 0;
-        for (Cluster<Model> c : allcs) {
+        for(Cluster<Model> c : allcs) {
           cnum.put(c, i);
           i++;
         }
         // Hierarchical clustering. Draw recursively.
-        DoubleDoublePair size = new DoubleDoublePair(0., 1.), pos = new DoubleDoublePair(0., 1.);
+        DoubleDoublePair size = new DoubleDoublePair(0., 1.),
+            pos = new DoubleDoublePair(0., 1.);
         Hierarchy<Cluster<Model>> hier = clustering.getClusterHierarchy();
-        for (Cluster<Model> cluster : topcs) {
+        for(Cluster<Model> cluster : topcs) {
           drawHierarchy(svgp, ml, size, pos, 0, cluster, cnum, hier);
         }
         kwi = size.first;
         khe = size.second;
       }
 
-      // Add a button to set style policy
-      {
-        StylingPolicy sp = context.getStyleResult().getStylingPolicy();
-        if (sp instanceof ClusterStylingPolicy && ((ClusterStylingPolicy) sp).getClustering() == clustering) {
-          // Don't show the button when active. May confuse people more than the
-          // disappearing button?
-
-          // SVGButton button = new SVGButton(.1, rows + 1.1, 3.8, .7, .2);
-          // button.setTitle("Active style", "darkgray");
-          // layer.appendChild(button.render(svgp));
-        } else {
-          SVGButton button = new SVGButton(.1, khe + 1.1, 3.8, .7, .2);
-          button.setTitle("Set style", "black");
-          Element elem = button.render(svgp);
-          // Attach listener
-          EventTarget etr = (EventTarget) elem;
-          etr.addEventListener(SVGConstants.SVG_CLICK_EVENT_TYPE, new EventListener() {
-            @Override
-            public void handleEvent(Event evt) {
-              setStylePolicy();
-            }
-          }, false);
-          layer.appendChild(elem);
-        }
-      }
-
       final double margin = style.getSize(StyleLibrary.MARGIN);
-      final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), kwi, khe + extrarows, margin / StyleLibrary.SCALE);
+      final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), kwi, khe, margin / StyleLibrary.SCALE);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     }
 
@@ -312,22 +274,23 @@ public class KeyVisualization extends AbstractVisFactory {
       DoubleDoublePair subpos = new DoubleDoublePair(pos.first + maxwidth, pos.second);
       int numc = hier.numChildren(cluster);
       double posy;
-      if (numc > 0) {
+      if(numc > 0) {
         double[] mids = new double[numc];
         Iter<Cluster<Model>> iter = hier.iterChildren(cluster);
-        for (int i = 0; iter.valid(); iter.advance(), i++) {
+        for(int i = 0; iter.valid(); iter.advance(), i++) {
           mids[i] = drawHierarchy(svgp, ml, size, subpos, depth, iter.get(), cnum, hier);
         }
         // Center:
         posy = (pos.second + subpos.second) * .5;
-        for (int i = 0; i < numc; i++) {
+        for(int i = 0; i < numc; i++) {
           Element line = svgp.svgLine(pos.first + maxwidth - 1., posy + .5, pos.first + maxwidth, mids[i] + .5);
           SVGUtil.setCSSClass(line, KEY_HIERLINE);
           layer.appendChild(line);
         }
         // Use vertical extends of children:
         pos.second = subpos.second;
-      } else {
+      }
+      else {
         posy = pos.second + .5;
         pos.second += 1.;
       }
@@ -344,17 +307,16 @@ public class KeyVisualization extends AbstractVisFactory {
      * Trigger a style change.
      */
     protected void setStylePolicy() {
-      context.getStyleResult().setStylingPolicy(new ClusterStylingPolicy(clustering, context.getStyleResult().getStyleLibrary()));
-      context.getHierarchy().resultChanged(context.getStyleResult());
+      context.setStylingPolicy(new ClusterStylingPolicy(clustering, context.getStyleLibrary()));
     }
 
     /**
      * Registers the Tooltip-CSS-Class at a SVGPlot.
-     * 
+     *
      * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
      */
     protected void setupCSS(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       final double fontsize = style.getTextSize(StyleLibrary.KEY);
       final String fontfamily = style.getFontFamily(StyleLibrary.KEY);
       final String color = style.getColor(StyleLibrary.KEY);

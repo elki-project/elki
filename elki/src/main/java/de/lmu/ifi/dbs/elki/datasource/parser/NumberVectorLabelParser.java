@@ -1,4 +1,26 @@
 package de.lmu.ifi.dbs.elki.datasource.parser;
+/*
+This file is part of ELKI:
+Environment for Developing KDD-Applications Supported by Index-Structures
+
+Copyright (C) 2015
+Ludwig-Maximilians-Universität München
+Lehr- und Forschungseinheit für Datenbanksysteme
+ELKI Development Team
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,8 +39,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hash.Unique;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -26,46 +47,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import gnu.trove.list.array.TDoubleArrayList;
-
 /**
  * Parser for a simple CSV type of format, with columns separated by the given
  * pattern (default: whitespace).
- * 
+ *
  * Several labels may be given per point. A label must not be parseable as
  * double. Lines starting with &quot;#&quot; will be ignored.
  *
  * An index can be specified to identify an entry to be treated as class label.
  * This index counts all entries (numeric and labels as well) starting with 0.
- * 
+ *
  * @author Arthur Zimek
- * 
+ * @author Erich Schubert
+ *
  * @apiviz.landmark
  * @apiviz.has NumberVector
- * 
+ *
  * @param <V> the type of NumberVector used
  */
 public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStreamingParser {
@@ -115,9 +112,9 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
   protected LabelList curlbl = null;
 
   /**
-   * (Reused) store for numerical attributes.
+   * Double array storing the numerical attributes during parsing.
    */
-  final TDoubleArrayList attributes = new TDoubleArrayList();
+  protected DoubleArray attributes = new DoubleArray(11);
 
   /**
    * (Reused) store for labels.
@@ -149,7 +146,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
 
   /**
    * Constructor with defaults.
-   * 
+   *
    * @param factory Vector factory
    */
   public NumberVectorLabelParser(NumberVector.Factory<V> factory) {
@@ -158,7 +155,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
 
   /**
    * Constructor.
-   * 
+   *
    * @param colSep Column separator
    * @param quoteChars Quote character
    * @param comment Comment pattern
@@ -171,7 +168,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
 
   /**
    * Test if the current column is marked as label column.
-   * 
+   *
    * @param col Column number
    * @return {@code true} when a label column.
    */
@@ -260,7 +257,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
    * Internal method for parsing a single line. Used by both line based parsing
    * as well as block parsing. This saves the building of meta data for each
    * line.
-   * 
+   *
    * @return {@code true} when a valid line was read, {@code false} on a label
    *         row.
    */
@@ -270,8 +267,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
     for(/* initialized by nextLineExceptComents()! */; tokenizer.valid(); tokenizer.advance(), i++) {
       if(!isLabelColumn(i) && !tokenizer.isQuoted()) {
         try {
-          double attribute = tokenizer.getDouble();
-          attributes.add(attribute);
+          attributes.add(tokenizer.getDouble());
           continue;
         }
         catch(NumberFormatException e) {
@@ -287,7 +283,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
       }
     }
     // Maybe a label row?
-    if(reader.getLineNumber() == 1 && attributes.size() == 0) {
+    if(reader.getLineNumber() == 1 && attributes.size == 0) {
       columnnames = new ArrayList<>(labels);
       haslabels = false;
       curvec = null;
@@ -295,28 +291,25 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
       return false;
     }
     // Pass outside via class variables
-    curvec = createDBObject(attributes, ArrayLikeUtil.TDOUBLELISTADAPTER);
+    curvec = createVector();
     curlbl = LabelList.make(labels);
-    attributes.reset();
+    attributes.clear();
     labels.clear();
     return true;
   }
 
   /**
    * Creates a database object of type V.
-   * 
-   * @param attributes the attributes of the vector to create.
-   * @param adapter Array adapter
-   * @param <A> attribute type
-   * @return a RalVector of type V containing the given attribute values
+   *
+   * @return a vector of type V containing the given attribute values
    */
-  protected <A> V createDBObject(A attributes, NumberArrayAdapter<?, A> adapter) {
-    return factory.newNumberVector(attributes, adapter);
+  protected V createVector() {
+    return factory.newNumberVector(attributes, attributes);
   }
 
   /**
    * Get a prototype object for the given dimensionality.
-   * 
+   *
    * @param mindim Minimum dimensionality
    * @param maxdim Maximum dimensionality
    * @return Prototype object
@@ -354,9 +347,9 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractStreamingParser.Parameterizer {
@@ -398,7 +391,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
 
     /**
      * Get the object factory.
-     * 
+     *
      * @param config Parameterization
      */
     protected void getFactory(Parameterization config) {
@@ -410,7 +403,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
 
     /**
      * Get the label indices.
-     * 
+     *
      * @param config Parameterization
      */
     protected void getLabelIndices(Parameterization config) {

@@ -29,14 +29,13 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 
 /**
  * Class to launch ELKI.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses AbstractApplication
  */
 public class ELKILauncher {
@@ -47,16 +46,16 @@ public class ELKILauncher {
 
   /**
    * Launch ELKI.
-   * 
+   *
    * @param args Command line arguments.
    */
   public static void main(String[] args) {
     if(args.length > 0 && args[0].charAt(0) != '-') {
-      try {
-        Class<?> cls = findMainClass(args[0]);
-        Method m = cls.getMethod("main", String[].class);
-        Object a = Arrays.copyOfRange(args, 1, args.length);
+      Class<?> cls = ELKIServiceRegistry.findImplementation(AbstractApplication.class, args[0]);
+      if(cls != null) {
         try {
+          Method m = cls.getMethod("main", String[].class);
+          Object a = Arrays.copyOfRange(args, 1, args.length);
           m.invoke(null, a);
         }
         catch(InvocationTargetException e) {
@@ -67,9 +66,6 @@ public class ELKILauncher {
         }
         return;
       }
-      catch(Exception e) {
-        // Ignore
-      }
     }
     try {
       Method m = DEFAULT_APPLICATION.getMethod("main", String[].class);
@@ -78,39 +74,5 @@ public class ELKILauncher {
     catch(Exception e) {
       LoggingUtil.exception(e);
     }
-  }
-
-  /**
-   * Find a class for the given name.
-   * 
-   * @param name Class name
-   * @return Class
-   * @throws ClassNotFoundException
-   */
-  public static Class<? extends AbstractApplication> findMainClass(String name) throws ClassNotFoundException {
-    try {
-      return Class.forName(name).asSubclass(AbstractApplication.class);
-    }
-    catch(ClassNotFoundException | ClassCastException e) {
-      // pass
-    }
-    try {
-      return Class.forName(AbstractApplication.class.getPackage().getName() + '.' + name)//
-      .asSubclass(AbstractApplication.class);
-    }
-    catch(ClassNotFoundException | ClassCastException e) {
-      // pass
-    }
-    for(Class<?> c : InspectionUtil.cachedFindAllImplementations(AbstractApplication.class)) {
-      if(c.isAnnotationPresent(Alias.class)) {
-        Alias aliases = c.getAnnotation(Alias.class);
-        for(String alias : aliases.value()) {
-          if(alias.equalsIgnoreCase(name)) {
-            return c.asSubclass(AbstractApplication.class);
-          }
-        }
-      }
-    }
-    throw new ClassNotFoundException(name);
   }
 }

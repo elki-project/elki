@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -36,13 +34,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
@@ -52,9 +51,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Renders PolygonsObject in the data set.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -72,35 +71,37 @@ public class PolygonVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<Relation<?>> results = ResultUtil.filterResults(result, Relation.class);
-    for(Relation<?> rel : results) {
-      if(TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
+  public void processNewResult(VisualizerContext context, Object result) {
+    VisualizationTree.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, Relation<?> rel, ScatterPlotProjector<?> p) {
+        if(!TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
+          return;
+        }
+        if(RelationUtil.dimensionality(p.getRelation()) != 2) {
+          return;
+        }
         // Assume that a 2d projector is using the same coordinates as the
         // polygons.
-        Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-        for(ScatterPlotProjector<?> p : ps) {
-          if(RelationUtil.dimensionality(p.getRelation()) == 2) {
-            final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), this);
-            task.level = VisualizationTask.LEVEL_DATA - 10;
-            baseResult.getHierarchy().add(rel, task);
-            baseResult.getHierarchy().add(p, task);
-          }
-        }
+        final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel, PolygonVisualization.this);
+        task.level = VisualizationTask.LEVEL_DATA - 10;
+        task.addUpdateFlags(VisualizationTask.ON_DATA);
+        context.addVis(rel, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   /**
    * Instance
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has PolygonsObject - - visualizes
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
@@ -117,25 +118,23 @@ public class PolygonVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Task to visualize
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.rep = task.getResult(); // Note: relation was used for projection
-      context.addDataStoreListener(this);
-      incrementalRedraw();
+      addListeners();
     }
 
     @Override
-    public void destroy() {
-      super.destroy();
-      context.removeDataStoreListener(this);
-    }
-
-    @Override
-    public void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    public void fullRedraw() {
+      setupCanvas();
+      final StyleLibrary style = context.getStyleLibrary();
       CSSClass css = new CSSClass(svgp, POLYS);
       // TODO: separate fill and line colors?
       css.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.POLYGONS));

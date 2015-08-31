@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,22 +23,21 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.XYPlot;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -50,9 +49,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Visualizer to render a simple 2D curve such as a ROC curve.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  * @apiviz.has XYPlot oneway - - visualizes
@@ -81,25 +80,24 @@ public class XYPlotVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     VisualizerContext context = task.getContext();
-    SVGPlot svgp = task.getPlot();
-    XYPlot plot = task.getResult();
+    XYPlot xyplot = task.getResult();
 
-    setupCSS(context, svgp, plot);
-    final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    setupCSS(context, plot, xyplot);
+    final StyleLibrary style = context.getStyleLibrary();
     final double sizex = StyleLibrary.SCALE;
-    final double sizey = StyleLibrary.SCALE * task.getHeight() / task.getWidth();
+    final double sizey = StyleLibrary.SCALE * height / width;
     final double margin = style.getSize(StyleLibrary.MARGIN);
-    Element layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), sizex, sizey, margin);
+    Element layer = SVGUtil.svgElement(plot.getDocument(), SVGConstants.SVG_G_TAG);
+    final String transform = SVGUtil.makeMarginTransform(width, height, sizex, sizey, margin);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
     // determine scaling
-    LinearScale scalex = new LinearScale(plot.getMinx(), plot.getMaxx());
-    LinearScale scaley = new LinearScale(plot.getMiny(), plot.getMaxy());
+    LinearScale scalex = new LinearScale(xyplot.getMinx(), xyplot.getMaxx());
+    LinearScale scaley = new LinearScale(xyplot.getMiny(), xyplot.getMaxy());
 
-    for(XYPlot.Curve curve : plot) {
+    for(XYPlot.Curve curve : xyplot) {
       // plot the line
       SVGPath path = new SVGPath();
       for(XYPlot.Curve.Itr iterator = curve.iterator(); iterator.valid(); iterator.advance()) {
@@ -107,41 +105,41 @@ public class XYPlotVisualization extends AbstractVisFactory {
         final double y = 1 - scaley.getScaled(iterator.getY());
         path.drawTo(sizex * x, sizey * y);
       }
-      Element line = path.makeElement(svgp);
+      Element line = path.makeElement(plot);
       line.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, SERIESID + curve.getColor());
       layer.appendChild(line);
     }
 
     // add axes
     try {
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scaley, 0, sizey, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
-      SVGSimpleLinearAxis.drawAxis(svgp, layer, scalex, 0, sizey, sizex, sizey, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, style);
+      SVGSimpleLinearAxis.drawAxis(plot, layer, scaley, 0, sizey, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
+      SVGSimpleLinearAxis.drawAxis(plot, layer, scalex, 0, sizey, sizex, sizey, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, style);
     }
     catch(CSSNamingConflict e) {
       LoggingUtil.exception(e);
     }
     // Add axis labels
     {
-      Element labelx = svgp.svgText(sizex * .5, sizey + margin * .9, plot.getLabelx());
+      Element labelx = plot.svgText(sizex * .5, sizey + margin * .9, xyplot.getLabelx());
       SVGUtil.setCSSClass(labelx, CSS_AXIS_LABEL);
       layer.appendChild(labelx);
-      Element labely = svgp.svgText(margin * -.8, sizey * .5, plot.getLabely());
+      Element labely = plot.svgText(margin * -.8, sizey * .5, xyplot.getLabely());
       SVGUtil.setCSSClass(labely, CSS_AXIS_LABEL);
       SVGUtil.setAtt(labely, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90," + FormatUtil.NF6.format(margin * -.8) + "," + FormatUtil.NF6.format(sizey * .5) + ")");
       layer.appendChild(labely);
     }
 
-    return new StaticVisualizationInstance(task, layer);
+    return new StaticVisualizationInstance(task, plot, width, height, layer);
   }
 
   /**
    * Setup the CSS classes for the plot.
-   * 
+   *
    * @param svgp Plot
    * @param plot Plot to render
    */
   private void setupCSS(VisualizerContext context, SVGPlot svgp, XYPlot plot) {
-    StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    StyleLibrary style = context.getStyleLibrary();
     for(XYPlot.Curve curve : plot) {
       CSSClass csscls = new CSSClass(this, SERIESID + curve.getColor());
       // csscls.setStatement(SVGConstants.SVG_STROKE_WIDTH_ATTRIBUTE, "0.2%");
@@ -160,14 +158,15 @@ public class XYPlotVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    final ArrayList<XYPlot> plots = ResultUtil.filterResults(result, XYPlot.class);
-    for(XYPlot plot : plots) {
-      final VisualizationTask task = new VisualizationTask(NAME, plot, null, this);
-      task.width = 1.0;
-      task.height = 1.0;
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<XYPlot> it = VisualizationTree.filterResults(context, start, XYPlot.class);
+    for(; it.valid(); it.advance()) {
+      XYPlot plot = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, plot, null, XYPlotVisualization.this);
+      task.reqwidth = 1.0;
+      task.reqheight = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
-      baseResult.getHierarchy().add(plot, task);
+      context.addVis(plot, task);
     }
   }
 

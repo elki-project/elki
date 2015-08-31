@@ -28,37 +28,39 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**
- * This helper class will replace a node in an SVG plot,
- * as soon as the tree is unlocked by the rendering engine.
- * 
- * @author Erich Schubert
+ * Runnable wrapper to replace all children of a given node.
  *
+ * @author Erich Schubert
  */
-public class NodeReplacer implements Runnable {
-  private SVGPlot plot;
-  private String id;
-  private Element newe;
-  
+public class NodeReplaceAllChildren extends NodeAppendChild {
   /**
-   * Setup a SVG node replacement.
-   * 
-   * @param newe New element
-   * @param plot SVG plot to process
-   * @param id Node ID to replace
+   * Trivial constructor.
+   *
+   * @param parent will become the parent of the appended Element.
+   * @param child the Element to be appended.
    */
-  public NodeReplacer(Element newe, SVGPlot plot, String id) {
-    super();
-    this.newe = newe;
-    this.plot = plot;
-    this.id = id;
+  public NodeReplaceAllChildren(Element parent, Element child) {
+    super(parent, child, null, null);
+  }
+
+  /**
+   * Full constructor.
+   *
+   * @param parent Parent node to append the child to
+   * @param child Child element
+   * @param plot Plot to register the ID (may be {@code null})
+   * @param id ID to register (may be {@code null}, requires plot to be given)
+   */
+  public NodeReplaceAllChildren(Element parent, Element child, SVGPlot plot, String id) {
+    super(parent, child, plot, id);
   }
 
   @Override
   public void run() {
-    Element olde = plot.getIdElement(id);
-    if (olde != null) {
-      olde.getParentNode().replaceChild(newe, olde);
-      plot.putIdElement(id, newe);
+    // remove all existing children.
+    while(parent.hasChildNodes()) {
+      parent.removeChild(parent.getLastChild());
     }
+    super.run();
   }
 }

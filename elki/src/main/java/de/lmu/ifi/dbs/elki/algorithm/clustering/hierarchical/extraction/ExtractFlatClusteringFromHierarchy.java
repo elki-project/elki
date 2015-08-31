@@ -1,30 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import gnu.trove.list.array.TDoubleArrayList;
-
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
@@ -51,6 +26,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -65,13 +41,13 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Extract a flat clustering from a full hierarchy, represented in pointer form.
- * 
+ *
  * FIXME: re-check tie handling!
- * 
+ *
  * TODO: add an hierarchy simplification step.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses HierarchicalClusteringAlgorithm
  * @apiviz.uses PointerHierarchyRepresentationResult
  */
@@ -83,9 +59,9 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
 
   /**
    * Threshold mode.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static enum ThresholdMode {
@@ -99,9 +75,9 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
 
   /**
    * Output mode.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static enum OutputMode {
@@ -138,7 +114,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
 
   /**
    * Constructor.
-   * 
+   *
    * @param algorithm Algorithm to run
    * @param minclusters Minimum number of clusters
    * @param outputmode Output mode: truncated hierarchy or strict partitions.
@@ -155,7 +131,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
 
   /**
    * Constructor.
-   * 
+   *
    * @param algorithm Algorithm to run
    * @param threshold Distance threshold
    * @param outputmode Output mode: truncated hierarchy or strict partitions.
@@ -185,11 +161,11 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
 
   /**
    * Extract all clusters from the pi-lambda-representation.
-   * 
+   *
    * @param ids Object ids to process
    * @param pi Pi store
    * @param lambda Lambda store
-   * 
+   *
    * @return Hierarchical clustering
    */
   private Clustering<DendrogramModel> extractClusters(DBIDs ids, final DBIDDataStore pi, final DoubleDataStore lambda) {
@@ -208,7 +184,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
     final int expcnum = ids.size() - split;
     WritableIntegerDataStore cluster_map = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_TEMP, -1);
     ArrayList<ModifiableDBIDs> cluster_dbids = new ArrayList<>(expcnum + 10);
-    TDoubleArrayList cluster_dist = new TDoubleArrayList(expcnum + 10);
+    DoubleArray cluster_dist = new DoubleArray(expcnum + 10);
     ArrayModifiableDBIDs cluster_leads = DBIDUtil.newArray(expcnum + 10);
 
     DBIDVar succ = DBIDUtil.newVar(); // Variable for successor.
@@ -382,7 +358,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
 
   /**
    * Find the splitting point in the ordered DBIDs list.
-   * 
+   *
    * @param order Ordered list
    * @param it Iterator on this list (reused)
    * @param lambda Join distances.
@@ -417,7 +393,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
 
   /**
    * Make the cluster for the given object
-   * 
+   *
    * @param lead Leading object
    * @param depth Linkage depth
    * @param members Member objects
@@ -449,9 +425,9 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

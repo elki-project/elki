@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -35,13 +33,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -53,9 +52,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
 
 /**
  * Tool-Visualization for the tool to select objects
- * 
+ *
  * @author Heidi Kolb
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance - - «create»
  */
@@ -67,7 +66,7 @@ public class SelectionToolDotVisualization extends AbstractVisFactory {
 
   /**
    * Input modes
-   * 
+   *
    * @apiviz.exclude
    */
   private enum Mode {
@@ -82,33 +81,31 @@ public class SelectionToolDotVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
-    for(SelectionResult selres : selectionResults) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-        task.level = VisualizationTask.LEVEL_INTERACTIVE;
-        task.tool = true;
-        task.thumbnail = false;
-        task.noexport = true;
-        task.initDefaultVisibility(false);
-        baseResult.getHierarchy().add(selres, task);
-        baseResult.getHierarchy().add(p, task);
-      }
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionToolDotVisualization.this);
+      task.level = VisualizationTask.LEVEL_INTERACTIVE;
+      task.tool = true;
+      task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SELECTION);
+      task.initDefaultVisibility(false);
+      context.addVis(context.getSelectionResult(), task);
+      context.addVis(p, task);
     }
   }
 
   /**
    * Instance
-   * 
+   *
    * @author Heidi Kolb
-   * 
+   *
    * @apiviz.has SelectionResult oneway - - updates
    * @apiviz.has DBIDSelection oneway - - updates
    */
@@ -130,16 +127,21 @@ public class SelectionToolDotVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
-      incrementalRedraw();
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
+      addListeners();
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
+      setupCanvas();
       addCSSClasses(svgp);
 
       //
@@ -155,7 +157,7 @@ public class SelectionToolDotVisualization extends AbstractVisFactory {
 
     /**
      * Delete the children of the element
-     * 
+     *
      * @param container SVG-Element
      */
     private void deleteChildren(Element container) {
@@ -192,7 +194,7 @@ public class SelectionToolDotVisualization extends AbstractVisFactory {
 
     /**
      * Get the current input mode, on each mouse event.
-     * 
+     *
      * @param evt Mouse event.
      * @return current input mode
      */
@@ -216,7 +218,7 @@ public class SelectionToolDotVisualization extends AbstractVisFactory {
 
     /**
      * Updates the selection in the context.<br>
-     * 
+     *
      * @param mode Input mode
      * @param proj
      * @param p1 first point of the selected rectangle
@@ -256,14 +258,14 @@ public class SelectionToolDotVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     protected void addCSSClasses(SVGPlot svgp) {
       // Class for the range marking
       if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
         final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));
         rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION_ACTIVE));
         svgp.addCSSClassOrLogError(rcls);

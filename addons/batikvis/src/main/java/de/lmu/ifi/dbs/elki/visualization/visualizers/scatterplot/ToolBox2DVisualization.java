@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  */
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -34,26 +33,28 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Renders a tool box on the left of the 2D visualization
- * 
+ *
  * @author Heidi Kolb
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -76,28 +77,27 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(result, ScatterPlotProjector.class);
-    for(ScatterPlotProjector<?> p : ps) {
-      final VisualizationTask task = new VisualizationTask(NAME, p, p.getRelation(), this);
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ToolBox2DVisualization.this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      task.thumbnail = false;
-      task.noexport = true;
-      task.noembed = true;
-      baseResult.getHierarchy().add(p, task);
+      task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT | VisualizationTask.FLAG_NO_EMBED);
+      context.addVis(p, task);
     }
   }
 
   /**
    * Instance.
-   * 
+   *
    * @author Heidi Kolb
-   * 
+   *
    * @apiviz.has VisualizationTask oneway - - visualizes
    */
   public class Instance extends AbstractScatterplotVisualization {
@@ -123,18 +123,21 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
-      // TODO: which result do we best attach to?
-      context.addResultListener(this);
-      incrementalRedraw();
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
+      context.addVisualizationListener(this);
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
+      setupCanvas();
       addCSSClasses(svgp);
       container = svgp.svgElement(SVGConstants.SVG_G_TAG);
       buildToolBox();
@@ -143,7 +146,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
 
     /**
      * Deletes the children of the container
-     * 
+     *
      * @param container Element to delete children
      */
     private void deleteChildren(Element container) {
@@ -160,8 +163,9 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       deleteChildren(container);
 
       ArrayList<VisualizationTask> vis = new ArrayList<>();
-      Collection<VisualizationTask> visualizers = ResultUtil.filterResults(task.getResult(), VisualizationTask.class);
-      for(VisualizationTask task : visualizers) {
+      Hierarchy.Iter<VisualizationTask> it = VisualizationTree.filter(context, task.getResult(), VisualizationTask.class);
+      for(; it.valid(); it.advance()) {
+        VisualizationTask task = it.get();
         if(task.tool && !vis.contains(task)) {
           vis.add(task);
         }
@@ -184,7 +188,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       for(int i = 0; i < vis.size(); i++) {
         VisualizationTask v = vis.get(i);
         toolTags[i] = svgp.svgRect(x, y, width, height);
-        String name = v.getLongName();
+        String name = v.getMenuName();
         // Split
         List<String> lines = FormatUtil.splitAtLastBlank(name, 8);
         // Generate label objects.
@@ -209,7 +213,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
@@ -235,7 +239,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       }
       // Class for the text of the tools
       if(!svgp.getCSSClassManager().contains(CSS_TOOL_CAPTION)) {
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         final CSSClass label = new CSSClass(svgp, CSS_TOOL_CAPTION);
         label.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));
         label.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.AXIS_LABEL));
@@ -247,7 +251,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
 
     /**
      * Add an event listener to the Element
-     * 
+     *
      * @param tag Element to add the listener
      * @param tool Tool represented by the Element
      */
@@ -263,7 +267,7 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
 
     /**
      * Handle the mouseClick - change the selected tool in the context
-     * 
+     *
      * @param tool Selected Tool
      */
     protected void handleMouseClick(VisualizationTask tool) {
@@ -271,35 +275,16 @@ public class ToolBox2DVisualization extends AbstractVisFactory {
       if(tool.visible) {
         context.setSelection(null);
       }
-      VisualizerUtil.setVisible(context, tool, true);
+      VisualizationTree.setVisible(context, tool, true);
     }
 
     @Override
-    public void resultAdded(Result child, Result parent) {
-      if(child instanceof VisualizationTask) {
-        VisualizationTask task = (VisualizationTask) child;
+    public void visualizationChanged(VisualizationItem item) {
+      super.visualizationChanged(item);
+      if(item instanceof VisualizationTask) {
+        VisualizationTask task = (VisualizationTask) item;
         if(task.tool) {
-          synchronizedRedraw();
-        }
-      }
-    }
-
-    @Override
-    public void resultRemoved(Result child, Result parent) {
-      if(child instanceof VisualizationTask) {
-        VisualizationTask task = (VisualizationTask) child;
-        if(task.tool) {
-          synchronizedRedraw();
-        }
-      }
-    }
-
-    @Override
-    public void resultChanged(Result current) {
-      if(current instanceof VisualizationTask) {
-        VisualizationTask task = (VisualizationTask) current;
-        if(task.tool) {
-          synchronizedRedraw();
+          svgp.requestRedraw(this.task, this);
         }
       }
     }

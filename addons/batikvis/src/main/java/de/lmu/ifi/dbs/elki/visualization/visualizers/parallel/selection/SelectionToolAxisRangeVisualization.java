@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2011
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
@@ -36,15 +34,15 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -56,9 +54,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVi
 
 /**
  * Tool-Visualization for the tool to select axis ranges
- * 
+ *
  * @author Robert Rödler
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -81,37 +79,35 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
-    for(SelectionResult selres : selectionResults) {
-      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
-      for(ParallelPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-        task.level = VisualizationTask.LEVEL_INTERACTIVE;
-        task.tool = true;
-        task.thumbnail = false;
-        task.noexport = true;
-        task.initDefaultVisibility(false);
-        baseResult.getHierarchy().add(selres, task);
-        baseResult.getHierarchy().add(p, task);
-      }
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ParallelPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionToolAxisRangeVisualization.this);
+      task.level = VisualizationTask.LEVEL_INTERACTIVE;
+      task.tool = true;
+      task.addUpdateFlags(VisualizationTask.ON_SELECTION);
+      task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
+      task.initDefaultVisibility(false);
+      context.addVis(context.getSelectionResult(), task);
+      context.addVis(p, task);
     }
   }
 
   /**
    * Instance
-   * 
+   *
    * @author Robert Rödler
-   * 
+   *
    * @apiviz.has SelectionResult oneway - - updates
    * @apiviz.has RangeSelection oneway - - updates
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector> implements DragableArea.DragListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector>implements DragableArea.DragListener {
     /**
      * Generic tag to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -130,16 +126,21 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
-      incrementalRedraw();
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
+      addListeners();
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
+      super.fullRedraw();
       addCSSClasses(svgp);
 
       // rtag: tag for the selected rect
@@ -155,7 +156,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
 
     /**
      * Delete the children of the element
-     * 
+     *
      * @param container SVG-Element
      */
     private void deleteChildren(Element container) {
@@ -167,7 +168,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
     /**
      * Set the selected ranges and the mask for the actual dimensions in the
      * context
-     * 
+     *
      * @param x1 min x-value
      * @param x2 max x-value
      * @param y1 min y-value
@@ -235,7 +236,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
 
     /**
      * Update the selection in the context.
-     * 
+     *
      * @param proj The projection
      * @param p1 First Point of the selected rectangle
      * @param p2 Second Point of the selected rectangle
@@ -288,14 +289,14 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     protected void addCSSClasses(SVGPlot svgp) {
       // Class for the range marking
       if(!svgp.getCSSClassManager().contains(CSS_RANGEMARKER)) {
         final CSSClass rcls = new CSSClass(this, CSS_RANGEMARKER);
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         rcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.SELECTION_ACTIVE));
         rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, style.getOpacity(StyleLibrary.SELECTION_ACTIVE));
         svgp.addCSSClassOrLogError(rcls);

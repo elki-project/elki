@@ -109,7 +109,7 @@ public class ClusteringVectorDumper implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
     List<Clustering<?>> cs = ResultUtil.getClusteringResults(newResult);
     if(cs.size() < 1) {
       return;
@@ -124,7 +124,7 @@ public class ClusteringVectorDumper implements ResultHandler {
           PrintStream writer = new PrintStream(os)) {
         // TODO: dump settings, too?
         for(Clustering<?> c : cs) {
-          dumpClusteringOutput(writer, baseResult.getHierarchy(), c);
+          dumpClusteringOutput(writer, hier, c);
         }
         append = true; // Append future results.
       }
@@ -134,7 +134,7 @@ public class ClusteringVectorDumper implements ResultHandler {
     }
     else {
       for(Clustering<?> c : cs) {
-        dumpClusteringOutput(System.out, baseResult.getHierarchy(), c);
+        dumpClusteringOutput(System.out, hier, c);
       }
     }
   }

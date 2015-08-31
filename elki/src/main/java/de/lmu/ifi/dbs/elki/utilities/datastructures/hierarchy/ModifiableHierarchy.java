@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,47 +25,52 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
 
 /**
  * Modifiable Hierarchy.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type
  */
 public interface ModifiableHierarchy<O> extends Hierarchy<O> {
   /**
    * Add a parent-child relationship.
-   * 
+   *
    * @param parent Parent
    * @param child Child
+   * @return {@code true} if changed
    */
-  void add(O parent, O child);
+  boolean add(O parent, O child);
 
   /**
    * Add an entry (initializes data structures).
-   * 
+   *
    * @param entry Entry
+   * @return {@code true} if changed
    */
-  void add(O entry);
+  boolean add(O entry);
 
   /**
    * Remove a parent-child relationship.
-   * 
+   *
    * @param parent Parent
    * @param child Child
+   * @return {@code true} if changed
    */
-  void remove(O parent, O child);
+  boolean remove(O parent, O child);
 
   /**
    * Remove an entry and all its parent-child relationships.
-   * 
+   *
    * @param entry Entry
+   * @return {@code true} if changed
    */
-  void remove(O entry);
+  boolean remove(O entry);
 
   /**
    * Remove an entry and it's whole subtree (unless the elements are reachable
    * by a different path!)
-   * 
+   *
    * @param entry Entry
+   * @return {@code true} if changed
    */
-  void removeSubtree(O entry);
+  boolean removeSubtree(O entry);
 }

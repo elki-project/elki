@@ -50,19 +50,20 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -84,7 +85,8 @@ import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
+import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 
 /**
  * Simple JOGL2 based parallel coordinates visualization.
@@ -130,22 +132,23 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
     boolean nonefound = true;
-    StyleResult style = getStyleResult(baseResult);
     List<Relation<?>> rels = ResultUtil.getRelations(newResult);
-    for (Relation<?> rel : rels) {
-      if (!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+    for(Relation<?> rel : rels) {
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         continue;
       }
       @SuppressWarnings("unchecked")
       Relation<? extends O> vrel = (Relation<? extends O>) rel;
       ScalesResult scales = ResultUtil.getScalesResult(vrel);
-      ProjectionParallel proj = new SimpleParallel(scales.getScales());
-      new Instance<>(vrel, proj, settings, style).run();
+      ProjectionParallel proj = new SimpleParallel(null, scales.getScales());
+      PropertiesBasedStyleLibrary stylelib = new PropertiesBasedStyleLibrary();
+      StylingPolicy stylepol = getStylePolicy(hier, stylelib);
+      new Instance<>(vrel, proj, settings, stylepol, stylelib).run();
       nonefound = false;
     }
-    if (nonefound && baseResult.equals(newResult)) {
+    if(nonefound && hier.equals(newResult)) {
       LOG.warning("3DPC did not find a number vector field relation to visualize!");
     }
   }
@@ -155,20 +158,14 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
    *
    * @return Style result
    */
-  public StyleResult getStyleResult(HierarchicalResult result) {
-    ArrayList<StyleResult> styles = ResultUtil.filterResults(result, StyleResult.class);
-    if (styles.size() > 0) {
-      return styles.get(0);
+  public StylingPolicy getStylePolicy(ResultHierarchy hier, StyleLibrary stylelib) {
+    Database db = ResultUtil.findDatabase(hier);
+    ResultUtil.ensureClusteringResult(db, db);
+    List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(db);
+    if(clusterings.size() > 0) {
+      return new ClusterStylingPolicy(clusterings.get(0), stylelib);
     }
-    StyleResult styleresult = new StyleResult();
-    styleresult.setStyleLibrary(new PropertiesBasedStyleLibrary());
-    ResultUtil.ensureClusteringResult(ResultUtil.findDatabase(result), result);
-    List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(result);
-    if (clusterings.size() > 0) {
-      styleresult.setStylingPolicy(new ClusterStylingPolicy(clusterings.get(0), styleresult.getStyleLibrary()));
-      result.getHierarchy().add(result, styleresult);
-      return styleresult;
-    } else {
+    else {
       throw new AbortException("No clustering result generated?!?");
     }
   }
@@ -314,7 +311,12 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       /**
        * Style result
        */
-      StyleResult style;
+      StylingPolicy stylepol;
+
+      /**
+       * Style library
+       */
+      StyleLibrary stylelib;
 
       /**
        * Layout
@@ -352,19 +354,20 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
      * @param settings Settings
      * @param style Style result
      */
-    public Instance(Relation<? extends O> rel, ProjectionParallel proj, Settings<O> settings, StyleResult style) {
+    public Instance(Relation<? extends O> rel, ProjectionParallel proj, Settings<O> settings, StylingPolicy stylepol, StyleLibrary stylelib) {
       super();
 
       this.shared.dim = RelationUtil.dimensionality(rel);
       this.shared.rel = rel;
       this.shared.proj = proj;
-      this.shared.style = style;
+      this.shared.stylelib = stylelib;
+      this.shared.stylepol = stylepol;
       this.shared.settings = settings;
       // Labels:
       this.shared.labels = new String[this.shared.dim];
       {
         VectorFieldTypeInformation<? extends O> vrel = RelationUtil.assumeVectorField(rel);
-        for (int i = 0; i < this.shared.dim; i++) {
+        for(int i = 0; i < this.shared.dim; i++) {
           this.shared.labels[i] = vrel.getLabel(i);
         }
       }
@@ -373,12 +376,12 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       this.menuOverlay = new SimpleMenuOverlay() {
         @Override
         public void menuItemClicked(int item) {
-          if (item < 0) {
+          if(item < 0) {
             switchState(State.EXPLORE);
             return;
           }
           final String name = menuOverlay.getOptions().get(item);
-          if (name == null) {
+          if(name == null) {
             switchState(State.EXPLORE);
             return;
           }
@@ -389,8 +392,8 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       this.menuStarter = new MouseAdapter() {
         @Override
         public void mouseClicked(MouseEvent e) {
-          if (State.EXPLORE.equals(state)) {
-            if (e.getButton() == MouseEvent.BUTTON3) {
+          if(State.EXPLORE.equals(state)) {
+            if(e.getButton() == MouseEvent.BUTTON3) {
               switchState(State.MENU);
               // e.consume();
             }
@@ -402,13 +405,13 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       // Init menu for SIGMOD demo. TODO: make more flexible.
       {
         ArrayList<String> options = menuOverlay.getOptions();
-        for (Class<?> clz : InspectionUtil.cachedFindAllImplementations(Layouter3DPC.class)) {
+        for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(Layouter3DPC.class)) {
           options.add(clz.getSimpleName());
         }
-        if (options.size() > 0) {
+        if(options.size() > 0) {
           options.add(null); // Spacer.
         }
-        for (Class<?> clz : InspectionUtil.cachedFindAllImplementations(DimensionSimilarity.class)) {
+        for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(DimensionSimilarity.class)) {
           options.add(clz.getSimpleName());
         }
       }
@@ -427,7 +430,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
     void initLabels() {
       // Labels:
       shared.labels = new String[shared.dim];
-      for (int i = 0; i < shared.dim; i++) {
+      for(int i = 0; i < shared.dim; i++) {
         shared.labels[i] = RelationUtil.getColumnLabel(shared.rel, i);
       }
     }
@@ -435,10 +438,10 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
     @SuppressWarnings("unchecked")
     protected void relayout(String parname) {
       try {
-        final Class<?> layoutc = InspectionUtil.findImplementation(Layouter3DPC.class, parname);
-        if (layoutc != null) {
+        final Class<?> layoutc = ELKIServiceRegistry.findImplementation(Layouter3DPC.class, parname);
+        if(layoutc != null) {
           ListParameterization params = new ListParameterization();
-          if (shared.settings.sim != null) {
+          if(shared.settings.sim != null) {
             params.addParameter(SimilarityBasedLayouter3DPC.SIM_ID, shared.settings.sim);
           }
           shared.settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, layoutc, params);
@@ -446,15 +449,16 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
           startLayoutThread();
           return;
         }
-      } catch (Exception e) {
+      }
+      catch(Exception e) {
         LOG.exception(e);
         // Try with Dimension Similarity instead.
       }
       try {
-        final Class<?> simc = InspectionUtil.findImplementation(DimensionSimilarity.class, parname);
-        if (simc != null) {
+        final Class<?> simc = ELKIServiceRegistry.findImplementation(DimensionSimilarity.class, parname);
+        if(simc != null) {
           shared.settings.sim = ClassGenericsUtil.tryInstantiate(DimensionSimilarity.class, simc, new EmptyParameterization());
-          if (!(shared.settings.layout instanceof SimilarityBasedLayouter3DPC)) {
+          if(!(shared.settings.layout instanceof SimilarityBasedLayouter3DPC)) {
             ListParameterization params = new ListParameterization();
             params.addParameter(SimilarityBasedLayouter3DPC.SIM_ID, shared.settings.sim);
             shared.settings.layout = ClassGenericsUtil.tryInstantiate(Layouter3DPC.class, SimpleCircularMSTLayout3DPC.class, params);
@@ -465,7 +469,8 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
           startLayoutThread();
           return;
         }
-      } catch (Exception e) {
+      }
+      catch(Exception e) {
         LOG.exception(e);
       }
       // TODO: improve menu, to allow pretty names and map name -> class.
@@ -477,10 +482,10 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
         @Override
         public void run() {
           messageOverlay.setMessage("Computing axis similarities and layout...");
-          if (shared.settings.sim != null && shared.settings.layout instanceof SimilarityBasedLayouter3DPC) {
+          if(shared.settings.sim != null && shared.settings.layout instanceof SimilarityBasedLayouter3DPC) {
             @SuppressWarnings("unchecked")
             final SimilarityBasedLayouter3DPC<O> layouter = (SimilarityBasedLayouter3DPC<O>) shared.settings.layout;
-            if (shared.mat == null) {
+            if(shared.mat == null) {
               messageOverlay.setMessage("Recomputing similarity matrix.");
               shared.mat = DimensionSimilarityMatrix.make(shared.dim);
               shared.settings.sim.computeDimensionSimilarites(shared.rel, shared.rel.getDBIDs(), shared.mat);
@@ -488,7 +493,8 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
             messageOverlay.setMessage("Recomputing layout using similarity matrix.");
             final Layout newlayout = layouter.layout(shared.dim, shared.mat);
             setLayout(newlayout);
-          } else {
+          }
+          else {
             messageOverlay.setMessage("Recomputing layout.");
             final Layout newlayout = shared.settings.layout.layout(shared.rel);
             setLayout(newlayout);
@@ -517,7 +523,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
     @Override
     public void init(GLAutoDrawable drawable) {
       GL2 gl = drawable.getGL().getGL2();
-      if (DEBUG) {
+      if(DEBUG) {
         gl = new DebugGL2(gl);
         drawable.setGL(gl);
       }
@@ -555,7 +561,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       canvas.removeMouseListener(arcball);
       canvas.removeMouseMotionListener(arcball);
       canvas.removeMouseWheelListener(arcball);
-      switch(newstate) {
+      switch(newstate){
       case EXPLORE: {
         canvas.addMouseListener(menuStarter);
         canvas.addMouseListener(arcball);
@@ -572,7 +578,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
         break;
       }
       }
-      if (state != newstate) {
+      if(state != newstate) {
         this.state = newstate;
         canvas.repaint();
       }
@@ -590,31 +596,31 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       GL2 gl = drawable.getGL().getGL2();
       gl.glClear(GL.GL_COLOR_BUFFER_BIT /* | GL.GL_DEPTH_BUFFER_BIT */);
 
-      if (shared.layout != null) {
+      if(shared.layout != null) {
         int res = prenderer.prepare(gl);
-        if (res == 1) {
+        if(res == 1) {
           // Request a repaint, to generate the next texture.
           canvas.repaint();
         }
-        if (res == 2) {
+        if(res == 2) {
           messageOverlay.setMessage("Texture rendering completed.");
           switchState(State.EXPLORE);
         }
       }
 
       shared.camera.apply(gl);
-      if (shared.layout != null) {
+      if(shared.layout != null) {
         prenderer.drawParallelPlot(drawable, gl);
       }
 
-      if (DEBUG) {
+      if(DEBUG) {
         arcball.debugRender(gl);
       }
 
-      if (State.MENU.equals(state)) {
+      if(State.MENU.equals(state)) {
         menuOverlay.render(gl);
       }
-      if (State.PREPARATION.equals(state)) {
+      if(State.PREPARATION.equals(state)) {
         messageOverlay.render(gl);
       }
     }
@@ -667,7 +673,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       ObjectParameter<Layouter3DPC<O>> layoutP = new ObjectParameter<>(LAYOUT_ID, Layouter3DPC.class, SimpleCircularMSTLayout3DPC.class);
-      if (config.grab(layoutP)) {
+      if(config.grab(layoutP)) {
         layout = layoutP.instantiateClass(config);
       }
     }

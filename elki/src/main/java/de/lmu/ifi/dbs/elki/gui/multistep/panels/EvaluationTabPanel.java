@@ -26,14 +26,14 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
 import java.lang.ref.WeakReference;
 
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
 
 /**
  * Panel to handle result evaluation
- * 
+ *
  * @author Erich Schubert
  */
 public class EvaluationTabPanel extends ParameterTabPanel {
@@ -64,7 +64,7 @@ public class EvaluationTabPanel extends ParameterTabPanel {
 
   /**
    * Constructor. We depend on an input panel.
-   * 
+   *
    * @param input Input panel to depend on.
    */
   public EvaluationTabPanel(InputTabPanel input, AlgorithmTabPanel algs) {
@@ -97,14 +97,14 @@ public class EvaluationTabPanel extends ParameterTabPanel {
     }
     // Get the database and run the algorithms
     Database database = input.getInputStep().getDatabase();
-    HierarchicalResult result = algs.getAlgorithmStep().getResult();
-    evals.runEvaluators(result, database);
-    basedOnResult = new WeakReference<Object>(result);
+    Result res = algs.getAlgorithmStep().getResult();
+    evals.runEvaluators(database.getHierarchy(), database);
+    basedOnResult = new WeakReference<Object>(res);
   }
 
   /**
    * Get the evaluation step.
-   * 
+   *
    * @return Evaluation step
    */
   public EvaluationStep getEvaluationStep() {

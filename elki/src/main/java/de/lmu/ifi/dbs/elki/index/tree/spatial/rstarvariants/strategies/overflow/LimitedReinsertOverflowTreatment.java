@@ -73,21 +73,21 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
 
   @Override
   public <N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> boolean handleOverflow(AbstractRStarTree<N, E, ?> tree, N node, IndexTreePath<E> path) {
-    final int level = /* tree.getHeight() - */(path.getPathCount() - 1);
+    final int depthm1 = path.getPathCount() - 1;
     // No reinsertions at root level
-    if(path.getPathCount() == 1) {
+    if(depthm1 == 0) {
       return false;
     }
     // Earlier reinsertions at the same level
-    if(BitsUtil.get(reinsertions, level)) {
+    if(BitsUtil.capacity(reinsertions) < depthm1) {
+      reinsertions = BitsUtil.copy(reinsertions, depthm1);
+    }
+    if(BitsUtil.get(reinsertions, depthm1)) {
       return false;
     }
 
-    if(BitsUtil.capacity(reinsertions) < level) {
-      reinsertions = BitsUtil.copy(reinsertions, level);
-    }
-    BitsUtil.setI(reinsertions, level);
-    final E entry = path.getLastPathComponent().getEntry();
+    BitsUtil.setI(reinsertions, depthm1);
+    final E entry = path.getEntry();
     assert (!entry.isLeafEntry()) : "Unexpected leaf entry";
     int[] cands = reinsertStrategy.computeReinserts(node, NodeArrayAdapter.STATIC, entry);
     if(cands == null || cands.length == 0) {

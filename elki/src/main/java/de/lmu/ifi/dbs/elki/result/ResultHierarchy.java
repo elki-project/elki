@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.result;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.result;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import javax.swing.event.EventListenerList;
+import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarch
 
 /**
  * Class to store a hierarchy of result objects.
- * 
+ *
  * @author Erich Schubert
  */
 // TODO: add listener merging!
@@ -45,7 +45,7 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
   /**
    * Holds the listener.
    */
-  private EventListenerList listenerList = new EventListenerList();
+  private ArrayList<ResultListener> listenerList = new ArrayList<>();
 
   /**
    * Constructor.
@@ -55,9 +55,9 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
   }
 
   @Override
-  public void add(Result parent, Result child) {
-    super.add(parent, child);
-    if(child instanceof HierarchicalResult) {
+  public boolean add(Result parent, Result child) {
+    boolean changed = super.add(parent, child);
+    if(changed && child instanceof HierarchicalResult) {
       HierarchicalResult hr = (HierarchicalResult) child;
       ModifiableHierarchy<Result> h = hr.getHierarchy();
       // Merge hierarchy
@@ -72,35 +72,37 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
       }
     }
     fireResultAdded(child, parent);
+    return changed;
   }
 
   @Override
-  public void remove(Result parent, Result child) {
-    super.remove(parent, child);
+  public boolean remove(Result parent, Result child) {
+    boolean changed = super.remove(parent, child);
     fireResultRemoved(child, parent);
+    return changed;
   }
 
   /**
    * Register a result listener.
-   * 
+   *
    * @param listener Result listener.
    */
   public void addResultListener(ResultListener listener) {
-    listenerList.add(ResultListener.class, listener);
+    listenerList.add(listener);
   }
 
   /**
    * Remove a result listener.
-   * 
+   *
    * @param listener Result listener.
    */
   public void removeResultListener(ResultListener listener) {
-    listenerList.remove(ResultListener.class, listener);
+    listenerList.remove(listener);
   }
 
   /**
    * Signal that a result has changed (public API)
-   * 
+   *
    * @param res Result that has changed.
    */
   public void resultChanged(Result res) {
@@ -109,7 +111,7 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
 
   /**
    * Informs all registered {@link ResultListener} that a new result was added.
-   * 
+   *
    * @param child New child result added
    * @param parent Parent result that was added to
    */
@@ -117,29 +119,29 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
     if(LOG.isDebugging()) {
       LOG.debug("Result added: " + child + " <- " + parent);
     }
-    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
-      l.resultAdded(child, parent);
+    for(int i = listenerList.size(); --i >= 0;) {
+      listenerList.get(i).resultAdded(child, parent);
     }
   }
 
   /**
    * Informs all registered {@link ResultListener} that a result has changed.
-   * 
+   *
    * @param current Result that has changed
    */
   private void fireResultChanged(Result current) {
     if(LOG.isDebugging()) {
       LOG.debug("Result changed: " + current);
     }
-    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
-      l.resultChanged(current);
+    for(int i = listenerList.size(); --i >= 0;) {
+      listenerList.get(i).resultChanged(current);
     }
   }
 
   /**
    * Informs all registered {@link ResultListener} that a new result has been
    * removed.
-   * 
+   *
    * @param child result that has been removed
    * @param parent Parent result that has been removed
    */
@@ -147,8 +149,8 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
     if(LOG.isDebugging()) {
       LOG.debug("Result removed: " + child + " <- " + parent);
     }
-    for(ResultListener l : listenerList.getListeners(ResultListener.class)) {
-      l.resultRemoved(child, parent);
+    for(int i = listenerList.size(); --i >= 0;) {
+      listenerList.get(i).resultRemoved(child, parent);
     }
   }
 }

@@ -39,12 +39,12 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * designed for the DeLiClu algorithm, having in each node a boolean array which
  * indicates whether the child nodes are already handled by the DeLiClu
  * algorithm.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.has DeLiCluNode oneway - - contains
  */
-public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, AbstractRTreeSettings> {
+public abstract class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, AbstractRTreeSettings> {
   /**
    * The logger for this class.
    */
@@ -57,7 +57,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, Abs
 
   /**
    * Constructor.
-   * 
+   *
    * @param pagefile Page file
    * @param settings Settings
    */
@@ -67,7 +67,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, Abs
 
   /**
    * Marks the nodes with the specified ids as expanded.
-   * 
+   *
    * @param entry1 the first node
    * @param entry2 the second node
    */
@@ -82,7 +82,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, Abs
 
   /**
    * Returns the nodes which are already expanded with the specified node.
-   * 
+   *
    * @param entry the id of the node for which the expansions should be returned
    * @return the nodes which are already expanded with the specified node
    */
@@ -96,7 +96,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, Abs
 
   /**
    * Returns the nodes which are already expanded with the specified node.
-   * 
+   *
    * @param entry the id of the node for which the expansions should be returned
    * @return the nodes which are already expanded with the specified node
    */
@@ -110,7 +110,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, Abs
 
   /**
    * Determines and returns the number of nodes in this index.
-   * 
+   *
    * @return the number of nodes in this index
    */
   public int numNodes() {
@@ -118,7 +118,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, Abs
 
     BreadthFirstEnumeration<DeLiCluNode, DeLiCluEntry> bfs = new BreadthFirstEnumeration<>(this, getRootPath());
     while(bfs.hasMoreElements()) {
-      Entry entry = bfs.nextElement().getLastPathComponent().getEntry();
+      Entry entry = bfs.nextElement().getEntry();
       if(!entry.isLeafEntry()) {
         numNodes++;
       }
@@ -129,7 +129,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, Abs
 
   /**
    * Creates a new leaf node with the specified capacity.
-   * 
+   *
    * @return a new leaf node
    */
   @Override
@@ -139,7 +139,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, Abs
 
   /**
    * Creates a new directory node with the specified capacity.
-   * 
+   *
    * @return a new directory node
    */
   @Override
@@ -149,7 +149,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, Abs
 
   /**
    * Creates a new directory entry representing the specified node.
-   * 
+   *
    * @param node the node to be represented by the new entry
    */
   @Override
@@ -159,7 +159,7 @@ public class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluEntry, Abs
 
   /**
    * Creates an entry representing the root node.
-   * 
+   *
    * @return an entry representing the root node
    */
   @Override

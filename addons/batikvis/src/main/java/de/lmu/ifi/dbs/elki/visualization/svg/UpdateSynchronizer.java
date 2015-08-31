@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,9 +26,9 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
 
 /**
  * API to synchronize updates
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has UpdateRunner
  */
 public interface UpdateSynchronizer {
@@ -39,7 +39,7 @@ public interface UpdateSynchronizer {
 
   /**
    * Set an update runner to use.
-   *  
+   *
    * @param updateRunner
    */
   void addUpdateRunner(UpdateRunner updateRunner);

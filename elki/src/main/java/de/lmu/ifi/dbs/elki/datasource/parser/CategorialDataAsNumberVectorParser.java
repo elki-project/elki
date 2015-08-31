@@ -1,5 +1,13 @@
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,31 +33,22 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 
 import gnu.trove.map.hash.TObjectIntHashMap;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-
 /**
  * A very simple parser for categorial data, which will then be encoded as
  * numbers. This is closely modeled after the number vector parser.
- * 
+ *
  * TODO: specify handling for numerical values.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has NumberVector
- * 
+ *
  * @param <V> the type of NumberVector used
  */
 @Description("This parser expects data in roughly the same format as the NumberVectorLabelParser,\n"//
-    + "except that it will enumerate all unique strings to always produce numerical values.\n"//
-    + "This way, it can for example handle files that contain lines like 'y,n,y,y,n,y,n'.")
++ "except that it will enumerate all unique strings to always produce numerical values.\n"//
++ "This way, it can for example handle files that contain lines like 'y,n,y,y,n,y,n'.")
 public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends NumberVectorLabelParser<V> {
   /**
    * Logging class.
@@ -73,7 +72,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
 
   /**
    * Constructor with defaults.
-   * 
+   *
    * @param factory Vector factory
    */
   public CategorialDataAsNumberVectorParser(NumberVector.Factory<V> factory) {
@@ -82,7 +81,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
 
   /**
    * Constructor.
-   * 
+   *
    * @param format Input format
    * @param labelIndices Column indexes that are numeric.
    * @param factory Vector factory
@@ -106,8 +105,7 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
     for(/* Initialized by nextLineExceptComments */; tokenizer.valid(); tokenizer.advance(), i++) {
       if(!isLabelColumn(i)) {
         try {
-          double attribute = tokenizer.getDouble();
-          attributes.add(attribute);
+          attributes.add(tokenizer.getDouble());
           continue;
         }
         catch(NumberFormatException e) {
@@ -130,9 +128,9 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
       labels.add(tokenizer.getSubstring());
     }
     // Pass outside via class variables
-    curvec = createDBObject(attributes, ArrayLikeUtil.TDOUBLELISTADAPTER);
+    curvec = createVector();
     curlbl = LabelList.make(labels);
-    attributes.reset();
+    attributes.clear();
     labels.clear();
     return true;
   }
@@ -144,9 +142,9 @@ public class CategorialDataAsNumberVectorParser<V extends NumberVector> extends 
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends NumberVectorLabelParser.Parameterizer<V> {

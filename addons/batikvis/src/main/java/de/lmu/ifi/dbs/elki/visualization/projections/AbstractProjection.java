@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,29 +24,36 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  */
 
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
 /**
  * Abstract base projection class.
- * 
+ *
  * @author Erich Schubert
  */
-public abstract class AbstractProjection extends AbstractHierarchicalResult implements Projection {
+public abstract class AbstractProjection implements Projection {
   /**
    * Scales in data set
    */
   final protected LinearScale[] scales;
-  
+
+  /**
+   * Projector used
+   */
+  final private Projector p;
+
   /**
    * Constructor.
-   * 
+   *
+   * @param p Projector
    * @param scales Scales to use
    */
-  public AbstractProjection(LinearScale[] scales) {
+  public AbstractProjection(Projector p, LinearScale[] scales) {
     super();
+    this.p = p;
     this.scales = scales;
   }
-  
+
   @Override
   public int getInputDimensionality() {
     return scales.length;
@@ -54,7 +61,7 @@ public abstract class AbstractProjection extends AbstractHierarchicalResult impl
 
   /**
    * Get the scales used, for rendering scales mostly.
-   * 
+   *
    * @param d Dimension
    * @return Scale used
    */
@@ -64,12 +71,12 @@ public abstract class AbstractProjection extends AbstractHierarchicalResult impl
   }
 
   @Override
-  public String getLongName() {
+  public String getMenuName() {
     return "Projection";
   }
 
   @Override
-  public String getShortName() {
-    return "projection";
+  public Projector getProjector() {
+    return p;
   }
 }

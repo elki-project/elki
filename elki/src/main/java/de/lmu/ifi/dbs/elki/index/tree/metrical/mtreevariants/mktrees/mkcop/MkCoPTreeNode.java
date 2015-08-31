@@ -140,11 +140,12 @@ class MkCoPTreeNode<O> extends AbstractMTreeNode<O, MkCoPTreeNode<O>, MkCoPEntry
   }
 
   @Override
-  public void adjustEntry(MkCoPEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, MkCoPTreeNode<O>, MkCoPEntry, ?> mTree) {
+  public boolean adjustEntry(MkCoPEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, MkCoPTreeNode<O>, MkCoPEntry, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust conservative distance approximation
     // int k_max = ((MkCoPTree<O,D>) mTree).getK_max();
     // entry.setConservativeKnnDistanceApproximation(conservativeKnnDistanceApproximation(k_max));
+    return true; // TODO: improve
   }
 
   @Override

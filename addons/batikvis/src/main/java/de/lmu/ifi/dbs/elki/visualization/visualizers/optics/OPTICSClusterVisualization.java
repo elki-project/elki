@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,13 +33,15 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -50,9 +51,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 /**
  * Visualize the clusters and cluster hierarchy found by OPTICS on the OPTICS
  * Plot.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -75,14 +76,16 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-    for(OPTICSProjector p : ops) {
-      final Clustering<OPTICSModel> ocl = findOPTICSClustering(baseResult);
+  public void processNewResult(VisualizerContext context, Object result) {
+    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
+    for(; it.valid(); it.advance()) {
+      OPTICSProjector p = it.get();
+      final Clustering<OPTICSModel> ocl = findOPTICSClustering(context, p.getResult());
       if(ocl != null) {
-        final VisualizationTask task = new VisualizationTask(NAME, ocl, null, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, ocl, null, this);
         task.level = VisualizationTask.LEVEL_DATA;
-        baseResult.getHierarchy().add(p, task);
+        context.addVis(p, task);
+        // TODO: use and react to style policy!
       }
     }
     // TODO: also run when a new clustering is added, instead of just new
@@ -90,8 +93,8 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -102,14 +105,16 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
   /**
    * Find the first OPTICS clustering child of a result.
-   * 
-   * @param result Result to start searching at
+   *
+   * @param context Result context
+   * @param start Result to start searching at
    * @return OPTICS clustering
    */
   @SuppressWarnings("unchecked")
-  protected static Clustering<OPTICSModel> findOPTICSClustering(Result result) {
-    Collection<Clustering<?>> cs = ResultUtil.filterResults(result, Clustering.class);
-    for(Clustering<?> clus : cs) {
+  protected static Clustering<OPTICSModel> findOPTICSClustering(VisualizerContext context, Result start) {
+    Hierarchy.Iter<Clustering<?>> it1 = VisualizationTree.filterResults(context, start, Clustering.class);
+    for(; it1.valid(); it1.advance()) {
+      Clustering<?> clus = it1.get();
       if(clus.getToplevelClusters().size() == 0) {
         continue;
       }
@@ -129,9 +134,9 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses Clustering oneway - - «visualizes»
    */
   public class Instance extends AbstractOPTICSVisualization {
@@ -147,22 +152,25 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.clus = task.getResult();
-      context.addResultListener(this);
-      incrementalRedraw();
+      addListeners();
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
       makeLayerElement();
       addCSSClasses();
 
-      ColorLibrary colors = context.getStyleResult().getStyleLibrary().getColorSet(StyleLibrary.PLOT);
+      ColorLibrary colors = context.getStyleLibrary().getColorSet(StyleLibrary.PLOT);
       HashMap<Cluster<?>, String> colormap = new HashMap<>();
       int cnum = 0;
       for(Cluster<?> c : clus.getAllClusters()) {
@@ -174,7 +182,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
     /**
      * Recursively draw clusters
-     * 
+     *
      * @param clusters Current set of clusters
      * @param depth Recursion depth
      * @param colormap Color mapping
@@ -215,7 +223,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
       // Class for the markers
       if(!svgp.getCSSClassManager().contains(CSS_BRACKET)) {
         final CSSClass cls = new CSSClass(this, CSS_BRACKET);
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         cls.setStatement(SVGConstants.CSS_STROKE_PROPERTY, style.getColor(StyleLibrary.PLOT));
         cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT));
         svgp.addCSSClassOrLogError(cls);

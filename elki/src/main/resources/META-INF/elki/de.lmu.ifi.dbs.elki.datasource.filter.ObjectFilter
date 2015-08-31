@@ -1,39 +1,39 @@
 de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter
 de.lmu.ifi.dbs.elki.datasource.filter.NoOpFilter
-de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter
-de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFromPatternFilter
-de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ExternalIDFilter
+de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.ClassLabelFilter
+de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFromPatternFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.ClassLabelFromPatternFilter
+de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ExternalIDFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.ExternalIDFilter
 de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.MultivariateTimeSeriesFilter
-de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.SparseVectorFieldFilter
-de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.SplitNumberVectorFilter
-de.lmu.ifi.dbs.elki.datasource.filter.selection.ByLabelFilter
-de.lmu.ifi.dbs.elki.datasource.filter.selection.RandomSamplingStreamFilter
-de.lmu.ifi.dbs.elki.datasource.filter.selection.ShuffleObjectsFilter
-de.lmu.ifi.dbs.elki.datasource.filter.selection.SortByLabelFilter
-de.lmu.ifi.dbs.elki.datasource.filter.cleaning.DropNaNFilter
-de.lmu.ifi.dbs.elki.datasource.filter.cleaning.ReplaceNaNWithRandomFilter
-de.lmu.ifi.dbs.elki.datasource.filter.cleaning.NoMissingValuesFilter
-de.lmu.ifi.dbs.elki.datasource.filter.cleaning.VectorDimensionalityFilter
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseMinMaxNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseVarianceNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseMeanNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseMADNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseErfNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseCDFNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseBetaNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.InverseDocumentFrequencyNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.IntegerRankTieNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.LengthNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.HellingerHistogramNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.SparseVectorFieldFilter de.lmu.ifi.dbs.elki.datasource.filter.SparseVectorFieldFilter
+de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.SplitNumberVectorFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.SplitNumberVectorFilter
+de.lmu.ifi.dbs.elki.datasource.filter.selection.ByLabelFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.ByLabelFilter
+de.lmu.ifi.dbs.elki.datasource.filter.selection.RandomSamplingStreamFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.RandomSamplingStreamFilter
+de.lmu.ifi.dbs.elki.datasource.filter.selection.ShuffleObjectsFilter de.lmu.ifi.dbs.elki.datasource.filter.ShuffleObjectsFilter
+de.lmu.ifi.dbs.elki.datasource.filter.selection.SortByLabelFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.SortByLabelFilter
+de.lmu.ifi.dbs.elki.datasource.filter.cleaning.DropNaNFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.DropNaNFilter
+de.lmu.ifi.dbs.elki.datasource.filter.cleaning.ReplaceNaNWithRandomFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.ReplaceNaNWithRandomFilter
+de.lmu.ifi.dbs.elki.datasource.filter.cleaning.NoMissingValuesFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.NoMissingValuesFilter
+de.lmu.ifi.dbs.elki.datasource.filter.cleaning.VectorDimensionalityFilter de.lmu.ifi.dbs.elki.datasource.filter.normalization.VectorDimensionalityFilter
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseMinMaxNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMinMaxNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseVarianceNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormalization z
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseMeanNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMeanNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseMADNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMADNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseErfNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseErfNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseCDFNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseCDFNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseBetaNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseBetaNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.InverseDocumentFrequencyNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.InverseDocumentFrequencyNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.IntegerRankTieNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.IntegerRankTieNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.LengthNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.LengthNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.HellingerHistogramNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.HellingerHistogramNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.InstanceMeanVarianceNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.InstanceMinMaxNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.InstanceRankNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.InstanceLogRankNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.Log1PlusNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.transform.GlobalPrincipalComponentAnalysisTransform
-de.lmu.ifi.dbs.elki.datasource.filter.transform.FastMultidimensionalScalingTransform
-de.lmu.ifi.dbs.elki.datasource.filter.transform.ClassicMultidimensionalScalingTransform
-de.lmu.ifi.dbs.elki.datasource.filter.transform.LinearDiscriminantAnalysisFilter
+de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise.Log1PlusNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.Log1PlusNormalization
+de.lmu.ifi.dbs.elki.datasource.filter.transform.GlobalPrincipalComponentAnalysisTransform whiten whitening pca
+de.lmu.ifi.dbs.elki.datasource.filter.transform.FastMultidimensionalScalingTransform fastmds
+de.lmu.ifi.dbs.elki.datasource.filter.transform.ClassicMultidimensionalScalingTransform mds
+de.lmu.ifi.dbs.elki.datasource.filter.transform.LinearDiscriminantAnalysisFilter lda
 de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorFeatureSelectionFilter
 de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorRandomFeatureSelectionFilter
 de.lmu.ifi.dbs.elki.datasource.filter.transform.LatLngToECEFFilter

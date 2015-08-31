@@ -27,8 +27,7 @@ import java.util.Collection;
 
 import de.lmu.ifi.dbs.elki.application.KDDCLIApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -42,9 +41,9 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 /**
  * KDDTask encapsulates the common workflow of an <i>unsupervised</i> knowledge
  * discovery task.
- * 
+ *
  * @author Arthur Zimek
- * 
+ *
  * @apiviz.composedOf InputStep
  * @apiviz.composedOf AlgorithmStep
  * @apiviz.composedOf EvaluationStep
@@ -77,13 +76,13 @@ public class KDDTask {
   private OutputStep outputStep;
 
   /**
-   * The result object.
+   * The result hierarchy.
    */
-  private HierarchicalResult result;
+  private ResultHierarchy hier;
 
   /**
    * Constructor.
-   * 
+   *
    * @param inputStep
    * @param algorithmStep
    * @param evaluationStep
@@ -106,34 +105,35 @@ public class KDDTask {
   public void run() {
     // Input step
     Database db = inputStep.getDatabase();
+    hier = db.getHierarchy();
 
     // Algorithms - Data Mining Step
-    result = algorithmStep.runAlgorithms(db);
+    algorithmStep.runAlgorithms(db);
 
     // TODO: this could be nicer
-    result.getHierarchy().add(result, new SettingsResult(settings));
+    hier.add(db, new SettingsResult(settings));
 
     // Evaluation
-    evaluationStep.runEvaluators(result, db);
+    evaluationStep.runEvaluators(hier, db);
 
     // Output / Visualization
-    outputStep.runResultHandlers(result);
+    outputStep.runResultHandlers(hier, db);
   }
 
   /**
-   * Get the algorithms result.
-   * 
-   * @return the result
+   * Get the algorithms result hierarchy.
+   *
+   * @return the result hierarchy
    */
-  public Result getResult() {
-    return result;
+  public ResultHierarchy getResultHierarchy() {
+    return hier;
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -171,7 +171,7 @@ public class KDDTask {
 
   /**
    * Runs a KDD task accordingly to the specified parameters.
-   * 
+   *
    * @param args parameter list according to description
    */
   public static void main(String[] args) {

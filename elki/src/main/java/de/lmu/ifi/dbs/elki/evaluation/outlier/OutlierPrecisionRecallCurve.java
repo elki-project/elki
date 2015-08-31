@@ -35,9 +35,9 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
@@ -50,9 +50,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 /**
  * Compute a curve containing the precision values for an outlier detection
  * method.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has PRCurve
  */
 public class OutlierPrecisionRecallCurve implements Evaluator {
@@ -62,22 +62,13 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
   private static final Logging LOG = Logging.getLogger(OutlierPrecisionRecallCurve.class);
 
   /**
-   * The pattern to identify positive classes.
-   * 
-   * <p>
-   * Key: {@code -precision.positive}
-   * </p>
-   */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("precision.positive", "Class label for the 'positive' class.");
-
-  /**
    * Stores the "positive" class.
    */
   private Pattern positiveClassName;
 
   /**
    * Constructor.
-   * 
+   *
    * @param positiveClassName Pattern to recognize outliers
    */
   public OutlierPrecisionRecallCurve(Pattern positiveClassName) {
@@ -86,13 +77,13 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Database db = ResultUtil.findDatabase(baseResult);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Database db = ResultUtil.findDatabase(hier);
     // Prepare
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
     if (positiveids.size() == 0) {
-      LOG.warning("Computing a ROC curve failed - no objects matched.");
+      LOG.warning("Computing a P/R curve failed - no objects matched.");
       return;
     }
 
@@ -156,7 +147,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
 
   /**
    * P/R Curve
-   * 
+   *
    * @author Erich Schubert
    */
   public static class PRCurve extends XYCurve {
@@ -177,7 +168,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
 
     /**
      * Constructor.
-     * 
+     *
      * @param size Size estimation
      * @param positive Number of positive elements (for AUC correction)
      */
@@ -198,12 +189,12 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
 
     /**
      * Get AUC value
-     * 
+     *
      * @return AUC value
      */
     public double getAUC() {
       if (Double.isNaN(auc)) {
-        double max = 1 - 1. / positive; 
+        double max = 1 - 1. / positive;
         auc = areaUnderCurve(this) / max;
       }
       return auc;
@@ -219,12 +210,20 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The pattern to identify positive classes.
+     *
+     * <p>
+     * Key: {@code -precision.positive}
+     * </p>
+     */
+    public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("precision.positive", "Class label for the 'positive' class.");
     protected Pattern positiveClassName = null;
 
     @Override

@@ -41,158 +41,179 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 
 /**
  * Utilities for handling result objects
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses Result oneway - - filters
  */
 public class ResultUtil {
   /**
    * Collect all Annotation results from a Result
-   * 
+   *
    * @param r Result
    * @return List of all annotation results
    */
   public static List<Relation<?>> getRelations(Result r) {
-    if (r instanceof Relation<?>) {
+    if(r instanceof Relation<?>) {
       List<Relation<?>> anns = new ArrayList<>(1);
       anns.add((Relation<?>) r);
       return anns;
     }
-    if (r instanceof HierarchicalResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, Relation.class));
+    if(r instanceof HierarchicalResult) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults(((HierarchicalResult) r).getHierarchy(), r, Relation.class));
     }
     return Collections.emptyList();
   }
 
   /**
    * Collect all ordering results from a Result
-   * 
+   *
    * @param r Result
    * @return List of ordering results
    */
   public static List<OrderingResult> getOrderingResults(Result r) {
-    if (r instanceof OrderingResult) {
+    if(r instanceof OrderingResult) {
       List<OrderingResult> ors = new ArrayList<>(1);
       ors.add((OrderingResult) r);
       return ors;
     }
-    if (r instanceof HierarchicalResult) {
-      return filterResults((HierarchicalResult) r, OrderingResult.class);
+    if(r instanceof HierarchicalResult) {
+      return filterResults(((HierarchicalResult) r).getHierarchy(), r, OrderingResult.class);
     }
     return Collections.emptyList();
   }
 
   /**
    * Collect all clustering results from a Result
-   * 
+   *
    * @param r Result
    * @return List of clustering results
    */
   public static List<Clustering<? extends Model>> getClusteringResults(Result r) {
-    if (r instanceof Clustering<?>) {
+    if(r instanceof Clustering<?>) {
       List<Clustering<?>> crs = new ArrayList<>(1);
       crs.add((Clustering<?>) r);
       return crs;
     }
-    if (r instanceof HierarchicalResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, Clustering.class));
+    if(r instanceof HierarchicalResult) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults(((HierarchicalResult) r).getHierarchy(), r, Clustering.class));
     }
     return Collections.emptyList();
   }
 
   /**
    * Collect all collection results from a Result
-   * 
+   *
    * @param r Result
    * @return List of collection results
    */
   public static List<CollectionResult<?>> getCollectionResults(Result r) {
-    if (r instanceof CollectionResult<?>) {
+    if(r instanceof CollectionResult<?>) {
       List<CollectionResult<?>> crs = new ArrayList<>(1);
       crs.add((CollectionResult<?>) r);
       return crs;
     }
-    if (r instanceof HierarchicalResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, CollectionResult.class));
+    if(r instanceof HierarchicalResult) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults(((HierarchicalResult) r).getHierarchy(), r, CollectionResult.class));
     }
     return Collections.emptyList();
   }
 
   /**
    * Return all Iterable results
-   * 
+   *
    * @param r Result
    * @return List of iterable results
    */
   public static List<IterableResult<?>> getIterableResults(Result r) {
-    if (r instanceof IterableResult<?>) {
+    if(r instanceof IterableResult<?>) {
       List<IterableResult<?>> irs = new ArrayList<>(1);
       irs.add((IterableResult<?>) r);
       return irs;
     }
-    if (r instanceof HierarchicalResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults((HierarchicalResult) r, IterableResult.class));
+    if(r instanceof HierarchicalResult) {
+      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults(((HierarchicalResult) r).getHierarchy(), r, IterableResult.class));
     }
     return Collections.emptyList();
   }
 
   /**
    * Collect all outlier results from a Result
-   * 
+   *
    * @param r Result
    * @return List of outlier results
    */
   public static List<OutlierResult> getOutlierResults(Result r) {
-    if (r instanceof OutlierResult) {
+    if(r instanceof OutlierResult) {
       List<OutlierResult> ors = new ArrayList<>(1);
       ors.add((OutlierResult) r);
       return ors;
     }
-    if (r instanceof HierarchicalResult) {
-      return filterResults((HierarchicalResult) r, OutlierResult.class);
+    if(r instanceof HierarchicalResult) {
+      return filterResults(((HierarchicalResult) r).getHierarchy(), r, OutlierResult.class);
     }
     return Collections.emptyList();
   }
 
   /**
    * Collect all settings results from a Result
-   * 
+   *
    * @param r Result
    * @return List of settings results
    */
   public static List<SettingsResult> getSettingsResults(Result r) {
-    if (r instanceof SettingsResult) {
+    if(r instanceof SettingsResult) {
       List<SettingsResult> ors = new ArrayList<>(1);
       ors.add((SettingsResult) r);
       return ors;
     }
-    if (r instanceof HierarchicalResult) {
-      return filterResults((HierarchicalResult) r, SettingsResult.class);
+    if(r instanceof HierarchicalResult) {
+      return filterResults(((HierarchicalResult) r).getHierarchy(), r, SettingsResult.class);
     }
     return Collections.emptyList();
   }
 
   /**
    * Return only results of the given restriction class
-   * 
+   *
    * @param <C> Class type
+   * @param hier Result hierarchy
+   * @param r Starting position
    * @param restrictionClass Class restriction
    * @return filtered results list
    */
-  // We can't ensure that restrictionClass matches C.
+  // We can't ensure that restrictionClass matches C exactly.
   @SuppressWarnings("unchecked")
-  public static <C> ArrayList<C> filterResults(Result r, Class<?> restrictionClass) {
+  public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Result r, Class<? super C> restrictionClass) {
     ArrayList<C> res = new ArrayList<>();
-    if (restrictionClass.isInstance(r)) {
+    if(restrictionClass.isInstance(r)) {
       res.add((C) restrictionClass.cast(r));
     }
-    if (r instanceof HierarchicalResult) {
-      for (Hierarchy.Iter<Result> iter = ((HierarchicalResult) r).getHierarchy().iterDescendants(r); iter.valid(); iter.advance()) {
-        Result result = iter.get();
-        if (restrictionClass.isInstance(result)) {
-          res.add((C) restrictionClass.cast(result));
-        }
+    for(Hierarchy.Iter<Result> iter = hier.iterDescendants(r); iter.valid(); iter.advance()) {
+      Result result = iter.get();
+      if(restrictionClass.isInstance(result)) {
+        res.add((C) restrictionClass.cast(result));
+      }
+    }
+    return res;
+  }
+
+  /**
+   * Return only results of the given restriction class
+   *
+   * @param <C> Class type
+   * @param hier Result hierarchy
+   * @param restrictionClass Class restriction
+   * @return filtered results list
+   */
+  // We can't ensure that restrictionClass matches C exactly.
+  @SuppressWarnings("unchecked")
+  public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Class<? super C> restrictionClass) {
+    ArrayList<C> res = new ArrayList<>();
+    for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
+      Result result = iter.get();
+      if(restrictionClass.isInstance(result)) {
+        res.add((C) restrictionClass.cast(result));
       }
     }
     return res;
@@ -200,14 +221,13 @@ public class ResultUtil {
 
   /**
    * Ensure that the result contains at least one Clustering.
-   * 
-   * @param <O> Database type
+   *
    * @param db Database to process
    * @param result result
    */
-  public static <O> void ensureClusteringResult(final Database db, final Result result) {
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(result, Clustering.class);
-    if (clusterings.size() == 0) {
+  public static void ensureClusteringResult(final Database db, final Result result) {
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(db.getHierarchy(), result, Clustering.class);
+    if(clusterings.size() == 0) {
       ClusteringAlgorithm<Clustering<Model>> split = new ByLabelOrAllInOneClustering();
       Clustering<Model> c = split.run(db);
       addChildResult(db, c);
@@ -216,13 +236,13 @@ public class ResultUtil {
 
   /**
    * Ensure that there also is a selection container object.
-   * 
+   *
    * @param db Database
    * @return selection result
    */
   public static SelectionResult ensureSelectionResult(final Database db) {
-    List<SelectionResult> selections = ResultUtil.filterResults(db, SelectionResult.class);
-    if (!selections.isEmpty()) {
+    List<SelectionResult> selections = ResultUtil.filterResults(db.getHierarchy(), db, SelectionResult.class);
+    if(!selections.isEmpty()) {
       return selections.get(0);
     }
     SelectionResult sel = new SelectionResult();
@@ -232,13 +252,13 @@ public class ResultUtil {
 
   /**
    * Get the sampling result attached to a relation
-   * 
+   *
    * @param rel Relation
    * @return Sampling result.
    */
   public static SamplingResult getSamplingResult(final Relation<?> rel) {
-    Collection<SamplingResult> selections = ResultUtil.filterResults(rel, SamplingResult.class);
-    if (selections.size() == 0) {
+    Collection<SamplingResult> selections = ResultUtil.filterResults(rel.getHierarchy(), rel, SamplingResult.class);
+    if(selections.size() == 0) {
       final SamplingResult newsam = new SamplingResult(rel);
       addChildResult(rel, newsam);
       return newsam;
@@ -248,13 +268,13 @@ public class ResultUtil {
 
   /**
    * Get (or create) a scales result for a relation.
-   * 
+   *
    * @param rel Relation
    * @return associated scales result
    */
   public static ScalesResult getScalesResult(final Relation<? extends NumberVector> rel) {
-    Collection<ScalesResult> scas = ResultUtil.filterResults(rel, ScalesResult.class);
-    if (scas.size() == 0) {
+    Collection<ScalesResult> scas = ResultUtil.filterResults(rel.getHierarchy(), rel, ScalesResult.class);
+    if(scas.size() == 0) {
       final ScalesResult newsca = new ScalesResult(rel);
       addChildResult(rel, newsca);
       return newsca;
@@ -264,7 +284,7 @@ public class ResultUtil {
 
   /**
    * Add a child result.
-   * 
+   *
    * @param parent Parent
    * @param child Child
    */
@@ -274,30 +294,37 @@ public class ResultUtil {
 
   /**
    * Find the first database result in the tree.
-   * 
+   *
    * @param baseResult Result tree base.
    * @return Database
    */
-  public static Database findDatabase(Result baseResult) {
-    final List<Database> dbs = filterResults(baseResult, Database.class);
-    if (!dbs.isEmpty()) {
-      return dbs.get(0);
-    } else {
-      return null;
-    }
+  public static Database findDatabase(ResultHierarchy hier, Result baseResult) {
+    final List<Database> dbs = filterResults(hier, baseResult, Database.class);
+    return (!dbs.isEmpty()) ? dbs.get(0) : null;
+  }
+
+  /**
+   * Find the first database result in the tree.
+   *
+   * @param baseResult Result tree base.
+   * @return Database
+   */
+  public static Database findDatabase(ResultHierarchy hier) {
+    final List<Database> dbs = filterResults(hier, Database.class);
+    return (!dbs.isEmpty()) ? dbs.get(0) : null;
   }
 
   /**
    * Recursively remove a result and its children.
-   * 
+   *
    * @param hierarchy Result hierarchy
    * @param child Result to remove
    */
   public static void removeRecursive(ResultHierarchy hierarchy, Result child) {
-    for (Hierarchy.Iter<Result> iter = hierarchy.iterParents(child); iter.valid(); iter.advance()) {
+    for(Hierarchy.Iter<Result> iter = hierarchy.iterParents(child); iter.valid(); iter.advance()) {
       hierarchy.remove(iter.get(), child);
     }
-    for (Hierarchy.Iter<Result> iter = hierarchy.iterChildren(child); iter.valid(); iter.advance()) {
+    for(Hierarchy.Iter<Result> iter = hierarchy.iterChildren(child); iter.valid(); iter.advance()) {
       removeRecursive(hierarchy, iter.get());
     }
   }

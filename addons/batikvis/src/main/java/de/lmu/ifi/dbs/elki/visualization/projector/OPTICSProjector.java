@@ -28,8 +28,6 @@ import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
@@ -38,10 +36,10 @@ import de.lmu.ifi.dbs.elki.visualization.projections.OPTICSProjection;
 
 /**
  * Projection for OPTICS plots.
- * 
+ *
  * @author Erich Schubert
  */
-public class OPTICSProjector extends AbstractHierarchicalResult implements Projector {
+public class OPTICSProjector implements Projector {
   /**
    * Cluster order result
    */
@@ -54,7 +52,7 @@ public class OPTICSProjector extends AbstractHierarchicalResult implements Proje
 
   /**
    * Constructor.
-   * 
+   *
    * @param co Cluster order
    */
   public OPTICSProjector(ClusterOrder co) {
@@ -63,19 +61,14 @@ public class OPTICSProjector extends AbstractHierarchicalResult implements Proje
   }
 
   @Override
-  public String getLongName() {
-    return "OPTICS projection";
+  public String getMenuName() {
+    return "OPTICS Plot Projection";
   }
 
   @Override
-  public String getShortName() {
-    return "optics";
-  }
-
-  @Override
-  public Collection<PlotItem> arrange() {
+  public Collection<PlotItem> arrange(VisualizerContext context) {
     List<PlotItem> col = new ArrayList<>(1);
-    List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
+    List<VisualizationTask> tasks = context.getVisTasks(this);
     if(tasks.size() > 0) {
       final PlotItem it = new PlotItem(4., 1., new OPTICSProjection(this));
       it.tasks = tasks;
@@ -86,7 +79,7 @@ public class OPTICSProjector extends AbstractHierarchicalResult implements Proje
 
   /**
    * Get the cluster order
-   * 
+   *
    * @return the cluster order
    */
   public ClusterOrder getResult() {
@@ -95,7 +88,7 @@ public class OPTICSProjector extends AbstractHierarchicalResult implements Proje
 
   /**
    * Get or produce the actual OPTICS plot.
-   * 
+   *
    * @param context Context to use
    * @return Plot
    */

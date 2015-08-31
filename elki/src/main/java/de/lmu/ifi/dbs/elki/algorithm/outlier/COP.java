@@ -75,20 +75,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * Correlation outlier probability: Outlier Detection in Arbitrarily Oriented
  * Subspaces
- * 
+ *
  * <p>
  * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek<br />
  * Outlier Detection in Arbitrarily Oriented Subspaces<br />
  * in: Proc. IEEE International Conference on Data Mining (ICDM 2012)
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("COP: Correlation Outlier Probability")
-@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", title = "Outlier Detection in Arbitrarily Oriented Subspaces", booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
-public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
+title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
+booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)", //
+url = "http://dx.doi.org/10.1109/ICDM.2012.21")
+public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult>implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -173,19 +176,18 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
   /**
    * Score type.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public enum DistanceDist {
     /**
      * Use chi^2 for score normalization.
      */
-    CHISQUARED,
-    /**
-     * Use gamma distributions for score normalization.
-     */
+    CHISQUARED, /**
+                 * Use gamma distributions for score normalization.
+                 */
     GAMMA
   }
 
@@ -201,7 +203,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k number of neighbors
    * @param pca PCA computation method
@@ -220,7 +222,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
   /**
    * Process a single relation.
-   * 
+   *
    * @param relation Relation to process
    * @return Outlier detection result
    */
@@ -351,9 +353,9 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
@@ -387,7 +389,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
      * Expected share of outliers.
      * <p>
      * Key: {@code -cop.expect}
-     * 
+     *
      * Default: 0.001
      * </p>
      */
@@ -397,7 +399,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
      * Include COP error vectors in output.
      * <p>
      * Key: {@code -cop.models}
-     * 
+     *
      * Default: off
      * </p>
      */

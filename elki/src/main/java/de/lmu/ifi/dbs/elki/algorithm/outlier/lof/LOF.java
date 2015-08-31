@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
@@ -71,6 +72,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * within ELKI we have renamed this parameter to &quot;k&quot;.
  * </p>
  * 
+ * <p>
+ * Compatibility note: as of ELKI 0.7.0, we no longer include the query point,
+ * for consistency with other methods.
+ * </p>
+ * 
  * Reference:
  * <p>
  * M. M. Breunig, H.-P. Kriegel, R. Ng, J. Sander:<br />
@@ -102,7 +108,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
   /**
    * The number of neighbors to query (including the query point!)
    */
-  protected int k = 2;
+  protected int k;
 
   /**
    * Constructor.
@@ -113,7 +119,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    */
   public LOF(int k, DistanceFunction<? super O> distanceFunction) {
     super(distanceFunction);
-    this.k = k + 1;
+    this.k = k + 1; // + query point
   }
 
   /**
@@ -127,16 +133,16 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LOF", 3) : null;
     DBIDs ids = relation.getDBIDs();
 
-    LOG.beginStep(stepprog, 1, "Materializing LOF neighborhoods.");
+    LOG.beginStep(stepprog, 1, "Materializing nearest-neighbor sets.");
     KNNQuery<O> knnq = DatabaseUtil.precomputedKNNQuery(database, relation, getDistanceFunction(), k);
 
     // Compute LRDs
-    LOG.beginStep(stepprog, 2, "Computing LRDs.");
+    LOG.beginStep(stepprog, 2, "Computing Local Reachability Densities (LRD).");
     WritableDoubleDataStore lrds = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     computeLRDs(knnq, ids, lrds);
 
     // compute LOF_SCORE of each db object
-    LOG.beginStep(stepprog, 3, "Computing LOFs.");
+    LOG.beginStep(stepprog, 3, "Computing Local Outlier Factors (LOF).");
     WritableDoubleDataStore lofs = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB);
     // track the maximum value for normalization.
     DoubleMinMax lofminmax = new DoubleMinMax();
@@ -158,25 +164,37 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    * @param lrds Reachability storage
    */
   private void computeLRDs(KNNQuery<O> knnq, DBIDs ids, WritableDoubleDataStore lrds) {
-    FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("LRD", ids.size(), LOG) : null;
+    FiniteProgress lrdsProgress = LOG.isVerbose() ? new FiniteProgress("Local Reachability Densities (LRD)", ids.size(), LOG) : null;
+    double lrd;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final KNNList neighbors = knnq.getKNNForDBID(iter, k);
-      double sum = 0.0;
-      int count = 0;
-      for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-        if(DBIDUtil.equal(neighbor, iter)) {
-          continue;
-        }
-        KNNList neighborsNeighbors = knnq.getKNNForDBID(neighbor, k);
-        sum += MathUtil.max(neighbor.doubleValue(), neighborsNeighbors.getKNNDistance());
-        count++;
-      }
-      // Avoid division by 0
-      final double lrd = (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
+      lrd = computeLRD(knnq, iter);
       lrds.putDouble(iter, lrd);
       LOG.incrementProcessed(lrdsProgress);
     }
     LOG.ensureCompleted(lrdsProgress);
+  }
+
+  /**
+   * Compute a single local reachability distance.
+   * 
+   * @param knnq kNN Query
+   * @param curr Current object
+   * @return Local Reachability Density
+   */
+  protected double computeLRD(KNNQuery<O> knnq, DBIDIter curr) {
+    final KNNList neighbors = knnq.getKNNForDBID(curr, k);
+    double sum = 0.0;
+    int count = 0;
+    for(DoubleDBIDListIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+      if(DBIDUtil.equal(curr, neighbor)) {
+        continue;
+      }
+      KNNList neighborsNeighbors = knnq.getKNNForDBID(neighbor, k);
+      sum += MathUtil.max(neighbor.doubleValue(), neighborsNeighbors.getKNNDistance());
+      count++;
+    }
+    // Avoid division by 0
+    return (sum > 0) ? (count / sum) : Double.POSITIVE_INFINITY;
   }
 
   /**
@@ -189,38 +207,43 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    * @param lofminmax Score minimum/maximum tracker
    */
   private void computeLOFScores(KNNQuery<O> knnq, DBIDs ids, DoubleDataStore lrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
-    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("LOF_SCORE for objects", ids.size(), LOG) : null;
+    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Local Outlier Factor (LOF) scores", ids.size(), LOG) : null;
+    double lof;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      final double lof;
-      final double lrdp = lrds.doubleValue(iter);
-      final KNNList neighbors = knnq.getKNNForDBID(iter, k);
-      if(!Double.isInfinite(lrdp)) {
-        double sum = 0.;
-        int count = 0;
-        for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
-          // skip the point itself
-          if(DBIDUtil.equal(neighbor, iter)) {
-            continue;
-          }
-          final double val = lrds.doubleValue(neighbor);
-          sum += val;
-          count++;
-          if(Double.isInfinite(val)) {
-            break;
-          }
-        }
-        lof = sum / (lrdp * count);
-      }
-      else {
-        lof = 1.0;
-      }
+      lof = computeLOFScore(knnq, iter, lrds);
       lofs.putDouble(iter, lof);
       // update minimum and maximum
       lofminmax.put(lof);
-
       LOG.incrementProcessed(progressLOFs);
     }
     LOG.ensureCompleted(progressLOFs);
+  }
+
+  /**
+   * Compute a single LOF score.
+   * 
+   * @param knnq kNN query
+   * @param cur Current object
+   * @param lrds Stored reachability densities
+   * @return LOF score.
+   */
+  protected double computeLOFScore(KNNQuery<O> knnq, DBIDRef cur, DoubleDataStore lrds) {
+    final double lrdp = lrds.doubleValue(cur);
+    if(Double.isInfinite(lrdp)) {
+      return 1.0;
+    }
+    double sum = 0.;
+    int count = 0;
+    final KNNList neighbors = knnq.getKNNForDBID(cur, k);
+    for(DBIDIter neighbor = neighbors.iter(); neighbor.valid(); neighbor.advance()) {
+      // skip the point itself
+      if(DBIDUtil.equal(cur, neighbor)) {
+        continue;
+      }
+      sum += lrds.doubleValue(neighbor);
+      ++count;
+    }
+    return sum / (lrdp * count);
   }
 
   @Override
@@ -248,7 +271,7 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
      * considered for computing its LOF score, must be an integer greater than
      * or equal to 1.
      */
-    public static final OptionID K_ID = new OptionID("lof.k", "The number of nearest neighbors of an object to be considered for computing its LOF score.");
+    public static final OptionID K_ID = new OptionID("lof.k", "The number of nearest neighbors (not including the query point) of an object to be considered for computing its LOF score.");
 
     /**
      * The neighborhood size to use.
@@ -259,8 +282,8 @@ public class LOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      final IntParameter pK = new IntParameter(K_ID);
-      pK.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      final IntParameter pK = new IntParameter(K_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(pK)) {
         k = pK.intValue();
       }

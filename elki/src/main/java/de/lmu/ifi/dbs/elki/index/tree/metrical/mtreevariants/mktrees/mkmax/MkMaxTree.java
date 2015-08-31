@@ -49,14 +49,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * supporting efficient processing of reverse k nearest neighbor queries for
  * parameter k <= k_max. The k-nearest neighbor distance for k = k_max is stored
  * in each entry of a node.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.has MkMaxTreeNode oneway - - contains
- * 
+ *
  * @param <O> the type of DatabaseObject to be stored in the MkMaxTree
  */
-public class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNode<O>, MkMaxEntry, MkTreeSettings<O, MkMaxTreeNode<O>, MkMaxEntry>> {
+public abstract class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNode<O>, MkMaxEntry, MkTreeSettings<O, MkMaxTreeNode<O>, MkMaxEntry>> {
   /**
    * The logger for this class.
    */
@@ -64,7 +64,7 @@ public class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNode<O>, MkM
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to index
    * @param pagefile Page file
    * @param settings Tree settings
@@ -125,7 +125,7 @@ public class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNode<O>, MkM
 
   /**
    * Adapts the knn distances before insertion of the specified entry.
-   * 
+   *
    */
   @Override
   protected void preInsert(MkMaxEntry entry) {
@@ -161,7 +161,7 @@ public class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNode<O>, MkM
    * the given query object with k = {@link #getKmax()}. It recursively traverses
    * all paths from the specified node, which cannot be excluded from leading to
    * qualifying objects.
-   * 
+   *
    * @param q the id of the query object
    * @param node the node of the subtree on which the query is performed
    * @param node_entry the entry representing the node
@@ -198,7 +198,7 @@ public class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNode<O>, MkM
 
   /**
    * Adapts the knn distances before insertion of entry q.
-   * 
+   *
    * @param q the entry to be inserted
    * @param nodeEntry the entry representing the root of the current subtree
    * @param knns_q the knns of q
@@ -319,7 +319,7 @@ public class MkMaxTree<O> extends AbstractMkTreeUnified<O, MkMaxTreeNode<O>, MkM
    */
   @Override
   protected MkMaxEntry createNewDirectoryEntry(MkMaxTreeNode<O> node, DBID routingObjectID, double parentDistance) {
-    return new MkMaxDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadius(routingObjectID, this), node.kNNDistance());
+    return new MkMaxDirectoryEntry(routingObjectID, parentDistance, node.getPageID(), node.coveringRadiusFromEntries(routingObjectID, this), node.kNNDistance());
   }
 
   /**

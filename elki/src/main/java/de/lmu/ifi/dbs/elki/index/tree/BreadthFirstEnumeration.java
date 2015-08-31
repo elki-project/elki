@@ -119,11 +119,11 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
     IndexTreePath<E> nextPath = enumeration.nextElement();
 
     Enumeration<IndexTreePath<E>> children;
-    if(nextPath.getLastPathComponent().getEntry().isLeafEntry()) {
+    if(nextPath.getEntry().isLeafEntry()) {
       children = EMPTY_ENUMERATION;
     }
     else {
-      N node = index.getNode(nextPath.getLastPathComponent().getEntry());
+      N node = index.getNode(nextPath.getEntry());
       children = node.children(nextPath);
     }
 

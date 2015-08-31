@@ -1,30 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.gui.overview;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import gnu.trove.list.array.TDoubleArrayList;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,15 +10,16 @@ import java.util.logging.Level;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 
 /**
  * This is a rather naive rectangle arrangement class. It will try to place
  * rectangles on a canvas while maintaining the canvas size ratio as good as
  * possible. It does not do an exhaustive search for optimizing the layout, but
  * a greedy placement strategy, extending the canvas as little as possible.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <T> Key type
  */
 public class RectangleArranger<T> {
@@ -70,12 +46,12 @@ public class RectangleArranger<T> {
   /**
    * Column widths
    */
-  private TDoubleArrayList widths = new TDoubleArrayList();
+  private DoubleArray widths = new DoubleArray();
 
   /**
    * Column heights
    */
-  private TDoubleArrayList heights = new TDoubleArrayList();
+  private DoubleArray heights = new DoubleArray();
 
   /**
    * Map indicating which cells are used.
@@ -89,7 +65,7 @@ public class RectangleArranger<T> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param ratio
    */
   public RectangleArranger(double ratio) {
@@ -98,7 +74,7 @@ public class RectangleArranger<T> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param width Canvas width
    * @param height Canvas height
    */
@@ -117,7 +93,7 @@ public class RectangleArranger<T> {
 
   /**
    * Add a new recangle.
-   * 
+   *
    * @param w Width
    * @param h Height
    * @param data Data object to add (key)
@@ -263,7 +239,7 @@ public class RectangleArranger<T> {
     }
     // Need to increase the total area
     if(bestinc > 0) {
-      assert (bestex == cols - 1 || bestey == rows - 1);
+      assert(bestex == cols - 1 || bestey == rows - 1);
       double inc = Math.max(bestwi, besthi * ratio);
       resize(inc);
 
@@ -311,7 +287,7 @@ public class RectangleArranger<T> {
   }
 
   protected void splitRow(int bestey, double besthi) {
-    assert (bestey < heights.size());
+    assert(bestey < heights.size());
     if(heights.get(bestey) - besthi <= Double.MIN_NORMAL) {
       return;
     }
@@ -325,7 +301,7 @@ public class RectangleArranger<T> {
   }
 
   protected void splitCol(int bestex, double bestwi) {
-    assert (bestex < widths.size());
+    assert(bestex < widths.size());
     if(widths.get(bestex) - bestwi <= Double.MIN_NORMAL) {
       return;
     }
@@ -376,7 +352,7 @@ public class RectangleArranger<T> {
 
   /**
    * Get the position data of the object
-   * 
+   *
    * @param object Query object
    * @return Position information: x,y,w,h
    */
@@ -394,23 +370,23 @@ public class RectangleArranger<T> {
     {
       double wsum = 0.0;
       for(int x = 0; x < cols; x++) {
-        assert (widths.get(x) > 0) : "Non-positive width: " + widths.get(x);
+        assert(widths.get(x) > 0) : "Non-positive width: " + widths.get(x) + " at " + x;
         wsum += widths.get(x);
       }
-      assert (Math.abs(wsum - twidth) < 1E-10);
+      assert(Math.abs(wsum - twidth) < 1E-10);
     }
     {
       double hsum = 0.0;
       for(int y = 0; y < rows; y++) {
-        assert (heights.get(y) > 0) : "Non-positive height: " + heights.get(y);
+        assert(heights.get(y) > 0) : "Non-positive height: " + heights.get(y) + " at " + y;
         hsum += heights.get(y);
       }
-      assert (Math.abs(hsum - theight) < 1E-10);
+      assert(Math.abs(hsum - theight) < 1E-10);
     }
     {
-      assert (usage.size() == rows);
+      assert(usage.size() == rows);
       for(int y = 0; y < rows; y++) {
-        assert (usage.get(y).size() == cols);
+        assert(usage.get(y).size() == cols);
       }
     }
     return true;
@@ -461,7 +437,7 @@ public class RectangleArranger<T> {
   /**
    * Compute the relative fill. Useful for triggering a relayout if the relative
    * fill is not satisfactory.
-   * 
+   *
    * @return relative fill
    */
   public double relativeFill() {
@@ -482,7 +458,7 @@ public class RectangleArranger<T> {
 
   /**
    * Get the total canvas width
-   * 
+   *
    * @return Width
    */
   public double getWidth() {
@@ -491,7 +467,7 @@ public class RectangleArranger<T> {
 
   /**
    * Get the total canvas height
-   * 
+   *
    * @return Height
    */
   public double getHeight() {
@@ -500,7 +476,7 @@ public class RectangleArranger<T> {
 
   /**
    * The items contained in the map.
-   * 
+   *
    * @return entry set
    */
   public Set<Entry<T, double[]>> entrySet() {
@@ -509,7 +485,7 @@ public class RectangleArranger<T> {
 
   /**
    * The item keys contained in the map.
-   * 
+   *
    * @return key set
    */
   public Set<T> keySet() {
@@ -518,7 +494,7 @@ public class RectangleArranger<T> {
 
   /**
    * Test method.
-   * 
+   *
    * @param args
    */
   public static void main(String[] args) {

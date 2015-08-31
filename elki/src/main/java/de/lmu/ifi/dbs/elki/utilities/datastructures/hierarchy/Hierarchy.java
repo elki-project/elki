@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,24 +27,32 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  * This interface represents an (external) hierarchy of objects. It can contain
  * arbitrary objects, BUT the hierarchy has to be accessed using the hierarchy
  * object, i.e. {@code hierarchy.iterChildren(object);}.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has Iter
- * 
+ *
  * @param <O> Object type
  */
 public interface Hierarchy<O> {
   /**
    * Total size - number of objects contained.
-   * 
+   *
    * @return Size
    */
   int size();
 
   /**
+   * Check if an object is part of a hierarchy.
+   *
+   * @param object Object to check
+   * @return {@code true} if part of the hierarchy
+   */
+  boolean contains(O object);
+
+  /**
    * Get number of children
-   * 
+   *
    * @param self object to get number of children for
    * @return number of children
    */
@@ -52,7 +60,7 @@ public interface Hierarchy<O> {
 
   /**
    * Iterate over the (direct) children.
-   * 
+   *
    * @param self object to get children for
    * @return iterator for children
    */
@@ -60,7 +68,7 @@ public interface Hierarchy<O> {
 
   /**
    * Iterate over the (direct) children in reverse order.
-   * 
+   *
    * @param self object to get children for
    * @return iterator for children
    */
@@ -68,15 +76,23 @@ public interface Hierarchy<O> {
 
   /**
    * Iterate descendants (recursive children)
-   * 
+   *
    * @param self object to get descendants for
    * @return iterator for descendants
    */
   Iter<O> iterDescendants(O self);
 
   /**
+   * Iterate descendants (recursive children) and self.
+   *
+   * @param self object to get descendants for
+   * @return iterator for descendants
+   */
+  Iter<O> iterDescendantsSelf(O self);
+
+  /**
    * Get number of (direct) parents
-   * 
+   *
    * @param self reference object
    * @return number of parents
    */
@@ -84,7 +100,7 @@ public interface Hierarchy<O> {
 
   /**
    * Iterate over the (direct) parents.
-   * 
+   *
    * @param self object to get parents for
    * @return iterator of parents
    */
@@ -92,7 +108,7 @@ public interface Hierarchy<O> {
 
   /**
    * Iterate over the (direct) parents in reverse order.
-   * 
+   *
    * @param self object to get parents for
    * @return iterator of parents
    */
@@ -100,32 +116,40 @@ public interface Hierarchy<O> {
 
   /**
    * Iterate ancestors (recursive parents)
-   * 
+   *
    * @param self object to get ancestors for
    * @return iterator for ancestors
    */
   Iter<O> iterAncestors(O self);
 
   /**
+   * Iterate ancestors (recursive parents) and self.
+   *
+   * @param self object to get ancestors for
+   * @return iterator for ancestors
+   */
+  Iter<O> iterAncestorsSelf(O self);
+
+  /**
    * Iterate over all members.
-   * 
+   *
    * @return Iterator over all members.
    */
   Iter<O> iterAll();
 
   /**
    * Iterator interface.
-   * 
+   *
    * TODO: add a skipSubtree method?
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <O> Object type.
    */
   static interface Iter<O> extends de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter {
     /**
      * Access the current object.
-     * 
+     *
      * @return Current object
      */
     O get();

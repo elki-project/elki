@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.pairsegments;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -44,28 +44,30 @@ import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segment;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segments;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGCheckbox;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer to draw circle segments of clusterings and enable interactive
  * selection of segments. For "empty" segments, all related segments are
  * selected instead, to visualize the differences.
- * 
+ *
  * <p>
  * Reference:<br />
  * Evaluation of Clusterings – Metrics and Visual Support<br />
@@ -73,22 +75,25 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * Zimek<br />
  * In: Proc. 28th International Conference on Data Engineering (ICDE) 2012
  * </p>
- * 
+ *
  * <p>
- * Details on the experimental setup can be found at: <a
- * href="http://elki.dbs.ifi.lmu.de/wiki/Examples/ClusterEvaluation"
- * >wiki/Examples/ClusterEvaluation</a>
+ * Details on the experimental setup can be found at:
+ * <a href="http://elki.dbs.ifi.lmu.de/wiki/Examples/ClusterEvaluation" >wiki/
+ * Examples/ClusterEvaluation</a>
  * </p>
- * 
+ *
  * @author Sascha Goldhofer
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", url = "http://dx.doi.org/10.1109/ICDE.2012.128")
+@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", //
+authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", //
+url = "http://dx.doi.org/10.1109/ICDE.2012.128")
 public class CircleSegmentsVisualizer extends AbstractVisFactory {
   /**
    * Class logger
@@ -105,46 +110,46 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
    */
   public CircleSegmentsVisualizer() {
     super();
-    this.thumbmask |= ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    // If no comparison result found abort
-    List<Segments> segments = ResultUtil.filterResults(result, Segments.class);
-    for(Segments segmentResult : segments) {
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<Segments> it1 = VisualizationTree.filterResults(context, start, Segments.class);
+    for(; it1.valid(); it1.advance()) {
+      Segments segmentResult = it1.get();
       SegmentsStylingPolicy policy;
-      List<SegmentsStylingPolicy> styles = ResultUtil.filterResults(segmentResult, SegmentsStylingPolicy.class);
-      if(!styles.isEmpty()) {
-        policy = styles.get(0);
+      Hierarchy.Iter<SegmentsStylingPolicy> it = VisualizationTree.filter(context, segmentResult, SegmentsStylingPolicy.class);
+      if(it.valid()) {
+        policy = it.get();
       }
       else {
         policy = new SegmentsStylingPolicy(segmentResult);
-        baseResult.getHierarchy().add(segmentResult, policy);
+        context.addVis(segmentResult, policy);
       }
       // create task for visualization
-      final VisualizationTask task = new VisualizationTask(NAME, policy, null, this);
-      task.width = 2.0;
-      task.height = 2.0;
+      final VisualizationTask task = new VisualizationTask(NAME, context, policy, null, this);
+      task.reqwidth = 2.0;
+      task.reqheight = 2.0;
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      baseResult.getHierarchy().add(segmentResult, task);
+      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
+      context.addVis(segmentResult, task);
     }
   }
 
   /**
    * Instance
-   * 
+   *
    * @author Sascha Goldhofer
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses Segments
    * @apiviz.has SegmentsStylingPolicy
-   * 
+   *
    */
   public class Instance extends AbstractVisualization implements ResultListener {
     /** Minimum width (radian) of Segment */
@@ -247,38 +252,41 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
     /**
      * Constructor
+     *
+     * @param task Task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height);
       policy = task.getResult();
       segments = policy.segments;
       // FIXME: handle this more generally.
-      policy.setStyleLibrary(context.getStyleResult().getStyleLibrary());
-      // Listen for result changes (Selection changed)
-      context.addResultListener(this);
+      policy.setStyleLibrary(context.getStyleLibrary());
+      addListeners();
     }
 
     public void toggleUnclusteredPairs(boolean show) {
       noIncrementalRedraw = true;
       showUnclusteredPairs = show;
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
     }
 
     @Override
     public void resultChanged(Result current) {
       super.resultChanged(current);
-      // Redraw on style result changes.
-      if(current == context.getStyleResult()) {
+      if(current == context.getStylingPolicy()) {
         // When switching to a different policy, unhighlight segments.
-        if(context.getStyleResult().getStylingPolicy() != policy) {
+        if(context.getStylingPolicy() != policy) {
           policy.deselectAllSegments();
         }
-        synchronizedRedraw();
       }
     }
 
     @Override
-    protected void incrementalRedraw() {
+    public void incrementalRedraw() {
       if(noIncrementalRedraw) {
         super.incrementalRedraw();
       }
@@ -288,7 +296,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
     }
 
     @Override
-    public void redraw() {
+    public void fullRedraw() {
       LOG.debug("Full redraw");
       noIncrementalRedraw = false; // Done that.
 
@@ -300,7 +308,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
       // Setup scaling for canvas: 0 to StyleLibrary.SCALE (usually 100 to avoid
       // a
       // Java drawing bug!)
-      String transform = SVGUtil.makeMarginTransform(task.width, task.height, StyleLibrary.SCALE, StyleLibrary.SCALE, 0) + "  translate(" + (StyleLibrary.SCALE * .5) + " " + (StyleLibrary.SCALE * .5) + ")";
+      String transform = SVGUtil.makeMarginTransform(task.reqwidth, task.reqheight, StyleLibrary.SCALE, StyleLibrary.SCALE, 0) + "  translate(" + (StyleLibrary.SCALE * .5) + " " + (StyleLibrary.SCALE * .5) + ")";
       visLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
       ctrlLayer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 
@@ -334,7 +342,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
      * Define and add required CSS classes
      */
     protected void addCSSClasses(int maxClusterSize) {
-      StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      StyleLibrary style = context.getStyleLibrary();
 
       // Cluster separation lines
       CSSClass cssReferenceBorder = new CSSClass(this.getClass(), CLR_BORDER_CLASS);
@@ -376,7 +384,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
      * Create the segments
      */
     private void drawSegments() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       final int clusterings = segments.getClusterings();
 
       // Reinitialize
@@ -498,7 +506,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
     }
 
     private void redrawSelection() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       LOG.debug("Updating selection only.");
       for(Entry<Segment, List<Element>> entry : segmentToElements.entrySet()) {
         Segment segment = entry.getKey();
@@ -529,7 +537,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
     /**
      * Creates a gradient over a set of colors
-     * 
+     *
      * @param shades number of colors in the gradient
      * @param colors colors for the gradient
      * @return array of colors for CSS
@@ -668,22 +676,20 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
       }
       policy.select(segment, ctrl);
       // update stylePolicy
-      context.getStyleResult().setStylingPolicy(policy);
-      // fire changed event to trigger redraw
-      context.getHierarchy().resultChanged(context.getStyleResult());
+      context.setStylingPolicy(policy);
     }
 
     /**
      * Proxy element to connect signals.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     private class SegmentListenerProxy implements EventListener {
       /**
        * Mouse double click time window in milliseconds
-       * 
+       *
        * TODO: does Batik have double click events?
        */
       public static final int EVT_DBLCLICK_DELAY = 350;
@@ -705,7 +711,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
       /**
        * Constructor.
-       * 
+       *
        * @param id Segment id
        * @param ringid Ring id
        */

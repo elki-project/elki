@@ -31,10 +31,10 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projections.AffineProjection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
@@ -44,15 +44,15 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisualizatio
 /**
  * ScatterPlotProjector is responsible for producing a set of scatterplot
  * visualizations.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses ScalesResult
  * @apiviz.uses Projection2D
- * 
+ *
  * @param <V> Vector type
  */
-public class ScatterPlotProjector<V extends NumberVector> extends AbstractHierarchicalResult implements Projector {
+public class ScatterPlotProjector<V extends NumberVector> implements Projector {
   /**
    * Relation we project.
    */
@@ -65,7 +65,7 @@ public class ScatterPlotProjector<V extends NumberVector> extends AbstractHierar
 
   /**
    * Constructor.
-   * 
+   *
    * @param rel Relation
    * @param maxdim Maximum dimension to use
    */
@@ -73,13 +73,13 @@ public class ScatterPlotProjector<V extends NumberVector> extends AbstractHierar
     super();
     this.rel = rel;
     this.dmax = maxdim;
-    assert (maxdim <= RelationUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
+    assert(maxdim <= RelationUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
   }
 
   @Override
-  public Collection<PlotItem> arrange() {
+  public Collection<PlotItem> arrange(VisualizerContext context) {
     List<PlotItem> layout = new ArrayList<>(1);
-    List<VisualizationTask> tasks = ResultUtil.filterResults(this, VisualizationTask.class);
+    List<VisualizationTask> tasks = context.getVisTasks(this);
     if(tasks.size() > 0) {
       ScalesResult scales = ResultUtil.getScalesResult(rel);
       final PlotItem master;
@@ -87,7 +87,7 @@ public class ScatterPlotProjector<V extends NumberVector> extends AbstractHierar
         // In 2d, make the plot twice as big.
         master = new PlotItem(2 + .1, 2 + .1, null);
         {
-          Projection2D proj = new Simple2D(scales.getScales(), 0, 1);
+          Projection2D proj = new Simple2D(this, scales.getScales(), 0, 1);
           PlotItem it = new PlotItem(.1, 0, 2., 2., proj);
           it.tasks = tasks;
           master.subitems.add(it);
@@ -95,20 +95,20 @@ public class ScatterPlotProjector<V extends NumberVector> extends AbstractHierar
         // Label at bottom
         {
           PlotItem it = new PlotItem(.1, 2., 2., .1, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 0)));
-          task.height = .1;
-          task.width = 2.;
-          task.nodetail = true;
+          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 0)));
+          task.reqheight = .1;
+          task.reqwidth = 2.;
+          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
           it.tasks.add(task);
           master.subitems.add(it);
         }
         // Label on left
         {
           PlotItem it = new PlotItem(0, 0, .1, 2, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 1), true));
-          task.height = 2.;
-          task.width = .1;
-          task.nodetail = true;
+          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 1), true));
+          task.reqheight = 2.;
+          task.reqwidth = .1;
+          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
           it.tasks.add(task);
           master.subitems.add(it);
         }
@@ -119,7 +119,7 @@ public class ScatterPlotProjector<V extends NumberVector> extends AbstractHierar
 
         for(int d1 = 0; d1 < dmax - 1; d1++) {
           for(int d2 = d1 + 1; d2 < dmax; d2++) {
-            Projection2D proj = new Simple2D(scales.getScales(), d1, d2);
+            Projection2D proj = new Simple2D(this, scales.getScales(), d1, d2);
             PlotItem it = new PlotItem(d1 + .1, d2 - 1, 1., 1., proj);
             it.tasks = tasks;
             master.subitems.add(it);
@@ -132,7 +132,7 @@ public class ScatterPlotProjector<V extends NumberVector> extends AbstractHierar
           // Wanna try 4d? go ahead:
           // p.addRotation(0, 3, Math.PI / 180 * -20.);
           // p.addRotation(1, 3, Math.PI / 180 * 30.);
-          Projection2D proj = new AffineProjection(scales.getScales(), p);
+          Projection2D proj = new AffineProjection(this, scales.getScales(), p);
           PlotItem it = new PlotItem(sizeh + .1, 0, sizeh, sizeh, proj);
           it.tasks = tasks;
           master.subitems.add(it);
@@ -140,20 +140,20 @@ public class ScatterPlotProjector<V extends NumberVector> extends AbstractHierar
         // Labels at bottom
         for(int d1 = 0; d1 < dmax - 1; d1++) {
           PlotItem it = new PlotItem(d1 + .1, dmax - 1, 1., .1, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d1)));
-          task.height = .1;
-          task.width = 1;
-          task.nodetail = true;
+          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d1)));
+          task.reqheight = .1;
+          task.reqwidth = 1;
+          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
           it.tasks.add(task);
           master.subitems.add(it);
         }
         // Labels on left
         for(int d2 = 1; d2 < dmax; d2++) {
           PlotItem it = new PlotItem(0, d2 - 1, .1, 1, null);
-          final VisualizationTask task = new VisualizationTask("", null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d2), true));
-          task.height = 1;
-          task.width = .1;
-          task.nodetail = true;
+          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d2), true));
+          task.reqheight = 1;
+          task.reqwidth = .1;
+          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
           it.tasks.add(task);
           master.subitems.add(it);
         }
@@ -165,18 +165,13 @@ public class ScatterPlotProjector<V extends NumberVector> extends AbstractHierar
   }
 
   @Override
-  public String getLongName() {
+  public String getMenuName() {
     return "Scatterplot";
-  }
-
-  @Override
-  public String getShortName() {
-    return "scatterplot";
   }
 
   /**
    * The relation we project.
-   * 
+   *
    * @return Relation
    */
   public Relation<V> getRelation() {

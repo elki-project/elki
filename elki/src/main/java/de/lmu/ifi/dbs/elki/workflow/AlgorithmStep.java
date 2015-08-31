@@ -32,8 +32,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -43,9 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
 
 /**
  * The "algorithms" step, where data is analyzed.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has Algorithm
  * @apiviz.has Result
  * @apiviz.uses Database
@@ -64,11 +64,11 @@ public class AlgorithmStep implements WorkflowStep {
   /**
    * The algorithm output
    */
-  private BasicResult result = null;
+  private Result stepresult;
 
   /**
    * Constructor.
-   * 
+   *
    * @param algorithms
    */
   public AlgorithmStep(List<Algorithm> algorithms) {
@@ -78,16 +78,15 @@ public class AlgorithmStep implements WorkflowStep {
 
   /**
    * Run algorithms.
-   * 
+   *
    * @param database Database
    * @return Algorithm result
    */
-  public HierarchicalResult runAlgorithms(Database database) {
-    result = new BasicResult("Algorithm Step", "main");
-    result.addChildResult(database);
+  public Result runAlgorithms(Database database) {
+    ResultHierarchy hier = database.getHierarchy();
     if(LOG.isStatistics()) {
       boolean first = true;
-      for(Iter<Result> it = database.getHierarchy().iterDescendants(database); it.valid(); it.advance()) {
+      for(Iter<Result> it = hier.iterDescendants(database); it.valid(); it.advance()) {
         if(!(it.get() instanceof Index)) {
           continue;
         }
@@ -98,6 +97,7 @@ public class AlgorithmStep implements WorkflowStep {
         ((Index) it.get()).logStatistics();
       }
     }
+    stepresult = new BasicResult("Algorithm Step", "algorithm-step");
     for(Algorithm algorithm : algorithms) {
       Thread.currentThread().setName(algorithm.toString());
       Duration duration = LOG.isStatistics() ? LOG.newDuration(algorithm.getClass().getName() + ".runtime").begin() : null;
@@ -107,7 +107,7 @@ public class AlgorithmStep implements WorkflowStep {
       }
       if(LOG.isStatistics()) {
         boolean first = true;
-        for(Iter<Result> it = database.getHierarchy().iterDescendants(database); it.valid(); it.advance()) {
+        for(Iter<Result> it = hier.iterDescendants(database); it.valid(); it.advance()) {
           if(!(it.get() instanceof Index)) {
             continue;
           }
@@ -119,26 +119,27 @@ public class AlgorithmStep implements WorkflowStep {
         }
       }
       if(res != null) {
-        result.addChildResult(res);
+        // Make sure the result is attached, but usually this is a noop:
+        hier.add(database, res);
       }
     }
-    return result;
+    return stepresult;
   }
 
   /**
-   * Get the algorithm result.
-   * 
-   * @return Algorithm result.
+   * Get the result.
+   *
+   * @return Result.
    */
-  public HierarchicalResult getResult() {
-    return result;
+  public Result getResult() {
+    return stepresult;
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

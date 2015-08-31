@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering;
 import de.lmu.ifi.dbs.elki.evaluation.histogram.ComputeOutlierHistogram;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionAtKCurve;
@@ -38,8 +39,8 @@ import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionRecallCurve;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierRankingEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -47,11 +48,11 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
 
 /**
  * Evaluator that tries to auto-run a number of evaluation methods.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.uses OutlierResult
  * @apiviz.uses Clustering
  * @apiviz.composedOf OutlierROCCurve
@@ -67,19 +68,20 @@ public class AutomaticEvaluation implements Evaluator {
   private static final Logging LOG = Logging.getLogger(AutomaticEvaluation.class);
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    autoEvaluateClusterings(baseResult, newResult);
-    autoEvaluateOutliers(baseResult, newResult);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    autoEvaluateClusterings(hier, newResult);
+    autoEvaluateOutliers(hier, newResult);
   }
 
-  protected void autoEvaluateOutliers(HierarchicalResult baseResult, Result newResult) {
-    Collection<OutlierResult> outliers = ResultUtil.filterResults(newResult, OutlierResult.class);
+  protected void autoEvaluateOutliers(ResultHierarchy hier, Result newResult) {
+    Collection<OutlierResult> outliers = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
     if(LOG.isDebugging()) {
       LOG.debug("Number of new outlier results: " + outliers.size());
     }
     if(outliers.size() > 0) {
-      ResultUtil.ensureClusteringResult(ResultUtil.findDatabase(baseResult), baseResult);
-      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(baseResult, Clustering.class);
+      Database db = ResultUtil.findDatabase(hier);
+      ResultUtil.ensureClusteringResult(db, db);
+      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, db, Clustering.class);
       if(clusterings.size() == 0) {
         LOG.warning("Could not find a clustering result, even after running 'ensureClusteringResult'?!?");
         return;
@@ -112,20 +114,20 @@ public class AutomaticEvaluation implements Evaluator {
       LOG.verbose("Evaluating using minority class: " + label);
       Pattern pat = Pattern.compile("^" + Pattern.quote(label) + "$");
       // Evaluate rankings.
-      new OutlierRankingEvaluation(pat).processNewResult(baseResult, newResult);
+      new OutlierRankingEvaluation(pat).processNewResult(hier, newResult);
       // Compute ROC curve
-      new OutlierROCCurve(pat).processNewResult(baseResult, newResult);
+      new OutlierROCCurve(pat).processNewResult(hier, newResult);
       // Compute Precision at k
-      new OutlierPrecisionAtKCurve(pat, min << 1).processNewResult(baseResult, newResult);
+      new OutlierPrecisionAtKCurve(pat, min << 1).processNewResult(hier, newResult);
       // Compute ROC curve
-      new OutlierPrecisionRecallCurve(pat).processNewResult(baseResult, newResult);
+      new OutlierPrecisionRecallCurve(pat).processNewResult(hier, newResult);
       // Compute outlier histogram
-      new ComputeOutlierHistogram(pat, 50, new LinearScaling(), false).processNewResult(baseResult, newResult);
+      new ComputeOutlierHistogram(pat, 50, new LinearScaling(), false).processNewResult(hier, newResult);
     }
   }
 
-  protected void autoEvaluateClusterings(HierarchicalResult baseResult, Result newResult) {
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
+  protected void autoEvaluateClusterings(ResultHierarchy hier, Result newResult) {
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, newResult, Clustering.class);
     if(LOG.isDebugging()) {
       LOG.warning("Number of new clustering results: " + clusterings.size());
     }
@@ -146,7 +148,7 @@ public class AutomaticEvaluation implements Evaluator {
     }
     if(clusterings.size() > 0) {
       try {
-        new EvaluateClustering(new ByLabelClustering(), false, true).processNewResult(baseResult, newResult);
+        new EvaluateClustering(new ByLabelClustering(), false, true).processNewResult(hier, newResult);
       }
       catch(NoSupportedDataTypeException e) {
         // Pass - the data probably did not have labels.
@@ -156,9 +158,9 @@ public class AutomaticEvaluation implements Evaluator {
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

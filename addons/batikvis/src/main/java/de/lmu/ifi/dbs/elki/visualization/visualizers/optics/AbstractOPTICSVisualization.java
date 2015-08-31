@@ -27,16 +27,18 @@ import org.apache.batik.util.SVGConstants;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.OPTICSProjection;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 
 /**
  * Abstract base class for OPTICS visualizer
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses OPTICSProjection
  */
 public abstract class AbstractOPTICSVisualization extends AbstractVisualization {
@@ -57,12 +59,16 @@ public abstract class AbstractOPTICSVisualization extends AbstractVisualization 
 
   /**
    * Constructor.
-   * 
+   *
    * @param task Visualization task.
+   * @param plot Plot to draw to
+   * @param width Embedding width
+   * @param height Embedding height
+   * @param proj Projection
    */
-  public AbstractOPTICSVisualization(VisualizationTask task) {
-    super(task);
-    this.optics = task.getProj();
+  public AbstractOPTICSVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    super(task, plot, width, height);
+    this.optics = (OPTICSProjection) proj;
   }
 
   /**
@@ -71,15 +77,15 @@ public abstract class AbstractOPTICSVisualization extends AbstractVisualization 
   protected void makeLayerElement() {
     plotwidth = StyleLibrary.SCALE;
     plotheight = StyleLibrary.SCALE / optics.getOPTICSPlot(context).getRatio();
-    final double margin = context.getStyleResult().getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
     layer = SVGUtil.svgElement(svgp.getDocument(), SVGConstants.SVG_G_TAG);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), plotwidth, plotheight, margin * .5, margin * .5, margin * 1.5, margin * .5);
+    final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), plotwidth, plotheight, margin * .5, margin * .5, margin * 1.5, margin * .5);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
   }
 
   /**
    * Access the raw cluster order
-   * 
+   *
    * @return Cluster order
    */
   protected ClusterOrder getClusterOrder() {

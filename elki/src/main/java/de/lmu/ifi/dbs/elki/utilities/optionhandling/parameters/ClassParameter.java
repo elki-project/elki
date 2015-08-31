@@ -29,8 +29,8 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -40,12 +40,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 
 /**
  * Parameter class for a parameter specifying a class name.
- * 
+ *
  * @author Steffi Wanka
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses InspectionUtil
- * 
+ *
  * @param <C> Class type
  */
 // TODO: add additional constructors with parameter constraints.
@@ -64,7 +64,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
   /**
    * Constructs a class parameter with the given optionID, restriction class,
    * and default value.
-   * 
+   *
    * @param optionID the unique id of the option
    * @param restrictionClass the restriction class of this class parameter
    * @param defaultValue the default value of this class parameter
@@ -87,7 +87,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
   /**
    * Constructs a class parameter with the given optionID, restriction class,
    * and optional flag.
-   * 
+   *
    * @param optionID the unique id of the option
    * @param restrictionClass the restriction class of this class parameter
    * @param optional specifies if this parameter is an optional parameter
@@ -110,7 +110,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
   /**
    * Constructs a class parameter with the given optionID, and restriction
    * class.
-   * 
+   *
    * @param optionID the unique id of the option
    * @param restrictionClass the restriction class of this class parameter
    */
@@ -128,7 +128,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
       return (Class<? extends C>) obj;
     }
     if(obj instanceof String) {
-      Class<? extends C> clz = InspectionUtil.findImplementation(restrictionClass, (String) obj);
+      Class<? extends C> clz = ELKIServiceRegistry.findImplementation(restrictionClass, (String) obj);
       if(clz != null) {
         return clz;
       }
@@ -156,7 +156,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
 
   /**
    * Returns a string representation of the parameter's type.
-   * 
+   *
    * @return &quot;&lt;class&gt;&quot;
    */
   @Override
@@ -166,7 +166,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
 
   /**
    * This class sometimes provides a list of value descriptions.
-   * 
+   *
    * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#hasValuesDescription()
    */
   @Override
@@ -176,7 +176,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
 
   /**
    * Return a description of known valid classes.
-   * 
+   *
    * @see de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.AbstractParameter#getValuesDescription()
    */
   @Override
@@ -191,7 +191,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
       }
       info.append(restrictionClass.getName());
       info.append(FormatUtil.NEWLINE);
-      
+
       List<Class<?>> known = getKnownImplementations();
       if(!known.isEmpty()) {
         info.append("Known classes (default package " + restrictionClass.getPackage().getName() + "):");
@@ -219,7 +219,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
    * <p/>
    * If the Class for the class name is not found, the instantiation is tried
    * using the package of the restriction class as package of the class name.
-   * 
+   *
    * @param config Parameterization to use (if Parameterizable))
    * @return a new instance for the value of this class parameter
    */
@@ -255,7 +255,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
 
   /**
    * Returns the restriction class of this class parameter.
-   * 
+   *
    * @return the restriction class of this class parameter.
    */
   public Class<C> getRestrictionClass() {
@@ -264,20 +264,20 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
 
   /**
    * Get an iterator over all known implementations of the class restriction.
-   * 
+   *
    * @return List object
    */
   public List<Class<?>> getKnownImplementations() {
-    return InspectionUtil.cachedFindAllImplementations(getRestrictionClass());
+    return ELKIServiceRegistry.findAllImplementations(getRestrictionClass());
   }
 
   /**
    * Get the "simple" form of a class name.
-   * 
+   *
    * @param c Class
    * @param pkg Package
    * @param postfix Postfix to strip
-   * 
+   *
    * @return Simplified class name
    */
   public static String canonicalClassName(Class<?> c, Package pkg, String postfix) {
@@ -296,16 +296,16 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
 
   /**
    * Get the "simple" form of a class name.
-   * 
+   *
    * @param c Class name
    * @param parent Parent/restriction class (to get package name to strip)
    * @return Simplified class name.
    */
   public static String canonicalClassName(Class<?> c, Class<?> parent) {
     if(parent == null) {
-      return canonicalClassName(c, null, InspectionUtil.FACTORY_POSTFIX);
+      return canonicalClassName(c, null, ELKIServiceRegistry.FACTORY_POSTFIX);
     }
-    return canonicalClassName(c, parent.getPackage(), InspectionUtil.FACTORY_POSTFIX);
+    return canonicalClassName(c, parent.getPackage(), ELKIServiceRegistry.FACTORY_POSTFIX);
   }
 
   @Override

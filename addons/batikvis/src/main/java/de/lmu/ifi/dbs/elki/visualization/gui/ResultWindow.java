@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.gui;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,23 +34,26 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
-import javax.swing.SwingUtilities;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultAdapter;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuAction;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuToggle;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
@@ -59,17 +62,16 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.DetailViewSelectedEvent;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
 
 /**
  * Swing window to manage a particular result visualization.
- * 
+ *
  * Yes, this is very basic and ad-hoc. Feel free to contribute something more
  * advanced to ELKI!
- * 
+ *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
- * 
+ *
  * @apiviz.composedOf JSVGSynchronizedCanvas
  * @apiviz.composedOf OverviewPlot
  * @apiviz.composedOf SelectionTableWindow
@@ -79,7 +81,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil;
  * @apiviz.uses DetailView oneway
  * @apiviz.uses DetailViewSelectedEvent oneway - - reacts to
  */
-public class ResultWindow extends JFrame implements ResultListener {
+public class ResultWindow extends JFrame implements ResultListener, VisualizationListener {
   /**
    * Serial version
    */
@@ -91,29 +93,267 @@ public class ResultWindow extends JFrame implements ResultListener {
   private static final Logging LOG = Logging.getLogger(ResultWindow.class);
 
   /**
-   * The "Overview" button, which goes to the overview view.
+   * Dynamic menu.
+   *
+   * @apiviz.exclude
    */
-  private JMenuItem overviewItem;
+  public class DynamicMenu {
+    /**
+     * Menubar component
+     */
+    private JMenuBar menubar;
 
-  /**
-   * The "Quit" button, to close the application.
-   */
-  private JMenuItem quitItem;
+    /**
+     * File menu.
+     */
+    private JMenu filemenu;
 
-  /**
-   * The "Export" button, to save the image
-   */
-  private JMenuItem exportItem;
+    /**
+     * The "Overview" button, which goes to the overview view.
+     */
+    private JMenuItem overviewItem;
 
-  /**
-   * The "tabular edit" item.
-   */
-  private JMenuItem editItem;
+    /**
+     * The "Quit" button, to close the application.
+     */
+    private JMenuItem quitItem;
 
-  /**
-   * The "Visualizers" button, to enable/disable visualizers
-   */
-  private JMenu visualizersMenu;
+    /**
+     * The "Export" button, to save the image
+     */
+    private JMenuItem exportItem;
+
+    /**
+     * The "tabular edit" item.
+     */
+    private JMenuItem editItem;
+
+    /**
+     * The "Visualizers" button, to enable/disable visualizers
+     */
+    private JMenu visualizersMenu;
+
+    /**
+     * Constructor.
+     */
+    public DynamicMenu() {
+      menubar = new JMenuBar();
+      filemenu = new JMenu("File");
+      filemenu.setMnemonic(KeyEvent.VK_F);
+
+      // setup buttons
+      if(!single) {
+        overviewItem = new JMenuItem("Open Overview");
+        overviewItem.setMnemonic(KeyEvent.VK_O);
+        overviewItem.setEnabled(false);
+        overviewItem.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent ae) {
+            showOverview();
+          }
+        });
+        filemenu.add(overviewItem);
+      }
+
+      exportItem = new JMenuItem("Export Plot");
+      exportItem.setMnemonic(KeyEvent.VK_E);
+      exportItem.setEnabled(false);
+      exportItem.addActionListener(new ActionListener() {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+          saveCurrentPlot();
+        }
+      });
+      filemenu.add(exportItem);
+
+      editItem = new JMenuItem("Table View/Edit");
+      editItem.setMnemonic(KeyEvent.VK_T);
+      editItem.addActionListener(new ActionListener() {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+          showTableView();
+        }
+      });
+      // FIXME: re-add when it is working again.
+      // filemenu.add(editItem);
+
+      quitItem = new JMenuItem("Quit");
+      quitItem.setMnemonic(KeyEvent.VK_Q);
+      quitItem.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          close();
+        }
+      });
+
+      filemenu.add(quitItem);
+      menubar.add(filemenu);
+
+      visualizersMenu = new JMenu("Visualizers");
+      visualizersMenu.setMnemonic(KeyEvent.VK_V);
+      menubar.add(visualizersMenu);
+    }
+
+    /**
+     * Update the visualizer menus.
+     */
+    protected void updateVisualizerMenus() {
+      menubar.removeAll();
+      menubar.add(filemenu);
+      ResultHierarchy hier = context.getHierarchy();
+      Hierarchy<Object> vistree = context.getVisHierarchy();
+      Result start = context.getBaseResult();
+      if(start == null) {
+        for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
+          if(hier.numParents(iter.get()) == 0) {
+            recursiveBuildMenu(menubar, iter.get(), hier, vistree);
+          }
+        }
+      }
+      else {
+        for(Hierarchy.Iter<Result> iter = hier.iterChildren(start); iter.valid(); iter.advance()) {
+          recursiveBuildMenu(menubar, iter.get(), hier, vistree);
+        }
+      }
+    }
+
+    private boolean recursiveBuildMenu(JComponent parent, Object r, ResultHierarchy hier, Hierarchy<Object> vistree) {
+      // Make a submenu for this element
+      final String nam;
+      if(r instanceof Result) {
+        nam = ((Result) r).getLongName();
+      }
+      else if(r instanceof VisualizationItem) {
+        nam = ((VisualizationItem) r).getMenuName();
+      }
+      else {
+        return false;
+      }
+      JMenu submenu = new JMenu((nam != null) ? nam : "unnamed");
+      boolean children = false;
+      // Add menus for any child results
+      if(r instanceof Result) {
+        for(Hierarchy.Iter<Result> iter = hier.iterChildren((Result) r); iter.valid(); iter.advance()) {
+          children |= recursiveBuildMenu(submenu, iter.get(), hier, vistree);
+        }
+      }
+      // Add visualizers:
+      for(Hierarchy.Iter<Object> iter = vistree.iterChildren(r); iter.valid(); iter.advance()) {
+        children |= recursiveBuildMenu(submenu, iter.get(), hier, vistree);
+      }
+
+      // Item for the visualizer
+      JMenuItem item = makeMenuItemForVisualizer(r);
+      if(item == null) {
+        if(children) {
+          parent.add(submenu);
+        }
+        else {
+          return false; // No menu.
+        }
+      }
+      else {
+        if(children) {
+          submenu.add(item, 0); // Prepend
+        }
+        else {
+          parent.add(item);
+        }
+      }
+      return true;
+    }
+
+    private JMenuItem makeMenuItemForVisualizer(Object r) {
+      if(r instanceof VisualizationMenuAction) {
+        final VisualizationMenuAction action = (VisualizationMenuAction) r;
+        JMenuItem visItem = new JMenuItem(action.getMenuName());
+        visItem.setEnabled(action.enabled());
+        visItem.addActionListener(new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            action.activate();
+          }
+        });
+        return visItem;
+      }
+      if(r instanceof VisualizationMenuToggle) {
+        final VisualizationMenuToggle toggle = (VisualizationMenuToggle) r;
+        final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(toggle.getMenuName(), toggle.active());
+        visItem.setEnabled(toggle.enabled());
+        visItem.addItemListener(new ItemListener() {
+          @Override
+          public void itemStateChanged(ItemEvent e) {
+            toggle.toggle();
+          }
+        });
+        return visItem;
+      }
+      if(!(r instanceof VisualizationTask)) {
+        return null;
+      }
+      final VisualizationTask v = (VisualizationTask) r;
+      JMenuItem item;
+
+      // Currently enabled?
+      final String name = v.getMenuName();
+      boolean enabled = v.visible;
+      boolean istool = v.tool;
+      if(!istool) {
+        final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
+        visItem.addItemListener(new ItemListener() {
+          @Override
+          public void itemStateChanged(ItemEvent e) {
+            VisualizationTree.setVisible(context, v, visItem.getState());
+          }
+        });
+        item = visItem;
+      }
+      else {
+        final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
+        visItem.addItemListener(new ItemListener() {
+          @Override
+          public void itemStateChanged(ItemEvent e) {
+            VisualizationTree.setVisible(context, v, visItem.isSelected());
+          }
+        });
+        item = visItem;
+      }
+      return item;
+    }
+
+    /**
+     * Get the menu bar component.
+     *
+     * @return Menu bar component
+     */
+    public JMenuBar getMenuBar() {
+      return menubar;
+    }
+
+    /**
+     * Enable / disable the overview menu.
+     *
+     * @param b Flag
+     */
+    public void enableOverview(boolean b) {
+      if(overviewItem != null) {
+        overviewItem.setEnabled(b);
+      }
+    }
+
+    /**
+     * Enable / disable the export menu.
+     *
+     * @param b Flag
+     */
+    public void enableExport(boolean b) {
+      exportItem.setEnabled(b);
+    }
+  }
+
+  private DynamicMenu menubar;
 
   /**
    * The SVG canvas.
@@ -136,27 +376,20 @@ public class ResultWindow extends JFrame implements ResultListener {
   private DetailView currentSubplot = null;
 
   /**
-   * Result to visualize
-   */
-  private HierarchicalResult result;
-
-  /**
    * Single view mode. No overview / detail view split
    */
   private boolean single = false;
 
   /**
    * Constructor.
-   * 
+   *
    * @param title Window title
-   * @param result Result to visualize
    * @param context Visualizer context
    * @param single Single visualization mode
    */
-  public ResultWindow(String title, HierarchicalResult result, VisualizerContext context, boolean single) {
+  public ResultWindow(String title, VisualizerContext context, boolean single) {
     super(title);
     this.context = context;
-    this.result = result;
     this.single = single;
 
     // close handler
@@ -173,70 +406,15 @@ public class ResultWindow extends JFrame implements ResultListener {
     // Create a panel and add the button, status label and the SVG canvas.
     final JPanel panel = new JPanel(new BorderLayout());
 
-    JMenuBar menubar = new JMenuBar();
-    JMenu filemenu = new JMenu("File");
-    filemenu.setMnemonic(KeyEvent.VK_F);
-
-    // setup buttons
-    if(!single) {
-      overviewItem = new JMenuItem("Overview");
-      overviewItem.setMnemonic(KeyEvent.VK_O);
-      overviewItem.setEnabled(false);
-      overviewItem.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-          showOverview();
-        }
-      });
-      filemenu.add(overviewItem);
-    }
-
-    exportItem = new JMenuItem("Export");
-    exportItem.setMnemonic(KeyEvent.VK_E);
-    exportItem.setEnabled(false);
-    exportItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-        saveCurrentPlot();
-      }
-    });
-    filemenu.add(exportItem);
-
-    editItem = new JMenuItem("Table View/Edit");
-    editItem.setMnemonic(KeyEvent.VK_T);
-    editItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent ae) {
-        showTableView();
-      }
-    });
-    // FIXME: re-add when it is working again.
-    // filemenu.add(editItem);
-
-    quitItem = new JMenuItem("Quit");
-    quitItem.setMnemonic(KeyEvent.VK_Q);
-    quitItem.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        close();
-      }
-    });
-
-    filemenu.add(quitItem);
-    menubar.add(filemenu);
-
-    visualizersMenu = new JMenu("Visualizers");
-    visualizersMenu.setMnemonic(KeyEvent.VK_V);
-    menubar.add(visualizersMenu);
-
-    panel.add("North", menubar);
+    menubar = new DynamicMenu();
+    panel.add("North", menubar.getMenuBar());
 
     svgCanvas = new JSVGSynchronizedCanvas();
     panel.add("Center", svgCanvas);
 
     this.getContentPane().add(panel);
 
-    this.overview = new OverviewPlot(result, context, single);
+    this.overview = new OverviewPlot(context, single);
     // when a subplot is clicked, show the selected subplot.
     overview.addActionListener(new ActionListener() {
       @Override
@@ -244,9 +422,9 @@ public class ResultWindow extends JFrame implements ResultListener {
         if(e instanceof DetailViewSelectedEvent) {
           showSubplot((DetailViewSelectedEvent) e);
         }
-        if(OverviewPlot.OVERVIEW_REFRESHED.equals(e.getActionCommand())) {
-          if (currentSubplot == null) {
-            svgCanvas.setPlot(overview.getPlot());
+        if(OverviewPlot.OVERVIEW_REFRESHED == e.getActionCommand()) {
+          if(currentSubplot == null) {
+            showOverview();
           }
         }
       }
@@ -269,18 +447,19 @@ public class ResultWindow extends JFrame implements ResultListener {
       }
     };
     this.overview.initialize(listener.getCurrentRatio());
-
     this.addComponentListener(listener);
 
     context.addResultListener(this);
+    context.addVisualizationListener(this);
 
     // update();
-    updateVisualizerMenus();
+    menubar.updateVisualizerMenus();
   }
 
   @Override
   public void dispose() {
     context.removeResultListener(this);
+    context.removeVisualizationListener(this);
     svgCanvas.setPlot(null);
     overview.destroy();
     if(currentSubplot != null) {
@@ -293,7 +472,7 @@ public class ResultWindow extends JFrame implements ResultListener {
   /**
    * Close the visualizer window.
    */
-  public void close() {
+  protected void close() {
     this.setVisible(false);
     this.dispose();
   }
@@ -311,7 +490,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
   /**
    * Navigate to a subplot.
-   * 
+   *
    * @param e
    */
   protected void showSubplot(DetailViewSelectedEvent e) {
@@ -323,7 +502,7 @@ public class ResultWindow extends JFrame implements ResultListener {
 
   /**
    * Navigate to a particular plot.
-   * 
+   *
    * @param plot Plot to show.
    */
   private void showPlot(SVGPlot plot) {
@@ -331,24 +510,20 @@ public class ResultWindow extends JFrame implements ResultListener {
       ((DetailView) svgCanvas.getPlot()).destroy();
     }
     svgCanvas.setPlot(plot);
-    if(overviewItem != null) {
-      overviewItem.setEnabled(plot != overview.getPlot());
-    }
-    exportItem.setEnabled(plot != null);
+    menubar.enableOverview(plot != overview.getPlot());
+    menubar.enableExport(plot != null);
   }
 
   /**
    * Save/export the current plot.
    */
-  public void saveCurrentPlot() {
-    // TODO: exclude "do not export" layers!
+  protected void saveCurrentPlot() {
     final SVGPlot currentPlot = svgCanvas.getPlot();
-    if(currentPlot != null) {
-      SVGSaveDialog.showSaveDialog(currentPlot, 512, 512);
-    }
-    else {
+    if(currentPlot == null) {
       LOG.warning("saveCurrentPlot() called without a visible plot!");
+      return;
     }
+    SVGSaveDialog.showSaveDialog(currentPlot, 512, 512);
   }
 
   /**
@@ -362,7 +537,7 @@ public class ResultWindow extends JFrame implements ResultListener {
    * Refresh the overview
    */
   protected void update() {
-    updateVisualizerMenus();
+    menubar.updateVisualizerMenus();
     if(currentSubplot != null) {
       // FIXME: really need to refresh?
       // currentSubplot.redraw();
@@ -372,60 +547,8 @@ public class ResultWindow extends JFrame implements ResultListener {
   }
 
   /**
-   * Update the visualizer menus.
-   */
-  private void updateVisualizerMenus() {
-    visualizersMenu.removeAll();
-    ResultHierarchy hier = context.getHierarchy();
-    for(Hierarchy.Iter<Result> iter = hier.iterChildren(result); iter.valid(); iter.advance()) {
-      recursiveBuildMenu(visualizersMenu, iter.get());
-    }
-  }
-
-  private boolean recursiveBuildMenu(JMenu parent, Result r) {
-    ResultHierarchy hier = context.getHierarchy();
-
-    // Skip "adapter" results that do not have visualizers
-    if(r instanceof ResultAdapter) {
-      if(hier.numChildren(r) <= 0) {
-        return false;
-      }
-    }
-    // Make a submenu for this element
-    boolean nochildren = true;
-    JMenu submenu = new JMenu((r.getLongName() != null) ? r.getLongName() : "unnamed");
-    // Add menus for any children
-    for(Hierarchy.Iter<Result> iter = hier.iterChildren(r); iter.valid(); iter.advance()) {
-      if(recursiveBuildMenu(submenu, iter.get())) {
-        nochildren = false;
-      }
-    }
-
-    // Item for the visualizer
-    JMenuItem item = makeMenuItemForVisualizer(r);
-    if(nochildren) {
-      if(item != null) {
-        parent.add(item);
-      }
-      else {
-        JMenuItem noresults = new JMenuItem("no visualizers");
-        noresults.setEnabled(false);
-        submenu.add(noresults);
-      }
-    }
-    else {
-      if(item != null) {
-        submenu.add(item, 0);
-      }
-      parent.add(submenu);
-    }
-
-    return true;
-  }
-
-  /**
    * Handle a resize event.
-   * 
+   *
    * @param newratio New window size ratio.
    */
   protected void handleResize(double newratio) {
@@ -434,72 +557,23 @@ public class ResultWindow extends JFrame implements ResultListener {
     }
   }
 
-  public JMenuItem makeMenuItemForVisualizer(Result r) {
-    if(VisualizationTask.class.isInstance(r)) {
-      final VisualizationTask v = (VisualizationTask) r;
-      JMenuItem item;
-
-      // Currently enabled?
-      final String name = v.getLongName();
-      boolean enabled = v.visible;
-      boolean istool = v.tool;
-      if(!istool) {
-        final JCheckBoxMenuItem visItem = new JCheckBoxMenuItem(name, enabled);
-        visItem.addItemListener(new ItemListener() {
-          @Override
-          public void itemStateChanged(ItemEvent e) {
-            // We need SwingUtilities to avoid a deadlock!
-            SwingUtilities.invokeLater(new Runnable() {
-              @Override
-              public void run() {
-                VisualizerUtil.setVisible(context, v, visItem.getState());
-              }
-            });
-          }
-        });
-        item = visItem;
-      }
-      else {
-        final JRadioButtonMenuItem visItem = new JRadioButtonMenuItem(name, enabled);
-        visItem.addItemListener(new ItemListener() {
-          @Override
-          public void itemStateChanged(ItemEvent e) {
-            // We need SwingUtilities to avoid a deadlock!
-            SwingUtilities.invokeLater(new Runnable() {
-              @Override
-              public void run() {
-                VisualizerUtil.setVisible(context, v, visItem.isSelected());
-              }
-            });
-          }
-        });
-        item = visItem;
-      }
-      if(v.hasoptions) {
-        final JMenu menu = new JMenu(name);
-        menu.add(item);
-        // TODO: build a menu for the visualizer!
-        return menu;
-      }
-      else {
-        return item;
-      }
-    }
-    return null;
-  }
-
   @Override
   public void resultAdded(Result child, Result parent) {
-    updateVisualizerMenus();
+    menubar.updateVisualizerMenus();
   }
 
   @Override
   public void resultChanged(Result current) {
-    updateVisualizerMenus();
+    menubar.updateVisualizerMenus();
   }
 
   @Override
   public void resultRemoved(Result child, Result parent) {
-    updateVisualizerMenus();
+    menubar.updateVisualizerMenus();
+  }
+
+  @Override
+  public void visualizationChanged(VisualizationItem item) {
+    menubar.updateVisualizerMenus();
   }
 }

@@ -38,7 +38,7 @@ public class DiscardResultHandler implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
     // always ignore the new result.
   }
 }

@@ -25,9 +25,9 @@ package de.lmu.ifi.dbs.elki.data.type;
 
 /**
  * Class that combines multiple type restrictions into one using an "and" operator.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf TypeInformation
  */
 public class CombinedTypeInformation implements TypeInformation {
@@ -35,7 +35,7 @@ public class CombinedTypeInformation implements TypeInformation {
    * The wrapped type restrictions
    */
   private final TypeInformation[] restrictions;
-  
+
   /**
    * Constructor.
    *

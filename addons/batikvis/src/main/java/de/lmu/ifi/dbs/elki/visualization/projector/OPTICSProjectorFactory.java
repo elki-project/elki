@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,18 +23,16 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 
 /**
  * Produce OPTICS plot projections
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has OPTICSProjector
  */
 public class OPTICSProjectorFactory implements ProjectorFactory {
@@ -46,10 +44,11 @@ public class OPTICSProjectorFactory implements ProjectorFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Collection<ClusterOrder> cos = ResultUtil.filterResults(newResult, ClusterOrder.class);
-    for(ClusterOrder co : cos) {
-      baseResult.getHierarchy().add(co, new OPTICSProjector(co));
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<ClusterOrder> it1 = VisualizationTree.filterResults(context, start, ClusterOrder.class);
+    for(; it1.valid(); it1.advance()) {
+      final ClusterOrder or = it1.get();
+      context.addVis(or, new OPTICSProjector(or));
     }
   }
 }

@@ -1,31 +1,5 @@
 package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import gnu.trove.list.TDoubleList;
-import gnu.trove.list.array.TDoubleArrayList;
-
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -44,9 +18,10 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -56,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Compute the C-index of a data set.
- * 
+ *
  * Reference:
  * <p>
  * L. J. Hubert and J.R. Levin <br />
@@ -64,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * recall<br />
  * Psychological Bulletin, Vol. 83(6)
  * </p>
- * 
+ *
  * @author Stephan Baier
  * @author Erich Schubert
  */
@@ -95,7 +70,7 @@ public class EvaluateCIndex<O> implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param distance Distance function
    * @param mergenoise Flag to treat noise as clusters, not singletons
    */
@@ -107,7 +82,7 @@ public class EvaluateCIndex<O> implements Evaluator {
 
   /**
    * Evaluate a single clustering.
-   * 
+   *
    * @param db Database
    * @param rel Data relation
    * @param c Clustering
@@ -120,7 +95,8 @@ public class EvaluateCIndex<O> implements Evaluator {
     double theta = 0;
     int w = 0;
     int ignorednoise = 0;
-    TDoubleList pairDists = new TDoubleArrayList();
+    int isize = clusters.size() <= 1 ? rel.size() : rel.size() / (clusters.size() - 1);
+    DoubleArray pairDists = new DoubleArray(isize);
 
     for(int i = 0; i < clusters.size(); i++) {
       Cluster<?> cluster = clusters.get(i);
@@ -190,12 +166,12 @@ public class EvaluateCIndex<O> implements Evaluator {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
+  public void processNewResult(ResultHierarchy hier, Result result) {
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
     if(crs.size() < 1) {
       return;
     }
-    Database db = ResultUtil.findDatabase(baseResult);
+    Database db = ResultUtil.findDatabase(hier);
     Relation<O> rel = db.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> dq = db.getDistanceQuery(rel, distance);
 
@@ -206,10 +182,10 @@ public class EvaluateCIndex<O> implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Stephan Baier
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractParameterizer {

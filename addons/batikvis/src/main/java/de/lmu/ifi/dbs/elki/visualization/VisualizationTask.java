@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,36 +25,23 @@ package de.lmu.ifi.dbs.elki.visualization;
 
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 
 /**
  * Container class, with ugly casts to reduce generics crazyness.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.composedOf VisFactory
  * @apiviz.has SVGPlot
  * @apiviz.has VisFactory
  * @apiviz.has Projection oneway - 0:1
  */
-public class VisualizationTask implements Cloneable, Result, Comparable<VisualizationTask> {
-  /**
-   * Constant for using thumbnail
-   */
-  public static final String THUMBNAIL = "thumbnail";
-
-  /**
-   * Thumbnail size
-   */
-  public static final String THUMBNAIL_RESOLUTION = "tres";
-
+public class VisualizationTask implements VisualizationItem, Comparable<VisualizationTask> {
   /**
    * Meta data key: Level for visualizer ordering
-   * 
+   *
    * Returns an integer indicating the "height" of this Visualizer. It is
    * intended to impose an ordering on the execution of Visualizers as a
    * Visualizer may depend on another Visualizer running earlier. <br>
@@ -72,24 +59,29 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
   public boolean visible = true;
 
   /**
+   * Capabilities
+   */
+  private int flags;
+
+  /**
    * Flag to signal there is no thumbnail needed.
    */
-  public boolean thumbnail = true;
+  public static final int FLAG_NO_THUMBNAIL = 1;
 
   /**
    * Mark as not having a (sensible) detail view.
    */
-  public boolean nodetail = false;
+  public static final int FLAG_NO_DETAIL = 2;
 
   /**
    * Flag to signal the visualizer should not be exported.
    */
-  public boolean noexport = false;
+  public static final int FLAG_NO_EXPORT = 4;
 
   /**
    * Flag to signal the visualizer should not be embedded.
    */
-  public boolean noembed = false;
+  public static final int FLAG_NO_EMBED = 8;
 
   /**
    * Flag to signal default visibility of a visualizer.
@@ -100,11 +92,6 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
    * Flag to mark the visualizer as tool.
    */
   public boolean tool = false;
-
-  /**
-   * Indicate whether this task has options.
-   */
-  public boolean hasoptions = false;
 
   /**
    * Background layer
@@ -132,6 +119,32 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
   public static final int LEVEL_INTERACTIVE = 1000;
 
   /**
+   * The update event mask. See {@link #ON_DATA}, {@link #ON_SELECTION},
+   * {@link #ON_STYLEPOLICY}, {@link #ON_SAMPLE}.
+   */
+  public int updatemask;
+
+  /**
+   * Constant to listen for data changes
+   */
+  public static final int ON_DATA = 1;
+
+  /**
+   * Constant to listen for selection changes
+   */
+  public static final int ON_SELECTION = 2;
+
+  /**
+   * Constant to listen for style result changes
+   */
+  public static final int ON_STYLEPOLICY = 4;
+
+  /**
+   * Constant to listen for sampling result changes
+   */
+  public static final int ON_SAMPLE = 8;
+
+  /**
    * Name
    */
   String name;
@@ -149,12 +162,7 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
   /**
    * The result we are attached to
    */
-  Result result;
-
-  /**
-   * The current projection
-   */
-  Projection proj;
+  Object result;
 
   /**
    * The main representation
@@ -162,70 +170,36 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
   Relation<?> relation;
 
   /**
-   * The plot to draw onto
+   * Width request
    */
-  SVGPlot svgp;
+  public double reqwidth;
 
   /**
-   * Width
+   * Height request
    */
-  public double width;
-
-  /**
-   * Height
-   */
-  public double height;
-
-  /**
-   * Thumbnail size
-   */
-  public int thumbsize;
+  public double reqheight;
 
   /**
    * Visualization task.
-   * 
+   *
    * @param name Name
+   * @param context Visualization context
    * @param result Result
    * @param relation Relation to use
    * @param factory Factory
    */
-  public VisualizationTask(String name, Result result, Relation<?> relation, VisFactory factory) {
-    super();
-    this.name = name;
-    this.result = result;
-    this.relation = relation;
-    this.factory = factory;
-  }
-
-  /**
-   * Constructor
-   * 
-   * @param name Name
-   * @param context Context
-   * @param result Result
-   * @param relation Representation
-   * @param factory Factory
-   * @param proj Projection
-   * @param svgp Plot
-   * @param width Width
-   * @param height Height
-   */
-  public VisualizationTask(String name, VisualizerContext context, Result result, Relation<?> relation, VisFactory factory, Projection proj, SVGPlot svgp, double width, double height) {
+  public VisualizationTask(String name, VisualizerContext context, Object result, Relation<?> relation, VisFactory factory) {
     super();
     this.name = name;
     this.context = context;
     this.result = result;
-    this.factory = factory;
-    this.proj = proj;
     this.relation = relation;
-    this.svgp = svgp;
-    this.width = width;
-    this.height = height;
+    this.factory = factory;
   }
 
   /**
    * Get the visualizer context.
-   * 
+   *
    * @return context
    */
   public VisualizerContext getContext() {
@@ -234,7 +208,7 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
 
   /**
    * Get the visualizer factory.
-   * 
+   *
    * @return Visualizer factory
    */
   public VisFactory getFactory() {
@@ -242,13 +216,8 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
   }
 
   @SuppressWarnings("unchecked")
-  public <R extends Result> R getResult() {
+  public <R> R getResult() {
     return (R) result;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <P extends Projection> P getProj() {
-    return (P) proj;
   }
 
   @SuppressWarnings("unchecked")
@@ -256,21 +225,9 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
     return (R) relation;
   }
 
-  public SVGPlot getPlot() {
-    return svgp;
-  }
-
-  public double getWidth() {
-    return width;
-  }
-
-  public double getHeight() {
-    return height;
-  }
-
   /**
    * Init the default visibility of a task.
-   * 
+   *
    * @param vis Visibility.
    */
   public void initDefaultVisibility(boolean vis) {
@@ -279,67 +236,20 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
   }
 
   @Override
-  public VisualizationTask clone() {
-    try {
-      return (VisualizationTask) super.clone();
-    } catch (CloneNotSupportedException e) {
-      throw new AbortException("Cloneable interface was removed.", e);
-    }
-  }
-
-  /**
-   * Special clone operation that replaces the target plot.
-   * 
-   * @param newplot Replacement plot to use
-   * @param context Visualizer context
-   * @return clone with different plot
-   */
-  public VisualizationTask clone(SVGPlot newplot, VisualizerContext context) {
-    VisualizationTask obj = this.clone();
-    obj.svgp = newplot;
-    obj.context = context;
-    return obj;
-  }
-
-  /**
-   * Special clone operation to set projection and size.
-   * 
-   * @param plot new plot
-   * @param p Projection to use
-   * @param width Width
-   * @param height Height
-   * @return clone with different plot
-   */
-  public VisualizationTask clone(SVGPlot plot, VisualizerContext context, Projection p, double width, double height) {
-    VisualizationTask obj = this.clone();
-    obj.svgp = plot;
-    obj.context = context;
-    obj.proj = p;
-    obj.width = width;
-    obj.height = height;
-    return obj;
-  }
-
-  @Override
-  public String getLongName() {
-    return name;
-  }
-
-  @Override
-  public String getShortName() {
+  public String getMenuName() {
     return name;
   }
 
   @Override
   public int compareTo(VisualizationTask other) {
     // sort by levels first
-    if (this.level != other.level) {
+    if(this.level != other.level) {
       return this.level - other.level;
     }
     // sort by name otherwise.
-    String name1 = this.getShortName();
-    String name2 = other.getShortName();
-    if (name1 != null && name2 != null && name1 != name2) {
+    String name1 = this.getMenuName();
+    String name2 = other.getMenuName();
+    if(name1 != null && name2 != null && name1 != name2) {
       return name1.compareTo(name2);
     }
     return 0;
@@ -349,11 +259,8 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append("VisTask: ").append(factory.getClass().getName()).append(' ');
-    if (result != null) {
-      buf.append("Result: ").append(result.getLongName()).append(' ');
-    }
-    if (proj != null) {
-      buf.append("Proj: ").append(proj.toString()).append(' ');
+    if(result != null && result instanceof Result) {
+      buf.append("Result: ").append(((Result) result).getLongName()).append(' ');
     }
     buf.append(super.toString());
     return buf.toString();
@@ -369,5 +276,43 @@ public class VisualizationTask implements Cloneable, Result, Comparable<Visualiz
   public boolean equals(Object o) {
     // Also don't inherit equals based on list contents!
     return (this == o);
+  }
+
+  /**
+   * Set (OR) the update flags.
+   *
+   * @param bits Bits to set
+   */
+  public void addUpdateFlags(int bits) {
+    updatemask |= bits;
+  }
+
+  /**
+   * Update if any oft these bits is set.
+   *
+   * @param bits Bits to check.
+   * @return
+   */
+  public boolean updateOnAny(int bits) {
+    return (updatemask & bits) != 0;
+  }
+
+  /**
+   * Update if any oft these flags is set.
+   *
+   * @param bits Bits to check.
+   * @return
+   */
+  public boolean hasAnyFlags(int bits) {
+    return (flags & bits) != 0;
+  }
+
+  /**
+   * Set a task flag.
+   *
+   * @param bits Flag to set
+   */
+  public void addFlags(int bits) {
+    flags |= bits;
   }
 }

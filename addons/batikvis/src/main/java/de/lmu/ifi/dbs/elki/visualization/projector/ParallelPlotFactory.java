@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2012
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,20 +23,18 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Produce parallel axes projections.
- * 
+ *
  * @author Robert Rödler
- * 
+ *
  * @apiviz.has ParallelPlotProjector
  */
 public class ParallelPlotFactory implements ProjectorFactory {
@@ -48,15 +46,16 @@ public class ParallelPlotFactory implements ProjectorFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Collection<Relation<?>> rels = ResultUtil.filterResults(newResult, Relation.class);
-    for(Relation<?> rel : rels) {
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<Relation<?>> it = VisualizationTree.filterResults(context, start, Relation.class);
+    for(; it.valid(); it.advance()) {
+      Relation<?> rel = it.get();
       // TODO: multi-relational parallel plots
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
         Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
         ParallelPlotProjector<NumberVector> proj = new ParallelPlotProjector<>(vrel);
-        baseResult.getHierarchy().add(vrel, proj);
+        context.addVis(vrel, proj);
       }
     }
   }

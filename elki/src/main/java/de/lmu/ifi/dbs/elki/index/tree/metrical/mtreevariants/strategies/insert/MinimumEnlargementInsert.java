@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.insert;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -42,7 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", url = "http://www.vldb.org/conf/1997/P426.PDF")
+@Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
+title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //
+booktitle = "VLDB'97, Proceedings of 23rd International Conference on Very Large Data Bases, August 25-29, 1997, Athens, Greece", //
+url = "http://www.vldb.org/conf/1997/P426.PDF")
 public class MinimumEnlargementInsert<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> implements MTreeInsert<O, N, E> {
   @Override
   public IndexTreePath<E> choosePath(AbstractMTree<O, N, E, ?> tree, E object) {
@@ -59,58 +61,29 @@ public class MinimumEnlargementInsert<O, N extends AbstractMTreeNode<O, N, E>, E
    * @return the path of the appropriate subtree to insert the given object
    */
   private IndexTreePath<E> choosePath(AbstractMTree<O, N, E, ?> tree, E object, IndexTreePath<E> subtree) {
-    N node = tree.getNode(subtree.getLastPathComponent().getEntry());
+    N node = tree.getNode(subtree.getEntry());
 
     // leaf
-    if (node.isLeaf()) {
+    if(node.isLeaf()) {
       return subtree;
     }
 
-    double bestDistance;
-    int bestIdx;
-    E bestEntry;
-    double enlarge; // Track best enlargement - null for no enlargement needed.
     // Initialize from first:
-    {
-      bestIdx = 0;
-      bestEntry = node.getEntry(0);
-      bestDistance = tree.distance(object.getRoutingObjectID(), bestEntry.getRoutingObjectID());
-      if (bestDistance <= bestEntry.getCoveringRadius()) {
-        enlarge = 0.;
-      } else {
-        enlarge = bestDistance - bestEntry.getCoveringRadius();
-      }
-    }
+    int bestIdx = 0;
+    E bestEntry = node.getEntry(0);
+    double bestDistance = tree.distance(object.getRoutingObjectID(), bestEntry.getRoutingObjectID());
 
     // Iterate over remaining
-    for (int i = 1; i < node.getNumEntries(); i++) {
+    for(int i = 1; i < node.getNumEntries(); i++) {
       E entry = node.getEntry(i);
       double distance = tree.distance(object.getRoutingObjectID(), entry.getRoutingObjectID());
 
-      if (distance <= entry.getCoveringRadius()) {
-        if (enlarge > 0. || distance < bestDistance) {
-          bestIdx = i;
-          bestEntry = entry;
-          bestDistance = distance;
-          enlarge = 0.;
-        }
-      } else if (enlarge > 0.) {
-        double enlrg = distance - entry.getCoveringRadius();
-        if (enlrg < enlarge) {
-          bestIdx = i;
-          bestEntry = entry;
-          bestDistance = distance;
-          enlarge = enlrg;
-        }
+      if(distance < bestDistance) {
+        bestIdx = i;
+        bestEntry = entry;
+        bestDistance = distance;
       }
     }
-
-    // FIXME: move this to the actual insertion procedure!
-    // Apply enlargement
-    if (enlarge > 0) {
-      bestEntry.setCoveringRadius(bestEntry.getCoveringRadius() + enlarge);
-    }
-
-    return choosePath(tree, object, subtree.pathByAddingChild(new TreeIndexPathComponent<>(bestEntry, bestIdx)));
+    return choosePath(tree, object, new IndexTreePath<>(subtree, bestEntry, bestIdx));
   }
 }

@@ -86,7 +86,7 @@ public class MTreeLeafEntry extends AbstractLeafEntry implements MTreeEntry {
    *         assigned a routing object.
    */
   @Override
-  public final void setRoutingObjectID(DBID objectID) {
+  public final boolean setRoutingObjectID(DBID objectID) {
     throw new UnsupportedOperationException("Leaf entries should not be assigned a routing object.");
   }
 
@@ -109,8 +109,12 @@ public class MTreeLeafEntry extends AbstractLeafEntry implements MTreeEntry {
    * @param parentDistance the distance to be set
    */
   @Override
-  public final void setParentDistance(double parentDistance) {
+  public final boolean setParentDistance(double parentDistance) {
+    if(this.parentDistance == parentDistance) {
+      return false;
+    }
     this.parentDistance = parentDistance;
+    return true;
   }
 
   /**
@@ -131,7 +135,7 @@ public class MTreeLeafEntry extends AbstractLeafEntry implements MTreeEntry {
    *         radius
    */
   @Override
-  public void setCoveringRadius(double coveringRadius) {
+  public boolean setCoveringRadius(double coveringRadius) {
     throw new UnsupportedOperationException("This entry is not a directory entry!");
   }
 
@@ -164,13 +168,13 @@ public class MTreeLeafEntry extends AbstractLeafEntry implements MTreeEntry {
    */
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
+    if(this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
+    if(o == null || getClass() != o.getClass()) {
       return false;
     }
-    if (!super.equals(o)) {
+    if(!super.equals(o)) {
       return false;
     }
 

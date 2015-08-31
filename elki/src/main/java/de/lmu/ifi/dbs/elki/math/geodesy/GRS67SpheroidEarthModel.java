@@ -28,14 +28,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * The GRS 67 spheroid earth model.
- * 
+ *
  * Radius: 6378160.0 m
- * 
+ *
  * Flattening: 1 / 298.25
- * 
+ *
  * @author Erich Schubert
  */
-@Alias({ "GRS67", "GRS-67", "GRS67" })
+@Alias({ "GRS67", "GRS-67" })
 public class GRS67SpheroidEarthModel extends AbstractEarthModel {
   /**
    * Static instance.
@@ -66,9 +66,9 @@ public class GRS67SpheroidEarthModel extends AbstractEarthModel {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

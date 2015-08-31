@@ -81,10 +81,11 @@ class MkMaxTreeNode<O> extends AbstractMTreeNode<O, MkMaxTreeNode<O>, MkMaxEntry
    * all its entries.
    */
   @Override
-  public void adjustEntry(MkMaxEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, MkMaxTreeNode<O>, MkMaxEntry, ?> mTree) {
+  public boolean adjustEntry(MkMaxEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, MkMaxTreeNode<O>, MkMaxEntry, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // adjust knn distance
     entry.setKnnDistance(kNNDistance());
+    return true; // TODO: improve
   }
 
   /**

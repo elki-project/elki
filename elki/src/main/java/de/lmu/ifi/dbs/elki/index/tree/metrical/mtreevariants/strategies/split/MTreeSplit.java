@@ -23,16 +23,13 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 
 /**
  * Abstract super class for splitting a node in an M-Tree.
@@ -59,16 +56,10 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
     // Build distance matrix
     for(int i = 0; i < n; i++) {
       E ei = node.getEntry(i);
-      for(int j = 0; j < n; j++) {
-        if(i == j) {
-          distancematrix[i * n + j] = 0.0;
-        }
-        else if(i < j) {
-          distancematrix[i * n + j] = tree.distance(ei, node.getEntry(j));
-        }
-        else { // i > j
-          distancematrix[i * n + j] = distancematrix[j * n + i];
-        }
+      for(int j = i + 1, b = i * n + j; j < n; j++, b++) {
+        double distance = tree.distance(ei, node.getEntry(j));
+        distancematrix[b] = distance;
+        distancematrix[j * n + i] = distance; // Symmetry
       }
     }
     return distancematrix;
@@ -85,46 +76,46 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
    *         specified node
    */
   Assignments<E> balancedPartition(AbstractMTree<O, N, E, ?> tree, N node, DBID routingObject1, DBID routingObject2) {
-    long[] assigned = BitsUtil.zero(node.getNumEntries());
-    List<DistanceEntry<E>> assigned1 = new ArrayList<>(node.getCapacity());
-    List<DistanceEntry<E>> assigned2 = new ArrayList<>(node.getCapacity());
+    assert (routingObject1 != null && routingObject2 != null);
+    final int n = node.getNumEntries(), l = n - 2;
+    int[] idx1 = new int[l], idx2 = new int[l];
+    double[] dis1 = new double[l], dis2 = new double[l];
 
-    double currentCR1 = 0.;
-    double currentCR2 = 0.;
-
-    List<DistanceEntry<E>> list1 = new ArrayList<>();
-    List<DistanceEntry<E>> list2 = new ArrayList<>();
-
-    // determine the nearest neighbors
-    for(int i = 0; i < node.getNumEntries(); i++) {
+    Assignments<E> assign = new Assignments<>((n + 1) >> 1);
+    assign.setFirstRoutingObject(routingObject1);
+    assign.setSecondRoutingObject(routingObject2);
+    for(int i = 0, j = 0; i < n; i++) {
       final E ent = node.getEntry(i);
-      DBID id = ent.getRoutingObjectID();
+      final DBID id = ent.getRoutingObjectID();
       if(DBIDUtil.equal(id, routingObject1)) {
-        assigned1.add(new DistanceEntry<>(ent, 0., i));
+        assign.addToFirst(ent, 0., i);
         continue;
       }
       if(DBIDUtil.equal(id, routingObject2)) {
-        assigned2.add(new DistanceEntry<>(ent, 0., i));
+        assign.addToSecond(ent, 0., i);
         continue;
       }
       // determine the distance of o to o1 / o2
-      double d1 = tree.distance(routingObject1, id);
-      double d2 = tree.distance(routingObject2, id);
-
-      list1.add(new DistanceEntry<>(ent, d1, i));
-      list2.add(new DistanceEntry<>(ent, d2, i));
+      dis1[j] = tree.distance(routingObject1, id);
+      idx1[j] = i;
+      dis2[j] = tree.distance(routingObject2, id);
+      idx2[j] = i;
+      j++;
     }
-    Collections.sort(list1, Collections.reverseOrder());
-    Collections.sort(list2, Collections.reverseOrder());
+    DoubleIntegerArrayQuickSort.sort(dis1, idx1, l);
+    DoubleIntegerArrayQuickSort.sort(dis2, idx2, l);
 
-    for(int i = 2; i < node.getNumEntries(); i++) {
-      currentCR1 = assignNN(assigned, assigned1, list1, currentCR1, node.isLeaf());
-      i++;
-      if(i < node.getNumEntries()) {
-        currentCR2 = assignNN(assigned, assigned2, list2, currentCR2, node.isLeaf());
+    long[] assigned = BitsUtil.zero(n);
+    int p1 = 0, p2 = 0;
+    for(int i = 0; i < l; ++i) {
+      p1 = assignBest(assign, assigned, node, dis1, idx1, p1, false);
+      if(++i < l) {
+        p2 = assignBest(assign, assigned, node, dis2, idx2, p2, true);
       }
     }
-    return new Assignments<>(routingObject1, routingObject2, currentCR1, currentCR2, assigned1, assigned2);
+    assert (assign.getFirstAssignments().size() + assign.getSecondAssignments().size() == n) : "Sizes do not sum up: " + assign.getFirstAssignments().size() + " + " + assign.getFirstAssignments().size() + " != " + n;
+    assert (Math.abs(assign.getFirstAssignments().size() - assign.getSecondAssignments().size()) <= 1) : assign.getFirstAssignments().size() + " " + assign.getSecondAssignments().size();
+    return assign;
   }
 
   /**
@@ -139,78 +130,73 @@ public abstract class MTreeSplit<O, N extends AbstractMTreeNode<O, N, E>, E exte
    *         specified node
    */
   Assignments<E> balancedPartition(AbstractMTree<O, N, E, ?> tree, N node, int routingEntNum1, int routingEntNum2, double[] distanceMatrix) {
-    final int n = node.getNumEntries();
-    long[] assigned = BitsUtil.zero(node.getNumEntries());
-    List<DistanceEntry<E>> assigned1 = new ArrayList<>(node.getCapacity());
-    List<DistanceEntry<E>> assigned2 = new ArrayList<>(node.getCapacity());
+    final int n = node.getNumEntries(), l = n - 2;
+    int[] idx1 = new int[l], idx2 = new int[l];
+    double[] dis1 = new double[l], dis2 = new double[l];
 
-    double currentCR1 = 0.;
-    double currentCR2 = 0.;
-
-    List<DistanceEntry<E>> list1 = new ArrayList<>();
-    List<DistanceEntry<E>> list2 = new ArrayList<>();
-
-    DBID routingObject1 = null, routingObject2 = null;
+    Assignments<E> assign = new Assignments<>((n + 1) >> 1);
     // determine the nearest neighbors
-    for(int i = 0; i < node.getNumEntries(); i++) {
+    for(int i = 0, j = 0; i < node.getNumEntries(); i++) {
       final E ent = node.getEntry(i);
       if(i == routingEntNum1) {
-        routingObject1 = ent.getRoutingObjectID();
-        assigned1.add(new DistanceEntry<>(ent, 0., i));
+        assign.setFirstRoutingObject(ent.getRoutingObjectID());
+        assign.addToFirst(ent, 0., i);
         continue;
       }
       if(i == routingEntNum2) {
-        routingObject2 = ent.getRoutingObjectID();
-        assigned2.add(new DistanceEntry<>(ent, 0., i));
+        assign.setSecondRoutingObject(ent.getRoutingObjectID());
+        assign.addToSecond(ent, 0., i);
         continue;
       }
       // Look up the distances of o to o1 / o2
-      double d1 = distanceMatrix[i * n + routingEntNum1];
-      double d2 = distanceMatrix[i * n + routingEntNum2];
-
-      list1.add(new DistanceEntry<>(ent, d1, i));
-      list2.add(new DistanceEntry<>(ent, d2, i));
+      dis1[j] = distanceMatrix[i * n + routingEntNum1];
+      idx1[j] = i;
+      dis2[j] = distanceMatrix[i * n + routingEntNum2];
+      idx2[j] = i;
+      j++;
     }
-    Collections.sort(list1, Collections.reverseOrder());
-    Collections.sort(list2, Collections.reverseOrder());
+    DoubleIntegerArrayQuickSort.sort(dis1, idx1, l);
+    DoubleIntegerArrayQuickSort.sort(dis2, idx2, l);
 
-    for(int i = 2; i < node.getNumEntries(); i++) {
-      currentCR1 = assignNN(assigned, assigned1, list1, currentCR1, node.isLeaf());
-      i++;
-      if(i < node.getNumEntries()) {
-        currentCR2 = assignNN(assigned, assigned2, list2, currentCR2, node.isLeaf());
+    long[] assigned = BitsUtil.zero(n);
+    int p1 = 0, p2 = 0;
+    for(int i = 0; i < l; ++i) {
+      p1 = assignBest(assign, assigned, node, dis1, idx1, p1, false);
+      if(++i < l) {
+        p2 = assignBest(assign, assigned, node, dis2, idx2, p2, true);
       }
     }
-    return new Assignments<>(routingObject1, routingObject2, currentCR1, currentCR2, assigned1, assigned2);
+    assert (assign.getFirstAssignments().size() + assign.getSecondAssignments().size() == n) : "Sizes do not sum up: " + assign.getFirstAssignments().size() + " + " + assign.getFirstAssignments().size() + " != " + n;
+    assert (Math.abs(assign.getFirstAssignments().size() - assign.getSecondAssignments().size()) <= 1) : assign.getFirstAssignments().size() + " " + assign.getSecondAssignments().size();
+    return assign;
   }
 
   /**
    * Assigns the first object of the specified list to the first assignment that
    * it is not yet assigned to the second assignment.
    * 
-   * @param assigned List of already assigned objects
-   * @param assigned1 the first assignment
-   * @param list the list, the first object should be assigned
-   * @param currentCR the current covering radius
-   * @param isLeaf true, if the node of the entries to be assigned is a leaf,
-   *        false otherwise
-   * @return the new covering radius
+   * @param assign Output assignment
+   * @param assigned Bitset of assigned objects
+   * @param dis Distances
+   * @param idx Indexes
+   * @param pos Current position
+   * @param second Assign to second, not first, set.
+   * @return the new index
    */
-  private double assignNN(long[] assigned, List<DistanceEntry<E>> assigned1, List<DistanceEntry<E>> list, double currentCR, boolean isLeaf) {
-    // Remove last unassigned:
-    DistanceEntry<E> distEntry = list.remove(list.size() - 1);
-    while(BitsUtil.get(assigned, distEntry.getIndex())) {
-      distEntry = list.remove(list.size() - 1);
+  private int assignBest(Assignments<E> assign, long[] assigned, N node, double[] dis, int[] idx, int pos, boolean second) {
+    int i = idx[pos];
+    // Skip already assigned objects:
+    while(BitsUtil.get(assigned, i)) {
+      i = idx[++pos];
     }
-    assigned1.add(distEntry);
-    BitsUtil.setI(assigned, distEntry.getIndex());
-
-    if(isLeaf) {
-      return Math.max(currentCR, distEntry.getDistance());
+    if(second) {
+      assign.addToSecond(node.getEntry(i), dis[pos], i);
     }
     else {
-      return Math.max(currentCR, distEntry.getDistance() + (distEntry.getEntry()).getCoveringRadius());
+      assign.addToFirst(node.getEntry(i), dis[pos], i);
     }
+    BitsUtil.setI(assigned, i);
+    return ++pos;
   }
 
   /**

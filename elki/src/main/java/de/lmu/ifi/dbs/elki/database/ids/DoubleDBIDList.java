@@ -26,9 +26,9 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 /**
  * Collection of double values associated with objects.
- * 
+ *
  * To iterate over the results, use the following code:
- * 
+ *
  * <pre>
  * {@code
  * for (DoubleDBIDListIter iter = result.iter(); iter.valid(); iter.advance()) {
@@ -37,10 +37,10 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * }
  * }
  * </pre>
- * 
+ *
  * If you are only interested in the IDs of the objects, the following is also
  * sufficient:
- * 
+ *
  * <pre>
  * {@code
  * for (DBIDIter iter = result.iter(); iter.valid(); iter.advance()) {
@@ -48,36 +48,26 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * }
  * }
  * </pre>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.composedOf DoubleDBIDPair
  * @apiviz.has DoubleDBIDListIter
  */
 public interface DoubleDBIDList extends DBIDs {
-  /**
-   * Size of list.
-   * 
-   * @return Size
-   */
   @Override
   int size();
 
   /**
    * Materialize a single pair.
-   * 
+   *
    * @param off Offset
    * @return Pair
    */
   DoubleDBIDPair get(int off);
 
-  /**
-   * Get an iterator
-   * 
-   * @return New iterator
-   */
   @Override
   DoubleDBIDListIter iter();
 }

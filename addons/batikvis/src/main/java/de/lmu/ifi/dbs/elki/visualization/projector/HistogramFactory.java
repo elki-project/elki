@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,25 +23,23 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 
 /**
  * Produce one-dimensional projections.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has HistogramProjector
  */
 public class HistogramFactory implements ProjectorFactory {
@@ -52,7 +50,7 @@ public class HistogramFactory implements ProjectorFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param maxdim Maximum dimensionality
    */
   public HistogramFactory(int maxdim) {
@@ -61,24 +59,25 @@ public class HistogramFactory implements ProjectorFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    ArrayList<Relation<?>> rels = ResultUtil.filterResults(newResult, Relation.class);
-    for(Relation<?> rel : rels) {
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<Relation<?>> it1 = VisualizationTree.filterResults(context, start, Relation.class);
+    for(; it1.valid(); it1.advance()) {
+      Relation<?> rel = it1.get();
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
         Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
         final int dim = RelationUtil.dimensionality(vrel);
         HistogramProjector<NumberVector> proj = new HistogramProjector<>(vrel, Math.min(dim, maxdim));
-        baseResult.getHierarchy().add(vrel, proj);
+        context.addVis(vrel, proj);
       }
     }
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

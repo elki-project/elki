@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segment;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.Segments;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -43,11 +42,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * Styling policy to communicate the segment selection to other visualizers.
- * 
+ *
+ * TODO: Remove "implements Result"
+ *
  * @author Sascha Goldhofer
  * @author Erich Schubert
  */
-public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
+public class SegmentsStylingPolicy implements ClassStylingPolicy {
   /**
    * The segments we use for visualization
    */
@@ -76,7 +77,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
 
   /**
    * Constructor.
-   * 
+   *
    * @param segments Segments
    */
   public SegmentsStylingPolicy(Segments segments) {
@@ -97,9 +98,9 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
 
   /**
    * Assign the style library, for compatibility color styling.
-   * 
+   *
    * FIXME: handle this more generally
-   * 
+   *
    * @param style Style library
    */
   public void setStyleLibrary(StyleLibrary style) {
@@ -108,7 +109,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
 
   /**
    * Test whether a segment is selected.
-   * 
+   *
    * @param segment Segment to test
    * @return true when selected
    */
@@ -132,10 +133,11 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
   @Override
   public int getColorForDBID(DBIDRef id) {
     int style = getStyleForDBID(id);
-    if (colorset != null) {
+    if(colorset != null) {
       // FIXME: add caching
       return SVGUtil.stringToColor(colorset.getColor(style)).getRGB();
-    } else {
+    }
+    else {
       return 0;
     }
   }
@@ -184,10 +186,10 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
    * clustering and cluster selected and the addToSelection option given, the
    * current selection will be modified. This method is called by clicking on a
    * segment and ring and the CTRL-button status.
-   * 
+   *
    * Adding selections does only work on the same clustering and cluster, else a
    * new selection will be added.
-   * 
+   *
    * @param segment the selected element representing a segment ring (specific
    *        clustering)
    * @param addToSelection flag for adding segment to current selection
@@ -248,7 +250,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
 
   /**
    * Deselect a segment
-   * 
+   *
    * @param segment Segment to deselect
    */
   protected void deselectSegment(Segment segment) {
@@ -284,7 +286,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
 
   /**
    * Select a segment
-   * 
+   *
    * @param segment Segment to select
    */
   protected void selectSegment(Segment segment) {
@@ -307,7 +309,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
 
   /**
    * Get the index of a selected segment.
-   * 
+   *
    * @param segment Segment to find
    * @return Index, or -1
    */
@@ -316,12 +318,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy, Result {
   }
 
   @Override
-  public String getLongName() {
+  public String getMenuName() {
     return "Pair segments styling policy";
-  }
-
-  @Override
-  public String getShortName() {
-    return "pairsegments-styling";
   }
 }

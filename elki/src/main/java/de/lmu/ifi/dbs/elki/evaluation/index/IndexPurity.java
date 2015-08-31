@@ -41,8 +41,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 
@@ -61,9 +61,9 @@ public class IndexPurity implements Evaluator {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Database database = ResultUtil.findDatabase(baseResult);
-    final ArrayList<SpatialIndexTree<?, ?>> indexes = ResultUtil.filterResults(newResult, SpatialIndexTree.class);
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
+    Database database = ResultUtil.findDatabase(hier);
+    final ArrayList<SpatialIndexTree<?, ?>> indexes = ResultUtil.filterResults(hier, newResult, SpatialIndexTree.class);
     if(indexes == null || indexes.size() <= 0) {
       return;
     }

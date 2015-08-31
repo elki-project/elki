@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.index;
 /*This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2012
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,9 +22,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -35,15 +32,17 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -57,9 +56,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index.TreeMBRVi
 
 /**
  * Visualize the of an R-Tree based index.
- * 
+ *
  * @author Robert Rödler
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -81,7 +80,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param settings Settings
    */
   public RTreeParallelVisualization(Parameterizer settings) {
@@ -90,39 +89,36 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance<RStarTreeNode, SpatialEntry>(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance<RStarTreeNode, SpatialEntry>(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    ArrayList<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>> trees = ResultUtil.filterResults(result, AbstractRStarTree.class);
-    for(AbstractRStarTree<RStarTreeNode, SpatialEntry, ?> tree : trees) {
-      if(tree instanceof Result) {
-        Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
-        for(ParallelPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, (Result) tree, p.getRelation(), this);
-          task.level = VisualizationTask.LEVEL_BACKGROUND + 2;
-          task.default_visibility = false;
-          baseResult.getHierarchy().add((Result) tree, task);
-          baseResult.getHierarchy().add(p, task);
-        }
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizationTree.findNewSiblings(context, start, AbstractRStarTree.class, ParallelPlotProjector.class, //
+    new VisualizationTree.Handler2<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>, ParallelPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, AbstractRStarTree<RStarTreeNode, SpatialEntry, ?> tree, ParallelPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, p.getRelation(), RTreeParallelVisualization.this);
+        task.level = VisualizationTask.LEVEL_BACKGROUND + 2;
+        task.default_visibility = false;
+        context.addVis((Result) tree, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   /**
    * Instance for a particular data set and tree
-   * 
+   *
    * @author Robert Rödler
-   * 
+   *
    * @apiviz.has AbstractRStarTree oneway - - visualizes
-   * 
+   *
    * @param <N> Tree node type
    * @param <E> Tree entry type
    */
-  // TODO: listen for tree changes instead of data changes?
-  public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
+  public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractParallelVisualization<NumberVector>implements DataStoreListener {
     /**
      * The tree we visualize
      */
@@ -130,41 +126,35 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
     @SuppressWarnings("unchecked")
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.tree = AbstractRStarTree.class.cast(task.getResult());
-      context.addDataStoreListener(this);
-      context.addResultListener(this);
-      incrementalRedraw();
+      addListeners();
     }
 
     @Override
-    public void destroy() {
-      context.removeDataStoreListener(this);
-      context.removeResultListener(this);
-      super.destroy();
-    }
-
-    @Override
-    protected void redraw() {
-      if(tree != null) {
-        addCSSClasses(svgp);
-        E root = tree.getRootEntry();
-        visualizeRTreeEntry(svgp, layer, proj, tree, root, 0, 0);
-      }
+    public void fullRedraw() {
+      super.fullRedraw();
+      addCSSClasses(svgp);
+      E root = tree.getRootEntry();
+      visualizeRTreeEntry(svgp, layer, proj, tree, root, 0, 0);
     }
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       final ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       for(int i = 0; i < tree.getHeight(); i++) {
@@ -194,7 +184,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
 
     /**
      * Recursively draw the MBR rectangles.
-     * 
+     *
      * @param svgp SVG Plot
      * @param layer Layer
      * @param proj Projection
@@ -206,7 +196,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
       final int dim = proj.getVisibleDimensions();
       double[] min = proj.fastProjectDataToRenderSpace(SpatialUtil.getMin(entry));
       double[] max = proj.fastProjectDataToRenderSpace(SpatialUtil.getMax(entry));
-      assert (min.length == dim && max.length == dim);
+      assert(min.length == dim && max.length == dim);
       SVGPath path = new SVGPath();
       for(int i = 0; i < dim; i++) {
         path.drawTo(getVisibleAxisX(i), Math.max(min[i], max[i]));
@@ -236,9 +226,9 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

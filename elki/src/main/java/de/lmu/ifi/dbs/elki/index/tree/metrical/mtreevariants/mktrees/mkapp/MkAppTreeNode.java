@@ -107,9 +107,10 @@ class MkAppTreeNode<O> extends AbstractMTreeNode<O, MkAppTreeNode<O>, MkAppEntry
    * @param mTree the M-Tree object holding this node
    */
   @Override
-  public void adjustEntry(MkAppEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, MkAppTreeNode<O>, MkAppEntry, ?> mTree) {
+  public boolean adjustEntry(MkAppEntry entry, DBID routingObjectID, double parentDistance, AbstractMTree<O, MkAppTreeNode<O>, MkAppEntry, ?> mTree) {
     super.adjustEntry(entry, routingObjectID, parentDistance, mTree);
     // entry.setKnnDistanceApproximation(knnDistanceApproximation());
+    return true; // TODO: improve
   }
 
   @Override

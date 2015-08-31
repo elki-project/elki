@@ -24,22 +24,23 @@ package de.lmu.ifi.dbs.elki.visualization.style;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 
 /**
  * Styling policy.
- * 
+ *
  * Implementations <em>must</em> implement either {@link ClassStylingPolicy} or
  * {@link SingleObjectsStylingPolicy} interfaces, as most visualizers will only
  * support these known interfaces.
- * 
+ *
  * @author Erich Schubert
  */
-public interface StylingPolicy {
+public interface StylingPolicy extends VisualizationItem {
   /**
    * Get the color for an individual object.
-   * 
+   *
    * Note: if possible, use a class styling policy which can optimize better.
-   * 
+   *
    * @param id Object ID
    * @return Color value
    */

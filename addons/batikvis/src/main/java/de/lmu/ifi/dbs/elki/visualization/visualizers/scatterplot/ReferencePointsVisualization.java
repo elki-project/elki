@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,19 +23,19 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.ReferencePointsResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -45,10 +45,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * The actual visualization instance, for a single projection
- * 
+ *
  * @author Remigius Wojdanowski
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -66,30 +66,29 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ReferencePointsResult<?>> rps = ResultUtil.filterResults(result, ReferencePointsResult.class);
-    for(ReferencePointsResult<?> rp : rps) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, rp, p.getRelation(), this);
+  public void processNewResult(VisualizerContext context, Object result) {
+    VisualizationTree.findNewResultVis(context, result, ReferencePointsResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<ReferencePointsResult<?>, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ReferencePointsResult<?> rp, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, context, rp, p.getRelation(), ReferencePointsVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
-        baseResult.getHierarchy().add(rp, task);
-        baseResult.getHierarchy().add(p, task);
+        context.addVis(rp, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   /**
    * Instance.
-   * 
+   *
    * @author Remigius Wojdanowski
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has ReferencePointsResult oneway - - visualizes
    */
   // TODO: add a result listener for the reference points.
@@ -107,18 +106,23 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
-      incrementalRedraw();
+      addListeners();
     }
 
     @Override
-    public void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    public void fullRedraw() {
+      setupCanvas();
+      final StyleLibrary style = context.getStyleLibrary();
       setupCSS(svgp);
       Iterator<? extends NumberVector> iter = result.iterator();
 
@@ -134,11 +138,11 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
 
     /**
      * Registers the Reference-Point-CSS-Class at a SVGPlot.
-     * 
+     *
      * @param svgp the SVGPlot to register the -CSS-Class.
      */
     private void setupCSS(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       CSSClass refpoint = new CSSClass(svgp, REFPOINT);
       refpoint.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getColor(StyleLibrary.REFERENCE_POINTS));
       svgp.addCSSClassOrLogError(refpoint);

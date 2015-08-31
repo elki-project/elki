@@ -47,17 +47,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Helper application to test the ELKI properties file for "missing"
  * implementations.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses ELKIServiceLoader
  */
 public class CheckELKIServices {
@@ -73,7 +74,7 @@ public class CheckELKIServices {
 
   /**
    * Main method.
-   * 
+   *
    * @param argv Command line arguments
    */
   public static void main(String[] argv) {
@@ -90,7 +91,7 @@ public class CheckELKIServices {
 
   /**
    * Retrieve all properties and check them.
-   * 
+   *
    * @param update Folder to update service files in
    */
   public void checkServices(String update) {
@@ -140,7 +141,7 @@ public class CheckELKIServices {
 
   /**
    * Check a single service class
-   * 
+   *
    * @param prop Class name.
    * @param update Folder to update service files in
    */
@@ -153,7 +154,7 @@ public class CheckELKIServices {
       LOG.warning("Service file name is not a class name: " + prop);
       return;
     }
-    List<Class<?>> impls = InspectionUtil.findAllImplementations(cls, false, false);
+    List<Class<?>> impls = ELKIServiceRegistry.findAllImplementations(cls, false, false);
     HashSet<String> names = new HashSet<>();
     for(Class<?> c2 : impls) {
       names.add(c2.getName());
@@ -179,9 +180,11 @@ public class CheckELKIServices {
           }
           String stripped = m.group(1);
           if(stripped.length() > 0) {
-            if(!names.remove(stripped) && !injar) {
-              LOG.warning("Name " + stripped + " found for property " + prop + " but no class discovered (or listed twice).");
+            String[] parts = stripped.split(" ");
+            if(!names.remove(parts[0]) && !injar) {
+              LOG.warning("Name " + parts[0] + " found for property " + prop + " but no class discovered (or listed twice).");
             }
+            checkAliases(cls, parts[0], parts);
           }
         }
       }
@@ -219,6 +222,65 @@ public class CheckELKIServices {
       catch(IOException e) {
         LOG.exception(e);
       }
+    }
+  }
+
+  /**
+   * Check if aliases are listed completely.
+   *
+   * @param parent Parent class
+   * @param classname Class name
+   * @param parts Splitted sevice line
+   */
+  @SuppressWarnings("unchecked")
+  private void checkAliases(Class<?> parent, String classname, String[] parts) {
+    Class<?> c = ELKIServiceRegistry.findImplementation((Class<Object>) parent, classname);
+    if (c == null) {
+      return;
+    }
+    Alias ann = c.getAnnotation(Alias.class);
+    if(ann == null) {
+      if(parts.length > 1) {
+        StringBuilder buf = new StringBuilder();
+        buf.append("Class ").append(classname);
+        buf.append(" has the following extraneous aliases:");
+        for(int i = 1; i < parts.length; i++) {
+          buf.append(' ').append(parts[i]);
+        }
+        LOG.warning(buf);
+      }
+      return;
+    }
+    HashSet<String> aliases = new HashSet<String>();
+    for(int i = 1; i < parts.length; i++) {
+      aliases.add(parts[i]);
+    }
+    StringBuilder buf = null;
+    for(String a : ann.value()) {
+      if(!aliases.remove(a)) {
+        if(buf == null) {
+          buf = new StringBuilder();
+          buf.append("Class ").append(classname);
+          buf.append(" is missing the following aliases:");
+        }
+        buf.append(' ').append(a);
+      }
+    }
+    if(!aliases.isEmpty()) {
+      if(buf == null) {
+        buf = new StringBuilder();
+      }
+      else {
+        buf.append('\n');
+      }
+      buf.append("Class ").append(classname);
+      buf.append(" has the following extraneous aliases:");
+      for(String a : aliases) {
+        buf.append(' ').append(a);
+      }
+    }
+    if(buf != null) {
+      LOG.warning(buf);
     }
   }
 }

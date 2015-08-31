@@ -23,19 +23,19 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
@@ -45,9 +45,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Visualize an OPTICS result by constructing an OPTICS plot for it.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -65,19 +65,21 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-    for(OPTICSProjector p : ops) {
+  public void processNewResult(VisualizerContext context, Object result) {
+    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
+    for(; it.valid(); it.advance()) {
+      OPTICSProjector p = it.get();
       // Add plots, attach visualizer
-      final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+      final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
       task.level = VisualizationTask.LEVEL_DATA;
-      baseResult.getHierarchy().add(p, task);
+      // FIXME: task.setUpdates(VisualizationTask.ON_STYLEPOLICY);
+      context.addVis(p, task);
     }
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -88,21 +90,26 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Erich Schubert
    */
   public class Instance extends AbstractOPTICSVisualization {
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
+      addListeners();
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
       makeLayerElement();
       // addCSSClasses();
 
@@ -124,7 +131,7 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
       double y1 = plotheight * opticsplot.scaleToPixel(scale.getMin()) / opticsplot.getHeight();
       double y2 = plotheight * opticsplot.scaleToPixel(scale.getMax()) / opticsplot.getHeight();
       try {
-        final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+        final StyleLibrary style = context.getStyleLibrary();
         SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, 0, y1, 0, y2, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
         SVGSimpleLinearAxis.drawAxis(svgp, layer, scale, plotwidth, y1, plotwidth, y2, SVGSimpleLinearAxis.LabelStyle.RIGHTHAND, style);
       }

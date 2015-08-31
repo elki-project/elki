@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -35,14 +33,16 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -53,15 +53,18 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
 
 /**
  * Visualize error vectors as produced by COP.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  * @apiviz.has OutlierResult oneway - - visualizes
  */
 @Title("COP: Correlation Outlier Probability")
-@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", title = "Outlier Detection in Arbitrarily Oriented Subspaces", booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
+title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
+booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)", //
+url = "http://dx.doi.org/10.1109/ICDM.2012.21")
 public class COPVectorVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
@@ -76,37 +79,34 @@ public class COPVectorVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-    for (OutlierResult o : ors) {
-      List<Relation<?>> rels = ResultUtil.filterResults(o, Relation.class);
-      for (Relation<?> rel : rels) {
-        if (!rel.getShortName().equals(COP.COP_ERRORVEC)) {
-          continue;
-        }
-        List<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-        boolean vis = true;
-        for (ScatterPlotProjector<?> p : ps) {
-          final VisualizationTask task = new VisualizationTask(NAME, rel, p.getRelation(), this);
-          task.level = VisualizationTask.LEVEL_DATA;
-          if (!vis) {
-            task.initDefaultVisibility(false);
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizationTree.findNewSiblings(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
+        Hierarchy.Iter<Relation<?>> it1 = VisualizationTree.filterResults(context, o, Relation.class);
+        for(; it1.valid(); it1.advance()) {
+          Relation<?> rel = it1.get();
+          if(!rel.getShortName().equals(COP.COP_ERRORVEC)) {
+            continue;
           }
-          baseResult.getHierarchy().add(o, task);
-          baseResult.getHierarchy().add(p, task);
+          final VisualizationTask task = new VisualizationTask(NAME, context, rel, p.getRelation(), COPVectorVisualization.this);
+          task.level = VisualizationTask.LEVEL_DATA;
+          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
+          context.addVis(o, task);
+          context.addVis(p, task);
         }
       }
-    }
+    });
   }
 
   /**
    * Visualize error vectors as produced by COP.
-   * 
+   *
    * @author Erich Schubert
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
@@ -123,41 +123,39 @@ public class COPVectorVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
-      context.addDataStoreListener(this);
-      incrementalRedraw();
+      addListeners();
     }
 
     @Override
-    public void destroy() {
-      super.destroy();
-      context.removeDataStoreListener(this);
-    }
-
-    @Override
-    public void redraw() {
+    public void fullRedraw() {
+      setupCanvas();
       setupCSS(svgp);
-      for (DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
+      for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
         Vector evec = result.get(objId);
-        if (evec == null) {
+        if(evec == null) {
           continue;
         }
         double[] ev = proj.fastProjectRelativeDataToRenderSpace(evec);
         // TODO: avoid hard-coded plot threshold
-        if (VMath.euclideanLength(ev) < 0.01) {
+        if(VMath.euclideanLength(ev) < 0.01) {
           continue;
         }
         final NumberVector vec = rel.get(objId);
-        if (vec == null) {
+        if(vec == null) {
           continue;
         }
         double[] v = proj.fastProjectDataToRenderSpace(vec);
-        if (v[0] != v[0] || v[1] != v[1]) {
+        if(v[0] != v[0] || v[1] != v[1]) {
           continue; // NaN!
         }
         Element arrow = svgp.svgLine(v[0], v[1], v[0] + ev[0], v[1] + ev[1]);
@@ -166,20 +164,13 @@ public class COPVectorVisualization extends AbstractVisFactory {
       }
     }
 
-    @Override
-    public void resultChanged(Result current) {
-      if (sample == current) {
-        synchronizedRedraw();
-      }
-    }
-
     /**
      * Registers the COP error vector-CSS-Class at a SVGPlot.
-     * 
+     *
      * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
      */
     private void setupCSS(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       CSSClass bubble = new CSSClass(svgp, VEC);
       bubble.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) / 2);
 

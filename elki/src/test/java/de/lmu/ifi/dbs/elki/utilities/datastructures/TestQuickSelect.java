@@ -31,11 +31,10 @@ import java.util.Random;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 
 /**
  * Test the QuickSelect math class.
- * 
+ *
  * @author Erich Schubert
  */
 public class TestQuickSelect implements JUnit4Test {
@@ -108,5 +107,14 @@ public class TestQuickSelect implements JUnit4Test {
   public void testTies() {
     double data[] = new double[] { 0.1, 0.1, 0.9, 0.9, 0.5, 0.9, 0.1, 0.1, 0.1, 0.9, 0.9, 0.9, 0.9, 0.1, 0.1 };
     assertEquals("Full median incorrect.", 0.5, QuickSelect.median(data), Double.MIN_VALUE);
+  }
+
+  @Test(timeout = 500)
+  public void testTiesLarge() {
+    int size = 1000000;
+    double[] data = new double[size];
+
+    // Run QuickSelect
+    QuickSelect.median(data);
   }
 }

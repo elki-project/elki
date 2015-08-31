@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -59,8 +58,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceScanner;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -76,7 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
 /**
  * Class to generate HTML parameter descriptions for all classes that have ELKI
  * {@link Parameter}s. Used in documentation generation only.
- * 
+ *
  * @author Erich Schubert
  *
  * @apiviz.uses Parameter
@@ -245,7 +244,7 @@ public class DocumentParameters {
   private static void buildParameterIndex(Map<Class<?>, List<Parameter<?>>> byclass, Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) {
     final ArrayList<TrackedParameter> options = new ArrayList<>();
     ExecutorService es = Executors.newSingleThreadExecutor();
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, false, true)) {
+    for(final Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, false, true)) {
       // Doesn't have a proper name?
       if(cls.getCanonicalName() == null) {
         continue;
@@ -271,7 +270,8 @@ public class DocumentParameters {
             try {
               ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
             }
-            catch(java.lang.NoSuchMethodException | java.lang.IllegalAccessException e) {
+            catch(java.lang.NoSuchMethodException
+                | java.lang.IllegalAccessException e) {
               // LOG.warning("Could not instantiate class " + cls.getName() +
               // " - no appropriate constructor or parameterizer found.");
             }
@@ -476,7 +476,7 @@ public class DocumentParameters {
     body.appendChild(maindl);
 
     List<Class<?>> classes = new ArrayList<>(byclass.keySet());
-    Collections.sort(classes, new InspectionUtil.ClassSorter());
+    Collections.sort(classes, new ELKIServiceScanner.ClassSorter());
 
     for(Class<?> cls : classes) {
       // DT = definition term
@@ -535,9 +535,9 @@ public class DocumentParameters {
 
   /**
    * Write to a Wiki format.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private static class WikiStream {
@@ -607,7 +607,7 @@ public class DocumentParameters {
 
   private static void makeByClassOverviewWiki(Map<Class<?>, List<Parameter<?>>> byclass, WikiStream out) {
     List<Class<?>> classes = new ArrayList<>(byclass.keySet());
-    Collections.sort(classes, new InspectionUtil.ClassSorter());
+    Collections.sort(classes, new ELKIServiceScanner.ClassSorter());
 
     for(Class<?> cls : classes) {
       out.indent = 0;
@@ -959,11 +959,15 @@ public class DocumentParameters {
         }
         elemdd.appendChild(ul);
       }
+      // FIXME: The following currently cannot be used:
       // Report when not in properties file.
-      Iterator<Class<?>> clss = new ELKIServiceLoader(opt.getRestrictionClass());
-      if(!clss.hasNext() && !opt.getRestrictionClass().getName().startsWith("experimentalcode.")) {
-        LOG.warning(opt.getRestrictionClass().getName() + " not in properties. No autocompletion available in release GUI.");
-      }
+      // Iterator<Class<?>> clss = new
+      // ELKIServiceLoader(opt.getRestrictionClass()).load();
+      // if(!clss.hasNext() &&
+      // !opt.getRestrictionClass().getName().startsWith("experimentalcode.")) {
+      // LOG.warning(opt.getRestrictionClass().getName() + " not in properties.
+      // No autocompletion available in release GUI.");
+      // }
     }
   }
 
@@ -981,7 +985,7 @@ public class DocumentParameters {
 
   /**
    * Append string containing the default value.
-   * 
+   *
    * @param htmldoc Document
    * @param par Parameter
    * @param optdd HTML Element
@@ -1003,7 +1007,7 @@ public class DocumentParameters {
 
   /**
    * Append string that there is not default value.
-   * 
+   *
    * @param htmldoc Document
    * @param optdd HTML Element
    */
@@ -1034,7 +1038,7 @@ public class DocumentParameters {
 
   /**
    * Return a link for the class name
-   * 
+   *
    * @param name Class name
    * @return (relative) link destination
    */
@@ -1045,9 +1049,9 @@ public class DocumentParameters {
 
   /**
    * Sort parameters by their option
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   protected static class SortByOption implements Comparator<OptionID> {

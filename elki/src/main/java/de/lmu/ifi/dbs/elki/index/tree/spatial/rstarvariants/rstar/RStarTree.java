@@ -37,15 +37,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * RStarTree is a spatial index structure based on the concepts of the R*-Tree.
  * Apart from organizing the objects it also provides several methods to search
  * for certain object in the structure and ensures persistence.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.has RStarTreeNode oneway - - contains
  */
 @Title("R*-Tree")
 @Description("Balanced index structure based on bounding rectangles.")
 @Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", title = "The R*-tree: an efficient and robust access method for points and rectangles", booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", url = "http://dx.doi.org/10.1145/93597.98741")
-public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry, AbstractRTreeSettings> {
+public abstract class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry, AbstractRTreeSettings> {
   /**
    * The logger for this class.
    */
@@ -53,7 +53,7 @@ public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry, Abs
 
   /**
    * Constructor.
-   * 
+   *
    * @param pagefile Page file
    * @param settings Settings class
    */
@@ -73,7 +73,7 @@ public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry, Abs
 
   /**
    * Creates a new leaf node with the specified capacity.
-   * 
+   *
    * @return a new leaf node
    */
   @Override
@@ -83,7 +83,7 @@ public class RStarTree extends NonFlatRStarTree<RStarTreeNode, SpatialEntry, Abs
 
   /**
    * Creates a new directory node with the specified capacity.
-   * 
+   *
    * @return a new directory node
    */
   @Override

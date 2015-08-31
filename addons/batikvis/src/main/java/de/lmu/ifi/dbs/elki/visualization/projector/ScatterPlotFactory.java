@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,33 +23,30 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 
 /**
  * Produce scatterplot projections.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has ScatterPlotProjector
  */
 public class ScatterPlotFactory implements ProjectorFactory {
   /**
    * Maximum number of dimensions to visualize.
-   * 
-   * TODO: Erich: add scrolling function for higher dimensionality!
+   *
+   * FIXME: add scrolling function for higher dimensionality!
    */
   public static final int MAX_DIMENSIONS_DEFAULT = 10;
 
@@ -60,7 +57,7 @@ public class ScatterPlotFactory implements ProjectorFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param maxdim Maximum number of dimensions to show.
    */
   public ScatterPlotFactory(int maxdim) {
@@ -69,30 +66,32 @@ public class ScatterPlotFactory implements ProjectorFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    ArrayList<Relation<?>> rels = ResultUtil.filterResults(newResult, Relation.class);
-    for(Relation<?> rel : rels) {
-      if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        @SuppressWarnings("unchecked")
-        Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
-        final int dim = RelationUtil.dimensionality(vrel);
-        ScatterPlotProjector<NumberVector> proj = new ScatterPlotProjector<>(vrel, Math.min(maxdim, dim));
-        baseResult.getHierarchy().add(vrel, proj);
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizationTree.findNew(context, start, Relation.class, new VisualizationTree.Handler1<Relation<?>>() {
+      @Override
+      public void process(VisualizerContext context, Relation<?> rel) {
+        if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+          @SuppressWarnings("unchecked")
+          Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
+          final int dim = RelationUtil.dimensionality(vrel);
+          ScatterPlotProjector<NumberVector> proj = new ScatterPlotProjector<>(vrel, Math.min(maxdim, dim));
+          context.addVis(vrel, proj);
+        }
       }
-    }
+    });
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Parameter for the maximum number of dimensions.
-     * 
+     *
      * <p>
      * Code: -vis.maxdim
      * </p>

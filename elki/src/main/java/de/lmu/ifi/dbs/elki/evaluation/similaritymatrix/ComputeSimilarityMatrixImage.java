@@ -47,10 +47,10 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -192,8 +192,8 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Database db = ResultUtil.findDatabase(baseResult);
+  public void processNewResult(ResultHierarchy hier, Result result) {
+    Database db = ResultUtil.findDatabase(hier);
     boolean nonefound = true;
     List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
@@ -219,7 +219,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     if(nonefound) {
       // Use the database ordering.
       // But be careful to NOT cause a loop, process new databases only.
-      List<Database> iter = ResultUtil.filterResults(result, Database.class);
+      List<Database> iter = ResultUtil.filterResults(hier, Database.class);
       for(Database database : iter) {
         // Get an arbitrary representation
         Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction());

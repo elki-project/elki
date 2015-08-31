@@ -33,9 +33,9 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * Utility class that allows plug-in use of various "array-like" types such as
  * lists in APIs that can take any kind of array to safe the cost of
  * reorganizing the objects into a real array.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.composedOf ArrayAdapter
  */
@@ -81,11 +81,6 @@ public final class ArrayLikeUtil {
   public static final NumberArrayAdapter<Float, float[]> FLOATARRAYADAPTER = new FloatArrayAdapter();
 
   /**
-   * Use a Trove double list as array.
-   */
-  public static final TDoubleListAdapter TDOUBLELISTADAPTER = new TDoubleListAdapter();
-
-  /**
    * Use ArrayDBIDs as array.
    */
   public static final ArrayDBIDsAdapter ARRAYDBIDADAPTER = new ArrayDBIDsAdapter();
@@ -104,7 +99,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Cast the static instance.
-   * 
+   *
    * @param dummy Dummy variable, for type inference
    * @return Static instance
    */
@@ -115,7 +110,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Cast the static instance.
-   * 
+   *
    * @param dummy Dummy variable, for type inference
    * @return Static instance
    */
@@ -126,7 +121,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Get the static instance.
-   * 
+   *
    * @param dummy Dummy object for type inference
    * @return Static instance
    */
@@ -137,7 +132,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Get the static instance.
-   * 
+   *
    * @param prototype Prototype value, for type inference
    * @return Instance
    */
@@ -148,7 +143,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Get the static instance.
-   * 
+   *
    * @param prototype Prototype value, for type inference
    * @return Instance
    */
@@ -158,7 +153,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Get the adapter for double arrays.
-   * 
+   *
    * @return double array adapter
    */
   public static NumberArrayAdapter<Double, double[]> doubleArrayAdapter() {
@@ -168,7 +163,7 @@ public final class ArrayLikeUtil {
   /**
    * Returns the index of the maximum of the given values. If no value is bigger
    * than the first, the index of the first entry is returned.
-   * 
+   *
    * @param <A> array type
    * @param array Array to inspect
    * @param adapter API adapter class
@@ -192,7 +187,7 @@ public final class ArrayLikeUtil {
   /**
    * Returns the index of the maximum of the given values. If no value is bigger
    * than the first, the index of the first entry is returned.
-   * 
+   *
    * @param array Array to inspect
    * @return the index of the maximum in the given values
    * @throws IndexOutOfBoundsException if the length of the array is 0.
@@ -203,7 +198,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Convert a numeric array-like to a <code>double[]</code>.
-   * 
+   *
    * @param array Array-like
    * @param adapter Adapter
    * @return primitive double array
@@ -221,7 +216,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Convert a list of numbers to <code>double[]</code>.
-   * 
+   *
    * @param array List of numbers
    * @return double array
    */
@@ -231,7 +226,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Convert a number vector to <code>double[]</code>.
-   * 
+   *
    * @param obj Object to convert
    * @return primitive double array
    */
@@ -241,7 +236,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Convert a numeric array-like to a <code>float[]</code>.
-   * 
+   *
    * @param array Array-like
    * @param adapter Adapter
    * @return primitive float array
@@ -259,7 +254,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Convert a list of numbers to <code>float[]</code>.
-   * 
+   *
    * @param array List of numbers
    * @return float array
    */
@@ -269,7 +264,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Convert a number vector to <code>float[]</code>.
-   * 
+   *
    * @param obj Object to convert
    * @return primitive float array
    */
@@ -279,7 +274,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Convert a numeric array-like to a <code>int[]</code>.
-   * 
+   *
    * @param array Array-like
    * @param adapter Adapter
    * @return primitive double array
@@ -294,7 +289,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Convert a list of numbers to <code>int[]</code>.
-   * 
+   *
    * @param array List of numbers
    * @return double array
    */
@@ -304,7 +299,7 @@ public final class ArrayLikeUtil {
 
   /**
    * Convert a number vector to <code>int[]</code>.
-   * 
+   *
    * @param obj Object to convert
    * @return primitive double array
    */

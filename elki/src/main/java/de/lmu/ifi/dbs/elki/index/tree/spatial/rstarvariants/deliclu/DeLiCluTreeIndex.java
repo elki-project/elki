@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -95,7 +94,7 @@ public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implem
    * @param obj the object to be marked as handled
    * @return the path of node ids from the root to the objects's parent
    */
-  public synchronized List<TreeIndexPathComponent<DeLiCluEntry>> setHandled(DBID id, O obj) {
+  public synchronized IndexTreePath<DeLiCluEntry> setHandled(DBID id, O obj) {
     if(LOG.isDebugging()) {
       LOG.debugFine("setHandled " + id + ", " + obj + "\n");
     }
@@ -108,12 +107,12 @@ public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implem
     }
 
     // set o handled
-    DeLiCluEntry entry = pathToObject.getLastPathComponent().getEntry();
+    DeLiCluEntry entry = pathToObject.getEntry();
     entry.setHasHandled(true);
     entry.setHasUnhandled(false);
 
     for(IndexTreePath<DeLiCluEntry> path = pathToObject; path.getParentPath() != null; path = path.getParentPath()) {
-      DeLiCluEntry parentEntry = path.getParentPath().getLastPathComponent().getEntry();
+      DeLiCluEntry parentEntry = path.getParentPath().getEntry();
       DeLiCluNode node = getNode(parentEntry);
       boolean hasHandled = false;
       boolean hasUnhandled = false;
@@ -126,7 +125,7 @@ public class DeLiCluTreeIndex<O extends NumberVector> extends DeLiCluTree implem
       parentEntry.setHasHandled(hasHandled);
     }
 
-    return pathToObject.getPath();
+    return pathToObject;
   }
 
   @Override

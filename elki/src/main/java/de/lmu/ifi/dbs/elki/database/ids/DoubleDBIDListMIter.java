@@ -1,10 +1,9 @@
-package de.lmu.ifi.dbs.elki.result;
-
+package de.lmu.ifi.dbs.elki.database.ids;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,16 +22,23 @@ package de.lmu.ifi.dbs.elki.result;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
- * Marker interface for trivial "adapter" type of results.
- * 
- * Such results can be hidden by a GUI, since they just provide a "view" on the main result.
- * 
+ * Modifiable DBIDList iterator.
+ *
  * @author Erich Schubert
- * 
- * @apiviz.exclude
  */
-public interface ResultAdapter extends Result {
-  // Empty
+public interface DoubleDBIDListMIter extends DoubleDBIDListIter, DBIDArrayMIter {
+  /**
+   * Update the current DBID value.
+   *
+   * @param ref Current value.
+   */
+  void setDBID(DBIDRef ref);
+
+  /**
+   * Update the value at the current position.
+   *
+   * @param value New value
+   */
+  void setDouble(double value);
 }

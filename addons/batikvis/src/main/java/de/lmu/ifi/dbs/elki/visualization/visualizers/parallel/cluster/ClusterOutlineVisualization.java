@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2012
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.Iterator;
 
 import org.apache.batik.util.SVGConstants;
@@ -37,21 +36,22 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
@@ -63,9 +63,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.Cluster
 
 /**
  * Generates a SVG-Element that visualizes the area covered by a cluster.
- * 
+ *
  * @author Robert Rödler
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -83,7 +83,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param settings Settings
    */
   public ClusterOutlineVisualization(Parameterizer settings) {
@@ -92,24 +92,21 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    // We attach ourselves to the style library, not the clustering, so there is
-    // only one hull.
-    Collection<StyleResult> styleres = ResultUtil.filterResults(result, StyleResult.class);
-    for(StyleResult s : styleres) {
-      Collection<ParallelPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ParallelPlotProjector.class);
-      for(ParallelPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, s, p.getRelation(), this);
-        task.level = VisualizationTask.LEVEL_DATA - 1;
-        task.initDefaultVisibility(false);
-        baseResult.getHierarchy().add(s, task);
-        baseResult.getHierarchy().add(p, task);
-      }
+  public void processNewResult(VisualizerContext context, Object start) {
+    // We use the style library, not individual clusterings!
+    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ParallelPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterOutlineVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA - 1;
+      task.initDefaultVisibility(false);
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY);
+      context.addVis(p, task);
     }
   }
 
@@ -121,11 +118,11 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
 
   /**
    * Instance
-   * 
+   *
    * @author Robert Rödler
    * @author Erich Schubert
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector>implements DataStoreListener {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.
@@ -133,33 +130,23 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
     public static final String CLUSTERAREA = "Clusteroutline";
 
     /**
-     * The result we visualize
-     */
-    private StyleResult style;
-
-    /**
      * Constructor.
-     * 
+     *
      * @param task VisualizationTask
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
-      this.style = task.getResult();
-      context.addDataStoreListener(this);
-      context.addResultListener(this);
-      incrementalRedraw();
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
+      addListeners();
     }
 
     @Override
-    public void destroy() {
-      context.removeDataStoreListener(this);
-      context.removeResultListener(this);
-      super.destroy();
-    }
-
-    @Override
-    protected void redraw() {
-      final StylingPolicy spol = style.getStylingPolicy();
+    public void fullRedraw() {
+      super.fullRedraw();
+      final StylingPolicy spol = context.getStylingPolicy();
       if(!(spol instanceof ClusterStylingPolicy)) {
         return;
       }
@@ -248,13 +235,13 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      * @param clusterID Cluster ID to style
      * @param opac Opacity
      */
     private void addCSSClasses(SVGPlot svgp, int clusterID, double opac) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       CSSClass cls = new CSSClass(this, CLUSTERAREA + clusterID);
@@ -272,9 +259,9 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

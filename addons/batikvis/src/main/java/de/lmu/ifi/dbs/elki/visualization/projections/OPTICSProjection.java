@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,18 +25,18 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
 /**
  * OPTICS projection. This is not really needed, but a quick hack to have more
  * consistency in the visualizer API.
- * 
+ *
  * @author Erich Schubert
  */
-public class OPTICSProjection extends AbstractHierarchicalResult implements Projection {
+public class OPTICSProjection implements Projection {
   /**
    * The projector we were generated from.
    */
@@ -44,7 +44,7 @@ public class OPTICSProjection extends AbstractHierarchicalResult implements Proj
 
   /**
    * Constructor.
-   * 
+   *
    * @param opticsProjector OPTICS projector
    */
   public OPTICSProjection(OPTICSProjector opticsProjector) {
@@ -53,13 +53,8 @@ public class OPTICSProjection extends AbstractHierarchicalResult implements Proj
   }
 
   @Override
-  public String getLongName() {
-    return "OPTICS projection";
-  }
-
-  @Override
-  public String getShortName() {
-    return "OPTICSproj";
+  public String getMenuName() {
+    return "OPTICS Plot Projection";
   }
 
   @Override
@@ -74,7 +69,7 @@ public class OPTICSProjection extends AbstractHierarchicalResult implements Proj
 
   /**
    * Get or produce the actual OPTICS plot.
-   * 
+   *
    * @param context Context to use
    * @return Plot
    */
@@ -84,10 +79,15 @@ public class OPTICSProjection extends AbstractHierarchicalResult implements Proj
 
   /**
    * Get the OPTICS cluster order.
-   * 
+   *
    * @return Cluster oder result.
    */
   public ClusterOrder getResult() {
     return projector.getResult();
+  }
+
+  @Override
+  public Projector getProjector() {
+    return projector;
   }
 }

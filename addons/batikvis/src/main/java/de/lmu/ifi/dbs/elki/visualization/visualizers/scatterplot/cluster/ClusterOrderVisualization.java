@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
@@ -32,11 +30,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -47,12 +46,13 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
 /**
  * Cluster order visualizer: connect objects via the spanning tree the cluster
  * order represents.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
+// TODO: draw sample only?
 public class ClusterOrderVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
@@ -67,30 +67,31 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<ClusterOrder> cos = ResultUtil.filterResults(result, ClusterOrder.class);
-    for(ClusterOrder co : cos) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, co, p.getRelation(), this);
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizationTree.findNewSiblings(context, start, ClusterOrder.class, ScatterPlotProjector.class, //
+    new VisualizationTree.Handler2<ClusterOrder, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, ClusterOrder co, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, context, co, p.getRelation(), ClusterOrderVisualization.this);
         task.initDefaultVisibility(false);
         task.level = VisualizationTask.LEVEL_DATA - 1;
-        baseResult.getHierarchy().add(co, task);
-        baseResult.getHierarchy().add(p, task);
+        task.addUpdateFlags(VisualizationTask.ON_DATA);
+        context.addVis(co, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   /**
    * Instance
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has ClusterOrderResult oneway - - visualizes
    */
   // TODO: listen for CLUSTER ORDER changes.
@@ -105,22 +106,25 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
      */
     protected ClusterOrder result;
 
-    public Instance(VisualizationTask task) {
-      super(task);
+    /**
+     * Constructor.
+     *
+     * @param task Visualization task.
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
+     */
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       result = task.getResult();
-      context.addDataStoreListener(this);
-      incrementalRedraw();
+      addListeners();
     }
 
     @Override
-    public void destroy() {
-      super.destroy();
-      context.removeDataStoreListener(this);
-    }
-
-    @Override
-    public void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    public void fullRedraw() {
+      setupCanvas();
+      final StyleLibrary style = context.getStyleLibrary();
       CSSClass cls = new CSSClass(this, CSSNAME);
       style.lines().formatCSSClass(cls, 0, style.getLineWidth(StyleLibrary.CLUSTERORDER));
 

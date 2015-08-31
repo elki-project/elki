@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.greedyensemble;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.application.greedyensemble;
  */
 
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 
@@ -48,8 +47,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVoting;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingMean;
@@ -59,10 +59,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.SimpleSVGViewer;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SimilarityMatrixVisualizer;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
@@ -138,6 +139,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   @Override
   public void run() {
     final Database database = inputstep.getDatabase();
+    ResultHierarchy hier = database.getHierarchy();
     Relation<NumberVector> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
@@ -246,16 +248,17 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       }
     }
     SimilarityMatrix smat = new ComputeSimilarityMatrixImage.SimilarityMatrix(img, relation, ids);
-    database.getHierarchy().add(database, smat);
+    hier.add(database, smat);
 
-    VisualizerContext context = vispar.newContext(database);
+    VisualizerContext context = vispar.newContext(hier, smat);
 
     // Attach visualizers to results
     SimilarityMatrixVisualizer factory = new SimilarityMatrixVisualizer();
-    factory.processNewResult(database, database);
+    factory.processNewResult(context, database);
 
-    List<VisualizationTask> tasks = ResultUtil.filterResults(database, VisualizationTask.class);
-    for(VisualizationTask task : tasks) {
+    Hierarchy.Iter<VisualizationTask> it = VisualizationTree.filter(context, VisualizationTask.class);
+    for(; it.valid(); it.advance()) {
+      VisualizationTask task = it.get();
       if(task.getFactory() == factory) {
         showVisualization(context, factory, task);
       }
@@ -270,8 +273,8 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
    * @param task Visualization task
    */
   private void showVisualization(VisualizerContext context, SimilarityMatrixVisualizer factory, VisualizationTask task) {
-    SVGPlot plot = new SVGPlot();
-    Visualization vis = factory.makeVisualization(task.clone(plot, context, null, 1.0, 1.0));
+    VisualizationPlot plot = new VisualizationPlot();
+    Visualization vis = factory.makeVisualization(task, plot, 1.0, 1.0, null);
     plot.getRoot().appendChild(vis.getLayer());
     plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     plot.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "20cm");

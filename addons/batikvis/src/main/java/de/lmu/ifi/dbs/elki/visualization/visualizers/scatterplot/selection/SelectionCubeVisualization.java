@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2012
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,25 +23,24 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -51,14 +50,13 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Visualizer for generating an SVG-Element containing a cube as marker
  * representing the selected range for each dimension
- * 
+ *
  * @author Heidi Kolb
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -75,39 +73,37 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param settings Settings
    */
   public SelectionCubeVisualization(Parameterizer settings) {
     super();
     this.settings = settings;
-    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<SelectionResult> selectionResults = ResultUtil.filterResults(result, SelectionResult.class);
-    for(SelectionResult selres : selectionResults) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, selres, p.getRelation(), this);
-        task.level = VisualizationTask.LEVEL_DATA - 2;
-        baseResult.getHierarchy().add(selres, task);
-        baseResult.getHierarchy().add(p, task);
-      }
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
+    for(; it.valid(); it.advance()) {
+      ScatterPlotProjector<?> p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionCubeVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA - 2;
+      task.addUpdateFlags(VisualizationTask.ON_SELECTION);
+      context.addVis(context.getSelectionResult(), task);
+      context.addVis(p, task);
     }
   }
 
   /**
    * Instance.
-   * 
+   *
    * @author Heidi Kolb
-   * 
+   *
    * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has RangeSelection oneway - - visualizes
    * @apiviz.uses SVGHyperCube
@@ -129,26 +125,27 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
      */
     public static final String CSS_CUBEFRAME = "selectionCubeFrame";
 
-    public Instance(VisualizationTask task) {
-      super(task);
-      addCSSClasses(svgp);
-      context.addResultListener(this);
-      incrementalRedraw();
-    }
-
-    @Override
-    public void destroy() {
-      context.removeResultListener(this);
-      super.destroy();
+    /**
+     * Constructor.
+     *
+     * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
+     */
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
+      addListeners();
     }
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       // Class for the cube
       if(!svgp.getCSSClassManager().contains(CSS_CUBE)) {
         CSSClass cls = new CSSClass(this, CSS_CUBE);
@@ -180,7 +177,7 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
     /**
      * Generates a cube and a frame depending on the selection stored in the
      * context
-     * 
+     *
      * @param svgp The plot
      * @param proj The projection
      */
@@ -216,7 +213,9 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
+      setupCanvas();
+      addCSSClasses(svgp);
       DBIDSelection selContext = context.getSelection();
       if(selContext instanceof RangeSelection) {
         setSVGRect(svgp, proj);
@@ -226,15 +225,15 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Flag for half-transparent filling of selection cubes.
-     * 
+     *
      * <p>
      * Key: {@code -selectionrange.nofill}
      * </p>

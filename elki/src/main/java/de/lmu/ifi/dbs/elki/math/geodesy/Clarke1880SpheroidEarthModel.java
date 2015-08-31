@@ -28,14 +28,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * The Clarke 1880 spheroid earth model.
- * 
+ *
  * Radius: 6378249.145 m
- * 
+ *
  * Flattening: 1 / 293.465
- * 
+ *
  * @author Erich Schubert
  */
-@Alias({ "Clarke 1880" })
+@Alias({ "Clarke1880" })
 public class Clarke1880SpheroidEarthModel extends AbstractEarthModel {
   /**
    * Static instance.
@@ -66,9 +66,9 @@ public class Clarke1880SpheroidEarthModel extends AbstractEarthModel {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  */
 
 import java.awt.Color;
-import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -33,14 +32,15 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -49,9 +49,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Visualize the steep areas found in an OPTICS plot
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -69,22 +69,23 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-    for(OPTICSProjector p : ops) {
+  public void processNewResult(VisualizerContext context, Object result) {
+    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
+    for(; it.valid(); it.advance()) {
+      OPTICSProjector p = it.get();
       final SteepAreaResult steep = findSteepAreaResult(p.getResult());
       if(steep != null) {
-        final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
         task.level = VisualizationTask.LEVEL_DATA + 1;
-        baseResult.getHierarchy().add(p, task);
-        baseResult.getHierarchy().add(steep, task);
+        context.addVis(p, task);
+        context.addVis(steep, task);
       }
     }
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -95,7 +96,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
 
   /**
    * Find the OPTICS clustering child of a cluster order.
-   * 
+   *
    * @param co Cluster order
    * @return OPTICS clustering
    */
@@ -110,11 +111,11 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
 
   /**
    * Instance
-   * 
+   *
    * @author Erich Schubert
-   * 
-   * @apiviz.uses 
-   *              de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult
+   *
+   * @apiviz.uses de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.
+   *              SteepAreaResult
    */
   public class Instance extends AbstractOPTICSVisualization {
     /**
@@ -134,18 +135,20 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.areas = findSteepAreaResult(this.optics.getResult());
-      context.addResultListener(this);
-      incrementalRedraw();
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
       makeLayerElement();
       addCSSClasses();
 
@@ -181,7 +184,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
      */
     private void addCSSClasses() {
       // Class for the markers
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       if(!svgp.getCSSClassManager().contains(CSS_STEEP_DOWN)) {
         final CSSClass cls = new CSSClass(this, CSS_STEEP_DOWN);
         Color color = SVGUtil.stringToColor(style.getColor(StyleLibrary.PLOT));
@@ -204,15 +207,6 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
         cls.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth(StyleLibrary.PLOT) * .5);
         svgp.addCSSClassOrLogError(cls);
       }
-    }
-
-    @Override
-    public void resultChanged(Result current) {
-      if(current instanceof SelectionResult) {
-        synchronizedRedraw();
-        return;
-      }
-      super.resultChanged(current);
     }
   }
 }

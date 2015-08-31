@@ -1,14 +1,10 @@
 package de.lmu.ifi.dbs.elki.visualization.projections;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,27 +23,33 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
+
 /**
  * Abstract base class for full projections.
- * 
+ *
  * Note: the full projection API may be removed at some point, unless we find a
  * clear use case that cannot be done by the low level fast projections.
- * 
+ *
  * @author Erich Schubert
  */
 public abstract class AbstractFullProjection extends AbstractProjection implements FullProjection {
   /**
    * Constructor.
-   * 
+   *
+   * @param p Projector
    * @param scales Scales
    */
-  public AbstractFullProjection(LinearScale[] scales) {
-    super(scales);
+  public AbstractFullProjection(Projector p, LinearScale[] scales) {
+    super(p, scales);
   }
 
   /**
    * Project a data vector from data space to scaled space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in scaled space
    */
@@ -64,7 +66,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
 
   /**
    * Project a data vector from data space to scaled space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in scaled space
    */
@@ -81,7 +83,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
 
   /**
    * Project a relative data vector from data space to scaled space.
-   * 
+   *
    * @param data relative vector in data space
    * @return relative vector in scaled space
    */
@@ -98,7 +100,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
 
   /**
    * Project a relative data vector from data space to scaled space.
-   * 
+   *
    * @param data relative vector in data space
    * @return relative vector in scaled space
    */
@@ -115,7 +117,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
 
   /**
    * Project a data vector from data space to rendering space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in rendering space
    */
@@ -126,7 +128,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
 
   /**
    * Project a data vector from data space to rendering space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in rendering space
    */
@@ -137,7 +139,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
 
   /**
    * Project a relative data vector from data space to rendering space.
-   * 
+   *
    * @param data relative vector in data space
    * @return relative vector in rendering space
    */
@@ -148,7 +150,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
 
   /**
    * Project a relative data vector from data space to rendering space.
-   * 
+   *
    * @param data relative vector in data space
    * @return relative vector in rendering space
    */
@@ -159,14 +161,14 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
 
   /**
    * Project a vector from scaled space to data space.
-   * 
+   *
    * @param <NV> Vector type
    * @param v vector in scaled space
    * @param factory Object factory
    * @return vector in data space
    */
   @Override
-  public <NV extends NumberVector> NV projectScaledToDataSpace(Vector v, NumberVector.Factory<NV>  factory) {
+  public <NV extends NumberVector> NV projectScaledToDataSpace(Vector v, NumberVector.Factory<NV> factory) {
     final int dim = v.getDimensionality();
     Vector vec = v.copy();
     double[] ds = vec.getArrayRef();
@@ -178,14 +180,14 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
 
   /**
    * Project a vector from rendering space to data space.
-   * 
+   *
    * @param <NV> Vector type
    * @param v vector in rendering space
    * @param prototype Object factory
    * @return vector in data space
    */
   @Override
-  public <NV extends NumberVector> NV projectRenderToDataSpace(Vector v, NumberVector.Factory<NV>  prototype) {
+  public <NV extends NumberVector> NV projectRenderToDataSpace(Vector v, NumberVector.Factory<NV> prototype) {
     final int dim = v.getDimensionality();
     Vector vec = projectRenderToScaled(v);
     double[] ds = vec.getArrayRef();
@@ -199,14 +201,14 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
 
   /**
    * Project a relative vector from scaled space to data space.
-   * 
+   *
    * @param <NV> Vector type
    * @param v relative vector in scaled space
    * @param prototype Object factory
    * @return relative vector in data space
    */
   @Override
-  public <NV extends NumberVector> NV projectRelativeScaledToDataSpace(Vector v, NumberVector.Factory<NV>  prototype) {
+  public <NV extends NumberVector> NV projectRelativeScaledToDataSpace(Vector v, NumberVector.Factory<NV> prototype) {
     final int dim = v.getDimensionality();
     Vector vec = v.copy();
     double[] ds = vec.getArrayRef();
@@ -218,14 +220,14 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
 
   /**
    * Project a relative vector from rendering space to data space.
-   * 
+   *
    * @param <NV> Vector type
    * @param v relative vector in rendering space
    * @param prototype Object factory
    * @return relative vector in data space
    */
   @Override
-  public <NV extends NumberVector> NV projectRelativeRenderToDataSpace(Vector v, NumberVector.Factory<NV>  prototype) {
+  public <NV extends NumberVector> NV projectRelativeRenderToDataSpace(Vector v, NumberVector.Factory<NV> prototype) {
     final int dim = v.getDimensionality();
     Vector vec = projectRelativeRenderToScaled(v);
     double[] ds = vec.getArrayRef();

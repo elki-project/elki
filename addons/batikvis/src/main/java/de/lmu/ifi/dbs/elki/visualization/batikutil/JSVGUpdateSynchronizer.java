@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.batikutil;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.visualization.batikutil;
 import java.lang.ref.WeakReference;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.batik.bridge.UpdateManager;
 import org.apache.batik.bridge.UpdateManagerAdapter;
@@ -37,9 +38,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.UpdateSynchronizer;
 
 /**
  * This class is used to synchronize SVG updates with an JSVG canvas.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses UpdateRunner
  */
 class JSVGUpdateSynchronizer implements UpdateSynchronizer {
@@ -59,17 +60,17 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
   private final UMAdapter umadapter = new UMAdapter();
 
   /**
-   * The current Runnable scheduled
+   * The current Runnable scheduled, prevents repeated invocations.
    */
-  private WeakReference<JSVGSynchronizedRunner> syncrunner = null;
+  private final AtomicReference<Runnable> pending = new AtomicReference<>();
 
   /**
    * Create an updateSynchronizer for the given component.
-   * 
+   *
    * @param component Component to manage updates on.
    */
   protected JSVGUpdateSynchronizer(JSVGComponent component) {
-    assert (component != null);
+    assert(component != null);
 
     this.cref = new WeakReference<>(component);
     // Hook into UpdateManager creation.
@@ -86,15 +87,14 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
    * Join the runnable queue of a component.
    */
   protected void makeRunnerIfNeeded() {
-    // Nothing to do if not connected to a plot
-    if(updaterunner.isEmpty()) {
-      return;
-    }
-    // we don't need to make a SVG runner when there are no pending updates.
+    // We don't need to make a SVG runner when there are no pending updates.
     boolean stop = true;
     for(WeakReference<UpdateRunner> wur : updaterunner) {
       UpdateRunner ur = wur.get();
-      if(ur != null && !ur.isEmpty()) {
+      if(ur == null) {
+        updaterunner.remove(wur);
+      }
+      else if(!ur.isEmpty()) {
         stop = false;
       }
     }
@@ -102,7 +102,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
       return;
     }
     // We only need a new runner when we don't have one in the queue yet!
-    if(getSynchronizedRunner() != null) {
+    if(pending.get() != null) {
       return;
     }
     // We need a component
@@ -110,15 +110,30 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
     if(component == null) {
       return;
     }
-    // Really create a new runner.
+    // Synchronize with all layers:
     synchronized(this) {
       synchronized(component) {
         UpdateManager um = component.getUpdateManager();
         if(um != null) {
           synchronized(um) {
             if(um.isRunning()) {
-              JSVGSynchronizedRunner newrunner = new JSVGSynchronizedRunner();
-              setSynchronizedRunner(newrunner);
+              // Create and insert a runner.
+              Runnable newrunner = new Runnable() {
+                @Override
+                public void run() {
+                  if(pending.compareAndSet(this, null)) {
+                    // Wake up all runners
+                    for(WeakReference<UpdateRunner> wur : updaterunner) {
+                      UpdateRunner ur = wur.get();
+                      if(ur == null || ur.isEmpty()) {
+                        continue;
+                      }
+                      ur.runQueue();
+                    }
+                  }
+                }
+              };
+              pending.set(newrunner);
               um.getUpdateRunnableQueue().invokeLater(newrunner);
               return;
             }
@@ -139,86 +154,10 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
   }
 
   /**
-   * Set the current update runner
-   * 
-   * @param newrunner
-   */
-  // Not synchronized - private
-  private void setSynchronizedRunner(JSVGSynchronizedRunner newrunner) {
-    syncrunner = new WeakReference<>(newrunner);
-  }
-
-  /**
-   * Get the current update runner.
-   * 
-   * @return current update runner
-   */
-  // Not synchronized - private
-  private JSVGSynchronizedRunner getSynchronizedRunner() {
-    if(syncrunner == null) {
-      return null;
-    }
-    return syncrunner.get();
-  }
-
-  /**
-   * Invoke from the SVGs run queue.
-   * 
-   * @param caller For consistency checks
-   */
-  protected void invokeFromRunner(JSVGSynchronizedRunner caller) {
-    synchronized(this) {
-      // Assert that we're still "the one"
-      if(caller != getSynchronizedRunner()) {
-        return;
-      }
-      // Remove ourself. We've been run.
-      setSynchronizedRunner(null);
-    }
-    // Wake up all runners
-    for(WeakReference<UpdateRunner> wur : updaterunner) {
-      UpdateRunner ur = wur.get();
-      if(ur == null || ur.isEmpty()) {
-        continue;
-      }
-      ur.runQueue();
-    }
-  }
-
-  /**
-   * Forget the current update runner. Called when the update manager is
-   * stopped.
-   */
-  protected void forgetSynchronizedRunner() {
-    setSynchronizedRunner(null);
-  }
-
-  /**
-   * Update Runner that will be placed in the Components UpdateManagers queue.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  private class JSVGSynchronizedRunner implements Runnable {
-    /**
-     * Constructor
-     */
-    protected JSVGSynchronizedRunner() {
-      // Nothing to do.
-    }
-
-    @Override
-    public void run() {
-      invokeFromRunner(this);
-    }
-  }
-
-  /**
    * Adapter that will track the component for UpdateManager changes.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class UMAdapter extends UpdateManagerAdapter {
@@ -239,7 +178,7 @@ class JSVGUpdateSynchronizer implements UpdateSynchronizer {
 
     @Override
     public void managerStopped(UpdateManagerEvent e) {
-      forgetSynchronizedRunner();
+      pending.set(null);
     }
   }
 }

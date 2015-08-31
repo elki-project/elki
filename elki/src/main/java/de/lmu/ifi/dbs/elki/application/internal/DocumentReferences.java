@@ -48,16 +48,16 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.InspectionUtil;
+import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
 
 /**
  * Build a reference documentation for all available parameters.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses Reference
  */
 public class DocumentReferences {
@@ -312,7 +312,7 @@ public class DocumentReferences {
     Map<Reference, List<Object>> map = new HashMap<>();
 
     HashSet<Package> packages = new HashSet<>();
-    for(Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true, false)) {
+    for(Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, true, false)) {
       inspectClass(cls, refs, map);
       if(packages.add(cls.getPackage())) {
         inspectPackage(cls.getPackage(), refs, map);
@@ -384,12 +384,12 @@ public class DocumentReferences {
 
   /**
    * Find all classes that have the reference annotation
-   * 
+   *
    * @return All classes with the reference annotation.
    */
   public static ArrayList<Class<?>> findAllClassesWithReferences() {
     ArrayList<Class<?>> references = new ArrayList<>();
-    for(final Class<?> cls : InspectionUtil.findAllImplementations(Object.class, true, false)) {
+    for(final Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, true, false)) {
       if(cls.isAnnotationPresent(Reference.class)) {
         references.add(cls);
       }

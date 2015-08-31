@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2013
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import java.util.Collection;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -45,14 +43,14 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -63,17 +61,16 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Factory for visualizers to generate an SVG-Element containing dots as markers
  * representing the kNN of the selected Database objects.
- * 
+ *
  * To use this, add a kNN preprocessor index to your database!
- * 
+ *
  * @author Erich Schubert
  * @author Robert Rödler
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -89,31 +86,31 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
    */
   public DistanceFunctionVisualization() {
     super();
-    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_SELECTION;
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<AbstractMaterializeKNNPreprocessor<?>> kNNIndex = ResultUtil.filterResults(result, AbstractMaterializeKNNPreprocessor.class);
-    for(AbstractMaterializeKNNPreprocessor<?> kNN : kNNIndex) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, kNN, p.getRelation(), this);
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizationTree.findNewSiblings(context, start, AbstractMaterializeKNNPreprocessor.class, ScatterPlotProjector.class, //
+    new VisualizationTree.Handler2<AbstractMaterializeKNNPreprocessor<?>, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, AbstractMaterializeKNNPreprocessor<?> kNN, ScatterPlotProjector<?> p) {
+        final VisualizationTask task = new VisualizationTask(NAME, context, kNN, p.getRelation(), DistanceFunctionVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
-        baseResult.getHierarchy().add(kNN, task);
-        baseResult.getHierarchy().add(p, task);
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_SELECTION);
+        context.addVis(kNN, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   /**
    * Get the "p" value of an Lp norm.
-   * 
+   *
    * @param kNN kNN preprocessor
    * @return p of LP norm, or NaN
    */
@@ -127,7 +124,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
 
   /**
    * Test whether the given preprocessor used an angular distance function
-   * 
+   *
    * @param kNN kNN preprocessor
    * @return true when angular
    */
@@ -144,7 +141,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
 
   /**
    * Visualizes Cosine and ArcCosine distance functions
-   * 
+   *
    * @param svgp SVG Plot
    * @param proj Visualization projection
    * @param mid mean vector
@@ -180,7 +177,8 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
       double l1 = VMath.scalarProduct(pm, p1), l2 = VMath.scalarProduct(pm, p2);
       // Rotate projection by + and - angle
       // Using sin(-x) = -sin(x) and cos(-x)=cos(x)
-      final double cangle = Math.cos(angle), sangle = MathUtil.cosToSin(angle, cangle);
+      final double cangle = Math.cos(angle),
+          sangle = MathUtil.cosToSin(angle, cangle);
       double r11 = +cangle * l1 - sangle * l2, r12 = +sangle * l1 + cangle * l2;
       double r21 = +cangle * l1 + sangle * l2, r22 = -sangle * l1 + cangle * l2;
       // Build rotated vectors - remove projected component, add rotated
@@ -225,13 +223,13 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
 
   /**
    * Instance, visualizing a particular set of kNNs
-   * 
+   *
    * @author Robert Rödler
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has DBIDSelection oneway - - visualizes
-   * 
+   *
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**
@@ -251,20 +249,23 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
 
     /**
      * Constructor
-     * 
+     *
      * @param task VisualizationTask
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
-      context.addDataStoreListener(this);
-      context.addResultListener(this);
-      incrementalRedraw();
+      addListeners();
     }
 
     @Override
-    protected void redraw() {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    public void fullRedraw() {
+      setupCanvas();
+      final StyleLibrary style = context.getStyleLibrary();
       addCSSClasses(svgp);
       final double p = getLPNormP(result);
       final boolean angular = isAngularDistance(result);
@@ -328,11 +329,11 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
 
     /**
      * Adds the required CSS-Classes
-     * 
+     *
      * @param svgp SVG-Plot
      */
     private void addCSSClasses(SVGPlot svgp) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       // Class for the distance markers
       if(!svgp.getCSSClassManager().contains(KNNMARKER)) {
         CSSClass cls = new CSSClass(this, KNNMARKER);
@@ -358,15 +359,6 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
         cls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.PLOT));
         svgp.addCSSClassOrLogError(cls);
       }
-    }
-
-    @Override
-    public void resultChanged(Result current) {
-      if(current instanceof SelectionResult) {
-        synchronizedRedraw();
-        return;
-      }
-      super.resultChanged(current);
     }
   }
 }

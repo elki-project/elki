@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVG12Constants;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -34,15 +32,17 @@ import org.w3c.dom.svg.SVGPoint;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSCut;
 import de.lmu.ifi.dbs.elki.visualization.opticsplot.OPTICSPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -52,10 +52,10 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 /**
  * Visualizes a cut in an OPTICS Plot to select an Epsilon value and generate a
  * new clustering result.
- * 
+ *
  * @author Heidi Kolb
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -73,18 +73,19 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-    for(OPTICSProjector p : ops) {
-      final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+  public void processNewResult(VisualizerContext context, Object result) {
+    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
+    for(; it.valid(); it.advance()) {
+      OPTICSProjector p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      baseResult.getHierarchy().add(p, task);
+      context.addVis(p, task);
     }
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -95,10 +96,10 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Heidi Kolb
    * @author Erich Schubert
-   * 
+   *
    * @param <E> cluster order entry type
    */
   public class Instance extends AbstractOPTICSVisualization implements DragableArea.DragListener {
@@ -139,20 +140,24 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
       incrementalRedraw();
     }
 
     @Override
-    protected void incrementalRedraw() {
+    public void incrementalRedraw() {
       if(layer == null) {
         makeLayerElement();
         addCSSClasses();
@@ -193,7 +198,8 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
       }
 
       if(eventarea == null) {
-        eventarea = new DragableArea(svgp, StyleLibrary.SCALE, 0, StyleLibrary.SCALE * 0.1, plotheight, this);
+        eventarea = new DragableArea(svgp, StyleLibrary.SCALE, -StyleLibrary.SCALE * 0.01, //
+        StyleLibrary.SCALE * 0.1, plotheight + StyleLibrary.SCALE * 0.02, this);
         layer.appendChild(eventarea.getElement());
       }
     }
@@ -206,7 +212,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
     /**
      * Get epsilon from y-value
-     * 
+     *
      * @param y y-Value
      * @return epsilon
      */
@@ -218,7 +224,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
     /**
      * Get y-value from epsilon
-     * 
+     *
      * @param epsilon epsilon
      * @return y-Value
      */
@@ -233,7 +239,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
     public boolean startDrag(SVGPoint start, Event evt) {
       epsilon = getEpsilonFromY(plotheight - start.getY());
       // opvis.unsetEpsilonExcept(this);
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return true;
     }
 
@@ -243,7 +249,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
         epsilon = getEpsilonFromY(plotheight - end.getY());
       }
       // opvis.unsetEpsilonExcept(this);
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return true;
     }
 
@@ -258,7 +264,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
         Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, epsilon);
         order.addChildResult(cl);
       }
-      synchronizedRedraw();
+      svgp.requestRedraw(this.task, this);
       return true;
     }
 
@@ -274,7 +280,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
      */
     private void addCSSClasses() {
       // Class for the epsilon-value
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       if(!svgp.getCSSClassManager().contains(CSS_EPSILON)) {
         final CSSClass label = new CSSClass(svgp, CSS_EPSILON);
         label.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));

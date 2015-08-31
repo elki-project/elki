@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -39,13 +37,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjector;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
@@ -53,9 +52,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Handle the marker in an OPTICS plot.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
@@ -72,7 +71,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
   /**
    * Input modes
-   * 
+   *
    * @apiviz.exclude
    */
   // TODO: Refactor all Mode copies into a shared class?
@@ -88,18 +87,20 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OPTICSProjector> ops = ResultUtil.filterResults(result, OPTICSProjector.class);
-    for(OPTICSProjector p : ops) {
-      final VisualizationTask task = new VisualizationTask(NAME, p, null, this);
+  public void processNewResult(VisualizerContext context, Object result) {
+    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
+    for(; it.valid(); it.advance()) {
+      OPTICSProjector p = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      baseResult.getHierarchy().add(p, task);
+      task.addUpdateFlags(VisualizationTask.ON_SELECTION);
+      context.addVis(p, task);
     }
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    return new Instance(task);
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
@@ -110,10 +111,10 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
   /**
    * Instance.
-   * 
+   *
    * @author Heidi Kolb
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses DBIDSelection oneway - 1 visualizes
    */
   public class Instance extends AbstractOPTICSVisualization implements DragableArea.DragListener {
@@ -139,17 +140,20 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
-      context.addResultListener(this);
-      incrementalRedraw();
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
+      addListeners();
     }
 
     @Override
-    protected void redraw() {
+    public void fullRedraw() {
       makeLayerElement();
       addCSSClasses();
 
@@ -201,7 +205,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     /**
      * Create a rectangle as marker (Marker higher than plot!)
-     * 
+     *
      * @param x1 X-Value for the marker
      * @param width Width of an entry
      * @return SVG-Element svg-rectangle
@@ -256,7 +260,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     /**
      * Get the current input mode, on each mouse event.
-     * 
+     *
      * @param evt Mouse event.
      * @return Input mode
      */
@@ -280,7 +284,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     /**
      * Gets the Index of the ClusterOrderEntry where the event occurred
-     * 
+     *
      * @param order List of ClusterOrderEntries
      * @param cPt clicked point
      * @return Index of the object
@@ -292,7 +296,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
     /**
      * Updates the selection for the given ClusterOrderEntry.
-     * 
+     *
      * @param mode Input mode
      * @param begin first index to select
      * @param end last index to select
@@ -351,15 +355,6 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
         rcls.setStatement(SVGConstants.CSS_OPACITY_PROPERTY, "0.2");
         svgp.addCSSClassOrLogError(rcls);
       }
-    }
-
-    @Override
-    public void resultChanged(Result current) {
-      if(current instanceof SelectionResult) {
-        synchronizedRedraw();
-        return;
-      }
-      super.resultChanged(current);
     }
   }
 }

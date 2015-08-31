@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,13 +26,12 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
@@ -41,9 +40,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 /**
  * Trivial "visualizer" that displays a static label. The visualizer is meant to
  * be used for dimension labels in the overview.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  */
@@ -67,7 +66,7 @@ public class LabelVisualization extends AbstractVisFactory {
 
   /**
    * The actually used constructor - with a static label.
-   * 
+   *
    * @param label Label to use
    */
   public LabelVisualization(String label) {
@@ -76,7 +75,7 @@ public class LabelVisualization extends AbstractVisFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param label Label to use
    * @param rotated Rotated 90 deg to the left
    */
@@ -87,16 +86,15 @@ public class LabelVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+  public void processNewResult(VisualizerContext context, Object start) {
     // No auto discovery supported.
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
-    SVGPlot svgp = task.getPlot();
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     VisualizerContext context = task.getContext();
-    CSSClass cls = new CSSClass(svgp, "unmanaged");
-    StyleLibrary style = context.getStyleResult().getStyleLibrary();
+    CSSClass cls = new CSSClass(plot, "unmanaged");
+    StyleLibrary style = context.getStyleLibrary();
     double fontsize = style.getTextSize("overview.labels") / StyleLibrary.SCALE;
     cls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(fontsize));
     cls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor("overview.labels"));
@@ -104,17 +102,17 @@ public class LabelVisualization extends AbstractVisFactory {
 
     Element layer;
     if(!rotated) {
-      layer = svgp.svgText(task.getWidth() * .5, task.getHeight() * .5 + .35 * fontsize, this.label);
+      layer = plot.svgText(width * .5, height * .5 + .35 * fontsize, this.label);
       SVGUtil.setAtt(layer, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
       SVGUtil.setAtt(layer, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
     }
     else {
-      layer = svgp.svgText(- task.getHeight() * .5, task.getWidth() * .5 + .35 * fontsize, this.label);
+      layer = plot.svgText(height * -.5, width * .5 + .35 * fontsize, this.label);
       SVGUtil.setAtt(layer, SVGConstants.SVG_STYLE_ATTRIBUTE, cls.inlineCSS());
       SVGUtil.setAtt(layer, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90)");
     }
-    return new StaticVisualizationInstance(task, layer);
+    return new StaticVisualizationInstance(task, plot, width, height, layer);
   }
 
   @Override

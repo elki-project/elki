@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 
 /**
  * Test the main hierarchy implementation.
- * 
+ *
  * @author Erich Schubert
  */
 public class TestHashMapHierarchy implements JUnit4Test {
@@ -61,9 +61,15 @@ public class TestHashMapHierarchy implements JUnit4Test {
     hier.add(c, d);
     validate(hier.iterAll(), new String[] { a, b, c, d });
     validate(hier.iterChildren(a), new String[] { b, c });
+    validate(hier.iterAncestors(a), new String[] {});
+    validate(hier.iterAncestorsSelf(a), new String[] { a });
     validate(hier.iterDescendants(a), new String[] { b, c, d });
+    validate(hier.iterDescendantsSelf(a), new String[] { a, b, c, d });
     validate(hier.iterParents(d), new String[] { b, c });
     validate(hier.iterAncestors(d), new String[] { a, b, c });
+    validate(hier.iterAncestorsSelf(d), new String[] { a, b, c, d });
+    validate(hier.iterDescendants(d), new String[] {});
+    validate(hier.iterDescendantsSelf(d), new String[] { d });
   }
 
   private <O> void validate(Iter<O> iter, O[] all) {

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -32,9 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -46,32 +42,37 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.style.StyleResult;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Generates a SVG-Element containing bubbles. A Bubble is a circle visualizing
  * an outlierness-score, with its center at the position of the visualized
  * object and its radius depending on the objects score.
- * 
+ *
  * @author Remigius Wojdanowski
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-@Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", title = "Visual Evaluation of Outlier Detection Models", booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010", url = "http://dx.doi.org/10.1007/978-3-642-12098-5_34")
+@Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", //
+title = "Visual Evaluation of Outlier Detection Models", //
+booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010", //
+url = "http://dx.doi.org/10.1007/978-3-642-12098-5_34")
 public class BubbleVisualization extends AbstractVisFactory {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -90,55 +91,52 @@ public class BubbleVisualization extends AbstractVisFactory {
 
   /**
    * Constructor.
-   * 
+   *
    * @param settings Settings
    */
   public BubbleVisualization(Parameterizer settings) {
     super();
     this.settings = settings;
-    thumbmask |= ThumbnailVisualization.ON_DATA | ThumbnailVisualization.ON_STYLE;
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     if(settings.scaling != null && settings.scaling instanceof OutlierScalingFunction) {
       final OutlierResult outlierResult = task.getResult();
       ((OutlierScalingFunction) settings.scaling).prepare(outlierResult);
     }
-    return new Instance(task);
+    return new Instance(task, plot, width, height, proj);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result result) {
-    Collection<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
-    for(OutlierResult o : ors) {
-      Collection<ScatterPlotProjector<?>> ps = ResultUtil.filterResults(baseResult, ScatterPlotProjector.class);
-      boolean vis = true;
-      // Quick and dirty hack: hide if parent result is also an outlier result
-      // Since that probably is already visible and we're redundant.
-      for(Hierarchy.Iter<Result> r = o.getHierarchy().iterParents(o); r.valid(); r.advance()) {
-        if(r.get() instanceof OutlierResult) {
-          vis = false;
-          break;
+  public void processNewResult(VisualizerContext context, Object start) {
+    VisualizationTree.findNewSiblings(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
+      @Override
+      public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
+        boolean vis = true;
+        // Quick and dirty hack: hide if parent result is also an outlier result
+        // Since that probably is already visible and we're redundant.
+        for(Hierarchy.Iter<Result> r = o.getHierarchy().iterParents(o); r.valid(); r.advance()) {
+          if(r.get() instanceof OutlierResult) {
+            vis = false;
+            break;
+          }
         }
-      }
-      for(ScatterPlotProjector<?> p : ps) {
-        final VisualizationTask task = new VisualizationTask(NAME, o, p.getRelation(), this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, o, p.getRelation(), BubbleVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
-        if(!vis) {
-          task.initDefaultVisibility(false);
-        }
-        baseResult.getHierarchy().add(o, task);
-        baseResult.getHierarchy().add(p, task);
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
+        task.initDefaultVisibility(vis);
+        context.addVis(o, task);
+        context.addVis(p, task);
       }
-    }
+    });
   }
 
   /**
    * Factory for producing bubble visualizations
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has OutlierResult oneway - - visualizes
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
@@ -149,30 +147,26 @@ public class BubbleVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     * 
+     *
      * @param task Visualization task
+     * @param plot Plot to draw to
+     * @param width Embedding width
+     * @param height Embedding height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task) {
-      super(task);
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(task, plot, width, height, proj);
       this.result = task.getResult();
-      context.addDataStoreListener(this);
-      context.addResultListener(this);
-      incrementalRedraw();
+      addListeners();
     }
 
     @Override
-    public void destroy() {
-      super.destroy();
-      context.removeResultListener(this);
-      context.removeDataStoreListener(this);
-    }
-
-    @Override
-    public void redraw() {
-      final StyleResult style = context.getStyleResult();
-      StylingPolicy stylepolicy = style.getStylingPolicy();
+    public void fullRedraw() {
+      setupCanvas();
+      StyleLibrary style = context.getStyleLibrary();
+      StylingPolicy stylepolicy = context.getStylingPolicy();
       // bubble size
-      final double bubble_size = style.getStyleLibrary().getSize(StyleLibrary.BUBBLEPLOT);
+      final double bubble_size = style.getSize(StyleLibrary.BUBBLEPLOT);
       if(stylepolicy instanceof ClassStylingPolicy) {
         ClassStylingPolicy colors = (ClassStylingPolicy) stylepolicy;
         setupCSS(svgp, colors);
@@ -223,22 +217,14 @@ public class BubbleVisualization extends AbstractVisFactory {
       }
     }
 
-    @Override
-    public void resultChanged(Result current) {
-      super.resultChanged(current);
-      if(sample == current || context.getStyleResult() == current) {
-        synchronizedRedraw();
-      }
-    }
-
     /**
      * Registers the Bubble-CSS-Class at a SVGPlot.
-     * 
+     *
      * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
      * @param policy Clustering to use
      */
     private void setupCSS(SVGPlot svgp, ClassStylingPolicy policy) {
-      final StyleLibrary style = context.getStyleResult().getStyleLibrary();
+      final StyleLibrary style = context.getStyleLibrary();
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       // creating IDs manually because cluster often return a null-ID.
@@ -264,7 +250,7 @@ public class BubbleVisualization extends AbstractVisFactory {
 
     /**
      * Convenience method to apply scalings in the right order.
-     * 
+     *
      * @param id object ID to get scaled score for
      * @return a Double representing a outlierness-score, after it has modified
      *         by the given scales.
@@ -285,15 +271,15 @@ public class BubbleVisualization extends AbstractVisFactory {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * Flag for half-transparent filling of bubbles.
-     * 
+     *
      * <p>
      * Key: {@code -bubble.fill}
      * </p>
@@ -302,7 +288,7 @@ public class BubbleVisualization extends AbstractVisFactory {
 
     /**
      * Parameter for scaling functions
-     * 
+     *
      * <p>
      * Key: {@code -bubble.scaling}
      * </p>

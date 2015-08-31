@@ -1,14 +1,14 @@
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction euclidean euclid l2 EuclideanDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction taxicab cityblock l1 ManhattanDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction lp minkowski p de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPIntegerNormDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MaximumDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MinimumDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.BrayCurtisDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.CanberraDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction arccos
+de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction cosine
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MaximumDistanceFunction maximum max chebyshev de.lmu.ifi.dbs.elki.distance.distancefunction.MaximumDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MinimumDistanceFunction minimum min de.lmu.ifi.dbs.elki.distance.distancefunction.MinimumDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction squaredeuclidean de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.BrayCurtisDistanceFunction bray-curtis braycurtis sorensen dice sorensen-dice
+de.lmu.ifi.dbs.elki.distance.distancefunction.CanberraDistanceFunction canberra
 de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedCanberraDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.ClarkDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.Kulczynski1DistanceFunction
@@ -40,11 +40,11 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LngLatDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.HistogramMatchDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.KolmogorovSmirnovDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JeffreyDivergenceDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiSquaredDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.HellingerDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiSquaredDistanceFunction chisq
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.HellingerDistanceFunction hellinger bhattacharyya
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JensenShannonDivergenceDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceAsymmetricDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceReverseAsymmetricDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceAsymmetricDistanceFunction kl
+de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.KullbackLeiblerDivergenceReverseAsymmetricDistanceFunction kli
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.SqrtJensenShannonDivergenceDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.set.HammingDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.set.JaccardSimilarityDistanceFunction

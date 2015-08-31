@@ -1,5 +1,25 @@
 package de.lmu.ifi.dbs.elki.visualization.svg;
 
+import java.awt.Color;
+import java.text.NumberFormat;
+import java.util.Locale;
+
+import javax.swing.text.html.StyleSheet;
+
+import org.apache.batik.dom.events.DOMMouseEvent;
+import org.apache.batik.util.SVGConstants;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.events.Event;
+import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.SVGLocatable;
+import org.w3c.dom.svg.SVGMatrix;
+import org.w3c.dom.svg.SVGPoint;
+
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,34 +45,14 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
 
 import gnu.trove.map.hash.TObjectIntHashMap;
 
-import java.awt.Color;
-import java.text.NumberFormat;
-import java.util.Locale;
-
-import javax.swing.text.html.StyleSheet;
-
-import org.apache.batik.dom.events.DOMMouseEvent;
-import org.apache.batik.util.SVGConstants;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.svg.SVGDocument;
-import org.w3c.dom.svg.SVGLocatable;
-import org.w3c.dom.svg.SVGMatrix;
-import org.w3c.dom.svg.SVGPoint;
-
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-
 /**
  * Utility class for SVG processing.
- * 
+ *
  * Much of the classes are to allow easier attribute setting (conversion to
  * string) and Namespace handling
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses Element oneway - - «create»
  */
 public final class SVGUtil {
@@ -249,7 +249,7 @@ public final class SVGUtil {
 
   /**
    * Format a double according to the SVG specs.
-   * 
+   *
    * @param x number to format
    * @return String representation
    */
@@ -259,7 +259,7 @@ public final class SVGUtil {
 
   /**
    * Create a SVG element in appropriate namespace
-   * 
+   *
    * @param document containing document
    * @param name node name
    * @return new SVG element.
@@ -270,7 +270,7 @@ public final class SVGUtil {
 
   /**
    * Set a SVG attribute
-   * 
+   *
    * @param el element
    * @param name attribute name
    * @param d double value
@@ -281,7 +281,7 @@ public final class SVGUtil {
 
   /**
    * Set a SVG attribute
-   * 
+   *
    * @param el element
    * @param name attribute name
    * @param d integer value
@@ -292,7 +292,7 @@ public final class SVGUtil {
 
   /**
    * Set a SVG attribute
-   * 
+   *
    * @param el element
    * @param name attribute name
    * @param d string value
@@ -303,7 +303,7 @@ public final class SVGUtil {
 
   /**
    * Set a SVG style attribute
-   * 
+   *
    * @param el element
    * @param d style value
    */
@@ -314,7 +314,7 @@ public final class SVGUtil {
   /**
    * Set the CSS class of an Element. See also {@link #addCSSClass} and
    * {@link #removeCSSClass}.
-   * 
+   *
    * @param e Element
    * @param cssclass class to set.
    */
@@ -324,19 +324,19 @@ public final class SVGUtil {
 
   /**
    * Add a CSS class to an Element.
-   * 
+   *
    * @param e Element
    * @param cssclass class to add.
    */
   public static void addCSSClass(Element e, String cssclass) {
     String oldval = e.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
-    if (oldval == null || oldval.length() == 0) {
+    if(oldval == null || oldval.length() == 0) {
       setAtt(e, SVGConstants.SVG_CLASS_ATTRIBUTE, cssclass);
       return;
     }
     String[] classes = oldval.split(" ");
-    for (String c : classes) {
-      if (c.equals(cssclass)) {
+    for(String c : classes) {
+      if(c.equals(cssclass)) {
         return;
       }
     }
@@ -345,35 +345,39 @@ public final class SVGUtil {
 
   /**
    * Remove a CSS class from an Element.
-   * 
+   *
    * @param e Element
    * @param cssclass class to remove.
    */
   public static void removeCSSClass(Element e, String cssclass) {
     String oldval = e.getAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
-    if (oldval == null) {
+    if(oldval == null) {
       return;
     }
     String[] classes = oldval.split(" ");
-    if (classes.length == 1) {
-      if (cssclass.equals(classes[0])) {
+    if(classes.length == 1) {
+      if(cssclass.equals(classes[0])) {
         e.removeAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
       }
-    } else if (classes.length == 2) {
-      if (cssclass.equals(classes[0])) {
-        if (cssclass.equals(classes[1])) {
+    }
+    else if(classes.length == 2) {
+      if(cssclass.equals(classes[0])) {
+        if(cssclass.equals(classes[1])) {
           e.removeAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE);
-        } else {
+        }
+        else {
           e.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, classes[1]);
         }
-      } else if (cssclass.equals(classes[1])) {
+      }
+      else if(cssclass.equals(classes[1])) {
         e.setAttribute(SVGConstants.SVG_CLASS_ATTRIBUTE, classes[0]);
       }
-    } else {
+    }
+    else {
       StringBuilder joined = new StringBuilder();
-      for (String c : classes) {
-        if (!c.equals(cssclass)) {
-          if (joined.length() > 0) {
+      for(String c : classes) {
+        if(!c.equals(cssclass)) {
+          if(joined.length() > 0) {
             joined.append(' ');
           }
           joined.append(c);
@@ -385,7 +389,7 @@ public final class SVGUtil {
 
   /**
    * Make a new CSS style element for the given Document.
-   * 
+   *
    * @param document document (factory)
    * @return new CSS style element.
    */
@@ -397,7 +401,7 @@ public final class SVGUtil {
 
   /**
    * Create a SVG rectangle element.
-   * 
+   *
    * @param document document to create in (factory)
    * @param x X coordinate
    * @param y Y coordinate
@@ -416,7 +420,7 @@ public final class SVGUtil {
 
   /**
    * Create a SVG circle element.
-   * 
+   *
    * @param document document to create in (factory)
    * @param cx center X
    * @param cy center Y
@@ -433,7 +437,7 @@ public final class SVGUtil {
 
   /**
    * Create a SVG line element. Do not confuse this with path elements.
-   * 
+   *
    * @param document document to create in (factory)
    * @param x1 first point x
    * @param y1 first point y
@@ -452,7 +456,7 @@ public final class SVGUtil {
 
   /**
    * Create a SVG text element.
-   * 
+   *
    * @param document document to create in (factory)
    * @param x first point x
    * @param y first point y
@@ -470,7 +474,7 @@ public final class SVGUtil {
   /**
    * Draw a simple "please wait" icon (in-progress) as placeholder for running
    * renderings.
-   * 
+   *
    * @param document Document.
    * @param x Left
    * @param y Top
@@ -488,13 +492,13 @@ public final class SVGUtil {
 
   /**
    * Convert a color name from SVG syntax to an AWT color object.
-   * 
+   *
    * @param str Color name
    * @return Color value
    */
   public static Color stringToColor(String str) {
     int icol = SVG_COLOR_NAMES.get(str.toLowerCase());
-    if (icol != NO_VALUE) {
+    if(icol != NO_VALUE) {
       return new Color(icol, false);
     }
     return colorLookupStylesheet.stringToColor(str);
@@ -502,9 +506,9 @@ public final class SVGUtil {
 
   /**
    * Convert a color name from an AWT color object to CSS syntax
-   * 
+   *
    * Note: currently only RGB (from ARGB order) are supported.
-   * 
+   *
    * @param col Color value
    * @return Color string
    */
@@ -514,16 +518,16 @@ public final class SVGUtil {
 
   /**
    * Convert a color name from an integer RGB color to CSS syntax
-   * 
+   *
    * Note: currently only RGB (from ARGB order) are supported. The alpha channel
    * will be ignored.
-   * 
+   *
    * @param col Color value
    * @return Color string
    */
   public static String colorToString(int col) {
     final char[] buf = new char[] { '#', 'X', 'X', 'X', 'X', 'X', 'X' };
-    for (int i = 6; i > 0; i--) {
+    for(int i = 6; i > 0; i--) {
       final int v = (col & 0xF);
       buf[i] = (char) ((v < 10) ? ('0' + v) : ('a' + v - 10));
       col >>>= 4;
@@ -533,7 +537,7 @@ public final class SVGUtil {
 
   /**
    * Make a transform string to add margins
-   * 
+   *
    * @param owidth Width of outer (embedding) canvas
    * @param oheight Height of outer (embedding) canvas
    * @param iwidth Width of inner (embedded) canvas
@@ -555,7 +559,7 @@ public final class SVGUtil {
 
   /**
    * Make a transform string to add margins
-   * 
+   *
    * @param owidth Width of outer (embedding) canvas
    * @param oheight Height of outer (embedding) canvas
    * @param iwidth Width of inner (embedded) canvas
@@ -570,7 +574,7 @@ public final class SVGUtil {
 
   /**
    * Make a transform string to add margins
-   * 
+   *
    * @param owidth Width of outer (embedding) canvas
    * @param oheight Height of outer (embedding) canvas
    * @param iwidth Width of inner (embedded) canvas
@@ -585,7 +589,7 @@ public final class SVGUtil {
   /**
    * Convert the coordinates of an DOM Event from screen into element
    * coordinates.
-   * 
+   *
    * @param doc Document context
    * @param tag Element containing the coordinate system
    * @param evt Event to interpret
@@ -600,7 +604,8 @@ public final class SVGUtil {
       cPt.setX(gnme.getClientX());
       cPt.setY(gnme.getClientY());
       return cPt.matrixTransform(imat);
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       LoggingUtil.warning("Error getting coordinates from SVG event.", e);
       return null;
     }
@@ -608,32 +613,30 @@ public final class SVGUtil {
 
   /**
    * Remove last child of an element, when present
-   * 
+   *
    * @param tag Parent
    */
   public static void removeLastChild(Element tag) {
     final Node last = tag.getLastChild();
-    if (last != null) {
+    if(last != null) {
       tag.removeChild(last);
     }
   }
 
   /**
    * Remove an element from its parent, if defined.
-   * 
+   *
    * @param elem Element to remove
    */
   public static void removeFromParent(Element elem) {
-    if (elem != null) {
-      if (elem.getParentNode() != null) {
-        elem.getParentNode().removeChild(elem);
-      }
+    if(elem != null && elem.getParentNode() != null) {
+      elem.getParentNode().removeChild(elem);
     }
   }
 
   /**
    * Create a circle segment.
-   * 
+   *
    * @param svgp Plot to draw to
    * @param centerx Center X position
    * @param centery Center Y position
@@ -661,7 +664,7 @@ public final class SVGUtil {
     double outer2ndy = centery - (outerRadius * cos2nd);
 
     double largeArc = 0;
-    if (angleDelta >= Math.PI) {
+    if(angleDelta >= Math.PI) {
       largeArc = 1;
     }
 
@@ -669,7 +672,7 @@ public final class SVGUtil {
     path.lineTo(outer1stx, outer1sty);
     path.ellipticalArc(outerRadius, outerRadius, 0, largeArc, 1, outer2ndx, outer2ndy);
     path.lineTo(inner2ndx, inner2ndy);
-    if (innerRadius > 0) {
+    if(innerRadius > 0) {
       path.ellipticalArc(innerRadius, innerRadius, 0, largeArc, 0, inner1stx, inner1sty);
     }
 

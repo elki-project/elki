@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,16 +28,16 @@ import java.util.Collection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
@@ -45,9 +45,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Pseudo-Visualizer, that lists the settings of the algorithm-
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»
  * @apiviz.has SettingsResult oneway - - visualizes
@@ -67,14 +67,13 @@ public class SettingsVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task) {
+  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     SettingsResult sr = task.getResult();
     VisualizerContext context = task.getContext();
-    SVGPlot svgp = task.getPlot();
 
     Collection<TrackedParameter> settings = sr.getSettings();
 
-    Element layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    Element layer = plot.svgElement(SVGConstants.SVG_G_TAG);
 
     // FIXME: use CSSClass and StyleLibrary
 
@@ -86,7 +85,8 @@ public class SettingsVisualization extends AbstractVisFactory {
         try {
           if(setting.getOwner() instanceof Class) {
             name = ((Class<?>) setting.getOwner()).getName();
-          } else {
+          }
+          else {
             name = setting.getOwner().getClass().getName();
           }
           if(ClassParameter.class.isInstance(setting.getOwner())) {
@@ -96,7 +96,7 @@ public class SettingsVisualization extends AbstractVisFactory {
         catch(NullPointerException e) {
           name = "[null]";
         }
-        Element object = svgp.svgText(0, i + 0.7, name);
+        Element object = plot.svgText(0, i + 0.7, name);
         object.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6; font-weight: bold");
         layer.appendChild(object);
         i++;
@@ -114,35 +114,36 @@ public class SettingsVisualization extends AbstractVisFactory {
         value = "[null]";
       }
 
-      Element label = svgp.svgText(0, i + 0.7, name);
+      Element label = plot.svgText(0, i + 0.7, name);
       label.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(label);
-      Element vale = svgp.svgText(7.5, i + 0.7, value);
+      Element vale = plot.svgText(7.5, i + 0.7, value);
       vale.setAttribute(SVGConstants.SVG_STYLE_ATTRIBUTE, "font-size: 0.6");
       layer.appendChild(vale);
       // only advance once, since we want these two to be in the same line.
       i++;
     }
 
-    int cols = Math.max(30, (int) (i * task.getHeight() / task.getWidth()));
+    int cols = Math.max(30, (int) (i * height / width));
     int rows = i;
-    final double margin = context.getStyleResult().getStyleLibrary().getSize(StyleLibrary.MARGIN);
-    final String transform = SVGUtil.makeMarginTransform(task.getWidth(), task.getHeight(), cols, rows, margin / StyleLibrary.SCALE);
+    final double margin = context.getStyleLibrary().getSize(StyleLibrary.MARGIN);
+    final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualizationInstance(task, layer);
+    return new StaticVisualizationInstance(task, plot, width, height, layer);
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Collection<SettingsResult> settingsResults = ResultUtil.filterResults(newResult, SettingsResult.class);
-    for(SettingsResult sr : settingsResults) {
-      final VisualizationTask task = new VisualizationTask(NAME, sr, null, this);
-      task.width = 1.0;
-      task.height = 1.0;
+  public void processNewResult(VisualizerContext context, Object start) {
+    Hierarchy.Iter<SettingsResult> it = VisualizationTree.filterResults(context, start, SettingsResult.class);
+    for(; it.valid(); it.advance()) {
+      SettingsResult sr = it.get();
+      final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, SettingsVisualization.this);
+      task.reqwidth = 1.0;
+      task.reqheight = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
       task.initDefaultVisibility(false);
-      baseResult.getHierarchy().add(sr, task);
+      context.addVis(sr, task);
     }
   }
 

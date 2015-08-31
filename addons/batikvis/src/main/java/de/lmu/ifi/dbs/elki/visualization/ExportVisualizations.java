@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,11 +31,9 @@ import org.apache.batik.util.SVGConstants;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -45,17 +43,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter.FileType;
+import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
-import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Class that automatically generates all visualizations and exports them into
  * SVG files.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf VisualizerParameterizer
  */
 // TODO: make more parameterizable, wrt. what to skip
@@ -102,7 +100,7 @@ public class ExportVisualizations implements ResultHandler {
   /**
    * Base result
    */
-  HierarchicalResult baseResult = null;
+  Result baseResult = null;
 
   /**
    * Visualizer context
@@ -116,7 +114,7 @@ public class ExportVisualizations implements ResultHandler {
 
   /**
    * Constructor.
-   * 
+   *
    * @param output Output folder
    * @param manager Parameterizer
    * @param ratio Canvas ratio
@@ -129,7 +127,7 @@ public class ExportVisualizations implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
+  public void processNewResult(ResultHierarchy hier, Result newResult) {
     if(output.isFile()) {
       throw new AbortException("Output folder cannot be an existing file.");
     }
@@ -138,30 +136,36 @@ public class ExportVisualizations implements ResultHandler {
         throw new AbortException("Could not create output directory.");
       }
     }
-    if(this.baseResult != baseResult) {
-      this.baseResult = baseResult;
+    if(this.baseResult == null) {
+      this.baseResult = newResult;
       context = null;
       counter = 0;
       LOG.verbose("Note: Reusing visualization exporter for more than one result is untested.");
     }
     if(context == null) {
-      context = manager.newContext(baseResult);
+      context = manager.newContext(hier, baseResult);
     }
 
     // Projected visualizations
-    ArrayList<Projector> projectors = ResultUtil.filterResults(baseResult, Projector.class);
-    for(Projector proj : projectors) {
+    Hierarchy<Object> vistree = context.getVisHierarchy();
+    for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
+      if(!(iter2.get() instanceof Projector)) {
+        continue;
+      }
+      Projector proj = (Projector) iter2.get();
       // TODO: allow selecting individual projections only.
-      Collection<PlotItem> items = proj.arrange();
+      Collection<PlotItem> items = proj.arrange(context);
       for(PlotItem item : items) {
         processItem(item);
       }
     }
-    ResultHierarchy hier = baseResult.getHierarchy();
-    ArrayList<VisualizationTask> tasks = ResultUtil.filterResults(baseResult, VisualizationTask.class);
-    for(VisualizationTask task : tasks) {
+    for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
+      if(!(iter2.get() instanceof VisualizationTask)) {
+        continue;
+      }
+      VisualizationTask task = (VisualizationTask) iter2.get();
       boolean isprojected = false;
-      for(Hierarchy.Iter<Result> iter = hier.iterParents(task); iter.valid(); iter.advance()) {
+      for(Hierarchy.Iter<?> iter = vistree.iterParents(task); iter.valid(); iter.advance()) {
         if(iter.get() instanceof Projector) {
           isprojected = true;
           break;
@@ -189,7 +193,7 @@ public class ExportVisualizations implements ResultHandler {
     }
     item.sort();
 
-    SVGPlot svgp = new SVGPlot();
+    VisualizationPlot svgp = new VisualizationPlot();
     svgp.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     svgp.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
     svgp.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
@@ -197,11 +201,11 @@ public class ExportVisualizations implements ResultHandler {
     ArrayList<Visualization> layers = new ArrayList<>();
     for(Iterator<VisualizationTask> iter = item.tasks.iterator(); iter.hasNext();) {
       VisualizationTask task = iter.next();
-      if(task.nodetail || task.noexport || !task.visible) {
+      if(task.hasAnyFlags(VisualizationTask.FLAG_NO_DETAIL | VisualizationTask.FLAG_NO_EXPORT) || !task.visible) {
         continue;
       }
       try {
-        Visualization v = task.getFactory().makeVisualization(task.clone(svgp, context, item.proj, width, height));
+        Visualization v = task.getFactory().makeVisualization(task, svgp, width, height, item.proj);
         layers.add(v);
       }
       catch(Exception e) {
@@ -242,9 +246,9 @@ public class ExportVisualizations implements ResultHandler {
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

@@ -30,6 +30,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -41,7 +42,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.transcoder.Transcoder;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
@@ -61,6 +61,7 @@ import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CloneInlineImages;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailTranscoder;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -70,9 +71,9 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 /**
  * Base class for SVG plots. Provides some basic functionality such as element
  * creation, axis plotting, markers and number formatting for SVG.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.composedOf CSSClassManager
  * @apiviz.composedOf UpdateRunner
@@ -90,6 +91,40 @@ public class SVGPlot {
    * Attribute to block export of element.
    */
   public static final String NO_EXPORT_ATTRIBUTE = "noexport";
+
+  /**
+   * Batik DOM implementation.
+   */
+  private static final DOMImplementation BATIK_DOM;
+
+  /**
+   * DOM implementations to try.
+   */
+  private static final String[] BATIK_DOMS = { //
+      "org.apache.batik.anim.dom.SVGDOMImplementation", // Batik 1.8
+      "org.apache.batik.dom.svg.SVGDOMImplementation", // Batik 1.7
+      "com.sun.org.apache.xerces.internal.dom.DOMImplementationImpl", // Untested
+  };
+
+  // Locate a usable DOM implementation.
+  static {
+    DOMImplementation dom = null;
+    for(String s : BATIK_DOMS) {
+      try {
+        Class<?> c = Class.forName(s);
+        Method m = c.getDeclaredMethod("getDOMImplementation");
+        DOMImplementation ret = DOMImplementation.class.cast(m.invoke(null));
+        if(ret != null) {
+          dom = ret;
+          break;
+        }
+      }
+      catch(Exception e) {
+        continue;
+      }
+    }
+    BATIK_DOM = dom;
+  }
 
   /**
    * SVG document we plot to.
@@ -137,7 +172,7 @@ public class SVGPlot {
   public SVGPlot() {
     super();
     // Get a DOMImplementation.
-    DOMImplementation domImpl = SVGDOMImplementation.getDOMImplementation();
+    DOMImplementation domImpl = getDomImpl();
     DocumentType dt = domImpl.createDocumentType(SVGConstants.SVG_SVG_TAG, SVGConstants.SVG_PUBLIC_ID, SVGConstants.SVG_SYSTEM_ID);
     // Workaround: sometimes DocumentType doesn't work right, which
     // causes problems with
@@ -166,6 +201,18 @@ public class SVGPlot {
   }
 
   /**
+   * Get a suitable SVG DOM implementation from Batik 1.7 or 1.8.
+   *
+   * @return DOM implementation
+   */
+  public static DOMImplementation getDomImpl() {
+    if(BATIK_DOM == null) {
+      throw new AbortException("No usable Apache Batik SVG DOM could be located.");
+    }
+    return BATIK_DOM;
+  }
+
+  /**
    * Clean up the plot.
    */
   public void dispose() {
@@ -174,7 +221,7 @@ public class SVGPlot {
 
   /**
    * Create a SVG element in the SVG namespace. Non-static version.
-   * 
+   *
    * @param name node name
    * @return new SVG element.
    */
@@ -184,7 +231,7 @@ public class SVGPlot {
 
   /**
    * Create a SVG rectangle
-   * 
+   *
    * @param x X coordinate
    * @param y Y coordinate
    * @param w Width
@@ -197,7 +244,7 @@ public class SVGPlot {
 
   /**
    * Create a SVG circle
-   * 
+   *
    * @param cx center X
    * @param cy center Y
    * @param r radius
@@ -209,7 +256,7 @@ public class SVGPlot {
 
   /**
    * Create a SVG line element
-   * 
+   *
    * @param x1 first point x
    * @param y1 first point y
    * @param x2 second point x
@@ -222,7 +269,7 @@ public class SVGPlot {
 
   /**
    * Create a SVG text element.
-   * 
+   *
    * @param x first point x
    * @param y first point y
    * @param text Content of text element.
@@ -234,7 +281,7 @@ public class SVGPlot {
 
   /**
    * Convert screen coordinates to element coordinates.
-   * 
+   *
    * @param tag Element to convert the coordinates for
    * @param evt Event object
    * @return Coordinates
@@ -245,7 +292,7 @@ public class SVGPlot {
 
   /**
    * Retrieve the SVG document.
-   * 
+   *
    * @return resulting document.
    */
   public SVGDocument getDocument() {
@@ -254,7 +301,7 @@ public class SVGPlot {
 
   /**
    * Getter for root element.
-   * 
+   *
    * @return DOM element
    */
   public Element getRoot() {
@@ -263,7 +310,7 @@ public class SVGPlot {
 
   /**
    * Getter for definitions section
-   * 
+   *
    * @return DOM element
    */
   public Element getDefs() {
@@ -272,7 +319,7 @@ public class SVGPlot {
 
   /**
    * Getter for style element.
-   * 
+   *
    * @return stylesheet DOM element
    * @deprecated Contents will be overwritten by CSS class manager!
    */
@@ -283,10 +330,10 @@ public class SVGPlot {
 
   /**
    * Get the plots CSS class manager.
-   * 
+   *
    * Note that you need to invoke {@link #updateStyleElement()} to make changes
    * take effect.
-   * 
+   *
    * @return CSS class manager.
    */
   public CSSClassManager getCSSClassManager() {
@@ -295,7 +342,7 @@ public class SVGPlot {
 
   /**
    * Convenience method to add a CSS class or log an error.
-   * 
+   *
    * @param cls CSS class to add.
    */
   public void addCSSClassOrLogError(CSSClass cls) {
@@ -303,7 +350,7 @@ public class SVGPlot {
       cssman.addClass(cls);
     }
     catch(CSSNamingConflict e) {
-      // de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+      de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
     }
   }
 
@@ -322,10 +369,10 @@ public class SVGPlot {
 
   /**
    * Save document into a SVG file.
-   * 
+   *
    * References PNG images from the temporary files will be inlined
    * automatically.
-   * 
+   *
    * @param file Output filename
    * @throws IOException On write errors
    * @throws TransformerFactoryConfigurationError Transformation error
@@ -346,7 +393,7 @@ public class SVGPlot {
 
   /**
    * Transcode a document into a file using the given transcoder.
-   * 
+   *
    * @param file Output file
    * @param transcoder Transcoder to use
    * @throws IOException On write errors
@@ -366,20 +413,20 @@ public class SVGPlot {
 
   /**
    * Clone the SVGPlot document for transcoding.
-   * 
+   *
    * This will usually be necessary for exporting the SVG document if it is
    * currently being displayed: otherwise, we break the Batik rendering trees.
    * (Discovered by Simon).
-   * 
+   *
    * @return cloned document
    */
   protected SVGDocument cloneDocument() {
-    return (SVGDocument) new CloneNoExport().cloneDocument(SVGDOMImplementation.getDOMImplementation(), document);
+    return (SVGDocument) new CloneNoExport().cloneDocument(getDomImpl(), document);
   }
 
   /**
    * Transcode file to PDF.
-   * 
+   *
    * @param file Output filename
    * @throws IOException On write errors
    * @throws TranscoderException On input/parsing errors.
@@ -400,7 +447,7 @@ public class SVGPlot {
 
   /**
    * Transcode file to PS.
-   * 
+   *
    * @param file Output filename
    * @throws IOException On write errors
    * @throws TranscoderException On input/parsing errors.
@@ -421,7 +468,7 @@ public class SVGPlot {
 
   /**
    * Transcode file to EPS.
-   * 
+   *
    * @param file Output filename
    * @throws IOException On write errors
    * @throws TranscoderException On input/parsing errors.
@@ -442,7 +489,7 @@ public class SVGPlot {
 
   /**
    * Test whether FOP were installed (for PDF, PS and EPS output support).
-   * 
+   *
    * @return true when FOP is available.
    */
   public static boolean hasFOPInstalled() {
@@ -459,7 +506,7 @@ public class SVGPlot {
 
   /**
    * Transcode file to PNG.
-   * 
+   *
    * @param file Output filename
    * @param width Width
    * @param height Height
@@ -475,7 +522,7 @@ public class SVGPlot {
 
   /**
    * Transcode file to JPEG.
-   * 
+   *
    * @param file Output filename
    * @param width Width
    * @param height Height
@@ -493,7 +540,7 @@ public class SVGPlot {
 
   /**
    * Transcode file to JPEG.
-   * 
+   *
    * @param file Output filename
    * @param width Width
    * @param height Height
@@ -506,7 +553,7 @@ public class SVGPlot {
 
   /**
    * Save a file trying to auto-guess the file type.
-   * 
+   *
    * @param file File name
    * @param width Width (for pixel formats)
    * @param height Height (for pixel formats)
@@ -544,7 +591,7 @@ public class SVGPlot {
 
   /**
    * Convert the SVG to a thumbnail image.
-   * 
+   *
    * @param width Width of thumbnail
    * @param height Height of thumbnail
    * @return Buffered image
@@ -576,7 +623,7 @@ public class SVGPlot {
 
   /**
    * Add an object id.
-   * 
+   *
    * @param id ID
    * @param obj Element
    */
@@ -586,7 +633,7 @@ public class SVGPlot {
 
   /**
    * Get an element by its id.
-   * 
+   *
    * @param id ID
    * @return Element
    */
@@ -597,7 +644,7 @@ public class SVGPlot {
 
   /**
    * Get all used DOM Ids in this plot.
-   * 
+   *
    * @return Collection of DOM element IDs.
    */
   protected Collection<String> getAllIds() {
@@ -606,7 +653,7 @@ public class SVGPlot {
 
   /**
    * Schedule an update.
-   * 
+   *
    * @param runnable Runnable to schedule
    */
   public void scheduleUpdate(Runnable runnable) {
@@ -615,7 +662,7 @@ public class SVGPlot {
 
   /**
    * Assign an update synchronizer.
-   * 
+   *
    * @param sync Update synchronizer
    */
   public void synchronizeWith(UpdateSynchronizer sync) {
@@ -624,7 +671,7 @@ public class SVGPlot {
 
   /**
    * Detach from synchronization.
-   * 
+   *
    * @param sync Update synchronizer to detach from.
    */
   public void unsynchronizeWith(UpdateSynchronizer sync) {
@@ -633,7 +680,7 @@ public class SVGPlot {
 
   /**
    * Get Batik disable default interactions flag.
-   * 
+   *
    * @return true when Batik default interactions are disabled
    */
   public boolean getDisableInteractions() {
@@ -642,7 +689,7 @@ public class SVGPlot {
 
   /**
    * Disable Batik predefined interactions.
-   * 
+   *
    * @param disable Flag
    */
   public void setDisableInteractions(boolean disable) {
@@ -651,9 +698,9 @@ public class SVGPlot {
 
   /**
    * Class to skip nodes during cloning that have the "noexport" attribute set.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   protected class CloneNoExport extends CloneInlineImages {

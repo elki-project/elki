@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,40 +24,48 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  */
 
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 
 /**
  * Base interface used for projections in the ELKI visualizers.
- * 
+ *
  * There are specialized interfaces for 1D and 2D that only compute the
  * projections in the required dimensions!
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.composedOf LinearScale
  */
-public interface Projection extends HierarchicalResult {
+public interface Projection extends VisualizationItem {
   /**
    * Scaling constant. Keep in sync with
    * {@link de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary#SCALE}.
    */
   public static final double SCALE = StyleLibrary.SCALE;
-  
+
   /**
    * Get the input dimensionality of the projection.
-   * 
+   *
    * @return Input dimensionality
    */
   public int getInputDimensionality();
 
   /**
    * Get the scale class for a particular dimension.
-   * 
+   *
    * @param d Dimension
    * @return Scale class
    */
   public LinearScale getScale(int d);
+
+  /**
+   * Projector used for generating this projection.
+   *
+   * @return Projector
+   */
+  public Projector getProjector();
 }

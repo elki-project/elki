@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,24 +27,35 @@ import org.w3c.dom.Element;
 
 /**
  * Base class for a materialized Visualization.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has Element oneway
  */
 public interface Visualization {
   /**
    * Get the SVG layer of the given visualization.
-   * 
+   *
    * @return layer
    */
-  public Element getLayer();
+  Element getLayer();
 
   /**
-   * Destroy the visualization. Called after the elements have been removed from the document.
-   * 
+   * Request an update of the visualization.
+   */
+  void incrementalRedraw();
+
+  /**
+   * Request a full redrawing of the visualization.
+   */
+  void fullRedraw();
+
+  /**
+   * Destroy the visualization. Called after the elements have been removed from
+   * the document.
+   *
    * Implementations should remove their listeners etc.
    */
-  public void destroy();
+  void destroy();
 }

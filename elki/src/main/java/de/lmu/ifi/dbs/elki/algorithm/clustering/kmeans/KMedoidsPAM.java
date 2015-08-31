@@ -46,19 +46,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * The original PAM algorithm or k-medoids clustering, as proposed by Kaufman
  * and Rousseeuw in "Partitioning Around Medoids".
- * 
+ *
  * Reference:
  * <p>
  * Clustering my means of Medoids<br />
  * Kaufman, L. and Rousseeuw, P.J.<br />
  * in: Statistical Data Analysis Based on the L1-Norm and Related Methods
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has MedoidModel
  * @apiviz.composedOf KMedoidsInitialization
- * 
+ *
  * @param <V> vector datatype
  */
 @Title("Partioning Around Medoids")
@@ -93,7 +93,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
@@ -108,7 +108,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
 
   /**
    * Run k-medoids
-   * 
+   *
    * @param database Database
    * @param relation relation to use
    * @return result
@@ -155,7 +155,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
 
   /**
    * Run the PAM optimization phase.
-   * 
+   *
    * @param distQ Distance query
    * @param ids IDs to process
    * @param medoids Medoids list
@@ -268,7 +268,7 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
   /**
    * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
    * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
-   * 
+   *
    * @param means Object centroids
    * @param ids Object ids
    * @param nearest Distance to nearest medoid
@@ -296,6 +296,9 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
           mindist2 = dist;
         }
       }
+      if(minIndex < 0) {
+        throw new AbortException("Too many infinite distances. Cannot assign objects.");
+      }
       assignment.put(iditer, minIndex);
       nearest.put(iditer, mindist);
       second.put(iditer, mindist2);
@@ -316,9 +319,9 @@ public class KMedoidsPAM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
