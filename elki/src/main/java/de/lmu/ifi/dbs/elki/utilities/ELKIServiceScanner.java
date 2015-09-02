@@ -21,7 +21,7 @@ package de.lmu.ifi.dbs.elki.utilities;
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 import java.io.File;
 import java.io.IOException;
@@ -244,7 +244,7 @@ public class ELKIServiceScanner {
                 }
               }
               final String fullname = new File(path, localname).toString();
-              files.add(fullname.substring(prefix.length(), fullname.length() - CLASS_EXT_LENGTH).replace('/', '.'));
+              files.add(fullname.substring(prefix.length(), fullname.length() - CLASS_EXT_LENGTH).replace(File.separatorChar, '.'));
               continue;
             }
             // Recurse into directories
