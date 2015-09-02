@@ -69,7 +69,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
   /**
    * Meta information on the visualizers contained.
    */
-  PlotItem visi;
+  private PlotItem item;
 
   /**
    * Ratio of this view.
@@ -115,10 +115,10 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
   public DetailView(VisualizerContext context, PlotItem vis, double ratio) {
     super();
     this.context = context;
-    this.visi = new PlotItem(vis); // Clone!
+    this.item = new PlotItem(vis); // Clone!
     this.ratio = ratio;
 
-    this.visi.sort();
+    this.item.sort();
 
     // TODO: only do this when there is an interactive visualizer?
     setDisableInteractions(true);
@@ -162,7 +162,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
 
     ArrayList<Visualization> layers = new ArrayList<>();
     // TODO: center/arrange visualizations?
-    for(Iterator<VisualizationTask> tit = visi.tasks.iterator(); tit.hasNext();) {
+    for(Iterator<VisualizationTask> tit = item.tasks.iterator(); tit.hasNext();) {
       VisualizationTask task = tit.next();
       if(task.visible) {
         Visualization v = instantiateVisualization(task);
@@ -217,7 +217,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
         if(task.visible != isVisible) {
           // scheduleUpdate(new AttributeModifier(
           layer.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, //
-          task.visible ? SVGConstants.CSS_VISIBLE_VALUE : SVGConstants.CSS_HIDDEN_VALUE);
+              task.visible ? SVGConstants.CSS_VISIBLE_VALUE : SVGConstants.CSS_HIDDEN_VALUE);
         }
       }
       else {
@@ -239,7 +239,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
           // Replace
           final Node parent = prevlayer.getParentNode();
           if(parent != null) {
-            parent.replaceChild(/* new! */ layer, /* old */ prevlayer);
+            parent.replaceChild(/* new! */layer, /* old */prevlayer);
           }
         }
         layermap.put(vis, layer);
@@ -259,7 +259,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
    */
   private Visualization instantiateVisualization(VisualizationTask task) {
     try {
-      Visualization v = task.getFactory().makeVisualization(task, this, width, height, visi.proj);
+      Visualization v = task.getFactory().makeVisualization(task, this, width, height, item.proj);
       if(task.hasAnyFlags(VisualizationTask.FLAG_NO_EXPORT)) {
         v.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
       }
@@ -373,7 +373,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
       boolean include = false;
       Hierarchy.Iter<Object> it = context.getVisHierarchy().iterAncestors(current);
       for(; it.valid(); it.advance()) {
-        if(visi.proj.getProjector() == it.get() || taskmap.containsKey(it.get())) {
+        if((item.proj != null && item.proj.getProjector() == it.get()) || taskmap.containsKey(it.get())) {
           include = true;
           break;
         }
@@ -422,5 +422,14 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
     if(active || true) {
       refresh();
     }
+  }
+
+  /**
+   * Get the item visualized by this view.
+   * 
+   * @return Plot item
+   */
+  public PlotItem getPlotItem() {
+    return item;
   }
 }

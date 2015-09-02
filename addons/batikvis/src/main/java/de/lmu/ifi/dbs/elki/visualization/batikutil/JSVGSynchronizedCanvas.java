@@ -101,7 +101,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
   public void setPlot(final SVGPlot newplot) {
     synchronized(synchronizer) {
       super.setSVGDocument(null);
-      scheduleDetach(this.plot, newplot);
+      scheduleSetPlot(this.plot, newplot);
     }
   }
 
@@ -110,7 +110,7 @@ public class JSVGSynchronizedCanvas extends JSVGCanvas {
    *
    * @param oldplot Plot to detach from.
    */
-  private void scheduleDetach(final SVGPlot oldplot, final SVGPlot newplot) {
+  private void scheduleSetPlot(final SVGPlot oldplot, final SVGPlot newplot) {
     UpdateManager um = this.getUpdateManager();
     if(um != null) {
       synchronized(um) {
