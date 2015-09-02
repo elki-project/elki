@@ -42,6 +42,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.SwingUtilities;
+
+import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
+import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -61,6 +65,8 @@ import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.DetailViewSelectedEvent;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
+import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
+import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
@@ -165,7 +171,6 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       exportItem.setMnemonic(KeyEvent.VK_E);
       exportItem.setEnabled(false);
       exportItem.addActionListener(new ActionListener() {
-
         @Override
         public void actionPerformed(ActionEvent ae) {
           saveCurrentPlot();
@@ -205,7 +210,12 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
     /**
      * Update the visualizer menus.
      */
-    protected void updateVisualizerMenus() {
+    protected synchronized void updateVisualizerMenus() {
+      Projection proj = null;
+      if(svgCanvas.getPlot() instanceof DetailView) {
+        PlotItem item = ((DetailView) svgCanvas.getPlot()).getPlotItem();
+        proj = item.proj;
+      }
       menubar.removeAll();
       menubar.add(filemenu);
       ResultHierarchy hier = context.getHierarchy();
@@ -215,22 +225,23 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       if(start == null) {
         for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
           if(hier.numParents(iter.get()) == 0) {
-            recursiveBuildMenu(items, iter.get(), hier, vistree);
+            recursiveBuildMenu(items, iter.get(), hier, vistree, proj);
           }
         }
       }
       else {
         for(Hierarchy.Iter<Result> iter = hier.iterChildren(start); iter.valid(); iter.advance()) {
-          recursiveBuildMenu(items, iter.get(), hier, vistree);
+          recursiveBuildMenu(items, iter.get(), hier, vistree, proj);
         }
       }
       // Add all items.
       for(JMenuItem item : items) {
         menubar.add(item);
       }
+      menubar.repaint();
     }
 
-    private void recursiveBuildMenu(Collection<JMenuItem> items, Object r, ResultHierarchy hier, Hierarchy<Object> vistree) {
+    private void recursiveBuildMenu(Collection<JMenuItem> items, Object r, ResultHierarchy hier, Hierarchy<Object> vistree, Projection proj) {
       // Make a submenu for this element
       final String nam;
       if(r instanceof Result) {
@@ -246,16 +257,28 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       // Add menus for any child results
       if(r instanceof Result) {
         for(Hierarchy.Iter<Result> iter = hier.iterChildren((Result) r); iter.valid(); iter.advance()) {
-          recursiveBuildMenu(subitems, iter.get(), hier, vistree);
+          recursiveBuildMenu(subitems, iter.get(), hier, vistree, proj);
         }
       }
       // Add visualizers:
       for(Hierarchy.Iter<Object> iter = vistree.iterChildren(r); iter.valid(); iter.advance()) {
-        recursiveBuildMenu(subitems, iter.get(), hier, vistree);
+        recursiveBuildMenu(subitems, iter.get(), hier, vistree, proj);
       }
 
       // Item for the visualizer
-      JMenuItem item = makeMenuItemForVisualizer(r);
+      JMenuItem item = null;
+      if(proj == null) {
+        item = makeMenuItemForVisualizer(r);
+      }
+      else {
+        // Only include items that belong to different projections:
+        for(Hierarchy.Iter<Object> iter = vistree.iterAncestorsSelf(r); iter.valid(); iter.advance()) {
+          if(iter.get() == proj.getProjector()) {
+            item = makeMenuItemForVisualizer(r);
+            break;
+          }
+        }
+      }
       final int numchild = subitems.size();
       if(numchild == 0) {
         if(item != null) {
@@ -470,11 +493,17 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       }
     };
     this.addComponentListener(listener);
+    svgCanvas.addGVTTreeBuilderListener(new GVTTreeBuilderAdapter() {
+      @Override
+      public void gvtBuildCompleted(GVTTreeBuilderEvent arg0) {
+        // Supposedly in Swing thread.
+        menubar.updateVisualizerMenus();
+      }
+    });
 
     context.addResultListener(this);
     context.addVisualizationListener(this);
     overview.initialize(listener.getCurrentRatio());
-    menubar.updateVisualizerMenus();
   }
 
   @Override
@@ -533,6 +562,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
     svgCanvas.setPlot(plot);
     menubar.enableOverview(plot != overview.getPlot());
     menubar.enableExport(plot != null);
+    updateVisualizerMenus();
   }
 
   /**
@@ -558,7 +588,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
    * Refresh the overview
    */
   protected void update() {
-    menubar.updateVisualizerMenus();
+    updateVisualizerMenus();
     if(currentSubplot != null) {
       showPlot(currentSubplot);
     }
@@ -578,21 +608,33 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
 
   @Override
   public void resultAdded(Result child, Result parent) {
-    menubar.updateVisualizerMenus();
+    updateVisualizerMenus();
   }
 
   @Override
   public void resultChanged(Result current) {
-    menubar.updateVisualizerMenus();
+    updateVisualizerMenus();
   }
 
   @Override
   public void resultRemoved(Result child, Result parent) {
-    menubar.updateVisualizerMenus();
+    updateVisualizerMenus();
   }
 
   @Override
   public void visualizationChanged(VisualizationItem item) {
-    menubar.updateVisualizerMenus();
+    updateVisualizerMenus();
+  }
+
+  /**
+   * Update visualizer menus, but only from Swing thread.
+   */
+  private void updateVisualizerMenus() {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        menubar.updateVisualizerMenus();
+      }
+    });
   }
 }

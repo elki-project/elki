@@ -214,10 +214,6 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
    * Delete the marked objects in the database.
    */
   protected void handleDelete() {
-    if (!(database instanceof UpdatableDatabase)) {
-      throw new UnsupportedOperationException("Database not updatable.");
-    }
-    UpdatableDatabase upd = (UpdatableDatabase) database;
     ModifiableDBIDs todel = DBIDUtil.newHashSet();
     ModifiableDBIDs remain = DBIDUtil.newHashSet(dbids);
     DBIDArrayIter it = dbids.iter();
@@ -230,7 +226,7 @@ public class SelectionTableWindow extends JFrame implements DataStoreListener, R
     context.setSelection(new DBIDSelection(remain));
     // Now delete them.
     for(DBIDIter iter = todel.iter(); iter.valid(); iter.advance()) {
-      upd.delete(iter);
+      database.delete(iter);
     }
   }
 
