@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
@@ -51,18 +51,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * k-medians clustering algorithm, but using Lloyd-style bulk iterations instead
  * of the more complicated approach suggested by Kaufman and Rousseeuw (see
  * {@link KMedoidsPAM} instead).
- * 
+ *
  * Reference:
  * <p>
  * Clustering via Concave Minimization<br />
  * P. S. Bradley, O. L. Mangasarian, W. N. Street<br />
  * in: Advances in Neural Information Processing Systems (NIPS)
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has MeanModel
- * 
+ *
  * @param <V> vector datatype
  */
 @Title("K-Medians")
@@ -83,13 +83,13 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMediansLloyd(PrimitiveDistanceFunction<? super NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMediansLloyd(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -143,9 +143,9 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {

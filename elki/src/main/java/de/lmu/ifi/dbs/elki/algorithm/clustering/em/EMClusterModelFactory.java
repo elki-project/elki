@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,24 +29,24 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 
 /**
  * Factory for initializing the EM models.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <V> Vector type
  */
 public interface EMClusterModelFactory<V extends NumberVector, M extends MeanModel> {
   /**
    * Build the initial models
-   * 
+   *
    * @param database Database
    * @param relation Relation
    * @param k Number of clusters
    * @param df Distance function
    * @return Initial models
    */
-  List<? extends EMClusterModel<M>> buildInitialModels(Database database, Relation<V> relation, int k, PrimitiveDistanceFunction<? super NumberVector> df);
+  List<? extends EMClusterModel<M>> buildInitialModels(Database database, Relation<V> relation, int k, NumberVectorDistanceFunction<? super V> df);
 }

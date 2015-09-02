@@ -111,7 +111,7 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
   public void add(K key, int max) {
     if (size < max) {
       add(key);
-    } else if (twoheap[0].compareTo(key) <= 0) {
+    } else if (twoheap[0].compareTo(key) < 0) {
       replaceTopElement(key);
     }
   }

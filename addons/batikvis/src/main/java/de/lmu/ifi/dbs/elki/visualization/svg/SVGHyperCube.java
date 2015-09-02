@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,28 +24,29 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  */
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 
 /**
  * Utility class to draw hypercubes, wireframe and filled.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses SVGPath
  * @apiviz.uses Projection2D
  */
 public class SVGHyperCube {
   /**
    * Wireframe hypercube.
-   * 
+   *
    * @param svgp SVG Plot
    * @param proj Visualization projection
    * @param min First corner
@@ -56,31 +57,51 @@ public class SVGHyperCube {
     SVGPath path = new SVGPath();
     ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
-    recDrawEdges(path, rv_min, edges, 0, new BitSet());
+    recDrawEdges(path, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
     return path.makeElement(svgp);
   }
 
   /**
    * Wireframe hypercube.
-   * 
-   * @param <V> vector type
+   *
    * @param svgp SVG Plot
    * @param proj Visualization projection
    * @param min First corner
    * @param max Opposite corner
    * @return path element
    */
-  public static <V extends NumberVector> Element drawFrame(SVGPlot svgp, Projection2D proj, V min, V max) {
+  public static Element drawFrame(SVGPlot svgp, Projection2D proj, NumberVector min, NumberVector max) {
     SVGPath path = new SVGPath();
-    ArrayList<double[]> edges = getVisibleEdges(proj, min.getColumnVector().getArrayRef(), max.getColumnVector().getArrayRef());
+    ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
-    recDrawEdges(path, rv_min, edges, 0, new BitSet());
+    recDrawEdges(path, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
+    return path.makeElement(svgp);
+  }
+
+  /**
+   * Wireframe hypercube.
+   *
+   * @param svgp SVG Plot
+   * @param proj Visualization projection
+   * @param box Bounding box
+   * @return path element
+   */
+  public static Element drawFrame(SVGPlot svgp, Projection2D proj, SpatialComparable box) {
+    SVGPath path = new SVGPath();
+    ArrayList<double[]> edges = getVisibleEdges(proj, box);
+    final int dim = box.getDimensionality();
+    double[] min = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      min[i] = box.getMin(i);
+    }
+    double[] rv_min = proj.fastProjectDataToRenderSpace(min);
+    recDrawEdges(path, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
     return path.makeElement(svgp);
   }
 
   /**
    * Filled hypercube.
-   * 
+   *
    * @param svgp SVG Plot
    * @param cls CSS class to use.
    * @param proj Visualization projection
@@ -92,14 +113,13 @@ public class SVGHyperCube {
     Element group = svgp.svgElement(SVGConstants.SVG_G_TAG);
     ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
-    recDrawSides(svgp, group, cls, rv_min, edges, 0, new BitSet());
+    recDrawSides(svgp, group, cls, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
     return group;
   }
 
   /**
    * Filled hypercube.
-   * 
-   * @param <V> vector type
+   *
    * @param svgp SVG Plot
    * @param cls CSS class to use.
    * @param proj Visualization projection
@@ -107,27 +127,101 @@ public class SVGHyperCube {
    * @param max Opposite corner
    * @return group element
    */
-  public static <V extends NumberVector> Element drawFilled(SVGPlot svgp, String cls, Projection2D proj, V min, V max) {
+  public static Element drawFilled(SVGPlot svgp, String cls, Projection2D proj, NumberVector min, NumberVector max) {
     Element group = svgp.svgElement(SVGConstants.SVG_G_TAG);
-    ArrayList<double[]> edges = getVisibleEdges(proj, min.getColumnVector().getArrayRef(), max.getColumnVector().getArrayRef());
+    ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
-    recDrawSides(svgp, group, cls, rv_min, edges, 0, new BitSet());
+    recDrawSides(svgp, group, cls, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
+    return group;
+  }
+
+  /**
+   * Filled hypercube.
+   *
+   * @param svgp SVG Plot
+   * @param cls CSS class to use.
+   * @param proj Visualization projection
+   * @param box Bounding box
+   * @return group element
+   */
+  public static Element drawFilled(SVGPlot svgp, String cls, Projection2D proj, SpatialComparable box) {
+    Element group = svgp.svgElement(SVGConstants.SVG_G_TAG);
+    ArrayList<double[]> edges = getVisibleEdges(proj, box);
+    final int dim = box.getDimensionality();
+    double[] min = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      min[i] = box.getMin(i);
+    }
+    double[] rv_min = proj.fastProjectDataToRenderSpace(min);
+    recDrawSides(svgp, group, cls, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
     return group;
   }
 
   /**
    * Get the visible (non-0) edges of a hypercube
-   * 
+   *
    * @param proj Projection
-   * @param s_min Minimum value (in scaled space)
-   * @param s_max Maximum value (in scaled space)
+   * @param s_min Minimum value (in data space)
+   * @param s_max Maximum value (in data space)
    * @return Edge list
    */
   private static ArrayList<double[]> getVisibleEdges(Projection2D proj, double[] s_min, double[] s_max) {
+    final int dim = s_min.length;
     double[] s_deltas = VMath.minus(s_max, s_min);
-    ArrayList<double[]> r_edges = new ArrayList<>();
-    for(int i = 0; i < s_min.length; i++) {
-      double[] delta = new double[s_min.length];
+    ArrayList<double[]> r_edges = new ArrayList<>(dim);
+    for(int i = 0; i < dim; i++) {
+      double[] delta = new double[dim];
+      delta[i] = s_deltas[i];
+      double[] deltas = proj.fastProjectRelativeDataToRenderSpace(delta);
+      if(deltas[0] != 0 || deltas[1] != 0) {
+        r_edges.add(deltas);
+      }
+    }
+    return r_edges;
+  }
+
+  /**
+   * Get the visible (non-0) edges of a hypercube
+   *
+   * @param proj Projection
+   * @param s_min Minimum value (in data space)
+   * @param s_max Maximum value (in data space)
+   * @return Edge list
+   */
+  private static ArrayList<double[]> getVisibleEdges(Projection2D proj, NumberVector s_min, NumberVector s_max) {
+    final int dim = s_min.getDimensionality();
+    double[] s_deltas = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      s_deltas[i] = s_max.doubleValue(i) - s_min.doubleValue(i);
+    }
+    ArrayList<double[]> r_edges = new ArrayList<>(dim);
+    for(int i = 0; i < dim; i++) {
+      double[] delta = new double[dim];
+      delta[i] = s_deltas[i];
+      double[] deltas = proj.fastProjectRelativeDataToRenderSpace(delta);
+      if(deltas[0] != 0 || deltas[1] != 0) {
+        r_edges.add(deltas);
+      }
+    }
+    return r_edges;
+  }
+
+  /**
+   * Get the visible (non-0) edges of a hypercube
+   *
+   * @param proj Projection
+   * @param box Box object
+   * @return Edge list
+   */
+  private static ArrayList<double[]> getVisibleEdges(Projection2D proj, SpatialComparable box) {
+    final int dim = box.getDimensionality();
+    double[] s_deltas = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      s_deltas[i] = box.getMax(i) - box.getMin(i);
+    }
+    ArrayList<double[]> r_edges = new ArrayList<>(dim);
+    for(int i = 0; i < dim; i++) {
+      double[] delta = new double[dim];
       delta[i] = s_deltas[i];
       double[] deltas = proj.fastProjectRelativeDataToRenderSpace(delta);
       if(deltas[0] != 0 || deltas[1] != 0) {
@@ -139,76 +233,108 @@ public class SVGHyperCube {
 
   /**
    * Recursive helper for hypercube drawing.
-   * 
+   *
    * @param path path
-   * @param r_min starting corner
+   * @param minx starting corner
+   * @param miny starting corner
    * @param r_edges edge vectors
    * @param off recursion offset (to avoid multi-recursion)
    * @param b bit set of drawn edges
    */
-  private static void recDrawEdges(SVGPath path, double[] r_min, List<double[]> r_edges, int off, BitSet b) {
+  private static void recDrawEdges(SVGPath path, double minx, double miny, List<double[]> r_edges, int off, long[] b) {
     // Draw all "missing" edges
     for(int i = 0; i < r_edges.size(); i++) {
-      if(!b.get(i)) {
-        double[] dest = new double[]{r_min[0] + r_edges.get(i)[0], r_min[1] + r_edges.get(i)[1]};
-        path.moveTo(r_min[0], r_min[1]);
-        path.drawTo(dest[0], dest[1]);
+      if(BitsUtil.get(b, i)) {
+        continue;
       }
-    }
-    // Recursion rule
-    for(int i = off; i < r_edges.size(); i++) {
-      if(!b.get(i)) {
-        BitSet b2 = (BitSet) b.clone();
-        b2.set(i);
-        double[] dest = new double[]{r_min[0] + r_edges.get(i)[0], r_min[1] + r_edges.get(i)[1]};
-        recDrawEdges(path, dest, r_edges, i + 1, b2);
+      final double[] edge = r_edges.get(i);
+      final double x_i = minx + edge[0];
+      if(!isFinite(x_i)) {
+        continue;
       }
+      final double y_i = miny + edge[1];
+      if(!isFinite(y_i)) {
+        continue;
+      }
+      path.moveTo(minx, miny);
+      path.drawTo(x_i, y_i);
+      // Recursion
+      BitsUtil.setI(b, i);
+      recDrawEdges(path, x_i, y_i , r_edges, i + 1, b);
+      BitsUtil.clearI(b, i);
     }
   }
 
   /**
    * Recursive helper for hypercube drawing.
-   * 
+   *
    * @param plot Plot
    * @param group Group element
    * @param cls CSS class
-   * @param r_min starting corner
+   * @param minx starting corner
+   * @param miny starting corner
    * @param r_edges edge vectors
    * @param off recursion offset (to avoid multi-recursion)
    * @param b bit set of drawn edges
    */
-  private static void recDrawSides(SVGPlot plot, Element group, String cls, double[] r_min, List<double[]> r_edges, int off, BitSet b) {
+  private static void recDrawSides(SVGPlot plot, Element group, String cls, double minx, double miny, List<double[]> r_edges, int off, long[] b) {
+    StringBuilder pbuf = new StringBuilder();
     // Draw all "missing" sides
     for(int i = 0; i < r_edges.size() - 1; i++) {
+      if(BitsUtil.get(b, i)) {
+        continue;
+      }
       double[] deltai = r_edges.get(i);
+      final double xi = minx + deltai[0];
+      if(!isFinite(xi)) {
+        continue;
+      }
+      final double yi = miny + deltai[1];
+      if(!isFinite(yi)) {
+        continue;
+      }
       for(int j = i + 1; j < r_edges.size(); j++) {
-        if(!b.get(i) && !b.get(j)) {
-          double[] deltaj = r_edges.get(j);
-          StringBuilder pbuf = new StringBuilder();
-          pbuf.append(SVGUtil.fmt(r_min[0])).append(',');
-          pbuf.append(SVGUtil.fmt(r_min[1])).append(' ');
-          pbuf.append(SVGUtil.fmt(r_min[0] + deltai[0])).append(',');
-          pbuf.append(SVGUtil.fmt(r_min[1] + deltai[1])).append(' ');
-          pbuf.append(SVGUtil.fmt(r_min[0] + deltai[0] + deltaj[0])).append(',');
-          pbuf.append(SVGUtil.fmt(r_min[1] + deltai[1] + deltaj[1])).append(' ');
-          pbuf.append(SVGUtil.fmt(r_min[0] + deltaj[0])).append(',');
-          pbuf.append(SVGUtil.fmt(r_min[1] + deltaj[1]));
-          
-          Element poly = plot.svgElement(SVGConstants.SVG_POLYGON_TAG);
-          SVGUtil.setAtt(poly, SVGConstants.SVG_POINTS_ATTRIBUTE, pbuf.toString());
-          SVGUtil.setCSSClass(poly, cls);
-          group.appendChild(poly);
+        if(BitsUtil.get(b, j)) {
+          continue;
         }
+        double[] deltaj = r_edges.get(j);
+        final double dxj = deltaj[0];
+        if(!isFinite(xi)) {
+          continue;
+        }
+        final double dyj = deltaj[1];
+        if(!isFinite(dxj)) {
+          continue;
+        }
+        pbuf.delete(0, pbuf.length()); // Clear
+        pbuf.append(SVGUtil.fmt(minx)).append(',');
+        pbuf.append(SVGUtil.fmt(miny)).append(' ');
+        pbuf.append(SVGUtil.fmt(xi)).append(',');
+        pbuf.append(SVGUtil.fmt(yi)).append(' ');
+        pbuf.append(SVGUtil.fmt(xi + dxj)).append(',');
+        pbuf.append(SVGUtil.fmt(yi + dyj)).append(' ');
+        pbuf.append(SVGUtil.fmt(minx + dxj)).append(',');
+        pbuf.append(SVGUtil.fmt(miny + dyj));
+
+        Element poly = plot.svgElement(SVGConstants.SVG_POLYGON_TAG);
+        SVGUtil.setAtt(poly, SVGConstants.SVG_POINTS_ATTRIBUTE, pbuf.toString());
+        SVGUtil.setCSSClass(poly, cls);
+        group.appendChild(poly);
       }
+      // Recursion
+      BitsUtil.setI(b, i);
+      recDrawSides(plot, group, cls, xi, yi, r_edges, i + 1, b);
+      BitsUtil.clearI(b, i);
     }
-    // Recursion rule
-    for(int i = off; i < r_edges.size(); i++) {
-      if(!b.get(i)) {
-        BitSet b2 = (BitSet) b.clone();
-        b2.set(i);
-        double[] dest = new double[]{r_min[0] + r_edges.get(i)[0], r_min[1] + r_edges.get(i)[1]};
-        recDrawSides(plot, group, cls, dest, r_edges, i + 1, b2);
-      }
-    }
+  }
+
+  /**
+   * Finite (and not NaN) double values.
+   *
+   * @param v Value
+   * @return true, when finite.
+   */
+  private static boolean isFinite(double v) {
+    return v < Double.POSITIVE_INFINITY && v > Double.NEGATIVE_INFINITY;
   }
 }

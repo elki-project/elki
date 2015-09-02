@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,17 +28,29 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Measure the similarity of clusters via the Adjusted Rand Index.
- * 
+ *
+ * Reference:
+ * <p>
+ * Rand, W. M.<br />
+ * Objective Criteria for the Evaluation of Clustering Methods<br />
+ * Journal of the American Statistical Association, Vol. 66 Issue 336
+ * </p>
+ *
  * @author Erich Schubert
  */
-public class ClusteringAdjustedRandIndexSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Clustering<?>> implements PrimitiveDistanceFunction<Clustering<?>> {
+@Reference(authors = "Rand, W. M.", //
+title = "Objective Criteria for the Evaluation of Clustering Methods", //
+booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", //
+url = "http://www.jstor.org/stable/10.2307/2284239")
+public class ClusteringAdjustedRandIndexSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Clustering<?>>implements ClusteringDistanceSimilarityFunction, NormalizedSimilarityFunction<Clustering<?>> {
   /**
    * Static instance.
    */
@@ -82,7 +94,7 @@ public class ClusteringAdjustedRandIndexSimilarityFunction extends AbstractPrimi
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude

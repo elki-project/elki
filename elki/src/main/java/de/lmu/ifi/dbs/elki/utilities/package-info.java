@@ -29,7 +29,6 @@
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil}: HTML (with XML DOM) generation.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil}: SVG generation (XML DOM based).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.visualization.batikutil.BatikUtil}: Apache Batik SVG utilities (coordinate transforms screen to canvas).</li>
- * <li>{@link de.lmu.ifi.dbs.elki.visualization.visualizers.VisualizerUtil}: Visualizer handling.</li>
  * </ul></li>
  * <li>Specialized:<ul>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil}: Managing parameter settings</li>

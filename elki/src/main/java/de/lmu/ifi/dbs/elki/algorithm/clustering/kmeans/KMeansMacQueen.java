@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
@@ -53,21 +53,21 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * The original k-means algorithm, using MacQueen style incremental updates;
  * making this effectively an "online" (streaming) algorithm.
- * 
+ *
  * This implementation will by default iterate over the data set until
  * convergence, although MacQueen likely only meant to do a single pass over the
  * data.
- * 
+ *
  * <p>
  * Reference:<br />
  * J. MacQueen: Some Methods for Classification and Analysis of Multivariate
  * Observations. <br />
  * In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297.
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @apiviz.has KMeansModel
- * 
+ *
  * @param <V> vector type to use
  */
 @Title("K-Means")
@@ -89,13 +89,13 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansMacQueen(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMeansMacQueen(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -152,9 +152,9 @@ public class KMeansMacQueen<V extends NumberVector> extends AbstractKMeans<V, KM
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {

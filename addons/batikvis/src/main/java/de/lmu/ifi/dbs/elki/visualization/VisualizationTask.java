@@ -33,10 +33,8 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
  * @author Erich Schubert
  *
  * @apiviz.landmark
- * @apiviz.composedOf VisFactory
- * @apiviz.has SVGPlot
+ * @apiviz.has VisualizerContext
  * @apiviz.has VisFactory
- * @apiviz.has Projection oneway - 0:1
  */
 public class VisualizationTask implements VisualizationItem, Comparable<VisualizationTask> {
   /**
@@ -291,7 +289,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
    * Update if any oft these bits is set.
    *
    * @param bits Bits to check.
-   * @return
+   * @return {@code true} if any bit is set.
    */
   public boolean updateOnAny(int bits) {
     return (updatemask & bits) != 0;
@@ -301,7 +299,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
    * Update if any oft these flags is set.
    *
    * @param bits Bits to check.
-   * @return
+   * @return {@code true} if any bit is set.
    */
   public boolean hasAnyFlags(int bits) {
     return (flags & bits) != 0;

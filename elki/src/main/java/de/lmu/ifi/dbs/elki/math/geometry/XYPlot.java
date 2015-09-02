@@ -30,12 +30,11 @@ import java.util.Iterator;
 import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
- * An XYCurve is an ordered collection of 2d points, meant for chart generation.
- * Of key interest is the method {@link #addAndSimplify} which tries to simplify
- * the curve while adding points.
- * 
+ * An XYCurve is an ordered collection of 2d {@link Curve}s, meant for chart
+ * generation.
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf Curve
  */
 public class XYPlot implements Result, Iterable<XYPlot.Curve> {
@@ -51,7 +50,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
   /**
    * Curve on this plot.
-   * 
+   *
    * @author Erich Schubert
    */
   public class Curve {
@@ -93,7 +92,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
     /**
      * Suggested color number.
-     * 
+     *
      * @return Color number
      */
     public int getColor() {
@@ -102,7 +101,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
     /**
      * Add a coordinate pair, but don't simplify
-     * 
+     *
      * @param x X coordinate
      * @param y Y coordinate
      */
@@ -120,7 +119,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
     /**
      * Curve X value at given position
-     * 
+     *
      * @param off Offset
      * @return X value
      */
@@ -130,7 +129,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
     /**
      * Curve Y value at given position
-     * 
+     *
      * @param off Offset
      * @return Y value
      */
@@ -140,7 +139,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
     /**
      * Size of curve.
-     * 
+     *
      * @return curve length
      */
     public int size() {
@@ -149,23 +148,23 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
     /**
      * Get an iterator for the curve.
-     * 
+     *
      * Note: this is <em>not</em> a Java style iterator, since the only way to
      * get positions is using "next" in Java style. Here, we can have two
      * getters for current values!
-     * 
+     *
      * Instead, use this style of iteration: <blockquote>
-     * 
+     *
      * <pre>
-     * {@code 
+     * {@code
      * for (XYCurve.Itr it = curve.iterator(); it.valid(); it.advance()) {
      *   doSomethingWith(it.getX(), it.getY());
      * }
      * }
      * </pre>
-     * 
+     *
      * </blockquote>
-     * 
+     *
      * @return Iterator
      */
     public Itr iterator() {
@@ -177,21 +176,21 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
      * reason is that we want to have {@code #getX()} and {@code #getY()}
      * operations, which does not work consistently with Java's
      * <code>next()</code> style of iterations.
-     * 
+     *
      * Instead, use this style of iteration: <blockquote>
-     * 
+     *
      * <pre>
-     * {@code 
+     * {@code
      * for (XYCurve.Itr it = curve.iterator(); it.valid(); it.advance()) {
      *   doSomethingWith(it.getX(), it.getY());
      * }
      * }
      * </pre>
-     * 
+     *
      * </blockquote>
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public class Itr {
@@ -202,7 +201,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
       /**
        * Get x value of current element.
-       * 
+       *
        * @return X value of current element
        */
       public double getX() {
@@ -211,7 +210,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
       /**
        * Get y value of current element.
-       * 
+       *
        * @return Y value of current element
        */
       public double getY() {
@@ -227,7 +226,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
       /**
        * Test if the iterator can advance.
-       * 
+       *
        * @return True when the iterator can be advanced.
        */
       public boolean valid() {
@@ -260,7 +259,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
   /**
    * Constructor with labels
-   * 
+   *
    * @param labelx Label for X axis
    * @param labely Label for Y axis
    */
@@ -279,7 +278,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
   /**
    * Make a new curve.
-   * 
+   *
    * @return Curve
    */
   public Curve makeCurve() {
@@ -290,7 +289,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
   /**
    * Make a new curve with desired color.
-   * 
+   *
    * @param color Color number
    * @return Curve
    */
@@ -302,7 +301,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
   /**
    * Make a new curve with desired color.
-   * 
+   *
    * @param color Color number
    * @param size Expected size
    * @return Curve
@@ -315,7 +314,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
   /**
    * Get label of x axis
-   * 
+   *
    * @return label of x axis
    */
   public String getLabelx() {
@@ -324,7 +323,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
   /**
    * Get label of y axis
-   * 
+   *
    * @return label of y axis
    */
   public String getLabely() {
@@ -333,7 +332,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
   /**
    * Minimum on x axis.
-   * 
+   *
    * @return Minimum on X
    */
   public double getMinx() {
@@ -342,7 +341,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
   /**
    * Maximum on x axis.
-   * 
+   *
    * @return Maximum on X
    */
   public double getMaxx() {
@@ -351,7 +350,7 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
   /**
    * Minimum on y axis.
-   * 
+   *
    * @return Minimum on Y
    */
   public double getMiny() {
@@ -360,13 +359,13 @@ public class XYPlot implements Result, Iterable<XYPlot.Curve> {
 
   /**
    * Maximum on y axis.
-   * 
+   *
    * @return Maximum on Y
    */
   public double getMaxy() {
     return maxy;
   }
-  
+
   @Override
   public Iterator<Curve> iterator() {
     return curves.iterator();

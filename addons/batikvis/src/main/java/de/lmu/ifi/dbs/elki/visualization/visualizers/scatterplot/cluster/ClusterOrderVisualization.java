@@ -26,10 +26,12 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -77,7 +79,11 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
     new VisualizationTree.Handler2<ClusterOrder, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, ClusterOrder co, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, co, p.getRelation(), ClusterOrderVisualization.this);
+        final Relation<?> rel = p.getRelation();
+        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+          return;
+        }
+        final VisualizationTask task = new VisualizationTask(NAME, context, co, rel, ClusterOrderVisualization.this);
         task.initDefaultVisibility(false);
         task.level = VisualizationTask.LEVEL_DATA - 1;
         task.addUpdateFlags(VisualizationTask.ON_DATA);
@@ -92,7 +98,7 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
    *
    * @author Erich Schubert
    *
-   * @apiviz.has ClusterOrderResult oneway - - visualizes
+   * @apiviz.has ClusterOrder oneway - - visualizes
    */
   // TODO: listen for CLUSTER ORDER changes.
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {

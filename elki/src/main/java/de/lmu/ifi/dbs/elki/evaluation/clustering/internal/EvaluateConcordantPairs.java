@@ -54,25 +54,27 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Compute the Gamma Criterion of a data set.
- * 
+ *
  * References:
  * <p>
  * F. B. Baker, and L. J. Hubert<br />
  * Measuring the Power of Hierarchical Cluster Analysis<br />
  * Journal of the American Statistical Association, 70(349)
  * </p>
- * 
+ *
  * Tau measures:
  * <p>
  * F. J. Rohlf<br />
  * Methods of comparing classifications<br />
  * Annual Review of Ecology and Systematics
  * </p>
- * 
+ *
  * The runtime complexity of this measure is O(n*n*log(n)).
- * 
+ *
  * @author Stephan Baier
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf NoiseHandling
  */
 @Reference(authors = "F. B. Baker, and L. J. Hubert",//
 title = "Measuring the Power of Hierarchical Cluster Analysis",//
@@ -101,7 +103,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param distance Distance function
    * @param noiseHandling Control noise handling
    */
@@ -113,7 +115,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
 
   /**
    * Evaluate a single clustering.
-   * 
+   *
    * @param db Database
    * @param rel Data relation
    * @param c Clustering
@@ -209,7 +211,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
 
   /**
    * Count (and annotate) the number of tied values.
-   * 
+   *
    * @param withinDistances Distances array
    * @param withinTies Output array of tie counts.
    * @return Number of tied values.
@@ -263,9 +265,12 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
 
   /**
    * Compute the Tau correlation measure
-   * 
-   * @param discordantPairs Number of discordant pairs
+   *
+   * @param c Concordant pairs
+   * @param d Discordant pairs
    * @param m Total number of pairs
+   * @param wd Number of within distances
+   * @param bd Number of between distances
    * @return Gamma plus statistic
    */
   @Reference(authors = "F. J. Rohlf", title = "Methods of comparing classifications", //
@@ -293,9 +298,9 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Stephan Baier
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractParameterizer {

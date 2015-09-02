@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,20 +35,18 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 
 /**
  * Compute a partitioning from an OPTICS plot by doing a horizontal cut.
- * 
+ *
  * @author Heidi Kolb
  * @author Erich Schubert
- * 
- * @apiviz.uses ClusterOrderResult
- * @apiviz.uses OPTICSDistanceAdapter
+ *
+ * @apiviz.uses ClusterOrder
  */
 // TODO: add non-flat clusterings
 public class OPTICSCut {
   /**
    * Compute an OPTICS cut clustering
-   * 
+   *
    * @param co Cluster order result
-   * @param adapter Distance adapter
    * @param epsilon Epsilon value for cut
    * @return New partitioning clustering
    */

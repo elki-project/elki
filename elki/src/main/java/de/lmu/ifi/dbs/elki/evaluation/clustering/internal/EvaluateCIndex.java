@@ -42,6 +42,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @author Stephan Baier
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf NoiseHandling
  */
 @Reference(authors = "L. J. Hubert and J. R. Levin", //
 title = "A general statistical framework for assessing categorical clustering in free recall.", //
@@ -72,7 +74,7 @@ public class EvaluateCIndex<O> implements Evaluator {
    * Constructor.
    *
    * @param distance Distance function
-   * @param mergenoise Flag to treat noise as clusters, not singletons
+   * @param noiseOpt Flag to control noise handling
    */
   public EvaluateCIndex(DistanceFunction<? super O> distance, NoiseHandling noiseOpt) {
     super();

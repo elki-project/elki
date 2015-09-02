@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.classification.holdout;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,36 +31,39 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 /**
  * A holdout procedure is to provide a range of partitions of a database to
  * pairs of training and test data sets.
- * 
+ *
  * @author Erich Schubert
+ *
+ * @apiviz.uses MultipleObjectsBundle
+ * @apiviz.has TrainingAndTestSet
  */
 public interface Holdout {
   /**
    * Initialize the holdout procedure for a data set.
-   * 
+   *
    * @param bundle Data set bundle
    */
   void initialize(MultipleObjectsBundle bundle);
 
   /**
    * Get the next partitioning of the given holdout.
-   * 
+   *
    * @return Next partitioning of the data set
    */
   TrainingAndTestSet nextPartitioning();
 
   /**
    * Get the <i>sorted</i> class labels present in this data set.
-   * 
+   *
    * For indexing into assignment arrays.
-   * 
+   *
    * @return Class labels
    */
   ArrayList<ClassLabel> getLabels();
 
   /**
    * How many partitions to test.
-   * 
+   *
    * @return Number of partitions.
    */
   int numberOfPartitions();

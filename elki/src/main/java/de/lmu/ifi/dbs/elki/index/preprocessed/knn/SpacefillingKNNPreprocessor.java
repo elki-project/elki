@@ -88,6 +88,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * </p>
  *
  * @author Erich Schubert
+ *
+ * @apiviz.has SpaceFillingKNNQuery
  */
 @Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
 title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //
@@ -310,7 +312,7 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
    *
    * Knuth / Fisher-Yates style shuffle
    *
-   * @param existing Existing array
+   * @param out Prefilled output array.
    * @param random Random generator.
    * @return Same array.
    */
@@ -414,6 +416,8 @@ public class SpacefillingKNNPreprocessor<O extends NumberVector> extends Abstrac
    * @author Erich Schubert
    *
    * @param <V> Vector type
+   *
+   * @apiviz.has SpacefillingKNNPreprocessor
    */
   public static class Factory<V extends NumberVector> implements IndexFactory<V, SpacefillingKNNPreprocessor<V>> {
     /**

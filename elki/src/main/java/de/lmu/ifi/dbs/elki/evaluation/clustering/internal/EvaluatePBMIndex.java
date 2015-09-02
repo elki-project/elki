@@ -55,18 +55,20 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * 
+ *
  * Compute the PBM of a data set
- * 
+ *
  * Reference:
  * <p>
  * M. K. Pakhira, and S. Bandyopadhyay, and U. Maulik<br />
  * Validity index for crisp and fuzzy clusters<br />
  * Pattern recognition, 37(3)
  * </p>
- * 
+ *
  * @author Stephan Baier
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf NoiseHandling
  */
 @Reference(authors = "M. K. Pakhira, and S. Bandyopadhyay, and U. Maulik", //
 title = "Validity index for crisp and fuzzy clusters",//
@@ -95,9 +97,9 @@ public class EvaluatePBMIndex implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param distance Distance function
-   * @param mergenoise Flag to treat noise as clusters, not singletons
+   * @param noiseOpt Flag to control noise handling
    */
   public EvaluatePBMIndex(NumberVectorDistanceFunction<?> distance, NoiseHandling noiseOpt) {
     super();
@@ -107,10 +109,9 @@ public class EvaluatePBMIndex implements Evaluator {
 
   /**
    * Evaluate a single clustering.
-   * 
+   *
    * @param db Database
    * @param rel Data relation
-   * @param dq Distance query
    * @param c Clustering
    * @return PBM
    */
@@ -223,10 +224,10 @@ public class EvaluatePBMIndex implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Stephan Baier
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

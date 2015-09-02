@@ -54,31 +54,63 @@ public class ClusterStyleAction extends AbstractVisFactory {
     Hierarchy.Iter<Clustering<?>> it = VisualizationTree.filterResults(context, start, Clustering.class);
     for(; it.valid(); it.advance()) {
       final Clustering<?> c = it.get();
-      context.addVis(c, new VisualizationMenuAction() {
-        @Override
-        public void activate() {
-          context.setStylingPolicy(new ClusterStylingPolicy(c, context.getStyleLibrary()));
-        }
-
-        @Override
-        public String getMenuName() {
-          return "Use as Styling Policy";
-        }
-
-        @Override
-        public boolean enabled() {
-          StylingPolicy sp = context.getStylingPolicy();
-          if(!(sp instanceof ClusterStylingPolicy)) {
-            return true;
-          }
-          return ((ClusterStylingPolicy) sp).getClustering() != c;
-        }
-      });
+      Hierarchy.Iter<SetStyleAction> it2 = VisualizationTree.filter(context, c, SetStyleAction.class);
+      if(it2.valid()) {
+        continue; // There already is a style button.
+      }
+      context.addVis(c, new SetStyleAction(c, context));
     }
   }
 
   @Override
   public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     throw new AbortException("Should never be called.");
+  }
+
+  /**
+   * Action to use a clustering as {@link ClusterStylingPolicy}.
+   *
+   * @author Erich Schubert
+   */
+  private static final class SetStyleAction implements VisualizationMenuAction {
+    /**
+     * Clustering to use
+     */
+    private final Clustering<?> c;
+
+    /**
+     * Visualization context.
+     */
+    private final VisualizerContext context;
+
+    /**
+     * Constructor.
+     *
+     * @param c Clustering
+     * @param context Context
+     */
+    private SetStyleAction(Clustering<?> c, VisualizerContext context) {
+      this.c = c;
+      this.context = context;
+    }
+
+    @Override
+    public void activate() {
+      context.setStylingPolicy(new ClusterStylingPolicy(c, context.getStyleLibrary()));
+    }
+
+    @Override
+    public String getMenuName() {
+      return "Use as Styling Policy";
+    }
+
+    @Override
+    public boolean enabled() {
+      StylingPolicy sp = context.getStylingPolicy();
+      if(!(sp instanceof ClusterStylingPolicy)) {
+        return true;
+      }
+      return ((ClusterStylingPolicy) sp).getClustering() != c;
+    }
   }
 }

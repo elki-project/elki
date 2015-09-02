@@ -71,11 +71,12 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * file. This class is meant to be able to read the default output of ELKI, i.e.
  * one object per line, with the DBID specified as <tt>ID=</tt> and the outlier
  * score specified with an algorithm-specific prefix.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has ScalingFunction
  * @apiviz.has File
+ * @apiviz.composedOf CSVReaderFormat
  */
 public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
@@ -120,7 +121,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
 
   /**
    * Constructor.
-   * 
+   *
    * @param file File to load
    * @param idpattern Pattern to match IDs
    * @param scorepattern Pattern to match scores with
@@ -138,7 +139,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
 
   /**
    * Run the algorithm.
-   * 
+   *
    * @param database Database to use
    * @param relation Relation to use
    * @return Result
@@ -232,9 +233,9 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

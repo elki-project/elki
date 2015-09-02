@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Measure the similarity of clusters via the intersection size.
- * 
+ *
  * @author Erich Schubert
  */
 public class ClusterIntersectionSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Cluster<?>> implements PrimitiveDistanceFunction<Cluster<?>> {
@@ -79,7 +79,7 @@ public class ClusterIntersectionSimilarityFunction extends AbstractPrimitiveSimi
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude

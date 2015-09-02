@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 /*
- This file is part of ELKI: Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,7 +35,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ProxyDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -51,16 +52,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * The bisecting k-means algorithm works by starting with an initial
  * partitioning into two clusters, then repeated splitting of the largest
  * cluster to get additional clusters.
- * 
+ *
  * Reference:<br>
  * <p>
  * M. Steinbach, G. Karypis, V. Kumar:<br />
  * A Comparison of Document Clustering Techniques<br />
  * KDD workshop on text mining. Vol. 400. No. 1
  * </p>
- * 
+ *
  * @author Stephan Baier
- * 
+ *
  * @param <V> Vector type
  * @param <M> Model type
  */
@@ -83,7 +84,7 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
 
   /**
    * Constructor.
-   * 
+   *
    * @param k k parameter - number of result clusters
    * @param innerkMeans KMeans variant parameter - for bisecting step
    */
@@ -157,7 +158,7 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
   }
 
   @Override
-  public void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector> distanceFunction) {
+  public void setDistanceFunction(NumberVectorDistanceFunction<? super V> distanceFunction) {
     innerkMeans.setDistanceFunction(distanceFunction);
   }
 
@@ -168,12 +169,12 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Stephan Baier
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <V> Vector type
    * @param <M> Model type
    */

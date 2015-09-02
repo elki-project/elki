@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  *
  * @apiviz.landmark
- * @apiviz.composedOf ArrayDBIDs
+ * @apiviz.composedOf ArrayStaticDBIDs
  * @apiviz.uses DatabaseConnection
  */
 @Description("Database using an in-memory hashtable and at least providing linear scans.")

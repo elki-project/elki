@@ -27,10 +27,12 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
@@ -82,6 +84,10 @@ public class LineVisualization extends AbstractVisFactory {
     Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ParallelPlotProjector<?> p = it.get();
+      final Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
+      }
       final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), LineVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA;
       task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY | VisualizationTask.ON_SAMPLE);
@@ -145,11 +151,15 @@ public class LineVisualization extends AbstractVisFactory {
           }
         }
         for(DBIDIter iter = sam.iter(); iter.valid(); iter.advance()) {
+          final int c = csp.getStyleForDBID(iter) + min;
+          if(c < 0) {
+            continue; // No style. Display differently?
+          }
           Element line = drawLine(iter);
           if(line == null) {
             continue;
           }
-          SVGUtil.addCSSClass(line, keys[csp.getStyleForDBID(iter) + min]);
+          SVGUtil.addCSSClass(line, keys[c]);
           layer.appendChild(line);
         }
       }

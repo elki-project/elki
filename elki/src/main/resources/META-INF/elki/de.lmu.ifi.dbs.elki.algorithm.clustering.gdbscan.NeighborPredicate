@@ -3,3 +3,4 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.COPACNeighborPredicate
 de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.ERiCNeighborPredicate
 de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.FourCNeighborPredicate
 de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.PreDeConNeighborPredicate
+de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.FDBSCANNeighborPredicate

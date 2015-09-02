@@ -29,12 +29,15 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGScoreBar;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -45,17 +48,17 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 /**
  * Pseudo-Visualizer, that lists the cluster evaluation results found.
  *
- * TODO: add indicator whether high values are better or low.
- *
  * TODO: add indication/warning when values are out-of-bounds.
+ *
+ * TODO: Find a nicer solution than the current hack to only display the
+ * evaluation results for the currently active clustering.
  *
  * @author Erich Schubert
  * @author Sascha Goldhofer
  *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»
- * @apiviz.has de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering.
- *             ScoreResult oneway - - visualizes
+ * @apiviz.has EvaluationResult oneway - - visualizes
  */
 public class EvaluationVisualization extends AbstractVisFactory {
   /**
@@ -83,8 +86,38 @@ public class EvaluationVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     Hierarchy.Iter<EvaluationResult> it = VisualizationTree.filterResults(context, start, EvaluationResult.class);
-    for(; it.valid(); it.advance()) {
+    candidate: for(; it.valid(); it.advance()) {
       EvaluationResult sr = it.get();
+      // Avoid duplicates:
+      Hierarchy.Iter<VisualizationTask> it2 = VisualizationTree.filter(context, sr, VisualizationTask.class);
+      for(; it2.valid(); it2.advance()) {
+        if(it2.get().getFactory() instanceof EvaluationVisualization) {
+          continue candidate;
+        }
+      }
+      // Hack: for clusterings, only show the currently visible clustering.
+      if(sr.visualizeSingleton()) {
+        Class<? extends EvaluationResult> c = sr.getClass();
+        // Ensure singleton.
+        Hierarchy.Iter<?> it3 = context.getVisHierarchy().iterChildren(context.getBaseResult());
+        for(; it3.valid(); it3.advance()) {
+          Object o = it3.get();
+          if(!(o instanceof VisualizationTask)) {
+            continue;
+          }
+          final VisualizationTask otask = (VisualizationTask) o;
+          if(otask.getFactory() instanceof EvaluationVisualization && otask.getResult() == c) {
+            continue candidate;
+          }
+        }
+        final VisualizationTask task = new VisualizationTask(NAME, context, c, null, EvaluationVisualization.this);
+        task.reqwidth = .5;
+        task.reqheight = sr.numLines() * .05;
+        task.level = VisualizationTask.LEVEL_STATIC;
+        task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
+        context.addVis(context.getBaseResult(), task);
+        continue candidate;
+      }
       final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, EvaluationVisualization.this);
       task.reqwidth = .5;
       task.reqheight = sr.numLines() * .05;
@@ -120,7 +153,28 @@ public class EvaluationVisualization extends AbstractVisFactory {
 
     double ypos = -.5; // Skip space before first header
     Element parent = plot.svgElement(SVGConstants.SVG_G_TAG);
-    EvaluationResult sr = task.getResult();
+    Object o = task.getResult();
+    EvaluationResult sr = null;
+    if(o instanceof EvaluationResult) {
+      sr = (EvaluationResult) o;
+    }
+    else if(o instanceof Class) {
+      // Use cluster evaluation of current style instead.
+      VisualizerContext context = task.getContext();
+      StylingPolicy spol = context.getStylingPolicy();
+      if(spol instanceof ClusterStylingPolicy) {
+        ClusterStylingPolicy cpol = (ClusterStylingPolicy) spol;
+        @SuppressWarnings("unchecked")
+        final Class<Object> c = (Class<Object>) o;
+        Iter<?> it = VisualizationTree.filterResults(context, cpol.getClustering(), c);
+        if(it.valid()) {
+          sr = (EvaluationResult) it.get();
+        }
+      }
+    }
+    if(sr == null) {
+      return new StaticVisualizationInstance(task, plot, width, height, parent); // Failed.
+    }
 
     for(String header : sr.getHeaderLines()) {
       ypos = addHeader(plot, parent, ypos, header);

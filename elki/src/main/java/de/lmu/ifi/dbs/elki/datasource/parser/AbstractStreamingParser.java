@@ -37,8 +37,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 
 /**
  * Base class for streaming parsers.
- * 
+ *
  * @author Erich Schubert
+ *
+ * @apiviz.uses CSVReaderFormat
+ * @apiviz.composedOf TokenizedReader
+ * @apiviz.composedOf Tokenizer
  */
 public abstract class AbstractStreamingParser implements StreamingParser {
   /**
@@ -53,7 +57,7 @@ public abstract class AbstractStreamingParser implements StreamingParser {
 
   /**
    * Constructor.
-   * 
+   *
    * @param format Reader format
    */
   public AbstractStreamingParser(CSVReaderFormat format) {
@@ -108,9 +112,9 @@ public abstract class AbstractStreamingParser implements StreamingParser {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public abstract static class Parameterizer extends AbstractParameterizer {

@@ -22,7 +22,6 @@ public interface VisFactory extends VisualizationProcessor {
   /**
    * Add visualizers for the given result (tree) to the context.
    *
-   * @param context TODO
    * @param context Visualization context
    * @param start Result to process
    */

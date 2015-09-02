@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.opticsplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -38,11 +38,11 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 
 /**
  * Class to produce an OPTICS plot image.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf LinearScale
- * @apiviz.has ClusterOrderResult oneway - - renders
+ * @apiviz.has ClusterOrder oneway - - renders
  */
 public class OPTICSPlot implements Result {
   /**
@@ -97,7 +97,7 @@ public class OPTICSPlot implements Result {
 
   /**
    * Constructor, with automatic distance adapter detection.
-   * 
+   *
    * @param co Cluster order to plot.
    * @param colors Coloring strategy
    */
@@ -142,7 +142,7 @@ public class OPTICSPlot implements Result {
 
   /**
    * Scale a reachability distance to a pixel value.
-   * 
+   *
    * @param reach Reachability
    * @return Pixel value.
    */
@@ -153,7 +153,7 @@ public class OPTICSPlot implements Result {
 
   /**
    * Scale a pixel value to a reachability
-   * 
+   *
    * @param y Pixel value
    * @return Reachability
    */
@@ -163,7 +163,7 @@ public class OPTICSPlot implements Result {
 
   /**
    * Compute the scale (value range)
-   * 
+   *
    * @param order Cluster order to process
    * @return Scale for value range of cluster order
    */
@@ -216,7 +216,7 @@ public class OPTICSPlot implements Result {
 
   /**
    * Get width-to-height ratio of image.
-   * 
+   *
    * @return {@code width / height}
    */
   public double getRatio() {
@@ -228,7 +228,7 @@ public class OPTICSPlot implements Result {
 
   /**
    * Get the OPTICS plot.
-   * 
+   *
    * @return plot image
    */
   public synchronized RenderedImage getPlot() {
@@ -248,7 +248,7 @@ public class OPTICSPlot implements Result {
 
   /**
    * Get the SVG registered plot number
-   * 
+   *
    * @return Plot URI
    */
   public String getSVGPlotURI() {
@@ -271,14 +271,13 @@ public class OPTICSPlot implements Result {
   /**
    * Static method to find an optics plot for a result, or to create a new one
    * using the given context.
-   * 
-   * @param Cluster order entry type
+   *
    * @param co Cluster order
    * @param context Context (for colors and reference clustering)
-   * 
+   *
    * @return New or existing optics plot
    */
-  public static <E extends ClusterOrder> OPTICSPlot plotForClusterOrder(E co, VisualizerContext context) {
+  public static OPTICSPlot plotForClusterOrder(ClusterOrder co, VisualizerContext context) {
     // Check for an existing plot
     // ArrayList<OPTICSPlot<D>> plots = ResultUtil.filterResults(co,
     // OPTICSPlot.class);
@@ -293,7 +292,7 @@ public class OPTICSPlot implements Result {
 
   /**
    * Get the cluster order we are attached to.
-   * 
+   *
    * @return Cluster order
    */
   public ClusterOrder getClusterOrder() {

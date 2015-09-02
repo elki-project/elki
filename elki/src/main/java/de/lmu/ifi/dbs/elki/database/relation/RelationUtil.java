@@ -30,6 +30,9 @@ import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
@@ -39,9 +42,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
  * Utility functions for handling database relation.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses Relation oneway
  * @apiviz.has CollectionFromRelation
  * @apiviz.has RelationObjectIterator
@@ -56,7 +59,7 @@ public final class RelationUtil {
 
   /**
    * Get the vector field type information from a relation.
-   * 
+   *
    * @param relation relation
    * @param <V> Vector type
    * @return Vector field type information
@@ -72,7 +75,7 @@ public final class RelationUtil {
 
   /**
    * Get the number vector factory of a database relation.
-   * 
+   *
    * @param relation relation
    * @param <V> Vector type
    * @return Vector field type information
@@ -86,23 +89,22 @@ public final class RelationUtil {
 
   /**
    * Get the dimensionality of a database relation.
-   * 
+   *
    * @param relation relation
    * @return Database dimensionality
    */
-  public static int dimensionality(Relation<? extends FeatureVector<?>> relation) {
-    try {
-      return ((VectorFieldTypeInformation<? extends FeatureVector<?>>) relation.getDataTypeInformation()).getDimensionality();
+  public static int dimensionality(Relation<? extends SpatialComparable> relation) {
+    final SimpleTypeInformation<? extends SpatialComparable> type = relation.getDataTypeInformation();
+    if(type instanceof FieldTypeInformation) {
+      return ((FieldTypeInformation) type).getDimensionality();
     }
-    catch(Exception e) {
-      return -1;
-    }
+    return -1;
   }
 
   /**
    * Determines the minimum and maximum values in each dimension of all objects
    * stored in the given database.
-   * 
+   *
    * @param relation the database storing the objects
    * @return Minimum and Maximum vector for the hyperrectangle
    */
@@ -127,7 +129,7 @@ public final class RelationUtil {
   /**
    * Determines the variances in each dimension of the specified objects stored
    * in the given database.
-   * 
+   *
    * @param database the database storing the objects
    * @param ids the ids of the objects
    * @param centroid the centroid or reference vector of the ids
@@ -149,10 +151,10 @@ public final class RelationUtil {
 
   /**
    * <em>Copy</em> a relation into a double matrix.
-   * 
+   *
    * This is <em>not recommended</em> unless you need to modify the data
    * temporarily.
-   * 
+   *
    * @param relation Relation
    * @param ids IDs, with well-defined order (i.e. array)
    * @return Data matrix
@@ -169,31 +171,31 @@ public final class RelationUtil {
         row[c] = vec.doubleValue(c);
       }
     }
-    assert (r == rowdim);
+    assert(r == rowdim);
     return mat;
   }
 
   /**
    * Get the column name or produce a generic label "Column XY".
-   * 
+   *
    * @param rel Relation
    * @param col Column
    * @param <V> Vector type
    * @return Label
    */
-  public static <V extends FeatureVector<?>> String getColumnLabel(Relation<? extends V> rel, int col) {
-    String lbl = assumeVectorField(rel).getLabel(col);
-    if(lbl != null) {
-      return lbl;
-    }
-    else {
+  public static <V extends SpatialComparable> String getColumnLabel(Relation<? extends V> rel, int col) {
+    SimpleTypeInformation<? extends V> type = rel.getDataTypeInformation();
+    if(!(type instanceof VectorFieldTypeInformation)) {
       return "Column " + col;
     }
+    final VectorFieldTypeInformation<?> vtype = (VectorFieldTypeInformation<?>) type;
+    String lbl = vtype.getLabel(col);
+    return (lbl != null) ? lbl : ("Column " + col);
   }
 
   /**
    * An ugly vector type cast unavoidable in some situations due to Generics.
-   * 
+   *
    * @param <V> Base vector type
    * @param <T> Derived vector type (is actually V, too)
    * @param database Database
@@ -206,7 +208,7 @@ public final class RelationUtil {
 
   /**
    * Iterator class that retrieves the given objects from the database.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class RelationObjectIterator<O> implements Iterator<O> {
@@ -222,7 +224,7 @@ public final class RelationUtil {
 
     /**
      * Full Constructor.
-     * 
+     *
      * @param iter Original iterator.
      * @param database Database
      */
@@ -234,7 +236,7 @@ public final class RelationUtil {
 
     /**
      * Simplified constructor.
-     * 
+     *
      * @param database Database
      */
     public RelationObjectIterator(Relation<? extends O> database) {
@@ -263,10 +265,10 @@ public final class RelationUtil {
 
   /**
    * Collection view on a database that retrieves the objects when needed.
-   * 
+   *
    * @author Erich Schubert
    */
-  public static class CollectionFromRelation<O> extends AbstractCollection<O> implements Collection<O> {
+  public static class CollectionFromRelation<O> extends AbstractCollection<O>implements Collection<O> {
     /**
      * The database we query.
      */
@@ -274,7 +276,7 @@ public final class RelationUtil {
 
     /**
      * Constructor.
-     * 
+     *
      * @param db Database
      */
     public CollectionFromRelation(Relation<? extends O> db) {
@@ -295,9 +297,9 @@ public final class RelationUtil {
 
   /**
    * Sort objects by a double relation
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class AscendingByDoubleRelation implements Comparator<DBIDRef> {
@@ -305,7 +307,7 @@ public final class RelationUtil {
      * Scores to use for sorting.
      */
     private final DoubleRelation scores;
-    
+
     /**
      * Constructor.
      *
@@ -324,9 +326,9 @@ public final class RelationUtil {
 
   /**
    * Sort objects by a double relation
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class DescendingByDoubleRelation implements Comparator<DBIDRef> {
@@ -334,7 +336,7 @@ public final class RelationUtil {
      * Scores to use for sorting.
      */
     private final DoubleRelation scores;
-    
+
     /**
      * Constructor.
      *

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * K-Means++ initialization for k-means.
- * 
+ *
  * Reference:
  * <p>
  * D. Arthur, S. Vassilvitskii<br />
@@ -54,9 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * In: Proc. of the Eighteenth Annual ACM-SIAM Symposium on Discrete Algorithms,
  * SODA 2007
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Vector type
  */
 @Reference(authors = "D. Arthur, S. Vassilvitskii", //
@@ -66,7 +66,7 @@ url = "http://dx.doi.org/10.1145/1283383.1283494")
 public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**
    * Constructor.
-   * 
+   *
    * @param rnd Random generator.
    */
   public KMeansPlusPlusInitialMeans(RandomFactory rnd) {
@@ -74,7 +74,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
     DistanceQuery<T> distQ = database.getDistanceQuery(relation, distanceFunction);
 
     DBIDs ids = relation.getDBIDs();
@@ -173,7 +173,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
 
   /**
    * Initialize the weight list.
-   * 
+   *
    * @param weights Weight list
    * @param ids IDs
    * @param latest Added ID
@@ -194,7 +194,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
 
   /**
    * Update the weight list.
-   * 
+   *
    * @param weights Weight list
    * @param ids IDs
    * @param latest Added ID
@@ -221,9 +221,9 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer {

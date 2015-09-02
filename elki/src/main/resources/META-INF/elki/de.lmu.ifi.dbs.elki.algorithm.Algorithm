@@ -11,6 +11,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClus
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK clustering.SLINK SLINK single-link single-linkage
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AnderbergHierarchicalClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AGNES HAC NaiveAgglomerativeHierarchicalClustering de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CLINK CLINK Defays
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly
@@ -59,6 +60,11 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByModelClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.FDBSCAN
+de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.CKMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.UKMeans
+de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.RepresentativeUncertainClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.CenterOfMassMetaClustering
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.APRIORI
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.Eclat
 de.lmu.ifi.dbs.elki.algorithm.itemsetmining.FPGrowth

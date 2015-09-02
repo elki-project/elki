@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,41 +27,41 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 
 /**
  * Interface for computing the quality of a K-Means clustering.
- * 
+ *
  * Important note: some measures are ascending, others are descending!
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Input Object restriction type
  */
 public interface KMeansQualityMeasure<O extends NumberVector> {
   /**
    * Calculates and returns the quality measure.
-   * 
+   *
    * @param clustering Clustering to analyze
    * @param distanceFunction Distance function to use (usually Euclidean or
    *        squared Euclidean!)
    * @param relation Relation for accessing objects
    * @param <V> Actual vector type (could be a subtype of O!)
-   * 
+   *
    * @return quality measure
    */
-  <V extends O> double quality(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation);
+  <V extends O> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation);
 
   /**
    * Use ascending or descending ordering.
-   * 
+   *
    * @return {@code true} when larger scores are better.
    */
   boolean ascending();
 
   /**
    * Compare two scores.
-   * 
+   *
    * @param currentCost New (candiate) cost/score
    * @param bestCost Existing best cost/score (may be {@code NaN})
    * @return {@code true} when the new score is better, or the old score is

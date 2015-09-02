@@ -25,17 +25,19 @@ package de.lmu.ifi.dbs.elki.visualization;
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.FilteredIter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.StackedIter;
 
 /**
  * Tree - actually a forest - to manage visualizations.
  *
  * @author Erich Schubert
  *
- * @apiviz.uses Handler1
- * @apiviz.uses Handler2
- * @apiviz.uses Handler3
+ * @apiviz.has Handler1
+ * @apiviz.has Handler2
+ * @apiviz.has Handler3
  */
 public class VisualizationTree extends HashMapHierarchy<Object> {
   /**
@@ -81,145 +83,6 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
   public void visChanged(VisualizationItem item) {
     for(int i = vlistenerList.size(); --i >= 0;) {
       vlistenerList.get(i).visualizationChanged(item);
-    }
-  }
-
-  /**
-   * Filtered iterator.
-   *
-   * @author Erich Schubert
-   *
-   * @param <O> Object type
-   *
-   * @apiviz.exclude
-   */
-  public static class StackedIter<B, A extends B> implements Hierarchy.Iter<B> {
-    /**
-     * Iterator in primary hierarchy.
-     */
-    private Hierarchy.Iter<? extends A> it1;
-
-    /**
-     * Secondary hierarchy.
-     */
-    private Hierarchy<B> hier2;
-
-    /**
-     * Iterator in secondary hierarchy.
-     */
-    private Hierarchy.Iter<B> it2;
-
-    /**
-     * Constructor.
-     *
-     * @param it1 Iterator in primary hierarchy
-     * @param hier2 Iterator in secondary hierarchy
-     */
-    public StackedIter(Hierarchy.Iter<? extends A> it1, Hierarchy<B> hier2) {
-      this.it1 = it1;
-      this.hier2 = hier2;
-      if(it1.valid()) {
-        this.it2 = hier2.iterDescendants(it1.get());
-        it1.advance();
-      }
-      else {
-        this.it2 = null;
-      }
-    }
-
-    @Override
-    public B get() {
-      return it2.get();
-    }
-
-    @Override
-    public boolean valid() {
-      return it2.valid();
-    }
-
-    @Override
-    public StackedIter<B, A> advance() {
-      if(it2.valid()) {
-        it2.advance();
-      }
-      while(!it2.valid() && it1.valid()) {
-        it2 = hier2.iterDescendants(it1.get());
-        it1.advance();
-      }
-      return this;
-    }
-  }
-
-  /**
-   * Filtered iterator.
-   *
-   * @author Erich Schubert
-   *
-   * @apiviz.exclude
-   *
-   * @param <O> Object type
-   */
-  public static class FilteredIter<O> implements Hierarchy.Iter<O> {
-    /**
-     * Class filter.
-     */
-    Class<O> filter;
-
-    /**
-     * Current object, if valid.
-     */
-    O current;
-
-    /**
-     * Iterator in primary hierarchy.
-     */
-    private Hierarchy.Iter<?> it;
-
-    /**
-     * Constructor.
-     *
-     * @param it Iterator in primary hierarchy
-     * @param clazz Class filter
-     */
-    public FilteredIter(Hierarchy.Iter<?> it, Class<O> clazz) {
-      this.it = it;
-      this.filter = clazz;
-      this.next();
-    }
-
-    @Override
-    public O get() {
-      return current;
-    }
-
-    @Override
-    public boolean valid() {
-      return current != null;
-    }
-
-    @Override
-    public FilteredIter<O> advance() {
-      if(!it.valid()) {
-        current = null;
-        return this;
-      }
-      next();
-      return this;
-    }
-
-    /**
-     * Java iterator style, because we need to "peek" the next element.
-     */
-    private void next() {
-      while(it.valid()) {
-        Object o = it.get();
-        it.advance();
-        if(filter.isInstance(o)) {
-          current = filter.cast(o);
-          return;
-        }
-      }
-      current = null;
     }
   }
 

@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
 
 /*
- This file is part of ELKI: Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,18 +30,18 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 
 /**
  * Class for computing the average overall distance.
- * 
+ *
  * The average of all average pairwise distances in a cluster.
- * 
+ *
  * @author Stephan Baier
  */
 public class WithinClusterMeanDistanceQualityMeasure implements KMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
     double clusterDistanceSum = 0;
     for(Cluster<? extends MeanModel> cluster : clustering.getAllClusters()) {
       DBIDs ids = cluster.getIDs();
@@ -48,7 +49,7 @@ public class WithinClusterMeanDistanceQualityMeasure implements KMeansQualityMea
       // Compute sum of pairwise distances:
       double clusterPairwiseDistanceSum = 0;
       for(DBIDIter iter1 = ids.iter(); iter1.valid(); iter1.advance()) {
-        V obj1 = relation.get(iter1);
+        NumberVector obj1 = relation.get(iter1);
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
           clusterPairwiseDistanceSum += distanceFunction.distance(obj1, relation.get(iter2));
         }

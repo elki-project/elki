@@ -23,6 +23,9 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -42,17 +45,20 @@ import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * Visualizer, displaying the key for a clustering.
+ * 
+ * TODO: re-add automatic sizing depending on the number of clusters.
+ * 
+ * TODO: also show in scatter plot detail view.
  *
  * @author Erich Schubert
  *
@@ -67,51 +73,32 @@ public class KeyVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
+    // Ensure there is a clustering result:
     Hierarchy.Iter<Clustering<?>> it = VisualizationTree.filterResults(context, start, Clustering.class);
-    for(; it.valid(); it.advance()) {
-      Clustering<?> c = it.get();
-      final int numc = c.getAllClusters().size();
-      final int topc = c.getToplevelClusters().size();
-      if(numc <= 0) {
-        continue;
-      }
-      final VisualizationTask task = new VisualizationTask(NAME, context, c, null, this);
-      if(numc == topc) {
-        // FIXME: compute from labels?
-        final double maxwidth = 10.;
-        // Flat clustering.
-        final int cols = getPreferredColumns(1.0, 1.0, numc, maxwidth);
-        final int rows = (int) Math.ceil(numc / (double) cols);
-        final double ratio = cols * maxwidth / (2. + rows);
-        task.reqwidth = (ratio >= 1.) ? 1 : 1. / ratio;
-        task.reqheight = (ratio >= 1.) ? 1. / ratio : 1;
-        if(numc > 100) {
-          task.reqwidth *= 2;
-          task.reqheight *= 2;
-        }
-      }
-      else {
-        // Hierarchical clustering.
-        final int[] shape = findDepth(c);
-        final double maxwidth = 8.;
-        final double ratio = shape[0] * maxwidth / (2. + shape[1]);
-        task.reqwidth = (ratio >= 1.) ? 1 : 1. / ratio;
-        task.reqheight = (ratio >= 1.) ? 1. / ratio : 1;
-        if(shape[0] * maxwidth > 20 || shape[1] > 18) {
-          task.reqwidth *= 2;
-          task.reqheight *= 2;
-        }
-      }
-      task.level = VisualizationTask.LEVEL_STATIC;
-      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
-      if(numc < 20) {
-        task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
-      }
-      context.addVis(c, task);
+    if(!it.valid()) {
+      return;
     }
+    Hierarchy.Iter<VisualizationTask> i2 = VisualizationTree.filter(context, VisualizationTask.class);
+    for(; i2.valid(); i2.advance()) {
+      if(i2.get().getFactory() instanceof KeyVisualization) {
+        return; // At most one key per plot.
+      }
+    }
+    final VisualizationTask task = new VisualizationTask(NAME, context, context.getStylingPolicy(), null, this);
+    task.level = VisualizationTask.LEVEL_STATIC;
+    task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
+    task.reqwidth = 1.;
+    task.reqheight = 1.;
+    context.addVis(context.getStylingPolicy(), task);
   }
 
-  private static <M extends Model> int[] findDepth(Clustering<M> c) {
+  /**
+   * Compute the size of the clustering.
+   * 
+   * @param c Clustering
+   * @return Array storing the depth and the number of leaf nodes.
+   */
+  protected static <M extends Model> int[] findDepth(Clustering<M> c) {
     final Hierarchy<Cluster<M>> hier = c.getClusterHierarchy();
     int[] size = { 0, 0 };
     for(Iter<Cluster<M>> iter = c.iterToplevelClusters(); iter.valid(); iter.advance()) {
@@ -120,6 +107,13 @@ public class KeyVisualization extends AbstractVisFactory {
     return size;
   }
 
+  /**
+   * Recursive depth computation.
+   * 
+   * @param hier Hierarchy
+   * @param cluster Current cluster
+   * @param size Counting array.
+   */
   private static <M extends Model> void findDepth(Hierarchy<Cluster<M>> hier, Cluster<M> cluster, int[] size) {
     if(hier.numChildren(cluster) > 0) {
       for(Iter<Cluster<M>> iter = hier.iterChildren(cluster); iter.valid(); iter.advance()) {
@@ -141,7 +135,7 @@ public class KeyVisualization extends AbstractVisFactory {
    * @param maxwidth Max width of entries
    * @return Preferred number of columns
    */
-  public static int getPreferredColumns(double width, double height, int numc, double maxwidth) {
+  protected static int getPreferredColumns(double width, double height, int numc, double maxwidth) {
     // Maximum width (compared to height) of labels - guess.
     // FIXME: do we really need to do this three-step computation?
     // Number of rows we'd use in a squared layout:
@@ -184,11 +178,6 @@ public class KeyVisualization extends AbstractVisFactory {
     private static final String KEY_HIERLINE = "key-hierarchy";
 
     /**
-     * Clustering to display
-     */
-    private Clustering<Model> clustering;
-
-    /**
      * Constructor.
      *
      * @param task Visualization task
@@ -198,15 +187,23 @@ public class KeyVisualization extends AbstractVisFactory {
      */
     public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height) {
       super(task, plot, width, height);
-      this.clustering = task.getResult();
       addListeners();
     }
 
     @Override
     public void fullRedraw() {
+      StylingPolicy pol = context.getStylingPolicy();
+      if(!(pol instanceof ClusterStylingPolicy)) {
+        Element label = svgp.svgText(0.1, 0.7, "No clustering selected.");
+        SVGUtil.setCSSClass(label, KEY_CAPTION);
+        layer.appendChild(label);
+        return;
+      }
+      @SuppressWarnings("unchecked")
+      Clustering<Model> clustering = (Clustering<Model>) ((ClusterStylingPolicy) pol).getClustering();
+
       StyleLibrary style = context.getStyleLibrary();
       MarkerLibrary ml = style.markers();
-
       final List<Cluster<Model>> allcs = clustering.getAllClusters();
       final List<Cluster<Model>> topcs = clustering.getToplevelClusters();
 
@@ -254,8 +251,7 @@ public class KeyVisualization extends AbstractVisFactory {
           i++;
         }
         // Hierarchical clustering. Draw recursively.
-        DoubleDoublePair size = new DoubleDoublePair(0., 1.),
-            pos = new DoubleDoublePair(0., 1.);
+        DoubleDoublePair size = new DoubleDoublePair(0., 1.), pos = new DoubleDoublePair(0., 1.);
         Hierarchy<Cluster<Model>> hier = clustering.getClusterHierarchy();
         for(Cluster<Model> cluster : topcs) {
           drawHierarchy(svgp, ml, size, pos, 0, cluster, cnum, hier);
@@ -301,13 +297,6 @@ public class KeyVisualization extends AbstractVisFactory {
       size.first = Math.max(size.first, pos.first + maxwidth);
       size.second = Math.max(size.second, pos.second);
       return posy;
-    }
-
-    /**
-     * Trigger a style change.
-     */
-    protected void setStylePolicy() {
-      context.setStylingPolicy(new ClusterStylingPolicy(clustering, context.getStyleLibrary()));
     }
 
     /**

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -38,10 +38,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Utility wrapper to track parameters for a configuration session.
- * 
+ *
  * All actual Parameterization operations are forwarded to the inner class.
- * 
+ *
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf TrackedParameter
  */
 public class TrackParameters implements Parameterization {
   /**
@@ -72,7 +74,7 @@ public class TrackParameters implements Parameterization {
 
   /**
    * Constructor.
-   * 
+   *
    * @param inner Inner parameterization to wrap.
    */
   public TrackParameters(Parameterization inner) {
@@ -82,7 +84,7 @@ public class TrackParameters implements Parameterization {
 
   /**
    * Constructor.
-   * 
+   *
    * @param inner Inner parameterization to wrap.
    * @param owner Class/instance owning the parameter
    */
@@ -94,7 +96,7 @@ public class TrackParameters implements Parameterization {
 
   /**
    * Internal constructor, for nested tracking.
-   * 
+   *
    * @param inner Inner parameterization
    * @param owner Object owning the current parameters
    * @param options List of options
@@ -146,7 +148,7 @@ public class TrackParameters implements Parameterization {
 
   /**
    * Get all seen parameters, set or unset, along with their owner objects.
-   * 
+   *
    * @return Parameters seen
    */
   public Collection<TrackedParameter> getAllParameters() {
@@ -160,7 +162,7 @@ public class TrackParameters implements Parameterization {
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * Track parameters using a shared options list with parent tracker.
    */
   @Override
@@ -186,7 +188,7 @@ public class TrackParameters implements Parameterization {
 
   /**
    * Traverse the tree upwards.
-   * 
+   *
    * @param pos Current object
    * @return Parent object
    */

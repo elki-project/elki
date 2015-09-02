@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
@@ -33,11 +34,11 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Variable for storing a single DBID reference.
- * 
+ *
  * TODO: what is the actual memory cost for adding a flag to indicate "null"
  * values, to allow the variable to be unset? Given 8-byte alignment of Java, it
  * should come for free!
- * 
+ *
  * @author Erich Schubert
  */
 class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
@@ -55,7 +56,7 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
 
   /**
    * Constructor.
-   * 
+   *
    * @param val
    */
   protected IntegerDBIDVar(DBIDRef val) {
@@ -69,7 +70,7 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
 
   /**
    * Internal set to integer.
-   * 
+   *
    * @param i integer value
    */
   protected void internalSetIndex(int i) {
@@ -145,6 +146,12 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
   }
 
   @Override
+  public DBIDVar from(DBIDDataStore store, DBIDRef ref) {
+    store.assignVar(ref, this);
+    return this;
+  }
+
+  @Override
   public ArrayDBIDs slice(int begin, int end) {
     if(begin == 0 && end == 1) {
       return this;
@@ -166,9 +173,9 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
 
   /**
    * Pseudo iterator for DBIDs interface.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   protected class Itr implements IntegerDBIDArrayIter, IntegerDBIDRef {

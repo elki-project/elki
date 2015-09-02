@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  *
  * @param <V> Vector type
  */
-public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends VectorTypeInformation<V> {
+public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends VectorTypeInformation<V> implements FieldTypeInformation {
   /**
    * Constructor for a type request without dimensionality constraints.
    *
@@ -149,11 +149,7 @@ public class VectorFieldTypeInformation<V extends FeatureVector<?>> extends Vect
     return true;
   }
 
-  /**
-   * Get the dimensionality of the type.
-   *
-   * @return dimensionality
-   */
+  @Override
   public int getDimensionality() {
     if(mindim != maxdim) {
       throw new UnsupportedOperationException("Requesting dimensionality for a type request without defined dimensionality!");

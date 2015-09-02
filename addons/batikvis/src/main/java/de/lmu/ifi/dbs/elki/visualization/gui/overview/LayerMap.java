@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.gui.overview;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,9 +31,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Class to help keeping track of the materialized layers of the different visualizations.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has PlotItem
  * @apiviz.has VisualizationTask
  */
@@ -42,10 +42,10 @@ public class LayerMap {
    * The actual map
    */
   private HashMap<Pair<PlotItem, VisualizationTask>, Pair<Element, Visualization>> map = new HashMap<>();
-  
+
   /**
    * Helper function for building a key object
-   * 
+   *
    * @param item Plot item
    * @param task Visualization Task
    * @return Key
@@ -56,7 +56,7 @@ public class LayerMap {
 
   /**
    * Helper function to build a value pair
-   * 
+   *
    * @param elem Container element
    * @param vis Visualization
    * @return Value object
@@ -67,7 +67,7 @@ public class LayerMap {
 
   /**
    * Get the visualization referenced by a item/key combination.
-   * 
+   *
    * @param item Plot ttem
    * @param task Visualization task
    * @return Visualization
@@ -83,7 +83,7 @@ public class LayerMap {
 
   /**
    * Get the container element referenced by a item/key combination.
-   * 
+   *
    * @param item Plot item
    * @param task Visualization task
    * @return Container element
@@ -99,7 +99,7 @@ public class LayerMap {
 
   /**
    * Iterate over values
-   * 
+   *
    * @return Value iterable
    */
   public Iterable<Pair<Element, Visualization>> values() {
@@ -115,7 +115,7 @@ public class LayerMap {
 
   /**
    * Put a new combination into the map.
-   * 
+   *
    * @param it Plot item
    * @param task Visualization Task
    * @param elem Container element
@@ -127,7 +127,7 @@ public class LayerMap {
 
   /**
    * Remove a combination.
-   * 
+   *
    * @param it Plot item
    * @param task Visualization task
    * @return Previous value
@@ -138,7 +138,7 @@ public class LayerMap {
 
   /**
    * Put a new item into the visualizations
-   * 
+   *
    * @param it Plot item
    * @param task Visualization task
    * @param pair Pair object
@@ -149,7 +149,7 @@ public class LayerMap {
 
   /**
    * Get a pair from the map
-   * 
+   *
    * @param it Plot item
    * @param task Visualization task
    * @return Pair object

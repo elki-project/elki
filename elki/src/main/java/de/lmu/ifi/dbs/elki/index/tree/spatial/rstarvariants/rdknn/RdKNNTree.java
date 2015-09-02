@@ -77,6 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  *
  * @apiviz.has RdKNNNode
  * @apiviz.has RdKNNTreeHeader
+ * @apiviz.composedOf RdkNNSettings
  *
  * @param <O> Object type
  */

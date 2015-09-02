@@ -5,6 +5,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.LSDBC
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK clustering.SLINK SLINK single-link single-linkage
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AnderbergHierarchicalClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AGNES HAC NaiveAgglomerativeHierarchicalClustering de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CLINK CLINK Defays
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly
@@ -33,6 +34,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.distance.HilOut de.lmu.ifi.dbs.elki.algori
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier knno
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier knnw
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ODIN de.lmu.ifi.dbs.elki.algorithm.outlier.ODIN
+de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ReferenceBasedOutlierDetection de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.parallel.ParallelKNNOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.parallel.ParallelKNNWeightOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.DWOF
@@ -56,11 +58,13 @@ de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses
 de.lmu.ifi.dbs.elki.algorithm.statistics.EstimateIntrinsicDimensionality
 de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality
 de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRetrievalPerformance
+de.lmu.ifi.dbs.elki.algorithm.statistics.HopkinsStatisticClusteringTendency
 de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram
 de.lmu.ifi.dbs.elki.algorithm.benchmark.KNNBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.ValidateApproximativeKNNIndex
 de.lmu.ifi.dbs.elki.algorithm.classification.KNNClassifier
+de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator
 de.lmu.ifi.dbs.elki.algorithm.KNNDistancesSampler
 de.lmu.ifi.dbs.elki.algorithm.KNNJoin
 de.lmu.ifi.dbs.elki.algorithm.MaterializeDistances

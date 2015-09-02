@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Estimate the parameters of a Generalized Pareto Distribution (GPD), using the
  * methods of L-Moments (LMM).
- * 
+ *
  * Reference:
  * <p>
  * J. R. M. Hosking, J. R. Wallis, and E. F. Wood<br />
@@ -38,10 +38,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * probability-weighted moments.<br />
  * Technometrics 27.3
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
- * @apiviz.has GeneralizedExtremeValueDistribution
+ *
+ * @apiviz.has GeneralizedParetoDistribution
  */
 @Reference(authors = "J.R.M. Hosking, J. R. Wallis, and E. F. Wood", //
 title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", //
@@ -84,9 +84,9 @@ public class GeneralizedParetoLMMEstimator extends AbstractLMMEstimator<Generali
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

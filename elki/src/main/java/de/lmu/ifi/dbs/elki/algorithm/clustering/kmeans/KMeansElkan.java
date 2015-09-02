@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -55,23 +55,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 
 /**
  * Elkan's fast k-means by exploiting the triangle inequality.
- * 
+ *
  * This variant needs O(n*k) additional memory to store bounds.
- * 
+ *
  * See {@link KMeansHamerly} for a close variant that only uses O(n*2)
  * additional memory for bounds.
- * 
+ *
  * <p>
  * Reference:<br />
  * C. Elkan<br/>
  * Using the triangle inequality to accelerate k-means<br/>
  * Proc. 20th International Conference on Machine Learning, ICML 2003
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KMeansModel
- * 
+ *
  * @param <V> vector datatype
  */
 @Reference(authors = "C. Elkan", //
@@ -91,13 +91,13 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansElkan(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMeansElkan(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -197,7 +197,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
 
   /**
    * Recompute the separation of cluster means.
-   * 
+   *
    * @param means Means
    * @param sep Output array of separation
    * @param cdist Center-to-Center distances
@@ -224,7 +224,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
   /**
    * Reassign objects, but only if their bounds indicate it is necessary to do
    * so.
-   * 
+   *
    * @param relation Data
    * @param means Current means
    * @param sums New means
@@ -236,7 +236,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
    */
   private int initialAssignToNearestCluster(Relation<V> relation, List<Vector> means, List<Vector> sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, WritableDoubleDataStore upper, WritableDataStore<double[]> lower) {
     assert (k == means.size());
-    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
     final boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       V fv = relation.get(it);
@@ -269,7 +269,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
   /**
    * Reassign objects, but only if their bounds indicate it is necessary to do
    * so.
-   * 
+   *
    * @param relation Data
    * @param means Current means
    * @param sums New means
@@ -283,7 +283,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
    */
   private int assignToNearestCluster(Relation<V> relation, List<Vector> means, List<Vector> sums, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] sep, double[][] cdist, WritableDoubleDataStore upper, WritableDataStore<double[]> lower) {
     assert (k == means.size());
-    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
     final boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
     int changed = 0;
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
@@ -342,7 +342,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
 
   /**
    * Maximum distance moved.
-   * 
+   *
    * @param means Old means
    * @param newmeans New means
    * @param dists Distances moved
@@ -365,7 +365,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
 
   /**
    * Update the bounds for k-means.
-   * 
+   *
    * @param relation Relation
    * @param assignment Cluster assignment
    * @param upper Upper bounds
@@ -389,9 +389,9 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {

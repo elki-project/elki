@@ -31,9 +31,9 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Abstract evaluation result.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf EvaluationResult.MeasurementGroup
  */
 public class EvaluationResult extends BasicResult implements TextWriteable, Iterable<EvaluationResult.MeasurementGroup> {
@@ -59,7 +59,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
   /**
    * Add a new measurement group.
-   * 
+   *
    * @param string Group name
    * @return Measurement group.
    */
@@ -71,7 +71,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
   /**
    * Find or add a new measurement group.
-   * 
+   *
    * @param label Group name
    * @return Measurement group.
    */
@@ -99,7 +99,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
   /**
    * Add a header line to this result.
-   * 
+   *
    * @param line Header line
    */
   public void addHeader(String line) {
@@ -108,7 +108,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
   /**
    * Get the header lines.
-   * 
+   *
    * @return Header lines
    */
   public Iterable<String> getHeaderLines() {
@@ -122,7 +122,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
   /**
    * Number of lines recommended for display.
-   * 
+   *
    * @return Number of lines
    */
   public int numLines() {
@@ -135,7 +135,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
   /**
    * Find or create an evaluation result.
-   * 
+   *
    * @param hierarchy Result hierarchy.
    * @param parent Parent result
    * @param name Long name
@@ -160,9 +160,9 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
   /**
    * A group of evaluation measurements.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.composedOf EvaluationResult.Measurement
    */
   public static class MeasurementGroup implements Iterable<Measurement> {
@@ -187,7 +187,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
     /**
      * Get the group name.
-     * 
+     *
      * @return Group name
      */
     public String getName() {
@@ -196,7 +196,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
     /**
      * Add a single measurement.
-     * 
+     *
      * @param name Measurement name
      * @param val Observed value
      * @param min Minimum value
@@ -211,7 +211,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
     /**
      * Add a single measurement.
-     * 
+     *
      * @param name Measurement name
      * @param val Observed value
      * @param min Minimum value
@@ -232,9 +232,9 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
   /**
    * Class representing a single measurement.
-   * 
+   *
    * TODO: indicate whether high or low is better.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class Measurement {
@@ -303,7 +303,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
     /**
      * Get the name of this measurement.
-     * 
+     *
      * @return Measurement name.
      */
     public String getName() {
@@ -312,7 +312,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
     /**
      * Get the observed value.
-     * 
+     *
      * @return observed value.
      */
     public double getVal() {
@@ -321,7 +321,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
     /**
      * Get the minimum value.
-     * 
+     *
      * @return Minimum value.
      */
     public double getMin() {
@@ -330,7 +330,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
     /**
      * Get the maximum value.
-     * 
+     *
      * @return Maximum value.
      */
     public double getMax() {
@@ -339,7 +339,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
     /**
      * Get the expected value. May be {@code Double.NaN}.
-     * 
+     *
      * @return Expected value.
      */
     public double getExp() {
@@ -348,11 +348,21 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
     /**
      * Return {@code true} if low values are better.
-     * 
+     *
      * @return {@code true} when low values are better.
      */
     public boolean lowerIsBetter() {
       return lowerisbetter;
     }
+  }
+
+  /**
+   * Flag to indicate that these results should be visualized using a single
+   * visualizer.
+   *
+   * @return Singleton
+   */
+  public boolean visualizeSingleton() {
+    return false;
   }
 }

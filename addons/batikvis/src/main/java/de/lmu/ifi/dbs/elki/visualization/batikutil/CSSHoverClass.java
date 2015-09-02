@@ -32,9 +32,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 
 /**
  * Do a hover effect using a CSS class.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  */
 public class CSSHoverClass implements EventListener {
   /**
@@ -54,7 +54,7 @@ public class CSSHoverClass implements EventListener {
 
   /**
    * Constructor
-   * 
+   *
    * @param overclass class to set when over
    * @param outclass class to set when out
    * @param clickisout consider a click to be an 'out' event
@@ -68,7 +68,7 @@ public class CSSHoverClass implements EventListener {
 
   /**
    * Constructor without 'clickisout' option.
-   * 
+   *
    * @param overclass class to set when over
    * @param outclass class to set when out
    */

@@ -58,12 +58,12 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  *
  * @apiviz.landmark
  * @apiviz.composedOf StyleLibrary
+ * @apiviz.composedOf StylingPolicy
  * @apiviz.composedOf SelectionResult
  * @apiviz.composedOf ResultHierarchy
- * @apiviz.composedOf EventListenerList
- * @apiviz.composedOf StyleResult
- * @apiviz.composedOf ProjectorFactory
- * @apiviz.composedOf VisFactory
+ * @apiviz.composedOf VisualizationTree
+ * @apiviz.composedOf DataStoreListener
+ * @apiviz.composedOf VisualizationProcessor
  */
 public class VisualizerContext implements DataStoreListener, Result {
   /**
@@ -149,15 +149,13 @@ public class VisualizerContext implements DataStoreListener, Result {
     }
     makeStyleResult(stylelib);
 
-    // result.getHierarchy().add(result, this);
-
     // Add visualizers.
     notifyFactories(db);
 
     // For proxying events.
     db.addDataStoreListener(this);
-    // Add a result listener. Don't expose these methods to avoid inappropriate
-    // use.
+    // Add a result listener.
+    // Don't expose these methods to avoid inappropriate use.
     addResultListener(new ResultListener() {
       @Override
       public void resultAdded(Result child, Result parent) {

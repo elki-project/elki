@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,14 +30,14 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
  * Some constants and options shared among kmeans family algorithms.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <V> Number vector type
  * @param <M> Actual model type
  */
@@ -66,7 +66,7 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
 
   /**
    * Run the clustering algorithm.
-   * 
+   *
    * @param database Database to run on.
    * @param rel Relation to process.
    * @return Clustering result
@@ -75,15 +75,15 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
 
   /**
    * Set the value of k. Needed for some types of nested k-means.
-   * 
+   *
    * @param k K parameter
    */
   void setK(int k);
 
   /**
    * Set the distance function to use.
-   * 
+   *
    * @param distanceFunction Distance function.
    */
-  void setDistanceFunction(PrimitiveDistanceFunction<? super NumberVector> distanceFunction);
+  void setDistanceFunction(NumberVectorDistanceFunction<? super V> distanceFunction);
 }

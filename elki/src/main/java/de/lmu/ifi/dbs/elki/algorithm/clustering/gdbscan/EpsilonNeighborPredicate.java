@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -47,23 +48,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * The default DBSCAN and OPTICS neighbor predicate, using an
  * epsilon-neighborhood.
- * 
+ *
+ * Reference:
  * <p>
- * Reference: <br>
- * M. Ester, H.-P. Kriegel, J. Sander, and X. Xu<br />
+ * M. Ester, H.-P. Kriegel, J. Sander, X. Xu<br />
  * A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases
- * with Noise. <br />
+ * with Noise<br />
  * In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96),
  * Portland, OR, 1996.
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has Instance
- * 
+ *
  * @param <O> object type
  */
-@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
+@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, X. Xu", //
+title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
+booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
+url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
 public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
   /**
    * Range to query with
@@ -77,7 +81,7 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
 
   /**
    * Full constructor.
-   * 
+   *
    * @param epsilon Epsilon value
    * @param distFunc Distance function to use
    */
@@ -107,28 +111,28 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
 
   /**
    * Instance for a particular data set.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class Instance implements NeighborPredicate.Instance<DoubleDBIDList> {
     /**
      * Range to query with
      */
-    double epsilon;
+    protected double epsilon;
 
     /**
      * Range query to use on the database.
      */
-    RangeQuery<?> rq;
+    protected RangeQuery<?> rq;
 
     /**
      * DBIDs to process
      */
-    DBIDs ids;
+    protected DBIDs ids;
 
     /**
      * Constructor.
-     * 
+     *
      * @param epsilon Epsilon
      * @param rq Range query to use
      * @param ids DBIDs to process
@@ -158,23 +162,23 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> object type
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
     /**
      * Range to query with
      */
-    double epsilon;
+    protected double epsilon;
 
     /**
      * Distance function to use
      */
-    DistanceFunction<O> distfun = null;
+    protected DistanceFunction<O> distfun = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -185,7 +189,8 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
         distfun = distanceP.instantiateClass(config);
       }
       // Get the epsilon parameter
-      DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID);
+      DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }

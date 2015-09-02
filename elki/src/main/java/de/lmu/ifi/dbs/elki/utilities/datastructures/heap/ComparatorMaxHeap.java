@@ -29,9 +29,9 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
  * Binary heap for primitive types.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has UnsortedIter
  * @param <K> Key type
  */
@@ -52,7 +52,7 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
   private final static int TWO_HEAP_INITIAL_SIZE = (1 << 5) - 1;
 
 
-  /** 
+  /**
    * Comparator
    */
   protected java.util.Comparator<Object> comparator;
@@ -72,7 +72,7 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
 
   /**
    * Constructor, with given minimum size.
-   * 
+   *
    * @param minsize Minimum size
    * @param comparator Comparator
    */
@@ -82,7 +82,7 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
     this.comparator = (java.util.Comparator<Object>) java.util.Comparator.class.cast(comparator);
     final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
     Object[] twoheap = new Object[size];
-      
+
     this.twoheap = twoheap;
   }
 
@@ -120,7 +120,7 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
   public void add(K key, int max) {
     if (size < max) {
       add(key);
-    } else if (comparator.compare(twoheap[0], key) >= 0) {
+    } else if (comparator.compare(twoheap[0], key) > 0) {
       replaceTopElement(key);
     }
   }
@@ -135,7 +135,7 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
 
   /**
    * Heapify-Up method for 2-ary heap.
-   * 
+   *
    * @param twopos Position in 2-ary heap.
    * @param cur Current object
    */
@@ -170,7 +170,7 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
 
   /**
    * Invoke heapify-down for the root object.
-   * 
+   *
    * @param cur Object to insert.
    */
   private void heapifyDown(Object cur) {
@@ -217,9 +217,9 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
 
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
-   * 
+   *
    * Use this class as follows:
-   * 
+   *
    * <pre>
    * {@code
    * for (ObjectHeap.UnsortedIter<K> iter = heap.unsortedIter(); iter.valid(); iter.next()) {
@@ -227,7 +227,7 @@ public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
    * }
    * }
    * </pre>
-   * 
+   *
    * @author Erich Schubert
    */
   private class UnsortedIter implements ObjectHeap.UnsortedIter<K> {

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -45,16 +45,15 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  * Database specifies the requirements for any database implementation. Note
  * that any implementing class is supposed to provide a constructor without
  * parameters for dynamic instantiation.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has DistanceQuery oneway - - provides
  * @apiviz.has KNNQuery oneway - - provides
  * @apiviz.has RangeQuery oneway - - provides
  * @apiviz.has RKNNQuery oneway - - provides
  * @apiviz.has Relation oneway - - contains
- * @apiviz.has Index oneway - - manages
  * @apiviz.has DataStoreListener oneway - - invokes
  */
 public interface Database extends HierarchicalResult {
@@ -66,14 +65,14 @@ public interface Database extends HierarchicalResult {
 
   /**
    * Get all relations of a database.
-   * 
+   *
    * @return All relations in the database
    */
   Collection<Relation<?>> getRelations();
 
   /**
    * Get an object representation.
-   * 
+   *
    * @param <O> Object type
    * @param restriction Type restriction
    * @param hints Optimizer hints
@@ -83,7 +82,7 @@ public interface Database extends HierarchicalResult {
 
   /**
    * Get the distance query for a particular distance function.
-   * 
+   *
    * @param <O> Object type
    * @param relation Relation used
    * @param distanceFunction Distance function to use
@@ -94,7 +93,7 @@ public interface Database extends HierarchicalResult {
 
   /**
    * Get the similarity query for a particular similarity function.
-   * 
+   *
    * @param <O> Object type
    * @param relation Relation used
    * @param similarityFunction Similarity function to use
@@ -105,17 +104,16 @@ public interface Database extends HierarchicalResult {
 
   /**
    * Get a KNN query object for the given distance query.
-   * 
-   * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   * 
+   *
+   * An index is used when possible, but it may fall back to a linear scan.
+   *
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
    * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
    * query needed</li>
    * </ul>
-   * 
+   *
    * @param <O> Object type
    * @param distanceQuery Distance query
    * @param hints Optimizer hints
@@ -124,18 +122,19 @@ public interface Database extends HierarchicalResult {
   <O> KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints);
 
   /**
-   * Get a range query object for the given distance query.
-   * 
-   * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   * 
+   * Get a range query object for the given distance query for radius-based
+   * neighbor search. (Range queries in ELKI refers to radius-based ranges, not
+   * rectangular query windows.)
+   *
+   * An index is used when possible, but it may fall back to a linear scan.
+   *
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
    * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
    * query needed</li>
    * </ul>
-   * 
+   *
    * @param <O> Object type
    * @param distanceQuery Distance query
    * @param hints Optimizer hints
@@ -145,17 +144,16 @@ public interface Database extends HierarchicalResult {
 
   /**
    * Get a rKNN query object for the given distance query.
-   * 
-   * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   * 
+   *
+   * An index is used when possible, but it may fall back to a linear scan.
+   *
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
    * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
    * query needed</li>
    * </ul>
-   * 
+   *
    * @param <O> Object type
    * @param distanceQuery Distance query
    * @param hints Optimizer hints
@@ -165,7 +163,7 @@ public interface Database extends HierarchicalResult {
 
   /**
    * Returns the DatabaseObject represented by the specified id.
-   * 
+   *
    * @param id the id of the Object to be obtained from the Database
    * @return Bundle containing the objects' data
    */
@@ -173,7 +171,7 @@ public interface Database extends HierarchicalResult {
 
   /**
    * Returns the DatabaseObject represented by the specified id.
-   * 
+   *
    * @param id the id of the Object to be obtained from the Database
    * @return Bundle containing the object data
    * @throws ObjectNotFoundException when the DBID was not found.
@@ -184,7 +182,7 @@ public interface Database extends HierarchicalResult {
   /**
    * Adds a listener for the <code>DataStoreEvent</code> posted after the
    * content of the database changes.
-   * 
+   *
    * @param l the listener to add
    * @see #removeDataStoreListener(DataStoreListener)
    * @see DataStoreListener
@@ -195,7 +193,7 @@ public interface Database extends HierarchicalResult {
   /**
    * Removes a listener previously added with
    * {@link #addDataStoreListener(DataStoreListener)}.
-   * 
+   *
    * @param l the listener to remove
    * @see #addDataStoreListener(DataStoreListener)
    * @see DataStoreListener
@@ -206,7 +204,7 @@ public interface Database extends HierarchicalResult {
   /**
    * Collects all insertion, deletion and update events until
    * {@link #flushDataStoreEvents()} is called.
-   * 
+   *
    * @see DataStoreEvent
    */
   void accumulateDataStoreEvents();
@@ -216,7 +214,7 @@ public interface Database extends HierarchicalResult {
    * DataStoreEvent, i.e. notifies all registered DataStoreListener how the
    * content of the database has been changed since
    * {@link #accumulateDataStoreEvents()} has been called.
-   * 
+   *
    * @see DataStoreListener
    * @see DataStoreEvent
    */

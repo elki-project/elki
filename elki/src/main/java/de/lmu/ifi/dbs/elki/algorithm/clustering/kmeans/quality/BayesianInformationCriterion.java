@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,20 +27,20 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Bayesian Information Criterion (BIC), also known as Schwarz criterion (SBC,
  * SBIC) for the use with evaluating k-means results.
- * 
+ *
  * Reference:
  * <p>
  * G. Schwarz<br />
  * Estimating the dimension of a model<br />
  * The annals of statistics 6.2.
  * </p>
- * 
+ *
  * The use for k-means was popularized by:
  * <p>
  * D. Pelleg, A. Moore:<br />
@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * In: Proceedings of the 17th International Conference on Machine Learning
  * (ICML 2000)
  * </p>
- * 
+ *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
  */
@@ -59,7 +59,7 @@ booktitle = "The annals of statistics 6.2", //
 url = "http://dx.doi.org/10.1214/aos/1176344136")
 public class BayesianInformationCriterion extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
-  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, PrimitiveDistanceFunction<? super NumberVector> distanceFunction, Relation<V> relation) {
+  public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
     return logLikelihood(relation, clustering, distanceFunction) //
         - (.5 * numberOfFreeParameters(relation, clustering)) * Math.log(numPoints(clustering));
   }

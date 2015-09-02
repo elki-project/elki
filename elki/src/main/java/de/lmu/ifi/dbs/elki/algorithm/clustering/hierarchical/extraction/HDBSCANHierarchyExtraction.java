@@ -62,13 +62,13 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Extraction of simplified cluster hierarchies, as proposed in HDBSCAN.
- * 
+ *
  * In contrast to the authors top-down approach, we use a bottom-up approach
  * based on the more efficient pointer representation introduced in SLINK.
- * 
+ *
  * In particular, it can also be used to extract a hierarchy from a hierarchical
  * agglomerative clustering.
- * 
+ *
  * Reference:
  * <p>
  * R. J. G. B. Campello, D. Moulavi, and J. Sander<br />
@@ -76,12 +76,12 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining,
  * PAKDD
  * </p>
- * 
+ *
  * Note: some of the code is rather complex because we delay the creation of
  * one-element clusters to reduce garbage collection overhead.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses HierarchicalClusteringAlgorithm
  * @apiviz.uses PointerHierarchyRepresentationResult
  */
@@ -112,7 +112,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
   /**
    * Constructor.
-   * 
+   *
    * @param algorithm Algorithm to run
    * @param minClSize Minimum cluster size
    * @param hierarchical Produce a hierarchical result
@@ -142,7 +142,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
   /**
    * Extract all clusters from the pi-lambda-representation.
-   * 
+   *
    * @param ids Object ids to process
    * @param pi Pi store
    * @param lambda Lambda store
@@ -247,7 +247,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
   /**
    * Spurious, also for non-materialized clusters.
-   * 
+   *
    * @param clus Cluster, may be {@code null} for 1-element clusters.
    * @param isCore Core property
    * @return {@code true} if spurious.
@@ -258,9 +258,9 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
   /**
    * Temporary cluster.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   protected static class TempCluster {
@@ -302,6 +302,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * Constructor.
      *
      * @param dist Distance
+     * @param a Object reference
      */
     public TempCluster(double dist, DBIDRef a) {
       this.dist = dist;
@@ -323,11 +324,10 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
     /**
      * Cluster containing two existing clusters.
-     * 
+     *
      * @param dist Distance
      * @param a First cluster
      * @param b Second cluster
-     * @return Merged cluster.
      */
     public TempCluster(double dist, TempCluster a, TempCluster b) {
       this.dist = dist;
@@ -339,7 +339,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
     /**
      * Join the contents of another cluster.
-     * 
+     *
      * @param dist Join distance
      * @param other Other cluster (may be {@code null})
      * @param id Cluster lead, for 1-element clusters.
@@ -363,7 +363,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
     /**
      * Add new objects to the cluster.
-     * 
+     *
      * @param dist Distance
      * @param id Object to add
      * @return {@code this}
@@ -387,7 +387,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
     /**
      * Total number of elements in this subtree.
-     * 
+     *
      * @return Total
      */
     public int totalElements() {
@@ -396,7 +396,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
     /**
      * Excess of mass measure.
-     * 
+     *
      * @return Excess of mass
      */
     public double excessOfMass() {
@@ -405,7 +405,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
     /**
      * Excess of mass measure.
-     * 
+     *
      * @return Excess of mass
      */
     public double totalStability() {
@@ -419,7 +419,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
     /**
      * Test if a cluster is spurious.
-     * 
+     *
      * @param minClSize Minimum cluster size
      * @return {@code true} if spurious
      */
@@ -429,7 +429,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
     /**
      * Make the cluster for the given object
-     * 
+     *
      * @param clustering Parent clustering
      * @param parent Parent cluster (for hierarchical output)
      * @param flatten Flag to flatten all clusters below.
@@ -451,7 +451,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
     /**
      * Recursive flattening of clusters.
-     * 
+     *
      * @param clustering Output clustering
      * @param cur Current temporary cluster
      * @param clus Output cluster
@@ -478,9 +478,9 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

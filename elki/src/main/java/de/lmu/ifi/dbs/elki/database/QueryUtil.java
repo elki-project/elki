@@ -46,11 +46,11 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 
 /**
  * Static class with utilities related to querying a database.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.uses Database
  * @apiviz.uses Relation
  * @apiviz.has DistanceQuery
@@ -63,7 +63,7 @@ public final class QueryUtil {
   /**
    * Get a distance query for a given distance function, automatically choosing
    * a relation.
-   * 
+   *
    * @param <O> Object type
    * @param database Database
    * @param distanceFunction Distance function
@@ -77,7 +77,7 @@ public final class QueryUtil {
 
   /**
    * Get a similarity query, automatically choosing a relation.
-   * 
+   *
    * @param <O> Object type
    * @param database Database
    * @param similarityFunction Similarity function
@@ -91,17 +91,16 @@ public final class QueryUtil {
 
   /**
    * Get a KNN query object for the given distance function.
-   * 
-   * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   * 
+   *
+   * An index is used when possible, but it may fall back to a linear scan.
+   *
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
    * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
    * query needed</li>
    * </ul>
-   * 
+   *
    * @param <O> Object type
    * @param database Database
    * @param distanceFunction Distance function
@@ -116,21 +115,20 @@ public final class QueryUtil {
 
   /**
    * Get a KNN query object for the given distance function.
-   * 
-   * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   * 
+   *
+   * An index is used when possible, but it may fall back to a linear scan.
+   *
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
    * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
    * query needed</li>
    * </ul>
-   * 
+   *
    * @param relation Relation used
    * @param distanceFunction Distance function
    * @param hints Optimizer hints
-   * 
+   *
    * @param <O> Object type
    * @return KNN Query object
    */
@@ -140,18 +138,19 @@ public final class QueryUtil {
   }
 
   /**
-   * Get a range query object for the given distance function.
-   * 
-   * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   * 
+   * Get a range query object for the given distance function for radius-based
+   * neighbor search. (Range queries in ELKI refers to radius-based ranges, not
+   * rectangular query windows.)
+   *
+   * An index is used when possible, but it may fall back to a linear scan.
+   *
    * Hints include:
    * <ul>
    * <li>Range: maximum range requested</li>
    * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
    * query needed</li>
    * </ul>
-   * 
+   *
    * @param <O> Object type
    * @param database Database
    * @param distanceFunction Distance function
@@ -165,22 +164,23 @@ public final class QueryUtil {
   }
 
   /**
-   * Get a range query object for the given distance function.
-   * 
-   * When possible, this will use an index, but it may default to an expensive
-   * linear scan.
-   * 
+   * Get a range query object for the given distance function for radius-based
+   * neighbor search. (Range queries in ELKI refers to radius-based ranges, not
+   * rectangular query windows.)
+   *
+   * An index is used when possible, but it may fall back to a linear scan.
+   *
    * Hints include:
    * <ul>
    * <li>Range: maximum range requested</li>
    * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
    * query needed</li>
    * </ul>
-   * 
+   *
    * @param relation Relation used
    * @param distanceFunction Distance function
    * @param hints Optimizer hints
-   * 
+   *
    * @param <O> Object type
    * @return KNN Query object
    */
@@ -191,21 +191,21 @@ public final class QueryUtil {
 
   /**
    * Get a rKNN query object for the given distance function.
-   * 
+   *
    * When possible, this will use an index, but it may default to an expensive
    * linear scan.
-   * 
+   *
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
    * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
    * query needed</li>
    * </ul>
-   * 
+   *
    * @param relation Relation used
    * @param distanceFunction Distance function
    * @param hints Optimizer hints
-   * 
+   *
    * @param <O> Object type
    * @return RKNN Query object
    */
@@ -216,7 +216,7 @@ public final class QueryUtil {
 
   /**
    * Get a linear scan query for the given distance query.
-   * 
+   *
    * @param <O> Object type
    * @param distanceQuery distance query
    * @return KNN query
@@ -237,7 +237,7 @@ public final class QueryUtil {
 
   /**
    * Get a linear scan query for the given distance query.
-   * 
+   *
    * @param <O> Object type
    * @param distanceQuery distance query
    * @return Range query
@@ -258,7 +258,7 @@ public final class QueryUtil {
 
   /**
    * Apply the square root function to each value in the list.
-   * 
+   *
    * @param knnList kNN list
    * @return new list, after taking the square root
    */

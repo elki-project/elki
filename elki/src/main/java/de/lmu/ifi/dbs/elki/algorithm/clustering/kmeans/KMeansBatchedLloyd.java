@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -60,18 +60,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * An algorithm for k-means, using Lloyd-style bulk iterations.
- * 
+ *
  * However, in contrast to Lloyd's k-means and similar to MacQueen, we do update
  * the mean vectors multiple times, not only at the very end of the iteration.
  * This should yield faster convergence at little extra cost.
- * 
+ *
  * To avoid issues with ordered data, we use random sampling to obtain the data
  * blocks.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KMeansModel
- * 
+ *
  * @param <V> vector datatype
  */
 public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
@@ -97,7 +97,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
@@ -105,7 +105,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
    * @param blocks Number of blocks
    * @param random Random factory used for partitioning.
    */
-  public KMeansBatchedLloyd(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, int blocks, RandomFactory random) {
+  public KMeansBatchedLloyd(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, int blocks, RandomFactory random) {
     super(distanceFunction, k, maxiter, initializer);
     this.blocks = blocks;
     this.random = random;
@@ -180,7 +180,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
   /**
    * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
    * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
-   * 
+   *
    * @param relation the database to cluster
    * @param ids IDs to process
    * @param oldmeans a list of k means
@@ -194,7 +194,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
   protected boolean assignToNearestCluster(Relation<V> relation, DBIDs ids, List<? extends NumberVector> oldmeans, double[][] meanshift, int[] changesize, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
     boolean changed = false;
 
-    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       double mindist = Double.POSITIVE_INFINITY;
       V fv = relation.get(iditer);
@@ -214,7 +214,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
 
   /**
    * Update the assignment of a single object.
-   * 
+   *
    * @param id Object to assign
    * @param fv Vector
    * @param clusters Clusters
@@ -253,7 +253,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
 
   /**
    * Merge changes into mean vectors.
-   * 
+   *
    * @param means Mean vectors
    * @param meanshift Shift offset
    * @param clusters
@@ -284,9 +284,9 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {

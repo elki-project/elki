@@ -56,7 +56,6 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGEffects;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.StaticVisualizationInstance;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
@@ -79,9 +78,19 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
   private static final Logging LOG = Logging.getLogger(OverviewPlot.class);
 
   /**
+   * Event when the overview plot started refreshing.
+   */
+  public static final String OVERVIEW_REFRESHING = "Overview refreshing";
+
+  /**
    * Event when the overview plot was refreshed.
    */
   public static final String OVERVIEW_REFRESHED = "Overview refreshed";
+
+  /**
+   * Draw red borders around items.
+   */
+  private static final boolean DEBUG_LAYOUT = false;
 
   /**
    * Visualizer context
@@ -156,7 +165,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
   /**
    * Reinitialize on refresh
    */
-  private boolean reinitOnRefresh = true;
+  private boolean reinitOnRefresh = false;
 
   /**
    * Constructor.
@@ -169,9 +178,8 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
     this.context = context;
     this.single = single;
 
-    // register context listener
-    context.addResultListener(this);
-    context.addVisualizationListener(this);
+    // Important:
+    // You still need to call: initialize(ratio);
   }
 
   /**
@@ -239,24 +247,36 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
       ratio = 1.4;
     }
     this.ratio = ratio;
+    if(plot != null) {
+      LOG.warning("Already initialized.");
+      lazyRefresh();
+      return;
+    }
     reinitialize();
+    // register context listener
+    context.addResultListener(this);
+    context.addVisualizationListener(this);
   }
 
   /**
    * Refresh the overview plot.
    */
-  private void reinitialize() {
+  private synchronized void reinitialize() {
+    if(plot == null) {
+      initializePlot();
+    }
+    else {
+      final ActionEvent ev = new ActionEvent(this, ActionEvent.ACTION_PERFORMED, OVERVIEW_REFRESHING);
+      for(ActionListener actionListener : actionListeners) {
+        actionListener.actionPerformed(ev);
+      }
+    }
+
     // Detach existing elements:
     for(Pair<Element, Visualization> pair : vistoelem.values()) {
       SVGUtil.removeFromParent(pair.first);
     }
-    initializePlot();
     plotmap = arrangeVisualizations(ratio, 1.0);
-    double s = plotmap.relativeFill();
-    if(s < 0.9) {
-      // Retry, sometimes this yields better results
-      plotmap = arrangeVisualizations(plotmap.getWidth() * s, plotmap.getHeight() * s);
-    }
 
     recalcViewbox();
     final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
@@ -267,8 +287,11 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
     vistoelem = new LayerMap();
 
     // Redo main layers
+    SVGUtil.removeFromParent(plotlayer);
+    SVGUtil.removeFromParent(hoverlayer);
     plotlayer = plot.svgElement(SVGConstants.SVG_G_TAG);
     hoverlayer = plot.svgElement(SVGConstants.SVG_G_TAG);
+    hoverlayer.setAttribute(SVGPlot.NO_EXPORT_ATTRIBUTE, SVGPlot.NO_EXPORT_ATTRIBUTE);
 
     // Redo the layout
     for(Entry<PlotItem, double[]> e : plotmap.entrySet()) {
@@ -335,9 +358,6 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
    * Initialize the SVG plot.
    */
   private void initializePlot() {
-    if(plot != null) {
-      plot.dispose();
-    }
     plot = new VisualizationPlot();
     { // Add a background element:
       CSSClass cls = new CSSClass(this, "background");
@@ -358,24 +378,28 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
     }
     { // setup the hover CSS classes.
       selcss = new CSSClass(this, "s");
+      if(DEBUG_LAYOUT) {
+        selcss.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_RED_VALUE);
+        selcss.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, .00001 * StyleLibrary.SCALE);
+        selcss.setStatement(SVGConstants.CSS_STROKE_OPACITY_PROPERTY, "0.5");
+      }
       selcss.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_RED_VALUE);
-      selcss.setStatement(SVGConstants.CSS_STROKE_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       selcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0");
       selcss.setStatement(SVGConstants.CSS_CURSOR_PROPERTY, SVGConstants.CSS_POINTER_VALUE);
+      plot.addCSSClassOrLogError(selcss);
       CSSClass hovcss = new CSSClass(this, "h");
       hovcss.setStatement(SVGConstants.CSS_FILL_OPACITY_PROPERTY, "0.25");
-      plot.addCSSClassOrLogError(selcss);
       plot.addCSSClassOrLogError(hovcss);
       // Hover listener.
       hoverer = new CSSHoverClass(hovcss.getName(), null, true);
     }
 
+    // Disable Batik default interactions (zoom, rotate, etc.)
     if(single) {
       plot.setDisableInteractions(true);
     }
     SVGEffects.addShadowFilter(plot);
     SVGEffects.addLightGradient(plot);
-    plot.updateStyleElement();
   }
 
   /**
@@ -408,8 +432,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
   /**
    * Do a refresh (when visibilities have changed).
    */
-  void refresh() {
-    pendingRefresh.set(null); // Clear
+  synchronized void refresh() {
     if(reinitOnRefresh) {
       LOG.debug("Reinitialize in thread " + Thread.currentThread().getName());
       reinitialize();
@@ -417,8 +440,10 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
       return;
     }
     synchronized(plot) {
-      LOG.debug("Incremental refresh");
       boolean refreshcss = false;
+      if(plotmap == null) {
+        LOG.warning("Plotmap is null", new Throwable());
+      }
       final int thumbsize = (int) Math.max(screenwidth / plotmap.getWidth(), screenheight / plotmap.getHeight());
       for(PlotItem pi : plotmap.keySet()) {
         for(Iterator<PlotItem> iter = pi.itemIterator(); iter.hasNext();) {
@@ -479,12 +504,12 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
    * Recompute the view box of the plot.
    */
   private void recalcViewbox() {
-    // Recalculate bounding box.
-    String vb = "0 0 " + plotmap.getWidth() + " " + plotmap.getHeight();
-    // Reset root bounding box.
-    SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
-    SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 * plotmap.getHeight() / plotmap.getWidth()) + "cm");
-    SVGUtil.setAtt(plot.getRoot(), SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
+    final Element root = plot.getRoot();
+    // Reset plot attributes
+    SVGUtil.setAtt(root, SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
+    SVGUtil.setAtt(root, SVGConstants.SVG_HEIGHT_ATTRIBUTE, SVGUtil.fmt(20 * plotmap.getHeight() / plotmap.getWidth()) + "cm");
+    String vb = "0 0 " + SVGUtil.fmt(plotmap.getWidth()) + " " + SVGUtil.fmt(plotmap.getHeight());
+    SVGUtil.setAtt(root, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, vb);
   }
 
   /**
@@ -620,14 +645,16 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
 
   @Override
   public void visualizationChanged(VisualizationItem child) {
-    if(child instanceof VisualizationTask) {
-      for(Hierarchy.Iter<Object> iter = context.getVisHierarchy().iterParents(child); iter.valid(); iter.advance()) {
-        final Object o = iter.get();
-        if(o instanceof Projector || o instanceof StaticVisualizationInstance) {
-          reinitOnRefresh = true;
-          break;
-        }
+    boolean isProjected = false;
+    for(Hierarchy.Iter<Object> iter = context.getVisHierarchy().iterParents(child); iter.valid(); iter.advance()) {
+      final Object o = iter.get();
+      if(o instanceof Projector) {
+        isProjected = true;
+        break;
       }
+    }
+    if(!isProjected) {
+      reinitOnRefresh = true;
     }
     lazyRefresh();
   }

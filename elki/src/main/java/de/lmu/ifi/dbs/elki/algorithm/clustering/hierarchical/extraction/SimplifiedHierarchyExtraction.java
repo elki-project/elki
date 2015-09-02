@@ -60,10 +60,10 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Extraction of simplified cluster hierarchies, as proposed in HDBSCAN.
- * 
+ *
  * In contrast to the authors top-down approach, we use a bottom-up approach
  * based on the more efficient pointer representation introduced in SLINK.
- * 
+ *
  * Reference:
  * <p>
  * R. J. G. B. Campello, D. Moulavi, and J. Sander<br />
@@ -71,9 +71,9 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining,
  * PAKDD
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses HierarchicalClusteringAlgorithm
  * @apiviz.uses PointerHierarchyRepresentationResult
  */
@@ -99,7 +99,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
 
   /**
    * Constructor.
-   * 
+   *
    * @param algorithm Algorithm to run
    * @param minClSize Minimum cluster size
    */
@@ -127,7 +127,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
 
   /**
    * Extract all clusters from the pi-lambda-representation.
-   * 
+   *
    * @param ids Object ids to process
    * @param pi Pi store
    * @param lambda Lambda store
@@ -250,7 +250,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
 
   /**
    * Add a singleton object, as point or cluster.
-   * 
+   *
    * @param clus Current cluster.
    * @param id Object to add
    * @param dist Distance
@@ -268,9 +268,9 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
 
   /**
    * Temporary cluster.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   protected static class TempCluster {
@@ -301,7 +301,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
     /**
      * Add new objects to the cluster.
      *
-     * @param ids IDs to add.
+     * @param id ID to add.
      */
     public void add(DBIDRef id) {
       this.newids.add(id);
@@ -318,7 +318,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
 
     /**
      * Add a child cluster.
-     * 
+     *
      * @param clu Child cluster.
      */
     public void addChild(Cluster<DendrogramModel> clu) {
@@ -327,7 +327,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
 
     /**
      * Test if a cluster is spurious.
-     * 
+     *
      * @param minClSize Minimum cluster size
      * @return {@code true} if spurious
      */
@@ -337,7 +337,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
 
     /**
      * Make the cluster for the given object
-     * 
+     *
      * @param clustering Parent clustering
      * @param lead Leading object
      * @return Cluster
@@ -370,10 +370,9 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
 
   /**
    * Make the cluster for the given object
-   * 
+   *
    * @param lead Leading object
    * @param depth Linkage depth
-   * @param members Member objects
    * @return Cluster
    */
   private Cluster<DendrogramModel> makeSingletonCluster(DBIDRef lead, double depth) {
@@ -388,9 +387,9 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

@@ -29,49 +29,53 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 
 /**
- * The interface for range queries
- * 
+ * The interface for range queries, that can return all objects within the
+ * specified radius.
+ *
+ * Do not confuse this with rectangular window queries, which are also commonly
+ * called "range queries".
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.uses DoubleDBIDList oneway - - «create»
- * 
+ *
  * @param <O> Object type
  */
 public interface RangeQuery<O> extends DatabaseQuery {
   /**
-   * Get the nearest neighbors for a particular id in a given query range
-   * 
+   * Get the neighbors for a particular id in a given query range
+   *
    * @param id query object ID
    * @param range Query range
    * @return neighbors
    */
-  public DoubleDBIDList getRangeForDBID(DBIDRef id, double range);
+  DoubleDBIDList getRangeForDBID(DBIDRef id, double range);
 
   /**
-   * Get the nearest neighbors for a particular object in a given query range
-   * 
+   * Get the neighbors for a particular object in a given query range
+   *
    * @param obj Query object
    * @param range Query range
    * @return neighbors
    */
-  public DoubleDBIDList getRangeForObject(O obj, double range);
+  DoubleDBIDList getRangeForObject(O obj, double range);
 
   /**
-   * Get the nearest neighbors for a particular object in a given query range
-   * 
+   * Get the neighbors for a particular object in a given query range
+   *
    * @param id query object ID
    * @param range Query range
    * @param result Neighbors output set
    */
-  public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result);
+  void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result);
 
   /**
-   * Get the nearest neighbors for a particular object in a given query range
-   * 
+   * Get the neighbors for a particular object in a given query range
+   *
    * @param obj Query object
    * @param range Query range
    * @param result Neighbors output set
    */
-  public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result);
+  void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result);
 }

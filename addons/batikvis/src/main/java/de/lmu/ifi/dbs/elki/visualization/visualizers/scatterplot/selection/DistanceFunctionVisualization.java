@@ -28,12 +28,14 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -99,7 +101,11 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
     new VisualizationTree.Handler2<AbstractMaterializeKNNPreprocessor<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, AbstractMaterializeKNNPreprocessor<?> kNN, ScatterPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, kNN, p.getRelation(), DistanceFunctionVisualization.this);
+        final Relation<?> rel = p.getRelation();
+        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+          return;
+        }
+        final VisualizationTask task = new VisualizationTask(NAME, context, kNN, rel, DistanceFunctionVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA - 1;
         task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_SELECTION);
         context.addVis(kNN, task);
@@ -227,9 +233,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
    * @author Robert Rödler
    * @author Erich Schubert
    *
-   * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has DBIDSelection oneway - - visualizes
-   *
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {
     /**

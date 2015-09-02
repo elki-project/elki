@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
 
 /*
- This file is part of ELKI: Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,18 +35,17 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.FirstKInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Test cluster quality measure computations.
- * 
+ *
  * @author Stephan Baier
  */
 public class TestWithinClusterMeanDistanceQualityMeasure extends AbstractSimpleAlgorithmTest implements JUnit4Test {
@@ -68,7 +68,7 @@ public class TestWithinClusterMeanDistanceQualityMeasure extends AbstractSimpleA
     // run KMeans on database
     @SuppressWarnings("unchecked")
     Clustering<MeanModel> result = (Clustering<MeanModel>) kmeans.run(db);
-    final PrimitiveDistanceFunction<? super NumberVector> dist = kmeans.getDistanceFunction();
+    final NumberVectorDistanceFunction<? super DoubleVector> dist = kmeans.getDistanceFunction();
 
     // Test Cluster Average Overall Distance
     KMeansQualityMeasure<? super DoubleVector> overall = new WithinClusterMeanDistanceQualityMeasure();

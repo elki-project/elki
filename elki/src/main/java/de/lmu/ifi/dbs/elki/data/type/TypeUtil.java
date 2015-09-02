@@ -38,6 +38,9 @@ import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.uncertain.DiscreteUncertainObject;
+import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -48,9 +51,9 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
 /**
  * Utility package containing various common types.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has TypeInformation oneway - -
  * @apiviz.landmark
  */
@@ -137,14 +140,14 @@ public final class TypeUtil {
 
   /**
    * Input type for algorithms that require number vector fields.
-   * 
+   *
    * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
    */
   public static final VectorFieldTypeInformation<DoubleVector> DOUBLE_VECTOR_FIELD = VectorFieldTypeInformation.typeRequest(DoubleVector.class);
 
   /**
    * Input type for algorithms that require number vector fields.
-   * 
+   *
    * If possible, please use {@link #NUMBER_VECTOR_FIELD}!
    */
   public static final VectorFieldTypeInformation<FloatVector> FLOAT_VECTOR_FIELD = VectorFieldTypeInformation.typeRequest(FloatVector.class);
@@ -171,14 +174,14 @@ public final class TypeUtil {
 
   /**
    * Sparse float vector field.
-   * 
+   *
    * If possible, please use {@link #SPARSE_VECTOR_FIELD} instead!
    */
   public static final VectorFieldTypeInformation<SparseFloatVector> SPARSE_FLOAT_FIELD = VectorFieldTypeInformation.typeRequest(SparseFloatVector.class);
 
   /**
    * Sparse double vector field.
-   * 
+   *
    * If possible, please use {@link #SPARSE_VECTOR_FIELD} instead!
    */
   public static final VectorFieldTypeInformation<SparseDoubleVector> SPARSE_DOUBLE_FIELD = VectorFieldTypeInformation.typeRequest(SparseDoubleVector.class);
@@ -229,8 +232,23 @@ public final class TypeUtil {
   public static final SimpleTypeInformation<Clustering<?>> CLUSTERING = new SimpleTypeInformation<>(Clustering.class);
 
   /**
+   * Uncertain objects.
+   */
+  public static final VectorFieldTypeInformation<UncertainObject> UNCERTAIN_OBJECT_FIELD = VectorFieldTypeInformation.typeRequest(UncertainObject.class);
+
+  /**
+   * Uncertain objects.
+   */
+  public static final VectorFieldTypeInformation<DiscreteUncertainObject> DISCRETE_UNCERTAIN_OBJECT = VectorFieldTypeInformation.typeRequest(DiscreteUncertainObject.class);
+
+  /**
+   * Spatial objects.
+   */
+  public static final SimpleTypeInformation<SpatialComparable> SPATIAL_OBJECT = new SimpleTypeInformation<>(SpatialComparable.class);
+
+  /**
    * Make a type array easily.
-   * 
+   *
    * @param ts Types
    * @return array
    */

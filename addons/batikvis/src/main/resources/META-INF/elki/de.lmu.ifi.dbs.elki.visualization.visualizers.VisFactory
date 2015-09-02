@@ -3,6 +3,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AxisVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.MarkerVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.PolygonVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.ClusterMeanVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.ClusterStarVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.ClusterHullVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.EMClusterVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.VoronoiVisualization
@@ -13,7 +14,6 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.outlier.BubbleVisualiz
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.outlier.COPVectorVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.TooltipScoreVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.TooltipStringVisualization
-de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.ToolBox2DVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.ReferencePointsVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.density.DensityEstimationOverlay
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.DistanceFunctionVisualization
@@ -23,8 +23,12 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionCon
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionCubeVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionToolCubeVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection.SelectionToolDotVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.uncertain.UncertainBoundingBoxVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.uncertain.UncertainSamplesVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.uncertain.UncertainInstancesVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.histogram.ColoredHistogramVisualizer
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.LineVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.BoundingBoxVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.ParallelAxisVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AxisVisibilityVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AxisReorderVisualization

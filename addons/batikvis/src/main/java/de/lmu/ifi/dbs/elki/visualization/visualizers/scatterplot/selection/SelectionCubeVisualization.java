@@ -26,7 +26,9 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -34,7 +36,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -60,6 +61,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
+// TODO: Does not use the relation. Always enable, but hide in the menu?
 public class SelectionCubeVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
@@ -91,7 +93,11 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
     Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionCubeVisualization.this);
+      Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionCubeVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA - 2;
       task.addUpdateFlags(VisualizationTask.ON_SELECTION);
       context.addVis(context.getSelectionResult(), task);
@@ -104,7 +110,6 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
    *
    * @author Heidi Kolb
    *
-   * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has RangeSelection oneway - - visualizes
    * @apiviz.uses SVGHyperCube
    */
@@ -184,28 +189,14 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
     private void setSVGRect(SVGPlot svgp, Projection2D proj) {
       DBIDSelection selContext = context.getSelection();
       if(selContext instanceof RangeSelection) {
-        DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
-        int dim = RelationUtil.dimensionality(rel);
-
-        double[] min = new double[dim];
-        double[] max = new double[dim];
-        for(int d = 0; d < dim; d++) {
-          if(ranges != null && ranges[d] != null) {
-            min[d] = ranges[d].first;
-            max[d] = ranges[d].second;
-          }
-          else {
-            min[d] = proj.getScale(d).getMin();
-            max[d] = proj.getScale(d).getMax();
-          }
-        }
+        HyperBoundingBox ranges = ((RangeSelection) selContext).getRanges();
         if(settings.nofill) {
-          Element r = SVGHyperCube.drawFrame(svgp, proj, min, max);
+          Element r = SVGHyperCube.drawFrame(svgp, proj, ranges);
           SVGUtil.setCSSClass(r, CSS_CUBEFRAME);
           layer.appendChild(r);
         }
         else {
-          Element r = SVGHyperCube.drawFilled(svgp, CSS_CUBE, proj, min, max);
+          Element r = SVGHyperCube.drawFilled(svgp, CSS_CUBE, proj, ranges);
           layer.appendChild(r);
         }
 

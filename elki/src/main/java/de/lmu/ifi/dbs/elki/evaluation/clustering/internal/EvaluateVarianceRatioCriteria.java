@@ -55,16 +55,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Compute the Variance Ratio Criteria of a data set.
- * 
+ *
  * Reference:
  * <p>
  * R. B. Calinski and J. Harabasz<br />
  * A dendrite method for cluster analysis<br />
  * Communications in Statistics-theory and Methods, 3(1)
  * </p>
- * 
+ *
  * @author Stephan Baier
  * @author Erich Schubert
+ *
+ * @apiviz.composedOf NoiseHandling
  */
 @Reference(authors = "R. B. Calinski and J. Harabasz", //
 title = "A dendrite method for cluster analysis",//
@@ -93,19 +95,19 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
 
   /**
    * Constructor.
-   * 
-   * @param mergenoise Flag to treat noise as clusters, not singletons
+   *
+   * @param noiseOption Flag to control noise handling
    * @param penalize noise, if {@link NoiseHandling#IGNORE_NOISE} is set.
    */
-  public EvaluateVarianceRatioCriteria(NoiseHandling opt, boolean penalize) {
+  public EvaluateVarianceRatioCriteria(NoiseHandling noiseOption, boolean penalize) {
     super();
-    this.noiseOption = opt;
+    this.noiseOption = noiseOption;
     this.penalize = penalize;
   }
 
   /**
    * Evaluate a single clustering.
-   * 
+   *
    * @param db Database
    * @param rel Data relation
    * @param c Clustering
@@ -169,7 +171,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
 
   /**
    * Update the global centroid.
-   * 
+   *
    * @param overallCentroid Centroid to udpate
    * @param rel Data relation
    * @param clusters Clusters
@@ -220,9 +222,9 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Stephan Baier
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractParameterizer {

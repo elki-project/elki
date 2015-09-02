@@ -74,21 +74,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * k-means. This should be used with {@link SquaredEuclideanDistanceFunction}
  * only (when used with other distances, it will manually square the values; but
  * beware that the result is less meaningful with other distance functions).
- * 
+ *
  * For clusterings that provide a cluster prototype object (e.g. k-means), the
  * prototype will be used. For other algorithms, the centroid will be
  * recomputed.
- * 
+ *
  * TODO: support non-vector based clusterings, too, if the algorithm provided a
  * prototype object (e.g. PAM).
- * 
+ *
  * TODO: when combined with k-means, detect if the distance functions agree
  * (both should be using squared Euclidean), and reuse the SSQ values provided
  * by k-means.
- * 
+ *
  * @author Erich Schubert
- * 
- * @param <O> Object type
+ *
+ * @apiviz.composedOf NoiseHandling
  */
 public class EvaluateSquaredErrors implements Evaluator {
   /**
@@ -113,7 +113,7 @@ public class EvaluateSquaredErrors implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param distance Distance function to use.
    * @param noiseOption Control noise handling.
    */
@@ -125,7 +125,7 @@ public class EvaluateSquaredErrors implements Evaluator {
 
   /**
    * Evaluate a single clustering.
-   * 
+   *
    * @param db Database
    * @param rel Data relation
    * @param c Clustering
@@ -187,9 +187,9 @@ public class EvaluateSquaredErrors implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

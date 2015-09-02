@@ -46,9 +46,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 /**
  * A trivial generalization of OPTICS that is not restricted to numerical
  * distances, and serves as a base for several other algorithms (HiCO, HiSC).
- * 
+ *
  * @author Erich Schubert
- * 
+ *
+ * @apiviz.composedOf Instance
+ *
  * @param <O> the type of objects handled by the algorithm
  * @param <R> the type of results in the cluster order
  */
@@ -62,7 +64,7 @@ public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> extends Abstr
 
   /**
    * Run OPTICS on the database.
-   * 
+   *
    * @param db Database
    * @param relation Relation
    * @return Result
@@ -129,7 +131,7 @@ public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> extends Abstr
 
     /**
      * Process the data set.
-     * 
+     *
      * @return Cluster order result.
      */
     public R run() {
@@ -161,7 +163,7 @@ public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> extends Abstr
 
     /**
      * Initialize for a new DBID.
-     * 
+     *
      * @param id Current object ID
      */
     abstract protected void initialDBID(DBIDRef id);
@@ -169,21 +171,21 @@ public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> extends Abstr
     /**
      * Add the current DBID to the cluster order, and expand its neighbors if
      * minPts and similar conditions are satisfied.
-     * 
+     *
      * @param id Current object ID
      */
     abstract protected void expandDBID(DBIDRef id);
 
     /**
      * Build the final result.
-     * 
+     *
      * @return Result
      */
     abstract protected R buildResult();
 
     /**
      * Get the class logger.
-     * 
+     *
      * @return Class logger
      */
     abstract protected Logging getLogger();

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * The standard k-means algorithm, using Lloyd-style bulk iterations.
- * 
+ *
  * <p>
  * Reference:<br />
  * S. Lloyd<br/>
@@ -60,12 +60,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * IEEE Transactions on Information Theory 28 (2)<br/>
  * previously published as Bell Telephone Laboratories Paper
  * </p>
- * 
+ *
  * @author Arthur Zimek
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has KMeansModel
- * 
+ *
  * @param <V> vector datatype
  */
 @Title("K-Means")
@@ -87,13 +87,13 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansLloyd(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMeansLloyd(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
     super(distanceFunction, k, maxiter, initializer);
   }
 
@@ -154,9 +154,9 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {

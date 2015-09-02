@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,14 +32,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Initialize K-means by randomly choosing k existing elements as cluster
  * centers.
- * 
+ *
  * This initialization is attributed to:
  * <p>
  * E. W. Forgy<br />
@@ -49,9 +49,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * but we were unable to verify this so far (apparently, only an abstract is
  * available in Biometrics).
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Vector type
  */
 @Reference(authors = "E. W. Forgy", //
@@ -60,7 +60,7 @@ booktitle = "Biometrics 21(3)")
 public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**
    * Constructor.
-   * 
+   *
    * @param rnd Random generator.
    */
   public RandomlyChosenInitialMeans(RandomFactory rnd) {
@@ -68,7 +68,7 @@ public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, PrimitiveDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
     DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
     List<V> means = new ArrayList<>(k);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -84,9 +84,9 @@ public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V> extends AbstractKMeansInitialization.Parameterizer {

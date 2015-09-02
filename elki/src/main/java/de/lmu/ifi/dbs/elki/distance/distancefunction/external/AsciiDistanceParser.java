@@ -43,9 +43,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * A line must have the following format: {@code id1 id2 distanceValue}, where
  * id1 and id2 are integers representing the two ids belonging to the distance
  * value. Lines starting with &quot;#&quot; will be ignored.
- * 
+ *
  * @author Elke Achtert
  * @author Erich Schubert
+ *
+ * @apiviz.uses CSVReaderFormat
+ * @apiviz.composedOf TokenizedReader
+ * @apiviz.composedOf Tokenizer
+ * @apiviz.uses DistanceCacheWriter
  */
 @Title("Number Distance Parser")
 @Description("Parser for the following line format:\n" //
@@ -69,7 +74,7 @@ public class AsciiDistanceParser implements DistanceParser {
 
   /**
    * Constructor.
-   * 
+   *
    * @param format Input format
    */
   public AsciiDistanceParser(CSVReaderFormat format) {
@@ -154,9 +159,9 @@ public class AsciiDistanceParser implements DistanceParser {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

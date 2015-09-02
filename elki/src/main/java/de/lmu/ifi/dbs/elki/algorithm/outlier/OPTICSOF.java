@@ -28,6 +28,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.AbstractOPTICS;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSTypeAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -62,19 +63,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Optics-OF outlier detection algorithm, an algorithm to find Local Outliers in
- * a database based on ideas from {@link OPTICSHeap} clustering.
+ * a database based on ideas from {@link OPTICSTypeAlgorithm} clustering.
  * <p>
  * Reference:<br>
  * Markus M. Breunig, Hans-Peter Kriegel, Raymond T. N, Jörg Sander:<br />
  * OPTICS-OF: Identifying Local Outliers<br />
  * In Proc. of the 3rd European Conference on Principles of Knowledge Discovery
  * and Data Mining (PKDD), Prague, Czech Republic
- * 
+ *
  * @author Ahmed Hettab
- * 
+ *
  * @apiviz.has KNNQuery
  * @apiviz.has RangeQuery
- * 
+ *
  * @param <O> DatabaseObject
  */
 @Title("OPTICS-OF: Identifying Local Outliers")
@@ -96,7 +97,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
 
   /**
    * Constructor with parameters.
-   * 
+   *
    * @param distanceFunction distance function
    * @param minpts minPts parameter
    */
@@ -107,7 +108,7 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
 
   /**
    * Perform OPTICS-based outlier detection.
-   * 
+   *
    * @param database Database
    * @param relation Relation
    * @return Outlier detection result
@@ -186,9 +187,9 @@ public class OPTICSOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

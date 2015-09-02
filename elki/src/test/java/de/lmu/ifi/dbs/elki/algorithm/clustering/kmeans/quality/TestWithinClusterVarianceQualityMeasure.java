@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
 
 /*
- This file is part of ELKI: Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,18 +35,17 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.FirstKInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Test cluster quality measure computations.
- * 
+ *
  * @author Stephan Baier
  */
 public class TestWithinClusterVarianceQualityMeasure extends AbstractSimpleAlgorithmTest implements JUnit4Test {
@@ -71,7 +71,7 @@ public class TestWithinClusterVarianceQualityMeasure extends AbstractSimpleAlgor
 
     // Test Cluster Variance
     KMeansQualityMeasure<? super DoubleVector> variance = new WithinClusterVarianceQualityMeasure();
-    final PrimitiveDistanceFunction<? super NumberVector> dist = kmeans.getDistanceFunction();
+    final NumberVectorDistanceFunction<? super DoubleVector> dist = kmeans.getDistanceFunction();
 
     final double quality = variance.quality(result2, dist, rel);
     assertEquals("Within cluster variance incorrect", 3.16666666666, quality, 1e-10);

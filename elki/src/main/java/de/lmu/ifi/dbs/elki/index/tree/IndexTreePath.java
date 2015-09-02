@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree;
 
-import java.util.ArrayList;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,14 +23,15 @@ import java.util.ArrayList;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
+
 /**
  * Represents a path to a node in an index structure.
- * 
+ *
  * @author Elke Achtert
- * 
- * @apiviz.composedOf TreeIndexPathComponent
- * @apiviz.uses Entry
- * 
+ *
+ * @apiviz.has Entry oneway - - «contains»
+ *
  * @param <E> the type of Entry used in the index
  */
 public class IndexTreePath<E extends Entry> {
@@ -54,7 +53,7 @@ public class IndexTreePath<E extends Entry> {
 
   /**
    * Constructs a new IndexPath.
-   * 
+   *
    * @param parent the parent path
    * @param entry the entry of the component
    * @param index index of the component in its parent
@@ -70,7 +69,7 @@ public class IndexTreePath<E extends Entry> {
 
   /**
    * Returns the entry of the component.
-   * 
+   *
    * @return the entry of the component
    */
   public E getEntry() {
@@ -79,7 +78,7 @@ public class IndexTreePath<E extends Entry> {
 
   /**
    * Returns the index of the component in its parent.
-   * 
+   *
    * @return the index of the component in its parent
    */
   public int getIndex() {
@@ -88,7 +87,7 @@ public class IndexTreePath<E extends Entry> {
 
   /**
    * Returns the number of elements in the path.
-   * 
+   *
    * @return an int giving a count of items the path
    */
   public int getPathCount() {
@@ -99,14 +98,6 @@ public class IndexTreePath<E extends Entry> {
     return result;
   }
 
-  /**
-   * Returns <code>true</code> if <code>this == o</code> has the value
-   * <code>true</code> or o is not null and o is of the same class as this
-   * instance and the two index paths are of the same length, and contain the
-   * same components (<code>.equals</code>), <code>false</code> otherwise.
-   * 
-   * @see de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent#equals(Object)
-   */
   @Override
   public boolean equals(Object o) {
     if(o == this) {
@@ -129,7 +120,7 @@ public class IndexTreePath<E extends Entry> {
   /**
    * Returns a path containing all the elements of this object, except the last
    * path component.
-   * 
+   *
    * @return a path containing all the elements of this object, except the last
    *         path component
    */
@@ -139,7 +130,7 @@ public class IndexTreePath<E extends Entry> {
 
   /**
    * Returns a string that displays the components of this index path.
-   * 
+   *
    * @return a string representation of the components of this index path
    */
   @Override

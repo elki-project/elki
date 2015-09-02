@@ -24,8 +24,12 @@ package de.lmu.ifi.dbs.elki.visualization.projector;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.FilteredIter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -48,15 +52,43 @@ public class ParallelPlotFactory implements ProjectorFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     Hierarchy.Iter<Relation<?>> it = VisualizationTree.filterResults(context, start, Relation.class);
-    for(; it.valid(); it.advance()) {
+    candidate: for(; it.valid(); it.advance()) {
       Relation<?> rel = it.get();
-      // TODO: multi-relational parallel plots
-      if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        @SuppressWarnings("unchecked")
-        Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
-        ParallelPlotProjector<NumberVector> proj = new ParallelPlotProjector<>(vrel);
-        context.addVis(vrel, proj);
+      // TODO: multi-relational parallel plots?
+      final int dim = dimensionality(rel);
+      if(dim <= 1) {
+        continue;
       }
+      // Do not enable nested relations by default:
+      Hierarchy.Iter<Relation<?>> it2 = new FilteredIter<>(context.getHierarchy().iterAncestors(rel), Relation.class);
+      for(; it2.valid(); it2.advance()) {
+        // Parent relation
+        final Relation<?> rel2 = (Relation<?>) it2.get();
+        final int odim = dimensionality(rel2);
+        if(odim == dim) {
+          // TODO: add Actions instead?
+          continue candidate;
+        }
+      }
+      @SuppressWarnings("unchecked")
+      Relation<SpatialComparable> vrel = (Relation<SpatialComparable>) rel;
+      ParallelPlotProjector<SpatialComparable> proj = new ParallelPlotProjector<>(vrel);
+      context.addVis(vrel, proj);
     }
+  }
+
+  private int dimensionality(Relation<?> rel) {
+    if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+      @SuppressWarnings("unchecked")
+      Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
+      return RelationUtil.dimensionality(vrel);
+    }
+    if(TypeUtil.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+      @SuppressWarnings("unchecked")
+      Relation<UncertainObject> vrel = (Relation<UncertainObject>) rel;
+      return RelationUtil.dimensionality(vrel);
+    }
+    // TODO: allow other spatial objects of fixed dimensionality!
+    return 0;
   }
 }

@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * find density-connected sets in a database.
  * <p>
  * Reference: <br>
- * M. Ester, H.-P. Kriegel, J. Sander, and X. Xu:<br />
+ * M. Ester, H.-P. Kriegel, J. Sander, X. Xu<br />
  * A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases
  * with Noise<br />
  * In Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96),
@@ -73,10 +73,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("DBSCAN: Density-Based Clustering of Applications with Noise")
 @Description("Algorithm to find density-connected sets in a database based on the parameters 'minpts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
-@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, and X. Xu", //
+@Reference(authors = "M. Ester, H.-P. Kriegel, J. Sander, X. Xu", //
 title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
 booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
-url = "http://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.71.1980")
+url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
 public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>>implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
@@ -149,6 +149,12 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
     return result;
   }
 
+  /**
+   * Run the DBSCAN algorithm
+   *
+   * @param relation Data relation
+   * @param rangeQuery Range query class
+   */
   protected void runDBSCAN(Relation<O> relation, RangeQuery<O> rangeQuery) {
     final int size = relation.size();
     FiniteProgress objprog = LOG.isVerbose() ? new FiniteProgress("Processing objects", size, LOG) : null;
@@ -225,7 +231,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
   /**
    * Process a single core point.
    *
-   * @param neighborhood Neighborhood
+   * @param neighbor Iterator over neighbors
    * @param currentCluster Current cluster
    * @param seeds Seed set
    */
@@ -284,7 +290,8 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID);
+      DoubleParameter epsilonP = new DoubleParameter(EPSILON_ID) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(epsilonP)) {
         epsilon = epsilonP.getValue();
       }
@@ -293,9 +300,9 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
       .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         minpts = minptsP.getValue();
-      }
-      if(minpts <= 2) {
-        LOG.warning("DBSCAN with minPts <= 2 is equivalent to single-link clustering at a single height. Consider using larger values of minPts.");
+        if(minpts <= 2) {
+          LOG.warning("DBSCAN with minPts <= 2 is equivalent to single-link clustering at a single height. Consider using larger values of minPts.");
+        }
       }
     }
 

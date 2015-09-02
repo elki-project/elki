@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,11 +27,11 @@ import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
 
 /**
- * Interface for OPTICS type algorithms, that can be analysed by OPTICS Xi etc.
- * 
+ * Interface for OPTICS type algorithms, that can be analyzed by OPTICS Xi etc.
+ *
  * @author Erich Schubert
- * 
- * @apiviz.has ClusterOrderResult
+ *
+ * @apiviz.has ClusterOrder
  */
 public interface OPTICSTypeAlgorithm extends Algorithm {
   @Override
@@ -39,7 +39,7 @@ public interface OPTICSTypeAlgorithm extends Algorithm {
 
   /**
    * Get the minpts value used. Needed for OPTICS Xi.
-   * 
+   *
    * @return minpts value
    */
   public int getMinPts();

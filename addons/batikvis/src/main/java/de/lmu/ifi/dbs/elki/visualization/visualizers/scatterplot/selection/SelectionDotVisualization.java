@@ -26,8 +26,10 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
@@ -57,7 +59,7 @@ public class SelectionDotVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
-  private static final String NAME = "Selection";
+  private static final String NAME = "Selection Markers";
 
   /**
    * Constructor
@@ -76,7 +78,11 @@ public class SelectionDotVisualization extends AbstractVisFactory {
     Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionDotVisualization.this);
+      Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionDotVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA - 1;
       task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SELECTION);
       context.addVis(context.getSelectionResult(), task);
@@ -89,7 +95,6 @@ public class SelectionDotVisualization extends AbstractVisFactory {
    *
    * @author Heidi Kolb
    *
-   * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has DBIDSelection oneway - - visualizes
    */
   public class Instance extends AbstractScatterplotVisualization implements DataStoreListener {

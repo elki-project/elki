@@ -62,11 +62,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Evaluate a distance functions performance by computing the mean average
  * precision, ROC, and NN classification performance when ranking the objects by
  * distance.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has RetrievalPerformanceResult
- * 
+ * @apiviz.composedOf KNNEvaluator
+ *
  * @param <O> Object type
  */
 public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgorithm<O, EvaluateRetrievalPerformance.RetrievalPerformanceResult> {
@@ -102,7 +103,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param sampling Sampling rate
    * @param random Random sampling generator
@@ -119,7 +120,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param database Database to run on (for kNN queries)
    * @param relation Relation for distance computations
    * @param lrelation Relation for class label comparison
@@ -181,7 +182,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
   /**
    * Test whether two relation agree.
-   * 
+   *
    * @param ref Reference object
    * @param test Test object
    * @return {@code true} if the objects match
@@ -219,7 +220,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
   /**
    * Find all matching objects.
-   * 
+   *
    * @param posn Output set.
    * @param lrelation Label relation
    * @param label Query object label
@@ -235,7 +236,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
   /**
    * Compute the distances to the neighbor objects.
-   * 
+   *
    * @param nlist Neighbor list (output)
    * @param query Query object
    * @param distQuery Distance function
@@ -270,7 +271,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
   /**
    * Evaluate kNN retrieval performance.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class KNNEvaluator {
@@ -281,7 +282,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
     /**
      * Evaluate by simulating kNN classification for k=1...maxk
-     * 
+     *
      * @param knnperf Output data storage
      * @param nlist Neighbor list
      * @param lrelation Label relation
@@ -335,7 +336,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
     /**
      * Counting helper for kNN classification.
-     * 
+     *
      * @param counters Counter storage
      * @param l Object labels
      * @return Maximum count
@@ -356,7 +357,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
   /**
    * Result object for MAP scores.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class RetrievalPerformanceResult implements Result, TextWriteable {
@@ -382,7 +383,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
     /**
      * Constructor.
-     * 
+     *
      * @param samplesize Sample size
      * @param map MAP value
      * @param rocauc ROC AUC value
@@ -441,11 +442,11 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

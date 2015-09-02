@@ -300,7 +300,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * Add a parent.
      *
      * @param parent Parent to add.
-     * @param {@code true} when changed
+     * @return {@code true} when changed
      */
     boolean addParent(O parent) {
       if(parents == EMPTY) {
@@ -326,7 +326,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * Add a child.
      *
      * @param child Child to add
-     * @param {@code true} when changed
+     * @return {@code true} when changed
      */
     boolean addChild(O child) {
       if(children == EMPTY) {
@@ -351,7 +351,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * Remove a parent.
      *
      * @param parent Parent to remove.
-     * @param {@code true} when changed
+     * @return {@code true} when changed
      */
     boolean removeParent(O parent) {
       if(parents == EMPTY) {
@@ -375,7 +375,7 @@ public class HashMapHierarchy<O> implements ModifiableHierarchy<O> {
      * Remove a child.
      *
      * @param child Child to remove.
-     * @param {@code true} when changed
+     * @return {@code true} when changed
      */
     boolean removeChild(O child) {
       if(children == EMPTY) {

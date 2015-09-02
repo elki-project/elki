@@ -27,9 +27,11 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -113,6 +115,10 @@ public class BubbleVisualization extends AbstractVisFactory {
     VisualizationTree.findNewSiblings(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
+        final Relation<?> rel = p.getRelation();
+        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+          return;
+        }
         boolean vis = true;
         // Quick and dirty hack: hide if parent result is also an outlier result
         // Since that probably is already visible and we're redundant.
@@ -122,7 +128,7 @@ public class BubbleVisualization extends AbstractVisFactory {
             break;
           }
         }
-        final VisualizationTask task = new VisualizationTask(NAME, context, o, p.getRelation(), BubbleVisualization.this);
+        final VisualizationTask task = new VisualizationTask(NAME, context, o, rel, BubbleVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;
         task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
         task.initDefaultVisibility(vis);

@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -93,8 +94,12 @@ public class TooltipStringVisualization extends AbstractVisFactory {
     VisualizationTree.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, Relation<?> rep, ScatterPlotProjector<?> p) {
+        final Relation<?> rel = p.getRelation();
+        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+          return;
+        }
         if(DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          final VisualizationTask task = new VisualizationTask(NAME_ID, context, rep, p.getRelation(), TooltipStringVisualization.this);
+          final VisualizationTask task = new VisualizationTask(NAME_ID, context, rep, rel, TooltipStringVisualization.this);
           task.tool = true;
           task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
           task.initDefaultVisibility(false);
@@ -102,7 +107,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
           context.addVis(p, task);
         }
         if(ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          final VisualizationTask task = new VisualizationTask(NAME_CLASS, context, rep, p.getRelation(), TooltipStringVisualization.this);
+          final VisualizationTask task = new VisualizationTask(NAME_CLASS, context, rep, rel, TooltipStringVisualization.this);
           task.tool = true;
           task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
           task.initDefaultVisibility(false);
@@ -110,7 +115,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
           context.addVis(p, task);
         }
         if(LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          final VisualizationTask task = new VisualizationTask(NAME_LABEL, context, rep, p.getRelation(), TooltipStringVisualization.this);
+          final VisualizationTask task = new VisualizationTask(NAME_LABEL, context, rep, rel, TooltipStringVisualization.this);
           task.tool = true;
           task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
           task.initDefaultVisibility(false);
@@ -118,7 +123,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
           context.addVis(p, task);
         }
         if(ExternalID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          final VisualizationTask task = new VisualizationTask(NAME_EID, context, rep, p.getRelation(), TooltipStringVisualization.this);
+          final VisualizationTask task = new VisualizationTask(NAME_EID, context, rep, rel, TooltipStringVisualization.this);
           task.tool = true;
           task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
           task.initDefaultVisibility(false);

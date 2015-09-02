@@ -26,11 +26,13 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.selection;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -76,7 +78,11 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
     Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ParallelPlotProjector<?> p = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionAxisRangeVisualization.this);
+      Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionAxisRangeVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA - 1;
       task.addUpdateFlags(VisualizationTask.ON_SELECTION);
       context.addVis(context.getSelectionResult(), task);
@@ -89,7 +95,6 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has SelectionResult oneway - - visualizes
    * @apiviz.has RangeSelection oneway - - visualizes
    */
   public class Instance extends AbstractParallelVisualization<NumberVector> {
@@ -143,29 +148,29 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
       if(!(selContext instanceof RangeSelection)) {
         return;
       }
-      DoubleDoublePair[] ranges = ((RangeSelection) selContext).getRanges();
-      if(ranges == null) {
+      HyperBoundingBox range = ((RangeSelection) selContext).getRanges();
+      if(range == null) {
         return;
       }
 
       // Project:
-      double[] min = new double[ranges.length];
-      double[] max = new double[ranges.length];
-      for(int d = 0; d < ranges.length; d++) {
-        if(ranges[d] != null) {
-          min[d] = ranges[d].first;
-          max[d] = ranges[d].second;
-        }
+      final int dims = range.getDimensionality();
+      double[] min = new double[dims];
+      double[] max = new double[dims];
+      for(int d = 0; d < dims; d++) {
+        min[d] = range.getMin(d);
+        max[d] = range.getMax(d);
       }
       min = proj.fastProjectDataToRenderSpace(min);
       max = proj.fastProjectDataToRenderSpace(max);
 
-      int dim = proj.getVisibleDimensions();
-      for(int d = 0; d < dim; d++) {
-        if(ranges[proj.getDimForVisibleAxis(d)] != null) {
-          double amin = Math.min(min[d], max[d]);
-          double amax = Math.max(min[d], max[d]);
-          Element rect = svgp.svgRect(getVisibleAxisX(d) - (0.01 * StyleLibrary.SCALE), amin, 0.02 * StyleLibrary.SCALE, amax - amin);
+      final int vdim = proj.getVisibleDimensions();
+      for(int vd = 0; vd < vdim; vd++) {
+        final int ad = proj.getDimForVisibleAxis(vd);
+        final double amin = Math.min(min[ad], max[ad]);
+        final double amax = Math.max(min[ad], max[ad]);
+        if(amin > Double.MIN_VALUE && amax < Double.MAX_VALUE) {
+          Element rect = svgp.svgRect(getVisibleAxisX(vd) - (0.01 * StyleLibrary.SCALE), amin, 0.02 * StyleLibrary.SCALE, amax - amin);
           SVGUtil.addCSSClass(rect, MARKER);
           layer.appendChild(rect);
         }

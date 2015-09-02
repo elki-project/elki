@@ -121,7 +121,7 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
   public void add(double key, V val, int max) {
     if (size < max) {
       add(key, val);
-    } else if (twoheap[0] <= key) {
+    } else if (twoheap[0] < key) {
       replaceTopElement(key, val);
     }
   }

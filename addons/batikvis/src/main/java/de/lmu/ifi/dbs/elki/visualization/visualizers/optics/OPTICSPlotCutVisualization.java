@@ -99,8 +99,6 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
    *
    * @author Heidi Kolb
    * @author Erich Schubert
-   *
-   * @param <E> cluster order entry type
    */
   public class Instance extends AbstractOPTICSVisualization implements DragableArea.DragListener {
     /**

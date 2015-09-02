@@ -120,7 +120,7 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
   public void add(double key, int val, int max) {
     if (size < max) {
       add(key, val);
-    } else if (twoheap[0] >= key) {
+    } else if (twoheap[0] > key) {
       replaceTopElement(key, val);
     }
   }

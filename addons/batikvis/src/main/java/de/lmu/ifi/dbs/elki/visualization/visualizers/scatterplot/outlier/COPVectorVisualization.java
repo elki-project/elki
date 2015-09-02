@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.algorithm.outlier.COP;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -88,13 +89,17 @@ public class COPVectorVisualization extends AbstractVisFactory {
     VisualizationTree.findNewSiblings(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
+        final Relation<?> rel2 = p.getRelation();
+        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel2.getDataTypeInformation())) {
+          return;
+        }
         Hierarchy.Iter<Relation<?>> it1 = VisualizationTree.filterResults(context, o, Relation.class);
         for(; it1.valid(); it1.advance()) {
           Relation<?> rel = it1.get();
           if(!rel.getShortName().equals(COP.COP_ERRORVEC)) {
             continue;
           }
-          final VisualizationTask task = new VisualizationTask(NAME, context, rel, p.getRelation(), COPVectorVisualization.this);
+          final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel2, COPVectorVisualization.this);
           task.level = VisualizationTask.LEVEL_DATA;
           task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
           context.addVis(o, task);

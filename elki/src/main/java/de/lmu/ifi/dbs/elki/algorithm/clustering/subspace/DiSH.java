@@ -93,12 +93,13 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * In Proc. 12th International Conference on Database Systems for Advanced
  * Applications (DASFAA), Bangkok, Thailand, 2007.
  * </p>
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.uses DiSHPreferenceVectorIndex
  * @apiviz.has SubspaceModel
- * 
+ * @apiviz.has DiSHClusterOrder
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("DiSH: Detecting Subspace cluster Hierarchies")
@@ -130,7 +131,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
   /**
    * Constructor.
-   * 
+   *
    * @param epsilon Epsilon value
    * @param mu Mu parameter (minPts)
    * @param dishPreprocessor DiSH preprocessor
@@ -144,7 +145,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
   /**
    * Performs the DiSH algorithm on the given database.
-   * 
+   *
    * @param relation Relation to process
    */
   public Clustering<SubspaceModel> run(Database db, Relation<V> relation) {
@@ -161,7 +162,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
   /**
    * Computes the hierarchical clusters according to the cluster order.
-   * 
+   *
    * @param database the database holding the objects
    * @param clusterOrder the cluster order
    */
@@ -243,7 +244,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
   /**
    * Extracts the clusters from the cluster order.
-   * 
+   *
    * @param relation the database storing the objects
    * @param clusterOrder the cluster order to extract the clusters from
    * @return the extracted clusters
@@ -335,7 +336,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
   /**
    * Returns a sorted list of the clusters w.r.t. the subspace dimensionality in
    * descending order.
-   * 
+   *
    * @param relation the database storing the objects
    * @param clustersMap the mapping of bits sets to clusters
    * @return a sorted list of the clusters
@@ -374,7 +375,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
   /**
    * Removes the clusters with size < minpts from the cluster map and adds them
    * to their parents.
-   * 
+   *
    * @param relation the relation storing the objects
    * @param clustersMap the map containing the clusters
    */
@@ -432,7 +433,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
   /**
    * Returns the parent of the specified cluster
-   * 
+   *
    * @param relation the relation storing the objects
    * @param child the child to search the parent for
    * @param clustersMap the map containing the clusters
@@ -475,7 +476,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
   /**
    * Builds the cluster hierarchy.
-   * 
+   *
    * @param clustering Clustering we process
    * @param clusters the sorted list of clusters
    * @param dimensionality the dimensionality of the data
@@ -560,7 +561,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
   /**
    * Returns true, if the specified parent cluster is a parent of one child of
    * the children clusters.
-   * 
+   *
    * @param relation the database containing the objects
    * @param parent the parent to be tested
    * @param iter the list of children to be tested
@@ -588,7 +589,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
   /**
    * Compute the common subspace dimensionality of two vectors.
-   * 
+   *
    * @param v1 First vector
    * @param v2 Second vector
    * @param pv1 First preference
@@ -614,7 +615,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
   /**
    * Computes the weighted distance between the two specified vectors according
    * to the given preference vector.
-   * 
+   *
    * @param v1 the first vector
    * @param v2 the second vector
    * @param weightVector the preference vector
@@ -642,9 +643,9 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
   /**
    * OPTICS variant used by DiSH internally.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class Instance extends GeneralizedOPTICS.Instance<V, DiSHClusterOrder> {
@@ -817,7 +818,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
     /**
      * Sort new candidates by their distance, for determining the core size.
-     * 
+     *
      * @author Erich Schubert
      *
      * @apiviz.exclude
@@ -839,7 +840,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
   /**
    * DiSH cluster order.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class DiSHClusterOrder extends CorrelationClusterOrder {
@@ -869,7 +870,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
     /**
      * Get the common subspace.
-     * 
+     *
      * @param id Object id
      * @return common subspace
      */
@@ -880,9 +881,9 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {

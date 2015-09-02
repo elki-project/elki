@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -39,14 +39,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
  * Class to load a database from a bundle file.
- * 
+ *
  * Bundle files are stored in a compact binary format along with metadata, so
  * that parsing should be simpler, albeit the focus was on using it in on-disk
  * indexes.
- * 
+ *
  * @author Erich Schubert
- * 
- * @apiviz.composedOf BundleStreamSource
+ *
+ * @apiviz.composedOf BundleReader
  */
 public class BundleDatabaseConnection extends AbstractDatabaseConnection {
   /**
@@ -61,7 +61,7 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Constructor.
-   * 
+   *
    * @param filters Filters
    * @param infile Input file
    */
@@ -92,9 +92,9 @@ public class BundleDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {

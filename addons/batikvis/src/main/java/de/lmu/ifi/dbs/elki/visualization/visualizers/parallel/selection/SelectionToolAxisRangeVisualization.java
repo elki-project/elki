@@ -28,15 +28,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
+import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -88,7 +90,11 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
     Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
     for(; it.valid(); it.advance()) {
       ParallelPlotProjector<?> p = it.get();
-      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), p.getRelation(), SelectionToolAxisRangeVisualization.this);
+      Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        continue;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionToolAxisRangeVisualization.this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
       task.tool = true;
       task.addUpdateFlags(VisualizationTask.ON_SELECTION);
@@ -104,7 +110,6 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
    *
    * @author Robert Rödler
    *
-   * @apiviz.has SelectionResult oneway - - updates
    * @apiviz.has RangeSelection oneway - - updates
    */
   public class Instance extends AbstractParallelVisualization<NumberVector>implements DragableArea.DragListener {
@@ -174,13 +179,13 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
      * @param y1 min y-value
      * @param y2 max y-value
      */
-    private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, DoubleDoublePair[] ranges) {
-      final int dim = proj.getVisibleDimensions();
-      int minaxis = dim + 1;
+    private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, ModifiableHyperBoundingBox ranges) {
+      final int dims = proj.getVisibleDimensions();
+      int minaxis = dims + 1;
       int maxaxis = -1;
       {
         int i = 0;
-        while(i < dim) {
+        while(i < dims) {
           double axx = getVisibleAxisX(i);
           if(x1 < axx || x2 < axx) {
             minaxis = i;
@@ -188,7 +193,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
           }
           i++;
         }
-        while(i <= dim) {
+        while(i <= dims) {
           double axx = getVisibleAxisX(i);
           if(x2 < axx && x1 < axx) {
             maxaxis = i;
@@ -202,10 +207,12 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
       for(int i = minaxis; i < maxaxis; i++) {
         double v1 = proj.fastProjectRenderToDataSpace(z1, i);
         double v2 = proj.fastProjectRenderToDataSpace(z2, i);
+        final int ddim = proj.getDimForVisibleAxis(i);
         if(LOG.isDebugging()) {
-          LOG.debug("Axis " + i + " dimension " + proj.getDimForVisibleAxis(i) + " " + v1 + " to " + v2);
+          LOG.debug("Axis " + i + " dimension " + ddim + " " + v1 + " to " + v2);
         }
-        ranges[proj.getDimForVisibleAxis(i)] = new DoubleDoublePair(Math.min(v1, v2), Math.max(v1, v2));
+        ranges.setMin(ddim, Math.min(v1, v2));
+        ranges.setMax(ddim, Math.max(v1, v2));
       }
     }
 
@@ -250,7 +257,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
       else {
         selection = DBIDUtil.newHashSet();
       }
-      DoubleDoublePair[] ranges;
+      ModifiableHyperBoundingBox ranges;
 
       if(p1 == null || p2 == null) {
         LOG.warning("no rect selected: p1: " + p1 + " p2: " + p2);
@@ -266,7 +273,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
           ranges = ((RangeSelection) selContext).getRanges();
         }
         else {
-          ranges = new DoubleDoublePair[dim];
+          ranges = new ModifiableHyperBoundingBox(dim, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY);
         }
         updateSelectionRectKoordinates(x1, x2, y1, y2, ranges);
 
@@ -274,9 +281,10 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
 
         candidates: for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
           NumberVector dbTupel = relation.get(iditer);
-          for(int i = 0; i < dim; i++) {
-            if(ranges != null && ranges[i] != null) {
-              if(dbTupel.doubleValue(i) < ranges[i].first || dbTupel.doubleValue(i) > ranges[i].second) {
+          for(int d = 0; d < dim; d++) {
+            final double min = ranges.getMin(d), max = ranges.getMax(d);
+            if(max < Double.POSITIVE_INFINITY && min > Double.NEGATIVE_INFINITY) {
+              if(dbTupel.doubleValue(d) < min || dbTupel.doubleValue(d) > max) {
                 continue candidates;
               }
             }

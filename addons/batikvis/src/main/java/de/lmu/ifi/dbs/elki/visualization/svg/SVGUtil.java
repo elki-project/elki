@@ -1,5 +1,28 @@
 package de.lmu.ifi.dbs.elki.visualization.svg;
 
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2015
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import java.awt.Color;
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -19,30 +42,6 @@ import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
@@ -75,6 +74,16 @@ public final class SVGUtil {
    * Hourglass style.
    */
   final public static String HOURGLASS_STYLE = "stroke: black; stroke-width: .01; fill: grey; opacity: .2";
+
+  /**
+   * Throbber path.
+   */
+  final public static String THROBBER_PATH = "M.5,.25 a.25,.25 0 0 1 .1766,.42635 l-.0589 -.0589 a-.1766 -.1766 0 0 0 -.1178,-.2835 z";
+
+  /**
+   * Throbber style.
+   */
+  final public static String THROBBER_STYLE = "fill: #3d7fe6; opacity: .2";
 
   /**
    * SVG color names conversion.
@@ -483,11 +492,24 @@ public final class SVGUtil {
    * @return New element (currently a {@link SVGConstants#SVG_PATH_TAG})
    */
   public static Element svgWaitIcon(Document document, double x, double y, double w, double h) {
-    Element elem = SVGUtil.svgElement(document, SVGConstants.SVG_PATH_TAG);
-    setAtt(elem, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + x + " " + y + ") scale(" + w + " " + h + ")");
-    setAtt(elem, SVGConstants.SVG_D_ATTRIBUTE, HOURGLASS_PATH);
-    setStyle(elem, HOURGLASS_STYLE);
-    return elem;
+    Element g = SVGUtil.svgElement(document, SVGConstants.SVG_G_TAG);
+    setAtt(g, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "translate(" + x + " " + y + ") scale(" + w + " " + h + ")");
+    Element thro = SVGUtil.svgElement(document, SVGConstants.SVG_PATH_TAG);
+    setAtt(thro, SVGConstants.SVG_D_ATTRIBUTE, THROBBER_PATH);
+    setStyle(thro, THROBBER_STYLE);
+    Element anim = SVGUtil.svgElement(document, SVGConstants.SVG_ANIMATE_TRANSFORM_TAG);
+    setAtt(anim, SVGConstants.SVG_ATTRIBUTE_NAME_ATTRIBUTE, SVGConstants.SVG_TRANSFORM_ATTRIBUTE);
+    setAtt(anim, SVGConstants.SVG_ATTRIBUTE_TYPE_ATTRIBUTE, "XML");
+    setAtt(anim, SVGConstants.SVG_TYPE_ATTRIBUTE, SVGConstants.SVG_ROTATE_ATTRIBUTE);
+    setAtt(anim, SVGConstants.SVG_FROM_ATTRIBUTE, "0 .5 .5");
+    setAtt(anim, SVGConstants.SVG_TO_ATTRIBUTE, "360 .5 .5");
+    setAtt(anim, SVGConstants.SVG_BEGIN_ATTRIBUTE, fmt(Math.random() * 2) + "s");
+    setAtt(anim, SVGConstants.SVG_DUR_ATTRIBUTE, "2s");
+    setAtt(anim, SVGConstants.SVG_REPEAT_COUNT_ATTRIBUTE, "indefinite");
+    setAtt(anim, SVGConstants.SVG_FILL_ATTRIBUTE, "freeze");
+    thro.appendChild(anim);
+    g.appendChild(thro);
+    return g;
   }
 
   /**
