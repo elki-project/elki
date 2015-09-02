@@ -42,6 +42,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.SwingUtilities;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -558,7 +559,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
    * Refresh the overview
    */
   protected void update() {
-    menubar.updateVisualizerMenus();
+    updateVisualizerMenus();
     if(currentSubplot != null) {
       showPlot(currentSubplot);
     }
@@ -578,21 +579,33 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
 
   @Override
   public void resultAdded(Result child, Result parent) {
-    menubar.updateVisualizerMenus();
+    updateVisualizerMenus();
   }
 
   @Override
   public void resultChanged(Result current) {
-    menubar.updateVisualizerMenus();
+    updateVisualizerMenus();
   }
 
   @Override
   public void resultRemoved(Result child, Result parent) {
-    menubar.updateVisualizerMenus();
+    updateVisualizerMenus();
   }
 
   @Override
   public void visualizationChanged(VisualizationItem item) {
-    menubar.updateVisualizerMenus();
+    updateVisualizerMenus();
+  }
+
+  /**
+   * Update visualizer menus, but only from Swing thread.
+   */
+  private void updateVisualizerMenus() {
+    SwingUtilities.invokeLater(new Runnable() {
+      @Override
+      public void run() {
+        menubar.updateVisualizerMenus();
+      }
+    });
   }
 }
