@@ -154,7 +154,6 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       
       //Punkte aus der Relation nehmen welche nicht beachtet werden
       List<ModifiableDBIDs> computingClusters = new ArrayList<>();
-      int count=0;
       for(int i=0; i < clusters.size(); i++)
       {
         computingClusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
@@ -165,22 +164,18 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
             computingClusters.get(i).add(clusters.get(i).get(j));
           }else
           { 
-            count++;
           }
               
         }
       }
-      System.out.println(iteration + " Punkt gelöscht insgesamt : " + count);
-      System.out.println("Nächste runde");
+      
       
       // Recompute means.
-      System.out.println(minHeap.size());
       means = means(computingClusters, means, relation);
-      System.out.println(minHeap.size());
       computingClusters.clear();
     }
-    System.out.println(minHeap.size());
-    System.out.println("bis hierhin hab ichs geschafft");
+    ArrayList<Double> all = new ArrayList<Double>();
+    ArrayList<Double> deleted = new ArrayList<Double>();
     //creating the noise cluster
     clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
       
@@ -189,10 +184,11 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     {
       for(int j = 0; j < clusters.get(i).size(); j++)
       {
+        all.add(clusters.get(i).get(j).doubleValue());
         if(clusters.get(i).get(j).doubleValue() >= minHeap.peek())
         {
+          deleted.add(clusters.get(i).get(j).doubleValue());
           //zuweisung an den noise Cluster
-          System.out.println("Hab einen Noise gefunden");
           clusters.get(k).add(clusters.get(i).get(j));
           assignment.putInt(clusters.get(i).get(j), k);
           clusters.get(i).remove(j);
@@ -200,6 +196,13 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
         }
       }
     }
+    
+    all.sort(null);
+    deleted.sort(null);
+    
+    System.out.println(all);
+    System.out.println("Und hier die gelöschten");
+    System.out.println(deleted);
     
     double[] computingMeans = {0.0, 0.0} ;
     Vector v = new Vector(computingMeans) ;
