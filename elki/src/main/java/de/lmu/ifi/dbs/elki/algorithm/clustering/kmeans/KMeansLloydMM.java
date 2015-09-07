@@ -27,6 +27,8 @@ import java.awt.image.DataBufferUShort;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
@@ -93,6 +95,8 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
    */
   public DoubleMinHeap minHeap;
   
+  public double rate;
+  
   /**
    * Constructor.
    * 
@@ -101,8 +105,9 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansLloydMM(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMeansLloydMM(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, double rate) {
     super(distanceFunction, k, maxiter, initializer);
+    this.rate = rate;
   }
 
   @Override
@@ -120,6 +125,8 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     
     //initialisieren vom Heap
     minHeap = new DoubleMinHeap();
+    int heapsize = (int) (relation.size()*rate);
+    System.out.println("Größe des Heaps: " + heapsize);
     
     // Setup cluster assignment store
     List<ModifiableDoubleDBIDList> clusters = new ArrayList<>();
@@ -127,19 +134,12 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
     }
     
-//    //creating the noise cluster
-//    clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
-//    
+ 
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
     double[] varsum = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
-    
-    //5% der Punkte werden nicht betrachtet
-    //TODO über Gui wert abfangen
-//    int heapsize = relation.size()/20;
-    int heapsize = 9;
     
     int iteration = 0;
     for(; maxiter <= 0 || iteration < maxiter; iteration++) {
@@ -152,20 +152,17 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
         break;
       }
       
-      //Punkte aus der Relation nehmen welche nicht beachtet werden
+    //Punkte aus der Relation nehmen welche nicht beachtet werde
       List<ModifiableDBIDs> computingClusters = new ArrayList<>();
-      for(int i=0; i < clusters.size(); i++)
+      for(int i = 0; i < clusters.size(); i++)
       {
         computingClusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
-        for(int j=0; j < clusters.get(i).size(); j++)
+        for(int j = 0; j < clusters.get(i).size(); j++)
         {
-          if(clusters.get(i).get(j).doubleValue()< minHeap.peek())
+          if(clusters.get(i).get(j).doubleValue() < minHeap.peek())
           {
             computingClusters.get(i).add(clusters.get(i).get(j));
-          }else
-          { 
-          }
-              
+          }              
         }
       }
       
@@ -174,13 +171,16 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       means = means(computingClusters, means, relation);
       computingClusters.clear();
     }
+    
+    
     ArrayList<Double> all = new ArrayList<Double>();
     ArrayList<Double> deleted = new ArrayList<Double>();
+    
     //creating the noise cluster
     clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
       
     //vor dem ausgeben der Resultate den noise bestimmen
-    for(int i = 0; i < clusters.size()-1; i++)
+    for(int i = 0; i < k; i++)
     {
       for(int j = 0; j < clusters.get(i).size(); j++)
       {
@@ -199,10 +199,14 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     
     all.sort(null);
     deleted.sort(null);
+    Collections.reverse(all);
+    Collections.reverse(deleted);
     
+    System.out.println("Hier alle Distanzen absteigend sortiert:");
     System.out.println(all);
-    System.out.println("Und hier die gelöschten");
+    System.out.println("Und hier die gelöschten:");
     System.out.println(deleted);
+    System.out.println(deleted.size() + " wurden insgesamt gelöscht" );
     
     double[] computingMeans = {0.0, 0.0} ;
     Vector v = new Vector(computingMeans) ;
@@ -350,7 +354,7 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     @Override
     protected KMeansLloydMM<V> makeInstance() {
       //TODO rate übergeben
-      return new KMeansLloydMM<>(distanceFunction, k, maxiter, initializer);
+      return new KMeansLloydMM<>(distanceFunction, k, maxiter, initializer, rate);
     }
   }
 }
