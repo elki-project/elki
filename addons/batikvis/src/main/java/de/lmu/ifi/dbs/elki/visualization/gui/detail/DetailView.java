@@ -282,19 +282,6 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
   public void destroy() {
     context.removeVisualizationListener(this);
     context.removeResultListener(this);
-    destroyVisualizations();
-  }
-
-  private void destroyVisualizations() {
-    for(Entry<Visualization, Element> v : layermap.entrySet()) {
-      Element layer = v.getValue();
-      if(layer != null) {
-        Node parent = layer.getParentNode();
-        if(parent != null) {
-          parent.removeChild(layer);
-        }
-      }
-    }
     for(Entry<VisualizationTask, Visualization> v : taskmap.entrySet()) {
       Visualization vis = v.getValue();
       if(vis != null) {
@@ -426,7 +413,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
 
   /**
    * Get the item visualized by this view.
-   * 
+   *
    * @return Plot item
    */
   public PlotItem getPlotItem() {
