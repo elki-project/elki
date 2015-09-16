@@ -71,12 +71,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @param <O> Vector type
  */
 @Reference(authors = "T. Zaeschke, C. Zimmerli, M.C. Norrie", title = "The PH-Tree -- A Space-Efficient Storage Structure and Multi-Dimensional Index", booktitle = "Proc. Intl. Conf. on Management of Data (SIGMOD'14), 2014", url = "http://dx.doi.org/10.1145/361002.361007")
-public class MinimalisticMemoryPHTree<O extends NumberVector> extends AbstractIndex<O> 
+public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O> 
     implements DynamicIndex,  KNNIndex<O>, RangeIndex<O> {
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(MinimalisticMemoryPHTree.class);
+  private static final Logging LOG = Logging.getLogger(MemoryPHTree.class);
 
   
   
@@ -107,7 +107,7 @@ public class MinimalisticMemoryPHTree<O extends NumberVector> extends AbstractIn
    * 
    * @param relation Relation to index
    */
-  public MinimalisticMemoryPHTree(Relation<O> relation) {
+  public MemoryPHTree(Relation<O> relation) {
     super(relation);
     if(LOG.isStatistics()) {
       String prefix = this.getClass().getName();
@@ -333,7 +333,7 @@ public class MinimalisticMemoryPHTree<O extends NumberVector> extends AbstractIn
    * @param <O> Vector type
    */
   @Alias({ "miniph", "ph" })
-  public static class Factory<O extends NumberVector> implements IndexFactory<O, MinimalisticMemoryPHTree<O>> {
+  public static class Factory<O extends NumberVector> implements IndexFactory<O, MemoryPHTree<O>> {
     /**
      * Constructor. Trivial parameterizable.
      */
@@ -342,8 +342,8 @@ public class MinimalisticMemoryPHTree<O extends NumberVector> extends AbstractIn
     }
 
     @Override
-    public MinimalisticMemoryPHTree<O> instantiate(Relation<O> relation) {
-      return new MinimalisticMemoryPHTree<>(relation);
+    public MemoryPHTree<O> instantiate(Relation<O> relation) {
+      return new MemoryPHTree<>(relation);
     }
 
     @Override
@@ -353,8 +353,8 @@ public class MinimalisticMemoryPHTree<O extends NumberVector> extends AbstractIn
     
     public static class Parametrizer extends AbstractParameterizer {
       @Override
-      protected MinimalisticMemoryPHTree.Factory<NumberVector> makeInstance() {
-        return new MinimalisticMemoryPHTree.Factory<>();
+      protected MemoryPHTree.Factory<NumberVector> makeInstance() {
+        return new MemoryPHTree.Factory<>();
       }
     }
   }
