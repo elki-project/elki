@@ -51,9 +51,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Estimate global average intrinsic dimensionality of a data set.
- * 
+ *
  * Note: this algorithm does not produce a result, but only logs statistics.
- * 
+ *
  * @author Erich Schubert
  *
  * @param <O> Data type
@@ -145,9 +145,9 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    *
    * @param <O> Object type
@@ -186,7 +186,7 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<IntrinsicDimensionalityEstimator> estimatorP = new ObjectParameter<>(ESTIMATOR_ID, GEDEstimator.class);
+      ObjectParameter<IntrinsicDimensionalityEstimator> estimatorP = new ObjectParameter<>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, GEDEstimator.class);
       if(config.grab(estimatorP)) {
         estimator = estimatorP.instantiateClass(config);
       }
