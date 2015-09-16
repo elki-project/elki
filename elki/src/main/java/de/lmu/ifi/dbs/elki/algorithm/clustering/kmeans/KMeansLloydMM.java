@@ -46,6 +46,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListMIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -90,11 +93,8 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
    */
   private static final String KEY = KMeansLloyd.class.getName();
   
-  /**
-   * MinHeap
-   */
-  public DoubleMinHeap minHeap;
-  
+
+  public DoubleMinHeap minHeap;  
   public double rate;
   
   /**
@@ -126,6 +126,7 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     //initialisieren vom Heap
     minHeap = new DoubleMinHeap();
     int heapsize = (int) (relation.size()*rate);
+    System.out.println("Punkte insgesamt: " + relation.size());
     System.out.println("Größe des Heaps: " + heapsize);
     
     // Setup cluster assignment store
@@ -142,8 +143,11 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
     
     int iteration = 0;
+    //*****************************************************************************\\
     for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       minHeap.clear();
+      for(int i=0; i<k; i++)
+        clusters.get(i).clear();
       LOG.incrementProcessed(prog);
       boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum, heapsize);
       logVarstat(varstat, varsum);
@@ -152,24 +156,9 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
         break;
       }
       
-    //Punkte aus der Relation nehmen welche nicht beachtet werde
-      List<ModifiableDBIDs> computingClusters = new ArrayList<>();
-      for(int i = 0; i < clusters.size(); i++)
-      {
-        computingClusters.add(DBIDUtil.newHashSet((int) (relation.size() * 2. / k)));
-        for(int j = 0; j < clusters.get(i).size(); j++)
-        {
-          if(clusters.get(i).get(j).doubleValue() < minHeap.peek())
-          {
-            computingClusters.get(i).add(clusters.get(i).get(j));
-          }              
-        }
-      }
-      
-      
       // Recompute means.
-      means = means(computingClusters, means, relation);
-      computingClusters.clear();
+      means = meansWithTreshhold(clusters, means, relation, minHeap.peek());
+      //TODO Heap nochmal aufbauen??
     }
     
     
@@ -207,7 +196,9 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     System.out.println("Und hier die gelöschten:");
     System.out.println(deleted);
     System.out.println(deleted.size() + " wurden insgesamt gelöscht" );
-    
+   
+    //TODO Means und Va für noise Cluster bestimmenn, oder anderes Modell?
+    //übergangslösung
     double[] computingMeans = {0.0, 0.0} ;
     Vector v = new Vector(computingMeans) ;
     means.add(v);
@@ -217,8 +208,6 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       noisevarsum[i] = varsum[i];
     }
     noisevarsum[varsum.length] = 0;
-    
-//    means = means(clusters, means, relation);
     
     LOG.setCompleted(prog);
     if(LOG.isStatistics()) {
@@ -235,9 +224,17 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       KMeansModel model = new KMeansModel(means.get(i), noisevarsum[i]);
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
+    
+//    //Noise Cluster
+//    DBIDs ids = clusters.get(k);
+//    KMeansModel model = new KMeansModel(null, 0);
+//    result.addToplevelCluster(new Cluster<>(ids, true, model));
+//    //cluster konstruktor mit noise flag true
     return result;
   }
 
+//*************************************************************************************//
+  
   @Override
   protected Logging getLogger() {
     return LOG;
@@ -288,39 +285,69 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     return changed;
   }
   
+//*************************************************************************************//
   
   protected boolean updateAssignmentWithDistance(DBIDIter iditer, List<? extends ModifiableDoubleDBIDList> clusters, WritableIntegerDataStore assignment, int newA, double mindist) {
     final int oldA = assignment.intValue(iditer);
     
-    //falls keine veränderung der Cluster
-    if(oldA == newA) {
-      //Suche den index der DBID im Cluster
-      for(int i = 0; i < clusters.get(oldA).size(); i++)
-      {
-        if(DBIDUtil.equal(clusters.get(oldA).get(i), iditer))
-        {
-            //"update" die distance
-            clusters.get(oldA).remove(i);
-            clusters.get(oldA).add(mindist, iditer);
-        }
-      }
+    //falls dem gleichen Cluster zugeordnet bleibt
+    if(oldA == newA)
+    {
+      clusters.get(oldA).add(mindist, iditer);
       return false;
     }
+
     //zuweisung des Punktes an den neuen Cluster
     clusters.get(newA).add(mindist, iditer);
     assignment.putInt(iditer, newA);
-    if(oldA >= 0) {
-      for(int i = 0; i< clusters.get(oldA).size(); i++)
-      {
-        if(DBIDUtil.equal(clusters.get(oldA).get(i), iditer))
-        {
-          clusters.get(oldA).remove(i);
-        }
-      }
-    }
     return true;
   }
   
+//*************************************************************************************//
+  
+  /**
+   * Returns the mean vectors of the given clusters in the given database.
+   * 
+   * @param clusters the clusters to compute the means
+   * @param means the recent means
+   * @param database the database containing the vectors
+   * @return the mean vectors of the given clusters in the given database
+   */
+  protected List<Vector> meansWithTreshhold(List<? extends ModifiableDoubleDBIDList> clusters, List<? extends NumberVector> means, Relation<V> database, Double tresh) {
+    // TODO: use Kahan summation for better numerical precision?
+    List<Vector> newMeans = new ArrayList<>(k);
+    for(int i = 0; i < k; i++) {
+      for( DoubleDBIDListMIter it = clusters.get(i).iter(); it.valid(); it.advance())
+      {
+        if(it.doubleValue() > tresh)
+          it.remove();
+      }
+        
+      DBIDs list = clusters.get(i);
+      Vector mean = null;
+      if(list.size() > 0) {
+        DBIDIter iter = list.iter();
+        // Initialize with first.
+        mean = database.get(iter).getColumnVector();
+        double[] raw = mean.getArrayRef();
+        iter.advance();
+        // Update with remaining instances
+        for(; iter.valid(); iter.advance()) {
+          NumberVector vec = database.get(iter);
+          for(int j = 0; j < mean.getDimensionality(); j++) {
+            raw[j] += vec.doubleValue(j);
+          }
+        }
+        mean.timesEquals(1.0 / list.size());
+      }
+      else {
+        // Keep degenerated means as-is for now.
+        mean = means.get(i).getColumnVector();
+      }
+      newMeans.add(mean);
+    }
+    return newMeans;
+  }
   
   //*************************************************************************************//
   
