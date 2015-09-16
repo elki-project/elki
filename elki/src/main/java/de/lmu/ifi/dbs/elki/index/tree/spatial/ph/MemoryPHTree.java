@@ -28,7 +28,6 @@ import ch.ethz.globis.pht.PhTreeF.PhQueryF;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -80,11 +79,6 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
 
   
   
-  /**
-   * The actual "tree" as a sorted array.
-   */
-  ArrayModifiableDBIDs sorted = null;
-  
   private final PhTreeF<DBID> tree;
 
   /**
@@ -124,9 +118,6 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
 
   @Override
   public void initialize() {
-    sorted = DBIDUtil.newArray(relation.getDBIDs());
-
-
     DBIDIter iter = relation.getDBIDs().iter();
 
     for(; iter.valid(); iter.advance()) {
