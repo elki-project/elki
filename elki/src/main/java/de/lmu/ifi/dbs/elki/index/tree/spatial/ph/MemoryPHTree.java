@@ -237,7 +237,7 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
     public KNNList getKNNForObject(O obj, int k) {
       final KNNHeap knns = DBIDUtil.newHeap(k);
       
-      for (double[] v: tree.nearestNeighbour(0, oToDouble(obj, new double[dims]))) {
+      for (double[] v: tree.nearestNeighbour(k, oToDouble(obj, new double[dims]))) {
         DBID id = tree.get(v);
         O o2 = relation.get(id);
         double distance = norm.distance(obj, o2);
