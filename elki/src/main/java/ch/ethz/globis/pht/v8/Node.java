@@ -1066,33 +1066,6 @@ class Node<T> {
     return createNodeEntry(key, val);
   }
 
-  /**
-   * Same as above, but without checks.
-   */
-  @SuppressWarnings("unchecked")
-  PhEntry<T> getPostPOBNoCheck(int offsPostKey, long hcPos, int DIM, long[] valTemplate,
-      long[] rangeMin, long[] rangeMax) {
-    int valPos = offs2ValPos(offsPostKey, hcPos, DIM);
-    T val = values[valPos];
-    if (val instanceof PhEntry) {
-      return (PhEntry<T>) val;
-    }
-
-    long[] key = new long[DIM];
-    System.arraycopy(valTemplate, 0, key, 0, DIM);
-    PhTreeHelper.applyHcPos(hcPos, postLen, key);
-
-    long[] ia = ba;
-    int offs = offsPostKey;
-    final long mask = (~0L)<<postLen;
-    for (int i = 0; i < key.length; i++) {
-      key[i] &= mask;
-      key[i] |= Bits.readArray(ia, offs, postLen);
-      offs += postLen;
-    }
-    return new PhEntry<T>(key, val);
-  }
-
   T getPostValuePOB(int offs, long pos, int DIM) {
     if (!isPostNI()) {
       int valPos = offs2ValPos(offs, pos, DIM);
@@ -1424,6 +1397,10 @@ class Node<T> {
 
   /**
    * Adjust the infix in cases were the parent node is removed.
+   * @param prefix 
+   * @param infixLenOfParent 
+   * @param postLenOfParent 
+   * @param hcPos 
    * @param infix
    */
   public void adjustInfix(long[] prefix, int infixLenOfParent, int postLenOfParent, long hcPos) {

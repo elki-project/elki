@@ -28,28 +28,30 @@ import org.zoodb.index.critbit.CritBit.QueryIteratorKD;
 /**
  * 
  * @author Tilmann Zaeschke
+ * 
+ * @param <V> The type of the value associated with each key 
  */
 public interface CritBitKD<V> {
 
-	/** @see CritBit#putKD(long[], Object) */
+	/* @see CritBit#putKD(long[], Object) */
 	V putKD(long[] key, V value);
 
-	/** @see CritBit#containsKD(long[]) */
+	/* @see CritBit#containsKD(long[]) */
 	boolean containsKD(long[] key);
 
-	/** @see CritBit#size() */  
+	/* @see CritBit#size() */  
 	int size();
 
-	/** @see CritBit#queryKD(long[], long[]) */  
+	/* @see CritBit#queryKD(long[], long[]) */  
 	QueryIteratorKD<V> queryKD(long[] lowerLeft, long[] upperRight);
 
-	/** @see CritBit#removeKD(long[]) */  
+	/* @see CritBit#removeKD(long[]) */  
 	V removeKD(long[] key);
 
-	/** @see CritBit#printTree() */  
+	/* @see CritBit#printTree() */  
 	void printTree();
 
-	/** @see CritBit#getKD(long[]) */  
+	/* @see CritBit#getKD(long[]) */  
 	V getKD(long[] key);
 
 }

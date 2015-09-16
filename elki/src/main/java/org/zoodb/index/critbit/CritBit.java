@@ -1472,7 +1472,6 @@ public class CritBit<V> implements CritBit1D<V>, CritBitKD<V> {
 		private static final byte READ_UPPER = 1;
 		private static final byte RETURN_TO_PARENT = 2;
 		private final byte[] readHigherNext;
-		private int stackTop = -1;
 		//This mask remembers whether a certain dimension is fully contained or not 
 		//We have a separate mask for each possible level
 		private final long[] domMaskLo;
@@ -1605,7 +1604,7 @@ public class CritBit<V> implements CritBit1D<V>, CritBitKD<V> {
 					if (diffHi == 0 && keyTemplate[keyTemplate.length-1] == maxOrig[maxOrig.length-1]) {
 						//TODO this can't work, 'i' is OOB.
 						if (true) throw new IllegalStateException();
-						return false;
+						//return false;
 					}
 				}
 				return true;
@@ -1712,8 +1711,8 @@ public class CritBit<V> implements CritBit1D<V>, CritBitKD<V> {
 //pointFound = true;
 			if (diffLo == MAX_MASK && diffHi == MAX_MASK) {
 				if (true) throw new IllegalStateException();
-				pointFound = true;
-				return true;
+				//pointFound = true;
+				//return true;
 			}
 			return true;
 		}

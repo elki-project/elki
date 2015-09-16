@@ -36,6 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  *
  * @author ztilmann (Tilmann Zaeschke)
+ * 
+ * @param <T> The value type of the tree 
  *
  */
 @Reference(authors = "T. Zaeschke, C. Zimmerli, M.C. Norrie", title = "The PH-Tree -- A Space-Efficient Storage Structure and Multi-Dimensional Index", booktitle = "Proc. Intl. Conf. on Management of Data (SIGMOD'14), 2014", url = "http://dx.doi.org/10.1145/361002.361007")
@@ -127,6 +129,7 @@ public abstract class PhTree<T> {
 	 * Create a new tree with the specified number of dimensions.
 	 * 
 	 * @param dim number of dimensions
+	 * @return PhTree
 	 */
     public static <T> PhTree<T> create(int dim) {
     	return new PhTree8<T>(dim);

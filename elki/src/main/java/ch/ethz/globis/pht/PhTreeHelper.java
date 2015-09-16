@@ -37,11 +37,14 @@ public abstract class PhTreeHelper {
     	//
     }
     
-	/** Determines how much memory should be allocated on array resizing. The batch
+	/** 
+	 * Determines how much memory should be allocated on array resizing. The batch
 	 * size designates multiples of 16byte on a JVM with < 32GB. Higher values
 	 * result in higher fixed memory requirements but reduce the number of arrays
 	 * to be created, copied and garbage collected when modifying the tree.
-	 * Recommended values are 1, 2, 3, 4.  Default is 1.*/
+	 * Recommended values are 1, 2, 3, 4.  Default is 1.
+	 * @param size 
+	 */
 	public static void setAllocBatchSize(int size) {
 		//This works as follows: For a long[] we always allocate even numbers, i.e. we allocate
 		//2*size slots.
@@ -186,37 +189,6 @@ public abstract class PhTreeHelper {
      * (left to right ordered)
      * 
      * @param valSet
-     * @param currentDepth
-     * @return Encoded HC position
-     */
-    public static final long posInArray(long[] valSet, int currentDepth, int DEPTH) {
-        //n=DIM,  i={0..n-1}
-        // i = 0 :  |0|1|0|1|0|1|0|1|
-        // i = 1 :  | 0 | 1 | 0 | 1 |
-        // i = 2 :  |   0   |   1   |
-        //len = 2^n
-        //Following formula was for inverse ordering of current ordering...
-        //pos = sum (i=1..n, len/2^i) = sum (..., 2^(n-i))
-
-    	long valMask = (1l << (DEPTH-1-currentDepth));
-    	
-        long pos = 0;
-        for (long v: valSet) {
-        	pos <<= 1;
-        	//set pos-bit if bit is set in value
-            if ((valMask & v) != 0) {
-                pos |= 1L;
-            }
-        }
-        return pos;
-    }
-
-    /**
-     * Encode the bits at the given position of all attributes into a hyper-cube address.
-     * Currently, the first attribute determines the left-most (high-value) bit of the address 
-     * (left to right ordered)
-     * 
-     * @param valSet
      * @param postLen
      * @return Encoded HC position
      */
@@ -241,83 +213,6 @@ public abstract class PhTreeHelper {
         }
         return pos;
     }
-
-    /**
-     * Transpose the value from long[DIM] to long[DEPTH].
-     * Transposition occurs such that high-order bits end up in the first value of 'tv'.
-     * Value from DIM=0 end up as highest order bits in 'tv'.
-     * 0001,
-     * 0010, 
-     * 0011
-     * becomes
-     * 000, 000, 011, 101
-     * 
-     * @param Value
-     * @return Transposed value
-     */
-    public static long[] transposeValue(long[] valSet, int DEPTH) {
-    	long[] tv = new long[DEPTH];
-    	long valMask = 1l << (DEPTH-1);
-    	for (int j = 0; j < DEPTH; j++) {
-	    	long pos = 0;
-	        for (long v: valSet) {
-	        	pos <<= 1;
-	        	//set pos-bit if bit is set in value
-	            if ((valMask & v) != 0) {
-	                pos |= 1L;
-	            }
-	        }
-	        tv[j] = pos;
-	        valMask >>>= 1;
-    	}
-        return tv;
-    }
-    
-
-    /**
-     * Apply a HC-position to a value. This means setting one bit for each dimension.
-     * Trailing bits are set to 0.
-     * @param pos
-     * @param val
-     * @deprecated This may or may not reset trailing bits (mask0 for cPL < 63). 
-     * Use applyHcPos() instead. 
-     */
-    public static void applyHcPosAndResetRemainder(long pos, int currentDepth, long[] val, 
-    		final int DEPTH) {
-    	int currentPostLen = DEPTH-1-currentDepth;
-    	applyHcPosAndResetRemainder(pos, currentPostLen, val, currentDepth == 0);
-    }
-
-    /**
-     * Apply a HC-position to a value. This means setting one bit for each dimension.
-     * Trailing bits are set to 0.
-     * @param pos
-     * @param currentPostLen
-     * @param val
-     * @param isDepth0 Set this to true if currentDepth==0.
-     * @deprecated This may or may not reset trailing bits (mask0 for cPL < 63). 
-     * Use applyHcPos() instead. 
-     */
-    public static void applyHcPosAndResetRemainder(long pos, int currentPostLen, long[] val, 
-    		boolean isDepth0) {
-    	//for depth=0 we need to set leading zeroes, for example if a valTemplate had previously
-    	//been assigned leading '1's for a negative value.
-    	long mask0 = isDepth0 ? 0 : ~(1l << currentPostLen);
-    	//leading '1'-digits for negative values on depth=0
-    	//mask1 = !isDepth0 ?   (1l << currentPostLen)  :  ((-1L) << currentPostLen); 
-    	long mask1 = (isDepth0 ? -1L : 1L) << currentPostLen;
-    	long posMask = 1L<<val.length;
-		for (int d = 0; d < val.length; d++) {
-			posMask >>>= 1;
-			long x = pos & posMask;
-			if (x!=0) {
-				val[d] |= mask1;
-			} else {
-				val[d] &= mask0;
-			}
-		}
-    }
-
 
    /**
      * Apply a HC-position to a value. This means setting one bit for each dimension.

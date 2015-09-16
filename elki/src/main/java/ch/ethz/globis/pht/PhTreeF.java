@@ -39,6 +39,8 @@ import ch.ethz.globis.pht.util.PhIteratorBase;
  *
  *
  * @author ztilmann (Tilmann Zaeschke)
+ * 
+ * @param <T> The value type of the tree 
  *
  */
 public class PhTreeF<T> {
@@ -50,6 +52,7 @@ public class PhTreeF<T> {
    * Create a new tree with the specified number of dimensions.
    * 
    * @param dim number of dimensions
+   * @return PhTree
    */
   public static <T> PhTreeF<T> create(int dim) {
     return new PhTreeF<T>(dim, new EmptyPP());
@@ -60,6 +63,7 @@ public class PhTreeF<T> {
    * 
    * @param dim number of dimensions
    * @param pre The preprocessor top be used.
+   * @return PhTree
    */
   public static <T> PhTreeF<T> create(int dim, PreProcessorPoint pre) {
     return new PhTreeF<T>(dim, pre);

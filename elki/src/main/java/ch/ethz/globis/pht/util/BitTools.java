@@ -53,6 +53,7 @@ public class BitTools {
 
     /**
      * @param value
+     * @param ret The array used to store the return value
      * @return long representation.
      */
 	public static long[] toSortableLong(double[] value, long[] ret) {
@@ -225,10 +226,12 @@ public class BitTools {
 	}
 	
 	/**
-	 * Splits a value and write it to trgV at position trg1 and trg2.
+	 * Splits a value.
 	 * This is the inverse operation to merge(...).
+	 * @param DIM 
 	 * @param toSplit
 	 * @param nBitsPerValue Number of bits of source value
+	 * @return The split value
 	 */
 	public static long[] splitLong(final int DIM, final int nBitsPerValue, final long[] toSplit) {
 		long[] trg = new long[DIM];
@@ -248,7 +251,9 @@ public class BitTools {
 	}
 
 	/**
-	 * @Param posBit Counts from left to right!!!
+	 * @param ba 
+	 * @param posBit Counts from left to right!!!
+	 * @return the bit as boolean 
 	 */
     public static boolean getBit(long[] ba, int posBit) {
         int pA = posBit >>> 6; // 1/64
@@ -258,7 +263,9 @@ public class BitTools {
 	}
 
 	/**
-	 * @Param posBit Counts from left to right (highest to lowest)!!!
+	 * @param ba 
+	 * @param posBit Counts from left to right (highest to lowest)!!!
+	 * @param b 
 	 */
     public static void setBit(long[] ba, int posBit, boolean b) {
         int pA = posBit >>> 6;  // 1/64

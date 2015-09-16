@@ -462,7 +462,9 @@ public class BitsLong {
 
 
   /**
+   * @param ba 
    * @param posBit Counts from left to right!!!
+   * @return the bit as boolean
    */
   public static boolean getBit(long[] ba, int posBit) {
     int pA = posBit >>> UNIT_3;
@@ -472,7 +474,9 @@ public class BitsLong {
   }
 
   /**
+   * @param ba 
    * @param posBit Counts from left to right!!!
+   * @return the bit a long
    */
   public static long getBit01(long[] ba, int posBit) {
     int pA = posBit >>> UNIT_3;
@@ -482,7 +486,9 @@ public class BitsLong {
   }
 
   /**
+   * @param ba 
    * @param posBit Counts from left to right (highest to lowest)!!!
+   * @param b 
    */
   public static void setBit(long[] ba, int posBit, boolean b) {
     int pA = posBit >>> UNIT_3;

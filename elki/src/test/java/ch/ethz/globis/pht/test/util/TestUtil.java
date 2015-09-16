@@ -61,6 +61,7 @@ public abstract class TestUtil {
 	
 	/**
 	 * Creates a special ZooKeeper.
+	 * @param args 
 	 */
 	public static void beforeTest(Object[] args) {
 		getInstance().beforeTest(args);

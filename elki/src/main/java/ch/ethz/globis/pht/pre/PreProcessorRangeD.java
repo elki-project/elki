@@ -27,7 +27,8 @@ public interface PreProcessorRangeD {
 	
 	/**
 	 * 
-	 * @param raw raw data (input)
+   * @param raw1 raw data (input) of lower left corner
+   * @param raw2 raw data (input) of upper right corner
 	 * @param pre pre-processed data (output, must be non-null and same size as input array)
 	 */
 	public void pre(double[] raw1, double[] raw2, long[] pre);
@@ -35,7 +36,10 @@ public interface PreProcessorRangeD {
 	
 	/**
 	 * @param pre pre-processed data (input)
-	 * @param post post-processed data (output, must be non-null and same size as input array)
+   * @param post1 post-processed data (output, must be non-null and same size as input array)
+   *              of lower left corner
+   * @param post2 post-processed data (output, must be non-null and same size as input array)
+   *              of upper right corner
 	 */
 	public void post(long[] pre, double[] post1, double[] post2);
 }
