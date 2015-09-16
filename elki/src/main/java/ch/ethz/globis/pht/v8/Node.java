@@ -1,12 +1,28 @@
-/*
- * Copyright 2011-2015 ETH Zurich. All Rights Reserved.
- *
- * This software is the proprietary information of ETH Zurich.
- * Use is subject to license terms.
- */
 package ch.ethz.globis.pht.v8;
 
-import static ch.ethz.globis.pht.PhTreeHelper.DEBUG_FULL;
+/*
+This file is part of ELKI:
+Environment for Developing KDD-Applications Supported by Index-Structures
+
+Copyright (C) 2011-2015
+Eidgenössische Technische Hochschule Zürich (ETH Zurich)
+Institute for Information Systems
+GlobIS Group
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 import static ch.ethz.globis.pht.PhTreeHelper.applyHcPos;
 
 import org.zoodb.index.critbit.CritBit64COW;
@@ -1065,17 +1081,6 @@ class Node<T> {
     long[] key = new long[DIM];
     System.arraycopy(valTemplate, 0, key, 0, DIM);
     PhTreeHelper.applyHcPos(hcPos, postLen, key);
-    if (DEBUG_FULL) {
-      //verify that we don't have keys here that can't possibly match...
-      final long mask = (~0L)<<postLen;
-      for (int i = 0; i < key.length; i++) {
-        key[i] &= mask;
-        if (key[i] < (rangeMin[i]&mask) || key[i] > (rangeMax[i]&mask)) {
-          throw new IllegalStateException("k=" + key[i] + " m/m=" + rangeMin[i] +
-              "/" + rangeMax[i]);
-        }
-      }
-    }
 
     long[] ia = ba;
     int offs = offsPostKey;
