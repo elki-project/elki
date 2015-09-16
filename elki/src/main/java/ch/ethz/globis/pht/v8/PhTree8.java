@@ -44,7 +44,6 @@ import ch.ethz.globis.pht.PhTreeConfig;
 import ch.ethz.globis.pht.PhTreeHelper;
 import ch.ethz.globis.pht.util.PhTreeQStats;
 import ch.ethz.globis.pht.util.StringBuilderLn;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * n-dimensional index (quad-/oct-/n-tree).
@@ -53,12 +52,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * on implementation)
  * Linearization: Storing Hypercube as paired array of index<->non_null_reference 
  *
+ * See also : T. Zaeschke, C. Zimmerli, M.C. Norrie; 
+ * "The PH-Tree -- A Space-Efficient Storage Structure and Multi-Dimensional Index", 
+ * (SIGMOD 2014)
+ *
  * @author ztilmann (Tilmann Zaeschke)
  * 
  * @param <T> The value type of the tree 
  *
  */
-@Reference(authors = "T. Zaeschke, C. Zimmerli, M.C. Norrie", title = "The PH-Tree -- A Space-Efficient Storage Structure and Multi-Dimensional Index", booktitle = "Proc. Intl. Conf. on Management of Data (SIGMOD'14), 2014", url = "http://dx.doi.org/10.1145/361002.361007")
 public class PhTree8<T> extends PhTree<T> {
 
 	//Enable HC incrementer / iteration

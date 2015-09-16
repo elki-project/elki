@@ -28,19 +28,20 @@ import java.util.List;
 import ch.ethz.globis.pht.util.PhIteratorBase;
 import ch.ethz.globis.pht.util.PhTreeQStats;
 import ch.ethz.globis.pht.v8.PhTree8;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * k-dimensional index (quad-/oct-/n-tree).
  * Supports key/value pairs.
  *
+ * See also : T. Zaeschke, C. Zimmerli, M.C. Norrie; 
+ * "The PH-Tree -- A Space-Efficient Storage Structure and Multi-Dimensional Index", 
+ * (SIGMOD 2014)
  *
  * @author ztilmann (Tilmann Zaeschke)
  * 
  * @param <T> The value type of the tree 
  *
  */
-@Reference(authors = "T. Zaeschke, C. Zimmerli, M.C. Norrie", title = "The PH-Tree -- A Space-Efficient Storage Structure and Multi-Dimensional Index", booktitle = "Proc. Intl. Conf. on Management of Data (SIGMOD'14), 2014", url = "http://dx.doi.org/10.1145/361002.361007")
 public abstract class PhTree<T> {
 
     
