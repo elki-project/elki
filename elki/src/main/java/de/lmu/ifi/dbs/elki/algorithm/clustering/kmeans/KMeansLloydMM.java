@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInit
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -67,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * The k-means-- algorithm, using Lloyd-style bulk iterations.
@@ -92,7 +94,7 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
    */
   private static final String KEY = KMeansLloyd.class.getName();
   
-
+  public boolean noiseFlag;
   public DoubleMinHeap minHeap;  
   public double rate;
   
@@ -104,9 +106,10 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansLloydMM(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, double rate) {
+  public KMeansLloydMM(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, double rate, boolean noiseFlag) {
     super(distanceFunction, k, maxiter, initializer);
     this.rate = rate;
+    this.noiseFlag = noiseFlag;
   }
 
   @Override
@@ -157,57 +160,42 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       
       // Recompute means.
       means = meansWithTreshhold(clusters, means, relation, minHeap.peek());
-      //TODO Heap nochmal aufbauen??
     }
-    
-    ArrayList<Double> all = new ArrayList<Double>();
-    ArrayList<Double> deleted = new ArrayList<Double>();
-    
-    //creating the noise cluster
-    clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
-      
-    //vor dem ausgeben der Resultate den noise bestimmen
-    double tresh = minHeap.peek();
-    for(int i = 0; i < k; i++)
-    {
-      for(DoubleDBIDListMIter it = clusters.get(i).iter(); it.valid(); it.advance())
+
+    //create noisecluster if wanted
+    if(noiseFlag){
+      rebuildHeap(relation, means, heapsize);
+      ArrayList<Double> all = new ArrayList<Double>();
+      ArrayList<Double> deleted = new ArrayList<Double>();
+      clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
+      double tresh = minHeap.peek();
+      for(int i = 0; i < k; i++)
       {
-        all.add(it.doubleValue());
-        if(it.doubleValue() >= tresh)
+        for(DoubleDBIDListMIter it = clusters.get(i).iter(); it.valid(); it.advance())
         {
-          deleted.add(it.doubleValue());
-          //zuweisung an den noise Cluster
-          clusters.get(k).add(it.getPair());
-          assignment.putInt(it, k);
-          it.remove();
-          it.retract();
+          all.add(it.doubleValue());
+          if(it.doubleValue() >= tresh)
+          {
+            deleted.add(it.doubleValue());
+            //zuweisung an den noise Cluster
+            clusters.get(k).add(it.getPair());
+            assignment.putInt(it, k);
+            it.remove();
+            it.retract();
+          }
         }
       }
+      all.sort(null);
+      deleted.sort(null);
+      Collections.reverse(all);
+      Collections.reverse(deleted);
+      System.out.println("Hier alle Distanzen absteigend sortiert:");
+      System.out.println(all);
+      System.out.println("Und hier die gelöschten:");
+      System.out.println(deleted);
+      System.out.println(deleted.size() + " wurden insgesamt gelöscht" );
     }
-    
-    all.sort(null);
-    deleted.sort(null);
-    Collections.reverse(all);
-    Collections.reverse(deleted);
-    
-    System.out.println("Hier alle Distanzen absteigend sortiert:");
-    System.out.println(all);
-    System.out.println("Und hier die gelöschten:");
-    System.out.println(deleted);
-    System.out.println(deleted.size() + " wurden insgesamt gelöscht" );
    
-    //TODO Means und Va für noise Cluster bestimmenn, oder anderes Modell?
-    //übergangslösung
-    double[] computingMeans = {0.0, 0.0} ;
-    Vector v = new Vector(computingMeans) ;
-    means.add(v);
-    double[] noisevarsum = new double[varsum.length+1];
-    for(int i=0; i< varsum.length; i++)
-    {
-      noisevarsum[i] = varsum[i];
-    }
-    noisevarsum[varsum.length] = 0;
-    
     LOG.setCompleted(prog);
     if(LOG.isStatistics()) {
       LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
@@ -215,23 +203,43 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
 
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for(int i = 0; i < clusters.size(); i++) {
+    for(int i = 0; i < k; i++) {
       DBIDs ids = clusters.get(i);
       if(ids.size() == 0) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means.get(i), noisevarsum[i]);
+      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
     
-//    //Noise Cluster
-//    DBIDs ids = clusters.get(k);
-//    KMeansModel model = new KMeansModel(null, 0);
-//    result.addToplevelCluster(new Cluster<>(ids, true, model));
-//    //cluster konstruktor mit noise flag true
+    //Noise Cluster
+    double[] computingMeans = {0.0, 0.0} ;
+    Vector v = new Vector(computingMeans) ;
+    KMeansModel model = new KMeansModel(v, 0);
+//  KMeansModel model = new KMeansModel(null, 0);
+    DBIDs ids = clusters.get(k);
+    result.addToplevelCluster(new Cluster<>(ids, true, model));
     return result;
   }
 
+//*************************************************************************************//
+  
+  protected void rebuildHeap(Relation<? extends V> relation, List<? extends NumberVector> means, int heapsize){
+    minHeap.clear();
+    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      double mindist = Double.POSITIVE_INFINITY;
+      V fv = relation.get(iditer);
+      for(int i = 0; i < k; i++) {
+        double dist = df.distance(fv, means.get(i));
+        if(dist < mindist) {
+          mindist = dist;
+        }
+      }
+      minHeap.add(mindist, heapsize);
+    }
+  }
+  
 //*************************************************************************************//
   
   @Override
@@ -359,28 +367,34 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
-    //TODO Description ergänzen
-    public static final OptionID RATE_ID = new OptionID("K-MeansMM-Rate", "description");
+    public static final OptionID RATE_ID = new OptionID("K-MeansMM-Rate", "determines the ignorationrate");
+    public static final OptionID NOISE_FLAG_ID = new OptionID("CreatingNoiseCluster", "Should a noisecluster be created?");
     private double rate;
+    private boolean noiseFlag;
+    
     @Override
     protected Logging getLogger() {
       return LOG;
     }
+
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter rateP = new DoubleParameter(RATE_ID, 0.05)//
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE)//
-      .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-      if(config.grab(rateP)) {
-        rate = rateP.doubleValue();
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE)//
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+          if(config.grab(rateP)) {
+            rate = rateP.doubleValue();
+          }
+      Flag createNoiseCluster = new Flag(NOISE_FLAG_ID);
+      if(config.grab(createNoiseCluster)){
+        noiseFlag = createNoiseCluster.getValue();
       }
     }
 
     @Override
     protected KMeansLloydMM<V> makeInstance() {
-      //TODO rate übergeben
-      return new KMeansLloydMM<>(distanceFunction, k, maxiter, initializer, rate);
+      return new KMeansLloydMM<>(distanceFunction, k, maxiter, initializer, rate, noiseFlag);
     }
   }
 }
