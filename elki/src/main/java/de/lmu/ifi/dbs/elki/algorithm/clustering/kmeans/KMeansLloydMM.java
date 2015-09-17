@@ -81,7 +81,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("K-Means--")
 @Description("Finds a least-squared partitioning into k clusters.")
-
 public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.
@@ -161,7 +160,6 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       //TODO Heap nochmal aufbauen??
     }
     
-    
     ArrayList<Double> all = new ArrayList<Double>();
     ArrayList<Double> deleted = new ArrayList<Double>();
     
@@ -169,19 +167,20 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
       
     //vor dem ausgeben der Resultate den noise bestimmen
+    double tresh = minHeap.peek();
     for(int i = 0; i < k; i++)
     {
-      for(int j = 0; j < clusters.get(i).size(); j++)
+      for(DoubleDBIDListMIter it = clusters.get(i).iter(); it.valid(); it.advance())
       {
-        all.add(clusters.get(i).get(j).doubleValue());
-        if(clusters.get(i).get(j).doubleValue() >= minHeap.peek())
+        all.add(it.doubleValue());
+        if(it.doubleValue() >= tresh)
         {
-          deleted.add(clusters.get(i).get(j).doubleValue());
+          deleted.add(it.doubleValue());
           //zuweisung an den noise Cluster
-          clusters.get(k).add(clusters.get(i).get(j));
-          assignment.putInt(clusters.get(i).get(j), k);
-          clusters.get(i).remove(j);
-          j--;
+          clusters.get(k).add(it.getPair());
+          assignment.putInt(it, k);
+          it.remove();
+          it.retract();
         }
       }
     }
