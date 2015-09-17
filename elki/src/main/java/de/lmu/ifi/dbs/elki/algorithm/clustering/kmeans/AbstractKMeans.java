@@ -114,7 +114,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   protected boolean assignToNearestCluster(Relation<? extends V> relation, List<? extends NumberVector> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
     assert(k == means.size());
     boolean changed = false;
+    // Reset all clusters
     Arrays.fill(varsum, 0.);
+    for (ModifiableDBIDs cluster : clusters) {
+      cluster.clear();
+    }
     final NumberVectorDistanceFunction<?> df = getDistanceFunction();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double mindist = Double.POSITIVE_INFINITY;
@@ -128,30 +132,10 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
         }
       }
       varsum[minIndex] += mindist;
-      changed |= updateAssignment(iditer, clusters, assignment, minIndex);
+      clusters.get(minIndex).add(iditer);
+      changed |= assignment.putInt(iditer, minIndex) != minIndex;
     }
     return changed;
-  }
-
-  /**
-   * Update the cluster assignments
-   *
-   * @param iditer Iterator over all objects
-   * @param clusters List of clusters
-   * @param assignment Assignment storage
-   * @param newA New cluster assignment.
-   * @return Cluster assignment
-   */
-  private boolean updateAssignment(DBIDIter iditer, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, int newA) {
-    final int oldA = assignment.putInt(iditer, newA);
-    if(oldA == newA) {
-      return false;
-    }
-    clusters.get(newA).add(iditer);
-    if(oldA >= 0) {
-      clusters.get(oldA).remove(iditer);
-    }
-    return true;
   }
 
   @Override
