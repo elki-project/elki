@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListMIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -106,7 +107,7 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
    */
-  public KMeansLloydMM(PrimitiveDistanceFunction<NumberVector> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, double rate, boolean noiseFlag) {
+  public KMeansLloydMM(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, double rate, boolean noiseFlag) {
     super(distanceFunction, k, maxiter, initializer);
     this.rate = rate;
     this.noiseFlag = noiseFlag;
@@ -215,8 +216,8 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     //Noise Cluster
     double[] computingMeans = {0.0, 0.0} ;
     Vector v = new Vector(computingMeans) ;
-    KMeansModel model = new KMeansModel(v, 0);
-//  KMeansModel model = new KMeansModel(null, 0);
+//    KMeansModel model = new KMeansModel(v, 0);
+  KMeansModel model = new KMeansModel(null, 0);
     DBIDs ids = clusters.get(k);
     result.addToplevelCluster(new Cluster<>(ids, true, model));
     return result;
@@ -226,7 +227,7 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
   
   protected void rebuildHeap(Relation<? extends V> relation, List<? extends NumberVector> means, int heapsize){
     minHeap.clear();
-    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double mindist = Double.POSITIVE_INFINITY;
       V fv = relation.get(iditer);
@@ -265,7 +266,7 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     assert(k == means.size());
     boolean changed = false;
     Arrays.fill(varsum, 0.);
-    final PrimitiveDistanceFunction<? super NumberVector> df = getDistanceFunction();
+    final NumberVectorDistanceFunction<?> df = getDistanceFunction();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       //Optimieren, indem man nur eine mindist hat
       double mindist = Double.POSITIVE_INFINITY;
@@ -394,7 +395,7 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
 
     @Override
     protected KMeansLloydMM<V> makeInstance() {
-      return new KMeansLloydMM<>(distanceFunction, k, maxiter, initializer, rate, noiseFlag);
+      return new KMeansLloydMM<V>(distanceFunction, k, maxiter, initializer, rate, noiseFlag);
     }
   }
 }
