@@ -215,6 +215,8 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     if(noiseFlag){
       KMeansModel model = new KMeansModel(null, 0);
       DBIDs ids = clusters.get(k);
+      if(ids.size() == 0)
+        return result;
       result.addToplevelCluster(new Cluster<>(ids, true, model));
     }
     return result;
