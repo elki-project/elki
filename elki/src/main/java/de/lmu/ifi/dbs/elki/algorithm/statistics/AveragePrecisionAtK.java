@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -57,9 +57,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 /**
  * Evaluate a distance functions performance by computing the average precision
  * at k, when ranking the objects by distance.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type
  */
 public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<DoubleVector>> {
@@ -90,7 +90,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param k K parameter
    * @param sampling Sampling rate
@@ -107,7 +107,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param database Database to run on (for kNN queries)
    * @param relation Relation for distance computations
    * @param lrelation Relation for class label comparison
@@ -156,7 +156,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
 
   /**
    * Test whether two relation agree.
-   * 
+   *
    * @param ref Reference object
    * @param test Test object
    * @return {@code true} if the objects match
@@ -205,11 +205,11 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
@@ -269,7 +269,6 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
         sampling = samplingP.getValue();
       }
       final RandomParameter rndP = new RandomParameter(SEED_ID);
-      rndP.setOptional(true);
       if(config.grab(rndP)) {
         seed = rndP.getValue();
       }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -61,9 +61,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * neighbors first, then irrelevant neighbors. A value of 0.5 can be obtained by
  * random sorting. A value of 0 means the distance function is inverted, i.e. a
  * similarity.
- * 
+ *
  * TODO: Add sampling
- * 
+ *
  * @author Erich Schubert
  * @param <O> Object type
  */
@@ -76,18 +76,13 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
   private static final Logging LOG = Logging.getLogger(RankingQualityHistogram.class);
 
   /**
-   * Option to configure the number of bins to use.
-   */
-  public static final OptionID HISTOGRAM_BINS_ID = new OptionID("rankqual.bins", "Number of bins to use in the histogram");
-
-  /**
    * Number of bins to use.
    */
-  int numbins = 100;
+  protected int numbins = 100;
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function to evaluate
    * @param numbins Number of bins
    */
@@ -98,7 +93,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
 
   /**
    * Process a database
-   * 
+   *
    * @param database Database to process
    * @param relation Relation to process
    * @return Histogram of ranking qualities
@@ -158,14 +153,18 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+    /**
+     * Option to configure the number of bins to use.
+     */
+    public static final OptionID HISTOGRAM_BINS_ID = new OptionID("rankqual.bins", "Number of bins to use in the histogram");
     /**
      * Number of bins.
      */

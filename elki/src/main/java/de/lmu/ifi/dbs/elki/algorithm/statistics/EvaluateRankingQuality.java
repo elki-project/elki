@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -72,15 +72,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * neighbors first, then irrelevant neighbors. A value of 0.5 can be obtained by
  * random sorting. A value of 0 means the distance function is inverted, i.e. a
  * similarity.
- * 
+ *
  * In contrast to {@link RankingQualityHistogram}, this method uses a binning
  * based on the centrality of objects. This allows analyzing whether or not a
  * particular distance degrades for the outer parts of a cluster.
- * 
+ *
  * TODO: Allow fixed binning range, configurable
- * 
+ *
  * TODO: Add sampling
- * 
+ *
  * @author Erich Schubert
  * @param <V> Vector type
  */
@@ -93,13 +93,13 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
   private static final Logging LOG = Logging.getLogger(EvaluateRankingQuality.class);
 
   /**
-   * Option to configure the number of bins to use.
+   * Number of bins to use.
    */
-  public static final OptionID HISTOGRAM_BINS_ID = new OptionID("rankqual.bins", "Number of bins to use in the histogram");
+  int numbins = 20;
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param numbins Number of bins
    */
@@ -107,11 +107,6 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
     super(distanceFunction);
     this.numbins = numbins;
   }
-
-  /**
-   * Number of bins to use.
-   */
-  int numbins = 20;
 
   @Override
   public HistogramResult<DoubleVector> run(Database database) {
@@ -186,14 +181,18 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <V> Vector type
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
+    /**
+     * Option to configure the number of bins to use.
+     */
+    public static final OptionID HISTOGRAM_BINS_ID = new OptionID("rankqual.bins", "Number of bins to use in the histogram");
     /**
      * Number of bins to use.
      */
@@ -202,8 +201,8 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, 20);
-      param.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter param = new IntParameter(HISTOGRAM_BINS_ID, 20) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(param)) {
         numbins = param.getValue();
       }

@@ -71,7 +71,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Reference:
  * <p>
  * B. Hopkins and J. G. Skellam<br />
- * A new method for determining the type of distribution of plant individuals<br />
+ * A new method for determining the type of distribution of plant individuals
+ * <br />
  * Annals of Botany, 18(2), 213-227.
  * </p>
  *
@@ -92,22 +93,22 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
   /**
    * The parameter sampleSizes
    */
-  private int sampleSize;
+  protected int sampleSize;
 
   /**
    * Number of repetitions
    */
-  private int rep;
+  protected int rep;
 
   /**
    * Nearest neighbor to use.
    */
-  private int k;
+  protected int k;
 
   /**
    * Random generator seeding.
    */
-  private RandomFactory random;
+  protected RandomFactory random;
 
   /**
    * Stores the maximum in each dimension.
@@ -158,7 +159,8 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
       LOG.warning("This algorithm must be used with at least logging level " + Level.STATISTICS);
     }
 
-    MeanVariance hmean = new MeanVariance(), umean = new MeanVariance(), wmean = new MeanVariance();
+    MeanVariance hmean = new MeanVariance(), umean = new MeanVariance(),
+        wmean = new MeanVariance();
     // compute the hopkins value several times and use the average value for a
     // more stable result
     for(int j = 0; j < this.rep; j++) {
@@ -246,7 +248,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
    * @param extend Data extend output array (preallocated!)
    */
   protected void initializeDataExtends(Relation<NumberVector> relation, int dim, double[] min, double[] extend) {
-    assert (min.length == dim && extend.length == dim);
+    assert(min.length == dim && extend.length == dim);
     // if no parameter for min max compute min max values for each dimension
     // from dataset
     if(minima == null || maxima == null || minima.length == 0 || maxima.length == 0) {
@@ -370,11 +372,6 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
 
-      IntParameter sampleP = new IntParameter(SAMPLESIZE_ID);
-      if(config.grab(sampleP)) {
-        sampleSize = sampleP.getValue();
-      }
-
       IntParameter repP = new IntParameter(REP_ID, 1) //
       .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(repP)) {
@@ -387,10 +384,15 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
         k = kP.getValue();
       }
 
-      final RandomParameter randomP = new RandomParameter(SEED_ID);
+      IntParameter sampleP = new IntParameter(SAMPLESIZE_ID);
+      if(config.grab(sampleP)) {
+        sampleSize = sampleP.getValue();
+      }
+      RandomParameter randomP = new RandomParameter(SEED_ID);
       if(config.grab(randomP)) {
         random = randomP.getValue();
       }
+
       DoubleListParameter minimaP = new DoubleListParameter(MINIMA_ID)//
       .setOptional(true);
       if(config.grab(minimaP)) {
@@ -408,7 +410,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
 
     @Override
     protected HopkinsStatisticClusteringTendency makeInstance() {
-      return new HopkinsStatisticClusteringTendency((NumberVectorDistanceFunction<? super NumberVector>) distanceFunction, sampleSize, random, rep, k, minima, maxima);
+      return new HopkinsStatisticClusteringTendency(distanceFunction, sampleSize, random, rep, k, minima, maxima);
     }
   }
 }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.GEDEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
@@ -67,17 +66,17 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
   /**
    * Number of neighbors to use.
    */
-  private double krate;
+  protected double krate;
 
   /**
    * Number of samples to draw.
    */
-  private double samples;
+  protected double samples;
 
   /**
    * Estimation method.
    */
-  private IntrinsicDimensionalityEstimator estimator = HillEstimator.STATIC;
+  protected IntrinsicDimensionalityEstimator estimator;
 
   /**
    * Constructor.
@@ -156,32 +155,32 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
     /**
      * Estimation method
      */
-    private static final OptionID ESTIMATOR_ID = new OptionID("idist.estimator", "Estimation method for intrinsic dimensionality.");
+    public static final OptionID ESTIMATOR_ID = new OptionID("idist.estimator", "Estimation method for intrinsic dimensionality.");
 
     /**
      * Number of kNN to use for each object.
      */
-    private static final OptionID KRATE_ID = new OptionID("idist.k", "Number of kNN (absolute or relative)");
+    public static final OptionID KRATE_ID = new OptionID("idist.k", "Number of kNN (absolute or relative)");
 
     /**
      * Number of samples to draw from the data set.
      */
-    private static final OptionID SAMPLES_ID = new OptionID("idist.sampling", "Sample size (absolute or relative)");
+    public static final OptionID SAMPLES_ID = new OptionID("idist.sampling", "Sample size (absolute or relative)");
 
     /**
      * Estimation method.
      */
-    private IntrinsicDimensionalityEstimator estimator = HillEstimator.STATIC;
+    protected IntrinsicDimensionalityEstimator estimator;
 
     /**
      * Number of neighbors to use.
      */
-    private double krate;
+    protected double krate;
 
     /**
      * Number of samples to draw.
      */
-    private double samples;
+    protected double samples;
 
     @Override
     protected void makeOptions(Parameterization config) {

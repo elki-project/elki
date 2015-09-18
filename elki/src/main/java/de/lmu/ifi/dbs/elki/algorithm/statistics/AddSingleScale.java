@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -45,9 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
 /**
  * Pseudo "algorithm" that computes the global min/max for a relation across all
  * attributes.
- * 
+ *
  * FIXME: this should become part of relation metadata.
- * 
+ *
  * @author Erich Schubert
  */
 @Description("Setup a scaling so that all dimensions are scaled equally in visualization.")
@@ -59,7 +59,7 @@ public class AddSingleScale implements Algorithm {
 
   /**
    * Constructor.
-   * 
+   *
    * @param minmax Minimum and maximum values
    */
   public AddSingleScale(double[] minmax) {
@@ -81,7 +81,7 @@ public class AddSingleScale implements Algorithm {
 
   /**
    * Add scales to a single vector relation.
-   * 
+   *
    * @param rel Relation
    * @return Scales
    */
@@ -123,21 +123,21 @@ public class AddSingleScale implements Algorithm {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Minimum and maximum to use.
-     */
-    double[] minmax = null;
-
-    /**
      * Minimum and maximum values.
      */
     public static final OptionID MINMAX_ID = new OptionID("scales.minmax", "Forcibly set the scales to the given range.");
+
+    /**
+     * Minimum and maximum to use.
+     */
+    double[] minmax = null;
 
     @Override
     protected void makeOptions(Parameterization config) {

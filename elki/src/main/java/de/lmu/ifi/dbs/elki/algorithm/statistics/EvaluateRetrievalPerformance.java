@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -79,17 +79,17 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
   /**
    * Relative number of object to use in sampling.
    */
-  private double sampling = 1.0;
+  protected double sampling = 1.0;
 
   /**
    * Random sampling seed.
    */
-  private RandomFactory random = null;
+  protected RandomFactory random = null;
 
   /**
    * Include query object in evaluation.
    */
-  private boolean includeSelf;
+  protected boolean includeSelf;
 
   /**
    * Prefix for statistics.
@@ -99,7 +99,7 @@ public class EvaluateRetrievalPerformance<O> extends AbstractDistanceBasedAlgori
   /**
    * K nearest neighbors to use for classification evaluation.
    */
-  private int maxk = 100;
+  protected int maxk = 100;
 
   /**
    * Constructor.

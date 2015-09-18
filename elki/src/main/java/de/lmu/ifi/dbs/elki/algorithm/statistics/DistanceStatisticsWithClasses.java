@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -71,9 +71,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 /**
  * Algorithm to gather statistics over the distance distribution in the data
  * set.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type
  */
 @Title("Distance Histogram")
@@ -85,38 +85,23 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
   private static final Logging LOG = Logging.getLogger(DistanceStatisticsWithClasses.class);
 
   /**
-   * Flag to compute exact value range for binning.
-   */
-  public static final OptionID EXACT_ID = new OptionID("diststat.exact", "In a first pass, compute the exact minimum and maximum, at the cost of O(2*n*n) instead of O(n*n). The number of resulting bins is guaranteed to be as requested.");
-
-  /**
-   * Flag to enable sampling.
-   */
-  public static final OptionID SAMPLING_ID = new OptionID("diststat.sampling", "Enable sampling of O(n) size to determine the minimum and maximum distances approximately. The resulting number of bins can be larger than the given n.");
-
-  /**
-   * Option to configure the number of bins to use.
-   */
-  public static final OptionID HISTOGRAM_BINS_ID = new OptionID("diststat.bins", "Number of bins to use in the histogram. By default, it is only guaranteed to be within 1*n and 2*n of the given number.");
-
-  /**
    * Number of bins to use in sampling.
    */
-  private int numbin;
+  protected int numbin;
 
   /**
    * Sampling flag.
    */
-  private boolean sampling = false;
+  protected boolean sampling = false;
 
   /**
    * Compute exactly (slower).
    */
-  private boolean exact = false;
+  protected boolean exact = false;
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function to use
    * @param numbins Number of bins
    * @param exact Exactness flag
@@ -297,7 +282,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
 
   /**
    * Estimate minimum and maximum via sampling.
-   * 
+   *
    * @param relation Relation to process
    * @param distFunc Distance function to use
    * @return Minimum and maximum
@@ -374,7 +359,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
 
   /**
    * Compute the exact maximum and minimum.
-   * 
+   *
    * @param relation Relation to process
    * @param distFunc Distance function
    * @return Exact maximum and minimum
@@ -400,7 +385,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
 
   /**
    * Shrink the heap of "hot" (extreme) items.
-   * 
+   *
    * @param hotset Set of hot items
    * @param k target size
    */
@@ -432,28 +417,43 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
+     * Flag to compute exact value range for binning.
+     */
+    public static final OptionID EXACT_ID = new OptionID("diststat.exact", "In a first pass, compute the exact minimum and maximum, at the cost of O(2*n*n) instead of O(n*n). The number of resulting bins is guaranteed to be as requested.");
+
+    /**
+     * Flag to enable sampling.
+     */
+    public static final OptionID SAMPLING_ID = new OptionID("diststat.sampling", "Enable sampling of O(n) size to determine the minimum and maximum distances approximately. The resulting number of bins can be larger than the given n.");
+
+    /**
+     * Option to configure the number of bins to use.
+     */
+    public static final OptionID HISTOGRAM_BINS_ID = new OptionID("diststat.bins", "Number of bins to use in the histogram. By default, it is only guaranteed to be within 1*n and 2*n of the given number.");
+
+    /**
      * Number of bins to use in sampling.
      */
-    private int numbin = 20;
+    protected int numbin = 20;
 
     /**
      * Sampling.
      */
-    private boolean sampling = false;
+    protected boolean sampling = false;
 
     /**
      * Exactness flag.
      */
-    private boolean exact = false;
+    protected boolean exact = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
