@@ -138,7 +138,6 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
     }
     
- 
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
     double[] varsum = new double[k];
 
@@ -165,7 +164,6 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
 
     //create noisecluster if wanted
     if(noiseFlag){
-      rebuildHeap(relation, means, heapsize);
       ArrayList<Double> all = new ArrayList<Double>();
       ArrayList<Double> deleted = new ArrayList<Double>();
       clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
@@ -214,33 +212,14 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     }
     
     //Noise Cluster
-    double[] computingMeans = {0.0, 0.0} ;
-    Vector v = new Vector(computingMeans) ;
-//    KMeansModel model = new KMeansModel(v, 0);
-  KMeansModel model = new KMeansModel(null, 0);
-    DBIDs ids = clusters.get(k);
-    result.addToplevelCluster(new Cluster<>(ids, true, model));
+    if(noiseFlag){
+      KMeansModel model = new KMeansModel(null, 0);
+      DBIDs ids = clusters.get(k);
+      result.addToplevelCluster(new Cluster<>(ids, true, model));
+    }
     return result;
   }
 
-//*************************************************************************************//
-  
-  protected void rebuildHeap(Relation<? extends V> relation, List<? extends NumberVector> means, int heapsize){
-    minHeap.clear();
-    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double mindist = Double.POSITIVE_INFINITY;
-      V fv = relation.get(iditer);
-      for(int i = 0; i < k; i++) {
-        double dist = df.distance(fv, means.get(i));
-        if(dist < mindist) {
-          mindist = dist;
-        }
-      }
-      minHeap.add(mindist, heapsize);
-    }
-  }
-  
 //*************************************************************************************//
   
   @Override
@@ -296,19 +275,8 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
 //*************************************************************************************//
   
   protected boolean updateAssignmentWithDistance(DBIDIter iditer, List<? extends ModifiableDoubleDBIDList> clusters, WritableIntegerDataStore assignment, int newA, double mindist) {
-    final int oldA = assignment.intValue(iditer);
-    
-    //falls dem gleichen Cluster zugeordnet bleibt
-    if(oldA == newA)
-    {
-      clusters.get(oldA).add(mindist, iditer);
-      return false;
-    }
-
-    //zuweisung des Punktes an den neuen Cluster
     clusters.get(newA).add(mindist, iditer);
-    assignment.putInt(iditer, newA);
-    return true;
+    return assignment.putInt(iditer, newA) != newA;
   }
   
 //*************************************************************************************//
@@ -324,31 +292,29 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
   protected List<Vector> meansWithTreshhold(List<? extends ModifiableDoubleDBIDList> clusters, List<? extends NumberVector> means, Relation<V> database, Double tresh) {
     // TODO: use Kahan summation for better numerical precision?
     List<Vector> newMeans = new ArrayList<>(k);
-    for(int i = 0; i < k; i++) {
-      for( DoubleDBIDListMIter it = clusters.get(i).iter(); it.valid(); it.advance())
-      {
-        if(it.doubleValue() > tresh)
-          it.remove();
-      }
-        
-      DBIDs list = clusters.get(i);
+    for(int i = 0; i < k; i++) {        
+      DoubleDBIDList list = clusters.get(i);
       Vector mean = null;
-      if(list.size() > 0) {
-        DBIDIter iter = list.iter();
-        // Initialize with first.
-        mean = database.get(iter).getColumnVector();
-        double[] raw = mean.getArrayRef();
-        iter.advance();
+      double[] raw = null;
+        int count = 0;
         // Update with remaining instances
-        for(; iter.valid(); iter.advance()) {
+        for(DoubleDBIDListIter iter = list.iter(); iter.valid(); iter.advance()) {
+          if(iter.doubleValue() >= tresh) {
+            continue;
+          }
           NumberVector vec = database.get(iter);
+          if (mean == null) { // Initialize:
+            mean = vec.getColumnVector();
+            raw = mean.getArrayRef();
+          }
           for(int j = 0; j < mean.getDimensionality(); j++) {
             raw[j] += vec.doubleValue(j);
           }
+          count++;
         }
-        mean.timesEquals(1.0 / list.size());
-      }
-      else {
+      if (mean != null) {
+        mean.timesEquals(1.0 / count);
+      } else {
         // Keep degenerated means as-is for now.
         mean = means.get(i).getColumnVector();
       }
