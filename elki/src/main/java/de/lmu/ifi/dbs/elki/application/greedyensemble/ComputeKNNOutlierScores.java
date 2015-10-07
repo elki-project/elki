@@ -89,6 +89,9 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * values of k, they can be disabled. For example
  * <tt>-disable '(LDOF|FastABOD)'</tt> disables these two methods.
  *
+ * For methods where k=1 does not make sense, this value will be skipped, and
+ * the procedure will commence at 1+stepsize.
+ *
  * Reference:
  * <p>
  * E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel<br />
@@ -276,7 +279,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       }
     });
     // LDOF
-    runForEachK("LDOF", startk, stepk, maxk, new AlgRunner() {
+    runForEachK("LDOF", startkmin2, stepk, maxk, new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
         if(k == startkmin2 && maxk > 100) {
@@ -289,7 +292,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       }
     });
     // Run ODIN
-    runForEachK("ODIN", startk, stepk, maxk, new AlgRunner() {
+    runForEachK("ODIN", startkmin2, stepk, maxk, new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
         ODIN<O> odin = new ODIN<>(distf, k);
