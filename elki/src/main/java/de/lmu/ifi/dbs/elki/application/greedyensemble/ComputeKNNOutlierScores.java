@@ -26,12 +26,8 @@ package de.lmu.ifi.dbs.elki.application.greedyensemble;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Locale;
 import java.util.regex.Pattern;
-
-import javax.xml.bind.DatatypeConverter;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.DWOF;
@@ -51,14 +47,11 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LoOP;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleKernelDensityLOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.ByLabelOutlier;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialAllOutlier;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialNoOutlier;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.PreprocessorKNNQuery;
@@ -69,6 +62,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -218,34 +212,14 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       throw new AbortException("Cannot create output file.", e);
     }
     // Control: print the DBIDs in case we are seeing an odd iteration
-    {
-      try {
-        MessageDigest md = MessageDigest.getInstance("MD5");
-        for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-          md.update((byte) ' ');
-          md.update(DBIDUtil.toString(iter).getBytes());
-        }
-        fout.append("# DBID-series MD5:");
-        fout.append(DatatypeConverter.printBase64Binary(md.digest()));
-        fout.append(FormatUtil.NEWLINE);
-      }
-      catch(NoSuchAlgorithmException e) {
-        throw new AbortException("MD5 not found.");
-      }
-    }
+    fout.append("# Data set size: " + relation.size());
+    fout.append(" data type: " + relation.getDataTypeInformation());
+    fout.append(FormatUtil.NEWLINE);
 
     // Label outlier result (reference)
     {
       OutlierResult bylabelresult = bylabel.run(database);
       writeResult(fout, ids, bylabelresult, new IdentityScaling(), "bylabel");
-    }
-    // No/all outliers "results"
-    boolean withdummy = false;
-    if(withdummy) {
-      OutlierResult noresult = (new TrivialNoOutlier()).run(database);
-      writeResult(fout, ids, noresult, new IdentityScaling(), "no-outliers");
-      OutlierResult allresult = (new TrivialAllOutlier()).run(database);
-      writeResult(fout, ids, allresult, new IdentityScaling(), "all-outliers");
     }
 
     final int startk = (this.startk > 0) ? this.startk : this.stepk;
@@ -302,12 +276,12 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       }
     });
     // LDOF
-    if(!isDisabled("FastABOD") && maxk >= 100) {
-      LOG.verbose("Note: LDOF can be slow for large k. Use -" + Parameterizer.DISBALE_ID.getName() + " LDOF to disable.");
-    }
     runForEachK("LDOF", startk, stepk, maxk, new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
+        if(k == startkmin2 && maxk > 100) {
+          LOG.verbose("Note: LODF needs O(k^2) distance computations. Use -" + Parameterizer.DISBALE_ID.getName() + " LDOF to disable.");
+        }
         LDOF<O> ldof = new LDOF<>(distf, k);
         OutlierResult result = ldof.run(database, relation);
         writeResult(fout, ids, result, scaling, kstr);
@@ -325,12 +299,12 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       }
     });
     // Run FastABOD
-    if(!isDisabled("FastABOD") && maxk > 100) {
-      LOG.verbose("Note: FastABOD can be slow for large k. Use -" + Parameterizer.DISBALE_ID.getName() + " FastABOD to disable.");
-    }
     runForEachK("FastABOD", startkmin2, stepk, maxk, new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
+        if(k == startkmin2 && maxk > 100) {
+          LOG.verbose("Note: FastABOD needs quadratic memory. Use -" + Parameterizer.DISBALE_ID.getName() + " FastABOD to disable.");
+        }
         FastABOD<O> fabod = new FastABOD<>(new PolynomialKernelFunction(2), k);
         OutlierResult result = fabod.run(database, relation);
         writeResult(fout, ids, result, scaling, kstr);
@@ -410,10 +384,13 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
         database.getHierarchy().removeSubtree(result);
       }
     });
-    // Run DWOF
-    runForEachK("DWOF", startk, stepk, maxk, new AlgRunner() {
+    // Run DWOF (need pairwise distances, too)
+    runForEachK("DWOF", startkmin2, stepk, maxk, new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
+        if(k == startkmin2 && maxk > 100) {
+          LOG.verbose("Note: DWOF needs O(k^2) distance computations. Use -" + Parameterizer.DISBALE_ID.getName() + " DWOF to disable.");
+        }
         DWOF<O> dwof = new DWOF<>(distf, k, 1.1);
         OutlierResult result = dwof.run(database, relation);
         writeResult(fout, ids, result, scaling, kstr);
@@ -465,7 +442,9 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     final int digits = (int) Math.ceil(Math.log10(maxk));
     final String format = "%s-%0" + digits + "d";
     for(int k = startk; k <= maxk; k += stepk) {
+      Duration time = LOG.newDuration(this.getClass().getCanonicalName() + "." + prefix + ".k" + k + ".runtime").begin();
       runner.run(k, String.format(Locale.ROOT, format, prefix, k));
+      LOG.statistics(time.end());
     }
   }
 
@@ -527,7 +506,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     /**
      * Option ID for disabling methods.
      */
-    public static final OptionID DISBALE_ID = new OptionID("disable", "Disable methods (regular expression).");
+    public static final OptionID DISBALE_ID = new OptionID("disable", "Disable methods (regular expression, case insensitive, anchored).");
 
     /**
      * k step size
