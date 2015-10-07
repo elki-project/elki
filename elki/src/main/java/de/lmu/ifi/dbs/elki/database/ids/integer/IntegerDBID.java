@@ -38,17 +38,17 @@ import de.lmu.ifi.dbs.elki.utilities.io.FixedSizeByteBufferSerializer;
 
 /**
  * Database ID object.
- * 
+ *
  * While this currently is just an Integer, it should be avoided to store the
  * object IDs in regular integers to reduce problems if this API ever changes
  * (for example if someone needs to support {@code long}, it should not require
  * changes in too many places!)
- * 
+ *
  * In particular, a developer should not make any assumption of these IDs being
  * consistent across multiple results/databases.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf DynamicSerializer
  * @apiviz.composedOf StaticSerializer
  */
@@ -60,7 +60,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   /**
    * Constructor from integer id.
-   * 
+   *
    * @param id integer id.
    */
   protected IntegerDBID(int id) {
@@ -70,7 +70,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   /**
    * Constructor from integer id.
-   * 
+   *
    * @param id integer id.
    */
   protected IntegerDBID(Integer id) {
@@ -80,7 +80,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   /**
    * Return the integer value of the object ID.
-   * 
+   *
    * @return integer id
    */
   @Override
@@ -116,7 +116,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     }
     if (!(obj instanceof IntegerDBID)) {
       if (obj instanceof DBIDRef) {
-        LoggingUtil.warning("Programming error: DBID.equals(DBIDRef) is not well-defined. use sameDBID!", new Throwable());
+        LoggingUtil.warning("Programming error: DBID.equals(DBIDRef) is not well-defined. Use DBIDUtil.equal() instead!", new Throwable());
       }
       return false;
     }
@@ -173,9 +173,9 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   /**
    * Pseudo iterator for DBIDs interface.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   protected class Itr implements DBIDArrayIter, IntegerDBIDRef {
@@ -245,7 +245,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   /**
    * Dynamic sized serializer, using varint.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class DynamicSerializer implements ByteBufferSerializer<DBID> {
@@ -274,7 +274,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   /**
    * Static sized serializer, using regular integers.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class StaticSerializer implements FixedSizeByteBufferSerializer<DBID> {
