@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
@@ -38,9 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Instance for a particular database, invoking the preprocessor.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Data object type
  */
 public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
@@ -61,7 +62,7 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to query
    * @param preprocessor Preprocessor instance to use
    */
@@ -74,28 +75,18 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
   @Override
   public KNNList getKNNForDBID(DBIDRef id, int k) {
     if(!warned && k > preprocessor.getK()) {
-      LoggingUtil.warning("Requested more neighbors than preprocessed!");
+      LoggingUtil.warning("Requested more neighbors than preprocessed: requested " + k + " preprocessed " + preprocessor.getK(), new Throwable());
+      warned = true;
     }
-    if(!warned && k < preprocessor.getK()) {
+    if(k < preprocessor.getK()) {
       KNNList dr = preprocessor.get(id);
       int subk = k;
-      double kdist = dr.get(subk - 1).doubleValue();
-      while(subk < dr.size()) {
-        double ndist = dr.get(subk).doubleValue();
-        if(kdist == ndist) {
-          // Tie - increase subk.
-          subk++;
-        }
-        else {
-          break;
-        }
+      DoubleDBIDListIter it = dr.iter();
+      final double kdist = it.seek(subk - 1).doubleValue();
+      for(it.advance(); it.valid() && kdist < it.doubleValue(); it.advance()) {
+        subk++;
       }
-      if(subk < dr.size()) {
-        return DBIDUtil.subList(dr, subk);
-      }
-      else {
-        return dr;
-      }
+      return subk < dr.size() ? DBIDUtil.subList(dr, subk) : dr;
     }
     return preprocessor.get(id);
   }
@@ -103,36 +94,26 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
   @Override
   public List<KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(!warned && k > preprocessor.getK()) {
-      LoggingUtil.warning("Requested more neighbors than preprocessed!");
+      LoggingUtil.warning("Requested more neighbors than preprocessed: requested " + k + " preprocessed " + preprocessor.getK(), new Throwable());
+      warned = true;
     }
-    List<KNNList> result = new ArrayList<>(ids.size());
     if(k < preprocessor.getK()) {
+      List<KNNList> result = new ArrayList<>(ids.size());
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         KNNList dr = preprocessor.get(iter);
         int subk = k;
-        double kdist = dr.get(subk - 1).doubleValue();
-        while(subk < dr.size()) {
-          double ndist = dr.get(subk).doubleValue();
-          if(kdist == ndist) {
-            // Tie - increase subk.
-            subk++;
-          }
-          else {
-            break;
-          }
+        DoubleDBIDListIter it = dr.iter();
+        final double kdist = it.seek(subk - 1).doubleValue();
+        for(it.advance(); it.valid() && kdist < it.doubleValue(); it.advance()) {
+          subk++;
         }
-        if(subk < dr.size()) {
-          result.add(DBIDUtil.subList(dr, subk));
-        }
-        else {
-          result.add(dr);
-        }
+        result.add(subk < dr.size() ? DBIDUtil.subList(dr, subk) : dr);
       }
+      return result;
     }
-    else {
-      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        result.add(preprocessor.get(iter));
-      }
+    List<KNNList> result = new ArrayList<>(ids.size());
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      result.add(preprocessor.get(iter));
     }
     return result;
   }
@@ -144,7 +125,7 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
 
   /**
    * Get the preprocessor instance.
-   * 
+   *
    * @return preprocessor instance
    */
   public AbstractMaterializeKNNPreprocessor<O> getPreprocessor() {
