@@ -188,6 +188,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
   public void run() {
     final Database database = inputstep.getDatabase();
     final Relation<O> relation = database.getRelation(distf.getInputTypeRestriction());
+    // Ensure we don't go beyond the relation size:
+    final int maxk = Math.min(this.maxk, relation.size() - 1);
 
     // Get a KNN query.
     KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, distf, maxk + 2);
