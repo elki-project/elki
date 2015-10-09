@@ -123,6 +123,10 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
           throw new AbortException("Too many duplicates!");
         }
         knns = knnQuery.getKNNForDBID(iditer, k2);
+        // Did not get the requested amount of neighbors (preprocessed?)
+        if(knns.size() < k2) {
+          break;
+        }
       }
 
       // Ensure our buffer is large enough
@@ -137,7 +141,7 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
         }
         buf[p++] = it.doubleValue();
       }
-      double id = estimator.estimate(buf, p);
+      double id = p > 1 ? estimator.estimate(buf, p) : 0.;
 
       id_score.putDouble(iditer, id);
       minmax.put(id);
