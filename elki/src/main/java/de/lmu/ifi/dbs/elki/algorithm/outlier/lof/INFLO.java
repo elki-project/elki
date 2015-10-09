@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Influence Outliers using Symmetric Relationship (INFLO) using two-way search,
  * is an outlier detection method based on LOF; but also using the reverse kNN.
- * 
+ *
  * Reference: <br>
  * <p>
  * W. Jin, A. Tung, J. Han, and W. Wang<br />
@@ -70,12 +70,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Proc. 10th Pacific-Asia conference on Advances in Knowledge Discovery and
  * Data Mining, 2006.
  * </p>
- * 
+ *
  * @author Ahmed Hettab
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KNNQuery
- * 
+ *
  * @param <O> the type of DatabaseObject the algorithm is applied on
  */
 @Title("INFLO: Influenced Outlierness Factor")
@@ -102,7 +102,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   /**
    * Constructor with parameters.
-   * 
+   *
    * @param distanceFunction Distance function in use
    * @param m m Parameter
    * @param k k Parameter
@@ -115,7 +115,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param database Database to process
    * @param relation Relation to process
    * @return Outlier result
@@ -153,7 +153,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   /**
    * Compute neighborhoods
-   * 
+   *
    * @param relation
    * @param knnQuery
    * @param pruned
@@ -185,7 +185,7 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   /**
    * Compute the final INFLO scores.
-   * 
+   *
    * @param relation Data relation
    * @param pruned Pruned objects
    * @param knns kNN storage
@@ -213,22 +213,22 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
         mean.put(density.doubleValue(niter));
       }
       double denP = density.doubleValue(iter);
-      double den;
+      final double inflo;
       if(denP > 0.) {
-        den = mean.getMean() / denP;
+        inflo = denP < Double.POSITIVE_INFINITY ? mean.getMean() / denP : 1.;
       }
       else {
-        den = mean.getMean() == 0 ? 1. : Double.POSITIVE_INFINITY;
+        inflo = mean.getMean() == 0 ? 1. : Double.POSITIVE_INFINITY;
       }
-      inflos.putDouble(iter, den);
+      inflos.putDouble(iter, inflo);
       // update minimum and maximum
-      inflominmax.put(den);
+      inflominmax.put(inflo);
     }
   }
 
   /**
    * Get the (forward only) kNN of an object, including the query point
-   * 
+   *
    * @param q Query point
    * @param knnQuery Query function
    * @param knns kNN storage
@@ -257,9 +257,9 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
