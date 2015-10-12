@@ -1,30 +1,34 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.ph;
 
+/*
+This file is part of ELKI:
+Environment for Developing KDD-Applications Supported by Index-Structures
+
+Copyright (C) 2014
+ETH Zurich, Switzerland and Tilmann Zaeschke
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import java.util.List;
+
+import ch.ethz.globis.pht.PhDistance;
+import ch.ethz.globis.pht.PhDistanceD;
+import ch.ethz.globis.pht.PhDistanceL;
 import ch.ethz.globis.pht.PhTreeF;
 import ch.ethz.globis.pht.PhTreeF.PhEntryF;
 import ch.ethz.globis.pht.PhTreeF.PhQueryF;
-
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- ETH Zurich, Switzerland and Tilmann Zaeschke
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -55,6 +59,7 @@ import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -76,6 +81,11 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(MemoryPHTree.class);
+
+  /**
+   * Distance computations performed.
+   */
+  private long distComputations = 0L;
 
   
   
@@ -144,6 +154,8 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
 
   @Override
   public void logStatistics() {
+    LOG.statistics(new LongStatistic(this.getClass().getName() + ".distance-computations", 
+        distComputations));
     if(objaccess != null) {
       LOG.statistics(objaccess);
     }
@@ -175,13 +187,13 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
     DistanceFunction<? super O> df = distanceQuery.getDistanceFunction();
     // TODO: if we know this works for other distance functions, add them, too!
     if(df instanceof LPNormDistanceFunction) {
-      return new PHTreeKNNQuery(distanceQuery, (Norm<? super O>) df);
+      return new PHTreeKNNQuery(distanceQuery, (Norm<NumberVector>) df);
     }
     if(df instanceof SquaredEuclideanDistanceFunction) {
-      return new PHTreeKNNQuery(distanceQuery, (Norm<? super O>) df);
+      return new PHTreeKNNQuery(distanceQuery, (Norm<NumberVector>) df);
     }
     if(df instanceof SparseLPNormDistanceFunction) {
-      return new PHTreeKNNQuery(distanceQuery, (Norm<? super O>) df);
+      return new PHTreeKNNQuery(distanceQuery, (Norm<NumberVector>) df);
     }
     return null;
   }
@@ -191,13 +203,13 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
     DistanceFunction<? super O> df = distanceQuery.getDistanceFunction();
     // TODO: if we know this works for other distance functions, add them, too!
     if(df instanceof LPNormDistanceFunction) {
-      return new PHTreeRangeQuery(distanceQuery, (Norm<? super O>) df);
+      return new PHTreeRangeQuery(distanceQuery, (Norm<NumberVector>) df);
     }
     if(df instanceof SquaredEuclideanDistanceFunction) {
-      return new PHTreeRangeQuery(distanceQuery, (Norm<? super O>) df);
+      return new PHTreeRangeQuery(distanceQuery, (Norm<NumberVector>) df);
     }
     if(df instanceof SparseLPNormDistanceFunction) {
-      return new PHTreeRangeQuery(distanceQuery, (Norm<? super O>) df);
+      return new PHTreeRangeQuery(distanceQuery, (Norm<NumberVector>) df);
     }
     return null;
   }
@@ -211,7 +223,9 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
     /**
      * Norm to use.
      */
-    private Norm<? super O> norm;
+    private final Norm<O> norm;
+    
+    private final PhDistance dist;
 
     /**
      * Constructor.
@@ -221,17 +235,23 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
      */
     public PHTreeKNNQuery(DistanceQuery<O> distanceQuery, Norm<? super O> norm) {
       super(distanceQuery);
-      this.norm = norm;
+      this.norm = (Norm<O>) norm;
+      this.dist = new PhNorm(norm, dims);
     }
 
     @Override
     public KNNList getKNNForObject(O obj, int k) {
       final KNNHeap knns = DBIDUtil.newHeap(k);
       
-      for (double[] v: tree.nearestNeighbour(k, oToDouble(obj, new double[dims]))) {
+      //TODO
+      //List<double[]> keys = tree.nearestNeighbour(k, dist, oToDouble(obj, new double[dims]));
+      List<double[]> keys = tree.nearestNeighbour(k, PhDistanceD.THIS, oToDouble(obj, new double[dims]));
+      System.out.println("DBID result size=" + keys.size());
+      for (double[] v: keys) {
         DBID id = tree.get(v);
         O o2 = relation.get(id);
         double distance = norm.distance(obj, o2);
+        System.out.println("DBID dist=" + distance);
         knns.insert(distance, id);
       }
       

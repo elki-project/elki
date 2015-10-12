@@ -31,6 +31,8 @@ import static ch.ethz.globis.pht.PhTreeHelper.posInArray;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Stack;
@@ -38,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import ch.ethz.globis.pht.PhDimFilter;
 import ch.ethz.globis.pht.PhDistance;
+import ch.ethz.globis.pht.PhDistanceL;
 import ch.ethz.globis.pht.PhEntry;
 import ch.ethz.globis.pht.PhTree;
 import ch.ethz.globis.pht.PhTreeConfig;
@@ -867,7 +870,36 @@ public class PhTree8<T> extends PhTree<T> {
 		return PhTree8.DEPTH_64;
 	}
 
-	/**
+  /**
+   * Performs a spherical range query with a maximum distance {@code maxDistance} from point
+   * {@code center}.
+   * @param center
+   * @param maxDistance
+   * @return Result iterator.
+   */
+  public PhQuery<T> query(long[] center, double maxDistance) {
+    if (center.length != DIM || maxDistance < 0) {
+      throw new IllegalArgumentException("Invalid arguments: " + center.length +  
+          " / " + maxDistance + "  DIM=" + DIM);
+    }
+    PhQuery<T> q = new PhIteratorNoGC<T>(this, DIM);
+    resetDistQuery(q, center, maxDistance);
+    return q;
+  }
+  
+  private PhQuery<T> resetDistQuery(PhQuery<T> query, long[] center, double maxDistance) {
+    //TODO improve!
+    long[] min = new long[DIM];
+    long[] max = new long[DIM];
+    for (int i = 0; i < DIM; i++) {
+      min[i] = (long) (center[i] - maxDistance);
+      max[i] = (long) (center[i] + maxDistance);
+    }
+    query.reset(min, max);
+    return query;
+  }
+
+  /**
 	 * Locate nearest neighbours for a given point in space.
 	 * @param nMin number of values to be returned. More values may be returned with several have
 	 * 				the same distance.
@@ -876,11 +908,349 @@ public class PhTree8<T> extends PhTree<T> {
 	 */
 	@Override
 	public ArrayList<long[]> nearestNeighbour(int nMin, long... v) {
-		throw new UnsupportedOperationException();
+    if (nMin > 0) {
+      //nearestNeighbour(getRoot(), 0, v, nMin, ret);
+      return nearestNeighbourBinarySearch(v, nMin, PhDistanceL.THIS);
+    }
+    return new ArrayList<long[]>();
 	}
 
+  //To correct for math errors
+  //final double SAFETY = 1 + DIM*DIM * Double.MIN_NORMAL; 
+  private static final double KNN_SAFETY = 1 + 0.000000001;
 
-	/**
+  /**
+   * This approach applies binary search to queries.
+   * It start with a query that covers the whole tree. Then whenever it finds an entry (the first)
+   * it discards the query and starts a smaller one with half the distance to the search-point.
+   * This effectifely reduces the volume by 2^k.
+   * Once a query returns no result, it uses the previous query to traverse all results
+   * and find the nearest result.
+   * As an intermediate step, it may INCREASE the query size until a non-empty query appears.
+   * Then it could decrease again, like a true binary search.
+   * 
+   * When looking von nMin > 1, one could search for queries with at least nMin results...
+   * 
+   * TODO find better starting point, e.g. start in node found by point search on v, and than use 
+   * node-local neighbours to iterate further. --> Easier for 1NN.
+   * 
+   * 
+   * @param val
+   * @param nMin
+   */
+  private ArrayList<long[]> nearestNeighbourBinarySearch(long[] val, int nMin, PhDistance dist) {
+    ArrayList<long[]> ret = new ArrayList<>();
+
+    //special case with minDist = 0
+    if (nMin == 1 && contains(val)) {
+      ret.add(val);
+      return ret;
+    }
+    final LAComparator comp = new LAComparator(val, dist);
+
+
+    PhIterator<T> itEx = queryExtent();
+    while (itEx.hasNext() && ret.size() < nMin) {
+      long[] e = itEx.nextKey();
+      ret.add(e);
+    }
+    //TODO optimise comparator, e.g. use special entries that store the 'distance'?
+    Collections.sort(ret, comp);
+
+    if (!itEx.hasNext()) {
+      //tree has <- nMin entries, return all!
+      return ret; 
+    }
+
+    //The minimum distance tells us that below that distance, there are not enough values.
+    //It helps that there can only be one point with dist=0
+    double minFailDist = 0;
+    //The maximum known distance required to get nMax entries
+    //use 'double' allow diagonals in 64-bit cube? max=sqrt(k)*Long.MAX_VALUE
+    double maxReqDist = dist.dist(ret.get(nMin-1), val)*KNN_SAFETY;
+
+    //TODO optimize:  bestDS >>> (64-numberOfLeadingZeros)  i.o.  Math.sqrt
+    //TODO for know we assume that val+/- bestD lies inside the value range of Long....?!!?!?
+    double currentDist = (maxReqDist+minFailDist)/2;
+
+    PhQuery<T> itEx2 = new PhIteratorNoGC<>(this, DIM);
+    ArrayList<long[]> candidates = new ArrayList<>();
+    do {
+      int result = getCandidates(currentDist, nMin, candidates, val, comp, itEx2, dist);
+
+      if (result == 0) {
+        //done!
+        return candidates;
+      }
+      if (result < 0) {
+        //so this was too wide
+        maxReqDist = currentDist;
+      } else {
+        //too few results, we need a bigger range
+        //TODO use min of previous round instead...
+        minFailDist = currentDist;
+      }
+
+      double newDist = (maxReqDist+minFailDist) / 2;
+
+      double delta = Math.abs(newDist-currentDist);//(maxReqDist-minFailDist);///maxReqDist;
+      if (delta < (Math.sqrt(DIM)-1)*KNN_SAFETY) {
+        //Get and sort ALL points in range...
+        //TODO do not use getCandidates but implement directly
+        getCandidates(maxReqDist*KNN_SAFETY, 10*1000*1000, candidates, val, comp, itEx2, dist);
+        return candidates;
+      }
+
+      currentDist = newDist;
+    } while (true); //currentDist > 1);  //TODO > 0?
+
+    //throw new IllegalStateException();
+    //return candidates;
+
+    //TODO consolidate?
+  }
+
+  private final int getCandidates(double maxDist, int nMin, 
+      ArrayList<long[]> cand, long[] val, Comparator<long[]> comp, PhQuery<T> itEx,
+      PhDistance dist) {
+    //What are we doing here?
+    //There are several cases to consider:
+    //1) maxDistSQ is too small, we get < nMin values
+    //2) If there are enough entries, we have to consider the following
+    //2a) Prevent going further down in case we have exactly nMin entries
+    //2b) Prevent going further down in case all entries beyond nMin have the same distance 
+    //    than nMin. (no more than nMax different distances)
+    //2c) Optimisation: Prevent going further down if we have more than nMin DIFFERENT entries, 
+    //    but we exhausted them all, so we can still easily return a final result.
+    //2d) There are too many entries.
+    //
+    //Finally we should consider an epsilon to avoid removing equally distanced entries
+    //TODO TEST epsilon!
+    //
+    //Solutions:
+    // a) Check nMin entries. Return SPACE_NEEDS_EXPANSION if size()<nMin.
+    //    [optional?: Return SUCCESS if query space is exhausted and n==nMin].
+    // b) Sort them.
+    // c) get distance of last entry.
+    // d) continue search until we get 
+    //    currentEntryCount > nMin*3
+    //    AND 
+    //    currentEntryCount > 2 * validEntryCount (entries with dist<=dist(cand.get(nMin-1))). 
+    //    --> This makes sure that don't shrink the search space if there are only a few too
+    //        many entries in the local space.
+    //        This is important, because we may have omitted many entries with dist>maxDistQ
+    //        TODO keep count?
+    //    --> The second term ensures that we don't abort if most of the entries are actually 
+    //        valid. 
+    // e) If we exhaust the query space, return all with dist<=dist(cand.get(nMin-1)).
+    // f) return SPACE_NEEDS_CONTRACTION
+    //We have to
+
+    //Epsilon for calculating the distance depends on DIM, the magnitude of the values and
+    //the precision of the Double mantissa.
+    //TODO, this should use the lowerBound i.o. upperBound
+    final double EPS = DIM * maxDist / (double)(1L << 51);//2^(53-2));
+    final int N_MIN_MULTIPLIER = 5;
+    final int ENTRY_TO_SIZE_RATIO = 2;
+    final int CONSOLIDATION_INTERVAL = 10;
+    cand.clear();
+    int nChecked = 0;
+    resetDistQuery(itEx, val, maxDist);
+    double maxDistSQ = maxDist * maxDist;// * KNN_SAFETY;
+
+    //a)
+    while (itEx.hasNext() && cand.size() < nMin) {
+      long[] e = itEx.nextKey();
+      nChecked++;
+      //TODO this test can be removed once we have a proper iterator.
+      if (maxDistSQ >= dist.distEst(e, val)) {
+        cand.add(e);
+      }
+    }
+
+    //b)
+    //TODO optimise comparator, e.g. use special entries that store the 'distance'?
+    //TODO consolidate only after size-check?
+    Collections.sort(cand, comp);
+
+    if (cand.size() < nMin) {
+      //too small
+      return 1;
+    }
+    if (!itEx.hasNext()) {
+      //perfect fit!
+      return 0;
+    }
+
+    //c)
+    maxDistSQ = dist.distEst(cand.get(nMin-1), val);
+
+    //TODO restart with new iterator based on maxDistSQ = maxSQ? 
+    //TODO --> allow query with squared distance?
+
+    //d)
+    while (itEx.hasNext()) {
+      long[] e = itEx.nextKey();
+      nChecked++;
+      if (maxDistSQ+EPS >= dist.distEst(e, val)) {
+        cand.add(e);
+      }
+      if (cand.size() % CONSOLIDATION_INTERVAL == 0) {
+        maxDistSQ = consolidate(cand, nMin, EPS, val, maxDistSQ, comp, dist); 
+      }
+      if (nChecked > nMin*N_MIN_MULTIPLIER && nChecked > ENTRY_TO_SIZE_RATIO * cand.size()) {
+        //TODO is this necessary?
+        //f)
+        consolidate(cand, nMin, EPS, val, maxDistSQ, comp, dist);
+        return -1;
+      }
+    }
+    //e)
+    consolidate(cand, nMin, EPS, val, maxDistSQ, comp, dist);
+    return 0;
+  }
+
+  private static double consolidate(ArrayList<long[]> cand, int nMin, double EPS, long[] val,
+      double maxSQ, Comparator<long[]> comp, PhDistance dist) {
+    Collections.sort(cand, comp);
+    double maxSQnew = dist.distEst(cand.get(nMin-1), val);
+    if (maxSQnew < maxSQ+EPS) { //TODO epsilon?
+      maxSQ = maxSQnew;
+      for (int i2 = nMin; i2 < cand.size(); i2++) {
+        //purge 
+        if (dist.distEst(cand.get(i2), val) + EPS > maxSQ) {
+          while (cand.size() > i2) {
+            cand.remove(cand.size()-1);  
+          }
+          break;
+        }
+      }
+    }
+    return maxSQ;
+  }
+
+  private static final class LAComparator implements Comparator<long[]> {
+    private final long[] val;
+
+    private final PhDistance dist;
+    
+    public LAComparator(long[] val, PhDistance dist) {
+      this.val = val;
+      this.dist = dist;
+    }
+
+    @Override
+    public int compare(long[] o1, long[] o2) {
+      double d = distSQ(o1) - distSQ(o2);
+      //Do not return d directly because it may exceed the limits of Integer.
+      return d > 0 ? 1 : (d < 0 ? -1 : 0);
+    }
+
+    private final double distSQ(long[] v) {
+      return dist.distEst(val, v);
+    }
+  }
+
+
+//  private static final double squareDist(long[] v1, long[] v2) {
+//    double r = 0;
+//    for (int i = 0; i < v1.length; i++) {
+//      double x = (double)v1[i]-(double)v2[i]; //cast to double to handle overflows... 
+//      r += x*x;
+//    }
+//    return r;
+//  }
+//
+//  private static final double dist(long[] v1, long[] v2) {
+//    return Math.sqrt(squareDist(v1, v2));
+//  }
+
+  /**
+   * How to do nearest neighbour queries:
+   * 
+   * 1) Search for value, stay in node if value not found.
+   *    Here we already know that the closest value can not be further away than any value in the
+   *    local node, i.e. with an editDistance=DIM on the level of the node's HC.
+   *    But it depends on the depth of the tree (# of parent nodes) whether this is helpful.
+   *    For root noodes, this is not helpful at all. 
+   * 2) Search local node, all postfixes/sub-nodes with editDistance=1.
+   *    In each sub-node, depending on the geometry, we can exclude some quadrants.
+   *    I.e. with editDistance=1, only half of the quadrants need to be searched, unless the closest
+   *    quadrant is empty.
+   *    With higher editDistance of the subnode, it gets more complicated.
+   *    With luck, we can already exclude finding one with editDistance > 1. 
+   *    From the result, take the closes value.
+   * 3) Perform range query on whole tree (proceed through parent nodes iteratively???) on a 
+   *    hyper rectangle with the currently known minimum distance.
+   *    Check all results and find minimum.
+   *    Problem: the complexity of the last step is unbound...
+   *     
+   * @param node
+   * @param currentDepth
+   * @param val
+   * @param nMin
+   * @param ret
+   */
+  private void nearestNeighbour(Node<T> node, int currentDepth, long[] val, int nMin,
+      ArrayList<PhEntry<T>> ret) {
+    if (node.getInfixLen() > 0) {
+      long mask = (1l<<(long)node.getInfixLen()) - 1l;//eg. (0-->0), (1-->1), (8-->127=0x01111111)
+      int shiftMask = node.getPostLen()+1;
+      //mask <<= shiftMask; //last bit is stored in bool-array
+      mask = shiftMask==64 ? 0 : mask<<shiftMask;
+      for (int i = 0; i < val.length; i++) {
+        if (((val[i] ^ node.getInfix(i)) & mask) != 0) {
+          //infix does not match
+          //--> there is no direct match, so lets find the nearest neighbour, which
+          //must be on this node.
+          break;
+        }
+      }
+      currentDepth += node.getInfixLen();
+    }
+
+    long pos = posInArray(val, node.getPostLen());
+    boolean isPostHC = node.isPostHC();
+    boolean isSubHC = node.isSubHC();
+
+    //check subnode (more likely than postfix, because there can be more than one value)
+    Node<T> sub = node.getSubNode(pos, DIM);
+    if (sub != null) {
+      nearestNeighbour(sub, currentDepth+1, val, nMin, ret);
+    } else {
+      //check postfix
+      int pob = node.getPostOffsetBits(pos, DIM);
+      if (pob >= 0) {
+        //If we have a match, we ignore it (we ignore perfect matches).
+        //Otherwise we return the value, because it is a close neighbour.
+        long[] v = new long[DIM];
+        System.arraycopy(val, 0, v, 0, DIM);
+        //TODOnode.getPost(pos, posPostLHC, v, postLen, isPostHC, bufOffsOfPosts);
+        applyHcPos(pos, node.getPostLen(), v);
+        T value = node.getPost(pos, v);
+        ret.add(new PhEntry<T>(v, value));
+      }
+    }
+
+    if (ret.size() >= nMin) {
+      return;
+    }
+
+    //TODO now start permutations...
+    if (isPostHC) {
+      //TODO search with permutation
+    } else {
+      //TODO traverse all and calculate distance
+    }
+
+    if (isSubHC) {
+      //TODO search with permutation
+    } else {
+      //TODO traverse all and calculate distance
+    }
+  }
+
+  /**
 	 * Best HC incrementer ever. 
 	 * @param v
 	 * @param min
@@ -904,12 +1274,16 @@ public class PhTree8<T> extends PhTree<T> {
 	@Override
 	public List<long[]> nearestNeighbour(int nMin, PhDistance dist,
 			PhDimFilter dims, long... key) {
-		throw new UnsupportedOperationException();
+    if (nMin > 0) {
+      //nearestNeighbour(getRoot(), 0, v, nMin, ret);
+      return nearestNeighbourBinarySearch(key, nMin, dist);
+    }
+    return new ArrayList<long[]>();
 	}
 
 	@Override
 	public T update(long[] oldKey, long[] newKey) {
-        return operations.update(oldKey, newKey);
+	  return operations.update(oldKey, newKey);
 	}
 	
 

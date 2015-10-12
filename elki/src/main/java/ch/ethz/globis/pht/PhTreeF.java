@@ -161,6 +161,26 @@ public class PhTreeF<T> {
     return ret;
   }
 
+  /**
+   * Locate nearest neighbours for a given point in space.
+   * @param nMin number of entries to be returned. More entries may be returned with several have
+   *        the same distance.
+   * @param dist distance function
+   * @param key
+   * @return List of neighbours.
+   */
+  public List<double[]> nearestNeighbour(int nMin, PhDistance dist, double... key) {
+    long[] lKey = new long[key.length];
+    pre.pre(key, lKey);
+    ArrayList<double[]> ret = new ArrayList<>();
+    for (long[] l: pht.nearestNeighbour(nMin, dist, null, lKey)) {
+      double[] dKey = new double[l.length];
+      pre.post(l, dKey);
+      ret.add(dKey);
+    }
+    return ret;
+  }
+
   public static class PhIteratorF<T> implements PhIteratorBase<double[], T, PhEntryF<T>> {
     private final PhIterator<T> iter;
     protected final PreProcessorPoint pre;
