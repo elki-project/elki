@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 
 /**
  * Representing a DBID range allocation.
- * 
+ *
  * @author Erich Schubert
  */
 final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
@@ -50,7 +50,7 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
 
   /**
    * Constructor.
-   * 
+   *
    * @param start Range start
    * @param len Range length
    */
@@ -92,7 +92,7 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
 
   /**
    * For storage array offsets.
-   * 
+   *
    * @param dbid ID reference
    * @return array offset
    */
@@ -102,12 +102,14 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
   }
 
   @Override
-  public void assignVar(int index, DBIDVar var) {
+  public DBIDVar assignVar(int index, DBIDVar var) {
     if (var instanceof IntegerDBIDVar) {
       ((IntegerDBIDVar) var).internalSetIndex(start + index);
+      return var;
     } else {
       // Much less efficient:
       var.set(get(index));
+      return var;
     }
   }
 
@@ -146,9 +148,9 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
 
   /**
    * Iterator in ELKI/C++ style.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private final static class Itr implements IntegerDBIDArrayIter {
@@ -169,7 +171,7 @@ final class IntegerDBIDRange implements IntegerDBIDs, DBIDRange, SetDBIDs {
 
     /**
      * Constructor.
-     * 
+     *
      * @param start Interval start
      * @param len Interval length
      */

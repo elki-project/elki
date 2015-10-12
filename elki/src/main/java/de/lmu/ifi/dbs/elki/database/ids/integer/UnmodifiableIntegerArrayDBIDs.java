@@ -31,9 +31,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 
 /**
  * Unmodifiable wrapper for DBIDs.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses IntegerArrayDBIDs
  * @apiviz.has UnmodifiableDBIDIter
  */
@@ -45,7 +45,7 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
 
   /**
    * Constructor.
-   * 
+   *
    * @param inner Inner DBID collection.
    */
   public UnmodifiableIntegerArrayDBIDs(IntegerArrayDBIDs inner) {
@@ -89,8 +89,8 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
   }
 
   @Override
-  public void assignVar(int index, DBIDVar var) {
-    inner.assignVar(index, var);
+  public DBIDVar assignVar(int index, DBIDVar var) {
+    return inner.assignVar(index, var);
   }
 
   @Override
@@ -105,7 +105,7 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
 
   /**
    * Make an existing DBIDMIter unmodifiable.
-   * 
+   *
    * @author Erich Schubert
    */
   class UnmodifiableDBIDIter implements IntegerDBIDArrayIter {
@@ -116,7 +116,7 @@ public class UnmodifiableIntegerArrayDBIDs implements IntegerArrayStaticDBIDs {
 
     /**
      * Constructor.
-     * 
+     *
      * @param it inner iterator
      */
     public UnmodifiableDBIDIter(IntegerDBIDArrayIter it) {

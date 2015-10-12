@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
  * Class using a primitive int[] array as storage.
- * 
+ *
  * @author Erich Schubert
  */
 class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayDBIDs {
@@ -56,7 +56,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
 
   /**
    * Constructor.
-   * 
+   *
    * @param isize Initial size
    */
   protected ArrayModifiableIntegerDBIDs(int isize) {
@@ -76,7 +76,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
 
   /**
    * Constructor.
-   * 
+   *
    * @param existing Existing ids
    */
   protected ArrayModifiableIntegerDBIDs(DBIDs existing) {
@@ -109,19 +109,21 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
   }
 
   @Override
-  public void assignVar(int index, DBIDVar var) {
+  public DBIDVar assignVar(int index, DBIDVar var) {
     if(var instanceof IntegerDBIDVar) {
       ((IntegerDBIDVar) var).internalSetIndex(store[index]);
+      return var;
     }
     else {
       // less efficient, involves object creation.
       var.set(get(index));
+      return var;
     }
   }
 
   /**
    * Resize as desired.
-   * 
+   *
    * @param minsize Desired size
    */
   private void ensureSize(int minsize) {
@@ -296,9 +298,9 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
 
   /**
    * Iterator class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class Itr implements IntegerDBIDArrayMIter {
@@ -359,9 +361,9 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
 
   /**
    * Slice of an array.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class Slice implements IntegerArrayDBIDs {
@@ -372,7 +374,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
 
     /**
      * Constructor.
-     * 
+     *
      * @param begin Begin, inclusive
      * @param end End, exclusive
      */
@@ -410,8 +412,8 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
     }
 
     @Override
-    public void assignVar(int index, DBIDVar var) {
-      ArrayModifiableIntegerDBIDs.this.assignVar(begin + index, var);
+    public DBIDVar assignVar(int index, DBIDVar var) {
+      return ArrayModifiableIntegerDBIDs.this.assignVar(begin + index, var);
     }
 
     @Override
@@ -431,9 +433,9 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
 
     /**
      * Iterator class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     private class SliceItr implements IntegerDBIDArrayIter {
@@ -460,7 +462,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
 
       @Override
       public int getOffset() {
-        return pos;
+        return pos - begin;
       }
 
       @Override

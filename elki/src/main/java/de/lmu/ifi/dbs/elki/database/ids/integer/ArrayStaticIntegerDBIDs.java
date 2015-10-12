@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Static (no modifications allowed) set of Database Object IDs.
- * 
+ *
  * @author Erich Schubert
  */
 class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
@@ -45,7 +45,7 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
 
   /**
    * Constructor.
-   * 
+   *
    * @param ids Array of ids.
    */
   protected ArrayStaticIntegerDBIDs(int... ids) {
@@ -80,12 +80,14 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
   }
 
   @Override
-  public void assignVar(int i, DBIDVar var) {
+  public DBIDVar assignVar(int i, DBIDVar var) {
     if (var instanceof IntegerDBIDVar) {
       ((IntegerDBIDVar) var).internalSetIndex(store[i]);
+      return var;
     } else {
       // Much less efficient:
       var.set(get(i));
+      return var;
     }
   }
 
@@ -106,9 +108,9 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
 
   /**
    * DBID iterator in ELKI/C style.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   protected class Itr implements IntegerDBIDArrayIter {
@@ -172,9 +174,9 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
 
   /**
    * Slice of an array.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class Slice implements IntegerArrayDBIDs {
@@ -185,7 +187,7 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
 
     /**
      * Constructor.
-     * 
+     *
      * @param begin Begin, inclusive
      * @param end End, exclusive
      */
@@ -223,8 +225,8 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
     }
 
     @Override
-    public void assignVar(int index, DBIDVar var) {
-      ArrayStaticIntegerDBIDs.this.assignVar(begin + index, var);
+    public DBIDVar assignVar(int index, DBIDVar var) {
+      return ArrayStaticIntegerDBIDs.this.assignVar(begin + index, var);
     }
 
     @Override
@@ -244,9 +246,9 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
 
     /**
      * Iterator class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     private class SliceItr implements IntegerDBIDArrayIter {
@@ -273,7 +275,7 @@ class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
 
       @Override
       public int getOffset() {
-        return pos;
+        return pos - begin;
       }
 
       @Override

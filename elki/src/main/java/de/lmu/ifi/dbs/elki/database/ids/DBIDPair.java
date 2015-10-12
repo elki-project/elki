@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,15 +26,15 @@ package de.lmu.ifi.dbs.elki.database.ids;
 /**
  * Immutable pair of two DBIDs. This can be stored more efficiently than when
  * using {@link de.lmu.ifi.dbs.elki.utilities.pairs.Pair}
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.ids.DBID
  */
-public interface DBIDPair extends DBIDs {
+public interface DBIDPair extends ArrayDBIDs {
   /**
    * Getter for first.
-   * 
+   *
    * @return first element in pair
    * @deprecated This method can be expensive. The use of a {@link DBIDVar} is
    *             recommended when many such accesses are needed.
@@ -44,7 +44,7 @@ public interface DBIDPair extends DBIDs {
 
   /**
    * Getter for second element in pair
-   * 
+   *
    * @return second element in pair
    * @deprecated This method can be expensive. The use of a {@link DBIDVar} is
    *             recommended when many such accesses are needed.

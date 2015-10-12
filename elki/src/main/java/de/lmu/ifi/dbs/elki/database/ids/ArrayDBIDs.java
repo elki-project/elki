@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,69 +25,69 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 /**
  * Interface for array based DBIDs.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has DBIDArrayIter
  */
 public interface ArrayDBIDs extends DBIDs {
   /**
    * Get the i'th entry (starting at 0)
-   * 
+   *
    * If possible, use an {@link DBIDArrayIter} via {@link #iter()} instead, or
    * an {@link DBIDVar} via {@link #assignVar}
-   * 
+   *
    * @param i Index
    * @return DBID of i'th entry.
-   * 
+   *
    * @deprecated Preferably use a {@link DBIDArrayIter} or a {@link DBIDVar}
    *             instead of materializing expensive {@link DBID} objects.
    */
   @Deprecated
-  public DBID get(int i);
+  DBID get(int i);
 
   /**
    * Assign a DBID variable the value of position {@code index}.
-   * 
+   *
    * @param index Position
    * @param var Variable to assign the value to.
    */
-  public void assignVar(int index, DBIDVar var);
+  DBIDVar assignVar(int index, DBIDVar var);
 
   /**
    * Iterable
-   * 
+   *
    * @return Iterator
    */
   @Override
-  public DBIDArrayIter iter();
+  DBIDArrayIter iter();
 
   /**
    * Size of the DBID "collection".
-   * 
+   *
    * @return size
    */
   @Override
-  public int size();
+  int size();
 
   /**
    * Search for the position of the given key, assuming that the data set is
-   * sorted.
-   * 
+   * sorted. For unsorted arrays, the result is undefined.
+   *
    * For keys not found, <code>-(1+insertion position)</code> is returned, as
    * for Java {@link java.util.Collections#binarySearch}
-   * 
+   *
    * @param key Key to search for
    * @return Offset of key
    */
-  public int binarySearch(DBIDRef key);
+  int binarySearch(DBIDRef key);
 
   /**
    * Slice a subarray (as view, not copy!)
-   * 
+   *
    * @param begin Begin (inclusive)
    * @param end End (exclusive)
    * @return Array slice.
    */
-  public ArrayDBIDs slice(int begin, int end);
+  ArrayDBIDs slice(int begin, int end);
 }

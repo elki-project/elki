@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -33,9 +33,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 
 /**
  * Unmodifiable wrapper for DBIDs.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.uses ArrayDBIDs
  * @apiviz.has UnmodifiableDBIDArrayIter
  */
@@ -47,7 +47,7 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
 
   /**
    * Constructor.
-   * 
+   *
    * @param inner Inner DBID collection.
    */
   public UnmodifiableArrayDBIDs(ArrayDBIDs inner) {
@@ -91,8 +91,8 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
   }
 
   @Override
-  public void assignVar(int index, DBIDVar var) {
-    inner.assignVar(index, var);
+  public DBIDVar assignVar(int index, DBIDVar var) {
+    return inner.assignVar(index, var);
   }
 
   @Override
@@ -107,7 +107,7 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
 
   /**
    * Make an existing DBIDMIter unmodifiable.
-   * 
+   *
    * @author Erich Schubert
    */
   class UnmodifiableDBIDArrayIter implements DBIDArrayIter {
@@ -118,7 +118,7 @@ public class UnmodifiableArrayDBIDs implements ArrayStaticDBIDs {
 
     /**
      * Constructor.
-     * 
+     *
      * @param it inner iterator
      */
     public UnmodifiableDBIDArrayIter(DBIDArrayIter it) {

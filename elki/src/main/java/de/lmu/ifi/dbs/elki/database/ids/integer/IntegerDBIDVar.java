@@ -135,13 +135,15 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
   }
 
   @Override
-  public void assignVar(int i, DBIDVar var) {
+  public DBIDVar assignVar(int i, DBIDVar var) {
     if(var instanceof IntegerDBIDVar) {
       ((IntegerDBIDVar) var).internalSetIndex(i);
+      return var;
     }
     else {
       // Much less efficient:
       var.set(get(i));
+      return var;
     }
   }
 

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,9 +29,9 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 
 /**
  * Empty DBID collection.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf EmptyDBIDIterator
  */
 public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
@@ -68,7 +68,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
   }
 
   @Override
-  public void assignVar(int index, DBIDVar var) {
+  public DBIDVar assignVar(int index, DBIDVar var) {
     throw new ArrayIndexOutOfBoundsException();
   }
 
@@ -89,7 +89,7 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
 
   /**
    * Iterator for empty DBIDs-
-   * 
+   *
    * @author Erich Schubert
    */
   protected static class EmptyDBIDIterator implements DBIDArrayMIter {

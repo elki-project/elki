@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -144,11 +144,12 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   }
 
   @Override
-  public void assignVar(int index, DBIDVar var) {
+  public DBIDVar assignVar(int index, DBIDVar var) {
     if (index != 0) {
       throw new ArrayIndexOutOfBoundsException();
     }
     var.set(this);
+    return var;
   }
 
   @Override

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,13 +23,16 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 
 /**
  * DBID pair using two ints for storage.
- * 
+ *
  * @author Erich Schubert
  */
 class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
@@ -45,7 +48,7 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
 
   /**
    * Initialize pair
-   * 
+   *
    * @param first first parameter
    * @param second second parameter
    */
@@ -72,6 +75,15 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
   @Override
   public final IntegerDBID getSecond() {
     return new IntegerDBID(second);
+  }
+
+  @Deprecated
+  @Override
+  public DBID get(int i) {
+    if(i < 0 || i > 1) {
+      throw new ArrayIndexOutOfBoundsException();
+    }
+    return i == 0 ? getFirst() : getSecond();
   }
 
   @Override
@@ -120,18 +132,59 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
   }
 
   @Override
-  public IntegerDBIDIter iter() {
+  public DBIDVar assignVar(int index, DBIDVar var) {
+    if(index == 0) {
+      if(var instanceof IntegerDBIDVar) {
+        ((IntegerDBIDVar) var).internalSetIndex(first);
+        return var;
+      }
+      else {
+        // Much less efficient:
+        var.set(new IntegerDBID(first));
+        return var;
+      }
+    }
+    if(index == 1) {
+      if(var instanceof IntegerDBIDVar) {
+        ((IntegerDBIDVar) var).internalSetIndex(second);
+        return var;
+      }
+      else {
+        // Much less efficient:
+        var.set(new IntegerDBID(second));
+        return var;
+      }
+    }
+    throw new ArrayIndexOutOfBoundsException();
+  }
+
+  @Override
+  public ArrayDBIDs slice(int begin, int end) {
+    return new Slice(begin, end);
+  }
+
+  @Override
+  public int binarySearch(DBIDRef key) {
+    int v = key.internalGetIndex();
+    return (v == first) ? 0 //
+    : (v == second) ? 1 //
+    : (v < first) ? -1 //
+    : (v < second) ? -2 : -3;
+  }
+
+  @Override
+  public IntegerDBIDArrayIter iter() {
     return new Itr(first, second);
   }
 
   /**
    * Iterator.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
-  private static class Itr implements IntegerDBIDIter {
+  private static class Itr implements IntegerDBIDArrayIter {
     /**
      * State
      */
@@ -139,7 +192,7 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
 
     /**
      * Constructor.
-     * 
+     *
      * @param first First ID
      * @param second Second ID
      */
@@ -156,7 +209,7 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
     }
 
     @Override
-    public DBIDIter advance() {
+    public Itr advance() {
       ++pos;
       return this;
     }
@@ -164,6 +217,163 @@ class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
     @Override
     public int internalGetIndex() {
       return (pos == 0) ? first : second;
+    }
+
+    @Override
+    public int getOffset() {
+      return pos;
+    }
+
+    @Override
+    public DBIDArrayIter advance(int count) {
+      // TODO Auto-generated method stub
+      return null;
+    }
+
+    @Override
+    public DBIDArrayIter retract() {
+      --pos;
+      return this;
+    }
+
+    @Override
+    public DBIDArrayIter seek(int off) {
+      pos = off;
+      return this;
+    }
+  }
+
+  /**
+   * Slice of an array.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  private class Slice implements IntegerArrayDBIDs {
+    /**
+     * Slice positions.
+     */
+    final int begin, end;
+
+    /**
+     * Constructor.
+     *
+     * @param begin Begin, inclusive
+     * @param end End, exclusive
+     */
+    public Slice(int begin, int end) {
+      super();
+      this.begin = begin;
+      this.end = end;
+    }
+
+    @Override
+    public int size() {
+      return end - begin;
+    }
+
+    @Override
+    public boolean contains(DBIDRef o) {
+      int oid = o.internalGetIndex();
+      if(begin == 0 && end > 0 && first == oid) {
+        return true;
+      }
+      if(begin <= 1 && end > 1 && second == oid) {
+        return true;
+      }
+      return false;
+    }
+
+    @Override
+    public boolean isEmpty() {
+      return begin == end;
+    }
+
+    @Override
+    public DBID get(int i) {
+      return IntegerDBIDPair.this.get(begin + i);
+    }
+
+    @Override
+    public DBIDVar assignVar(int index, DBIDVar var) {
+      return IntegerDBIDPair.this.assignVar(begin + index, var);
+    }
+
+    @Override
+    public int binarySearch(DBIDRef key) {
+      return IntegerDBIDPair.this.binarySearch(key) - begin;
+    }
+
+    @Override
+    public IntegerDBIDArrayIter iter() {
+      return new SliceItr();
+    }
+
+    @Override
+    public Slice slice(int begin, int end) {
+      return new Slice(begin + begin, begin + end);
+    }
+
+    /**
+     * Iterator class.
+     *
+     * @author Erich Schubert
+     *
+     * @apiviz.exclude
+     */
+    private class SliceItr implements IntegerDBIDArrayIter {
+      /**
+       * Iterator position.
+       */
+      int pos = begin;
+
+      @Override
+      public int internalGetIndex() {
+        if(pos < 0 || pos > 1) {
+          throw new ArrayIndexOutOfBoundsException();
+        }
+        return pos == 0 ? first : second;
+      }
+
+      @Override
+      public boolean valid() {
+        return pos < end && pos >= begin;
+      }
+
+      @Override
+      public SliceItr advance() {
+        ++pos;
+        return this;
+      }
+
+      @Override
+      public int getOffset() {
+        return pos - begin;
+      }
+
+      @Override
+      public SliceItr advance(int count) {
+        pos += count;
+        return this;
+      }
+
+      @Override
+      public SliceItr retract() {
+        --pos;
+        return this;
+      }
+
+      @Override
+      public SliceItr seek(int off) {
+        pos = begin + off;
+        return this;
+      }
+
+      @Override
+      public String toString() {
+        return Integer.toString(internalGetIndex()) + "@" + pos;
+      }
     }
   }
 }
