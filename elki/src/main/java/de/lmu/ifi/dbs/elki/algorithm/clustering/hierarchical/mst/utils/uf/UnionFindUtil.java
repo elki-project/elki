@@ -1,5 +1,4 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.mst.utils.uf;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,45 +22,25 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.mst.utils.uf;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 
 /**
- * Union-find implementations in ELKI
+ * Union-find algorithm factory, to choose the best implementation.
  *
  * @author Erich Schubert
  */
-public interface UnionFind {
+public class UnionFindUtil {
   /**
-   * Join the components of elements p and q.
+   * Make a new instance (automatically choosing the best implementation).
    *
-   * @param p First element
-   * @param q Second element
-   * @return Component id.
+   * @param ids ID set
+   * @return Union find algorithm
    */
-  int union(DBIDRef p, DBIDRef q);
-
-  /**
-   * Test if two components are connected.
-   *
-   * @param p First element
-   * @param q Second element
-   * @return {@code true} if they are in the same component.
-   */
-  boolean isConnected(DBIDRef p, DBIDRef q);
-
-  /**
-   * Collect all component root elements.
-   *
-   * @return Root elements
-   */
-  DBIDs getRoots();
-
-  /**
-   * Find the component ID of an element.
-   *
-   * @param p Element
-   * @return Component id
-   */
-  int find(DBIDRef p);
+  public static UnionFind make(StaticDBIDs ids) {
+    if(ids instanceof DBIDRange) {
+      return new WeightedQuickUnionRangeDBIDs((DBIDRange) ids);
+    }
+    return new WeightedQuickUnionStaticDBIDs(ids);
+  }
 }
