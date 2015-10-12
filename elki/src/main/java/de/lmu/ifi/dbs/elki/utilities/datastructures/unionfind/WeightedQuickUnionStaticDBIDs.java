@@ -1,6 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.mst.utils.uf;
-
-import java.util.Arrays;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.unionfind;
 
 /*
  This file is part of ELKI:
@@ -25,22 +23,33 @@ import java.util.Arrays;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
+
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Union-find algorithm for {@link DBIDRange} only, with optimizations.
+ * Union-find algorithm for {@link StaticDBIDs}, with optimizations.
  *
- * To instantiate, use {@link UnionFindUtil#make}. This version is optimized for
- * {@link DBIDRange}s.
+ * To instantiate, use {@link UnionFindFactory#make}, which will automatically
+ * choose the best implementation available.
  *
  * This is the weighted quick union approach, weighted by count and using
  * path-halving for optimization.
+ *
+ * This version needs more memory than {@link WeightedQuickUnionRangeDBIDs} but
+ * can work with any unmodifiable DBID set (although {@link ArrayDBIDs} are
+ * recommended).
  *
  * Reference:
  * <p>
@@ -55,11 +64,16 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "R. Sedgewick", //
 title = "1.3 Union-Find Algorithms", //
 booktitle = "Algorithms in C, Parts 1-4")
-public class WeightedQuickUnionRangeDBIDs implements UnionFind {
+public class WeightedQuickUnionStaticDBIDs implements UnionFind {
   /**
    * Object ID range.
    */
-  private DBIDRange ids;
+  private ArrayDBIDs ids;
+
+  /**
+   * Index, to map DBID to offset.
+   */
+  private WritableIntegerDataStore index;
 
   /**
    * Parent element
@@ -76,8 +90,13 @@ public class WeightedQuickUnionRangeDBIDs implements UnionFind {
    *
    * @param ids Range to use
    */
-  WeightedQuickUnionRangeDBIDs(DBIDRange ids) {
-    this.ids = ids;
+  WeightedQuickUnionStaticDBIDs(StaticDBIDs ids) {
+    this.ids = DBIDUtil.ensureArray(ids);
+    index = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+    int j = 0;
+    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+      index.put(iter, j++);
+    }
     weight = new int[ids.size()];
     Arrays.fill(weight, 1);
     parent = new int[ids.size()];
@@ -88,7 +107,7 @@ public class WeightedQuickUnionRangeDBIDs implements UnionFind {
 
   @Override
   public int find(DBIDRef element) {
-    int cur = ids.getOffset(element);
+    int cur = index.intValue(element);
     assert (cur >= 0 && cur < ids.size());
     int p = parent[cur], tmp;
     while(cur != p) {

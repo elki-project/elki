@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.mst.utils.uf;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.unionfind;
 
 /*
  This file is part of ELKI:
