@@ -106,6 +106,10 @@ public class EvaluateClustering implements Evaluator {
 
   @Override
   public void processNewResult(ResultHierarchy hier, Result newResult) {
+    // We may just have added this result.
+    if(newResult instanceof Clustering && isReferenceResult((Clustering<?>) newResult)) {
+      return;
+    }
     Database db = ResultUtil.findDatabase(hier);
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(newResult);
     if(crs == null || crs.size() < 1) {
@@ -153,15 +157,32 @@ public class EvaluateClustering implements Evaluator {
       if(c == refc) {
         continue;
       }
-      ClusterContingencyTable contmat = new ClusterContingencyTable(selfPairing, noiseSpecialHandling);
-      contmat.process(refc, c);
-
-      ScoreResult sr = new ScoreResult(contmat);
-      sr.addHeader(c.getLongName());
-      db.getHierarchy().add(c, sr);
+      evaluteResult(db, c, refc);
     }
   }
 
+  /**
+   * Evaluate a clustering result.
+   *
+   * @param db Database
+   * @param c Clustering
+   * @param refc Reference clustering
+   */
+  protected void evaluteResult(Database db, Clustering<?> c, Clustering<?> refc) {
+    ClusterContingencyTable contmat = new ClusterContingencyTable(selfPairing, noiseSpecialHandling);
+    contmat.process(refc, c);
+
+    ScoreResult sr = new ScoreResult(contmat);
+    sr.addHeader(c.getLongName());
+    db.getHierarchy().add(c, sr);
+  }
+
+  /**
+   * Test if a clustering result is a valid reference result.
+   *
+   * @param t Clustering to test.
+   * @return {@code true} if it is considered to be a reference result.
+   */
   private boolean isReferenceResult(Clustering<?> t) {
     // FIXME: don't hard-code strings
     if("bylabel-clustering".equals(t.getShortName())) {
