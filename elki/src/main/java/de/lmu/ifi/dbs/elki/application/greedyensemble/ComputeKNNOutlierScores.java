@@ -192,17 +192,18 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     final int maxk = Math.min(this.maxk, relation.size() - 1);
 
     // Get a KNN query.
-    KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, distf, maxk + 2);
+    final int lim = Math.min(maxk + 2, relation.size());
+    KNNQuery<O> knnq = QueryUtil.getKNNQuery(relation, distf, lim);
 
     // Precompute kNN:
     if(!(knnq instanceof PreprocessorKNNQuery)) {
-      MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, distf, maxk + 2);
+      MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, distf, lim);
       preproc.initialize();
       relation.getHierarchy().add(relation, preproc);
     }
 
     // Test that we now get a proper index query
-    knnq = QueryUtil.getKNNQuery(relation, distf, maxk + 2);
+    knnq = QueryUtil.getKNNQuery(relation, distf, lim);
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       throw new AbortException("Not using preprocessor knn query -- KNN queries using class: " + knnq.getClass());
     }
