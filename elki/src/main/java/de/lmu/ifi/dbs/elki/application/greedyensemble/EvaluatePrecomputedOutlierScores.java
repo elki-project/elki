@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * Class to load an outlier detection summary file, as produced by
  * {@link ComputeKNNOutlierScores}, and compute popular evaluation metrics for
  * it.
- * 
+ *
  * File format description:
  * <ul>
  * <li>Each column is one object in the data set</li>
@@ -70,11 +70,11 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * <tt>bylabel</tt>, where <tt>0</tt> indicates an inlier and <tt>1</tt>
  * indicates an outlier</li>
  * </ul>
- * 
+ *
  * The evaluation assumes that high scores correspond to outliers, unless the
  * method name matches the pattern given using {@link Parameterizer#REVERSED_ID}
  * (Default: <tt>(ODIN|ABOD)</tt>).
- * 
+ *
  * @author Erich Schubert
  * @author Guilherme Oliveira Campos
  */
@@ -106,7 +106,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
 
   /**
    * Constructor.
-   * 
+   *
    * @param inputstep Input step
    * @param reverse Pattern for reversed outlier scores.
    * @param outfile Output file name
@@ -166,6 +166,10 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
         }
         String label = labels.get(iditer);
         final NumberVector vec = relation.get(iditer);
+        if(checkForNaNs(vec)) {
+          LOG.warning("NaN value encountered in vector " + label);
+          continue;
+        }
         AbstractVectorIter iter = m.reset(label).find() ? new IncreasingVectorIter(vec) : new DecreasingVectorIter(vec);
         double auc = ROCEvaluation.STATIC.evaluate(positive, iter.seek(0));
         double avep = AveragePrecisionEvaluation.STATIC.evaluate(positive, iter.seek(0));
@@ -199,10 +203,26 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
   }
 
   /**
+   * Check for NaN values.
+   *
+   * @param vec Vector
+   * @return {@code true} if NaN values are present.
+   */
+  private boolean checkForNaNs(NumberVector vec) {
+    for(int i = 0, d = vec.getDimensionality(); i < d; i++) {
+      double v = vec.doubleValue(i);
+      if(v != v) { // NaN!
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
@@ -263,7 +283,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
 
   /**
    * Main method.
-   * 
+   *
    * @param args Command line parameters.
    */
   public static void main(String[] args) {
