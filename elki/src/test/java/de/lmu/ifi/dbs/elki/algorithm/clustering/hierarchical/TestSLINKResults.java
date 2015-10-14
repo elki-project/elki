@@ -57,7 +57,6 @@ public class TestSLINKResults extends AbstractSimpleAlgorithmTest implements JUn
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, SLINK.class);
     ExtractFlatClusteringFromHierarchy slink = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);

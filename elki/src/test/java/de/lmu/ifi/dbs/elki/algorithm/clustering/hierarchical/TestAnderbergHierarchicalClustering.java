@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 /**
  * Perform agglomerative hierarchical clustering, using the anderberg improved
  * algorithm.
- * 
+ *
  * @author Erich Schubert
  */
 public class TestAnderbergHierarchicalClustering extends AbstractSimpleAlgorithmTest implements JUnit4Test {
@@ -54,7 +54,6 @@ public class TestAnderbergHierarchicalClustering extends AbstractSimpleAlgorithm
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AnderbergHierarchicalClustering.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, SingleLinkageMethod.class);
@@ -78,7 +77,6 @@ public class TestAnderbergHierarchicalClustering extends AbstractSimpleAlgorithm
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AnderbergHierarchicalClustering.class);
     ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
@@ -101,7 +99,6 @@ public class TestAnderbergHierarchicalClustering extends AbstractSimpleAlgorithm
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AnderbergHierarchicalClustering.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, GroupAverageLinkageMethod.class);
@@ -125,7 +122,6 @@ public class TestAnderbergHierarchicalClustering extends AbstractSimpleAlgorithm
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AnderbergHierarchicalClustering.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, CompleteLinkageMethod.class);

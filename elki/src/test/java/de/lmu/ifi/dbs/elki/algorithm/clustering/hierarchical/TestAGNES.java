@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Perform agglomerative hierarchical clustering, using the naive algorithm.
- * 
+ *
  * @author Erich Schubert
  */
 public class TestAGNES extends AbstractSimpleAlgorithmTest implements JUnit4Test {
@@ -53,7 +53,6 @@ public class TestAGNES extends AbstractSimpleAlgorithmTest implements JUnit4Test
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, SingleLinkageMethod.class);
@@ -77,7 +76,6 @@ public class TestAGNES extends AbstractSimpleAlgorithmTest implements JUnit4Test
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
     ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
@@ -100,7 +98,6 @@ public class TestAGNES extends AbstractSimpleAlgorithmTest implements JUnit4Test
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, GroupAverageLinkageMethod.class);
@@ -124,7 +121,6 @@ public class TestAGNES extends AbstractSimpleAlgorithmTest implements JUnit4Test
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.OUTPUTMODE_ID, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS);
     params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, CompleteLinkageMethod.class);

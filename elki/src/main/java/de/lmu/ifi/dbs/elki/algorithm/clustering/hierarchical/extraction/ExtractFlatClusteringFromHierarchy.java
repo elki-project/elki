@@ -74,59 +74,45 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
   }
 
   /**
-   * Output mode.
-   *
-   * @author Erich Schubert
-   *
-   * @apiviz.exclude
-   */
-  public static enum OutputMode {
-    /** Strict partitioning. */
-    STRICT_PARTITIONS,
-    /** Partial hierarchy. */
-    PARTIAL_HIERARCHY,
-  }
-
-  /**
    * Minimum number of clusters to extract
    */
   private final int minclusters;
 
   /**
-   * Clustering algorithm to run to obtain the hierarchy.
-   */
-  private HierarchicalClusteringAlgorithm algorithm;
-
-  /**
-   * Include empty cluster in the hierarchy produced.
-   */
-  private OutputMode outputmode = OutputMode.PARTIAL_HIERARCHY;
-
-  /**
    * Threshold for extracting clusters.
    */
-  private double threshold;
+  private final double threshold;
 
   /**
-   * Disallow singleton clusters, but add them to the parent cluster instead.
+   * Include empty clusters in the hierarchy produced.
    */
-  private boolean singletons = false;
+  private final boolean hierarchical;
+
+  /**
+   * Merge singleton clusters into the parent cluster.
+   */
+  private final boolean nosingletons;
+
+  /**
+   * Clustering algorithm to run to obtain the hierarchy.
+   */
+  private final HierarchicalClusteringAlgorithm algorithm;
 
   /**
    * Constructor.
    *
    * @param algorithm Algorithm to run
    * @param minclusters Minimum number of clusters
-   * @param outputmode Output mode: truncated hierarchy or strict partitions.
-   * @param singletons Allow producing singleton clusters.
+   * @param hierarchical Produce a hierarchical output
+   * @param nosingletons Merge singletons into parent
    */
-  public ExtractFlatClusteringFromHierarchy(HierarchicalClusteringAlgorithm algorithm, int minclusters, OutputMode outputmode, boolean singletons) {
+  public ExtractFlatClusteringFromHierarchy(HierarchicalClusteringAlgorithm algorithm, int minclusters, boolean hierarchical, boolean nosingletons) {
     super();
     this.algorithm = algorithm;
     this.threshold = Double.NaN;
     this.minclusters = minclusters;
-    this.outputmode = outputmode;
-    this.singletons = singletons;
+    this.hierarchical = hierarchical;
+    this.nosingletons = nosingletons;
   }
 
   /**
@@ -134,16 +120,16 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
    *
    * @param algorithm Algorithm to run
    * @param threshold Distance threshold
-   * @param outputmode Output mode: truncated hierarchy or strict partitions.
-   * @param singletons Allow producing singleton clusters.
+   * @param hierarchical Produce a hierarchical output
+   * @param nosingletons Merge singletons into parent
    */
-  public ExtractFlatClusteringFromHierarchy(HierarchicalClusteringAlgorithm algorithm, double threshold, OutputMode outputmode, boolean singletons) {
+  public ExtractFlatClusteringFromHierarchy(HierarchicalClusteringAlgorithm algorithm, double threshold, boolean hierarchical, boolean nosingletons) {
     super();
     this.algorithm = algorithm;
     this.threshold = threshold;
     this.minclusters = -1;
-    this.outputmode = outputmode;
-    this.singletons = singletons;
+    this.hierarchical = hierarchical;
+    this.nosingletons = nosingletons;
   }
 
   @Override
@@ -221,8 +207,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
       LOG.incrementProcessed(progress);
     }
     final Clustering<DendrogramModel> dendrogram;
-    switch(outputmode){
-    case PARTIAL_HIERARCHY: {
+    if(hierarchical) {
       // Build a hierarchy out of these clusters.
       dendrogram = new Clustering<>("Hierarchical Clustering", "hierarchical-clustering");
       Cluster<DendrogramModel> root = null;
@@ -245,7 +230,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
         if(clusterid >= 0) {
           clus = clusters.get(clusterid);
         }
-        else if(!singletons && ids.size() != 1) {
+        else if(nosingletons && ids.size() > 1) {
           clus = null;
         }
         else {
@@ -256,63 +241,63 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
         if(DBIDUtil.equal(it, succ)) {
           assert (root == null);
           root = clus;
+          LOG.incrementProcessed(progress);
+          continue;
         }
-        else {
-          // Parent cluster:
-          int parentid = cluster_map.intValue(succ);
-          double depth = lambda.doubleValue(it);
-          // Parent cluster exists - merge as a new cluster:
-          if(parentid >= 0) {
-            final Cluster<DendrogramModel> pclus = clusters.get(parentid);
-            if(pclus.getModel().getDistance() == depth) {
-              if(clus == null) {
-                ((ModifiableDBIDs) pclus.getIDs()).add(it);
-              }
-              else {
-                dendrogram.addChildCluster(pclus, clus);
-              }
+        // Parent cluster:
+        int parentid = cluster_map.intValue(succ);
+        double depth = lambda.doubleValue(it);
+        // Parent cluster exists - merge as a new cluster:
+        if(parentid >= 0) {
+          final Cluster<DendrogramModel> pclus = clusters.get(parentid);
+          if(pclus.getModel().getDistance() == depth) {
+            if(clus == null) {
+              ((ModifiableDBIDs) pclus.getIDs()).add(it);
             }
             else {
-              // Merge at new depth:
-              ModifiableDBIDs cids = DBIDUtil.newArray(clus == null ? 1 : 0);
-              if(clus == null) {
-                cids.add(it);
-              }
-              Cluster<DendrogramModel> npclus = makeCluster(succ, depth, cids);
-              if(clus != null) {
-                dendrogram.addChildCluster(npclus, clus);
-              }
-              dendrogram.addChildCluster(npclus, pclus);
-              // Replace existing parent cluster: new depth
-              clusters.set(parentid, npclus);
+              dendrogram.addChildCluster(pclus, clus);
             }
           }
           else {
-            // Merge with parent at this depth:
-            final Cluster<DendrogramModel> pclus;
-            if(!singletons) {
-              ModifiableDBIDs cids = DBIDUtil.newArray(clus == null ? 2 : 1);
-              cids.add(succ);
-              if(clus == null) {
-                cids.add(it);
-              }
-              // New cluster for parent and/or new point
-              pclus = makeCluster(succ, depth, cids);
+            // Merge at new depth:
+            ModifiableDBIDs cids = DBIDUtil.newArray(clus == null ? 1 : 0);
+            if(clus == null) {
+              cids.add(it);
             }
-            else {
-              // Create a new, one-element cluster for parent, and a merged
-              // cluster on top.
-              pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
-              dendrogram.addChildCluster(pclus, makeCluster(succ, Double.NaN, DBIDUtil.deref(succ)));
-            }
+            Cluster<DendrogramModel> npclus = makeCluster(succ, depth, cids);
             if(clus != null) {
-              dendrogram.addChildCluster(pclus, clus);
+              dendrogram.addChildCluster(npclus, clus);
             }
-            // Store cluster:
-            parentid = clusters.size();
-            clusters.add(pclus); // Remember parent cluster
-            cluster_map.putInt(succ, parentid); // Reference
+            dendrogram.addChildCluster(npclus, pclus);
+            // Replace existing parent cluster: new depth
+            clusters.set(parentid, npclus);
           }
+        }
+        else {
+          // Merge with parent at this depth:
+          final Cluster<DendrogramModel> pclus;
+          if(nosingletons) {
+            ModifiableDBIDs cids = DBIDUtil.newArray(clus == null ? 2 : 1);
+            cids.add(succ);
+            if(clus == null) {
+              cids.add(it);
+            }
+            // New cluster for parent and/or new point
+            pclus = makeCluster(succ, depth, cids);
+          }
+          else {
+            // Create a new, one-element cluster for parent, and a merged
+            // cluster on top.
+            pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS);
+            dendrogram.addChildCluster(pclus, makeCluster(succ, Double.NaN, DBIDUtil.deref(succ)));
+          }
+          if(clus != null) {
+            dendrogram.addChildCluster(pclus, clus);
+          }
+          // Store cluster:
+          parentid = clusters.size();
+          clusters.add(pclus); // Remember parent cluster
+          cluster_map.putInt(succ, parentid); // Reference
         }
 
         // Decrement counter
@@ -321,9 +306,8 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
       assert (root != null);
       // attach root
       dendrogram.addToplevelCluster(root);
-      break;
     }
-    case STRICT_PARTITIONS: {
+    else {
       // Build a hierarchy out of these clusters.
       dendrogram = new Clustering<>("Flattened Hierarchical Clustering", "flattened-hierarchical-clustering");
       // Convert initial clusters to cluster objects
@@ -334,7 +318,16 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
           dendrogram.addToplevelCluster(makeCluster(it2, depth, cluster_dbids.get(i)));
         }
         cluster_dist = null; // Invalidate
-        cluster_dbids = null; // Invalidate
+      }
+      if(nosingletons) {
+        // Convert singletons.
+        for(it.seek(split); it.valid(); it.advance()) {
+          int parentid = cluster_map.intValue(succ);
+          if(parentid >= 0) {
+            cluster_dbids.get(parentid).add(it);
+            cluster_map.put(it, parentid);
+          }
+        }
       }
       // Process the upper part, bottom-up.
       for(it.seek(split); it.valid(); it.advance()) {
@@ -346,10 +339,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
         // Decrement counter
         LOG.incrementProcessed(progress);
       }
-      break;
-    }
-    default:
-      throw new AbortException("Unsupported output mode.");
+      cluster_dbids = null; // Invalidate
     }
     LOG.ensureCompleted(progress);
 
@@ -449,12 +439,17 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
     /**
      * Parameter to configure the output mode (nested or truncated clusters).
      */
-    public static final OptionID OUTPUTMODE_ID = new OptionID("hierarchical.output-mode", "The output mode: a truncated cluster hierarchy, or a strict (flat) partitioning of the data set.");
+    public static final OptionID HIERARCHICAL_ID = new OptionID("hierarchical.hierarchy", "Generate a truncated hierarchical clustering result (or strict partitions).");
 
     /**
      * Flag to produce singleton clusters.
      */
-    public static final OptionID SINGLETONS_ID = new OptionID("hierarchical.singletons", "Do not avoid singleton clusters. This produces a more complex hierarchy.");
+    public static final OptionID NO_SINGLETONS_ID = new OptionID("hierarchical.mergesingletons", "Merge singleton clusters into parent. This produces a more complex hierarchy, but that is easier to understand.");
+
+    /**
+     * Threshold mode.
+     */
+    ThresholdMode thresholdmode = null;
 
     /**
      * Number of clusters to extract.
@@ -467,24 +462,19 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
     double threshold = Double.NaN;
 
     /**
-     * Flag to produce empty clusters to model the hierarchy above.
+     * Flag to generate a hierarchical result.
      */
-    OutputMode outputmode = null;
+    boolean hierarchical = false;
+
+    /**
+     * Also create singleton clusters.
+     */
+    boolean nosingletons = false;
 
     /**
      * The hierarchical clustering algorithm to run.
      */
     HierarchicalClusteringAlgorithm algorithm;
-
-    /**
-     * Threshold mode.
-     */
-    ThresholdMode thresholdmode = null;
-
-    /**
-     * Also create singleton clusters.
-     */
-    boolean singletons = false;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -515,20 +505,20 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
       }
 
       if(thresholdmode == null || !ThresholdMode.NO_THRESHOLD.equals(thresholdmode)) {
-        EnumParameter<OutputMode> outputP = new EnumParameter<>(OUTPUTMODE_ID, OutputMode.class);
-        if(config.grab(outputP)) {
-          outputmode = outputP.getValue();
+        Flag hierarchicalF = new Flag(HIERARCHICAL_ID);
+        if(config.grab(hierarchicalF)) {
+          hierarchical = hierarchicalF.isTrue();
         }
       }
       else {
         // This becomes full hierarchy:
         minclusters = -1;
-        outputmode = OutputMode.PARTIAL_HIERARCHY;
+        hierarchical = true;
       }
 
-      Flag singletonsF = new Flag(SINGLETONS_ID);
+      Flag singletonsF = new Flag(NO_SINGLETONS_ID);
       if(config.grab(singletonsF)) {
-        singletons = singletonsF.isTrue();
+        nosingletons = singletonsF.isTrue();
       }
     }
 
@@ -537,9 +527,9 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
       switch(thresholdmode){
       case NO_THRESHOLD:
       case BY_MINCLUSTERS:
-        return new ExtractFlatClusteringFromHierarchy(algorithm, minclusters, outputmode, singletons);
+        return new ExtractFlatClusteringFromHierarchy(algorithm, minclusters, hierarchical, nosingletons);
       case BY_THRESHOLD:
-        return new ExtractFlatClusteringFromHierarchy(algorithm, threshold, outputmode, singletons);
+        return new ExtractFlatClusteringFromHierarchy(algorithm, threshold, hierarchical, nosingletons);
       default:
         throw new AbortException("Unknown extraction mode.");
       }

@@ -60,7 +60,7 @@ public class TestFileBasedDoubleDistanceFunction extends AbstractSimpleAlgorithm
     distparams.addParameter(FileBasedDoubleDistanceFunction.Parameterizer.MATRIX_ID, FILENAME);
     FileBasedDoubleDistanceFunction df = ClassGenericsUtil.parameterizeOrAbort(FileBasedDoubleDistanceFunction.class, distparams);
     SLINK<DBID> slink = new SLINK<>(df);
-    ExtractFlatClusteringFromHierarchy clus = new ExtractFlatClusteringFromHierarchy(slink, 0.5, ExtractFlatClusteringFromHierarchy.OutputMode.STRICT_PARTITIONS, true);
+    ExtractFlatClusteringFromHierarchy clus = new ExtractFlatClusteringFromHierarchy(slink, 0.5, false, false);
     Clustering<DendrogramModel> c = clus.run(db);
 
     testClusterSizes(c, new int[] { 2, 2 });
