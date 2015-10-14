@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * Reference:
  * <p>
- * Bagga, A. and Baldwin, B.<br />
+ * A. Bagga and B. Baldwin<br />
  * Entity-based cross-document coreferencing using the Vector Space Model<br />
  * Proc. COLING '98 Proceedings of the 17th international conference on
  * Computational linguistics
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @author Sascha Goldhofer
  */
-@Reference(authors = "Bagga, A. and Baldwin, B.", //
+@Reference(authors = "A. Bagga and B. Baldwin", //
 title = "Entity-based cross-document coreferencing using the Vector Space Model", //
 booktitle = "Proc. COLING '98 Proceedings of the 17th international conference on Computational linguistics", //
 url = "http://dx.doi.org/10.3115/980451.980859")
@@ -60,20 +60,25 @@ public class BCubed {
     bCubedRecall = 0.0;
 
     for(int i1 = 0; i1 < table.size1; i1++) {
+      final int[] row = table.contingency[i1];
       for(int i2 = 0; i2 < table.size2; i2++) {
-        // precision of one item
-        double precision = 1.0 * table.contingency[i1][i2] / table.contingency[i1][table.size2];
-        // precision for all items in cluster
-        bCubedPrecision += (precision * table.contingency[i1][i2]);
+        final int c = row[i2];
+        if(c > 0) {
+          // precision of one item
+          double precision = 1.0 * c / row[table.size2];
+          // precision for all items in cluster
+          bCubedPrecision += (precision * c);
 
-        // recall of one item
-        double recall = 1.0 * table.contingency[i1][i2] / table.contingency[table.size1][i2];
-        // recall for all items in cluster
-        bCubedRecall += (recall * table.contingency[i1][i2]);
+          // recall of one item
+          double recall = 1.0 * c / table.contingency[table.size1][i2];
+          // recall for all items in cluster
+          bCubedRecall += (recall * c);
+        }
       }
     }
-    bCubedPrecision = bCubedPrecision / table.contingency[table.size1][table.size2];
-    bCubedRecall = bCubedRecall / table.contingency[table.size1][table.size2];
+    final int total = table.contingency[table.size1][table.size2];
+    bCubedPrecision = bCubedPrecision / total;
+    bCubedRecall = bCubedRecall / total;
   }
 
   /**
