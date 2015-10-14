@@ -104,7 +104,7 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
         int subk = k;
         DoubleDBIDListIter it = dr.iter();
         final double kdist = it.seek(subk - 1).doubleValue();
-        for(it.advance(); it.valid() && kdist < it.doubleValue(); it.advance()) {
+        for(it.advance(); it.valid() && kdist < it.doubleValue() && subk < k; it.advance()) {
           subk++;
         }
         result.add(subk < dr.size() ? DBIDUtil.subList(dr, subk) : dr);
