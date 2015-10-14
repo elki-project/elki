@@ -168,7 +168,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
    *
    * @return Hierarchical clustering
    */
-  private Clustering<DendrogramModel> extractClusters(DBIDs ids, final DBIDDataStore pi, final DoubleDataStore lambda) {
+  public Clustering<DendrogramModel> extractClusters(DBIDs ids, final DBIDDataStore pi, final DoubleDataStore lambda) {
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
 
     // Sort DBIDs by lambda. We need this for two things:

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -134,7 +134,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
    * @param coredist Core distances
    * @return Hierarchical clustering
    */
-  private Clustering<DendrogramModel> extractClusters(DBIDs ids, DBIDDataStore pi, DoubleDataStore lambda, DoubleDataStore coredist) {
+  public Clustering<DendrogramModel> extractClusters(DBIDs ids, DBIDDataStore pi, DoubleDataStore lambda, DoubleDataStore coredist) {
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
 
     // Sort DBIDs by lambda, to process merges in increasing order.
