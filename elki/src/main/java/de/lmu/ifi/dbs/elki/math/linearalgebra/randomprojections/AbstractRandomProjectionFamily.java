@@ -1,10 +1,12 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
 
+import java.util.Arrays;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,9 +28,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.VectorUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -37,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Abstract base class for random projection families.
- * 
+ *
  * @author Erich Schubert
  */
 public abstract class AbstractRandomProjectionFamily implements RandomProjectionFamily {
@@ -55,10 +56,102 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
   }
 
   /**
-   * Parameterization interface (with the shared
-   * 
+   * Class to project using a matrix multiplication. This class is optimized for
+   * dense vector multiplications. In other words, the row dimensionality is the
+   * output dimensionality, the column dimensionality is the input
+   * dimensionality.
+   *
+   * It is <b>not thread safe</b> because it uses an internal buffer to store a
+   * local copy of the vector.
+   *
    * @author Erich Schubert
-   * 
+   */
+  public static class MatrixProjection implements Projection {
+    /**
+     * Projection matrix.
+     */
+    double[][] matrix;
+
+    /**
+     * Shared buffer to use during projections.
+     */
+    private double[] buf;
+
+    /**
+     * Constructor.
+     *
+     * @param matrix Projection matrix ([output dim][input dim]).
+     */
+    public MatrixProjection(double[][] matrix) {
+      super();
+      this.matrix = matrix;
+      this.buf = new double[matrix.length];
+    }
+
+    @Override
+    public double[] project(NumberVector in) {
+      return project(in, new double[matrix.length]);
+    }
+
+    @Override
+    public double[] project(NumberVector in, double[] ret) {
+      if(in instanceof SparseNumberVector) {
+        return projectSparse((SparseNumberVector) in, ret);
+      }
+      final int dim = MathUtil.min(buf.length, in.getDimensionality());
+      assert (ret.length >= matrix.length) : "Output buffer too small!";
+      // Copy vector into local buffer
+      for(int i = 0; i < dim; i++) {
+        buf[i] = in.doubleValue(i);
+      }
+      // Iterate over output dimensions:
+      for(int o = 0; o < matrix.length; o++) {
+        final double[] row = matrix[o];
+        double v = 0.;
+        for(int i = 0; i < dim; i++) {
+          v += row[i] * buf[i]; // Rows and input are aligned.
+        }
+        ret[o] = v;
+      }
+      // Fill excess dimensions.
+      for(int d = matrix.length; d < ret.length; d++) {
+        ret[d] = 0;
+      }
+      return ret;
+    }
+
+    /**
+     * Project, exploiting sparsity; but the transposed matrix layout would have
+     * been better. For projections where you expect sparse input, consider the
+     * opposite.
+     *
+     * @param in Input vector
+     * @param ret Projection buffer
+     * @return Projected data.
+     */
+    private double[] projectSparse(SparseNumberVector in, double[] ret) {
+      Arrays.fill(ret, 0);
+      for(int iter = in.iter(); in.iterValid(iter); iter = in.iterAdvance(iter)) {
+        final int i = in.iterDim(iter);
+        final double val = in.iterDoubleValue(iter);
+        for(int o = 0; o < ret.length; o++) {
+          ret[o] += val * matrix[o][i]; // Not aligned.
+        }
+      }
+      return ret;
+    }
+
+    @Override
+    public int getOutputDimensionality() {
+      return matrix.length;
+    }
+  }
+
+  /**
+   * Parameterization interface (with the shared parameters)
+   *
+   * @author Erich Schubert
+   *
    * @apiviz.exclude
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
@@ -76,56 +169,9 @@ public abstract class AbstractRandomProjectionFamily implements RandomProjection
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       RandomParameter rndP = new RandomParameter(RANDOM_ID);
-      if (config.grab(rndP)) {
+      if(config.grab(rndP)) {
         random = rndP.getValue();
       }
-    }
-  }
-
-  /**
-   * Class to project using a matrix multiplication.
-   * 
-   * @author Erich Schubert
-   */
-  public static class MatrixProjection implements Projection {
-    /**
-     * Projection matrix.
-     */
-    Matrix matrix;
-
-    /**
-     * Projection buffer.
-     */
-    Vector buf;
-
-    /**
-     * Projection buffer values.
-     */
-    double[] vals;
-    
-    /**
-     * Constructor.
-     *
-     * @param matrix Projection matrix.
-     */
-    public MatrixProjection(Matrix matrix) {
-      super();
-      this.matrix = matrix;
-      this.buf = new Vector(matrix.getColumnDimensionality());
-      this.vals = buf.getArrayRef();
-    }
-
-    @Override
-    public double[] project(NumberVector in) {
-      for (int d = 0; d < vals.length; d++) {
-        vals[d] = in.doubleValue(d);
-      }
-      return VectorUtil.fastTimes(matrix, buf);
-    }
-
-    @Override
-    public int getOutputDimensionality() {
-      return matrix.getRowDimensionality();
     }
   }
 }

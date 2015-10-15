@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.lsh.hashfunctions;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.index.lsh.hashfunctions;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -31,14 +32,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * LSH hash function for vector space data. Depending on the choice of random
  * vectors, it can be appropriate for Manhattan and Euclidean distances.
- * 
+ *
  * Reference:
  * <p>
- * Locality-sensitive hashing scheme based on p-stable distributions<br />
  * M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni<br />
+ * Locality-sensitive hashing scheme based on p-stable distributions<br />
  * Proc. 20th annual symposium on Computational geometry<br />
  * </p>
- * 
+ *
  * @author Erich Schubert
  */
 @Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", //
@@ -68,7 +69,7 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
 
   /**
    * Constructor.
-   * 
+   *
    * @param projection Projection vectors
    * @param width Width of bins
    * @param rnd Random number generator
@@ -97,9 +98,9 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
 
   @Override
   public int hashObject(NumberVector vec) {
-    long t1sum = 0L;
     // Project the vector:
     final double[] proj = projection.project(vec);
+    long t1sum = 0L;
     for(int i = 0; i < shift.length; i++) {
       int ai = (int) Math.floor((proj[i] + shift[i]) * iwidth);
       t1sum += (randoms1[i] & MASK32) * ai; // unsigned math!
@@ -107,9 +108,21 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
     return fastModPrime(t1sum);
   }
 
+  @Override
+  public int hashObject(NumberVector vec, double[] buf) {
+    // Project the vector:
+    projection.project(vec, buf);
+    long t1sum = 0L;
+    for(int i = 0; i < shift.length; i++) {
+      int ai = (int) Math.floor((buf[i] + shift[i]) * iwidth);
+      t1sum += (randoms1[i] & MASK32) * ai; // unsigned math!
+    }
+    return fastModPrime(t1sum);
+  }
+
   /**
    * Fast modulo operation for the largest unsigned integer prime.
-   * 
+   *
    * @param data Long input
    * @return {@code data % (2^32 - 5)}.
    */
@@ -123,5 +136,10 @@ public class MultipleProjectionsLocalitySensitiveHashFunction implements Localit
       alpha = alpha + 5;
     }
     return alpha;
+  }
+
+  @Override
+  public int getNumberOfProjections() {
+    return this.projection.getOutputDimensionality();
   }
 }

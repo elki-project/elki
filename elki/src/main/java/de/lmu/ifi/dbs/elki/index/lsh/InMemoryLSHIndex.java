@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.lsh;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.index.lsh;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
@@ -60,12 +61,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Locality Sensitive Hashing.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has LocalitySensitiveHashFunctionFamily
  * @apiviz.has Instance
- * 
+ *
  * @param <V> Object type to index
  */
 public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.Instance> {
@@ -91,7 +92,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
   /**
    * Constructor.
-   * 
+   *
    * @param family Projection family
    * @param l Number of hash tables to use
    * @param numberOfBuckets Number of buckets to use.
@@ -115,9 +116,9 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
   /**
    * Instance of a LSH index for a single relation.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.has LocalitySensitiveHashFunction
    */
   public class Instance extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
@@ -138,7 +139,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
     /**
      * Constructor.
-     * 
+     *
      * @param relation Relation to index.
      * @param hashfunctions Hash functions.
      */
@@ -166,6 +167,8 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
         hashtables.add(new TIntObjectHashMap<DBIDs>(numberOfBuckets));
       }
 
+      // TODO: We assume all hash functions have the same dimensionality.
+      double[] buf = new double[hashfunctions.get(0).getNumberOfProjections()];
       FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Building LSH index.", relation.size(), LOG) : null;
       int expect = Math.max(2, (int) Math.ceil(relation.size() / (double) numberOfBuckets));
       for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
@@ -174,7 +177,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
           final TIntObjectMap<DBIDs> table = hashtables.get(i);
           final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
           // Get the initial (unbounded) hash code:
-          int hash = hashfunc.hashObject(obj);
+          int hash = hashfunc.hashObject(obj, buf);
           // Reduce to hash table size
           int bucket = hash % numberOfBuckets;
           DBIDs cur = table.get(bucket);
@@ -250,15 +253,15 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
     /**
      * Class for handling kNN queries against the LSH index.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     protected class LSHKNNQuery extends AbstractKNNQuery {
       /**
        * Constructor.
-       * 
+       *
        * @param distanceQuery
        */
       public LSHKNNQuery(DistanceQuery<V> distanceQuery) {
@@ -269,11 +272,12 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
       public KNNList getKNNForObject(V obj, int k) {
         ModifiableDBIDs candidates = null;
         final int numhash = hashtables.size();
+        double[] buf = new double[hashfunctions.get(0).getNumberOfProjections()];
         for(int i = 0; i < numhash; i++) {
           final TIntObjectMap<DBIDs> table = hashtables.get(i);
           final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
           // Get the initial (unbounded) hash code:
-          int hash = hashfunc.hashObject(obj);
+          int hash = hashfunc.hashObject(obj, buf);
           // Reduce to hash table size
           int bucket = hash % numberOfBuckets;
           DBIDs cur = table.get(bucket);
@@ -301,15 +305,15 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
     /**
      * Class for handling kNN queries against the LSH index.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     protected class LSHRangeQuery extends AbstractRangeQuery {
       /**
        * Constructor.
-       * 
+       *
        * @param distanceQuery
        */
       public LSHRangeQuery(DistanceQuery<V> distanceQuery) {
@@ -320,11 +324,12 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
       public void getRangeForObject(V obj, double range, ModifiableDoubleDBIDList result) {
         ModifiableDBIDs candidates = DBIDUtil.newHashSet();
         final int numhash = hashtables.size();
+        double[] buf = new double[hashfunctions.get(0).getNumberOfProjections()];
         for(int i = 0; i < numhash; i++) {
           final TIntObjectMap<DBIDs> table = hashtables.get(i);
           final LocalitySensitiveHashFunction<? super V> hashfunc = hashfunctions.get(i);
           // Get the initial (unbounded) hash code:
-          int hash = hashfunc.hashObject(obj);
+          int hash = hashfunc.hashObject(obj, buf);
           // Reduce to hash table size
           int bucket = hash % numberOfBuckets;
           DBIDs cur = table.get(bucket);
@@ -347,9 +352,9 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V> extends AbstractParameterizer {

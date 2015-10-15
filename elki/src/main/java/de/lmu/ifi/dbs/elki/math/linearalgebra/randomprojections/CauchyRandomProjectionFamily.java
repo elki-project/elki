@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,27 +22,30 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Random projections using Cauchy distributions (1-stable).
- * 
+ *
  * Reference:
  * <p>
  * M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni<br />
  * Locality-sensitive hashing scheme based on p-stable distributions.<br />
- * In Proc. 20th annual symposium on Computational geometry
+ * In Proc. 20th Symposium on Computational Geometry
  * </p>
- * 
+ *
  * @author Erich Schubert
  */
-@Reference(title = "Locality-sensitive hashing scheme based on p-stable distributions", authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", booktitle = "Proceedings of the 20th annual symposium on Computational geometry", url = "http://dx.doi.org/10.1145/997817.997857")
+@Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", //
+title = "Locality-sensitive hashing scheme based on p-stable distributions", //
+booktitle = "Proc. 20th Symposium on Computational Geometry", //
+url = "http://dx.doi.org/10.1145/997817.997857")
 public class CauchyRandomProjectionFamily extends AbstractRandomProjectionFamily {
   /**
    * Constructor.
-   * 
+   *
    * @param random Random number generator.
    */
   public CauchyRandomProjectionFamily(RandomFactory random) {
@@ -51,22 +54,21 @@ public class CauchyRandomProjectionFamily extends AbstractRandomProjectionFamily
 
   @Override
   public Projection generateProjection(int idim, int odim) {
-    Matrix projectionMatrix = new Matrix(odim, idim);
-    for (int i = 0; i < odim; ++i) {
-      for (int j = 0; j < idim; ++j) {
-        final double r = random.nextDouble() - .5;
-        final double value = Math.tan(Math.PI * r);
-        projectionMatrix.set(i, j, value);
+    double[][] matrix = new double[odim][idim];
+    for(int i = 0; i < odim; ++i) {
+      double[] row = matrix[i];
+      for(int j = 0; j < idim; ++j) {
+        row[j] = Math.tan(Math.PI * (random.nextDouble() - .5));
       }
     }
-    return new MatrixProjection(projectionMatrix);
+    return new MatrixProjection(matrix);
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractRandomProjectionFamily.Parameterizer {

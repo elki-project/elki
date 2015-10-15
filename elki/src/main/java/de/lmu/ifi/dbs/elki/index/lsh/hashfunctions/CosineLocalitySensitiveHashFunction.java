@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "M.S. Charikar", //
 title = "Similarity estimation techniques from rounding algorithms", //
 booktitle = "Proc. 34th ACM Symposium on Theory of computing, STOC'02", //
-url = "https://dx.doi.org/10.1145%2F509907.509965")
+url = "https://dx.doi.org/10.1145/509907.509965")
 public class CosineLocalitySensitiveHashFunction implements LocalitySensitiveHashFunction<NumberVector> {
   /**
    * Projection function.
@@ -61,13 +61,30 @@ public class CosineLocalitySensitiveHashFunction implements LocalitySensitiveHas
 
   @Override
   public int hashObject(NumberVector obj) {
-    double[] projectionResult = projection.project(obj);
+    double[] buf = projection.project(obj);
     int hashValue = 0;
-    for(int i = 0, j = 1; i < projectionResult.length; i++, j <<= 1) {
-      if(projectionResult[i] > 0) {
+    for(int i = 0, j = 1; i < buf.length; i++, j <<= 1) {
+      if(buf[i] > 0) {
         hashValue = hashValue | j;
       }
     }
     return hashValue;
+  }
+
+  @Override
+  public int hashObject(NumberVector obj, double[] buf) {
+    projection.project(obj, buf);
+    int hashValue = 0;
+    for(int i = 0, j = 1; i < buf.length; i++, j <<= 1) {
+      if(buf[i] > 0) {
+        hashValue = hashValue | j;
+      }
+    }
+    return hashValue;
+  }
+
+  @Override
+  public int getNumberOfProjections() {
+    return projection.getOutputDimensionality();
   }
 }

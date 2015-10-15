@@ -25,17 +25,33 @@ package de.lmu.ifi.dbs.elki.index.lsh.hashfunctions;
 
 /**
  * Hash functions as used by locality sensitive hashing.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <V> Data type to hash.
  */
 public interface LocalitySensitiveHashFunction<V> {
   /**
-   * Compute the hash value of an object
-   * 
+   * Compute the hash value of an object.
+   *
    * @param obj Object to hash
    * @return Hash value
    */
   int hashObject(V obj);
+
+  /**
+   * Compute the hash value of an object (faster version).
+   *
+   * @param obj Object to hash
+   * @param buf Buffer, sized according to the number of projections.
+   * @return Hash value
+   */
+  int hashObject(V obj, double[] buf);
+
+  /**
+   * Get the number of projections performed.
+   *
+   * @return Number of projections.
+   */
+  int getNumberOfProjections();
 }

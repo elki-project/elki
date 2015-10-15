@@ -27,6 +27,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -41,6 +42,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Proc. 29th ACM Conference on Research and Development in Information
  * Retrieval. ACM SIGIR, 2006
  * </p>
+ *
+ * TODO: Benchmark if boolean[][] and "if" is faster, or multiplication (does
+ * Java emit SIMD code then?)
  *
  * @author Evgeniy Faerman
  * @author Erich Schubert
@@ -73,6 +77,9 @@ public class SimplifiedRandomHyperplaneProjectionFamily implements RandomProject
   /**
    * Fast projection class, using booleans to represent +-1 matrix entries.
    *
+   * Optimized for sparse multiplications, thus we are using a column-row
+   * layout.
+   *
    * @author Erich Schubert
    */
   private static class SignedProjection implements Projection {
@@ -85,6 +92,11 @@ public class SimplifiedRandomHyperplaneProjectionFamily implements RandomProject
      * Output dimensionality
      */
     private int k;
+
+    /**
+     * Shared buffer to use during projections.
+     */
+    private double[] buf;
 
     /**
      * Constructor.
@@ -102,25 +114,31 @@ public class SimplifiedRandomHyperplaneProjectionFamily implements RandomProject
         }
       }
       this.k = k;
+      this.buf = new double[dim];
     }
 
     @Override
     public double[] project(NumberVector in) {
-      if(in instanceof SparseNumberVector) {
-        return projectSparse((SparseNumberVector) in);
+      return project(in, new double[k]);
+    }
+
+    @Override
+    public double[] project(NumberVector vec, double[] ret) {
+      if(!(vec instanceof SparseNumberVector)) {
+        return projectDense(vec, ret);
       }
+      SparseNumberVector in = (SparseNumberVector) vec;
       final int k = this.k;
-      final double d = in.getDimensionality();
-      double[] ret = new double[k];
-      for(int i = 0; i < d; i++) {
-        double val = in.doubleValue(i);
-        boolean[] row = mat[i];
-        for(int j = 0; j < k; j++) {
-          if(row[j]) {
-            ret[j] += val;
+      for(int iter = in.iter(); in.iterValid(iter); iter = in.iterAdvance(iter)) {
+        final int i = in.iterDim(iter);
+        final double x = in.iterDoubleValue(iter);
+        boolean[] row = mat[i]; // Rows and output are aligned.
+        for(int o = 0; o < k; o++) {
+          if(row[o]) {
+            ret[o] += x;
           }
           else {
-            ret[j] -= val;
+            ret[o] -= x;
           }
         }
       }
@@ -128,24 +146,23 @@ public class SimplifiedRandomHyperplaneProjectionFamily implements RandomProject
     }
 
     /**
-     * Project, exploiting sparsity.
+     * Slower version, for dense multiplication.
      *
      * @param in Input vector
      * @return Projected data.
      */
-    private double[] projectSparse(SparseNumberVector in) {
+    private double[] projectDense(NumberVector in, double[] ret) {
       final int k = this.k;
-      double[] ret = new double[k];
-      for(int iter = in.iter(); in.iterValid(iter); iter = in.iterAdvance(iter)) {
-        final int dim = in.iterDim(iter);
-        final double val = in.iterDoubleValue(iter);
-        boolean[] row = mat[dim];
-        for(int j = 0; j < k; j++) {
-          if(row[j]) {
-            ret[j] += val;
+      final double dim = MathUtil.min(buf.length, in.getDimensionality());
+      for(int i = 0; i < dim; i++) {
+        final boolean[] row = mat[i];
+        double vali = in.doubleValue(i);
+        for(int o = 0; o < k; o++) {
+          if(row[o]) {
+            ret[o] += vali;
           }
           else {
-            ret[j] -= val;
+            ret[o] -= vali;
           }
         }
       }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -21,8 +21,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections;
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+*/
+
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -32,19 +32,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
  * Random projections as suggested by Dimitris Achlioptas.
- * 
+ *
  * Reference:
  * <p>
+ * D. Achlioptas:<br />
  * Database-friendly random projections: Johnson-Lindenstrauss with binary coins
  * <br />
- * Dimitris Achlioptas<br />
- * In: Proceedings of the twentieth ACM SIGMOD-SIGACT-SIGART symposium on
- * Principles of database systems
+ * Proc. 20th ACM SIGMOD-SIGACT-SIGART symposium on Principles of database
+ * systems
  * </p>
- * 
+ *
+ * TODO: faster implementation exploiting sparsity.
+ *
  * @author Erich Schubert
  */
-@Reference(title = "Database-friendly random projections: Johnson-Lindenstrauss with binary coins", authors = "Dimitris Achlioptas", booktitle = "Proceedings of the twentieth ACM SIGMOD-SIGACT-SIGART symposium on Principles of database systems", url = "http://dx.doi.org/10.1145/375551.375608")
+@Reference(title = "Database-friendly random projections: Johnson-Lindenstrauss with binary coins", //
+authors = "D. Achlioptas", //
+booktitle = "Proc. 20th ACM SIGMOD-SIGACT-SIGART symposium on Principles of database systems", //
+url = "http://dx.doi.org/10.1145/375551.375608")
 public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFamily {
   /**
    * Projection sparsity.
@@ -53,7 +58,7 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
 
   /**
    * Constructor.
-   * 
+   *
    * @param sparsity Projection sparsity
    * @param random Random number generator.
    */
@@ -68,32 +73,22 @@ public class AchlioptasRandomProjectionFamily extends AbstractRandomProjectionFa
     final double pNeg = pPos + pPos; // Threshold
     double baseValuePart = Math.sqrt(this.sparsity);
 
-    Matrix projectionMatrix = new Matrix(odim, idim);
+    double[][] matrix = new double[odim][idim];
     for(int i = 0; i < odim; ++i) {
+      double[] row = matrix[i];
       for(int j = 0; j < idim; ++j) {
         final double r = random.nextDouble();
-        final double value;
-        if(r < pPos) {
-          value = baseValuePart;
-        }
-        else if(r < pNeg) {
-          value = -baseValuePart;
-        }
-        else {
-          value = 0.;
-        }
-
-        projectionMatrix.set(i, j, value);
+        row[j] = (r < pPos) ? baseValuePart : (r < pNeg) ? -baseValuePart : 0;
       }
     }
-    return new MatrixProjection(projectionMatrix);
+    return new MatrixProjection(matrix);
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractRandomProjectionFamily.Parameterizer {
