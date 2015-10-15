@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -49,22 +49,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Simple distanced based outlier detection algorithm. User has to specify two
  * parameters An object is flagged as an outlier if at least a fraction p of all
  * data objects has a distance above d from c
- * 
+ *
  * Reference:
  * <p>
  * E.M. Knorr, R. T. Ng:<br />
  * Algorithms for Mining Distance-Based Outliers in Large Datasets,<br />
  * In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
  * </p>
- * 
+ *
  * This paper presents several Distance Based Outlier Detection algorithms.
  * Implemented here is a simple index based algorithm as presented in section
  * 3.1.
- * 
+ *
  * @author Lisa Reichert
- * 
+ *
  * @apiviz.has KNNQuery
- * 
+ *
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 @Title("DBOD: Distance Based Outlier Detection")
@@ -86,12 +86,12 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
 
   /**
    * Constructor with actual parameters.
-   * 
+   *
    * @param distanceFunction distance function parameter
    * @param d distance query radius
    * @param p percentage parameter
    */
-  public DBOutlierDetection(DistanceFunction<O> distanceFunction, double d, double p) {
+  public DBOutlierDetection(DistanceFunction<? super O> distanceFunction, double d, double p) {
     super(distanceFunction, d);
     this.p = p;
   }
@@ -162,9 +162,9 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDBOutlier.Parameterizer<O> {

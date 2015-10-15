@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -62,26 +62,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Spatial outlier detection based on random walks.
- * 
+ *
  * Note: this method can only handle one-dimensional data, but could probably be
  * easily extended to higher dimensional data by using an distance function
  * instead of the absolute difference.
- * 
+ *
  * <p>
  * X. Liu and C.-T. Lu and F. Chen:<br>
  * Spatial outlier detection: random walk based approaches,<br>
  * in Proc. 18th SIGSPATIAL International Conference on Advances in Geographic
  * Information Systems, 2010
  * </p>
- * 
+ *
  * @author Ahmed Hettab
- * 
- * @param <N> Spatial Vector type
+ *
+ * @param <P> Spatial Vector type
  */
 @Title("Random Walk on Exhaustive Combination")
 @Description("Spatial Outlier Detection using Random Walk on Exhaustive Combination")
 @Reference(authors = "X. Liu and C.-T. Lu and F. Chen", title = "Spatial outlier detection: random walk based approaches", booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems, 2010", url = "http://dx.doi.org/10.1145/1869790.1869841")
-public class CTLuRandomWalkEC<N> extends AbstractDistanceBasedAlgorithm<N, OutlierResult> implements OutlierAlgorithm {
+public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger.
    */
@@ -104,13 +104,13 @@ public class CTLuRandomWalkEC<N> extends AbstractDistanceBasedAlgorithm<N, Outli
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param alpha Alpha parameter
    * @param c C parameter
    * @param k Number of neighbors
    */
-  public CTLuRandomWalkEC(DistanceFunction<N> distanceFunction, double alpha, double c, int k) {
+  public CTLuRandomWalkEC(DistanceFunction<? super P> distanceFunction, double alpha, double c, int k) {
     super(distanceFunction);
     this.alpha = alpha;
     this.c = c;
@@ -119,13 +119,13 @@ public class CTLuRandomWalkEC<N> extends AbstractDistanceBasedAlgorithm<N, Outli
 
   /**
    * Run the algorithm.
-   * 
+   *
    * @param spatial Spatial neighborhood relation
    * @param relation Attribute value relation
    * @return Outlier result
    */
-  public OutlierResult run(Relation<N> spatial, Relation<? extends NumberVector> relation) {
-    DistanceQuery<N> distFunc = getDistanceFunction().instantiate(spatial);
+  public OutlierResult run(Relation<P> spatial, Relation<? extends NumberVector> relation) {
+    DistanceQuery<P> distFunc = getDistanceFunction().instantiate(spatial);
     WritableDataStore<Vector> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
     WritableDataStore<DBIDs> neighbors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, DBIDs.class);
 
@@ -239,11 +239,11 @@ public class CTLuRandomWalkEC<N> extends AbstractDistanceBasedAlgorithm<N, Outli
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Ahmed Hettab
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <N> Vector type
    */
   public static class Parameterizer<N> extends AbstractDistanceBasedAlgorithm.Parameterizer<N> {
@@ -287,7 +287,7 @@ public class CTLuRandomWalkEC<N> extends AbstractDistanceBasedAlgorithm<N, Outli
 
     /**
      * Get the kNN parameter.
-     * 
+     *
      * @param config Parameterization
      */
     protected void configK(Parameterization config) {
@@ -300,7 +300,7 @@ public class CTLuRandomWalkEC<N> extends AbstractDistanceBasedAlgorithm<N, Outli
 
     /**
      * Get the alpha parameter.
-     * 
+     *
      * @param config Parameterization
      */
     protected void configAlpha(Parameterization config) {
@@ -312,7 +312,7 @@ public class CTLuRandomWalkEC<N> extends AbstractDistanceBasedAlgorithm<N, Outli
 
     /**
      * get the c parameter.
-     * 
+     *
      * @param config Parameterization
      */
     protected void configC(Parameterization config) {

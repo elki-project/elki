@@ -52,14 +52,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Provides an order of the kNN-distances for all objects within the database.
- * 
+ *
  * This class can be used to estimate parameters for other algorithms, such as
  * estimating the epsilon parameter for DBSCAN: set k to minPts-1, and then
  * choose a percentile from the sample as epsilon, or plot the result as a graph
  * and look for a bend or knee in this plot.
- * 
+ *
  * @author Arthur Zimek
- * 
+ *
  * @param <O> the type of objects handled by this Algorithm
  */
 @Title("KNN-Distance-Order")
@@ -87,13 +87,13 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param k k Parameter
    * @param sample Sampling rate, or sample size (when > 1)
    * @param rnd Random source.
    */
-  public KNNDistancesSampler(DistanceFunction<O> distanceFunction, int k, double sample, RandomFactory rnd) {
+  public KNNDistancesSampler(DistanceFunction<? super O> distanceFunction, int k, double sample, RandomFactory rnd) {
     super(distanceFunction);
     this.k = k;
     this.sample = sample;
@@ -103,7 +103,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
   /**
    * Provides an order of the kNN-distances for all objects within the specified
    * database.
-   * 
+   *
    * @param database Database
    * @param relation Relation
    * @return Result
@@ -140,9 +140,9 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
 
   /**
    * Curve result for a list containing the knn distances.
-   * 
+   *
    * @author Arthur Zimek
-   * 
+   *
    * @apiviz.exclude
    */
   public static class KNNDistanceOrderResult extends XYCurve {
@@ -153,7 +153,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
 
     /**
      * Construct result
-     * 
+     *
      * @param knnDistances distance list to wrap.
      * @param k number of neighbors considered
      */
@@ -179,9 +179,9 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -107,7 +107,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
    * @param k number of nearest neighbors to use
    * @param alpha Significance niveau
    */
-  public CTLuGLSBackwardSearchAlgorithm(DistanceFunction<V> distanceFunction, int k, double alpha) {
+  public CTLuGLSBackwardSearchAlgorithm(DistanceFunction<? super V> distanceFunction, int k, double alpha) {
     super(distanceFunction);
     this.alpha = alpha;
     this.k = k;

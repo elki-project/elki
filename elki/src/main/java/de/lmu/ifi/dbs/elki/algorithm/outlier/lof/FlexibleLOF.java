@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -73,21 +73,21 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * <p>
  * Flexible variant of the "Local Outlier Factor" algorithm.
  * </p>
- * 
+ *
  * <p>
  * This implementation diverts from the original LOF publication in that it
  * allows the user to use a different distance function for the reachability
  * distance and neighborhood determination (although the default is to use the
  * same value.)
  * </p>
- * 
+ *
  * <p>
  * The k nearest neighbors are determined using the parameter
  * {@link de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}
  * , while the reference set used in reachability distance computation is
  * configured using {@link Parameterizer#REACHABILITY_DISTANCE_FUNCTION_ID}.
  * </p>
- * 
+ *
  * <p>
  * The original LOF parameter was called &quot;minPts&quot;. For consistency
  * with the name "kNN query", we chose to rename the parameter to {@code k}.
@@ -95,7 +95,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * parameters {@link Parameterizer#KREF_ID} ({@code -lof.krefer}) and
  * {@link Parameterizer#KREACH_ID} ({@code -lof.kreach})
  * </p>
- * 
+ *
  * <p>
  * Reference: <br>
  * M. M. Breunig, H.-P. Kriegel, R. Ng, J. Sander: LOF: Identifying
@@ -103,14 +103,14 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * In: Proc. 2nd ACM SIGMOD Int. Conf. on Management of Data (SIGMOD'00),
  * Dallas, TX, 2000.
  * </p>
- * 
+ *
  * @author Peer Kröger
  * @author Erich Schubert
  * @author Elke Achtert
- * 
+ *
  * @apiviz.has LOFResult oneway - - computes
  * @apiviz.has KNNQuery
- * 
+ *
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 @Title("LOF: Local Outlier Factor")
@@ -147,7 +147,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
   /**
    * Constructor.
-   * 
+   *
    * @param krefer The number of neighbors for reference
    * @param kreach The number of neighbors for reachability distance
    * @param neighborhoodDistanceFunction the neighborhood distance function
@@ -164,7 +164,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
   /**
    * Performs the Generalized LOF algorithm on the given database by calling
    * {@link #doRunInTime}.
-   * 
+   *
    * @param database Database to query
    * @param relation Data to process
    * @return LOF outlier result
@@ -179,7 +179,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
   /**
    * Get the kNN queries for the algorithm.
-   * 
+   *
    * @param relation the data
    * @param stepprog the progress logger
    * @return the kNN queries for the algorithm
@@ -219,7 +219,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
    * Performs the Generalized LOF_SCORE algorithm on the given database and
    * returns a {@link FlexibleLOF.LOFResult} encapsulating information that may
    * be needed by an OnlineLOF algorithm.
-   * 
+   *
    * @param ids Object ids
    * @param kNNRefer the kNN query w.r.t. reference neighborhood distance
    *        function
@@ -259,7 +259,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
   /**
    * Computes the local reachability density (LRD) of the specified objects.
-   * 
+   *
    * @param knnq the precomputed neighborhood of the objects w.r.t. the
    *        reachability distance
    * @param ids the ids of the objects
@@ -289,7 +289,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
   /**
    * Computes the Local outlier factor (LOF) of the specified objects.
-   * 
+   *
    * @param knnq the precomputed neighborhood of the objects w.r.t. the
    *        reference distance
    * @param ids IDs to process
@@ -352,7 +352,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
   /**
    * Encapsulates information like the neighborhood, the LRD and LOF values of
    * the objects during a run of the {@link FlexibleLOF} algorithm.
-   * 
+   *
    * @author Elke Achtert
    */
   public static class LOFResult<O> {
@@ -394,7 +394,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
     /**
      * Encapsulates information generated during a run of the
      * {@link FlexibleLOF} algorithm.
-     * 
+     *
      * @param result the result of the run of the {@link FlexibleLOF} algorithm
      * @param kNNRefer the kNN query w.r.t. the reference neighborhood distance
      * @param kNNReach the kNN query w.r.t. the reachability distance
@@ -411,7 +411,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
     /**
      * Get the knn query for the reference set.
-     * 
+     *
      * @return the kNN query w.r.t. the reference neighborhood distance
      */
     public KNNQuery<O> getKNNRefer() {
@@ -420,7 +420,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
     /**
      * Get the knn query for the reachability set.
-     * 
+     *
      * @return the kNN query w.r.t. the reachability distance
      */
     public KNNQuery<O> getKNNReach() {
@@ -429,7 +429,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
     /**
      * Get the LRD data store.
-     * 
+     *
      * @return the LRD values of the objects
      */
     public WritableDoubleDataStore getLrds() {
@@ -438,7 +438,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
     /**
      * Get the LOF data store.
-     * 
+     *
      * @return the LOF values of the objects
      */
     public WritableDoubleDataStore getLofs() {
@@ -447,7 +447,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
     /**
      * Get the outlier result.
-     * 
+     *
      * @return the result of the run of the {@link FlexibleLOF} algorithm
      */
     public OutlierResult getResult() {
@@ -456,7 +456,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
     /**
      * Sets the RkNN query w.r.t. the reference neighborhood distance.
-     * 
+     *
      * @param rkNNRefer the query to set
      */
     public void setRkNNRefer(RKNNQuery<O> rkNNRefer) {
@@ -465,7 +465,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
     /**
      * Get the RkNN query for the reference set.
-     * 
+     *
      * @return the RkNN query w.r.t. the reference neighborhood distance
      */
     public RKNNQuery<O> getRkNNRefer() {
@@ -474,7 +474,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
     /**
      * Get the RkNN query for the reachability set.
-     * 
+     *
      * @return the RkNN query w.r.t. the reachability distance
      */
     public RKNNQuery<O> getRkNNReach() {
@@ -483,7 +483,7 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
     /**
      * Sets the RkNN query w.r.t. the reachability distance.
-     * 
+     *
      * @param rkNNReach the query to set
      */
     public void setRkNNReach(RKNNQuery<O> rkNNReach) {
@@ -493,9 +493,9 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
@@ -531,12 +531,12 @@ public class FlexibleLOF<O> extends AbstractAlgorithm<OutlierResult>implements O
     /**
      * Neighborhood distance function.
      */
-    protected DistanceFunction<O> neighborhoodDistanceFunction = null;
+    protected DistanceFunction<? super O> neighborhoodDistanceFunction = null;
 
     /**
      * Reachability distance function.
      */
-    protected DistanceFunction<O> reachabilityDistanceFunction = null;
+    protected DistanceFunction<? super O> reachabilityDistanceFunction = null;
 
     @Override
     protected void makeOptions(Parameterization config) {

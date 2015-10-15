@@ -32,13 +32,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract base class for distance-based algorithms.
- * 
+ *
  * @author Arthur Zimek
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has DistanceFunction
  * @apiviz.excludeSubtypes
- * 
+ *
  * @param <O> the type of objects handled by this Algorithm
  * @param <R> the type of result to retrieve from this Algorithm
  */
@@ -51,7 +51,7 @@ public abstract class AbstractDistanceBasedAlgorithm<O, R extends Result> extend
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    */
   protected AbstractDistanceBasedAlgorithm(DistanceFunction<? super O> distanceFunction) {
@@ -61,7 +61,7 @@ public abstract class AbstractDistanceBasedAlgorithm<O, R extends Result> extend
 
   /**
    * Returns the distanceFunction.
-   * 
+   *
    * @return the distanceFunction
    */
   @Override
@@ -71,21 +71,21 @@ public abstract class AbstractDistanceBasedAlgorithm<O, R extends Result> extend
 
   /**
    * Parameterization helper class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public abstract static class Parameterizer<O> extends AbstractParameterizer {
     /**
      * The distance function to use.
      */
-    protected DistanceFunction<O> distanceFunction;
+    protected DistanceFunction<? super O> distanceFunction;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DistanceFunction<O>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }

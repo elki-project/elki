@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -41,22 +41,22 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Compute percentage of neighbors in the given neighborhood with size d.
- * 
+ *
  * Generalization of the DB Outlier Detection by using the fraction as outlier
  * score thus eliminating this parameter and turning the method into a ranking
  * method instead of a labelling one.
- * 
+ *
  * Reference:
  * <p>
  * E.M. Knorr, R. T. Ng:<br />
  * Algorithms for Mining Distance-Based Outliers in Large Datasets,<br />
  * In: Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998.
  * </p>
- * 
+ *
  * @author Lisa Reichert
- * 
+ *
  * @apiviz.has RangeQuery
- * 
+ *
  * @param <O> Database object type
  */
 @Title("Distance based outlier score")
@@ -75,11 +75,11 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
 
   /**
    * Constructor with parameters.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param d distance radius parameter
    */
-  public DBOutlierScore(DistanceFunction<O> distanceFunction, double d) {
+  public DBOutlierScore(DistanceFunction<? super O> distanceFunction, double d) {
     super(distanceFunction, d);
   }
 
@@ -106,9 +106,9 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDBOutlier.Parameterizer<O> {
