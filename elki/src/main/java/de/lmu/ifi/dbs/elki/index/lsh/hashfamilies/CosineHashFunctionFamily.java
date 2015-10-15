@@ -33,33 +33,43 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.CosineLocalitySensitiveHashFunction;
 import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomHyperplaneProjectionFamily;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.SimplifiedRandomHyperplaneProjectionFamily;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.randomprojections.RandomProjectionFamily;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
- * Hash function family to use with Cosine distance.
- * 
- * Reference:
+ * Hash function family to use with Cosine distance, using simplified hash
+ * functions where the projection is only drawn from +-1, instead of Gaussian
+ * distributions.
+ *
+ * References:
  * <p>
  * M.S. Charikar<br />
  * Similarity estimation techniques from rounding algorithms<br />
  * Proc. 34th ACM Symposium on Theory of computing, STOC'02
  * </p>
- * 
+ * <p>
+ * M. Henzinger<br />
+ * Finding near-duplicate web pages: a large-scale evaluation of algorithms
+ * <br />
+ * Proc. 29th ACM Conference on Research and Development in Information
+ * Retrieval. ACM SIGIR, 2006
+ * </p>
+ *
  * @author Evgeniy Faerman
  */
 @Reference(authors = "M.S. Charikar", //
 title = "Similarity estimation techniques from rounding algorithms", //
 booktitle = "Proc. 34th ACM Symposium on Theory of computing, STOC'02", //
-url = "https://dx.doi.org/10.1145%2F509907.509965")
+url = "https://dx.doi.org/10.1145/509907.509965")
 public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFamily<NumberVector> {
   /**
    * Projection family to use.
@@ -79,7 +89,7 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
    */
   public CosineHashFunctionFamily(int k, RandomFactory random) {
     super();
-    this.proj = new RandomHyperplaneProjectionFamily(random);
+    this.proj = new SimplifiedRandomHyperplaneProjectionFamily(random);
     this.k = k;
   }
 
@@ -106,9 +116,9 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Evgeniy Faerman
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -135,13 +145,14 @@ public class CosineHashFunctionFamily implements LocalitySensitiveHashFunctionFa
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      RandomParameter randP = new RandomParameter(RANDOM_ID, RandomFactory.DEFAULT);
+      RandomParameter randP = new RandomParameter(RANDOM_ID);
       if(config.grab(randP)) {
         random = randP.getValue();
       }
 
       IntParameter lP = new IntParameter(NUMPROJ_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+      .addConstraint(new LessEqualConstraint(32)); // Integer precision
       if(config.grab(lP)) {
         k = lP.intValue();
       }

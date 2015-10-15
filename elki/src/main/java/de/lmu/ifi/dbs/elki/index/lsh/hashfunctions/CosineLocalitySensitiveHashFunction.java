@@ -30,14 +30,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Random projection family to use with sparse vectors.
- * 
+ *
  * Reference:
  * <p>
  * M.S. Charikar<br />
  * Similarity estimation techniques from rounding algorithms<br />
  * Proc. 34th ACM Symposium on Theory of computing, STOC'02
  * </p>
- * 
+ *
  * @author Evgeniy Faerman
  */
 @Reference(authors = "M.S. Charikar", //
@@ -63,9 +63,9 @@ public class CosineLocalitySensitiveHashFunction implements LocalitySensitiveHas
   public int hashObject(NumberVector obj) {
     double[] projectionResult = projection.project(obj);
     int hashValue = 0;
-    for(int i = 0; i < projectionResult.length; i++) {
+    for(int i = 0, j = 1; i < projectionResult.length; i++, j <<= 1) {
       if(projectionResult[i] > 0) {
-        hashValue = hashValue + (1 << i);
+        hashValue = hashValue | j;
       }
     }
     return hashValue;

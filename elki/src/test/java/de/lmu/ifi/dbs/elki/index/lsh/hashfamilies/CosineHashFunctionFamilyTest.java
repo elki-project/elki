@@ -60,7 +60,7 @@ public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest im
     // test with {1,1,-1,1,-1}
     int numberOfProjections = 2;
     LocalitySensitiveHashFunction<? super NumberVector> hashFunction = createCosineHashFunction(numberOfProjections);
-    assertEquals(3, hashFunction.hashObject(new DoubleVector(new double[] { 1, 1, 1, 1, 1 })));
+    assertEquals(2, hashFunction.hashObject(new DoubleVector(new double[] { 1, 1, 1, 1, 1 })));
     assertEquals(2, hashFunction.hashObject(new DoubleVector(new double[] { 1, 1, 1, 1, 3 })));
   }
 
