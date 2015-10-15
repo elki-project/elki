@@ -56,6 +56,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuRandomWalkEC
 de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IDOS
 de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IntrinsicDimensionalityOutlier
 de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK
+de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceQuantileSampler
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses
 de.lmu.ifi.dbs.elki.algorithm.statistics.EstimateIntrinsicDimensionality
 de.lmu.ifi.dbs.elki.algorithm.statistics.EvaluateRankingQuality
