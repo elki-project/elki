@@ -33,10 +33,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * A collection of math related utility functions.
- * 
+ *
  * @author Arthur Zimek
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  */
 public final class MathUtil {
@@ -169,7 +169,7 @@ public final class MathUtil {
 
   /**
    * Compute the base 2 logarithm.
-   * 
+   *
    * @param x X
    * @return Logarithm base 2.
    */
@@ -180,10 +180,10 @@ public final class MathUtil {
   /**
    * Computes the square root of the sum of the squared arguments without under
    * or overflow.
-   * 
+   *
    * Note: this code is <em>not</em> redundant to {@link Math#hypot}, since the
    * latter is significantly slower (but maybe has a higher precision).
-   * 
+   *
    * @param a first cathetus
    * @param b second cathetus
    * @return {@code sqrt(a<sup>2</sup> + b<sup>2</sup>)}
@@ -211,10 +211,10 @@ public final class MathUtil {
   /**
    * Computes the square root of the sum of the squared arguments without under
    * or overflow.
-   * 
+   *
    * Note: this code is <em>not</em> redundant to {@link Math#hypot}, since the
    * latter is significantly slower (but has a higher precision).
-   * 
+   *
    * @param a first cathetus
    * @param b second cathetus
    * @param c second cathetus
@@ -242,7 +242,7 @@ public final class MathUtil {
 
   /**
    * Compute the Mahalanobis distance using the given weight matrix.
-   * 
+   *
    * @param weightMatrix Weight Matrix
    * @param o1_minus_o2 Delta vector
    * @return Mahalanobis distance
@@ -257,7 +257,7 @@ public final class MathUtil {
 
   /**
    * Compute the Mahalanobis distance using the given weight matrix.
-   * 
+   *
    * @param weightMatrix Weight Matrix
    * @param o1_minus_o2 Delta vector
    * @return Mahalanobis distance
@@ -272,7 +272,7 @@ public final class MathUtil {
 
   /**
    * Compute the Mahalanobis distance using the given weight matrix.
-   * 
+   *
    * @param weightMatrix Weight Matrix
    * @param o1 First vector
    * @param o2 Center vector
@@ -288,7 +288,7 @@ public final class MathUtil {
 
   /**
    * Compute the Mahalanobis distance using the given weight matrix.
-   * 
+   *
    * @param weightMatrix Weight Matrix
    * @param o1 First vector
    * @param o2 Center vector
@@ -305,7 +305,7 @@ public final class MathUtil {
   /**
    * Compute the Pearson product-moment correlation coefficient for two
    * NumberVectors.
-   * 
+   *
    * @param x first NumberVector
    * @param y second NumberVector
    * @return the Pearson product-moment correlation coefficient for x and y
@@ -358,7 +358,7 @@ public final class MathUtil {
   /**
    * Compute the Pearson product-moment correlation coefficient for two
    * NumberVectors.
-   * 
+   *
    * @param x first NumberVector
    * @param y second NumberVector
    * @param weights Weights
@@ -406,7 +406,7 @@ public final class MathUtil {
   /**
    * Compute the Pearson product-moment correlation coefficient for two
    * FeatureVectors.
-   * 
+   *
    * @param x first FeatureVector
    * @param y second FeatureVector
    * @param weights Weights
@@ -454,7 +454,7 @@ public final class MathUtil {
   /**
    * Compute the Pearson product-moment correlation coefficient for two
    * FeatureVectors.
-   * 
+   *
    * @param x first FeatureVector
    * @param y second FeatureVector
    * @return the Pearson product-moment correlation coefficient for x and y
@@ -499,7 +499,7 @@ public final class MathUtil {
   /**
    * Compute the Pearson product-moment correlation coefficient for two
    * FeatureVectors.
-   * 
+   *
    * @param x first FeatureVector
    * @param y second FeatureVector
    * @param weights Weights
@@ -550,7 +550,7 @@ public final class MathUtil {
    * <p>
    * Use this method if for large values of <code>n</code>.
    * </p>
-   * 
+   *
    * @param n Note: n &gt;= 0. This {@link BigInteger} <code>n</code> will be 0
    *        after this method finishes.
    * @return n * (n-1) * (n-2) * ... * 1
@@ -567,7 +567,7 @@ public final class MathUtil {
   /**
    * Compute the Factorial of n, often written as <code>c!</code> in
    * mathematics.
-   * 
+   *
    * @param n Note: n &gt;= 0
    * @return n * (n-1) * (n-2) * ... * 1
    */
@@ -583,7 +583,7 @@ public final class MathUtil {
    * <p>
    * Binomial coefficient, also known as "n choose k".
    * </p>
-   * 
+   *
    * @param n Total number of samples. n &gt; 0
    * @param k Number of elements to choose. <code>n &gt;= k</code>,
    *        <code>k &gt;= 0</code>
@@ -601,7 +601,7 @@ public final class MathUtil {
   /**
    * Compute the Factorial of n, often written as <code>c!</code> in
    * mathematics.
-   * 
+   *
    * @param n Note: n &gt;= 0
    * @return n * (n-1) * (n-2) * ... * 1
    */
@@ -615,7 +615,7 @@ public final class MathUtil {
 
   /**
    * Binomial coefficent, also known as "n choose k").
-   * 
+   *
    * @param n Total number of samples. n &gt; 0
    * @param k Number of elements to choose. <code>n &gt;= k</code>,
    *        <code>k &gt;= 0</code>
@@ -632,7 +632,7 @@ public final class MathUtil {
 
   /**
    * Compute the sum of the i first integers.
-   * 
+   *
    * @param i maximum summand
    * @return Sum
    */
@@ -642,7 +642,7 @@ public final class MathUtil {
 
   /**
    * Produce an array of random numbers in [0:1].
-   * 
+   *
    * @param len Length
    * @return Array
    */
@@ -652,7 +652,7 @@ public final class MathUtil {
 
   /**
    * Produce an array of random numbers in [0:1].
-   * 
+   *
    * @param len Length
    * @param r Random generator
    * @return Array
@@ -667,10 +667,10 @@ public final class MathUtil {
 
   /**
    * Convert Degree to Radians.
-   * 
+   *
    * This is essentially the same as {@link Math#toRadians}, but we keep it for
    * now, it might be marginally faster, but certainly not slower.
-   * 
+   *
    * @param deg Degree value
    * @return Radian value
    */
@@ -680,10 +680,10 @@ public final class MathUtil {
 
   /**
    * Radians to Degree.
-   * 
+   *
    * This is essentially the same as {@link Math#toRadians}, but we keep it for
    * now, it might be marginally faster, but certainly not slower.
-   * 
+   *
    * @param rad Radians value
    * @return Degree value
    */
@@ -693,7 +693,7 @@ public final class MathUtil {
 
   /**
    * Compute the angle between two vectors.
-   * 
+   *
    * @param v1 first vector
    * @param v2 second vector
    * @return Angle
@@ -704,7 +704,7 @@ public final class MathUtil {
 
   /**
    * Compute the angle between two vectors.
-   * 
+   *
    * @param v1 first vector
    * @param v2 second vector
    * @return Angle
@@ -735,7 +735,7 @@ public final class MathUtil {
 
   /**
    * Compute the angle between two vectors.
-   * 
+   *
    * @param v1 first vector
    * @param v2 second vector
    * @param o Origin
@@ -747,7 +747,7 @@ public final class MathUtil {
 
   /**
    * Compute the angle between two vectors.
-   * 
+   *
    * @param v1 first vector
    * @param v2 second vector
    * @param o Origin
@@ -783,7 +783,7 @@ public final class MathUtil {
 
   /**
    * Normalize an angle to [0:2pi[
-   * 
+   *
    * @param x Input angle
    * @return Normalized angle
    */
@@ -794,7 +794,7 @@ public final class MathUtil {
 
   /**
    * <b>Fast</b> way of computing cos(x) from x and sin(x).
-   * 
+   *
    * @param angle Input angle x
    * @param sin Sine of x.
    * @return Cosine of x
@@ -811,7 +811,7 @@ public final class MathUtil {
 
   /**
    * <b>Fast</b> way of computing sin(x) from x and cos(x).
-   * 
+   *
    * @param angle Input angle x
    * @param cos Cosine of x.
    * @return Sine of x
@@ -828,10 +828,10 @@ public final class MathUtil {
 
   /**
    * Find the next power of 2.
-   * 
+   *
    * Classic bit operation, for signed 32-bit. Valid for positive integers only
    * (0 otherwise).
-   * 
+   *
    * @param x original integer
    * @return Next power of 2
    */
@@ -847,10 +847,10 @@ public final class MathUtil {
 
   /**
    * Find the next power of 2.
-   * 
+   *
    * Classic bit operation, for signed 64-bit. Valid for positive integers only
    * (0 otherwise).
-   * 
+   *
    * @param x original long integer
    * @return Next power of 2
    */
@@ -866,10 +866,10 @@ public final class MathUtil {
 
   /**
    * Find the next larger number with all ones.
-   * 
+   *
    * Classic bit operation, for signed 32-bit. Valid for positive integers only
    * (-1 otherwise).
-   * 
+   *
    * @param x original integer
    * @return Next number with all bits set
    */
@@ -884,10 +884,10 @@ public final class MathUtil {
 
   /**
    * Find the next larger number with all ones.
-   * 
+   *
    * Classic bit operation, for signed 64-bit. Valid for positive integers only
    * (-1 otherwise).
-   * 
+   *
    * @param x original long integer
    * @return Next number with all bits set
    */
@@ -902,10 +902,10 @@ public final class MathUtil {
 
   /**
    * Return the largest double that rounds down to this float.
-   * 
+   *
    * Note: Probably not always correct - subnormal values are quite tricky. So
    * some of the bounds might not be tight.
-   * 
+   *
    * @param f Float value
    * @return Double value
    */
@@ -964,10 +964,10 @@ public final class MathUtil {
 
   /**
    * Return the largest double that rounds up to this float.
-   * 
+   *
    * Note: Probably not always correct - subnormal values are quite tricky. So
    * some of the bounds might not be tight.
-   * 
+   *
    * @param f Float value
    * @return Double value
    */
@@ -1026,7 +1026,7 @@ public final class MathUtil {
 
   /**
    * More stable than {@code Math.log(1 - Math.exp(x))}
-   * 
+   *
    * @param x Value
    * @return log(1-exp(x))
    */
@@ -1036,7 +1036,7 @@ public final class MathUtil {
 
   /**
    * Fast loop for computing {@code Math.pow(x, p)} for p >= 0 integer.
-   * 
+   *
    * @param x Base
    * @param p Exponent
    * @return {@code Math.pow(x, p)}
@@ -1062,7 +1062,7 @@ public final class MathUtil {
   /**
    * Fast loop for computing {@code Math.pow(x, p)} for p >= 0 integer and x
    * integer.
-   * 
+   *
    * @param x Base
    * @param p Exponent
    * @return {@code Math.pow(x, p)}
@@ -1092,7 +1092,7 @@ public final class MathUtil {
 
   /**
    * Generate an array of integers.
-   * 
+   *
    * @param start First integer
    * @param end Last integer (exclusive!)
    * @return Array of integers of length end-start
@@ -1110,11 +1110,11 @@ public final class MathUtil {
 
   /**
    * Binary max, <i>without</i> handling of special values.
-   * 
+   *
    * Because of the lack of special case handling, this is faster than
    * {@link Math#max}. But usually, it should be written inline as
    * {@code (a >= b) ? a : b}
-   * 
+   *
    * The result is asymmetric in case of {@code Double.NaN}:<br />
    * {@code MathUtil.max(Double.NaN, 1.)} is 1, but <br />
    * {@code MathUtil.max(1., Double.NaN)} is {@code Double.NaN}.
@@ -1129,7 +1129,7 @@ public final class MathUtil {
 
   /**
    * Ternary max, <i>without</i> handling of special values.
-   * 
+   *
    * Because of the lack of special case handling, this is faster than
    * {@link Math#max}. But usually, it should be written inline.
    *
@@ -1144,7 +1144,7 @@ public final class MathUtil {
 
   /**
    * Quadrary max, <i>without</i> handling of special values.
-   * 
+   *
    * Because of the lack of special case handling, this is faster than
    * {@link Math#max}. But usually, it should be written inline.
    *
@@ -1186,7 +1186,7 @@ public final class MathUtil {
 
   /**
    * Quadrary max, <i>without</i> handling of special values.
-   * 
+   *
    * Because of the lack of special case handling, this is faster than
    * {@link Math#max}. But usually, it should be written inline.
    *
@@ -1204,12 +1204,12 @@ public final class MathUtil {
   }
 
   /**
-   * Binary min, <i>without</i< handling of special values.
-   * 
+   * Binary min, <i>without</i> handling of special values.
+   *
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline as
    * {@code (a <= b) ? a : b}
-   * 
+   *
    * The result is asymmetric in case of {@code Double.NaN}:<br />
    * {@code MathUtil.min(Double.NaN, 1.)} is 1, but <br />
    * {@code MathUtil.min(1., Double.NaN)} is {@code Double.NaN}.
@@ -1223,8 +1223,8 @@ public final class MathUtil {
   }
 
   /**
-   * Ternary min, <i>without</i< handling of special values.
-   * 
+   * Ternary min, <i>without</i> handling of special values.
+   *
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline.
    *
@@ -1238,8 +1238,8 @@ public final class MathUtil {
   }
 
   /**
-   * Quadrary min, <i>without</i< handling of special values.
-   * 
+   * Quadrary min, <i>without</i> handling of special values.
+   *
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline.
    *
@@ -1257,8 +1257,8 @@ public final class MathUtil {
   }
 
   /**
-   * Binary min, <i>without</i< handling of special values.
-   * 
+   * Binary min, <i>without</i> handling of special values.
+   *
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline.
    *
@@ -1271,8 +1271,8 @@ public final class MathUtil {
   }
 
   /**
-   * Ternary min, <i>without</i< handling of special values.
-   * 
+   * Ternary min, <i>without</i> handling of special values.
+   *
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline.
    *
@@ -1286,8 +1286,8 @@ public final class MathUtil {
   }
 
   /**
-   * Quadrary min, <i>without</i< handling of special values.
-   * 
+   * Quadrary min, <i>without</i> handling of special values.
+   *
    * Because of the lack of special case handling, this is faster than
    * {@link Math#min}. But usually, it should be written inline.
    *
