@@ -65,22 +65,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Outlier Detection with Kernel Density Functions.
- * 
+ *
  * A variation of LOF which uses kernel density estimation, but in contrast to
  * {@link SimpleKernelDensityLOF} also uses the reachability concept of LOF.
- * 
+ *
  * Reference:
  * <p>
  * Outlier Detection with Kernel Density Functions.<br/>
  * L. J. Latecki, A. Lazarevic, D. Pokrajac<br />
  * Machine Learning and Data Mining in Pattern Recognition 2007
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KNNQuery
  * @apiviz.has KernelDensityFunction
- * 
+ *
  * @param <O> the type of objects handled by this Algorithm
  */
 @Reference(authors = "L. J. Latecki, A. Lazarevic, D. Pokrajac", //
@@ -115,7 +115,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
   /**
    * Constructor.
-   * 
+   *
    * @param k the value of k
    * @param kernel Kernel function
    * @param h Kernel bandwidth scaling
@@ -131,7 +131,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
   /**
    * Run the naive kernel density LOF algorithm.
-   * 
+   *
    * @param database Database to query
    * @param relation Data to process
    * @return LOF outlier result
@@ -158,7 +158,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
           continue;
         }
         final double nkdist = knnq.getKNNForDBID(neighbor, k).getKNNDistance();
-        if(!(nkdist > 0.)) {
+        if(!(nkdist > 0.) || nkdist == Double.POSITIVE_INFINITY) {
           sum = Double.POSITIVE_INFINITY;
           count++;
           break;
@@ -194,7 +194,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       }
       sum /= count;
       final double div = lrdp + c * sum;
-      double ldf = (div > 0) ? sum / div : 0;
+      double ldf = div == Double.POSITIVE_INFINITY ? (sum < Double.POSITIVE_INFINITY ? 0. : 1) : (div > 0) ? sum / div : 0;
       ldfs.putDouble(it, ldf);
       // update minimum and maximum
       lofminmax.put(ldf);
@@ -225,11 +225,11 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> vector type
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
