@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
@@ -195,7 +194,6 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
    * @param inflominmax Output of minimum and maximum
    */
   protected void computeINFLO(Relation<O> relation, ModifiableDBIDs pruned, WritableDataStore<ModifiableDBIDs> knns, WritableDataStore<ModifiableDBIDs> rnns, WritableDoubleDataStore density, WritableDoubleDataStore inflos, DoubleMinMax inflominmax) {
-    Mean mean = new Mean();
     for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
       if(pruned.contains(iter)) {
         inflos.putDouble(iter, 1.);
@@ -205,20 +203,22 @@ public class INFLO<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> i
       ModifiableDBIDs knn = knns.get(iter), rnn = rnns.get(iter);
       knn.addDBIDs(rnn);
       // Compute mean density of NN \cup RNN
-      mean.reset();
+      double sum = 0.;
+      int c = 0;
       for(DBIDIter niter = knn.iter(); niter.valid(); niter.advance()) {
         if(DBIDUtil.equal(iter, niter)) {
           continue;
         }
-        mean.put(density.doubleValue(niter));
+        sum += density.doubleValue(niter);
+        c++;
       }
       double denP = density.doubleValue(iter);
       final double inflo;
       if(denP > 0.) {
-        inflo = denP < Double.POSITIVE_INFINITY ? mean.getMean() / denP : 1.;
+        inflo = denP < Double.POSITIVE_INFINITY ? sum / (c * denP) : 1.;
       }
       else {
-        inflo = mean.getMean() == 0 ? 1. : Double.POSITIVE_INFINITY;
+        inflo = sum == 0 ? 1. : Double.POSITIVE_INFINITY;
       }
       inflos.putDouble(iter, inflo);
       // update minimum and maximum
