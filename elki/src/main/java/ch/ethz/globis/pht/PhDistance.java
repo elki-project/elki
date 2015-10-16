@@ -21,7 +21,7 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
  * Distance method for the PhTree, for example used in nearest neighbor queries.
@@ -29,31 +29,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * @author ztilmann
  */
 public interface PhDistance {
-  
+
   /**
-   * Returns a measurement for the distance. The returned distance does not need to have
-   * euclidean properties. For example, for 2D coordinate distance, it is sufficient to return
-   * d = x1*x1 + x2*x2, without applying square-root function.
-   * 
-   * The only requirement is that if (and only if) d1 > d2 then d1 should always indicate a bigger
-   * distance, while d1=d2 should always indicate equal distance.
-   * 
-   * Depending on the dataset it may help if (d1=2*d2) really indicates approximately
-   * double distance in real terms.
+   * Returns the distance between v1 and v2.
    * 
    * @param v1
    * @param v2
-   * @return A measurement for the distance.
+   * @return The distance.
    */
   double dist(long[] v1, long[] v2);
-  
+
   /**
-   * Returns a measurement for the distance. The returned distance does not need to have
-   * euclidean properties. For example, for 2D coordinate distance, it is sufficient to return
-   * d = x1*x1 + x2*x2, without applying square-root function.
+   * Returns an approximate measurement for the distance. The returned distance does not need 
+   * to have euclidean properties. For example, for 2D coordinate distance, it is sufficient to 
+   * return d = x1*x1 + x2*x2, without applying square-root function.
    * 
-   * The only requirement is that if (and only if) d1 > d2 then d1 should always indicate a bigger
-   * distance, while d1=d2 should always indicate equal distance.
+   * The only requirement is that if (and only if) d1 > d2 then d1 should always indicate a 
+   * bigger distance, while d1=d2 should always indicate equal distance.
    * 
    * Depending on the dataset it may help if (d1=2*d2) really indicates approximately
    * double distance in real terms.

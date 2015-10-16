@@ -23,14 +23,13 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import ch.ethz.globis.pht.PhTree.PhIterator;
 import ch.ethz.globis.pht.PhTree.PhQuery;
-import ch.ethz.globis.pht.pre.EmptyPP;
-import ch.ethz.globis.pht.pre.PreProcessorPoint;
+import ch.ethz.globis.pht.PhTree.PhQueryKNN;
+import ch.ethz.globis.pht.pre.EmptyPPF;
+import ch.ethz.globis.pht.pre.PreProcessorPointF;
 import ch.ethz.globis.pht.util.PhIteratorBase;
 
 /**
@@ -46,7 +45,7 @@ import ch.ethz.globis.pht.util.PhIteratorBase;
 public class PhTreeF<T> {
 
   private final PhTree<T> pht;
-  private final PreProcessorPoint pre;
+  private final PreProcessorPointF pre;
 
   /**
    * Create a new tree with the specified number of dimensions.
@@ -55,7 +54,7 @@ public class PhTreeF<T> {
    * @return PhTree
    */
   public static <T> PhTreeF<T> create(int dim) {
-    return new PhTreeF<T>(dim, new EmptyPP());
+    return new PhTreeF<T>(dim, new EmptyPPF());
   }
 
   /**
@@ -65,18 +64,18 @@ public class PhTreeF<T> {
    * @param pre The preprocessor top be used.
    * @return PhTree
    */
-  public static <T> PhTreeF<T> create(int dim, PreProcessorPoint pre) {
+  public static <T> PhTreeF<T> create(int dim, PreProcessorPointF pre) {
     return new PhTreeF<T>(dim, pre);
   }
 
-  private PhTreeF(int dim, PreProcessorPoint pre) {
+  private PhTreeF(int dim, PreProcessorPointF pre) {
     pht = PhTree.create(dim);
     this.pre = pre;
   }
 
   public PhTreeF(PhTree<T> tree) {
     pht = tree;
-    pre = new EmptyPP();
+    pre = new EmptyPPF();
   }
 
   public int size() {
@@ -149,16 +148,11 @@ public class PhTreeF<T> {
    * @param key
    * @return List of neighbours.
    */
-  public List<double[]> nearestNeighbour(int nMin, double... key) {
+  public PhQueryKNNF<T> nearestNeighbour(int nMin, double... key) {
     long[] lKey = new long[key.length];
     pre.pre(key, lKey);
-    ArrayList<double[]> ret = new ArrayList<>();
-    for (long[] l: pht.nearestNeighbour(nMin, lKey)) {
-      double[] dKey = new double[l.length];
-      pre.post(l, dKey);
-      ret.add(dKey);
-    }
-    return ret;
+    PhQueryKNN<T> iter = pht.nearestNeighbour(nMin, PhDistanceF.THIS, null, lKey);
+    return new PhQueryKNNF<>(iter, pht.getDIM(), pre);
   }
 
   /**
@@ -167,26 +161,21 @@ public class PhTreeF<T> {
    *        the same distance.
    * @param dist distance function
    * @param key
-   * @return List of neighbours.
+   * @return KNN query iterator.
    */
-  public List<double[]> nearestNeighbour(int nMin, PhDistance dist, double... key) {
+  public PhQueryKNNF<T> nearestNeighbour(int nMin, PhDistance dist, double... key) {
     long[] lKey = new long[key.length];
     pre.pre(key, lKey);
-    ArrayList<double[]> ret = new ArrayList<>();
-    for (long[] l: pht.nearestNeighbour(nMin, dist, null, lKey)) {
-      double[] dKey = new double[l.length];
-      pre.post(l, dKey);
-      ret.add(dKey);
-    }
-    return ret;
+    PhQueryKNN<T> iter = pht.nearestNeighbour(nMin, dist, null, lKey);
+    return new PhQueryKNNF<>(iter, pht.getDIM(), pre);
   }
 
   public static class PhIteratorF<T> implements PhIteratorBase<double[], T, PhEntryF<T>> {
     private final PhIterator<T> iter;
-    protected final PreProcessorPoint pre;
+    protected final PreProcessorPointF pre;
     private final int DIM;
 
-    private PhIteratorF(PhIterator<T> iter, int DIM, PreProcessorPoint pre) {
+    private PhIteratorF(PhIterator<T> iter, int DIM, PreProcessorPointF pre) {
       this.iter = iter;
       this.pre = pre;
       this.DIM = DIM;
@@ -205,7 +194,7 @@ public class PhTreeF<T> {
     @Override
     public PhEntryF<T> nextEntry() {
       double[] d = new double[DIM];
-      PhEntry<T> e = iter.nextEntry();
+      PhEntry<T> e = iter.nextEntryReuse();
       pre.post(e.getKey(), d);
       return new PhEntryF<T>(d, e.getValue());
     }
@@ -213,7 +202,7 @@ public class PhTreeF<T> {
     @Override
     public double[] nextKey() {
       double[] d = new double[DIM];
-      pre.post(iter.nextKey(), d);
+      pre.post(iter.nextEntryReuse().getKey(), d);
       return d;
     }
 
@@ -234,7 +223,7 @@ public class PhTreeF<T> {
     private final double[] MIN;
     private final double[] MAX;
 
-    private PhQueryF(PhQuery<T> iter, int DIM, PreProcessorPoint pre) {
+    private PhQueryF(PhQuery<T> iter, int DIM, PreProcessorPointF pre) {
       super(iter, DIM, pre);
       q = iter;
       MIN = new double[DIM];
@@ -249,6 +238,24 @@ public class PhTreeF<T> {
       pre.pre(lower, lMin);
       pre.pre(upper, lMax);
       q.reset(lMin, lMax);
+    }
+  }
+
+  public static class PhQueryKNNF<T> extends PhIteratorF<T> {
+    private final long[] lCenter;
+    private final PhQueryKNN<T> q;
+
+    private PhQueryKNNF(PhQueryKNN<T> iter, int DIM, PreProcessorPointF pre) {
+      super(iter, DIM, pre);
+      q = iter;
+      lCenter = new long[DIM];
+    }
+
+    public PhQueryKNNF<T> reset(int nMin, PhDistance dist, PhDimFilter dims, 
+        double... center) {
+      pre.pre(center, lCenter);
+      q.reset(nMin, dist, dims, lCenter);
+      return this;
     }
   }
 

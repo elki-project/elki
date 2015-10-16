@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.util.NoSuchElementException;
 
 import ch.ethz.globis.pht.PhEntry;
-import ch.ethz.globis.pht.PhTree.PhQuery;
+import ch.ethz.globis.pht.PhTree.PhIterator;
 import ch.ethz.globis.pht.PhTreeHelper;
 
 /**
@@ -41,15 +41,15 @@ import ch.ethz.globis.pht.PhTreeHelper;
  *
  * @param <T>
  */
-public final class PhIteratorNoGC<T> implements PhQuery<T> {
+public final class PhIteratorFullNoGC<T> implements PhIterator<T> {
 
   private class PhIteratorStack {
-    private final NodeIteratorNoGC<T>[] stack;
+    private final NodeIteratorFullNoGC<T>[] stack;
     private int size = 0;
 
     @SuppressWarnings("unchecked")
     public PhIteratorStack() {
-      stack = new NodeIteratorNoGC[PhTree8.DEPTH_64];
+      stack = new NodeIteratorFullNoGC[PhTree8.DEPTH_64];
     }
 
     public boolean isEmpty() {
@@ -57,18 +57,15 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
     }
 
     public boolean prepare(Node<T> node) {
-      if (!PhTree8.checkAndApplyInfix(node, valTemplate, rangeMin, rangeMax)) {
-        STAT_NODES_PREFIX_FAILED++;
-        return false;
-      }
+      node.getInfix(valTemplate);
 
       if (checker != null) {
         long mask = (-1L) << (node.getPostLen() + 1);
         for (int i = 0; i < valTemplate.length; i++) {
-          valTemplate[i] &= mask;  //TODO do somewhere else??
+          valTemplate[i] &= mask;
         }
         //skip this for postLen>=63
-        if (node.getPostLen() < (PhTree8.DEPTH_64-1) &&
+        if (node.getPostLen() < (PhTree8.DEPTH_64-1) && 
             !checker.isValid(node, valTemplate)) {
           STAT_NODES_IGNORED++;
           return false;
@@ -76,21 +73,21 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
           STAT_NODES_CHECKED++;
         }
       }
-      NodeIteratorNoGC<T> ni = stack[size++];
+      NodeIteratorFullNoGC<T> ni = stack[size++];
       if (ni == null)  {
-        ni = new NodeIteratorNoGC<>(DIM, valTemplate);
+        ni = new NodeIteratorFullNoGC<>(DIM, valTemplate);
         stack[size-1] = ni;
       }
 
-      ni.init(rangeMin, rangeMax, valTemplate, node, checker);
+      ni.init(node, checker);
       return true;
     }
 
-    public NodeIteratorNoGC<T> peek() {
+    public NodeIteratorFullNoGC<T> peek() {
       return stack[size-1];
     }
 
-    public NodeIteratorNoGC<T> pop() {
+    public NodeIteratorFullNoGC<T> pop() {
       return stack[--size];
     }
   }
@@ -106,15 +103,13 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
   private final int DIM;
   private final PhIteratorStack stack;
   private final long[] valTemplate;
-  private long[] rangeMin;
-  private long[] rangeMax;
   private PhTraversalChecker<T> checker;
   private final PhTree8<T> pht;
 
   private PhEntry<T> result;
   boolean isFinished = false;
 
-  public PhIteratorNoGC(PhTree8<T> pht, PhTraversalChecker<T> checker) {
+  public PhIteratorFullNoGC(PhTree8<T> pht, PhTraversalChecker<T> checker) {
     this.DIM = pht.getDIM();
     this.checker = checker;
     this.stack = new PhIteratorStack();
@@ -122,17 +117,14 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
     this.pht = pht;
   }	
 
-  @Override
-  public void reset(long[] rangeMin, long[] rangeMax) {	
-    this.rangeMin = rangeMin;
-    this.rangeMax = rangeMax;
+  public PhIteratorFullNoGC<T> reset() {	
     this.stack.size = 0;
     this.isFinished = false;
 
     if (pht.getRoot() == null) {
       //empty index
       isFinished = true;
-      return;
+      return this;
     }
 
     if (stack.prepare(pht.getRoot())) {
@@ -140,12 +132,13 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
     } else {
       isFinished = true;
     }
+    return this;
   }
 
   private void findNextElement() {
     stackLoop:
       while (!stack.isEmpty()) {
-        NodeIteratorNoGC<T> p = stack.peek();
+        NodeIteratorFullNoGC<T> p = stack.peek();
         while (p.increment()) {
           if (p.isNextSub()) {
             //leave this here. We could move applyToArrayPos somewhere else, but we have to
@@ -174,7 +167,13 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
   public long[] nextKey() {
     long[] key = nextEntryReuse().getKey();
     long[] ret = new long[key.length];
-    System.arraycopy(key, 0, ret, 0, key.length);
+    if (DIM > 10) {
+      System.arraycopy(key, 0, ret, 0, key.length);
+    } else {
+      for (int i = 0; i < key.length; i++) {
+        ret[i] = key[i];
+      }
+    }
     return ret;
   }
 

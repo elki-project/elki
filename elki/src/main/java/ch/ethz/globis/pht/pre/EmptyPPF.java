@@ -23,28 +23,22 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-public class IntegerPP implements PreProcessorPointF {
+import ch.ethz.globis.pht.util.BitTools;
 
-	private final double preMult;
-	private final double postMult;
-	
-	public IntegerPP(double multiplyer) {
-		preMult = multiplyer;
-		postMult = 1./multiplyer;
-	}
-	
-	@Override
-	public void pre(double[] raw, long[] pre) {
-		for (int d=0; d<raw.length; d++) {
-			pre[d] = (long) (raw[d] * preMult);
-		}
-	}
+public class EmptyPPF implements PreProcessorPointF {
 
-	@Override
-	public void post(long[] pre, double[] post) {
-		for (int d=0; d<pre.length; d++) {
-			post[d] = pre[d] * postMult;
-		}
-	}
+  @Override
+  public void pre(double[] raw, long[] pre) {
+    for (int d=0; d<raw.length; d++) {
+      pre[d] = BitTools.toSortableLong(raw[d]);
+    }
+  }
+
+  @Override
+  public void post(long[] pre, double[] post) {
+    for (int d=0; d<pre.length; d++) {
+      post[d] = BitTools.toDouble(pre[d]);
+    }
+  }
 
 }

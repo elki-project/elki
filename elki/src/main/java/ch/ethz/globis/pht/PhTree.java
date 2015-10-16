@@ -100,9 +100,9 @@ public abstract class PhTree<T> {
 	 * @param nMin number of entries to be returned. More entries may be returned with several have
 	 * 				the same distance.
 	 * @param key
-	 * @return List of neighbours.
+   * @return The query iterator.
 	 */
-	public abstract List<long[]> nearestNeighbour(int nMin, long... key);
+	public abstract PhQueryKNN<T> nearestNeighbour(int nMin, long... key);
 	
 	/**
 	 * Locate nearest neighbours for a given point in space.
@@ -111,9 +111,9 @@ public abstract class PhTree<T> {
 	 * @param dist the distance function, can be {@code null}. The default is {@link PhDistanceL}.
 	 * @param dims the dimension filter, can be {@code null}
 	 * @param key
-	 * @return List of neighbours.
+	 * @return The query iterator.
 	 */
-	public abstract List<long[]> nearestNeighbour(int nMin, PhDistance dist, PhDimFilter dims, 
+	public abstract PhQueryKNN<T> nearestNeighbour(int nMin, PhDistance dist, PhDimFilter dims, 
 			long... key);
 
 	/**
@@ -136,7 +136,20 @@ public abstract class PhTree<T> {
     	return new PhTree8<T>(dim);
     }
 
-    public static interface PhIterator<T> extends PhIteratorBase<long[], T, PhEntry<T>> {}
+    public static interface PhIterator<T> extends PhIteratorBase<long[], T, PhEntry<T>> {
+        
+        /**
+         * Special 'next' method that avoids creating new objects internally by reusing Entry objects.
+         * Advantage: Should completely avoid any GC effort.
+         * Disadvantage: Returned PhEntries are not stable and are only valid until the
+         * next call to next(). After that they may change state. Modifying returned entries may
+         * invalidate the backing tree.
+         * @return The next entry
+         */
+          PhEntry<T> nextEntryReuse();
+
+    }
+    
     public static interface PhQuery<T> extends PhIterator<T> {
  
 		/**
@@ -145,6 +158,19 @@ public abstract class PhTree<T> {
     	 * @param max
     	 */
     	void reset(long[] min, long[] max);
+    }
+    
+    public static interface PhQueryKNN<T> extends PhIterator<T> {
+        
+    /**
+       * Reset the query with the new parameters.
+       * @param nMin Minimum result count
+       * @param dist Distance function
+       * @param dims dimension filter to specify ignored dimensions
+       * @param center The point to find the nearest neighbours for
+       * @return the query itself
+       */
+      PhQueryKNN<T> reset(int nMin, PhDistance dist, PhDimFilter dims, long... center);
     }
     
    	/**

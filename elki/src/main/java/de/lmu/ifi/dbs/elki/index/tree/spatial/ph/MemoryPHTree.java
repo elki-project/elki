@@ -24,11 +24,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.util.List;
 
 import ch.ethz.globis.pht.PhDistance;
-import ch.ethz.globis.pht.PhDistanceD;
+import ch.ethz.globis.pht.PhDistanceEuclidPPF;
+import ch.ethz.globis.pht.PhDistanceF;
 import ch.ethz.globis.pht.PhDistanceL;
 import ch.ethz.globis.pht.PhTreeF;
 import ch.ethz.globis.pht.PhTreeF.PhEntryF;
 import ch.ethz.globis.pht.PhTreeF.PhQueryF;
+import ch.ethz.globis.pht.PhTreeF.PhQueryKNNF;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -245,13 +247,12 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
       
       //TODO
       //List<double[]> keys = tree.nearestNeighbour(k, dist, oToDouble(obj, new double[dims]));
-      List<double[]> keys = tree.nearestNeighbour(k, PhDistanceD.THIS, oToDouble(obj, new double[dims]));
-      System.out.println("DBID result size=" + keys.size());
-      for (double[] v: keys) {
-        DBID id = tree.get(v);
+      //List<double[]> keys = tree.nearestNeighbour(k, PhDistanceF.THIS, oToDouble(obj, new double[dims]));
+      PhQueryKNNF<DBID> keys = tree.nearestNeighbour(k, PhDistanceEuclidPPF.DOUBLE, oToDouble(obj, new double[dims]));
+      while (keys.hasNext()) {
+        DBID id = keys.nextValue();
         O o2 = relation.get(id);
         double distance = norm.distance(obj, o2);
-        System.out.println("DBID dist=" + distance);
         knns.insert(distance, id);
       }
       

@@ -69,6 +69,7 @@ public class NodeIteratorNoGC<T> {
 	private boolean useSubHcIncrementer;
 	private boolean isPostFinished;
 	private boolean isSubFinished;
+	private PhTraversalChecker<T> checker;
 	private final PhEntry<T> nextPost1;
 	private final PhEntry<T> nextPost2;
 	private boolean isNextPost1free;
@@ -76,14 +77,8 @@ public class NodeIteratorNoGC<T> {
 
 	/**
 	 * 
-	 * @param node
 	 * @param DIM
 	 * @param valTemplate A null indicates that no values are to be extracted.
-	 * @param lower The minimum HC-Pos that a value should have.
-	 * @param upper
-	 * @param minValue The minimum value that any found value should have. If the found value is
-	 *  lower, the search continues.
-	 * @param maxValue
 	 */
 	public NodeIteratorNoGC(int DIM, long[] valTemplate) {
 		this.DIM = DIM;
@@ -92,8 +87,19 @@ public class NodeIteratorNoGC<T> {
 		this.nextPost2 = new PhEntry<T>(new long[DIM], null);
 	}
 	
-	private void reinit(Node<T> node, long[] rangeMin, long[] rangeMax, long lower, long upper) {
-		this.rangeMin = rangeMin;
+	/**
+	 * 
+	 * @param node
+	 * @param rangeMin The minimum value that any found value should have. If the found value is
+	 *  lower, the search continues.
+	 * @param rangeMax
+	 * @param lower The minimum HC-Pos that a value should have.
+	 * @param upper
+	 * @param checker result verifier, can be null.
+	 */
+	private void reinit(Node<T> node, long[] rangeMin, long[] rangeMax, long lower, long upper, 
+	    PhTraversalChecker<T> checker) {
+	  this.rangeMin = rangeMin;
 		this.rangeMax = rangeMax;
 		next = -1;
 		nextPost = -1;
@@ -105,6 +111,7 @@ public class NodeIteratorNoGC<T> {
 		niIterator = null;
 		nPostsFound = 0;
 		posSubLHC = -1; //position in sub-node LHC array
+	    this.checker = checker;
 	
 		this.node = node;
 		this.isPostHC = node.isPostHC();
@@ -223,6 +230,10 @@ public class NodeIteratorNoGC<T> {
 			return false;
 		}
 		
+		if (checker != null && !checker.isValid(key)) {
+		  return false;
+		}
+
 		//Don't set to 'null' here, that interferes with parallel iteration over post/sub 
 		//nextSubNode = null;
 		isNextPost1free = !isNextPost1free;
@@ -239,6 +250,9 @@ public class NodeIteratorNoGC<T> {
 			if (eKey[i] < rangeMin[i] || eKey[i] > rangeMax[i]) {
 				return false;
 			}
+		}
+		if (checker != null && !checker.isValid(eKey)) {
+		  return false;
 		}
 		System.arraycopy(eKey, 0, result.getKey(), 0, DIM);
 		result.setValue(e.getValue());
@@ -538,7 +552,8 @@ public class NodeIteratorNoGC<T> {
 		return node;
 	}
 
-	void init(long[] rangeMin, long[] rangeMax, long[] valTemplate, Node<T> node) {
+	void init(long[] rangeMin, long[] rangeMax, 
+	    long[] valTemplate, Node<T> node, PhTraversalChecker<T> checker) {
 		//create limits for the local node. there is a lower and an upper limit. Each limit
 		//consists of a series of DIM bit, one for each dimension.
 		//For the lower limit, a '1' indicates that the 'lower' half of this dimension does 
@@ -597,7 +612,7 @@ public class NodeIteratorNoGC<T> {
 				}
 			}
 		}
-		reinit(node, rangeMin, rangeMax, lowerLimit, upperLimit);
+		reinit(node, rangeMin, rangeMax, lowerLimit, upperLimit, checker);
 	}
 
 }

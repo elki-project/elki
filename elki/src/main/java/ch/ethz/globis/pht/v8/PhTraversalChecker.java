@@ -1,4 +1,4 @@
-package ch.ethz.globis.pht.pre;
+package ch.ethz.globis.pht.v8;
 
 /*
 This file is part of ELKI:
@@ -21,30 +21,22 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
-public class IntegerPP implements PreProcessorPointF {
+/**
+ * Interface for PhIterator checkers. A checker is continuously checked 
+ * during navigation to see whether subnodes or postfixes should be traversed. 
+ * 
+ * 
+ * @author Tilmann Zäschke
+ * 
+ * @param <T> The value type of the tree 
+ *
+ */
+public interface PhTraversalChecker<T> {
 
-	private final double preMult;
-	private final double postMult;
+	boolean isValid(long[] key);
 	
-	public IntegerPP(double multiplyer) {
-		preMult = multiplyer;
-		postMult = 1./multiplyer;
-	}
+	boolean isValid(Node<T> node, long[] prefix);
 	
-	@Override
-	public void pre(double[] raw, long[] pre) {
-		for (int d=0; d<raw.length; d++) {
-			pre[d] = (long) (raw[d] * preMult);
-		}
-	}
-
-	@Override
-	public void post(long[] pre, double[] post) {
-		for (int d=0; d<pre.length; d++) {
-			post[d] = pre[d] * postMult;
-		}
-	}
-
 }
