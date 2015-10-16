@@ -78,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 title = "Intrinsic Dimensional Outlier Detection in High-Dimensional Data", //
 booktitle = "NII Technical Report (NII-2015-003E)", //
 url = "http://www.nii.ac.jp/TechReports/15-003E.html")
-public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult>implements OutlierAlgorithm {
+public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
@@ -197,13 +197,14 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult>imp
           continue;
         }
         final double id = intDims.doubleValue(neighbor);
-        sum += 1.0 / id;
+        sum += id > 0 ? 1.0 / id : 0.;
         if(++cnt == k_r) { // Always stop after at most k_r elements.
           break;
         }
       }
       final double id_q = intDims.doubleValue(iter);
-      final double idos = id_q * sum / cnt;
+      final double idos = id_q > 0 ? id_q * sum / cnt : 0.;
+
       ldms.putDouble(iter, idos);
       idosminmax.put(idos);
       LOG.incrementProcessed(prog);
