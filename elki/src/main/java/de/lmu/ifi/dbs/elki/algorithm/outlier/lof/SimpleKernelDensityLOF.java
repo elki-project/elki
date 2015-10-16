@@ -64,12 +64,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 /**
  * A simple variant of the LOF algorithm, which uses a simple kernel density
  * estimation instead of the local reachability density.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KNNQuery
  * @apiviz.has KernelDensityFunction
- * 
+ *
  * @param <O> the type of objects handled by this Algorithm
  */
 public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
@@ -90,7 +90,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
 
   /**
    * Constructor.
-   * 
+   *
    * @param k the value of k
    * @param kernel Kernel function
    */
@@ -102,7 +102,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
 
   /**
    * Run the naive kernel density LOF algorithm.
-   * 
+   *
    * @param database Database to query
    * @param relation Data to process
    * @return LOF outlier result
@@ -129,6 +129,10 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
           continue;
         }
         double max = knnq.getKNNForDBID(neighbor, k).getKNNDistance();
+        if(max == 0) {
+          sum = Double.POSITIVE_INFINITY;
+          break;
+        }
         final double v = neighbor.doubleValue() / max;
         sum += kernel.density(v) / MathUtil.powi(max, dim);
         count++;
@@ -161,7 +165,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
           sum += dens.doubleValue(neighbor);
           count++;
         }
-        lof = sum / (count * lrdp);
+        lof = (lrdp == Double.POSITIVE_INFINITY) ? (sum == Double.POSITIVE_INFINITY ? 1 : 0.) : sum / (count * lrdp);
       }
       else {
         lof = 1.0;
@@ -196,11 +200,11 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> vector type
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
