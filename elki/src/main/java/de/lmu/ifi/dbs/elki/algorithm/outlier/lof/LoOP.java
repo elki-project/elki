@@ -48,7 +48,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -70,18 +69,18 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * LoOP: Local Outlier Probabilities
- * 
+ *
  * Distance/density based algorithm similar to LOF to detect outliers, but with
  * statistical methods to achieve better result stability.
- * 
+ *
  * Reference:
  * <p>
  * Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek:<br />
- * LoOP: Local Outlier Probabilities< br />
- * In Proceedings of the 18th International Conference on Information and
- * Knowledge Management (CIKM), Hong Kong, China, 2009
+ * LoOP: Local Outlier Probabilities< br /> In Proceedings of the 18th
+ * International Conference on Information and Knowledge Management (CIKM), Hong
+ * Kong, China, 2009
  * </p>
- * 
+ *
  * Implementation notes:
  * <ul>
  * <li>The lambda parameter was removed from the pdist term, because it cancels
@@ -89,11 +88,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * <li>In ELKI 0.7.0, the {@code k} parameters have changed by 1 to make them
  * similar to other methods and more intuitive.</li>
  * </ul>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KNNQuery
- * 
+ *
  * @param <O> type of objects handled by this algorithm
  */
 @Title("LoOP: Local Outlier Probabilities")
@@ -136,7 +135,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
 
   /**
    * Constructor with parameters.
-   * 
+   *
    * @param kreach k for reachability
    * @param kcomp k for comparison
    * @param reachabilityDistanceFunction distance function for reachability
@@ -154,7 +153,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
 
   /**
    * Get the kNN queries for the algorithm.
-   * 
+   *
    * @param database Database to analyze
    * @param relation Relation to analyze
    * @param stepprog Progress logger, may be {@code null}
@@ -177,7 +176,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
 
   /**
    * Performs the LoOP algorithm on the given database.
-   * 
+   *
    * @param database Database to process
    * @param relation Relation to process
    * @return Outlier result
@@ -234,7 +233,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
 
   /**
    * Compute the probabilistic distances used by LoOP.
-   * 
+   *
    * @param relation Data relation
    * @param knn kNN query
    * @param pdists Storage for distances
@@ -264,7 +263,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
 
   /**
    * Compute the LOF values, using the pdist distances.
-   * 
+   *
    * @param relation Data relation
    * @param knn kNN query
    * @param pdists Precomputed distances
@@ -273,7 +272,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
    */
   protected double computePLOFs(Relation<O> relation, KNNQuery<O> knn, WritableDoubleDataStore pdists, WritableDoubleDataStore plofs) {
     FiniteProgress progressPLOFs = LOG.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), LOG) : null;
-    Mean mvplof = new Mean();
+    double nplof = 0.;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final KNNList neighbors = knn.getKNNForDBID(iditer, kcomp + 1);
       // use first kref neighbors as comparison set.
@@ -291,17 +290,17 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
         plof = 1.0;
       }
       plofs.putDouble(iditer, plof);
-      mvplof.put((plof - 1.0) * (plof - 1.0));
+      nplof += (plof - 1.0) * (plof - 1.0);
 
       LOG.incrementProcessed(progressPLOFs);
     }
     LOG.ensureCompleted(progressPLOFs);
 
-    double nplof = lambda * Math.sqrt(mvplof.getMean());
-    if(LOG.isDebugging()) {
-      LOG.verbose("nplof normalization factor is " + nplof + " " + mvplof.getMean());
+    nplof = lambda * Math.sqrt(nplof / relation.size());
+    if(LOG.isDebuggingFine()) {
+      LOG.debugFine("nplof normalization factor is " + nplof);
     }
-    return nplof;
+    return nplof > 0. ? nplof : 1.;
   }
 
   @Override
@@ -323,11 +322,11 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractParameterizer {
