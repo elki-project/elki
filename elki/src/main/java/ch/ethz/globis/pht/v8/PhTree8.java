@@ -34,6 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import ch.ethz.globis.pht.PhDimFilter;
 import ch.ethz.globis.pht.PhDistance;
+import ch.ethz.globis.pht.PhDistanceL;
 import ch.ethz.globis.pht.PhEntry;
 import ch.ethz.globis.pht.PhTree;
 import ch.ethz.globis.pht.PhTreeConfig;
@@ -680,8 +681,7 @@ public class PhTree8<T> extends PhTree<T> {
    */
   @Override
   public PhQueryKNN<T> nearestNeighbour(int nMin, long... v) {
-    throw new UnsupportedOperationException();
-    //return new PhQueryKnnLong<T>(this).reset(nMin, null, null, v); 
+    return new PhQueryKnnPP<T>(this).reset(nMin, PhDistanceL.THIS, null, v); 
   }
 
 

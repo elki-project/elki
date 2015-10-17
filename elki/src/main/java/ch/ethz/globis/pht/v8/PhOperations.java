@@ -25,8 +25,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 public interface PhOperations<T> {
 	
-    public Node<T> createNode(Node<T> original, int dim);
-
 	public Node<T> createNode(PhTree8<T> parent, int infixLen, int postLen, 
 			int estimatedPostCount, final int DIM);
 

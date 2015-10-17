@@ -23,8 +23,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import org.zoodb.index.critbit.CritBit64COW.Entry;
-import org.zoodb.index.critbit.CritBit64COW.QueryIteratorMask;
+import org.zoodb.index.critbit.CritBit64.Entry;
+import org.zoodb.index.critbit.CritBit64.QueryIteratorMask;
 
 import ch.ethz.globis.pht.PhEntry;
 import ch.ethz.globis.pht.PhTreeHelper;

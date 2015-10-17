@@ -27,8 +27,8 @@ import static ch.ethz.globis.pht.PhTreeHelper.applyHcPos;
 
 import java.util.NoSuchElementException;
 
-import org.zoodb.index.critbit.CritBit64COW.CBIterator;
-import org.zoodb.index.critbit.CritBit64COW.Entry;
+import org.zoodb.index.critbit.CritBit64.CBIterator;
+import org.zoodb.index.critbit.CritBit64.Entry;
 
 /**
  * An iterator for full iteration of the the PH-tree. It does not use

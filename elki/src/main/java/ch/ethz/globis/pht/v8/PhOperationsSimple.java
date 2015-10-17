@@ -27,7 +27,8 @@ import static ch.ethz.globis.pht.PhTreeHelper.applyHcPos;
 import static ch.ethz.globis.pht.PhTreeHelper.getMaxConflictingBits;
 import static ch.ethz.globis.pht.PhTreeHelper.posInArray;
 
-import org.zoodb.index.critbit.CritBit64COW;
+import org.zoodb.index.critbit.CritBit64.CBIterator;
+import org.zoodb.index.critbit.CritBit64.Entry;
 
 import ch.ethz.globis.pht.v8.PhTree8.NodeEntry;
 
@@ -53,11 +54,6 @@ public class PhOperationsSimple<T> implements PhOperations<T> {
 
     public PhOperationsSimple(PhTree8<T> tree) {
         this.tree = tree;
-    }
-
-    @Override
-    public Node<T> createNode(Node<T> original, int dim) {
-    	return Node.createNode(original, dim);
     }
 
     @Override
@@ -452,8 +448,8 @@ public class PhOperationsSimple<T> implements PhOperations<T> {
         T oldValue = e.getValue();
 
         //locate the other entry
-        CritBit64COW.CBIterator<NodeEntry<T>> iter = node.niIterator();
-        CritBit64COW.Entry<NodeEntry<T>> ie = iter.nextEntry();
+        CBIterator<NodeEntry<T>> iter = node.niIterator();
+        Entry<NodeEntry<T>> ie = iter.nextEntry();
         if (ie.key() == pos) {
             //pos2 is the entry to be deleted, find the other entry for pos2
             ie = iter.nextEntry();
@@ -596,26 +592,6 @@ public class PhOperationsSimple<T> implements PhOperations<T> {
             put(newKey, v);
         }
         return v;
-    }
-
-    protected Node<T> copyNodeAndReplaceInParent(Node<T> node, Node<T> parent, long posInParent) {
-        if (parent != null) {
-            node = createNode(node, tree.getDIM());
-            parent.replaceSub(posInParent, node, tree.getDIM());
-        }
-        return node;
-    }
-
-    protected Node<T> copyNodeAndReplaceInParentNI(Node<T> node, long childPos) {
-        NodeEntry<T> e = node.getChildNI(childPos);
-        if (e != null) {
-            if (e.node != null) {
-                node.niPut(childPos, createNode(e.node, tree.getDIM()));
-            } else {
-                node.niPut(childPos, e.getKey(), e.getValue());
-            }
-        }
-        return node;
     }
 
     public void setTree(PhTree8<T> tree) {

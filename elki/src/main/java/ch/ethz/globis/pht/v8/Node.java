@@ -25,9 +25,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import static ch.ethz.globis.pht.PhTreeHelper.applyHcPos;
 
-import org.zoodb.index.critbit.CritBit64COW;
-import org.zoodb.index.critbit.CritBit64COW.CBIterator;
-import org.zoodb.index.critbit.CritBit64COW.Entry;
+import org.zoodb.index.critbit.CritBit64.Entry;
+import org.zoodb.index.critbit.CritBit64;
+import org.zoodb.index.critbit.CritBit64.CBIterator;
 
 import ch.ethz.globis.pht.PhEntry;
 import ch.ethz.globis.pht.PhTreeHelper;
@@ -86,39 +86,8 @@ class Node<T> {
   private byte postLen = 0;
   private byte infixLen = 0; //prefix size
 
-  private CritBit64COW<NodeEntry<T>> ind = null;
+  private CritBit64<NodeEntry<T>> ind = null;
 
-  @SuppressWarnings("unchecked")
-  protected Node(Node<T> original, int dim) {
-    if (original.subNRef != null) {
-      int size = original.subNRef.length;
-      this.subNRef = new Node[size];
-      System.arraycopy(original.subNRef, 0, this.subNRef, 0, size);
-    }
-    if (original.values != null) {
-      this.values = (T[]) original.values.clone();
-    }
-    if (original.ba != null) {
-      this.ba = new long[original.ba.length];
-      System.arraycopy(original.ba, 0, this.ba, 0, original.ba.length);
-    }
-    this.subCnt = original.subCnt;
-    this.postCnt = original.postCnt;
-    this.infixLen = original.infixLen;
-    this.isHC = original.isHC;
-    this.postLen = original.postLen;
-    this.infixLen = original.infixLen;
-    if (original.ind != null) {
-      this.ind = original.ind.copy();
-    }
-    if (original.ba != null) {
-      int nrBits = original.isPostNI() ? 
-          calcArraySizeTotalBitsNI(dim) 
-          : calcArraySizeTotalBits(original.getPostCount(), dim);
-          this.ba = Bits.arrayCreate(nrBits);
-          System.arraycopy(original.ba, 0, this.ba, 0, original.ba.length);
-    }
-  }
 
   protected Node(int infixLen, int postLen, int estimatedPostCount, int DIM, PhTree8<T> tree) {
     this.infixLen = (byte) infixLen;
@@ -133,10 +102,6 @@ class Node<T> {
   static <T> Node<T> createNode(PhTree8<T> tree, int infixLen, int postLen, 
       int estimatedPostCount, final int DIM) {
     return new Node<T>(infixLen, postLen, estimatedPostCount, DIM, tree);
-  }
-
-  static <T> Node<T> createNode(Node<T> original, int dim) {
-    return new Node<T>(original, dim);
   }
 
   NodeEntry<T> createNodeEntry(Node<T> sub) {
@@ -693,7 +658,7 @@ class Node<T> {
     if (ind != null || isPostNI() || isSubNI()) {
       throw new IllegalStateException();
     }
-    ind = CritBit64COW.create();
+    ind = CritBit64.create();
 
     //read posts 
     if (isPostHC()) {
@@ -1433,7 +1398,7 @@ class Node<T> {
   Node<T> subNRef(int pos) {
     return subNRef[pos];
   }
-  CritBit64COW<NodeEntry<T>> ind() {
+  CritBit64<NodeEntry<T>> ind() {
     return ind;
   }
 

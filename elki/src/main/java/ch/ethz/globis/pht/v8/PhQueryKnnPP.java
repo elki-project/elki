@@ -30,8 +30,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
 
-import org.zoodb.index.critbit.CritBit64COW.CBIterator;
-import org.zoodb.index.critbit.CritBit64COW.Entry;
+import org.zoodb.index.critbit.CritBit64.CBIterator;
+import org.zoodb.index.critbit.CritBit64.Entry;
 
 import ch.ethz.globis.pht.PhDimFilter;
 import ch.ethz.globis.pht.PhDistance;
