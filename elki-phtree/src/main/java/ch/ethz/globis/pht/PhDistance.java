@@ -21,46 +21,38 @@ GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ */
 
 /**
- * Calculate the distance for integer values.
- * 
- * @see PhDistance
+ * Distance method for the PhTree, for example used in nearest neighbor queries.
  * 
  * @author ztilmann
  */
-public class PhDistanceL implements PhDistance {
+public interface PhDistance {
 
-  public static final PhDistanceL THIS = new PhDistanceL();
-  
   /**
-   * Calculate the distance for integer values.
+   * Returns the distance between v1 and v2.
    * 
-   * @see PhDistance#dist(long[], long[])
+   * @param v1
+   * @param v2
+   * @return The distance.
    */
-  @Override
-  public double dist(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
-    }
-    return Math.sqrt(d);
-  }
-  
+  double dist(long[] v1, long[] v2);
+
   /**
-   * Calculate the estimated distance for integer values.
+   * Returns an approximate measurement for the distance. The returned distance does not need 
+   * to have euclidean properties. For example, for 2D coordinate distance, it is sufficient to 
+   * return d = x1*x1 + x2*x2, without applying square-root function.
    * 
-   * @see PhDistance#dist(long[], long[])
+   * The only requirement is that if (and only if) d1 > d2 then d1 should always indicate a 
+   * bigger distance, while d1=d2 should always indicate equal distance.
+   * 
+   * Depending on the dataset it may help if (d1=2*d2) really indicates approximately
+   * double distance in real terms.
+   * 
+   * @param v1
+   * @param v2
+   * @return A measurement for the distance.
    */
-  @Override
-  public double distEst(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
-    }
-    return d;
-  }
+  double distEst(long[] v1, long[] v2);
 }

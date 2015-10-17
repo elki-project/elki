@@ -1,4 +1,4 @@
-package ch.ethz.globis.pht;
+package ch.ethz.globis.pht.pre;
 
 /*
 This file is part of ELKI:
@@ -23,44 +23,22 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- * Calculate the distance for integer values.
- * 
- * @see PhDistance
- * 
- * @author ztilmann
- */
-public class PhDistanceL implements PhDistance {
+import ch.ethz.globis.pht.util.BitTools;
 
-  public static final PhDistanceL THIS = new PhDistanceL();
-  
-  /**
-   * Calculate the distance for integer values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
+public class EmptyPPF implements PreProcessorPointF {
+
   @Override
-  public double dist(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
+  public void pre(double[] raw, long[] pre) {
+    for (int d=0; d<raw.length; d++) {
+      pre[d] = BitTools.toSortableLong(raw[d]);
     }
-    return Math.sqrt(d);
   }
-  
-  /**
-   * Calculate the estimated distance for integer values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
+
   @Override
-  public double distEst(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
+  public void post(long[] pre, double[] post) {
+    for (int d=0; d<pre.length; d++) {
+      post[d] = BitTools.toDouble(pre[d]);
     }
-    return d;
   }
+
 }

@@ -23,44 +23,58 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- * Calculate the distance for integer values.
- * 
- * @see PhDistance
- * 
- * @author ztilmann
- */
-public class PhDistanceL implements PhDistance {
+public class PhTreeConfig {
 
-  public static final PhDistanceL THIS = new PhDistanceL();
-  
-  /**
-   * Calculate the distance for integer values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
-  @Override
-  public double dist(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
-    }
-    return Math.sqrt(d);
-  }
-  
-  /**
-   * Calculate the estimated distance for integer values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
-  @Override
-  public double distEst(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
-    }
-    return d;
-  }
+	private int dimUser;
+	private int dimActual;
+	private int depth;
+	private boolean[] unique; 
+	
+	public PhTreeConfig(int dim, int depth) {
+		this.dimUser = dim;
+		this.dimActual = dim;
+		this.depth = depth;
+		this.unique = new boolean[dimUser];
+	}
+	
+	/**
+	 * Mark a dimension as unique
+	 * @param dim
+	 */
+	public void setUnique(int dim) {
+		unique[dim] = true;
+		dimActual++;
+	}
+	
+	public int getDimActual() {
+		return dimActual;
+	}
+	
+	/**
+	 * 
+	 * @return Dimensionality as defined by user.
+	 */
+	public int getDim() {
+		return dimUser;
+	}
+	
+	/**
+	 * 
+	 * @return Depth in bits.
+	 */
+	public int getDepth() {
+		return depth;
+	}
+
+	public int[] getDimsToSplit() {
+		int[] ret = new int[dimActual-dimUser];
+		int n = 0;
+		for (int i = 0; i < unique.length; i++) {
+			if (unique[i]) {
+				ret[n] = i;
+				n++;
+			}
+		}
+		return ret;
+	}
 }

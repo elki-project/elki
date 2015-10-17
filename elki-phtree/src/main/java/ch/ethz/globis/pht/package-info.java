@@ -1,3 +1,6 @@
+/**
+ * Implementation of the PH-tree.
+ */
 package ch.ethz.globis.pht;
 
 /*
@@ -22,45 +25,3 @@ GNU Affero General Public License for more details.
 You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
-/**
- * Calculate the distance for integer values.
- * 
- * @see PhDistance
- * 
- * @author ztilmann
- */
-public class PhDistanceL implements PhDistance {
-
-  public static final PhDistanceL THIS = new PhDistanceL();
-  
-  /**
-   * Calculate the distance for integer values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
-  @Override
-  public double dist(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
-    }
-    return Math.sqrt(d);
-  }
-  
-  /**
-   * Calculate the estimated distance for integer values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
-  @Override
-  public double distEst(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
-    }
-    return d;
-  }
-}

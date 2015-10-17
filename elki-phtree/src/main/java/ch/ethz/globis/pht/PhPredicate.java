@@ -23,44 +23,29 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import java.io.Serializable;
+
 /**
- * Calculate the distance for integer values.
- * 
- * @see PhDistance
- * 
+ * A predicate class that can for example be used to filter query results before they are returned.
+ *
+ * This interface needs to be serializable because in the distributed version of the PhTree, it is send
+ * from the client machine to the server machine.
+ *
  * @author ztilmann
  */
-public class PhDistanceL implements PhDistance {
+public interface PhPredicate extends Serializable {
 
-  public static final PhDistanceL THIS = new PhDistanceL();
-  
-  /**
-   * Calculate the distance for integer values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
-  @Override
-  public double dist(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
+	PhPredicate ACCEPT_ALL = new PhPredicate() {
+    
+    /**  */
+    private static final long serialVersionUID = 1L;
+
+    @Override
+    public boolean test(long[] point) {
+      return true;
     }
-    return Math.sqrt(d);
-  }
-  
-  /**
-   * Calculate the estimated distance for integer values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
-  @Override
-  public double distEst(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
-    }
-    return d;
-  }
+  };
+
+	boolean test(long[] point);
+	
 }

@@ -23,6 +23,7 @@
 
 	<modules>
 		<module>elki</module>
+		<module>elki-phtree</module>
 	</modules>
 
 	<properties>

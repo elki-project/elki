@@ -23,19 +23,22 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import ch.ethz.globis.pht.util.BitTools;
+
+
 /**
- * Calculate the distance for integer values.
+ * Calculate the distance for encoded {@code double} values.
  * 
  * @see PhDistance
  * 
  * @author ztilmann
  */
-public class PhDistanceL implements PhDistance {
+public class PhDistanceF implements PhDistance {
 
-  public static final PhDistanceL THIS = new PhDistanceL();
-  
+  public static final PhDistance THIS = new PhDistanceF();
+
   /**
-   * Calculate the distance for integer values.
+   * Calculate the distance for encoded {@code double} values.
    * 
    * @see PhDistance#dist(long[], long[])
    */
@@ -43,14 +46,14 @@ public class PhDistanceL implements PhDistance {
   public double dist(long[] v1, long[] v2) {
     double d = 0;
     for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
+      double dl = BitTools.toDouble(v1[i]) - BitTools.toDouble(v2[i]);
       d += dl*dl;
     }
     return Math.sqrt(d);
   }
-  
+
   /**
-   * Calculate the estimated distance for integer values.
+   * Calculate the estimated distance for encoded {@code double} values.
    * 
    * @see PhDistance#dist(long[], long[])
    */
@@ -58,7 +61,7 @@ public class PhDistanceL implements PhDistance {
   public double distEst(long[] v1, long[] v2) {
     double d = 0;
     for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
+      double dl = BitTools.toDouble(v1[i]) - BitTools.toDouble(v2[i]);
       d += dl*dl;
     }
     return d;

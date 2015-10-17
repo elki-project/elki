@@ -1,4 +1,4 @@
-package ch.ethz.globis.pht;
+package ch.ethz.globis.pht.pre;
 
 /*
 This file is part of ELKI:
@@ -24,43 +24,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 /**
- * Calculate the distance for integer values.
- * 
- * @see PhDistance
+ * Preprocessor for integer data.
  * 
  * @author ztilmann
+ *
  */
-public class PhDistanceL implements PhDistance {
-
-  public static final PhDistanceL THIS = new PhDistanceL();
-  
-  /**
-   * Calculate the distance for integer values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
-  @Override
-  public double dist(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
-    }
-    return Math.sqrt(d);
-  }
-  
-  /**
-   * Calculate the estimated distance for integer values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
-  @Override
-  public double distEst(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
-    }
-    return d;
-  }
+public interface PreProcessorRange {
+	
+	/**
+	 * 
+   * @param raw1 raw data (input) of lower left corner
+   * @param raw2 raw data (input) of upper right corner
+	 * @param pre pre-processed data (output, must be non-null and same size as input array)
+	 */
+	public void pre(long[] raw1, long[] raw2, long[] pre);
+	
+	
+	/**
+   * @param pre pre-processed data (input)
+   * @param post1 post-processed data (output, must be non-null and same size as input array)
+   *              of lower left corner
+   * @param post2 post-processed data (output, must be non-null and same size as input array)
+   *              of upper right corner
+	 */
+	public void post(long[] pre, long[] post1, long[] post2);
 }
