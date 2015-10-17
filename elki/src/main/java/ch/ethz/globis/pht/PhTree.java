@@ -23,8 +23,6 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.util.List;
-
 import ch.ethz.globis.pht.util.PhIteratorBase;
 import ch.ethz.globis.pht.util.PhTreeQStats;
 import ch.ethz.globis.pht.v8.PhTree8;

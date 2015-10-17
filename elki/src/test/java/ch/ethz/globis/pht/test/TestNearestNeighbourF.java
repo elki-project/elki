@@ -113,17 +113,14 @@ public class TestNearestNeighbourF {
 
     List<double[]> result = toList(idx.nearestNeighbour(4, 3, 3));
 
-    //    for (long[] l: result) {
-      //      System.out.println(Arrays.toString(l));
-    //    }
-
     checkContains(result, 3, 3);
-    checkContains(result, 4, 4);
-    checkContains(result, 4, 2);
-    checkContains(result, 2, 2);
-    checkContains(result, 2, 4);
+    int n = 1;
+    n += contains(result, 4, 4) ? 1 : 0;
+    n += contains(result, 4, 2) ? 1 : 0;
+    n += contains(result, 2, 2) ? 1 : 0;
+    n += contains(result, 2, 4) ? 1 : 0;
 
-    assertEquals(5, result.size());
+    assertTrue(n >= 4);
   }
 
   @Test
@@ -578,6 +575,15 @@ public class TestNearestNeighbourF {
     fail("Not found: " + Arrays.toString(v));
   }
 
+  private boolean contains(List<double[]> l, double ... v) {
+    for (double[] vl: l) {
+      if (Arrays.equals(vl, v)) {
+        return true;
+      }
+    }
+    return false;
+  }
+  
   //  private void check(long[] t, long[] s) {
   //    for (int i = 0; i < s.length; i++) {
   //      assertEquals("i=" + i + " | " + Bits.toBinary(s) + " / " + 

@@ -709,10 +709,7 @@ public class PhTree8<T> extends PhTree<T> {
   @Override
   public PhQueryKNN<T> nearestNeighbour(int nMin, PhDistance dist,
       PhDimFilter dimsFilter, long... focus) {
-    //return new PhQueryKnnDist<T>(this).reset(nMin, dist, dimsFilter, focus);
-    //return new PhQueryKnnDistCheck<T>(this).reset(nMin, dist, dimsFilter, focus);
-    return new PhQueryKnnDistCheckReuse<T>(this).reset(nMin, dist, dimsFilter, focus);
-    //return new PhQueryKnnDistCheckReuse1Run<T>(this).reset(nMin, dist, dimsFilter, focus);
+    return new PhQueryKnnPP<T>(this).reset(nMin, dist, dimsFilter, focus);
   }
 
   @Override

@@ -23,16 +23,18 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.ph;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ch.ethz.globis.pht.util.BitTools;
+import ch.ethz.globis.pht.pre.PreProcessorPointF;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 final class PhNumberVectorAdapter implements NumberVector {
   
+  private final PreProcessorPointF pre;
   private final double[] min;
   //private double[] max;
   
-  public PhNumberVectorAdapter(int dimension) {
+  public PhNumberVectorAdapter(int dimension, PreProcessorPointF pre) {
+    this.pre = pre;
     min = new double[dimension];
   }
   
@@ -93,9 +95,7 @@ final class PhNumberVectorAdapter implements NumberVector {
   }
 
   public NumberVector wrap(long[] v) {
-    for (int i = 0; i < min.length; i++) {
-      min[i] = BitTools.toDouble(v[i]);
-    }
+    pre.post(v, min);
     return this;
   }
 }

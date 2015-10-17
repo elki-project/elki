@@ -49,7 +49,6 @@ public class PhDistanceF implements PhDistance {
       double dl = BitTools.toDouble(v1[i]) - BitTools.toDouble(v2[i]);
       d += dl*dl;
     }
-    System.out.println("PH dist=" + Math.sqrt(d));
     return Math.sqrt(d);
   }
 
@@ -65,7 +64,6 @@ public class PhDistanceF implements PhDistance {
       double dl = BitTools.toDouble(v1[i]) - BitTools.toDouble(v2[i]);
       d += dl*dl;
     }
-    System.out.println("PH distEst=" + d);
     return d;
   }
 }

@@ -313,5 +313,13 @@ public class PhTreeF<T> {
     return pht;
   }
 
+ /**
+  * 
+  * @return the preprocessor of this tree.
+  */
+  public PreProcessorPointF getPreprocessor() {
+    return pre;
+  }
+
 }
 

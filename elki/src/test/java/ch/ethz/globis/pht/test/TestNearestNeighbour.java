@@ -109,17 +109,14 @@ public class TestNearestNeighbour {
 
     List<long[]> result = toList(idx.nearestNeighbour(4, 3, 3));
 
-    //    for (long[] l: result) {
-      //      System.out.println(Arrays.toString(l));
-    //    }
-
     checkContains(result, 3, 3);
-    checkContains(result, 4, 4);
-    checkContains(result, 4, 2);
-    checkContains(result, 2, 2);
-    checkContains(result, 2, 4);
+    int n = 1;
+    n += contains(result, 4, 4) ? 1 : 0;
+    n += contains(result, 4, 2) ? 1 : 0;
+    n += contains(result, 2, 2) ? 1 : 0;
+    n += contains(result, 2, 4) ? 1 : 0;
 
-    assertEquals(5, result.size());
+    assertTrue(n >= 4);
   }
 
   @Test
@@ -493,6 +490,15 @@ public class TestNearestNeighbour {
       }
     }
     fail("Not found: " + Arrays.toString(v));
+  }
+
+  private boolean contains(List<long[]> l, long ... v) {
+    for (long[] vl: l) {
+      if (Arrays.equals(vl, v)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private List<long[]> toList(PhQueryKNN<?> q) {

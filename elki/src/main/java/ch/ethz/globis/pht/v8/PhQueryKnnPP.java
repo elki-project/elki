@@ -41,9 +41,11 @@ import ch.ethz.globis.pht.PhTree.PhQueryKNN;
 import ch.ethz.globis.pht.v8.PhTree8.NodeEntry;
 
 /**
- * kNN query implementation.
+ * kNN query implementation that uses preprocessors and distance functions.
+ * 
+ * @param <T> 
  */
-public class PhQueryKnnDistCheckReuse<T> implements PhQueryKNN<T> {
+public class PhQueryKnnPP<T> implements PhQueryKNN<T> {
 
   private final int DIM;
   private int nMin;
@@ -55,7 +57,7 @@ public class PhQueryKnnDistCheckReuse<T> implements PhQueryKNN<T> {
   private final PhIteratorFullNoGC<T> itEx;
   private final PhTraversalDistanceChecker<T> checker;
 
-  public PhQueryKnnDistCheckReuse(PhTree8<T> pht) {
+  public PhQueryKnnPP(PhTree8<T> pht) {
     this.DIM = pht.getDIM();
     this.pht = pht;
     this.checker = new PhTraversalDistanceChecker<>();
@@ -136,9 +138,7 @@ public class PhQueryKnnDistCheckReuse<T> implements PhQueryKNN<T> {
       NodeEntry<T> e = node.getChildNI(pos);
       if (e == null) {
         //return simply any value
-        long[] k = node.ind().iterator().next().getKey();
-        System.arraycopy(k, 0, ret, 0, k.length);
-        return ret;
+        return returnAnyValue(ret, key, node);
       } else if (e.node != null) {
         return findKnnCandidate(key, e.node, ret);
       }

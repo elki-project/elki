@@ -21,16 +21,11 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import java.util.List;
-
-import ch.ethz.globis.pht.PhDistance;
-import ch.ethz.globis.pht.PhDistanceEuclidPPF;
-import ch.ethz.globis.pht.PhDistanceF;
-import ch.ethz.globis.pht.PhDistanceL;
 import ch.ethz.globis.pht.PhTreeF;
 import ch.ethz.globis.pht.PhTreeF.PhEntryF;
 import ch.ethz.globis.pht.PhTreeF.PhQueryF;
 import ch.ethz.globis.pht.PhTreeF.PhQueryKNNF;
+import ch.ethz.globis.pht.pre.IntegerPP;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -89,8 +84,9 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
    */
   private long distComputations = 0L;
 
-  
-  
+  /**
+   * The PH-Tree instance.
+   */
   private final PhTreeF<DBID> tree;
 
   /**
@@ -125,7 +121,11 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
       this.distcalc = null;
     }
     dims = RelationUtil.dimensionality(relation);
+    //TODO
+    //standard preprocessor
     tree = PhTreeF.create(dims);
+    //IntegerPP: about 20% faster, but slightly less accurate
+    //tree = PhTreeF.create(dims, new IntegerPP(100L*1000L*1000L));
   }
 
   @Override
@@ -227,7 +227,11 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
      */
     private final Norm<O> norm;
     
-    private final PhDistance dist;
+    private final PhNorm<O> dist;
+    
+    private final PhQueryKNNF<DBID> query;
+    
+    private final double[] center;
 
     /**
      * Constructor.
@@ -238,23 +242,26 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
     public PHTreeKNNQuery(DistanceQuery<O> distanceQuery, Norm<? super O> norm) {
       super(distanceQuery);
       this.norm = (Norm<O>) norm;
-      this.dist = new PhNorm(norm, dims);
+      this.dist = new PhNorm(norm, dims, tree.getPreprocessor());
+      this.center = new double[dims];
+      //use 'k=0' to avoid executing a query here (center = {0,0,...})
+      this.query = tree.nearestNeighbour(0, dist, new double[dims]);
     }
 
     @Override
     public KNNList getKNNForObject(O obj, int k) {
       final KNNHeap knns = DBIDUtil.newHeap(k);
       
-      //TODO
-      //List<double[]> keys = tree.nearestNeighbour(k, dist, oToDouble(obj, new double[dims]));
-      //List<double[]> keys = tree.nearestNeighbour(k, PhDistanceF.THIS, oToDouble(obj, new double[dims]));
-      PhQueryKNNF<DBID> keys = tree.nearestNeighbour(k, PhDistanceEuclidPPF.DOUBLE, oToDouble(obj, new double[dims]));
-      while (keys.hasNext()) {
-        DBID id = keys.nextValue();
+      oToDouble(obj, center);
+      query.reset(k, dist, null, center);
+      while (query.hasNext()) {
+        DBID id = query.nextValue();
         O o2 = relation.get(id);
         double distance = norm.distance(obj, o2);
         knns.insert(distance, id);
       }
+      
+      distComputations += dist.getAndResetDistanceCounter();
       
       return knns.toKNNList();
     }
@@ -262,18 +269,6 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
 
   /**
    * Range query for the ph-tree.
-   * 
-   * In a range query, we return all entries within a given distance of a given point.
-   * 
-   * For the PH-Tree, we perform a query on the bounding rectangle and then filter out all
-   * points that still violate the distance function.
-   * 
-   * TODO
-   * Unfortunately, this does not scale well with high dimensions because in high dimensions,
-   * cubes grow exponentially faster than spheres.
-   * As a solution we should pass in the distance function into the PH-query mechanism where
-   * it can be used to skip sub-trees that would fit into the rectangle but not into the given
-   * distance. 
    */
   public class PHTreeRangeQuery extends AbstractDistanceRangeQuery<O> {
     /**

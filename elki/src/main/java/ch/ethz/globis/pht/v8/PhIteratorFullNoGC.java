@@ -67,10 +67,7 @@ public final class PhIteratorFullNoGC<T> implements PhIterator<T> {
         //skip this for postLen>=63
         if (node.getPostLen() < (PhTree8.DEPTH_64-1) && 
             !checker.isValid(node, valTemplate)) {
-          STAT_NODES_IGNORED++;
           return false;
-        } else {
-          STAT_NODES_CHECKED++;
         }
       }
       NodeIteratorFullNoGC<T> ni = stack[size++];
@@ -91,14 +88,6 @@ public final class PhIteratorFullNoGC<T> implements PhIterator<T> {
       return stack[--size];
     }
   }
-
-  public static int STAT_NODES_CHECKED = 0;
-  public static int STAT_NODES_IGNORED = 0;
-  public static int STAT_NODES_PREFIX_FAILED = 0;
-  public static int STAT_NODES_EARLY_IRE_CHECK = 0;
-  public static int STAT_NODES_EARLY_IRE_ABORT_I = 0;
-  public static int STAT_NODES_EARLY_IRE_ABORT_E = 0;
-  public static long MBB_TIME = 0;
 
   private final int DIM;
   private final PhIteratorStack stack;
