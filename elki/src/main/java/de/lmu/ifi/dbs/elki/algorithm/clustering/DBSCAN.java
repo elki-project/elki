@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -77,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
 booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
 url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
-public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>>implements ClusteringAlgorithm<Clustering<Model>> {
+public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -109,6 +110,11 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
   protected ModifiableDBIDs processedIDs;
 
   /**
+   * Number of neighbors.
+   */
+  protected long ncounter;
+
+  /**
    * Constructor with parameters.
    *
    * @param distanceFunction Distance function
@@ -136,6 +142,14 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
     }
     else {
       runDBSCAN(relation, rangeQuery);
+    }
+    double averagen = ncounter / relation.size();
+    LOG.statistics(new DoubleStatistic(DBSCAN.class.getName() + ".average-neighbors", averagen));
+    if(averagen < 1 + 0.1 * (minpts - 1)) {
+      LOG.warning("There are very few neighbors found. Epsilon may be too small.");
+    }
+    if(averagen > minpts * minpts) {
+      LOG.warning("There are very many neighbors found. Epsilon may be too large.");
     }
 
     Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
@@ -190,6 +204,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
    */
   protected void expandCluster(Relation<O> relation, RangeQuery<O> rangeQuery, DBIDRef startObjectID, FiniteProgress objprog, IndefiniteProgress clusprog) {
     DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(startObjectID, epsilon);
+    ncounter += neighbors.size();
 
     // startObject is no core-object
     if(neighbors.size() < minpts) {
@@ -213,6 +228,7 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
     while(!seeds.isEmpty()) {
       seeds.pop(o);
       neighbors = rangeQuery.getRangeForDBID(o, epsilon);
+      ncounter += neighbors.size();
 
       if(neighbors.size() >= minpts) {
         processNeighbors(neighbors.iter(), currentCluster, seeds);
