@@ -34,6 +34,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -161,12 +163,18 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
         double[] mean = null;
         try {
           if(model instanceof MeanModel) {
-            MeanModel mmodel = (MeanModel) model;
-            mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
+            final Vector mmean = ((MeanModel) model).getMean();
+            if(mmean == null) {
+              continue;
+            }
+            mean = proj.fastProjectDataToRenderSpace(mmean);
           }
           else if(model instanceof MedoidModel) {
-            MedoidModel mmodel = (MedoidModel) model;
-            NumberVector v = rel.get(mmodel.getMedoid());
+            DBID medoid = ((MedoidModel) model).getMedoid();
+            if(medoid == null) {
+              continue;
+            }
+            NumberVector v = rel.get(medoid);
             if(v == null) {
               continue;
             }

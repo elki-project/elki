@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
@@ -113,7 +114,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   protected boolean assignToNearestCluster(Relation<? extends V> relation, List<? extends NumberVector> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
     assert(k == means.size());
     boolean changed = false;
+    // Reset all clusters
     Arrays.fill(varsum, 0.);
+    for (ModifiableDBIDs cluster : clusters) {
+      cluster.clear();
+    }
     final NumberVectorDistanceFunction<?> df = getDistanceFunction();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double mindist = Double.POSITIVE_INFINITY;
@@ -127,22 +132,10 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
         }
       }
       varsum[minIndex] += mindist;
-      changed |= updateAssignment(iditer, clusters, assignment, minIndex);
+      clusters.get(minIndex).add(iditer);
+      changed |= assignment.putInt(iditer, minIndex) != minIndex;
     }
     return changed;
-  }
-
-  protected boolean updateAssignment(DBIDIter iditer, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, int newA) {
-    final int oldA = assignment.intValue(iditer);
-    if(oldA == newA) {
-      return false;
-    }
-    clusters.get(newA).add(iditer);
-    assignment.putInt(iditer, newA);
-    if(oldA >= 0) {
-      clusters.get(oldA).remove(iditer);
-    }
-    return true;
   }
 
   @Override
@@ -158,11 +151,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<Vector> means(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector> means, Relation<V> database) {
+  protected List<Vector> means(List<? extends DBIDs> clusters, List<? extends NumberVector> means, Relation<V> database) {
     // TODO: use Kahan summation for better numerical precision?
     List<Vector> newMeans = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
-      ModifiableDBIDs list = clusters.get(i);
+      DBIDs list = clusters.get(i);
       Vector mean = null;
       if(list.size() > 0) {
         DBIDIter iter = list.iter();
@@ -196,12 +189,12 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<Vector> medians(List<? extends ModifiableDBIDs> clusters, List<Vector> medians, Relation<V> database) {
+  protected List<Vector> medians(List<? extends DBIDs> clusters, List<Vector> medians, Relation<V> database) {
     final int dim = medians.get(0).getDimensionality();
     final SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(database);
     List<Vector> newMedians = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
-      ModifiableDBIDs clu = clusters.get(i);
+      DBIDs clu = clusters.get(i);
       if(clu.size() <= 0) {
         newMedians.add(medians.get(i));
         continue;

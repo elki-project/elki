@@ -31,9 +31,11 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -194,15 +196,25 @@ public class VoronoiVisualization extends AbstractVisFactory {
           Vector mean;
           try {
             if(model instanceof KMeansModel) {
-              KMeansModel mmodel = (KMeansModel) model;
-              mean = mmodel.getMean().getColumnVector();
+              Vector mmean = ((KMeansModel) model).getMean();
+              if(mmean == null) {
+                continue;
+              }
+              mean = mmean.getColumnVector();
               if(mean.getDimensionality() != dim) {
                 continue;
               }
             }
             else if(model instanceof MedoidModel) {
-              MedoidModel mmodel = (MedoidModel) model;
-              mean = rel.get(mmodel.getMedoid()).getColumnVector();
+              DBID medoid = ((MedoidModel) model).getMedoid();
+              if(medoid == null) {
+                continue;
+              }
+              NumberVector v = rel.get(medoid);
+              if(v == null) {
+                continue;
+              }
+              mean = v.getColumnVector();
               if(mean.getDimensionality() != dim) {
                 continue;
               }

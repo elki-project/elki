@@ -238,6 +238,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       for(JMenuItem item : items) {
         menubar.add(item);
       }
+      menubar.revalidate();
       menubar.repaint();
     }
 
