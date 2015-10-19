@@ -90,9 +90,10 @@ public class PhTreeF<T> {
    */
   public T put(double[] key, T value) {
     long[] lKey = new long[key.length];
+   // System.out.println("Inserting: " + Arrays.toString(key));
     pre.pre(key, lKey);
     return pht.put(lKey, value);
-  };
+  }
 
   public boolean contains(double ... key) {
     long[] lKey = new long[key.length];

@@ -58,11 +58,10 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
 
     public boolean prepare(Node<T> node) {
       if (!PhTree8.checkAndApplyInfix(node, valTemplate, rangeMin, rangeMax)) {
-        STAT_NODES_PREFIX_FAILED++;
         return false;
       }
 
-      if (checker != null) {
+      if (checker != null && node.getSubCount()+node.getPostCount()>2) {
         long mask = (-1L) << (node.getPostLen() + 1);
         for (int i = 0; i < valTemplate.length; i++) {
           valTemplate[i] &= mask;  //TODO do somewhere else??
@@ -70,10 +69,7 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
         //skip this for postLen>=63
         if (node.getPostLen() < (PhTree8.DEPTH_64-1) &&
             !checker.isValid(node, valTemplate)) {
-          STAT_NODES_IGNORED++;
           return false;
-        } else {
-          STAT_NODES_CHECKED++;
         }
       }
       NodeIteratorNoGC<T> ni = stack[size++];
@@ -94,14 +90,6 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
       return stack[--size];
     }
   }
-
-  public static int STAT_NODES_CHECKED = 0;
-  public static int STAT_NODES_IGNORED = 0;
-  public static int STAT_NODES_PREFIX_FAILED = 0;
-  public static int STAT_NODES_EARLY_IRE_CHECK = 0;
-  public static int STAT_NODES_EARLY_IRE_ABORT_I = 0;
-  public static int STAT_NODES_EARLY_IRE_ABORT_E = 0;
-  public static long MBB_TIME = 0;
 
   private final int DIM;
   private final PhIteratorStack stack;

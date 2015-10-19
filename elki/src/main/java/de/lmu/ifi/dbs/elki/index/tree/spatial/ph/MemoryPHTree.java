@@ -123,9 +123,9 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
     dims = RelationUtil.dimensionality(relation);
     //TODO
     //standard preprocessor
-    tree = PhTreeF.create(dims);
+    //tree = PhTreeF.create(dims);
     //IntegerPP: about 20% faster, but slightly less accurate
-    //tree = PhTreeF.create(dims, new IntegerPP(100L*1000L*1000L));
+    tree = PhTreeF.create(dims, new IntegerPP(100L*1000L*1000L));
   }
 
   @Override

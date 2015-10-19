@@ -210,6 +210,15 @@ public class NodeIteratorFullNoGC<T> {
     return true;
   }
 
+  /**
+   * 
+   * @return False if the value does not match the range, otherwise true.
+   */
+  private boolean readSub(long pos, Node<T> sub) {
+    PhTreeHelper.applyHcPos(pos, postLen, valTemplate);
+    sub.getInfix(valTemplate);
+    return (checker == null || checker.isValid(sub, valTemplate));
+  }
 
   private long getNext(PhEntry<T> result) {
     if (node.isPostNI()) {
@@ -300,9 +309,12 @@ public class NodeIteratorFullNoGC<T> {
         break;
       }
       if (node.subNRef(currentPos) != null) {
-        nextSub = currentPos;
-        nextSubNode = node.subNRef(currentPos);
-        break;
+        Node<T> sub = node.subNRef(currentPos);
+        if (readSub(currentPos, sub)) {
+          nextSub = currentPos;
+          nextSubNode = sub;
+          break;
+        }
       }
     }
   } 
@@ -317,9 +329,12 @@ public class NodeIteratorFullNoGC<T> {
       long currentPos = Bits.readArray(node.ba, currentOffsetSub, Node.SIK_WIDTH(DIM));
       currentOffsetSub += Node.SIK_WIDTH(DIM);
       posSubLHC++;
-      nextSub = currentPos;
-      nextSubNode = node.subNRef(posSubLHC);
-      break;
+      Node<T> sub = node.subNRef(posSubLHC);
+      if (readSub(currentPos, sub)) {
+        nextSub = currentPos;
+        nextSubNode = sub;
+        break;
+      }
     }
   }
 
@@ -330,6 +345,10 @@ public class NodeIteratorFullNoGC<T> {
       nextSubNode = e.value().node;
       if (nextSubNode == null) {
         if (!readValue(e.key(), e.value(), result)) {
+          continue;
+        }
+      } else {
+        if (!readSub(e.key(), nextSubNode)) {
           continue;
         }
       }

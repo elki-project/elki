@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
 final class PhNorm<O extends NumberVector> implements PhDistance {
 
   private final Norm<NumberVector> norm;
+  private final PreProcessorPointF pre;
   private final PhNumberVectorAdapter o1;
   private final PhNumberVectorAdapter o2;
   
@@ -45,6 +46,7 @@ final class PhNorm<O extends NumberVector> implements PhDistance {
   
   PhNorm(Norm<O> norm, int dimensions, PreProcessorPointF pre) {
     this.norm = (Norm<NumberVector>) norm;
+    this.pre = pre;
     this.o1 = new PhNumberVectorAdapter(dimensions, pre);
     this.o2 = new PhNumberVectorAdapter(dimensions, pre);
   }
@@ -66,4 +68,22 @@ final class PhNorm<O extends NumberVector> implements PhDistance {
     distanceCalcCount = 0;
     return x;
   }
+  
+
+  @Override
+  public void toMBB(double distance, long[] center, long[] outMin,
+      long[] outMax) {
+    double[] c = new double[center.length];
+    double[] min = new double[outMin.length];
+    double[] max = new double[outMax.length];
+    pre.post(center, c);
+    //TODO this only really works for eucledean distance...
+    for (int i = 0; i < center.length; i++) {
+      min[i] = c[i] - distance;
+      max[i] = c[i] + distance;
+    }
+    pre.pre(min, outMin);
+    pre.pre(max, outMax);
+  }
+
 }

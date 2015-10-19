@@ -681,35 +681,13 @@ public class PhTree8<T> extends PhTree<T> {
    */
   @Override
   public PhQueryKNN<T> nearestNeighbour(int nMin, long... v) {
-    return new PhQueryKnnPP<T>(this).reset(nMin, PhDistanceL.THIS, null, v); 
-  }
-
-
-  /**
-   * Best HC incrementer ever. 
-   * @param v
-   * @param min
-   * @param max
-   * @return next valid value or min.
-   */
-  static long inc(long v, long min, long max) {
-    //first, fill all 'invalid' bits with '1' (bits that can have only one value).
-    long r = v | (~max);
-    //increment. The '1's in the invalid bits will cause bitwise overflow to the next valid bit.
-    r++;
-    //remove invalid bits.
-    return (r & max) | min;
-
-    //return -1 if we exceed 'max' and cause an overflow or return the original value. The
-    //latter can happen if there is only one possible value (all filter bits are set).
-    //The <= is also owed to the bug tested in testBugDecrease()
-    //return (r <= v) ? -1 : r;
+    return new PhQueryKnnMbbPP<T>(this).reset(nMin, PhDistanceL.THIS, null, v); 
   }
 
   @Override
   public PhQueryKNN<T> nearestNeighbour(int nMin, PhDistance dist,
       PhDimFilter dimsFilter, long... focus) {
-    return new PhQueryKnnPP<T>(this).reset(nMin, dist, dimsFilter, focus);
+    return new PhQueryKnnMbbPP<T>(this).reset(nMin, dist, dimsFilter, focus);
   }
 
   @Override
@@ -731,6 +709,27 @@ public class PhTree8<T> extends PhTree<T> {
   void adjustCounts(int deletedPosts, int deletedNodes) {
     nEntries.addAndGet(-deletedPosts);
     nNodes.addAndGet(-deletedNodes);
+  }
+
+  /**
+   * Best HC incrementer ever. 
+   * @param v
+   * @param min
+   * @param max
+   * @return next valid value or min.
+   */
+  static long inc(long v, long min, long max) {
+    //first, fill all 'invalid' bits with '1' (bits that can have only one value).
+    long r = v | (~max);
+    //increment. The '1's in the invalid bits will cause bitwise overflow to the next valid bit.
+    r++;
+    //remove invalid bits.
+    return (r & max) | min;
+
+    //return -1 if we exceed 'max' and cause an overflow or return the original value. The
+    //latter can happen if there is only one possible value (all filter bits are set).
+    //The <= is also owed to the bug tested in testBugDecrease()
+    //return (r <= v) ? -1 : r;
   }
 }
 

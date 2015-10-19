@@ -59,17 +59,6 @@ public final class PhIteratorFullNoGC<T> implements PhIterator<T> {
     public boolean prepare(Node<T> node) {
       node.getInfix(valTemplate);
 
-      if (checker != null) {
-        long mask = (-1L) << (node.getPostLen() + 1);
-        for (int i = 0; i < valTemplate.length; i++) {
-          valTemplate[i] &= mask;
-        }
-        //skip this for postLen>=63
-        if (node.getPostLen() < (PhTree8.DEPTH_64-1) && 
-            !checker.isValid(node, valTemplate)) {
-          return false;
-        }
-      }
       NodeIteratorFullNoGC<T> ni = stack[size++];
       if (ni == null)  {
         ni = new NodeIteratorFullNoGC<>(DIM, valTemplate);

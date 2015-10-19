@@ -55,4 +55,14 @@ public interface PhDistance {
    * @return A measurement for the distance.
    */
   double distEst(long[] v1, long[] v2);
+
+  /**
+   * Calculate the minimum bounding box for all points that are less than 
+   * {@code distance} away from {@code center}.
+   * @param distance
+   * @param center
+   * @param outMin
+   * @param outMax
+   */
+  void toMBB(double distance, long[] center, long[] outMin, long[] outMax);
 }

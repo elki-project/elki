@@ -75,4 +75,19 @@ public class PhDistanceEuclidPPF implements PhDistance {
     }
     return d;
   }
+
+  @Override
+  public void toMBB(double distance, long[] center, long[] outMin,
+      long[] outMax) {
+    double[] c = new double[center.length];
+    double[] min = new double[outMin.length];
+    double[] max = new double[outMax.length];
+    pre.post(center, c);
+    for (int i = 0; i < center.length; i++) {
+      min[i] = c[i] - distance;
+      max[i] = c[i] + distance;
+    }
+    pre.pre(min, outMin);
+    pre.pre(max, outMax);
+  }
 }

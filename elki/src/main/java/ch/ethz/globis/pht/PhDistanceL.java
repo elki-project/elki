@@ -63,4 +63,13 @@ public class PhDistanceL implements PhDistance {
     }
     return d;
   }
+
+  @Override
+  public void toMBB(double distance, long[] center, long[] outMin,
+      long[] outMax) {
+    for (int i = 0; i < center.length; i++) {
+      outMin[i] = (long) (center[i] - distance);
+      outMax[i] = (long) (center[i] + distance);
+    }
+  }
 }

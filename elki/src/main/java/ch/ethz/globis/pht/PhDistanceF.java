@@ -66,4 +66,14 @@ public class PhDistanceF implements PhDistance {
     }
     return d;
   }
+
+  @Override
+  public void toMBB(double distance, long[] center, long[] outMin,
+      long[] outMax) {
+    for (int i = 0; i < center.length; i++) {
+      double c = BitTools.toDouble(center[i]);
+      outMin[i] = BitTools.toSortableLong(c - distance);
+      outMax[i] = BitTools.toSortableLong(c + distance);
+    }
+  }
 }
