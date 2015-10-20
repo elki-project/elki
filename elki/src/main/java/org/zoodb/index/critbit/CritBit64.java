@@ -1,27 +1,24 @@
-package org.zoodb.index.critbit;
-
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
-
-Copyright (C) 2009-2015
-Tilmann Zaeschke
-The author can be contacted via email: zoodb@gmx.de
-https://github.com/tzaeschke/critbit
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ * Copyright 2009-2014 Tilmann Zaeschke. All rights reserved.
+ * 
+ * This file is part of ZooDB.
+ * 
+ * ZooDB is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * ZooDB is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with ZooDB.  If not, see <http://www.gnu.org/licenses/>.
+ * 
+ * See the README and COPYING files for further information. 
+ */
+package org.zoodb.index.critbit;
 
 /**
  * CritBit64 is a 1D crit-bit tree with 64bit key length.
@@ -30,6 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * BitTools.toSortableLong(...), also when supplying query parameters.
  * Extracted values can be converted back with BitTools.toDouble() or toFloat().
  *
+ * Version 1.3.4 
+ * - Merged with CB64COW
+ * - Implemented resetable iterators
+ * 
  * Version 1.3.2
  * - Improved mask checking in QueryWithMask
  * 
@@ -62,16 +63,28 @@ import java.util.NoSuchElementException;
 
 public class CritBit64<V> implements Iterable<V> {
 
-	private final int DEPTH = 64;
+	protected static final int DEPTH = 64;
 	
-	private Node<V> root;
-	//the following contains either the actual key or the prefix for the sub-node
-	private long rootKey;
-	private V rootVal;
+	protected AtomicInfo<V> info = new AtomicInfo<>();
 
-	private int size;
+	protected static class AtomicInfo<V> {
+		protected Node<V> root;
+        //the following contains either the actual key or the prefix for the sub-node
+		protected long rootKey;
+		protected V rootVal;
+		protected int size;
+
+		protected AtomicInfo<V> copy() {
+            AtomicInfo<V> c = new AtomicInfo<>();
+            c.root = this.root;
+            c.rootKey = this.rootKey;
+            c.rootVal = this.rootVal;
+            c.size = this.size;
+            return c;
+        }
+    }
 	
-	private static class Node<V> {
+	protected static class Node<V> {
 		//TODO replace posDiff with posMask 
 		//     --> Possibly easier to calculate (non-log?)
 		//     --> Similarly powerful....
@@ -92,9 +105,19 @@ public class CritBit64<V> implements Iterable<V> {
 			this.hiVal = hiVal;
 			this.posDiff = (byte) posDiff;
 		}
+
+        Node(Node<V> original) {
+            this.loVal = original.loVal;
+            this.hiVal = original.hiVal;
+            this.lo = original.lo;
+            this.hi = original.hi;
+            this.loPost = original.loPost;
+            this.hiPost = original.hiPost;
+            this.posDiff = original.posDiff;
+        }
 	}
 	
-	private CritBit64() {
+	protected CritBit64() {
 		//private 
 	}
 	
@@ -113,28 +136,28 @@ public class CritBit64<V> implements Iterable<V> {
 	 * @return The previous value or {@code null} if there was no previous value
 	 */
 	public V put(long key, V val) {
-		if (size == 0) {
-			rootKey = key;
-			rootVal = val;
-			size++;
+		if (info.size == 0) {
+			info.rootKey = key;
+			info.rootVal = val;
+			info.size++;
 			return null;
 		}
-		if (size == 1) {
-			Node<V> n2 = createNode(key, val, rootKey, rootVal);
+		if (info.size == 1) {
+			Node<V> n2 = createNode(key, val, info.rootKey, info.rootVal);
 			if (n2 == null) {
-				V prev = rootVal;
-				rootVal = val;
+				V prev = info.rootVal;
+				info.rootVal = val;
 				return prev; 
 			}
-			root = n2;
-			rootKey = extractPrefix(key, n2.posDiff-1);
-			rootVal = null;
-			size++;
+			info.root = n2;
+			info.rootKey = extractPrefix(key, n2.posDiff-1);
+			info.rootVal = null;
+			info.size++;
 			return null;
 		}
-		Node<V> n = root;
+		Node<V> n = info.root;
 		int parentPosDiff = -1;
-		long prefix = rootKey;
+		long prefix = info.rootKey;
 		Node<V> parent = null;
 		boolean isCurrentChildLo = false;
 		while (true) {
@@ -152,8 +175,8 @@ public class CritBit64<V> implements Iterable<V> {
 						newSub.hi = n;
 					}
 					if (parent == null) {
-						rootKey = subPrefix;
-						root = newSub;
+						info.rootKey = subPrefix;
+						info.root = newSub;
 					} else if (isCurrentChildLo) {
 						parent.loPost = subPrefix;
 						parent.lo = newSub;
@@ -161,7 +184,7 @@ public class CritBit64<V> implements Iterable<V> {
 						parent.hiPost = subPrefix;
 						parent.hi = newSub;
 					}
-					size++;
+					info.size++;
 					return null;
 				}
 			}			
@@ -183,7 +206,7 @@ public class CritBit64<V> implements Iterable<V> {
 					n.hi = n2;
 					n.hiPost = extractPrefix(key, n2.posDiff-1);
 					n.hiVal = null;
-					size++;
+					info.size++;
 					return null;
 				}
 			} else {
@@ -202,7 +225,7 @@ public class CritBit64<V> implements Iterable<V> {
 					n.lo = n2;
 					n.loPost = extractPrefix(key, n2.posDiff-1);
 					n.loVal = null;
-					size++;
+					info.size++;
 					return null;
 				}
 			}
@@ -216,15 +239,15 @@ public class CritBit64<V> implements Iterable<V> {
 	
 	@Override
 	public String toString() {
-		if (size == 0) {
+		if (info.size == 0) {
 			return "- -";
 		}
-		if (root == null) {
-			return "-" + BitTools.toBinary(rootKey, 64) + " v=" + rootVal;
+		if (info.root == null) {
+			return "-" + BitTools.toBinary(info.rootKey, 64) + " v=" + info.rootVal;
 		}
-		Node<V> n = root;
+		Node<V> n = info.root;
 		StringBuilder s = new StringBuilder();
-		printNode(n, s, "", 0, rootKey);
+		printNode(n, s, "", 0, info.rootKey);
 		return s.toString();
 	}
 	
@@ -249,14 +272,14 @@ public class CritBit64<V> implements Iterable<V> {
 	}
 	
 	public boolean checkTree() {
-		if (root == null) {
-			if (size > 1) {
-				System.err.println("root node = null AND size = " + size);
+		if (info.root == null) {
+			if (info.size > 1) {
+				System.err.println("root node = null AND size = " + info.size);
 				return false;
 			}
 			return true;
 		}
-		return checkNode(root, 0, rootKey);
+		return checkNode(info.root, 0, info.rootKey);
 	}
 	
 	private boolean checkNode(Node<V> n, int firstBitOfNode, long prefix) {
@@ -337,7 +360,7 @@ public class CritBit64<V> implements Iterable<V> {
 	 * @return the number of keys in the tree
 	 */
 	public int size() {
-		return size;
+		return info.size;
 	}
 
 	/**
@@ -346,14 +369,14 @@ public class CritBit64<V> implements Iterable<V> {
 	 * @return {@code true} if the key exists otherwise {@code false}
 	 */
 	public boolean contains(long key) {
-		if (size == 0) {
+		if (info.size == 0) {
 			return false;
 		} 
-		if (size == 1) {
-			return key == rootKey;
+		if (info.size == 1) {
+			return key == info.rootKey;
 		}
-		Node<V> n = root;
-		long prefix = rootKey;
+		Node<V> n = info.root;
+		long prefix = info.rootKey;
 		while (doesPrefixMatch(n.posDiff, key, prefix)) {
 			//prefix matches, so now we check sub-nodes and postfixes
 			if (BitTools.getBit(key, n.posDiff)) {
@@ -381,14 +404,14 @@ public class CritBit64<V> implements Iterable<V> {
 	 * @return the values associated with {@code key} or {@code null} if the key does not exist.
 	 */
 	public V get(long key) {
-		if (size == 0) {
+		if (info.size == 0) {
 			return null;
 		}
-		if (size == 1) {
-			return (key == rootKey) ? rootVal : null;
+		if (info.size == 1) {
+			return (key == info.rootKey) ? info.rootVal : null;
 		}
-		Node<V> n = root;
-		long prefix = rootKey;
+		Node<V> n = info.root;
+		long prefix = info.rootKey;
 		while (doesPrefixMatch(n.posDiff, key, prefix)) {
 			//prefix matches, so now we check sub-nodes and postfixes
 			if (BitTools.getBit(key, n.posDiff)) {
@@ -416,23 +439,23 @@ public class CritBit64<V> implements Iterable<V> {
 	 * @return The value of the key of {@code null} if the value was not found. 
 	 */
 	public V remove(long key) {
-		if (size == 0) {
+		if (info.size == 0) {
 			return null;
 		}
-		if (size == 1) {
-			if (key == rootKey) {
-				size--;
-				rootKey = 0;
-				V prev = rootVal;
-				rootVal = null;
+		if (info.size == 1) {
+			if (key == info.rootKey) {
+				info.size--;
+				info.rootKey = 0;
+				V prev = info.rootVal;
+				info.rootVal = null;
 				return prev;
 			}
 			return null;
 		}
-		Node<V> n = root;
+		Node<V> n = info.root;
 		Node<V> parent = null;
 		boolean isParentHigh = false;
-		long prefix = rootKey;
+		long prefix = info.rootKey;
 		while (doesPrefixMatch(n.posDiff, key, prefix)) {
 			//prefix matches, so now we check sub-nodes and postfixes
 			if (BitTools.getBit(key, n.posDiff)) {
@@ -478,9 +501,9 @@ public class CritBit64<V> implements Iterable<V> {
 		
 		newPost = (newSub == null) ? newPost : extractPrefix(newPost, newSub.posDiff-1);
 		if (parent == null) {
-			rootKey = newPost;
-			rootVal = newVal;
-			root = newSub;
+			info.rootKey = newPost;
+			info.rootVal = newVal;
+			info.root = newSub;
 		} else if (isParentHigh) {
 			parent.hiPost = newPost;
 			parent.hiVal = newVal;
@@ -490,11 +513,12 @@ public class CritBit64<V> implements Iterable<V> {
 			parent.loVal = newVal;
 			parent.lo = newSub;
 		}
-		size--;
+		info.size--;
 	}
 
+	@Override
 	public CBIterator<V> iterator() {
-		return new CBIterator<V>(this, DEPTH);
+		return new CBIterator<V>().reset(this);
 	}
 	
 	public static class CBIterator<V> implements Iterator<V> {
@@ -510,22 +534,29 @@ public class CritBit64<V> implements Iterable<V> {
 		private int stackTop = -1;
 
 		@SuppressWarnings("unchecked")
-		public CBIterator(CritBit64<V> cb, int DEPTH) {
+		public CBIterator() {
 			this.stack = new Node[DEPTH];
 			this.readHigherNext = new byte[DEPTH];  // default = false
-
-			if (cb.size == 0) {
+		}
+		
+		public CBIterator<V> reset(CritBit64<V> cb) {
+			stackTop = -1;
+			hasNext = true;
+			readHigherNext[0] = READ_LOWER;
+			AtomicInfo<V> info = cb.info;
+			if (info.size == 0) {
 				//Tree is empty
 				hasNext = false;
-				return;
+				return this;
 			}
-			if (cb.size == 1) {
-				nextValue = cb.rootVal;
-				nextKey = cb.rootKey;
-				return;
+			if (info.size == 1) {
+				nextValue = info.rootVal;
+				nextKey = info.rootKey;
+				return this;
 			}
-			stack[++stackTop] = cb.root;
+			stack[++stackTop] = info.root;
 			findNext();
+			return this;
 		}
 
 		private void findNext() {
@@ -615,12 +646,12 @@ public class CritBit64<V> implements Iterable<V> {
 	 * @return An iterator over the matching entries.
 	 */
 	public QueryIterator<V> query(long min, long max) {
-		return new QueryIterator<V>(this, min, max, DEPTH);
+		return new QueryIterator<V>().reset(this, min, max);
 	}
 	
 	public static class QueryIterator<V> implements Iterator<V> {
-		private final long minOrig;
-		private final long maxOrig;
+		private long minOrig;
+		private long maxOrig;
 		private long nextKey = 0; 
 		private V nextValue = null;
 		private boolean hasNext = true;
@@ -634,30 +665,38 @@ public class CritBit64<V> implements Iterable<V> {
 		private int stackTop = -1;
 
 		@SuppressWarnings("unchecked")
-		public QueryIterator(CritBit64<V> cb, long minOrig, long maxOrig, int DEPTH) {
+		public QueryIterator() {
 			this.stack = new Node[DEPTH];
 			this.readHigherNext = new byte[DEPTH];  // default = false
 			this.prefixes = new long[DEPTH];
+		}
+		
+		public QueryIterator<V> reset(CritBit64<V> cb, long minOrig, long maxOrig) {
+			stackTop = -1;
+			hasNext = true;
+			readHigherNext[0] = READ_LOWER;
+			AtomicInfo<V> info = cb.info;
 			this.minOrig = minOrig;
 			this.maxOrig = maxOrig;
 
-			if (cb.size == 0) {
+			if (info.size == 0) {
 				//Tree is empty
 				hasNext = false;
-				return;
+				return this;
 			}
-			if (cb.size == 1) {
-				hasNext = checkMatchFullIntoNextVal(cb.rootKey, cb.rootVal);
-				return;
+			if (info.size == 1) {
+				hasNext = checkMatchFullIntoNextVal(info.rootKey, info.rootVal);
+				return this;
 			}
-			Node<V> n = cb.root;
-			if (!checkMatch(cb.rootKey, n.posDiff-1)) {
+			Node<V> n = info.root;
+			if (!checkMatch(info.rootKey, n.posDiff-1)) {
 				hasNext = false;
-				return;
+				return this;
 			}
-			stack[++stackTop] = cb.root;
-			prefixes[stackTop] = cb.rootKey;
+			stack[++stackTop] = info.root;
+			prefixes[stackTop] = info.rootKey;
 			findNext();
+			return this;
 		}
 
 		private void findNext() {
@@ -787,12 +826,12 @@ public class CritBit64<V> implements Iterable<V> {
 	 * @return An iterator over the matching entries.
 	 */
 	public QueryIteratorMask<V> queryWithMask(long min, long max) {
-		return new QueryIteratorMask<V>(this, min, max, DEPTH);
+		return new QueryIteratorMask<V>().reset(this, min, max);
 	}
 	
 	public static class QueryIteratorMask<V> implements Iterator<V> {
-		private final long minOrig;
-		private final long maxOrig;
+		private long minOrig;
+		private long maxOrig;
 		private long nextKey = 0; 
 		private V nextValue = null;
 		boolean hasNext = true;
@@ -806,30 +845,37 @@ public class CritBit64<V> implements Iterable<V> {
 		private int stackTop = -1;
 
 		@SuppressWarnings("unchecked")
-		public QueryIteratorMask(CritBit64<V> cb, long minOrig, long maxOrig, int DEPTH) {
+		public QueryIteratorMask() {
 			this.stack = new Node[DEPTH];
 			this.readHigherNext = new byte[DEPTH];  // default = false
 			this.prefixes = new long[DEPTH];
+		}
+		
+		public QueryIteratorMask<V> reset(CritBit64<V> cb, long minOrig, long maxOrig) {
+			stackTop = -1;
+			hasNext = true;
+			readHigherNext[0] = READ_LOWER;
+			AtomicInfo<V> info = cb.info;
 			this.minOrig = minOrig;
 			this.maxOrig = maxOrig;
-
-			if (cb.size == 0) {
+			if (info.size == 0) {
 				//Tree is empty
 				hasNext = false;
-				return;
+				return this;
 			}
-			if (cb.size == 1) {
-				hasNext = checkMatchFullIntoNextVal(cb.rootKey, cb.rootVal);
-				return;
+			if (info.size == 1) {
+				hasNext = checkMatchFullIntoNextVal(info.rootKey, info.rootVal);
+				return this;
 			}
-			Node<V> n = cb.root;
-			if (!checkMatch(cb.rootKey, n.posDiff-1)) {
+			Node<V> n = info.root;
+			if (!checkMatch(info.rootKey, n.posDiff-1)) {
 				hasNext = false;
-				return;
+				return this;
 			}
-			stack[++stackTop] = cb.root;
-			prefixes[stackTop] = cb.rootKey;
+			stack[++stackTop] = info.root;
+			prefixes[stackTop] = info.rootKey;
 			findNext();
+			return this;
 		}
 
 		private void findNext() {

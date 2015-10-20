@@ -23,6 +23,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import org.zoodb.index.critbit.CritBit64;
 import org.zoodb.index.critbit.CritBit64.CBIterator;
 import org.zoodb.index.critbit.CritBit64.Entry;
 
@@ -101,7 +102,6 @@ public class NodeIteratorFullNoGC<T> {
     currentOffsetPostKey = 0;
     currentOffsetPostVal = 0;
     currentOffsetSub = 0;
-    niIterator = null;
     nPostsFound = 0;
     posSubLHC = -1; //position in sub-node LHC array
     this.checker = checker;
@@ -119,7 +119,10 @@ public class NodeIteratorFullNoGC<T> {
     currentOffsetSub = node.getBitPos_SubNodeIndex(DIM);
     if (isPostNI) {
       postEntryLen = -1; //not used
-      niIterator = node.ind().iterator();
+      if (niIterator == null) {
+          niIterator = new CritBit64.CBIterator<>();
+        }
+        niIterator.reset(node.ind());
     } else {
       currentOffsetPostKey = node.getBitPos_PostIndex(DIM);
       // -set key offset to position before first element

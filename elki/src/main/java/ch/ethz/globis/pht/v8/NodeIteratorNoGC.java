@@ -71,6 +71,7 @@ public class NodeIteratorNoGC<T> {
   private long[] rangeMax;
   private boolean usePostHcIncrementer;
   private boolean useSubHcIncrementer;
+  private boolean useNiHcIncrementer;
   private boolean isPostFinished;
   private boolean isSubFinished;
   private PhFilter checker;
@@ -112,7 +113,6 @@ public class NodeIteratorNoGC<T> {
     currentOffsetPostKey = 0;
     currentOffsetPostVal = 0;
     currentOffsetSub = 0;
-    niIterator = null;
     nPostsFound = 0;
     posSubLHC = -1; //position in sub-node LHC array
     this.checker = checker;
@@ -156,6 +156,7 @@ public class NodeIteratorNoGC<T> {
 
     useSubHcIncrementer = false;
     usePostHcIncrementer = false;
+    useNiHcIncrementer = false;
 
     if (DIM > 3) {
       //LHC, NI, ...
@@ -170,9 +171,13 @@ public class NodeIteratorNoGC<T> {
         boolean useHcIncrementer = (nChild > nPossibleMatch*(double)logNChild*2);
         //DIM < 60 as safeguard against overflow of (nPossibleMatch*logNChild)
         if (useHcIncrementer && PhTree8.HCI_ENABLED && DIM < 50) {
-          niIterator = null;
+            useNiHcIncrementer = true;
         } else {
-          niIterator = node.ind().queryWithMask(maskLower, maskUpper);
+            useNiHcIncrementer = false;
+            if (niIterator == null) {
+              niIterator = new QueryIteratorMask<>();
+            }
+            niIterator.reset(node.ind(), maskLower, maskUpper);
         }
       } else if (PhTree8.HCI_ENABLED){
         if (isPostHC) {
@@ -487,7 +492,7 @@ public class NodeIteratorNoGC<T> {
 
   private void niFindNext(PhEntry<T> result) {
     //iterator?
-    if (niIterator != null) {
+    if (!useNiHcIncrementer) {
       while (niIterator.hasNext()) {
         Entry<NodeEntry<T>> e = niIterator.nextEntry();
         next = e.key();
