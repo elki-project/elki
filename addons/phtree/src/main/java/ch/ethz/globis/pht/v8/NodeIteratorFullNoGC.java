@@ -27,6 +27,7 @@ import org.zoodb.index.critbit.CritBit64.CBIterator;
 import org.zoodb.index.critbit.CritBit64.Entry;
 
 import ch.ethz.globis.pht.PhEntry;
+import ch.ethz.globis.pht.PhFilter;
 import ch.ethz.globis.pht.PhTreeHelper;
 import ch.ethz.globis.pht.v8.PhTree8.NodeEntry;
 
@@ -63,7 +64,7 @@ public class NodeIteratorFullNoGC<T> {
   private final long[] valTemplate;
   private boolean isPostFinished;
   private boolean isSubFinished;
-  private PhTraversalChecker<T> checker;
+  private PhFilter checker;
   private final PhEntry<T> nextPost1;
   private final PhEntry<T> nextPost2;
   private boolean isNextPost1free;
@@ -93,7 +94,7 @@ public class NodeIteratorFullNoGC<T> {
    * @param upper
    * @param checker result verifier, can be null.
    */
-  private void reinit(Node<T> node, PhTraversalChecker<T> checker) {
+  private void reinit(Node<T> node, PhFilter checker) {
     next = -1;
     nextPost = -1;
     nextSub = -1;
@@ -217,7 +218,7 @@ public class NodeIteratorFullNoGC<T> {
   private boolean readSub(long pos, Node<T> sub) {
     PhTreeHelper.applyHcPos(pos, postLen, valTemplate);
     sub.getInfix(valTemplate);
-    return (checker == null || checker.isValid(sub, valTemplate));
+    return (checker == null || checker.isValid(sub.getPostLen()+1, valTemplate));
   }
 
   private long getNext(PhEntry<T> result) {
@@ -367,7 +368,7 @@ public class NodeIteratorFullNoGC<T> {
     return node;
   }
 
-  void init(Node<T> node, PhTraversalChecker<T> checker) {
+  void init(Node<T> node, PhFilter checker) {
     reinit(node, checker);
   }
 

@@ -435,21 +435,6 @@ public class TestNearestNeighbour {
     return best;
   }
 
-  private long[] nearestNeighborK(PhTree<?> tree, long[] q) {
-    double d = Double.MAX_VALUE;
-    long[] best = null;
-    PhIterator<?> i = tree.queryExtent();
-    while (i.hasNext()) {
-      long[] cand = i.nextKey();
-      double dNew = dist(q, cand);
-      if (dNew < d) {
-        d = dNew;
-        best = cand;
-      }
-    }
-    return best;
-  }
-
   private void check(long[] v, long[] c1, long[] c2) {
     for (int i = 0; i < c1.length; i++) {
       if (c1[i] != c2[i]) {
