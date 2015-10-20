@@ -209,9 +209,4 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public PhFilter getFilter() {
-    return checker;
-  }
-
 }

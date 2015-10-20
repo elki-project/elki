@@ -42,6 +42,9 @@ import ch.ethz.globis.pht.v8.PhTree8.NodeEntry;
  * @param <T>
  */
 public class NodeIteratorFullNoGC<T> {
+
+  private static final long FINISHED = Long.MAX_VALUE; 
+
   private final int DIM;
   private boolean isPostHC;
   private boolean isPostNI;
@@ -62,8 +65,6 @@ public class NodeIteratorFullNoGC<T> {
   private int posSubLHC = -1; //position in sub-node LHC array
   private int postEntryLen;
   private final long[] valTemplate;
-  private boolean isPostFinished;
-  private boolean isSubFinished;
   private PhFilter checker;
   private final PhEntry<T> nextPost1;
   private final PhEntry<T> nextPost2;
@@ -96,8 +97,6 @@ public class NodeIteratorFullNoGC<T> {
    */
   private void reinit(Node<T> node, PhFilter checker) {
     next = -1;
-    nextPost = -1;
-    nextSub = -1;
     nextSubNode = null;
     currentOffsetPostKey = 0;
     currentOffsetPostVal = 0;
@@ -114,8 +113,8 @@ public class NodeIteratorFullNoGC<T> {
     this.postLen = node.getPostLen();
     nMaxPost = node.getPostCount();
     nMaxSub = node.getSubCount();
-    isPostFinished = (nMaxPost <= 0);
-    isSubFinished = (nMaxSub <= 0);
+    nextPost = (nMaxPost > 0) ? -1 : FINISHED;
+    nextSub = (nMaxSub > 0) ? -1 : FINISHED;
     //Position of the current entry
     currentOffsetSub = node.getBitPos_SubNodeIndex(DIM);
     if (isPostNI) {
@@ -138,19 +137,12 @@ public class NodeIteratorFullNoGC<T> {
   }
 
   /**
-   * @return TRUE if the node has more elements, irrespective of whether they match the query.
-   */
-  boolean hasNext() {
-    return !isPostFinished || !isSubFinished;
-  }
-
-  /**
    * Advances the cursor. 
    * @return TRUE iff a matching element was found.
    */
   boolean increment() {
     next = getNext(isNextPost1free ? nextPost1 : nextPost2);
-    return next != -1;
+    return next != FINISHED;
   }
 
   long getCurrentPos() {
@@ -230,41 +222,31 @@ public class NodeIteratorFullNoGC<T> {
     //Search for next entry if there are more entries and if current
     //entry has already been returned (or is -1).
     // (nextPost == next) is true when the previously returned entry (=next) was a postfix.
-    if (!isPostFinished && nextPost == next) {
+    if (nextPost != FINISHED && nextPost == next) {
       if (isPostHC) {
         getNextPostAHC(result);
       } else {
         getNextPostLHC(result);
       }
     }
-    if (!isSubFinished && nextSub == next) {
+    if (nextSub != FINISHED && nextSub == next) {
       if (isSubHC) {
         getNextSubAHC();
       } else {
         getNextSubLHC();
       }
-      //			if (nextSub >= 0 && nextSub < nextPost && !isSubFinished) {
-      //				return nextSub;
-      //			}
     }
 
-    if (isPostFinished && isSubFinished) {
-      return -1;
-    } 
-    if (!isPostFinished && !isSubFinished) {
-      return (nextSub < nextPost) ? nextSub : nextPost;
-    }
-    return isPostFinished ? nextSub : nextPost;
+    return (nextSub < nextPost) ? nextSub : nextPost;
   }
 
   private void getNextPostAHC(PhEntry<T> result) {
     //while loop until 1 is found.
     long currentPos = nextPost; 
-    nextPost = -1;
-    while (!isPostFinished) {
+    while (true) {
       currentPos++;  //pos w/o bit-offset
       if (currentPos > MAX_POS) {
-        isPostFinished = true;
+        nextPost = FINISHED;
         break;
       }
       boolean bit = Bits.getBit(node.ba, currentOffsetPostKey);
@@ -282,10 +264,9 @@ public class NodeIteratorFullNoGC<T> {
   }
 
   private void getNextPostLHC(PhEntry<T> result) {
-    nextPost = -1;
-    while (!isPostFinished) {
+    while (true) {
       if (++nPostsFound > nMaxPost) {
-        isPostFinished = true;
+        nextPost = FINISHED;
         break;
       }
       int offs = currentOffsetPostKey;
@@ -302,15 +283,14 @@ public class NodeIteratorFullNoGC<T> {
 
   private void getNextSubAHC() {
     int currentPos = (int) nextSub;  //We use (int) because arrays are always (int).
-    nextSub = -1;
-    while (!isSubFinished) {
+    while (true) {
       currentPos++;
       if (currentPos > MAX_POS) {
-        isSubFinished = true;
+        nextSub = FINISHED;
         break;
       }
-      if (node.subNRef(currentPos) != null) {
-        Node<T> sub = node.subNRef(currentPos);
+      Node<T> sub = node.subNRef(currentPos);
+      if (sub != null) {
         if (readSub(currentPos, sub)) {
           nextSub = currentPos;
           nextSubNode = sub;
@@ -321,10 +301,9 @@ public class NodeIteratorFullNoGC<T> {
   } 
 
   private void getNextSubLHC() {
-    nextSub = -1;
-    while (!isSubFinished) {
+    while (true) {
       if (posSubLHC + 1  >= nMaxSub) {
-        isSubFinished = true;
+        nextSub = FINISHED;
         break;
       }
       long currentPos = Bits.readArray(node.ba, currentOffsetSub, Node.SIK_WIDTH(DIM));
@@ -355,9 +334,7 @@ public class NodeIteratorFullNoGC<T> {
       }
       return;
     }
-
-    next = -1;
-    return;
+    next = FINISHED;
   }
 
   public Node<T> getCurrentSubNode() {

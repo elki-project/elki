@@ -175,11 +175,6 @@ public abstract class PhTree<T> {
      * @param max
      */
     void reset(long[] min, long[] max);
-
-    /**
-     * @return The filter object. 
-     */
-    PhFilter getFilter();
   }
 
   public static interface PhQueryKNN<T> extends PhIterator<T> {

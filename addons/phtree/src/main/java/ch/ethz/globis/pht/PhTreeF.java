@@ -51,18 +51,19 @@ public class PhTreeF<T> {
    * Create a new tree with the specified number of dimensions.
    * 
    * @param dim number of dimensions
-   * @return PhTree
+   * @return PhTreeF
    */
   public static <T> PhTreeF<T> create(int dim) {
     return new PhTreeF<T>(dim, new EmptyPPF());
   }
 
   /**
-   * Create a new tree with the specified number of dimensions.
+   * Create a new tree with the specified number of dimensions and
+   * a custom preprocessor.
    * 
    * @param dim number of dimensions
-   * @param pre The preprocessor top be used.
-   * @return PhTree
+   * @param pre The preprocessor to be used
+   * @return PhTreeF
    */
   public static <T> PhTreeF<T> create(int dim, PreProcessorPointF pre) {
     return new PhTreeF<T>(dim, pre);
@@ -90,7 +91,6 @@ public class PhTreeF<T> {
    */
   public T put(double[] key, T value) {
     long[] lKey = new long[key.length];
-   // System.out.println("Inserting: " + Arrays.toString(key));
     pre.pre(key, lKey);
     return pht.put(lKey, value);
   }
@@ -187,7 +187,8 @@ public class PhTreeF<T> {
    * Locate nearest neighbours for a given point in space.
    * @param nMin number of entries to be returned. More entries may be returned with several have
    *        the same distance.
-   * @param dist distance function
+   * @param dist Distance function. Note that the distance function should be compatible
+   * with the preprocessor of the tree.
    * @param key
    * @return KNN query iterator.
    */

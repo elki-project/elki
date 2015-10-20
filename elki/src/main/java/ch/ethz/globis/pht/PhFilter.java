@@ -48,11 +48,5 @@ public interface PhFilter {
 	 * @return False if key with the given prefix cannot pass the filter, otherwise true.
 	 */
 	boolean isValid(int bitsToIgnore, long[] prefix);
-
-	/**
-	 * Reset the parameters of the filter.
-	 * @param parameters
-	 */
-  void setParam(Object ... parameters);
 	
 }

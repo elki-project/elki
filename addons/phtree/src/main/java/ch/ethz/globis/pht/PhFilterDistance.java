@@ -62,9 +62,4 @@ public class PhFilterDistance implements PhFilter {
     return dist.dist(v, buf) <= maxDist;
   }
 
-  @Override
-  public void setParam(Object ... parameters) {
-    maxDist = (double) parameters[0]; 
-  }
-
 }

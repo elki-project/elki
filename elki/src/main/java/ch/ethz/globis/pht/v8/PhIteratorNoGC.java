@@ -62,7 +62,7 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
         return false;
       }
 
-      if (checker != null && node.getSubCount()+node.getPostCount()>2) {
+      if (checker != null) {
         long mask = (-1L) << (node.getPostLen() + 1);
         for (int i = 0; i < valTemplate.length; i++) {
           valTemplate[i] &= mask;  //TODO do somewhere else??
@@ -207,11 +207,6 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
   @Override
   public void remove() {
     throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public PhFilter getFilter() {
-    return checker;
   }
 
 }
