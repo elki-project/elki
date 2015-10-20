@@ -23,7 +23,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ch.ethz.globis.pht.PhTreeF;
 import ch.ethz.globis.pht.PhTreeF.PhEntryF;
-import ch.ethz.globis.pht.PhTreeF.PhQueryF;
 import ch.ethz.globis.pht.PhTreeF.PhQueryKNNF;
 import ch.ethz.globis.pht.PhTreeF.PhRangeQueryF;
 import ch.ethz.globis.pht.pre.IntegerPP;
@@ -78,7 +77,7 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(MemoryPHTree2.class);
+  private static final Logging LOG = Logging.getLogger(MemoryPHTree.class);
 
   /**
    * Distance computations performed.
@@ -353,7 +352,7 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
    * @param <O> Vector type
    */
   @Alias({ "miniph", "ph" })
-  public static class Factory<O extends NumberVector> implements IndexFactory<O, MemoryPHTree2<O>> {
+  public static class Factory<O extends NumberVector> implements IndexFactory<O, MemoryPHTree<O>> {
     /**
      * Constructor. Trivial parameterizable.
      */
@@ -362,8 +361,8 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
     }
 
     @Override
-    public MemoryPHTree2<O> instantiate(Relation<O> relation) {
-      return new MemoryPHTree2<>(relation);
+    public MemoryPHTree<O> instantiate(Relation<O> relation) {
+      return new MemoryPHTree<>(relation);
     }
 
     @Override
@@ -373,8 +372,8 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
     
     public static class Parametrizer extends AbstractParameterizer {
       @Override
-      protected MemoryPHTree2.Factory<NumberVector> makeInstance() {
-        return new MemoryPHTree2.Factory<>();
+      protected MemoryPHTree.Factory<NumberVector> makeInstance() {
+        return new MemoryPHTree.Factory<>();
       }
     }
   }
