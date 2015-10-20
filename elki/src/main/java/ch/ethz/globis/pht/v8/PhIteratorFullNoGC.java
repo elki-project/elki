@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.util.NoSuchElementException;
 
 import ch.ethz.globis.pht.PhEntry;
+import ch.ethz.globis.pht.PhFilter;
 import ch.ethz.globis.pht.PhTree.PhIterator;
 import ch.ethz.globis.pht.PhTreeHelper;
 
@@ -81,13 +82,13 @@ public final class PhIteratorFullNoGC<T> implements PhIterator<T> {
   private final int DIM;
   private final PhIteratorStack stack;
   private final long[] valTemplate;
-  private PhTraversalChecker<T> checker;
+  private PhFilter checker;
   private final PhTree8<T> pht;
 
   private PhEntry<T> result;
   boolean isFinished = false;
 
-  public PhIteratorFullNoGC(PhTree8<T> pht, PhTraversalChecker<T> checker) {
+  public PhIteratorFullNoGC(PhTree8<T> pht, PhFilter checker) {
     this.DIM = pht.getDIM();
     this.checker = checker;
     this.stack = new PhIteratorStack();

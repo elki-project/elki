@@ -35,13 +35,13 @@ import java.util.Random;
 
 import org.junit.Test;
 
+import ch.ethz.globis.pht.PhRangeQuery;
 import ch.ethz.globis.pht.PhTree;
 import ch.ethz.globis.pht.PhTree.PhIterator;
-import ch.ethz.globis.pht.PhTree.PhQueryKNN;
 import ch.ethz.globis.pht.test.util.TestUtil;
 import ch.ethz.globis.pht.util.Bits;
 
-public class TestNearestNeighbour {
+public class TestRangeQuery {
 
   @Test
   public void testDirectHit() {
@@ -51,22 +51,22 @@ public class TestNearestNeighbour {
     idx.put(new long[]{1,3}, new long[]{1,3});
     idx.put(new long[]{3,1}, new long[]{3,1});
 
-    List<long[]> result = toList(idx.nearestNeighbour(0, 3, 3));
+    List<long[]> result = toList(idx.rangeQuery(0, 3, 3));
     assertTrue(result.isEmpty());
 
-    result = toList(idx.nearestNeighbour(1, 2, 2));
+    result = toList(idx.rangeQuery(1, 2, 2));
     assertEquals(1, result.size());
     check(8, result.get(0), 2, 2);
 
-    result = toList(idx.nearestNeighbour(1, 1, 1));
+    result = toList(idx.rangeQuery(1, 1, 1));
     assertEquals(1, result.size());
     check(8, result.get(0), 1, 1);
 
-    result = toList(idx.nearestNeighbour(1, 1, 3));
+    result = toList(idx.rangeQuery(1, 1, 3));
     assertEquals(1, result.size());
     check(8, result.get(0), 1, 3);
 
-    result = toList(idx.nearestNeighbour(1, 3, 1));
+    result = toList(idx.rangeQuery(1, 3, 1));
     assertEquals(1, result.size());
     check(8, result.get(0), 3, 1);
   }
@@ -79,7 +79,7 @@ public class TestNearestNeighbour {
     idx.put(new long[]{1,3}, new long[]{1,3});
     idx.put(new long[]{3,1}, new long[]{3,1});
 
-    List<long[]> result = toList(idx.nearestNeighbour(1, 3, 3));
+    List<long[]> result = toList(idx.rangeQuery(1.5, 3, 3));
     check(8, result.get(0), 2, 2);
     assertEquals(1, result.size());
   }
@@ -93,7 +93,7 @@ public class TestNearestNeighbour {
     idx.put(new long[]{1,3}, new long[]{1,3});
     idx.put(new long[]{3,1}, new long[]{3,1});
 
-    List<long[]> result = toList(idx.nearestNeighbour(1, 3, 3));
+    List<long[]> result = toList(idx.rangeQuery(1, 3, 3));
     check(8, result.get(0), 3, 3);
     assertEquals(1, result.size());
   }
@@ -107,7 +107,7 @@ public class TestNearestNeighbour {
     idx.put(new long[]{2,4}, new long[]{2,4});
     idx.put(new long[]{4,2}, new long[]{4,2});
 
-    List<long[]> result = toList(idx.nearestNeighbour(4, 3, 3));
+    List<long[]> result = toList(idx.rangeQuery(1.5, 3, 3));
 
     checkContains(result, 3, 3);
     int n = 1;
@@ -116,7 +116,7 @@ public class TestNearestNeighbour {
     n += contains(result, 2, 2) ? 1 : 0;
     n += contains(result, 2, 4) ? 1 : 0;
 
-    assertTrue(n >= 4);
+    assertEquals(5, n);
   }
 
   @Test
@@ -126,10 +126,11 @@ public class TestNearestNeighbour {
     final int N = 1000;
     final int NQ = 1000;
     final int MAXV = 1000;
+    final int range = MAXV/2;
     final Random R = new Random(0);
     for (int d = 0; d < LOOP; d++) {
       PhTree<Object> ind = TestUtil.newTree(DIM, 32);
-      PhQueryKNN<Object> q = ind.nearestNeighbour(1, new long[DIM]);
+      PhRangeQuery<Object> q = ind.rangeQuery(1, new long[DIM]);
       for (int i = 0; i < N; i++) {
         long[] v = new long[DIM];
         for (int j = 0; j < DIM; j++) {
@@ -142,11 +143,11 @@ public class TestNearestNeighbour {
         for (int j = 0; j < DIM; j++) {
           v[j] = Math.abs(R.nextInt(MAXV)); //TODO try long?
         }
-        long[] exp = nearestNeighbor1(ind, v);
+        long[] exp = rangeQuery(ind, range, v).get(0);
         //        System.out.println("d="+ d + "   i=" + i + "   minD=" + dist(v, exp));
         //        System.out.println("v="+ Arrays.toString(v));
         //        System.out.println("exp="+ Arrays.toString(exp));
-        List<long[]> nnList = toList(q.reset(1, null, null, v));
+        List<long[]> nnList = toList(q.reset(range, v));
 
         //        System.out.println(ind.toStringPlain());
         //        System.out.println("v  =" + Arrays.toString(v));
@@ -177,8 +178,9 @@ public class TestNearestNeighbour {
     }
 
     long[] v={44, 84, 75};
-    long[] exp = nearestNeighbor1(ind, v);
-    List<long[]> nnList = toList(ind.nearestNeighbour(1, v));
+    double dist = 20;
+    long[] exp = rangeQuery(ind, dist, v).get(0);
+    List<long[]> nnList = toList(ind.rangeQuery(dist, v));
     assertTrue(!nnList.isEmpty());
     long[] nn = nnList.get(0);
     check(v, exp, nn);
@@ -235,10 +237,11 @@ public class TestNearestNeighbour {
 
     long[] center = {32, 0, 22, 7, 5};
 
-    List<long[]> lst = toList(ind.nearestNeighbour(1, center));
+    List<long[]> lst = toList(ind.rangeQuery(30, center));
     assertTrue(!lst.isEmpty());
     long[] nn = lst.get(0);
     assertArrayEquals(exp, nn);
+    assertEquals(1, lst.size());
   }
 
   @Test
@@ -385,10 +388,12 @@ public class TestNearestNeighbour {
     }
 
     long[] center = {32, 0, 22, 7, 5};
-    exp = nearestNeighbor1(ind, center);
-    List<long[]> lst = toList(ind.nearestNeighbour(1, center));
+    double dist = 30;
+    exp = rangeQuery(ind, dist, center).get(0);
+    List<long[]> lst = toList(ind.rangeQuery(dist, center));
     long[] nn = lst.get(0);
     assertArrayEquals(exp, nn);
+    assertEquals(1, lst.size());
   }
 
   @Test
@@ -411,8 +416,9 @@ public class TestNearestNeighbour {
     for (int j = 0; j < DIM; j++) {
       v[j] = Math.abs(R.nextInt(MAXV)); //TODO try long?
     }
-    long[] exp = nearestNeighbor1(ind, v);
-    List<long[]> nnList = toList(ind.nearestNeighbour(1, v));
+    double range = 10;
+    long[] exp = rangeQuery(ind, range, v).get(0);
+    List<long[]> nnList = toList(ind.rangeQuery(range, v));
     assertTrue(!nnList.isEmpty());
     long[] nn = nnList.get(0);
     check(v, exp, nn);
@@ -420,19 +426,17 @@ public class TestNearestNeighbour {
 
 
 
-  private long[] nearestNeighbor1(PhTree<?> tree, long[] q) {
-    double d = Double.MAX_VALUE;
-    long[] best = null;
+  private ArrayList<long[]> rangeQuery(PhTree<?> tree, double range, long[] q) {
+    ArrayList<long[]> points = new ArrayList<>();
     PhIterator<?> i = tree.queryExtent();
     while (i.hasNext()) {
       long[] cand = i.nextKey();
       double dNew = dist(q, cand);
-      if (dNew < d) {
-        d = dNew;
-        best = cand;
+      if (dNew < range) {
+        points.add(cand);
       }
     }
-    return best;
+    return points;
   }
 
   private void check(long[] v, long[] c1, long[] c2) {
@@ -486,18 +490,11 @@ public class TestNearestNeighbour {
     return false;
   }
 
-  private List<long[]> toList(PhQueryKNN<?> q) {
+  private List<long[]> toList(PhRangeQuery<?> q) {
     ArrayList<long[]> ret = new ArrayList<>();
     while (q.hasNext()) {
       ret.add(q.nextKey());
     }
     return ret;
   }
-
-  //  private void check(long[] t, long[] s) {
-  //    for (int i = 0; i < s.length; i++) {
-  //      assertEquals("i=" + i + " | " + Bits.toBinary(s) + " / " + 
-  //          Bits.toBinary(t), (short)s[i], (short)t[i]);
-  //    }
-  //  }
 }

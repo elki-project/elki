@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import java.util.NoSuchElementException;
 
 import ch.ethz.globis.pht.PhEntry;
+import ch.ethz.globis.pht.PhFilter;
 import ch.ethz.globis.pht.PhTree.PhQuery;
 import ch.ethz.globis.pht.PhTreeHelper;
 
@@ -68,7 +69,7 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
         }
         //skip this for postLen>=63
         if (node.getPostLen() < (PhTree8.DEPTH_64-1) &&
-            !checker.isValid(node, valTemplate)) {
+            !checker.isValid(node.getPostLen()+1, valTemplate)) {
           return false;
         }
       }
@@ -96,13 +97,13 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
   private final long[] valTemplate;
   private long[] rangeMin;
   private long[] rangeMax;
-  private PhTraversalChecker<T> checker;
+  private PhFilter checker;
   private final PhTree8<T> pht;
 
   private PhEntry<T> result;
   boolean isFinished = false;
 
-  public PhIteratorNoGC(PhTree8<T> pht, PhTraversalChecker<T> checker) {
+  public PhIteratorNoGC(PhTree8<T> pht, PhFilter checker) {
     this.DIM = pht.getDIM();
     this.checker = checker;
     this.stack = new PhIteratorStack();
@@ -154,8 +155,8 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
         // no matching (more) elements found
         stack.pop();
       }
-  //finished
-  isFinished = true;
+    //finished
+    isFinished = true;
   }
 
   @Override
@@ -206,6 +207,11 @@ public final class PhIteratorNoGC<T> implements PhQuery<T> {
   @Override
   public void remove() {
     throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public PhFilter getFilter() {
+    return checker;
   }
 
 }

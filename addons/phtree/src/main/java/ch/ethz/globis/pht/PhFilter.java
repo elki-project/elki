@@ -1,4 +1,5 @@
-package ch.ethz.globis.pht.v8;
+package ch.ethz.globis.pht;
+
 
 /*
 This file is part of ELKI:
@@ -24,19 +25,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
- * Interface for PhIterator checkers. A checker is continuously checked 
+ * Interface for PhIterator filters. A checker is continuously checked 
  * during navigation to see whether subnodes or postfixes should be traversed. 
  * 
  * 
  * @author Tilmann Zäschke
- * 
- * @param <T> The value type of the tree 
  *
  */
-public interface PhTraversalChecker<T> {
+public interface PhFilter {
 
+  /**
+   * 
+   * @param key
+   * @return True if the key passes the filter.
+   */
 	boolean isValid(long[] key);
 	
-	boolean isValid(Node<T> node, long[] prefix);
+	/**
+	 * 
+	 * @param bitsToIgnore trailing bits to ignore
+	 * @param prefix
+	 * @return False if key with the given prefix cannot pass the filter, otherwise true.
+	 */
+	boolean isValid(int bitsToIgnore, long[] prefix);
+
+	/**
+	 * Reset the parameters of the filter.
+	 * @param parameters
+	 */
+  void setParam(Object ... parameters);
 	
 }

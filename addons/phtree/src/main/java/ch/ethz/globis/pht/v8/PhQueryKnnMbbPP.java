@@ -36,6 +36,7 @@ import org.zoodb.index.critbit.CritBit64.Entry;
 import ch.ethz.globis.pht.PhDimFilter;
 import ch.ethz.globis.pht.PhDistance;
 import ch.ethz.globis.pht.PhEntry;
+import ch.ethz.globis.pht.PhFilterDistance;
 import ch.ethz.globis.pht.PhTree.PhIterator;
 import ch.ethz.globis.pht.PhTree.PhQueryKNN;
 import ch.ethz.globis.pht.v8.PhTree8.NodeEntry;
@@ -85,14 +86,14 @@ public class PhQueryKnnMbbPP<T> implements PhQueryKNN<T> {
   private final long[] mbbMin;
   private final long[] mbbMax;
   private final PhIteratorNoGC<T> itEx;
-  private final PhTraversalDistanceChecker<T> checker;
+  private final PhFilterDistance checker;
 
   public PhQueryKnnMbbPP(PhTree8<T> pht) {
     this.DIM = pht.getDIM();
     this.mbbMin = new long[DIM];
     this.mbbMax = new long[DIM];
     this.pht = pht;
-    this.checker = new PhTraversalDistanceChecker<>();
+    this.checker = new PhFilterDistance();
     this.itEx = new PhIteratorNoGC<>(pht, checker);
   }
 

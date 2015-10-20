@@ -1,4 +1,4 @@
-package ch.ethz.globis.pht.v8;
+package ch.ethz.globis.pht;
 
 /*
 This file is part of ELKI:
@@ -23,23 +23,20 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ch.ethz.globis.pht.PhDistance;
 
 /**
  * Check distance to a point using a distance function.
  * 
  * @author Tilmann Zäschke
  *
- * @param <T> The value type of the tree 
- *
  */
-public class PhTraversalDistanceChecker<T> implements PhTraversalChecker<T> {
+public class PhFilterDistance implements PhFilter {
 
   private long[] v;
   private PhDistance dist;
   private double maxDist;
 
-  void set(long[] v, PhDistance dist, double maxDist) {
+  public void set(long[] v, PhDistance dist, double maxDist) {
     this.v = v;
     this.dist = dist;
     this.maxDist = maxDist;
@@ -51,8 +48,8 @@ public class PhTraversalDistanceChecker<T> implements PhTraversalChecker<T> {
   }
 
   @Override
-  public boolean isValid(Node<T> node, long[] prefix) {
-    long maskMin = (-1L) << (node.getPostLen() + 1);
+  public boolean isValid(int bitsToIgnore, long[] prefix) {
+    long maskMin = (-1L) << bitsToIgnore;
     long maskMax = ~maskMin;
     long[] buf = new long[prefix.length];
     for (int i = 0; i < buf.length; i++) {
@@ -61,10 +58,13 @@ public class PhTraversalDistanceChecker<T> implements PhTraversalChecker<T> {
       long min = prefix[i] & maskMin;
       long max = prefix[i] | maskMax;
       buf[i] = min > v[i] ? min : (max < v[i] ? max : v[i]); 
-      //			buf[i] = prefix[i] & maskMin;
-      //			buf[i] = buf[i] > v[i] ? buf[i] : ((buf[i]|maskMax) < v[i] ? buf[i]|maskMax : v[i]); 
     }
     return dist.dist(v, buf) <= maxDist;
+  }
+
+  @Override
+  public void setParam(Object ... parameters) {
+    maxDist = (double) parameters[0]; 
   }
 
 }

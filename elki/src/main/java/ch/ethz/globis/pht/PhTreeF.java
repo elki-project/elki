@@ -138,6 +138,33 @@ public class PhTreeF<T> {
     return new PhQueryF<>(pht.query(lMin, lMax), pht.getDIM(), pre);
   }
 
+  /**
+   * Find all entries within a given distance from a center point.
+   * @param dist Maximum distance
+   * @param center Center point
+   * @return All entries with at most distance `dist` from `center`.
+   */
+  public PhRangeQueryF<T> rangeQuery(double dist, double...center) {
+    return rangeQuery(dist, PhDistanceF.THIS, center);
+  }
+
+  /**
+   * Find all entries within a given distance from a center point.
+   * @param dist Maximum distance
+   * @param optionalDist Distance function, optional, can be `null`.
+   * @param center Center point
+   * @return All entries with at most distance `dist` from `center`.
+   */
+  public PhRangeQueryF<T> rangeQuery(double dist, PhDistance optionalDist, double...center) {
+    if (optionalDist == null) {
+      optionalDist = PhDistanceF.THIS; 
+    }
+    long[] lKey = new long[center.length];
+    pre.pre(center, lKey);
+    PhRangeQuery<T> iter = pht.rangeQuery(dist, optionalDist, lKey);
+    return new PhRangeQueryF<T>(iter, pht, pre);
+  }
+
   public int getDim() {
     return pht.getDIM();
   }
@@ -256,6 +283,25 @@ public class PhTreeF<T> {
         double... center) {
       pre.pre(center, lCenter);
       q.reset(nMin, dist, dims, lCenter);
+      return this;
+    }
+  }
+
+  public static class PhRangeQueryF<T> extends PhIteratorF<T> {
+    private final long[] lCenter;
+    private final PhRangeQuery<T> q;
+    private final int DIM;
+
+    private PhRangeQueryF(PhRangeQuery<T> iter, PhTree<T> tree, PreProcessorPointF pre) {
+      super(iter, tree.getDIM(), pre);
+      this.DIM = tree.getDIM();
+      this.q = iter;
+      this.lCenter = new long[DIM];
+    }
+
+    public PhRangeQueryF<T> reset(double range, double... center) {
+      pre.pre(center, lCenter);
+      q.reset(range, lCenter);
       return this;
     }
   }

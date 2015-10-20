@@ -27,6 +27,7 @@ import org.zoodb.index.critbit.CritBit64.Entry;
 import org.zoodb.index.critbit.CritBit64.QueryIteratorMask;
 
 import ch.ethz.globis.pht.PhEntry;
+import ch.ethz.globis.pht.PhFilter;
 import ch.ethz.globis.pht.PhTreeHelper;
 import ch.ethz.globis.pht.v8.PhTree8.NodeEntry;
 
@@ -69,7 +70,7 @@ public class NodeIteratorNoGC<T> {
 	private boolean useSubHcIncrementer;
 	private boolean isPostFinished;
 	private boolean isSubFinished;
-	private PhTraversalChecker<T> checker;
+	private PhFilter checker;
 	private final PhEntry<T> nextPost1;
 	private final PhEntry<T> nextPost2;
 	private boolean isNextPost1free;
@@ -98,7 +99,7 @@ public class NodeIteratorNoGC<T> {
 	 * @param checker result verifier, can be null.
 	 */
 	private void reinit(Node<T> node, long[] rangeMin, long[] rangeMax, long lower, long upper, 
-	    PhTraversalChecker<T> checker) {
+	    PhFilter checker) {
 	  this.rangeMin = rangeMin;
 		this.rangeMax = rangeMax;
 		next = -1;
@@ -553,7 +554,7 @@ public class NodeIteratorNoGC<T> {
 	}
 
 	void init(long[] rangeMin, long[] rangeMax, 
-	    long[] valTemplate, Node<T> node, PhTraversalChecker<T> checker) {
+	    long[] valTemplate, Node<T> node, PhFilter checker) {
 		//create limits for the local node. there is a lower and an upper limit. Each limit
 		//consists of a series of DIM bit, one for each dimension.
 		//For the lower limit, a '1' indicates that the 'lower' half of this dimension does 

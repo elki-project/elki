@@ -23,8 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import ch.ethz.globis.pht.PhTreeF;
 import ch.ethz.globis.pht.PhTreeF.PhEntryF;
-import ch.ethz.globis.pht.PhTreeF.PhQueryF;
 import ch.ethz.globis.pht.PhTreeF.PhQueryKNNF;
+import ch.ethz.globis.pht.PhTreeF.PhRangeQueryF;
 import ch.ethz.globis.pht.pre.IntegerPP;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -227,10 +227,19 @@ public class MemoryPHTree2<O extends NumberVector> extends AbstractIndex<O>
      */
     private final Norm<O> norm;
     
+    /**
+     * Norm wrapper.
+     */
     private final PhNorm<O> dist;
     
+    /**
+     * Query instance.
+     */
     private final PhQueryKNNF<DBID> query;
     
+    /**
+     * Center point.
+     */
     private final double[] center;
 
     /**
@@ -274,21 +283,28 @@ public class MemoryPHTree2<O extends NumberVector> extends AbstractIndex<O>
     /**
      * Norm to use.
      */
-    private Norm<? super O> norm;
+    private final Norm<? super O> norm;
+    
+    /**
+     * Norm wrapper.
+     */
+    private final PhNorm<O> dist;
 
     /**
      * Query instance.
      */
-    private PhQueryF<DBID> query;
+    private PhRangeQueryF<DBID> query;
 
     /**
      * The query rectangle.
      */
-    private final double[] min, max;
+    private final double[] mid;
 
-    
     /**
      * Constructor.
+     * 
+     * Returns all entries within a given distance of a given center.
+     * In euclidean space this is a spherical query.
      * 
      * @param distanceQuery Distance query
      * @param norm Norm to use
@@ -296,24 +312,22 @@ public class MemoryPHTree2<O extends NumberVector> extends AbstractIndex<O>
     public PHTreeRangeQuery(DistanceQuery<O> distanceQuery, Norm<? super O> norm) {
       super(distanceQuery);
       this.norm = norm;
-      this.min = new double[dims];
-      this.max = new double[dims];
+      this.dist = new PhNorm(norm, dims, tree.getPreprocessor());
+      this.mid = new double[dims];
     }
 
     @Override
     public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
-      oToDouble(obj, min);
-      oToDouble(obj, max);
+      oToDouble(obj, mid);
       range = Math.abs(range);
-      for (int i = 0; i < min.length; i++) {
-        min[i] = obj.doubleValue(i) - range;
-        max[i] = obj.doubleValue(i) + range;
-      }
+
+      long[] longCenter = new long[dims];
+      tree.getPreprocessor().pre(mid, longCenter);
       
       if (query == null) {
-        query = tree.query(min, max);
+        query = tree.rangeQuery(range, dist, mid);
       } else {
-        query.reset(min, max);
+        query.reset(range, mid);
       }
       
       while (query.hasNext()) {
@@ -321,9 +335,7 @@ public class MemoryPHTree2<O extends NumberVector> extends AbstractIndex<O>
         DBID id = e.getValue();
         O o2 = relation.get(id);
         double distance = norm.distance(obj, o2);
-        if (distance <= range) {
-          result.add(distance, id);
-        }
+        result.add(distance, id);
       }
       result.sort();
     }

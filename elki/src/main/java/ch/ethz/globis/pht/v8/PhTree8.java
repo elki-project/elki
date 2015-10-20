@@ -36,6 +36,8 @@ import ch.ethz.globis.pht.PhDimFilter;
 import ch.ethz.globis.pht.PhDistance;
 import ch.ethz.globis.pht.PhDistanceL;
 import ch.ethz.globis.pht.PhEntry;
+import ch.ethz.globis.pht.PhFilterDistance;
+import ch.ethz.globis.pht.PhRangeQuery;
 import ch.ethz.globis.pht.PhTree;
 import ch.ethz.globis.pht.PhTreeConfig;
 import ch.ethz.globis.pht.PhTreeHelper;
@@ -686,8 +688,21 @@ public class PhTree8<T> extends PhTree<T> {
 
   @Override
   public PhQueryKNN<T> nearestNeighbour(int nMin, PhDistance dist,
-      PhDimFilter dimsFilter, long... focus) {
-    return new PhQueryKnnMbbPP<T>(this).reset(nMin, dist, dimsFilter, focus);
+      PhDimFilter dimsFilter, long... center) {
+    return new PhQueryKnnMbbPP<T>(this).reset(nMin, dist, dimsFilter, center);
+  }
+
+  @Override
+  public PhRangeQuery<T> rangeQuery(double dist, PhDistance optionalDist, long...center) {
+    PhFilterDistance filter = new PhFilterDistance();
+    if (optionalDist == null) {
+      optionalDist = PhDistanceL.THIS;
+    }
+    filter.set(center, optionalDist, dist);
+    PhQuery<T> q = new PhIteratorNoGC<T>(this, filter);
+    PhRangeQuery<T> qr = new PhRangeQuery<>(q, this, optionalDist, filter);
+    qr.reset(dist, center);
+    return qr;
   }
 
   @Override
