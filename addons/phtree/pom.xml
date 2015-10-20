@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>de.lmu.ifi.dbs.elki</groupId>
+		<version>0.6.5-SNAPSHOT</version>
+		<artifactId>elki-project</artifactId>
+		<relativePath>../../</relativePath>
+	</parent>
+
+	<artifactId>elki-phtree</artifactId>
+	<packaging>jar</packaging>
+
+	<name>ELKI Data Mining Framework - PH-Tree</name>
+
+	<licenses>
+		<license>
+			<name>GNU Affero General Public License (AGPL) version 3.0</name>
+			<url>http://www.gnu.org/licenses/agpl-3.0.txt</url>
+		</license>
+	</licenses>
+
+	<properties>
+		<elki.projdir>${basedir}/../..</elki.projdir>
+	</properties>
+
+	<build>
+		<plugins>
+			<!-- jar packaging -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.3.1</version>
+				<configuration>
+					<archive>
+						<manifestFile>${elki.projdir}/elki/src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<mainClass>de.lmu.ifi.dbs.elki.application.ELKILauncher</mainClass>
+							<classpathPrefix>dependency/</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>net.sf.trove4j</groupId>
+			<artifactId>trove4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>

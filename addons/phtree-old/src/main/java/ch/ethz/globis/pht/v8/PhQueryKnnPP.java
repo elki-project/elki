@@ -43,37 +43,9 @@ import ch.ethz.globis.pht.v8.PhTree8.NodeEntry;
 /**
  * kNN query implementation that uses preprocessors and distance functions.
  * 
- * The algorithm works as follows:
- * 
- * First we drill down in the tree to find an entry that is 'close' to
- * desired center of the kNN query. A 'close' entry is one that is in the same node
- * where the center would be, or in one of its sub-nodes. Note that we do not use
- * the center-point itself in case it exists in the tree. The result of the first step is 
- * a guess at the initial search distance (this would be 0 if we used the center itself). 
- * 
- * We then use a combination of rectangle query (center +/- initDistance) and distance-query. 
- * The query traverses only nodes and values that lie in the query rectangle and that satisfy the
- * distance requirement (circular distance when using euclidean space).
- * 
- * While iterating through the query result, we regularly sort the returned entries 
- * to see which distance would suffice to return 'k' result. If the new distance is smaller,
- * we adjust the query rectangle and the distance function before continuing the
- * query. As a result, when the query returns no more entries, we are guaranteed to
- * have all closest neighbours.
- * 
- * The only thing that can go wrong is that we may get less than 'k' neighbours if the
- * initial distance was too small. In that case we multiply the initial distance by 10
- * and run the algorithm again. Not that multiplying the distance by 10 means a 10^k fold
- * increase in the search volume. 
- *   
- *   
- * WARNING:
- * The query rectangle is calculated using the PhDistance.toMBB() method.
- * The implementation of this method may not work with non-euclidean spaces! 
- * 
  * @param <T> 
  */
-public class PhQueryKnnMbbPP<T> implements PhQueryKNN<T> {
+public class PhQueryKnnPP<T> implements PhQueryKNN<T> {
 
   private final int DIM;
   private int nMin;
@@ -82,18 +54,14 @@ public class PhQueryKnnMbbPP<T> implements PhQueryKNN<T> {
   private final ArrayList<DistEntry<T>> entries = new ArrayList<>();
   private int resultSize = 0;
   private int currentPos = -1;
-  private final long[] mbbMin;
-  private final long[] mbbMax;
-  private final PhIteratorNoGC<T> itEx;
+  private final PhIteratorFullNoGC<T> itEx;
   private final PhTraversalDistanceChecker<T> checker;
 
-  public PhQueryKnnMbbPP(PhTree8<T> pht) {
+  public PhQueryKnnPP(PhTree8<T> pht) {
     this.DIM = pht.getDIM();
-    this.mbbMin = new long[DIM];
-    this.mbbMax = new long[DIM];
     this.pht = pht;
     this.checker = new PhTraversalDistanceChecker<>();
-    this.itEx = new PhIteratorNoGC<>(pht, checker);
+    this.itEx = new PhIteratorFullNoGC<>(pht, checker);
   }
 
   @Override
@@ -216,13 +184,7 @@ public class PhQueryKnnMbbPP<T> implements PhQueryKNN<T> {
   }
 
   private long[] returnAnyValue(long[] ret, long[] key, Node<T> node) {
-    //First, get correct prefix.
-    long mask = ((-1L) << (node.getPostLen()+1));
-    for (int i = 0; i < DIM; i++) {
-      ret[i] = key[i] & mask;
-    }
-    
-    NodeIteratorFullNoGC<T> ni = new NodeIteratorFullNoGC<>(DIM, ret);
+    NodeIteratorFullNoGC<T> ni = new NodeIteratorFullNoGC<>(DIM, key);
     ni.init(node, null);
     while (ni.increment()) {
       if (ni.isNextSub()) {
@@ -272,21 +234,68 @@ public class PhQueryKnnMbbPP<T> implements PhQueryKNN<T> {
         PhEntry<T> e = itEx.nextEntryReuse();
         addEntry(e, val);
       }
+
       sortEntries();
       return;
     }
 
-    //estimate initial distance
     long[] cand = new long[DIM];
     findKnnCandidate(val, cand);
     double currentDist = distance.dist(val, cand);
-    
-    while (!findNeighbours(currentDist, nMin, val)) {
-      currentDist *= 10;
+    if (currentDist < 0.0000001) {
+      //TODO this is quite arbitrary
+      System.err.println("KNN-Query: dist too small: " + currentDist);
+      currentDist = 1.0;
     }
+
+    //System.out.println("knnQ start");
+    do {
+      int result = getCandidates(currentDist, nMin, val);
+
+      if (result == 0) {
+        //done!
+        return;
+      }
+
+      currentDist *= 2;
+      //System.out.println("knnQ dist: " + currentDist);
+    } while (true);
   }
 
-  private final boolean findNeighbours(double maxDist, int nMin, long[] val) {
+  private final int getCandidates(double maxDist, int nMin, long[] val) {
+    //What are we doing here?
+    //There are several cases to consider:
+    //1) maxDistSQ is too small, we get < nMin values
+    //2) If there are enough entries, we have to consider the following
+    //2a) Prevent going further down in case we have exactly nMin entries
+    //2b) Prevent going further down in case all entries beyond nMin have the same distance 
+    //    than nMin. (no more than nMax different distances)
+    //2c) Optimisation: Prevent going further down if we have more than nMin DIFFERENT entries, 
+    //	  but we exhausted them all, so we can still easily return a final result.
+    //2d) There are too many entries.
+    //
+    //Finally we should consider an epsilon to avoid removing equally distanced entries
+    //TODO TEST epsilon!
+    //
+    //Solutions:
+    // a) Check nMin entries. Return SPACE_NEEDS_EXPANSION if size()<nMin.
+    //    [optional?: Return SUCCESS if query space is exhausted and n==nMin].
+    // b) Sort them.
+    // c) get distance of last entry.
+    // d) continue search until we get 
+    //    currentEntryCount > nMin*3
+    //    AND 
+    //    currentEntryCount > 2 * validEntryCount (entries with dist<=dist(cand.get(nMin-1))). 
+    //    --> This makes sure that don't shrink the search space if there are only a few too
+    //        many entries in the local space.
+    //        This is important, because we may have omitted many entries with dist>maxDistQ
+    //        TODO keep count?
+    //    --> The second term ensures that we don't abort if most of the entries are actually 
+    //        valid. 
+    // e) If we exhaust the query space, return all with dist<=dist(cand.get(nMin-1)).
+    // f) return SPACE_NEEDS_CONTRACTION
+    //We have to
+
     //Epsilon for calculating the distance depends on DIM, the magnitude of the values and
     //the precision of the Double mantissa.
     //TODO, this should use the lowerBound i.o. upperBound
@@ -294,63 +303,67 @@ public class PhQueryKnnMbbPP<T> implements PhQueryKNN<T> {
     final int CONSOLIDATION_INTERVAL = 10;
     clearEntries();
     checker.set(val, distance, maxDist);
-    distance.toMBB(maxDist, val, mbbMin, mbbMax);
-    itEx.reset(mbbMin, mbbMax);
+    itEx.reset();
+    double maxDistSQ = maxDist * maxDist;// * KNN_SAFETY;
 
-    // Get nMin results
+    //a)
     while (itEx.hasNext() && resultSize < nMin) {
       PhEntry<T> en = itEx.nextEntryReuse();
       addEntry(en, val);
     }
+
+    //b)
     sortEntries();
 
     if (resultSize < nMin) {
-      //too small, we need a bigger range
-      return false;
+      //too small
+      return 1;
     }
     if (!itEx.hasNext()) {
       //perfect fit!
-      return true;
+      return 0;
     }
 
-    //get distance of furthest entry and continue query with this new distance
-    maxDist = entries.get(nMin-1).dist;
-    checker.set(val, distance, maxDist);
-    distance.toMBB(maxDist, val, mbbMin, mbbMax);
+    //c)
+    maxDistSQ = squareDist(entries.get(nMin-1).getKey(), val);
+    checker.set(val, distance, Math.sqrt(maxDistSQ));
 
-    // we continue the query but reduce the range maximum range 
-    int cnt = 0;
+    //d)
     while (itEx.hasNext()) {
       PhEntry<T> e = itEx.nextEntryReuse();
       addEntry(e, val);
-      cnt++;
-      if (cnt % CONSOLIDATION_INTERVAL == 0) {
-        maxDist = consolidate(nMin, EPS, maxDist);
+      if (resultSize % CONSOLIDATION_INTERVAL == 0) {
+        maxDistSQ = consolidate(nMin, EPS, val, maxDistSQ);
+        //TODO this only works for SQRT
         //update query-dist
-        checker.set(val, distance, maxDist);
-        distance.toMBB(maxDist, val, mbbMin, mbbMax);
+        checker.set(val, distance, Math.sqrt(maxDistSQ));
       }
     }
-    // no more elements in tree
-    consolidate(nMin, EPS, maxDist);
-    return true;
+    //e)
+    consolidate(nMin, EPS, val, maxDistSQ);
+    return 0;
   }
 
-  private double consolidate(int nMin, double EPS, double max) {
+  private double consolidate(int nMin, double EPS, long[] val, double maxSQ) {
     sortEntries();
-    double maxDnew = entries.get(nMin-1).dist;
-    if (maxDnew < max+EPS) { //TODO epsilon?
-      max = maxDnew;
+    double maxSQnew = squareDist(entries.get(nMin-1).getKey(), val);
+    if (maxSQnew < maxSQ+EPS) { //TODO epsilon?
+      maxSQ = maxSQnew;
       for (int i2 = nMin; i2 < resultSize; i2++) {
         //purge 
-        if (entries.get(i2).dist + EPS > max) {
+        if (squareDist(entries.get(i2).getKey(), val) + EPS > maxSQ) {
           resultSize = i2;
           break;
         }
       }
     }
-    return max;
+    return maxSQ;
   }
+
+  private double squareDist(long[] v1, long[] v2) {
+    return distance.distEst(v1, v2);
+  }
+
 
   private static class DistEntry<T> extends PhEntry<T> {
     static final Comparator<DistEntry<?>> COMP = new Comparator<DistEntry<?>>() {

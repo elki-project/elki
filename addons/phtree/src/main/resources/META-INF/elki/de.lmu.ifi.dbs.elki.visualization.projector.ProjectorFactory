@@ -1,0 +1,4 @@
+de.lmu.ifi.dbs.elki.visualization.projector.HistogramFactory
+de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotFactory
+de.lmu.ifi.dbs.elki.visualization.projector.ParallelPlotFactory
+de.lmu.ifi.dbs.elki.visualization.projector.OPTICSProjectorFactory

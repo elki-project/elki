@@ -77,7 +77,7 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(MemoryPHTree.class);
+  private static final Logging LOG = Logging.getLogger(MemoryPHTree2.class);
 
   /**
    * Distance computations performed.
@@ -340,7 +340,7 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
    * @param <O> Vector type
    */
   @Alias({ "miniph", "ph" })
-  public static class Factory<O extends NumberVector> implements IndexFactory<O, MemoryPHTree<O>> {
+  public static class Factory<O extends NumberVector> implements IndexFactory<O, MemoryPHTree2<O>> {
     /**
      * Constructor. Trivial parameterizable.
      */
@@ -349,8 +349,8 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
     }
 
     @Override
-    public MemoryPHTree<O> instantiate(Relation<O> relation) {
-      return new MemoryPHTree<>(relation);
+    public MemoryPHTree2<O> instantiate(Relation<O> relation) {
+      return new MemoryPHTree2<>(relation);
     }
 
     @Override
@@ -360,8 +360,8 @@ public class MemoryPHTree<O extends NumberVector> extends AbstractIndex<O>
     
     public static class Parametrizer extends AbstractParameterizer {
       @Override
-      protected MemoryPHTree.Factory<NumberVector> makeInstance() {
-        return new MemoryPHTree.Factory<>();
+      protected MemoryPHTree2.Factory<NumberVector> makeInstance() {
+        return new MemoryPHTree2.Factory<>();
       }
     }
   }
