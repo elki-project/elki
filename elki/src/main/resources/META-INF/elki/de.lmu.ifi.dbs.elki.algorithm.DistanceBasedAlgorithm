@@ -33,6 +33,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.distance.DBOutlierScore de.lmu.ifi.dbs.elk
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.HilOut de.lmu.ifi.dbs.elki.algorithm.outlier.HilOut
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier knno
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier knnw
+de.lmu.ifi.dbs.elki.algorithm.outlier.distance.LocalIsolationCoefficient
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ODIN de.lmu.ifi.dbs.elki.algorithm.outlier.ODIN
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ReferenceBasedOutlierDetection de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.parallel.ParallelKNNOutlier
