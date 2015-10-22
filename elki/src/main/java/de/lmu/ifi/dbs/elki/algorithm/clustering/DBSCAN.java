@@ -143,12 +143,12 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
     else {
       runDBSCAN(relation, rangeQuery);
     }
-    double averagen = ncounter / relation.size();
+    double averagen = ncounter / (double) relation.size();
     LOG.statistics(new DoubleStatistic(DBSCAN.class.getName() + ".average-neighbors", averagen));
     if(averagen < 1 + 0.1 * (minpts - 1)) {
       LOG.warning("There are very few neighbors found. Epsilon may be too small.");
     }
-    if(averagen > minpts * minpts) {
+    if(averagen > 100 * minpts) {
       LOG.warning("There are very many neighbors found. Epsilon may be too large.");
     }
 
