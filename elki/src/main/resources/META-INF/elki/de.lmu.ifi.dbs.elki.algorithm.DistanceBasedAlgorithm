@@ -52,6 +52,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOCI de.lmu.ifi.dbs.elki.algorithm.out
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF SimplifiedLOF outlier.SimplifiedLOF de.lmu.ifi.dbs.elki.algorithm.outlier.SimplifiedLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel.ParallelSimplifiedLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleKernelDensityLOF
+de.lmu.ifi.dbs.elki.algorithm.outlier.lof.VarianceOfVolume
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuGLSBackwardSearchAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuRandomWalkEC
 de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IDOS

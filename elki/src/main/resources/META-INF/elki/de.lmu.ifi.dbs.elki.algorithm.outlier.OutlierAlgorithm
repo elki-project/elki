@@ -35,6 +35,7 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.lof.OnlineLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF SimplifiedLOF outlier.SimplifiedLOF de.lmu.ifi.dbs.elki.algorithm.outlier.SimplifiedLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel.ParallelSimplifiedLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleKernelDensityLOF
+de.lmu.ifi.dbs.elki.algorithm.outlier.lof.VarianceOfVolume
 de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.AggarwalYuEvolutionary
 de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.AggarwalYuNaive
 de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.OUTRES
