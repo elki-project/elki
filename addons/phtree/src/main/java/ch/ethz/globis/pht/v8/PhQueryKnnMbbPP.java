@@ -176,7 +176,7 @@ public class PhQueryKnnMbbPP<T> implements PhQueryKNN<T> {
         return findKnnCandidate(key, e.node, ret);
       }
       //Never return closest key if we look for nMin>1 keys!
-      if (nMin > 1 && distance.distEst(key, e.getKey()) == 0) {
+      if (nMin > 1 && distance.dist(key, e.getKey()) == 0) {
         //Never return a perfect match if we look for nMin>1 keys!
         //otherwise the distance is too small.
         CBIterator<NodeEntry<T>> it = node.ind().iterator();
@@ -232,7 +232,7 @@ public class PhQueryKnnMbbPP<T> implements PhQueryKNN<T> {
       } else {
         PhEntry<T> e = ni.getCurrentPost();
         //Never return closest key if we look for nMin>1 keys!
-        if (nMin > 1 && distance.distEst(key, e.getKey()) == 0) {
+        if (nMin > 1 && distance.dist(key, e.getKey()) == 0) {
           //Never return a perfect match if we look for nMin>1 keys!
           //otherwise the distance is too small.
           continue;

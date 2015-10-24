@@ -57,12 +57,6 @@ final class PhNorm<O extends NumberVector> implements PhDistance {
     return norm.distance((NumberVector)o1.wrap(v1), (NumberVector)o2.wrap(v2));
   }
   
-  @Override
-  public double distEst(long[] v1, long[] v2) {
-    distanceCalcCount++;
-    return norm.distance((NumberVector)o1.wrap(v1), (NumberVector)o2.wrap(v2));
-  }
-
   public long getAndResetDistanceCounter() {
     long x = distanceCalcCount;
     distanceCalcCount = 0;

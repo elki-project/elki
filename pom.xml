@@ -23,7 +23,6 @@
 
 	<modules>
 		<module>elki</module>
-		<module>elki-phtree</module>
 	</modules>
 
 	<properties>
@@ -248,6 +247,7 @@
 			<id>svg</id>
 			<modules>
 				<module>addons/batikvis</module>
+				<module>addons/phtree</module>
 			</modules>
 		</profile>
 		<profile>

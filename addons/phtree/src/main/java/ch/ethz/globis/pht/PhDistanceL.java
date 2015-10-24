@@ -49,21 +49,6 @@ public class PhDistanceL implements PhDistance {
     return Math.sqrt(d);
   }
   
-  /**
-   * Calculate the estimated distance for integer values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
-  @Override
-  public double distEst(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = (double)v1[i] - (double)v2[i];
-      d += dl*dl;
-    }
-    return d;
-  }
-
   @Override
   public void toMBB(double distance, long[] center, long[] outMin,
       long[] outMax) {

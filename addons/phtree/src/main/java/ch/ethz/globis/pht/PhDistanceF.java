@@ -52,21 +52,6 @@ public class PhDistanceF implements PhDistance {
     return Math.sqrt(d);
   }
 
-  /**
-   * Calculate the estimated distance for encoded {@code double} values.
-   * 
-   * @see PhDistance#dist(long[], long[])
-   */
-  @Override
-  public double distEst(long[] v1, long[] v2) {
-    double d = 0;
-    for (int i = 0; i < v1.length; i++) {
-      double dl = BitTools.toDouble(v1[i]) - BitTools.toDouble(v2[i]);
-      d += dl*dl;
-    }
-    return d;
-  }
-
   @Override
   public void toMBB(double distance, long[] center, long[] outMin,
       long[] outMax) {

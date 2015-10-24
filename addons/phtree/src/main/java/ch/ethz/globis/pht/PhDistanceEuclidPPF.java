@@ -53,17 +53,6 @@ public class PhDistanceEuclidPPF implements PhDistance {
    */
   @Override
   public double dist(long[] v1, long[] v2) {
-    double d = distEst(v1, v2);
-    return Math.sqrt(d);
-  }
-
-  /**
-   * Calculate an approximate distance for encoded {@code double} values.
-   * 
-   * @see PhDistance#distEst(long[], long[])
-   */
-  @Override
-  public double distEst(long[] v1, long[] v2) {
     double d = 0;
     double[] d1 = new double[v1.length];
     double[] d2 = new double[v2.length];
@@ -73,7 +62,7 @@ public class PhDistanceEuclidPPF implements PhDistance {
       double dl = d1[i] - d2[i];
       d += dl*dl;
     }
-    return d;
+    return Math.sqrt(d);
   }
 
   @Override
