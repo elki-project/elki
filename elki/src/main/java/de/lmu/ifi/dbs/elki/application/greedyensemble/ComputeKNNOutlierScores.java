@@ -286,7 +286,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       @Override
       public void run(int k, String kstr) {
         if(k == startkmin2 && maxk > 100) {
-          LOG.verbose("Note: LODF needs O(k^2) distance computations. Use -" + Parameterizer.DISBALE_ID.getName() + " LDOF to disable.");
+          LOG.verbose("Note: LODF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " LDOF to disable.");
         }
         LDOF<O> ldof = new LDOF<>(distf, k);
         OutlierResult result = ldof.run(database, relation);
@@ -309,7 +309,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       @Override
       public void run(int k, String kstr) {
         if(k == startkmin2 && maxk > 100) {
-          LOG.verbose("Note: FastABOD needs quadratic memory. Use -" + Parameterizer.DISBALE_ID.getName() + " FastABOD to disable.");
+          LOG.verbose("Note: FastABOD needs quadratic memory. Use -" + Parameterizer.DISABLE_ID.getName() + " FastABOD to disable.");
         }
         FastABOD<O> fabod = new FastABOD<>(new PolynomialKernelFunction(2), k);
         OutlierResult result = fabod.run(database, relation);
@@ -395,7 +395,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       @Override
       public void run(int k, String kstr) {
         if(k == startkmin2 && maxk > 100) {
-          LOG.verbose("Note: DWOF needs O(k^2) distance computations. Use -" + Parameterizer.DISBALE_ID.getName() + " DWOF to disable.");
+          LOG.verbose("Note: DWOF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " DWOF to disable.");
         }
         DWOF<O> dwof = new DWOF<>(distf, k, 1.1);
         OutlierResult result = dwof.run(database, relation);
@@ -512,7 +512,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     /**
      * Option ID for disabling methods.
      */
-    public static final OptionID DISBALE_ID = new OptionID("disable", "Disable methods (regular expression, case insensitive, anchored).");
+    public static final OptionID DISABLE_ID = new OptionID("disable", "Disable methods (regular expression, case insensitive, anchored).");
 
     /**
      * k step size
@@ -598,7 +598,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
         scaling = scalingP.instantiateClass(config);
       }
 
-      PatternParameter disableP = new PatternParameter(DISBALE_ID) //
+      PatternParameter disableP = new PatternParameter(DISABLE_ID) //
       .setOptional(true);
       if(config.grab(disableP)) {
         disable = disableP.getValue();
