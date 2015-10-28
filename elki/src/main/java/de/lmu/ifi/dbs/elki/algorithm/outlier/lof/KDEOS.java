@@ -146,6 +146,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult>im
    * @param kmin Minimum number of neighbors
    * @param kmax Maximum number of neighbors
    * @param kernel Kernel function
+   * @param minBandwidth Minimum bandwidth
    * @param scale Kernel scaling parameter
    * @param idim Intrinsic dimensionality (use 0 to use real dimensionality)
    */
