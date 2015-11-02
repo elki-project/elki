@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.DWOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased.FastABOD;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.LocalIsolationCoefficient;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ODIN;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IDOS;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IntrinsicDimensionalityOutlier;
@@ -46,9 +47,12 @@ import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LoOP;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleKernelDensityLOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.VarianceOfVolume;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.ByLabelOutlier;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -322,8 +326,8 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       @Override
       public void run(int k, String kstr) {
         KDEOS<O> kdeos = new KDEOS<>(distf, k, k, //
-        GaussianKernelDensityFunction.KERNEL, //
-        GaussianKernelDensityFunction.KERNEL.canonicalBandwidth(), 0.5, 2);
+        GaussianKernelDensityFunction.KERNEL, 0., //
+        GaussianKernelDensityFunction.KERNEL.canonicalBandwidth(), 2);
         OutlierResult result = kdeos.run(database, relation);
         writeResult(fout, ids, result, scaling, kstr);
         database.getHierarchy().removeSubtree(result);
@@ -333,7 +337,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     runForEachK("LDF", startk, stepk, maxk, new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        LDF<O> ldf = new LDF<>(k, distf, GaussianKernelDensityFunction.KERNEL, 2, .1);
+        LDF<O> ldf = new LDF<>(k, distf, GaussianKernelDensityFunction.KERNEL, 1., .1);
         OutlierResult result = ldf.run(database, relation);
         writeResult(fout, ids, result, scaling, kstr);
         database.getHierarchy().removeSubtree(result);
@@ -403,6 +407,32 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
         database.getHierarchy().removeSubtree(result);
       }
     });
+    // Run LIC
+    runForEachK("LIC", startk, stepk, maxk, new AlgRunner() {
+      @Override
+      public void run(int k, String kstr) {
+        LocalIsolationCoefficient<O> lic = new LocalIsolationCoefficient<>(distf, k);
+        OutlierResult result = lic.run(database, relation);
+        writeResult(fout, ids, result, scaling, kstr);
+        database.getHierarchy().removeSubtree(result);
+      }
+    });
+    // Run VOV (requires a vector field).
+    if(TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(relation.getDataTypeInformation())) {
+      @SuppressWarnings("unchecked")
+      final DistanceFunction<? super DoubleVector> df = (DistanceFunction<? super DoubleVector>) distf;
+      @SuppressWarnings("unchecked")
+      final Relation<DoubleVector> rel = (Relation<DoubleVector>) (Relation<?>) relation;
+      runForEachK("VOV", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          VarianceOfVolume<DoubleVector> vov = new VarianceOfVolume<>(k, df);
+          OutlierResult result = vov.run(database, rel);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+    }
   }
 
   /**
