@@ -52,23 +52,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Outlier detection based on the in-degree of the kNN graph.
- * 
+ *
  * This is a curried version: instead of using a threshold T to obtain a binary
  * decision, we use the computed value as outlier score; normalized by k to make
  * the numbers more comparable across different parameterizations.
- * 
+ *
  * Reference:
  * <p>
- * V. Hautamäki and I. Kärkkäinen and P Fränti<br />
+ * V. Hautamäki and I. Kärkkäinen and P. Fränti<br />
  * Outlier detection using k-nearest neighbour graph<br />
  * Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type
  */
-@Reference(authors = "V. Hautamäki and I. Kärkkäinen and P Fränti", //
+@Reference(authors = "V. Hautamäki and I. Kärkkäinen and P. Fränti", //
 title = "Outlier detection using k-nearest neighbour graph", //
 booktitle = "Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004", //
 url = "http://dx.doi.org/10.1109/ICPR.2004.1334558")
@@ -86,18 +86,18 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param k k parameter
    */
   public ODIN(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
-    this.k = k;
+    this.k = k + 1;
   }
 
   /**
    * Run the ODIN algorithm
-   * 
+   *
    * @param database Database to run on.
    * @param relation Relation to process.
    * @return ODIN outlier result.
@@ -151,17 +151,17 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter for the number of nearest neighbors:
-     * 
+     *
      * <pre>
      * -odin.k &lt;int&gt;
      * </pre>
@@ -177,11 +177,8 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntParameter param = new IntParameter(K_ID);
-      // Since in a database context, the 1 nearest neighbor
-      // will usually be the query object itself, we require
-      // this value to be at least 2.
-      param.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      IntParameter param = new IntParameter(K_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(param)) {
         k = param.intValue();
       }
