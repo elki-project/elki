@@ -62,21 +62,24 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Variance of Volume for outlier detection.
- * 
+ *
  * The volume is estimated by the distance to the k-nearest neighbor, then the
  * variance of volume is computed.
- * 
+ *
+ * Unfortuately, this approach needs an enormous numerical precision, and may
+ * not work for high-dimensional, non-normalized data.
+ *
  * Reference:
  * <p>
  * T. Hu, and S. Y. Sung<br />
  * Detecting pattern-based outliers<br />
  * Pattern Recognition Letters 24(16)
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KNNQuery
- * 
+ *
  * @param <O> the type of data objects handled by this algorithm
  */
 @Reference(authors = "T. Hu, and S. Y. Sung", //
@@ -96,7 +99,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
 
   /**
    * Constructor.
-   * 
+   *
    * @param k the number of neighbors to use for comparison (excluding the query
    *        point)
    * @param distanceFunction the neighborhood distance function
@@ -108,7 +111,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
 
   /**
    * Runs the VOV algorithm on the given database.
-   * 
+   *
    * @param database Database to query
    * @param relation Data to process
    * @return VOV outlier result
@@ -143,7 +146,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
 
   /**
    * Compute volumes
-   * 
+   *
    * @param knnq KNN query
    * @param dim Data dimensionality
    * @param ids IDs to process
@@ -151,10 +154,15 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
    */
   private void computeVolumes(KNNQuery<O> knnq, int dim, DBIDs ids, WritableDoubleDataStore vols) {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Volume", ids.size(), LOG) : null;
-    double scaleconst = Math.pow(Math.PI, dim * .5) / GammaDistribution.gamma(1 + dim * .5);
+    double scaleconst = MathUtil.SQRTPI * Math.pow(GammaDistribution.gamma(1 + dim * .5), -1. / dim);
+    boolean warned = false;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double dk = knnq.getKNNForDBID(iter, k).getKNNDistance();
-      double vol = dk > 0 ? scaleconst * MathUtil.powi(dk, dim) : 0.;
+      double vol = dk > 0 ? MathUtil.powi(dk * scaleconst, dim) : 0.;
+      if(vol == Double.POSITIVE_INFINITY && !warned) {
+        LOG.warning("Variance of Volumes has hit double precision limits, results are not reliable.");
+        warned = true;
+      }
       vols.putDouble(iter, vol);
       LOG.incrementProcessed(prog);
     }
@@ -163,7 +171,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
 
   /**
    * Compute variance of volumes.
-   * 
+   *
    * @param knnq KNN query
    * @param ids IDs to process
    * @param vols Volumes
@@ -172,6 +180,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
    */
   private void computeVOVs(KNNQuery<O> knnq, DBIDs ids, DoubleDataStore vols, WritableDoubleDataStore vovs, DoubleMinMax vovminmax) {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Variance of Volume", ids.size(), LOG) : null;
+    boolean warned = false;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       KNNList knns = knnq.getKNNForDBID(iter, k);
       DoubleDBIDListIter it = knns.iter();
@@ -185,9 +194,13 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
         double v = vols.doubleValue(it) - vbar;
         vov += v * v;
       }
+      if(!(vov < Double.POSITIVE_INFINITY) && !warned) {
+        LOG.warning("Variance of Volumes has hit double precision limits, results are not reliable.");
+        warned = true;
+      }
+      vov = (knns.size() > 1 && vov < Double.POSITIVE_INFINITY) ? vov / (knns.size() - 1) : Double.POSITIVE_INFINITY;
       vovs.putDouble(iter, vov);
       // update minimum and maximum
-      vov = (knns.size() > 1) ? vov / (knns.size() - 1) : Double.POSITIVE_INFINITY;
       vovminmax.put(vov);
       LOG.incrementProcessed(prog);
     }
@@ -206,11 +219,11 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O extends SpatialComparable> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
