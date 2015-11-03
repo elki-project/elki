@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,34 +28,36 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Zipf estimator (qq-estimator) of the intrinsic dimensionality.
- * 
+ *
  * Unfortunately, this estimator appears to have a bias. We have empirically
  * modified the plot position such that bias is reduced, but could not find the
  * proper way of removing this bias for small samples.
- * 
+ *
  * References:
  * <p>
  * M. Kratz and S. I. Resnick<br />
  * The QQ-estimator and heavy tails.<br />
  * Stochastic Models, 12(4), 699-724.
  * </p>
- * 
+ *
  * <p>
  * J. Schultze and J. Steinebach<br />
  * On Least Squares Estimates of an Exponential Tail Coefficient<br />
  * Statistics & Risk Modeling. Band 14, Heft 4
  * </p>
- * 
+ *
  * <p>
  * J. Beirlant and G. Dierckx and A. Guillou<br />
  * Estimation of the extreme-value index and generalized quantile plots.<br />
  * Bernoulli, 11(6), 949-970.
  * </p>
- * 
+ *
+ * TODO: possible to improve numerical precision via log1p?
+ *
  * @author Erich Schubert
  */
 @Reference(authors = "M. Kratz and S. I. Resnick", //
-title = "On Least Squares Estimates of an Exponential Tail Coefficient",//
+title = "On Least Squares Estimates of an Exponential Tail Coefficient", //
 booktitle = "Statistics & Risk Modeling. Band 14, Heft 4", //
 url = "http://dx.doi.org/10.1524/strm.1996.14.4.353")
 public class ZipfEstimator extends AbstractIntrinsicDimensionalityEstimator {
@@ -67,7 +69,7 @@ public class ZipfEstimator extends AbstractIntrinsicDimensionalityEstimator {
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     if(len < 2) {
-      return 0.;
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
     // TODO: any value from literature that works?
     final double bias = .6; // Literature uses 1.
@@ -89,7 +91,7 @@ public class ZipfEstimator extends AbstractIntrinsicDimensionalityEstimator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude

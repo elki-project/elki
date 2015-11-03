@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,11 +27,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Probability weighted moments based estimator, using the second moment.
- * 
+ *
  * It can be shown theoretically that this estimator is expected to have a
  * higher variance than the one using the first moment only, it is included for
  * completeness only.
- * 
+ *
  * We use the unbiased weights of Maciunas Landwehr et al.:
  * <p>
  * J. Maciunas Landwehr and N. C. Matalas and J. R. Wallis<br />
@@ -55,7 +55,7 @@ public class PWM2Estimator extends AbstractIntrinsicDimensionalityEstimator {
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     if(len < 2) {
-      return 0.;
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
     if(len == 2) { // Fallback to MoM
       double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
@@ -80,7 +80,7 @@ public class PWM2Estimator extends AbstractIntrinsicDimensionalityEstimator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude

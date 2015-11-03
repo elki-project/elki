@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,14 +29,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Generalized Expansion Dimension for estimating the intrinsic dimensionality.
- * 
+ *
  * Reference:
  * <p>
  * M. E. Houle, H. Kashima, M. Nett<br />
  * Generalized expansion dimension<br />
  * In: 12th International Conference on Data Mining Workshops (ICDMW)
  * </p>
- * 
+ *
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
@@ -53,7 +53,7 @@ public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     if(len < 2) {
-      return 0.;
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
     final int end = len - 1;
     double[] meds = new double[end << 1];
@@ -78,7 +78,7 @@ public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude

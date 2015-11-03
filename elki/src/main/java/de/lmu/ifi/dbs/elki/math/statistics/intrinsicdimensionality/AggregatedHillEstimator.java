@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,14 +28,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Estimator using the weighted average of multiple hill estimators.
- * 
+ *
  * Reference:
  * <p>
  * R. Huisman and K. G. Koedijk and C. J. M. Kool and F. Palm<br />
  * Tail-Index Estimates in Small Samples<br />
  * Journal of Business & Economic Statistics
  * </p>
- * 
+ *
+ * TODO: possible to improve numerical precision via log1p?
+ *
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
@@ -52,7 +54,7 @@ public class AggregatedHillEstimator extends AbstractIntrinsicDimensionalityEsti
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     if(len < 2) {
-      return 0.;
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
     double hsum = 0.;
     double sum = Math.log(adapter.getDouble(data, 0));
@@ -66,12 +68,12 @@ public class AggregatedHillEstimator extends AbstractIntrinsicDimensionalityEsti
       // Update sum for next hill.
       sum += logv;
     }
-    return -(len) / hsum;
+    return -len / hsum;
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Probability weighted moments based estimator.
- * 
+ *
  * We use the unbiased weights of Maciunas Landwehr et al.:
  * <p>
  * J. Maciunas Landwehr and N. C. Matalas and J. R. Wallis<br />
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * data. When implemented exactly, we would have to assign a weight of 0 to the
  * first point. But since we are not using the mean, we don't want to do this.
  * This hack causes this estimator to have a bias to underestimate the ID.
- * 
+ *
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
@@ -52,7 +52,7 @@ public class PWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     if(len < 2) {
-      return 0.;
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
     if(len == 2) { // Fallback to MoM
       double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
@@ -73,7 +73,7 @@ public class PWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude

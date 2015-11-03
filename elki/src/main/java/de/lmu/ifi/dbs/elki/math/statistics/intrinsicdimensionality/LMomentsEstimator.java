@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,9 +28,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Probability weighted moments based estimator using L-Moments.
- * 
+ *
  * Derived from the L-Moments estimation for the exponential distribution.
- * 
+ *
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
@@ -43,7 +43,7 @@ public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator 
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     if(len < 2) {
-      return 0.;
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
     if(len == 2) { // Fallback to MoM
       double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
@@ -61,7 +61,7 @@ public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator 
 
   /**
    * Adapter to process an array in reverse order.
-   * 
+   *
    * @author Erich Schubert
    *
    * @param <A> Array type
@@ -131,7 +131,7 @@ public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator 
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude
