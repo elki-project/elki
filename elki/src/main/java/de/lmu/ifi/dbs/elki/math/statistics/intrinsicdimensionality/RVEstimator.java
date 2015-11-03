@@ -27,22 +27,23 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Regularly Varying Functions estimator of the intrinsic dimensionality 
- * 
+ * Regularly Varying Functions estimator of the intrinsic dimensionality
+ *
  * Reference:
  * <p>
- * Amsaleg, L., Chelly, O., Furon, T., Girard, S., Houle, M. E., Kawarabayashi, K. & Nett, M.<br />
- * Estimating Local Intrinsic Dimensionality.<br />
- * http://dl.acm.org/citation.cfm?id=2783405.
+ * L. Amsaleg and O. Chelly and T. Furon and S. Girard and M. E. Houle and K.
+ * Kawarabayashi and M. Nett<br />
+ * Estimating Local Intrinsic Dimensionality<br />
+ * Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining
+ * 2015
  * </p>
- * 
+ *
  * @author Oussama Chelly
- * @author Erich Schubert
  */
-@Reference(authors = "Amsaleg, L., Chelly, O., Furon, T., Girard, S., Houle, M. E., & Nett, M.", //
-title = "Estimating Continuous Intrinsic Dimensionality", //
-booktitle = "Proceedings of the 21th ACM SIGKDD.", //
-url = "http://dl.acm.org/citation.cfm?id=2783405")
+@Reference(authors = "L. Amsaleg and O. Chelly and T. Furon and S. Girard and M. E. Houle and K. Kawarabayashi and M. Nett", //
+title = "Estimating Local Intrinsic Dimensionality", //
+booktitle = "Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining 2015", //
+url = "http://dx.doi.org/10.1145/2783258.2783405")
 public class RVEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
@@ -50,24 +51,27 @@ public class RVEstimator extends AbstractIntrinsicDimensionalityEstimator {
   public static final RVEstimator STATIC = new RVEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    int k = len;
-    double n1 = k/2;
-    double n2 = 3*k/4;
-    double n3 = k-1;
-    double r1 = adapter.getDouble(data, (int)n1);
-    double r2 = adapter.getDouble(data, (int)n2);
-    double r3 = adapter.getDouble(data, (int)n3);
-    double p = (r3-r2)/(r1-2*r2+r3);
-    double a1 = 1;
-    double a2 = (1/p)-1;
-    return ( a1*Math.log(n3/n2) + a2*Math.log(n1/n2) ) / ( a1*Math.log(r3/r2) + a2*Math.log(r1/r2) );
+  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int k) {
+    if(k < 2) {
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
+    }
+    final int n1 = k >> 1; // i in Section 5.1 of the ACM publication
+    final int n2 = (3 * k) >> 2; // j in Section 5.1 of the ACM publication
+    final int n3 = k; // n in Section 5.1 of the ACM publication
+    final double r1 = adapter.getDouble(data, n1 - 1);
+    final double r2 = adapter.getDouble(data, n2 - 1);
+    final double r3 = adapter.getDouble(data, n3 - 1);
+    final double p = (r3 - r2) / (r1 - 2 * r2 + r3);
+    // Optimized away: final double a1 = 1;
+    final double a2 = (1. - p) / p;
+    return (/* a1 * */ Math.log(n3 / (double) n2) //
+    + a2 * Math.log(n1 / (double) n2)) / (/* a1 * */ Math.log(r3 / r2) + a2 * Math.log(r1 / r2));
   }
-  
+
   /**
    * Parameterization class.
-   * 
-   * @author Erich Schubert
+   *
+   * @author Oussama Chelly
    *
    * @apiviz.exclude
    */
