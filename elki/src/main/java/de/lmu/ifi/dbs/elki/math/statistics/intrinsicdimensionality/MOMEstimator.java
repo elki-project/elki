@@ -28,23 +28,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Methods of moments estimator, using the first moment (i.e. average).
- * 
+ *
  * This could be generalized to higher order moments, but the variance increases
  * with the order, and we need this to work well with small sample sizes.
- * 
+ *
  * Reference:
  * <p>
- * Amsaleg, L., Chelly, O., Furon, T., Girard, S., Houle, M. E., & Nett, M.<br />
- * Estimating Continuous Intrinsic Dimensionality.<br />
- * NII Technical Report NII-2014-001E.
+ * L. Amsaleg and O. Chelly and T. Furon and S. Girard and M. E. Houle and K.
+ * Kawarabayashi and M. Nett<br />
+ * Estimating Local Intrinsic Dimensionality<br />
+ * Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining
+ * 2015
  * </p>
- * 
+ *
  * @author Erich Schubert
  */
-@Reference(authors = "Amsaleg, L., Chelly, O., Furon, T., Girard, S., Houle, M. E., & Nett, M.", //
-title = "Estimating Continuous Intrinsic Dimensionality", //
-booktitle = "NII Technical Report NII-2014-001E.", //
-url = "http://www.nii.ac.jp/TechReports/14-001E.pdf")
+@Reference(authors = "L. Amsaleg and O. Chelly and T. Furon and S. Girard and M. E. Houle and K. Kawarabayashi and M. Nett", //
+title = "Estimating Local Intrinsic Dimensionality", //
+booktitle = "Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining 2015", //
+url = "http://dx.doi.org/10.1145/2783258.2783405")
 public class MOMEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
@@ -54,7 +56,7 @@ public class MOMEstimator extends AbstractIntrinsicDimensionalityEstimator {
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     if(len < 2) {
-      return 0.;
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
     double v1 = 0.;
     final int num = len - 1;
@@ -67,7 +69,7 @@ public class MOMEstimator extends AbstractIntrinsicDimensionalityEstimator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude
