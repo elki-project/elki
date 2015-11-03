@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,14 +29,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Hill estimator of the intrinsic dimensionality (maximum likelihood estimator
  * for ID).
- * 
+ *
  * Reference:
  * <p>
  * Hill, B. M.<br />
  * A simple general approach to inference about the tail of a distribution<br />
  * The annals of statistics, 3(5), 1163-1174
  * </p>
- * 
+ *
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
@@ -53,23 +53,25 @@ public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     if(len < 2) {
-      return 0.;
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
     final int k = len - 1;
+    final double w = adapter.getDouble(data, k);
+    if(w <= 0.) {
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
+    }
     double sum = 0.;
     for(int i = 0; i < k; ++i) {
-      double v = adapter.getDouble(data, i);
+      final double v = adapter.getDouble(data, i);
       assert (v > 0.);
-      sum += Math.log(v);
+      sum += Math.log1p((v - w) / w);
     }
-    sum /= k;
-    sum -= Math.log(adapter.getDouble(data, k));
-    return -1. / sum;
+    return -k / sum;
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude
