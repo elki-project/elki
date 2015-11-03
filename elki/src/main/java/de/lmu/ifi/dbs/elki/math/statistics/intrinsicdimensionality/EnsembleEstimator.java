@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 
 /**
  * Ensemble estimator taking the median of three of our best estimators.
- * 
+ *
  * However, the method-of-moments estimator seems to work best at least on
  * artificial distances - you don't benefit from always choosing the second
  * best, so this ensemble approach does not appear to help.
@@ -45,14 +45,14 @@ public class EnsembleEstimator extends AbstractIntrinsicDimensionalityEstimator 
   public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
     double mom = MOMEstimator.STATIC.estimate(data, adapter, len);
     double mle = HillEstimator.STATIC.estimate(data, adapter, len);
-    double ged = GEDEstimator.STATIC.estimate(data, adapter, len);
+    double rve = RVEstimator.STATIC.estimate(data, adapter, len);
     return (mom < mle) //
-    ? (mle < ged) ? mle : //
-    // A2) mom,lme < mle
-    (mom < ged) ? ged : mom //
+    ? (mle < rve) ? mle : //
+    // A2) mom,rve < mle
+    (mom < rve) ? rve : mom //
     // B) mle < mom
-    : (mom < ged) ? mom : //
-    // B2) mle, lme < mom
-    (mle < ged) ? ged : mle;
+    : (mom < rve) ? mom : //
+    // B2) mle, rve < mom
+    (mle < rve) ? rve : mle;
   }
 }

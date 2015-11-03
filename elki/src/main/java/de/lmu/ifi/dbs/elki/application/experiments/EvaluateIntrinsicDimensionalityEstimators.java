@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.experiments;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.LMomentsEstim
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWM2Estimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.RVEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.ZipfEstimator;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
@@ -52,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 /**
  * Class for testing the estimation quality of intrinsic dimensionality
  * estimators.
- * 
+ *
  * @author Erich Schubert
  */
 public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplication {
@@ -104,15 +105,18 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     // Hill estimator
     abbreviat.add("Hill");
     estimators.add(HillEstimator.STATIC);
+    // Method of Moments
+    abbreviat.add("MoM");
+    estimators.add(MOMEstimator.STATIC);
+    // Regularly varying functions estimator.
+    abbreviat.add("RV");
+    estimators.add(RVEstimator.STATIC);
     // Aggregated hill estimator
-    abbreviat.add("AggHill");
+    abbreviat.add("AggHi");
     estimators.add(AggregatedHillEstimator.STATIC);
     // Zipf estimator (qq-estimator)
     abbreviat.add("Zipf");
     estimators.add(ZipfEstimator.STATIC);
-    // Method of Moments
-    abbreviat.add("MoM");
-    estimators.add(MOMEstimator.STATIC);
     // Generalized expansion dimension
     abbreviat.add("GED");
     estimators.add(GEDEstimator.STATIC);
@@ -184,7 +188,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
 
   /**
    * Generate a data sample.
-   * 
+   *
    * @param maxk Number of entries.
    * @return Data sample
    */
@@ -201,7 +205,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
 
   /**
    * Output format
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude
@@ -212,7 +216,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
 
   /**
    * Aggregation methods.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude
@@ -399,7 +403,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     ;
     /**
      * Aggregate values.
-     * 
+     *
      * @param data Data to aggregate.
      * @return Aggregated values.
      */
@@ -407,7 +411,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
 
     /**
      * Descriptions of the aggregate values.
-     * 
+     *
      * @return Descriptions
      */
     abstract String[] description();
@@ -422,7 +426,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude
