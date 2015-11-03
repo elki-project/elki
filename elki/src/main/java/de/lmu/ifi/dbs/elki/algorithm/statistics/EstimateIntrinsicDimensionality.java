@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDime
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -97,13 +98,13 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
     DBIDs allids = relation.getDBIDs();
     // Number of samples to draw.
     int ssize = (int) ((samples > 1.) ? samples : Math.ceil(samples * allids.size()));
-    // Number of neighbors to fetch
-    int kk = (int) ((krate > 1.) ? krate : Math.ceil(krate * allids.size()));
+    // Number of neighbors to fetch (+ query point)
+    int kk = 1 + (int) ((krate > 1.) ? krate : Math.ceil(krate * allids.size()));
 
     DBIDs sampleids = DBIDUtil.randomSample(allids, ssize, RandomFactory.DEFAULT);
 
     DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnq = database.getKNNQuery(dq, kk + 1);
+    KNNQuery<O> knnq = database.getKNNQuery(dq, kk);
 
     double[] idim = new double[ssize], kdists = new double[ssize];
     int samples = 0;
@@ -189,7 +190,8 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
       if(config.grab(estimatorP)) {
         estimator = estimatorP.instantiateClass(config);
       }
-      DoubleParameter krateP = new DoubleParameter(KRATE_ID, 50);
+      DoubleParameter krateP = new DoubleParameter(KRATE_ID, 50) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(krateP)) {
         krate = krateP.doubleValue();
       }
