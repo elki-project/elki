@@ -32,17 +32,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * Reference:
  * <p>
- * Hill, B. M.<br />
+ * B. M. Hill<br />
  * A simple general approach to inference about the tail of a distribution<br />
- * The annals of statistics, 3(5), 1163-1174
+ * The annals of statistics 3(5)
  * </p>
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert
  */
-@Reference(authors = "Hill, B. M.", //
+@Reference(authors = "B. M. Hill", //
 title = "A simple general approach to inference about the tail of a distribution", //
-booktitle = "The annals of statistics, 3(5), 1163-1174", //
+booktitle = "The annals of statistics 3(5)", //
 url = "http://dx.doi.org/10.1214/aos/1176343247")
 public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
@@ -60,11 +60,12 @@ public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
     if(w <= 0.) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
+    final double halfw = 0.5 * w;
     double sum = 0.;
     for(int i = 0; i < k; ++i) {
       final double v = adapter.getDouble(data, i);
       assert (v > 0.);
-      sum += Math.log1p((v - w) / w);
+      sum += v < halfw ? Math.log(v / w) : Math.log1p((v - w) / w);
     }
     return -k / sum;
   }
