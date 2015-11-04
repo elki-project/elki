@@ -131,18 +131,18 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
    * Performs the DBSCAN algorithm on the given database.
    */
   public Clustering<Model> run(Relation<O> relation) {
-    RangeQuery<O> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction());
     final int size = relation.size();
+    if(size < minpts) {
+      Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
+      result.addToplevelCluster(new Cluster<Model>(relation.getDBIDs(), true, ClusterModel.CLUSTER));
+      return result;
+    }
 
+    RangeQuery<O> rangeQuery = QueryUtil.getRangeQuery(relation, getDistanceFunction());
     resultList = new ArrayList<>();
     noise = DBIDUtil.newHashSet();
-    if(size < minpts) {
-      // The can't be any clusters
-      noise.addDBIDs(relation.getDBIDs());
-    }
-    else {
-      runDBSCAN(relation, rangeQuery);
-    }
+    runDBSCAN(relation, rangeQuery);
+
     double averagen = ncounter / (double) relation.size();
     LOG.statistics(new DoubleStatistic(DBSCAN.class.getName() + ".average-neighbors", averagen));
     if(averagen < 1 + 0.1 * (minpts - 1)) {
@@ -154,12 +154,9 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
 
     Clustering<Model> result = new Clustering<>("DBSCAN Clustering", "dbscan-clustering");
     for(ModifiableDBIDs res : resultList) {
-      Cluster<Model> c = new Cluster<Model>(res, ClusterModel.CLUSTER);
-      result.addToplevelCluster(c);
+      result.addToplevelCluster(new Cluster<Model>(res, ClusterModel.CLUSTER));
     }
-
-    Cluster<Model> n = new Cluster<Model>(noise, true, ClusterModel.CLUSTER);
-    result.addToplevelCluster(n);
+    result.addToplevelCluster(new Cluster<Model>(noise, true, ClusterModel.CLUSTER));
     return result;
   }
 
