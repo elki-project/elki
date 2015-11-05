@@ -25,13 +25,14 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.util.Comparator;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
  * Represents a subspace of the original data space.
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.owns de.lmu.ifi.dbs.elki.data.Subspace.DimensionComparator
  */
 public class Subspace {
@@ -47,18 +48,18 @@ public class Subspace {
 
   /**
    * Creates a new one-dimensional subspace of the original data space.
-   * 
+   *
    * @param dimension the dimension building this subspace
    */
   public Subspace(int dimension) {
-    dimensions = BitsUtil.zero(dimension);
+    dimensions = BitsUtil.zero(dimension + 1);
     BitsUtil.setI(dimensions, dimension);
     dimensionality = 1;
   }
 
   /**
    * Creates a new k-dimensional subspace of the original data space.
-   * 
+   *
    * @param dimensions the dimensions building this subspace
    */
   public Subspace(long[] dimensions) {
@@ -68,7 +69,7 @@ public class Subspace {
 
   /**
    * Returns the BitSet representing the dimensions of this subspace.
-   * 
+   *
    * @return the dimensions of this subspace
    */
   public final long[] getDimensions() {
@@ -77,7 +78,7 @@ public class Subspace {
 
   /**
    * Returns the dimensionality of this subspace.
-   * 
+   *
    * @return the number of dimensions this subspace contains
    */
   public final int dimensionality() {
@@ -89,7 +90,7 @@ public class Subspace {
    * successful if both subspaces have the first k-1 dimensions in common (where
    * k is the number of dimensions) and the last dimension of this subspace is
    * less than the last dimension of the specified subspace.
-   * 
+   *
    * @param other the subspace to join
    * @return the join of this subspace with the specified subspace if the join
    *         condition is fulfilled, null otherwise.
@@ -107,7 +108,7 @@ public class Subspace {
   /**
    * Returns a string representation of this subspace by calling
    * {@link #toString} with an empty prefix.
-   * 
+   *
    * @return a string representation of this subspace
    */
   @Override
@@ -118,7 +119,7 @@ public class Subspace {
   /**
    * Returns a string representation of this subspace that contains the given
    * string prefix and the dimensions of this subspace.
-   * 
+   *
    * @param pre a string prefix for each row of this string representation
    * @return a string representation of this subspace
    */
@@ -139,7 +140,7 @@ public class Subspace {
   /**
    * Returns a string representation of the dimensions of this subspace
    * separated by comma.
-   * 
+   *
    * @return a string representation of the dimensions of this subspace
    */
   public String dimensonsToString() {
@@ -148,7 +149,7 @@ public class Subspace {
 
   /**
    * Returns a string representation of the dimensions of this subspace.
-   * 
+   *
    * @param sep the separator between the dimensions
    * @return a string representation of the dimensions of this subspace
    */
@@ -172,7 +173,7 @@ public class Subspace {
    * Returns true if this subspace is a subspace of the specified subspace, i.e.
    * if the set of dimensions building this subspace are contained in the set of
    * dimensions building the specified subspace.
-   * 
+   *
    * @param subspace the subspace to test
    * @return true if this subspace is a subspace of the specified subspace,
    *         false otherwise
@@ -196,7 +197,7 @@ public class Subspace {
    * dimensions in common (where k is the number of dimensions) and the last
    * dimension of this subspace is less than the last dimension of the specified
    * subspace.
-   * 
+   *
    * @param other the subspace to join
    * @return the joined dimensions of this subspace with the dimensions of the
    *         specified subspace if the join condition is fulfilled, null
@@ -207,10 +208,13 @@ public class Subspace {
       return null;
     }
 
-    long[] resultDimensions = BitsUtil.zero(this.dimensionality);
+    int alloc = MathUtil.max(dimensions.length, other.dimensions.length);
+    long[] resultDimensions = new long[alloc];
     int last1 = -1, last2 = -1;
 
-    for(int d1 = BitsUtil.nextSetBit(this.dimensions, 0), d2 = BitsUtil.nextSetBit(other.dimensions, 0); d1 >= 0 && d2 >= 0; d1 = BitsUtil.nextSetBit(this.dimensions, d1 + 1), d2 = BitsUtil.nextSetBit(other.dimensions, d2 + 1)) {
+    for(int d1 = BitsUtil.nextSetBit(this.dimensions, 0), d2 = BitsUtil.nextSetBit(other.dimensions, 0); //
+    d1 >= 0 && d2 >= 0; //
+    d1 = BitsUtil.nextSetBit(this.dimensions, d1 + 1), d2 = BitsUtil.nextSetBit(other.dimensions, d2 + 1)) {
       if(d1 == d2) {
         BitsUtil.setI(resultDimensions, d1);
       }
@@ -218,7 +222,7 @@ public class Subspace {
       last2 = d2;
     }
 
-    if(last1 < last2) {
+    if(last1 >= 0 && last2 >= 0 && last1 < last2) {
       BitsUtil.setI(resultDimensions, last1);
       BitsUtil.setI(resultDimensions, last2);
       return resultDimensions;
@@ -230,7 +234,7 @@ public class Subspace {
 
   /**
    * Returns the hash code value of the {@link #dimensions} of this subspace.
-   * 
+   *
    * @return a hash code value for this subspace
    */
   @Override
@@ -242,7 +246,7 @@ public class Subspace {
    * Indicates if the specified object is equal to this subspace, i.e. if the
    * specified object is a Subspace and is built of the same dimensions than
    * this subspace.
-   * 
+   *
    * {@inheritDoc}
    */
   @Override
@@ -263,7 +267,7 @@ public class Subspace {
   /**
    * A comparator for subspaces based on their involved dimensions. The
    * subspaces are ordered according to the ordering of their dimensions.
-   * 
+   *
    * @author Elke Achtert
    */
   public static class DimensionComparator implements Comparator<Subspace> {
@@ -277,7 +281,7 @@ public class Subspace {
      * Then a negative integer or a positive integer will be returned if
      * {@code d1} is less than or greater than {@code d2}. Otherwise the two
      * subspaces have equal dimensions and zero will be returned.
-     * 
+     *
      * {@inheritDoc}
      */
     @Override
