@@ -91,14 +91,15 @@ public class TooltipStringVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    VisualizationTree.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
+    VisualizationTree.findNewSiblings(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, Relation<?> rep, ScatterPlotProjector<?> p) {
         final Relation<?> rel = p.getRelation();
         if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
           return;
         }
-        if(DBID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+        final Class<?> clz = rep.getDataTypeInformation().getRestrictionClass();
+        if(DBID.class.isAssignableFrom(clz)) {
           final VisualizationTask task = new VisualizationTask(NAME_ID, context, rep, rel, TooltipStringVisualization.this);
           task.tool = true;
           task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
