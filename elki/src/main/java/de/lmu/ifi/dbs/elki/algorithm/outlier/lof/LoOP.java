@@ -163,7 +163,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     KNNQuery<O> knnComp, knnReach;
     if(comparisonDistanceFunction == reachabilityDistanceFunction || comparisonDistanceFunction.equals(reachabilityDistanceFunction)) {
       LOG.beginStep(stepprog, 1, "Materializing neighborhoods with respect to reference neighborhood distance function.");
-      knnComp = DatabaseUtil.precomputedKNNQuery(database, relation, comparisonDistanceFunction, kcomp + 1);
+      knnComp = DatabaseUtil.precomputedKNNQuery(database, relation, comparisonDistanceFunction, MathUtil.max(kcomp, kreach) + 1);
       knnReach = knnComp;
     }
     else {
@@ -242,7 +242,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     // computing PRDs
     FiniteProgress prdsProgress = LOG.isVerbose() ? new FiniteProgress("pdists", relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList neighbors = knn.getKNNForDBID(iditer, kreach + 1);
+      final KNNList neighbors = knn.getKNNForDBID(iditer, kreach + 1); // + query point
       // use first kref neighbors as reference set
       int ks = 0;
       double ssum = 0.;
@@ -274,7 +274,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     FiniteProgress progressPLOFs = LOG.isVerbose() ? new FiniteProgress("PLOFs for objects", relation.size(), LOG) : null;
     double nplof = 0.;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList neighbors = knn.getKNNForDBID(iditer, kcomp + 1);
+      final KNNList neighbors = knn.getKNNForDBID(iditer, kcomp + 1); // + query point
       // use first kref neighbors as comparison set.
       int ks = 0;
       double sum = 0.;

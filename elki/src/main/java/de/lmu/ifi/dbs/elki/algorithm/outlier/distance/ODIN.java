@@ -92,7 +92,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
    */
   public ODIN(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
-    this.k = k + 1;
+    this.k = k + 1; // + query point
   }
 
   /**

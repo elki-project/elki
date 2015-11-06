@@ -96,7 +96,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
    */
   public SimpleKernelDensityLOF(int k, DistanceFunction<? super O> distance, KernelDensityFunction kernel) {
     super(distance);
-    this.k = k + 1;
+    this.k = k + 1; // + query point
     this.kernel = kernel;
   }
 
@@ -216,7 +216,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     /**
      * The neighborhood size to use.
      */
-    protected int k = 2;
+    protected int k;
 
     /**
      * Kernel density function parameter
@@ -227,8 +227,8 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID);
-      pK.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      final IntParameter pK = new IntParameter(LOF.Parameterizer.K_ID) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(pK)) {
         k = pK.getValue();
       }

@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * A simplified version of the original LOF algorithm, which does not use the
  * reachability distance, yielding less stable results on inliers.
- * 
+ *
  * Reference:
  * <p>
  * Erich Schubert, Arthur Zimek, Hans-Peter Kriegel<br />
@@ -66,11 +66,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Applications to Spatial, Video, and Network Outlier Detection<br />
  * Data Mining and Knowledge Discovery, 28(1): 190–237, 2014.
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KNNQuery
- * 
+ *
  * @param <O> the type of data objects handled by this algorithm
  */
 @Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
@@ -91,17 +91,17 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
 
   /**
    * Constructor.
-   * 
+   *
    * @param k the value of k
    */
   public SimplifiedLOF(int k, DistanceFunction<? super O> distance) {
     super(distance);
-    this.k = k + 1;
+    this.k = k + 1; // + query point
   }
 
   /**
    * Run the Simple LOF algorithm.
-   * 
+   *
    * @param database Database to query
    * @param relation Data to process
    * @return LOF outlier result
@@ -136,7 +136,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
 
   /**
    * Compute the simplified reachability densities.
-   * 
+   *
    * @param ids IDs to process
    * @param knnq kNN query class
    * @param lrds Density output
@@ -164,7 +164,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
 
   /**
    * Compute the simplified LOF factors.
-   * 
+   *
    * @param ids IDs to compute for
    * @param knnq kNN query class
    * @param slrds Object densities
@@ -218,11 +218,11 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

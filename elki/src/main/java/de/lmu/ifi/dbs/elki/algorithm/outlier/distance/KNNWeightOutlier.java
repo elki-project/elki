@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Outlier Detection based on the accumulated distances of a point to its k
  * nearest neighbors.
- * 
+ *
  * As in the original publication (as far as we could tell from the pseudocode
  * included), the current point is not included in the nearest neighbors (see
  * figures in the publication). This matches the intuition common in nearest
@@ -67,11 +67,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * training set; but it contrasts to the pseudocode of the kNN outlier method
  * and the database interpretation (which returns all objects stored in the
  * database).
- * 
+ *
  * Furthermore, we report the sum of the k distances (called "weight" in the
  * original publication). Other implementations may return the average distance
  * instead, and therefore yield different results.
- * 
+ *
  * Reference:
  * <p>
  * F. Angiulli, C. Pizzuti:<br />
@@ -79,11 +79,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * In: Proc. European Conference on Principles of Knowledge Discovery and Data
  * Mining (PKDD'02), Helsinki, Finland, 2002.
  * </p>
- * 
+ *
  * @author Lisa Reichert
- * 
+ *
  * @apiviz.has KNNQuery
- * 
+ *
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 @Title("KNNWeight outlier detection")
@@ -100,13 +100,13 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
   private static final Logging LOG = Logging.getLogger(KNNWeightOutlier.class);
 
   /**
-   * Holds the number of nearest neighbors to query (including query point!)
+   * Holds the number of nearest neighbors to query (excluding the query point!)
    */
   private int k;
 
   /**
    * Constructor with parameters.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param k k Parameter (not including query point!)
    */
@@ -117,20 +117,20 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
 
   /**
    * Runs the algorithm in the timed evaluation part.
-   * 
+   *
    * @param database Database context
    * @param relation Data relation
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1);
+    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1); // + query point
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute kNN weights.", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore knnw_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList knn = knnQuery.getKNNForDBID(iditer, k + 1);
+      final KNNList knn = knnQuery.getKNNForDBID(iditer, k + 1); // + query point
       double skn = 0; // sum of the distances to the k nearest neighbors
       int i = 0; // number of neighbors so far
       for(DoubleDBIDListIter neighbor = knn.iter(); i < k && neighbor.valid(); neighbor.advance()) {
@@ -169,9 +169,9 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
@@ -185,7 +185,7 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
     /**
      * k parameter
      */
-    protected int k = 0;
+    protected int k;
 
     @Override
     protected void makeOptions(Parameterization config) {

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -70,17 +70,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Algorithm to compute dynamic-window outlier factors in a database based on a
  * specified parameter {@link Parameterizer#K_ID} ({@code -dwof.k}).
  * </p>
- * 
+ *
  * <p>
  * The parameter {@link Parameterizer#K_ID} specifies the number of the
  * neighbors to be considered during the calculation of the DWOF score.
  * </p>
- * 
+ *
  * <p>
  * All the distance queries -KNN and Range- are determined using the parameter
  * {@link AbstractDistanceBasedAlgorithm#DISTANCE_FUNCTION_ID}
  * </p>
- * 
+ *
  * <p>
  * Reference: <br>
  * Rana Momtaz, Nesma Mohssen and Mohammad A. Gowayyed: DWOF: A Robust
@@ -88,9 +88,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * In: Pattern Recognition and Image Analysis , Proc. 6th Iberian Conference,
  * IbPRIA 2013, Funchal, Madeira, Portugal, June 5-7, 2013.
  * </p>
- * 
+ *
  * @author Omar Yousry
- * 
+ *
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 @Title("DWOF: Dynamic Window Outlier Factor")
@@ -117,21 +117,21 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function to use in queries
    * @param k the value of k
    * @param delta Radius increase factor
    */
   public DWOF(DistanceFunction<? super O> distanceFunction, int k, double delta) {
     super(distanceFunction);
-    this.k = k + 1;
+    this.k = k + 1; // + query point
     this.delta = delta;
   }
 
   /**
    * Performs the Generalized DWOF_SCORE algorithm on the given database by
    * calling all the other methods in the proper order.
-   * 
+   *
    * @param database Database to query
    * @param relation Data to process
    * @return new OutlierResult instance
@@ -198,10 +198,10 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
   /**
    * This method prepares a container for the radii of the objects and
    * initializes radii according to the equation:
-   * 
+   *
    * initialRadii of a certain object = (absoluteMinDist of all objects) *
    * (avgDist of the object) / (minAvgDist of all objects)
-   * 
+   *
    * @param ids Database IDs to process
    * @param distFunc Distance function
    * @param knnq kNN search function
@@ -250,13 +250,13 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * This method applies a density based clustering algorithm.
-   * 
+   *
    * It looks for an unclustered object and builds a new cluster for it, then
    * adds all the points within its radius to that cluster.
-   * 
+   *
    * nChain represents the points to be added to the cluster and its
    * radius-neighbors
-   * 
+   *
    * @param ids Database IDs to process
    * @param rnnQuery Data to process
    * @param radii Radii to cluster accordingly
@@ -307,7 +307,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * This method updates each object's cluster size after the clustering step.
-   * 
+   *
    * @param ids Object IDs to process
    * @param labels references for each object's cluster
    * @param newSizes the sizes container to be updated
@@ -340,11 +340,11 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Omar Yousry
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
@@ -361,7 +361,7 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     /**
      * Number of neighbors to get
      */
-    protected int k = 2;
+    protected int k;
 
     /**
      * Radius increase factor.
@@ -372,14 +372,14 @@ public class DWOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     protected void makeOptions(Parameterization config) {
       // The super class has the distance function parameter!
       super.makeOptions(config);
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+      IntParameter kP = new IntParameter(K_ID) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(kP)) {
         k = kP.getValue();
       }
-      DoubleParameter deltaP = new DoubleParameter(DELTA_ID);
-      deltaP.setDefaultValue(1.1);
-      deltaP.addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE);
+      DoubleParameter deltaP = new DoubleParameter(DELTA_ID) //
+      .setDefaultValue(1.1) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE);
       if(config.grab(deltaP)) {
         delta = deltaP.getValue();
       }

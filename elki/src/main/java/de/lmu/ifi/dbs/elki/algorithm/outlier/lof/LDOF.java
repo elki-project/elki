@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -58,30 +58,29 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * <p>
  * Computes the LDOF (Local Distance-Based Outlier Factor) for all objects of a
  * Database.
- * </p>
- * 
+ *
+ * Reference:
  * <p>
- * Reference:<br>
- * K. Zhang, M. Hutter, H. Jin: A New Local Distance-Based Outlier Detection
- * Approach for Scattered Real-World Data.<br>
+ * K. Zhang, M. Hutter, H. Jin<br />
+ * A New Local Distance-Based Outlier Detection Approach for Scattered
+ * Real-World Data.<br />
  * In: Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and
  * Data Mining (PAKDD 2009), Bangkok, Thailand, 2009.
  * </p>
- * 
+ *
  * @author Arthur Zimek
- * 
+ *
  * @apiviz.has KNNQuery
- * 
+ *
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 @Title("LDOF: Local Distance-Based Outlier Factor")
 @Description("Local outlier detection appraoch suitable for scattered data by averaging the kNN distance over all k nearest neighbors")
 @Reference(authors = "K. Zhang, M. Hutter, H. Jin", //
 title = "A New Local Distance-Based Outlier Detection Approach for Scattered Real-World Data", //
-booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009), Bangkok, Thailand, 2009", //
+booktitle = "Proc. 13th Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining (PAKDD 2009)", //
 url = "http://dx.doi.org/10.1007/978-3-642-01307-2_84")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF" })
 public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
@@ -91,43 +90,37 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
   private static final Logging LOG = Logging.getLogger(LDOF.class);
 
   /**
-   * Parameter to specify the number of nearest neighbors of an object to be
-   * considered for computing its LDOF_SCORE, must be an integer greater than 1.
-   */
-  public static final OptionID K_ID = new OptionID("ldof.k", "The number of nearest neighbors of an object to be considered for computing its LDOF_SCORE.");
-
-  /**
    * The baseline for LDOF values. The paper gives 0.5 for uniform
    * distributions, although one might also discuss using 1.0 as baseline.
    */
   private static final double LDOF_BASELINE = 0.5;
 
   /**
-   * Holds the value of {@link #K_ID}.
+   * Number of neighbors to query.
    */
-  int k;
+  protected int k;
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k Parameter
    */
   public LDOF(DistanceFunction<? super O> distanceFunction, int k) {
     super(distanceFunction);
-    this.k = k;
+    this.k = k + 1; // + query point
   }
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param database Database to process
    * @param relation Relation to process
    * @return Outlier result
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, k + 1);
+    KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, k);
 
     // track the maximum value for normalization
     DoubleMinMax ldofminmax = new DoubleMinMax();
@@ -142,10 +135,11 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     Mean dxp = new Mean(), Dxp = new Mean();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      KNNList neighbors = knnQuery.getKNNForDBID(iditer, k + 1);
+      KNNList neighbors = knnQuery.getKNNForDBID(iditer, k);
       dxp.reset();
       Dxp.reset();
-      DoubleDBIDListIter neighbor1 = neighbors.iter(), neighbor2 = neighbors.iter();
+      DoubleDBIDListIter neighbor1 = neighbors.iter(),
+          neighbor2 = neighbors.iter();
       for(; neighbor1.valid(); neighbor1.advance()) {
         // skip the point itself
         if(DBIDUtil.equal(neighbor1, iditer)) {
@@ -190,13 +184,23 @@ public class LDOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
-    protected int k = 0;
+    /**
+     * Parameter to specify the number of nearest neighbors of an object to be
+     * considered for computing its LDOF_SCORE, must be an integer greater than
+     * 1.
+     */
+    public static final OptionID K_ID = new OptionID("ldof.k", "The number of nearest neighbors of an object to be considered for computing its LDOF_SCORE.");
+
+    /**
+     * Number of neighbors to use
+     */
+    protected int k;
 
     @Override
     protected void makeOptions(Parameterization config) {

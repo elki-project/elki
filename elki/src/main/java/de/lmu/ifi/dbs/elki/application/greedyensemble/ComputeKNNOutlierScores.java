@@ -321,13 +321,13 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
         database.getHierarchy().removeSubtree(result);
       }
     });
-    // Run KDEOS
+    // Run KDEOS with intrinsic dimensionality 2.
     runForEachK("KDEOS", startkmin2, stepk, maxk, new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
         KDEOS<O> kdeos = new KDEOS<>(distf, k, k, //
         GaussianKernelDensityFunction.KERNEL, 0., //
-        GaussianKernelDensityFunction.KERNEL.canonicalBandwidth(), 2);
+        .5 * GaussianKernelDensityFunction.KERNEL.canonicalBandwidth(), 2);
         OutlierResult result = kdeos.run(database, relation);
         writeResult(fout, ids, result, scaling, kstr);
         database.getHierarchy().removeSubtree(result);
@@ -353,6 +353,16 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
         database.getHierarchy().removeSubtree(result);
       }
     });
+    // Run COF
+    runForEachK("COF", startk, stepk, maxk, new AlgRunner() {
+      @Override
+      public void run(int k, String kstr) {
+        COF<O> cof = new COF<>(k, distf);
+        OutlierResult result = cof.run(database, relation);
+        writeResult(fout, ids, result, scaling, kstr);
+        database.getHierarchy().removeSubtree(result);
+      }
+    });
     // Run simple Intrinsic dimensionality
     runForEachK("Intrinsic", startkmin2, stepk, maxk, new AlgRunner() {
       @Override
@@ -369,16 +379,6 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       public void run(int k, String kstr) {
         IDOS<O> idos = new IDOS<>(distf, HillEstimator.STATIC, k, k);
         OutlierResult result = idos.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run COF
-    runForEachK("COF", startk, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        COF<O> cof = new COF<>(k, distf);
-        OutlierResult result = cof.run(database, relation);
         writeResult(fout, ids, result, scaling, kstr);
         database.getHierarchy().removeSubtree(result);
       }

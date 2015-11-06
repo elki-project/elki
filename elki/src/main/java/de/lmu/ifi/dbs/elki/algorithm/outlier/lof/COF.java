@@ -58,14 +58,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Connectivity-based outlier factor (COF).
- * 
+ *
  * Reference:
  * <p>
  * J. Tang, Z. Chen, A. W. C. Fu, D. W. Cheung<br />
  * Enhancing effectiveness of outlier detections for low density patterns.<br />
  * In Advances in Knowledge Discovery and Data Mining.
  * </p>
- * 
+ *
  * @author Erich Schubert
  *
  * @param <O> Object type
@@ -87,19 +87,19 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
 
   /**
    * Constructor.
-   * 
+   *
    * @param k the number of neighbors to use for comparison (excluding the query
    *        point)
    * @param distanceFunction the neighborhood distance function
    */
   public COF(int k, DistanceFunction<? super O> distanceFunction) {
     super(distanceFunction);
-    this.k = k + 1;
+    this.k = k + 1; // + query point
   }
 
   /**
    * Runs the COF algorithm on the given database.
-   * 
+   *
    * @param database Database to query
    * @param relation Data to process
    * @return COF outlier result
@@ -136,9 +136,9 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    * to approximate this value using a weighted mean that assumes every object
    * is reached from the previous point (but actually every point could be best
    * reachable from the first, in which case this does not make much sense.)
-   * 
+   *
    * TODO: can we accelerate this by using the kNN of the neighbors?
-   * 
+   *
    * @param knnq KNN query
    * @param dq Distance query
    * @param ids IDs to process
@@ -196,7 +196,7 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
 
   /**
    * Compute Connectivity outlier factors.
-   * 
+   *
    * @param knnq KNN query
    * @param ids IDs to process
    * @param acds Average chaining distances
@@ -238,11 +238,11 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
@@ -255,7 +255,7 @@ public class COF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
     /**
      * The neighborhood size to use.
      */
-    protected int k = 2;
+    protected int k;
 
     @Override
     protected void makeOptions(Parameterization config) {

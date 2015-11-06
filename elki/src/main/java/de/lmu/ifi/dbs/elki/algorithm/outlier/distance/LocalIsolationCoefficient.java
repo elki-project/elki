@@ -56,21 +56,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * The Local Isolation Coefficient is the sum of the kNN distance and the
  * average distance to its k nearest neighbors.
- * 
+ *
  * The algorithm originally used a normalized Manhattan distance on numerical
  * attributes, and Hamming distance on categorial attributes.
- * 
+ *
  * Reference:
  * <p>
  * B. Yu, and M. Song, and L. Wang<br />
  * Local Isolation Coefficient-Based Outlier Mining Algorithm<br />
  * Int. Conf. on Information Technology and Computer Science (ITCS) 2009
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has KNNQuery
- * 
+ *
  * @param <O> the type of objects handled by this Algorithm
  */
 @Reference(authors = "B. Yu, and M. Song, and L. Wang", //
@@ -90,7 +90,7 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
 
   /**
    * Constructor with parameters.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param k k Parameter (not including query point!)
    */
@@ -101,20 +101,20 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
 
   /**
    * Runs the algorithm in the timed evaluation part.
-   * 
+   *
    * @param database Database context
    * @param relation Data relation
    */
   public OutlierResult run(Database database, Relation<O> relation) {
     final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1);
+    KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1); // + query point
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute Local Isolation Coefficients", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore lic_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final KNNList knn = knnQuery.getKNNForDBID(iditer, k + 1);
+      final KNNList knn = knnQuery.getKNNForDBID(iditer, k + 1); // + query point
       double skn = 0; // sum of the distances to the k nearest neighbors
       int i = 0; // number of neighbors so far
       for(DoubleDBIDListIter neighbor = knn.iter(); i < k && neighbor.valid(); neighbor.advance()) {
@@ -149,9 +149,9 @@ public class LocalIsolationCoefficient<O> extends AbstractDistanceBasedAlgorithm
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
