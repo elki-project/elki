@@ -234,6 +234,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
 
     final int startk = (this.startk > 0) ? this.startk : this.stepk;
     final int startkmin2 = (startk >= 2) ? startk : (startk + stepk);
+    final int startkmin3 = (startk >= 3) ? startk : (startkmin2 >= 3) ? startkmin2 : (startkmin2 + stepk);
 
     // KNN
     runForEachK("KNN", startk, stepk, maxk, new AlgRunner() {
@@ -309,10 +310,10 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       }
     });
     // Run FastABOD
-    runForEachK("FastABOD", startkmin2, stepk, maxk, new AlgRunner() {
+    runForEachK("FastABOD", startkmin3, stepk, maxk, new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
-        if(k == startkmin2 && maxk > 100) {
+        if(k == startkmin3 && maxk > 100) {
           LOG.verbose("Note: FastABOD needs quadratic memory. Use -" + Parameterizer.DISABLE_ID.getName() + " FastABOD to disable.");
         }
         FastABOD<O> fabod = new FastABOD<>(new PolynomialKernelFunction(2), k);

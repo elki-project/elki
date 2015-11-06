@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
@@ -60,6 +61,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
  *
  * Fast-ABOD (approximateABOF) version.
+ *
+ * Note: the minimum k is 3. The 2 nearest neighbors yields one 1 angle, which
+ * implies a constant 0 variance everywhere.
  *
  * Reference:
  * <p>
@@ -207,7 +211,8 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final IntParameter kP = new IntParameter(K_ID);
+      final IntParameter kP = new IntParameter(K_ID) //
+      .addConstraint(new GreaterEqualConstraint(3));
       if(config.grab(kP)) {
         k = kP.intValue();
       }
