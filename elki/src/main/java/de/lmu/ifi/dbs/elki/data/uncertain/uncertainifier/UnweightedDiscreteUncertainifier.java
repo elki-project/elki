@@ -56,7 +56,7 @@ public class UnweightedDiscreteUncertainifier extends AbstractDiscreteUncertaini
   @Override
   public <A> UnweightedDiscreteUncertainObject newFeatureVector(Random rand, A array, NumberArrayAdapter<?, A> adapter) {
     UncertainObject uo = inner.newFeatureVector(rand, array, adapter);
-    final int distributionSize = rand.nextInt((maxQuant - minQuant) + 1) + (int) minQuant;
+    final int distributionSize = rand.nextInt((maxQuant - minQuant) + 1) + minQuant;
     DoubleVector[] samples = new DoubleVector[distributionSize];
     for(int i = 0; i < distributionSize; i++) {
       samples[i] = uo.drawSample(rand);
