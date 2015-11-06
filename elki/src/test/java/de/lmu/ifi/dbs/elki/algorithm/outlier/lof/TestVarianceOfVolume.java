@@ -35,12 +35,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 
 /**
  * Tests the Variance of Volume algorithm.
- * 
+ *
  * @author Erich Schubert
  */
 public class TestVarianceOfVolume extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
-  public void testLOF() {
+  public void testVOV() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
     // Parameterization
@@ -54,7 +54,7 @@ public class TestVarianceOfVolume extends AbstractSimpleAlgorithmTest implements
     // run LOF on database
     OutlierResult result = lof.run(db);
 
-    testSingleScore(result, 1293, 4.384024065523565e7);
+    testSingleScore(result, 1293, 848349.0186);
     testAUC(db, "Noise", result, 0.936448179271);
   }
 }
