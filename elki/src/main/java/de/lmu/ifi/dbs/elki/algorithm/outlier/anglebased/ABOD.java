@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,10 +32,10 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
@@ -60,11 +60,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
- * 
+ *
  * Outlier detection using variance analysis on angles, especially for high
  * dimensional data sets. Exact version, which has cubic runtime (see also
  * {@link FastABOD} and {@link LBABOD} for faster versions).
- * 
+ *
  * Reference:
  * <p>
  * H.-P. Kriegel, M. Schubert, and A. Zimek:<br />
@@ -72,10 +72,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
  * (KDD '08), Las Vegas, NV, 2008.
  * </p>
- * 
+ *
  * @author Matthias Schubert (Original Code)
  * @author Erich Schubert (ELKIfication)
- * 
+ *
  * @param <V> Vector type
  */
 @Title("ABOD: Angle-Based Outlier Detection")
@@ -98,7 +98,7 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
 
   /**
    * Constructor for Angle-Based Outlier Detection (ABOD).
-   * 
+   *
    * @param kernelFunction kernel function to use
    */
   public ABOD(SimilarityFunction<? super V> kernelFunction) {
@@ -108,12 +108,12 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
 
   /**
    * Run ABOD on the data set.
-   * 
+   *
    * @param relation Relation to process
    * @return Outlier detection result
    */
   public OutlierResult run(Database db, Relation<V> relation) {
-    DBIDs ids = relation.getDBIDs();
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     // Build a kernel matrix, to make O(n^3) slightly less bad.
     SimilarityQuery<V> sq = db.getSimilarityQuery(relation, kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
@@ -122,8 +122,9 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
     DoubleMinMax minmaxabod = new DoubleMinMax();
 
     MeanVariance s = new MeanVariance();
-    for(DBIDIter pA = ids.iter(); pA.valid(); pA.advance()) {
-      final double abof = computeABOF(relation, kernelMatrix, pA, s);
+    DBIDArrayIter pA = ids.iter(), pB = ids.iter(), pC = ids.iter();
+    for(; pA.valid(); pA.advance()) {
+      final double abof = computeABOF(kernelMatrix, pA, pB, pC, s);
       minmaxabod.put(abof);
       abodvalues.putDouble(pA, abof);
     }
@@ -136,51 +137,50 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
 
   /**
    * Compute the exact ABOF value.
-   * 
-   * @param relation Relation
+   *
    * @param kernelMatrix Kernel matrix
    * @param pA Object A to compute ABOF for
+   * @param pB Iterator over objects B
+   * @param pc Iterator over objects C
    * @param s Statistics tracker
    * @return ABOF value
    */
-  protected double computeABOF(Relation<V> relation, KernelMatrix kernelMatrix, DBIDRef pA, MeanVariance s) {
+  protected double computeABOF(KernelMatrix kernelMatrix, DBIDRef pA, DBIDArrayIter pB, DBIDArrayIter pC, MeanVariance s) {
     s.reset(); // Reused
     double simAA = kernelMatrix.getSimilarity(pA, pA);
 
-    for(DBIDIter nB = relation.iterDBIDs(); nB.valid(); nB.advance()) {
-      if(DBIDUtil.equal(nB, pA)) {
+    for(pB.seek(0); pB.valid(); pB.advance()) {
+      if(DBIDUtil.equal(pB, pA)) {
         continue;
       }
-      double simBB = kernelMatrix.getSimilarity(nB, nB);
-      double simAB = kernelMatrix.getSimilarity(pA, nB);
+      double simBB = kernelMatrix.getSimilarity(pB, pB);
+      double simAB = kernelMatrix.getSimilarity(pA, pB);
       double sqdAB = simAA + simBB - simAB - simAB;
       if(!(sqdAB > 0.)) {
         continue;
       }
-      for(DBIDIter nC = relation.iterDBIDs(); nC.valid(); nC.advance()) {
-        if(DBIDUtil.equal(nC, pA) || DBIDUtil.compare(nC, nB) < 0) {
+      for(pC.seek(pB.getOffset() + 1); pC.valid(); pC.advance()) {
+        if(DBIDUtil.equal(pC, pA)) {
           continue;
         }
-        double simCC = kernelMatrix.getSimilarity(nC, nC);
-        double simAC = kernelMatrix.getSimilarity(pA, nC);
-        double sqdAC = simAA + simCC - simAC;
+        double simCC = kernelMatrix.getSimilarity(pC, pC);
+        double simAC = kernelMatrix.getSimilarity(pA, pC);
+        double sqdAC = simAA + simCC - simAC - simAC;
         if(!(sqdAC > 0.)) {
           continue;
         }
         // Exploit bilinearity of scalar product:
-        // <B-A, C-A> = <B, C-A> - <A,C-A>
+        // <B-A, C-A> = <B,C-A> - <A,C-A>
         // = <B,C> - <B,A> - <A,C> + <A,A>
-        // For computing variance, AA is a constant and can be ignored.
-        double simBC = kernelMatrix.getSimilarity(nB, nC);
-        double numerator = simBC - simAB - simAC; // + simAA;
-        double val = numerator / (sqdAB * sqdAC);
-        s.put(val, 1. / Math.sqrt(sqdAB * sqdAC));
+        double simBC = kernelMatrix.getSimilarity(pB, pC);
+        double numerator = simBC - simAB - simAC + simAA;
+        double div = 1. / (sqdAB * sqdAC);
+        s.put(numerator * div, Math.sqrt(div));
       }
     }
-    // Sample variance probably would be correct, but the ABOD publication
+    // Sample variance probably would be better here, but the ABOD publication
     // uses the naive variance.
-    final double abof = s.getNaiveVariance();
-    return abof;
+    return s.getNaiveVariance();
   }
 
   @Override
@@ -195,9 +195,9 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {

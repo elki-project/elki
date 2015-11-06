@@ -27,7 +27,6 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased.FastABOD;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 
 /**
  * Tests the ABOD algorithm.
- * 
+ *
  * @author Lucia Cichella
  */
 public class TestFastABOD extends AbstractSimpleAlgorithmTest implements JUnit4Test {
@@ -55,7 +54,7 @@ public class TestFastABOD extends AbstractSimpleAlgorithmTest implements JUnit4T
     // run ABOD on database
     OutlierResult result = abod.run(db);
 
-    testAUC(db, "Noise", result, 0.963259259259);
-    testSingleScore(result, 945, 0.68723169783);
+    testAUC(db, "Noise", result, 0.94626962962);
+    testSingleScore(result, 945, 3.28913914467E-4);
   }
 }

@@ -35,9 +35,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 
 /**
  * Tests the ABOD algorithm.
- * 
+ *
  * Note: we don't implement JUnit4Test, as this test is slow.
- * 
+ *
  * @author Lucia Cichella
  */
 public class TestABOD extends AbstractSimpleAlgorithmTest {
@@ -55,7 +55,7 @@ public class TestABOD extends AbstractSimpleAlgorithmTest {
     // run ABOD on database
     OutlierResult result = abod.run(db);
 
-    testAUC(db, "Noise", result, 0.94887037037037);
-    testSingleScore(result, 945, 1.88108120738508E-4);
+    testAUC(db, "Noise", result, 0.9297962962962);
+    testSingleScore(result, 945, 2.0897348547799E-5);
   }
 }

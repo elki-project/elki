@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -33,7 +33,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
@@ -47,8 +49,6 @@ import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMaxHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ObjectHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -58,9 +58,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
- * 
+ *
  * Fast-ABOD (approximateABOF) version.
- * 
+ *
  * Reference:
  * <p>
  * H.-P. Kriegel, M. Schubert, and A. Zimek:<br />
@@ -68,10 +68,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
  * (KDD '08), Las Vegas, NV, 2008.
  * </p>
- * 
+ *
  * @author Matthias Schubert (Original Code)
  * @author Erich Schubert (ELKIfication)
- * 
+ *
  * @param <V> Vector type
  */
 @Title("Approximate ABOD: Angle-Based Outlier Detection")
@@ -94,7 +94,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
 
   /**
    * Constructor for Angle-Based Outlier Detection (ABOD).
-   * 
+   *
    * @param kernelFunction kernel function to use
    * @param k Number of nearest neighbors
    */
@@ -105,7 +105,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
 
   /**
    * Run Fast-ABOD on the data set.
-   * 
+   *
    * @param relation Relation to process
    * @return Outlier detection result
    */
@@ -120,12 +120,12 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
     DoubleMinMax minmaxabod = new DoubleMinMax();
 
     MeanVariance s = new MeanVariance();
+    KNNHeap nn = DBIDUtil.newHeap(k);
     for(DBIDIter pA = ids.iter(); pA.valid(); pA.advance()) {
-      s.reset();
       final double simAA = kernelMatrix.getSimilarity(pA, pA);
 
       // Choose the k-min nearest
-      ComparableMaxHeap<DoubleDBIDPair> nn = new ComparableMaxHeap<>(k);
+      nn.clear();
       for(DBIDIter nB = relation.iterDBIDs(); nB.valid(); nB.advance()) {
         if(DBIDUtil.equal(nB, pA)) {
           continue;
@@ -136,43 +136,35 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
         if(!(sqdAB > 0.)) {
           continue;
         }
-        if(nn.size() < k) {
-          nn.add(DBIDUtil.newPair(sqdAB, nB));
-        }
-        else if(sqdAB < nn.peek().doubleValue()) {
-          nn.replaceTopElement(DBIDUtil.newPair(sqdAB, nB));
-        }
+        nn.insert(sqdAB, nB);
       }
+      KNNList nl = nn.toKNNList();
 
-      for(ObjectHeap.UnsortedIter<DoubleDBIDPair> iB = nn.unsortedIter(); iB.valid(); iB.advance()) {
-        DoubleDBIDPair nB = iB.get();
-        double sqdAB = nB.doubleValue();
-        double simAB = kernelMatrix.getSimilarity(pA, nB);
+      s.reset();
+      DoubleDBIDListIter iB = nl.iter(), iC = nl.iter();
+      for(; iB.valid(); iB.advance()) {
+        double sqdAB = iB.doubleValue();
+        double simAB = kernelMatrix.getSimilarity(pA, iB);
         if(!(sqdAB > 0.)) {
           continue;
         }
-        for(ObjectHeap.UnsortedIter<DoubleDBIDPair> iC = nn.unsortedIter(); iC.valid(); iC.advance()) {
-          DoubleDBIDPair nC = iC.get();
-          if(DBIDUtil.compare(nC, nB) < 0) {
-            continue;
-          }
-          double sqdAC = nC.doubleValue();
-          double simAC = kernelMatrix.getSimilarity(pA, nC);
+        for(iC.seek(iB.getOffset() + 1); iC.valid(); iC.advance()) {
+          double sqdAC = iC.doubleValue();
+          double simAC = kernelMatrix.getSimilarity(pA, iC);
           if(!(sqdAC > 0.)) {
             continue;
           }
           // Exploit bilinearity of scalar product:
           // <B-A, C-A> = <B, C-A> - <A,C-A>
           // = <B,C> - <B,A> - <A,C> + <A,A>
-          // For computing variance, AA is a constant and can be ignored.
-          double simBC = kernelMatrix.getSimilarity(nB, nC);
-          double numerator = simBC - simAB - simAC; // + simAA;
-          double val = numerator / (sqdAB * sqdAC);
-          s.put(val, 1. / Math.sqrt(sqdAB * sqdAC));
+          double simBC = kernelMatrix.getSimilarity(iB, iC);
+          double numerator = simBC - simAB - simAC + simAA;
+          double div = 1. / (sqdAB * sqdAC);
+          s.put(numerator * div, Math.sqrt(div));
         }
       }
-      // Sample variance probably would be correct, but the ABOD publication
-      // uses the naive variance.
+      // Sample variance probably would probably be better, but the ABOD
+      // publication uses the naive variance.
       final double abof = s.getNaiveVariance();
       minmaxabod.put(abof);
       abodvalues.putDouble(pA, abof);
@@ -196,9 +188,9 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends ABOD.Parameterizer<V> {

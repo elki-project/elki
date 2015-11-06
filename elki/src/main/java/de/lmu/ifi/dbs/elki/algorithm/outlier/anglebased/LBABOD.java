@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,10 +30,14 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
@@ -50,10 +54,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMaxHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMinHeap;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ObjectHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -64,13 +65,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
- * 
+ *
  * LB-ABOD (lower-bound) version. Exact on the top k outliers, approximate on
  * the remaining.
- * 
+ *
  * Outlier detection using variance analysis on angles, especially for high
  * dimensional data sets.
- * 
+ *
  * Reference:
  * <p>
  * H.-P. Kriegel, M. Schubert, and A. Zimek:<br />
@@ -78,10 +79,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * In: Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining
  * (KDD '08), Las Vegas, NV, 2008.
  * </p>
- * 
+ *
  * @author Matthias Schubert (Original Code)
  * @author Erich Schubert (ELKIfication)
- * 
+ *
  * @param <V> Vector type
  */
 @Title("LB-ABOD: Lower Bounded Angle-Based Outlier Detection")
@@ -104,7 +105,7 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
 
   /**
    * Actual constructor, with parameters. Fast mode (sampling).
-   * 
+   *
    * @param kernelFunction Kernel function to use
    * @param k k parameter
    * @param l Number of outliers to find exact
@@ -116,13 +117,14 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
 
   /**
    * Run LB-ABOD on the data set.
-   * 
+   *
    * @param relation Relation to process
    * @return Outlier detection result
    */
   @Override
   public OutlierResult run(Database db, Relation<V> relation) {
-    DBIDs ids = relation.getDBIDs();
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
+    DBIDArrayIter pB = ids.iter(), pC = ids.iter();
     SimilarityQuery<V> sq = db.getSimilarityQuery(relation, kernelFunction);
     KernelMatrix kernelMatrix = new KernelMatrix(sq, relation, ids);
 
@@ -134,10 +136,10 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
     // Storage for squared distances (will be reused!)
     WritableDoubleDataStore sqDists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     // Nearest neighbor heap (will be reused!)
-    ComparableMaxHeap<DoubleDBIDPair> nn = new ComparableMaxHeap<>(k);
+    KNNHeap nn = DBIDUtil.newHeap(k);
 
     // Priority queue for candidates
-    ComparableMinHeap<DoubleDBIDPair> candidates = new ComparableMinHeap<>(relation.size());
+    ModifiableDoubleDBIDList candidates = DBIDUtil.newDistanceDBIDList(relation.size());
     // get Candidate Ranking
     for(DBIDIter pA = relation.iterDBIDs(); pA.valid(); pA.advance()) {
       // Compute nearest neighbors and distances.
@@ -145,26 +147,19 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
       double simAA = kernelMatrix.getSimilarity(pA, pA);
       // Sum of 1./(|AB|) and 1./(|AB|^2); for computing R2.
       double sumid = 0., sumisqd = 0.;
-      for(DBIDIter nB = relation.iterDBIDs(); nB.valid(); nB.advance()) {
-        if(DBIDUtil.equal(nB, pA)) {
+      for(pB.seek(0); pB.valid(); pB.advance()) {
+        if(DBIDUtil.equal(pB, pA)) {
           continue;
         }
-        double simBB = kernelMatrix.getSimilarity(nB, nB);
-        double simAB = kernelMatrix.getSimilarity(pA, nB);
+        double simBB = kernelMatrix.getSimilarity(pB, pB);
+        double simAB = kernelMatrix.getSimilarity(pA, pB);
         double sqdAB = simAA + simBB - simAB - simAB;
-        sqDists.putDouble(nB, sqdAB);
-        if(!(sqdAB > 0.)) {
-          continue;
-        }
-        sumid += 1. / Math.sqrt(sqdAB);
-        sumisqd += 1. / sqdAB;
+        sqDists.putDouble(pB, sqdAB);
+        final double isqdAB = 1. / sqdAB;
+        sumid += Math.sqrt(isqdAB);
+        sumisqd += isqdAB;
         // Update heap
-        if(nn.size() < k) {
-          nn.add(DBIDUtil.newPair(sqdAB, nB));
-        }
-        else if(sqdAB < nn.peek().doubleValue()) {
-          nn.replaceTopElement(DBIDUtil.newPair(sqdAB, nB));
-        }
+        nn.insert(sqdAB, pB);
       }
 
       // Compute FastABOD approximation, adjust for lower bound.
@@ -172,27 +167,24 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
       // Variance as E(X^2)-E(X)^2 suffers from catastrophic cancellation!
       // TODO: ensure numerical precision!
       double nnsum = 0., nnsumsq = 0., nnsumisqd = 0.;
-      for(ObjectHeap.UnsortedIter<DoubleDBIDPair> iB = nn.unsortedIter(); iB.valid(); iB.advance()) {
-        DoubleDBIDPair nB = iB.get();
-        double sqdAB = nB.doubleValue();
-        double simAB = kernelMatrix.getSimilarity(pA, nB);
+      KNNList nl = nn.toKNNList();
+      DoubleDBIDListIter iB = nl.iter(), iC = nl.iter();
+      for(; iB.valid(); iB.advance()) {
+        double sqdAB = iB.doubleValue();
+        double simAB = kernelMatrix.getSimilarity(pA, iB);
         if(!(sqdAB > 0.)) {
           continue;
         }
-        for(ObjectHeap.UnsortedIter<DoubleDBIDPair> iC = nn.unsortedIter(); iC.valid(); iC.advance()) {
-          DoubleDBIDPair nC = iC.get();
-          if(DBIDUtil.compare(nC, nB) < 0) {
-            continue;
-          }
-          double sqdAC = nC.doubleValue();
-          double simAC = kernelMatrix.getSimilarity(pA, nC);
+        for(iC.seek(iB.getOffset() + 1); iC.valid(); iC.advance()) {
+          double sqdAC = iC.doubleValue();
+          double simAC = kernelMatrix.getSimilarity(pA, iC);
           if(!(sqdAC > 0.)) {
             continue;
           }
           // Exploit bilinearity of scalar product:
           // <B-A, C-A> = <B, C-A> - <A,C-A>
           // = <B,C> - <B,A> - <A,C> + <A,A>
-          double simBC = kernelMatrix.getSimilarity(nB, nC);
+          double simBC = kernelMatrix.getSimilarity(iB, iC);
           double numerator = simBC - simAB - simAC + simAA;
           double sqweight = 1. / (sqdAB * sqdAC);
           double weight = Math.sqrt(sqweight);
@@ -212,21 +204,21 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
         max = lbabof;
       }
       abodvalues.putDouble(pA, lbabof);
-      candidates.add(DBIDUtil.newPair(lbabof, pA));
+      candidates.add(lbabof, pA);
     }
     minmaxabod.put(max); // Put maximum from approximate values.
+    candidates.sort();
 
     // refine Candidates
     int refinements = 0;
     DoubleMinHeap topscores = new DoubleMinHeap(l);
     MeanVariance s = new MeanVariance();
-    while(!candidates.isEmpty()) {
+    for(DoubleDBIDListIter pA = candidates.iter(); pA.valid(); pA.advance()) {
       // Stop refining
-      if(topscores.size() >= k && candidates.peek().doubleValue() > topscores.peek()) {
+      if(topscores.size() >= k && pA.doubleValue() > topscores.peek()) {
         break;
       }
-      DoubleDBIDPair pA = candidates.poll();
-      final double abof = computeABOF(relation, kernelMatrix, pA, s);
+      final double abof = computeABOF(kernelMatrix, pA, pB, pC, s);
       // Store refined score:
       abodvalues.putDouble(pA, abof);
       minmaxabod.put(abof);
@@ -263,9 +255,9 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends FastABOD.Parameterizer<V> {
