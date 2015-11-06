@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.HaltonUniformDistribution;
@@ -63,17 +64,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
 
 /**
  * Data source from an XML specification.
- * 
+ *
  * This data source will generate random (or pseudo-random, fixed seeds are
  * supported) data sets that satisfy a given specification file.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf GeneratorMain
  */
 public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
@@ -168,21 +170,6 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   public static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s+");
 
   /**
-   * Parameter to give the configuration file
-   */
-  public static final OptionID CONFIGFILE_ID = new OptionID("bymodel.spec", "The generator specification file.");
-
-  /**
-   * Parameter to give the configuration file
-   */
-  public static final OptionID RANDOMSEED_ID = new OptionID("bymodel.randomseed", "The random generator seed.");
-
-  /**
-   * Parameter to give the configuration file
-   */
-  public static final OptionID SIZE_SCALE_ID = new OptionID("bymodel.sizescale", "Factor for scaling the specified cluster sizes.");
-
-  /**
    * File name of the generators XML Schema file.
    */
   public static final String GENERATOR_SCHEMA_FILE = GeneratorXMLSpec.class.getPackage().getName().replace('.', '/') + '/' + "GeneratorByModel.xsd";
@@ -198,6 +185,11 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   double sizescale = 1.0;
 
   /**
+   * Pattern for clusters to reassign.
+   */
+  Pattern reassign = null;
+
+  /**
    * Random generator used for initializing cluster generators.
    */
   private Random clusterRandom = null;
@@ -209,20 +201,19 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Constructor.
-   * 
+   *
    * @param filters Filters.
    * @param specfile Specification file
    * @param sizescale Size scaling
+   * @param reassign Reassignment pattern
    * @param clusterRandom Random number generator
    */
-  public GeneratorXMLDatabaseConnection(List<ObjectFilter> filters, File specfile, double sizescale, Random clusterRandom) {
+  public GeneratorXMLDatabaseConnection(List<ObjectFilter> filters, File specfile, double sizescale, Pattern reassign, RandomFactory clusterRandom) {
     super(filters);
     this.specfile = specfile;
     this.sizescale = sizescale;
-    this.clusterRandom = clusterRandom;
-    if(this.clusterRandom == null) {
-      this.clusterRandom = new Random();
-    }
+    this.reassign = reassign;
+    this.clusterRandom = clusterRandom.getSingleThreadedRandom();
   }
 
   @Override
@@ -237,11 +228,12 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     catch(UnableToComplyException e) {
       throw new AbortException("Cannot load XML specification", e);
     }
-    if(LOG.isVerbose()) {
-      LOG.verbose("Generating clusters ...");
-    }
     if(testAgainstModel != null) {
       gen.setTestAgainstModel(testAgainstModel.booleanValue());
+    }
+    gen.setReassignPattern(reassign);
+    if(LOG.isVerbose()) {
+      LOG.verbose("Generating clusters ...");
     }
     try {
       return super.invokeBundleFilters(gen.generate());
@@ -253,9 +245,9 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Load the XML configuration file.
-   * 
+   *
    * @throws UnableToComplyException
-   * 
+   *
    * @return Generator
    */
   private GeneratorMain loadXMLSpecification() throws UnableToComplyException {
@@ -303,7 +295,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Process a 'dataset' Element in the XML stream.
-   * 
+   *
    * @param gen Generator
    * @param cur Current document nod
    * @throws UnableToComplyException
@@ -336,7 +328,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Process a 'cluster' Element in the XML stream.
-   * 
+   *
    * @param gen Generator
    * @param cur Current document nod
    * @throws UnableToComplyException
@@ -403,7 +395,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Process a 'uniform' Element in the XML stream.
-   * 
+   *
    * @param cluster
    * @param cur Current document nod
    * @throws UnableToComplyException
@@ -438,7 +430,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Process a 'normal' Element in the XML stream.
-   * 
+   *
    * @param cluster
    * @param cur Current document nod
    * @throws UnableToComplyException
@@ -472,7 +464,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Process a 'gamma' Element in the XML stream.
-   * 
+   *
    * @param cluster
    * @param cur Current document nod
    * @throws UnableToComplyException
@@ -506,7 +498,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Process a 'halton' Element in the XML stream.
-   * 
+   *
    * @param cluster
    * @param cur Current document nod
    * @throws UnableToComplyException
@@ -541,7 +533,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Process a 'rotate' Element in the XML stream.
-   * 
+   *
    * @param cluster
    * @param cur Current document nod
    * @throws UnableToComplyException
@@ -588,7 +580,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Process a 'translate' Element in the XML stream.
-   * 
+   *
    * @param cluster
    * @param cur Current document nod
    * @throws UnableToComplyException
@@ -618,7 +610,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Process a 'clipping' Element in the XML stream.
-   * 
+   *
    * @param cluster
    * @param cur Current document nod
    * @throws UnableToComplyException
@@ -654,7 +646,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Process a 'static' cluster Element in the XML stream.
-   * 
+   *
    * @param gen Generator
    * @param cur Current document nod
    * @throws UnableToComplyException
@@ -688,7 +680,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Parse a 'point' element (point vector for a static cluster)
-   * 
+   *
    * @param points current list of points (to append to)
    * @param cur Current document nod
    * @throws UnableToComplyException
@@ -718,9 +710,9 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Parse a string into a vector.
-   * 
+   *
    * TODO: move this into utility package?
-   * 
+   *
    * @param s String to parse
    * @return Vector
    * @throws UnableToComplyException
@@ -746,12 +738,32 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
+    /**
+     * Parameter to give the configuration file
+     */
+    public static final OptionID CONFIGFILE_ID = new OptionID("bymodel.spec", "The generator specification file.");
+
+    /**
+     * Parameter to give the configuration file
+     */
+    public static final OptionID SIZE_SCALE_ID = new OptionID("bymodel.sizescale", "Factor for scaling the specified cluster sizes.");
+
+    /**
+     * Parameter for cluster reassignment
+     */
+    public static final OptionID REASSIGN_ID = new OptionID("bymodel.reassign", "Pattern to specify clusters to reassign.");
+
+    /**
+     * Parameter to give the configuration file
+     */
+    public static final OptionID RANDOMSEED_ID = new OptionID("bymodel.randomseed", "The random generator seed.");
+
     /**
      * The configuration file.
      */
@@ -760,12 +772,17 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     /**
      * Parameter for scaling the cluster sizes.
      */
-    double sizescale = 1.0;
+    double sizescale = 1.;
+
+    /**
+     * Pattern for clusters to reassign.
+     */
+    Pattern reassign = null;
 
     /**
      * Random generator used for initializing cluster generators.
      */
-    private Random clusterRandom = null;
+    private RandomFactory clusterRandom;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -780,18 +797,24 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
       if(config.grab(scalepar)) {
         sizescale = scalepar.getValue().doubleValue();
       }
+      // Reassign pattern
+      final PatternParameter reassignP = new PatternParameter(REASSIGN_ID) //
+      .setOptional(true);
+      if(config.grab(reassignP)) {
+        reassign = reassignP.getValue();
+      }
       // Random generator
       final RandomParameter rndP = new RandomParameter(RANDOMSEED_ID);
       if(config.grab(rndP)) {
         // TODO: use RandomFactory in cluster
-        clusterRandom = rndP.getValue().getSingleThreadedRandom();
+        clusterRandom = rndP.getValue();
       }
       super.configFilters(config);
     }
 
     @Override
     protected GeneratorXMLDatabaseConnection makeInstance() {
-      return new GeneratorXMLDatabaseConnection(filters, specfile, sizescale, clusterRandom);
+      return new GeneratorXMLDatabaseConnection(filters, specfile, sizescale, reassign, clusterRandom);
     }
   }
 }
