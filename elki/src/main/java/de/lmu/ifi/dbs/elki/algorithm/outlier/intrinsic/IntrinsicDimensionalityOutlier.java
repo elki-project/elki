@@ -141,7 +141,13 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
         }
         buf[p++] = it.doubleValue();
       }
-      double id = p > 1 ? estimator.estimate(buf, p) : 0.;
+      double id = 0.;
+      try {
+        id = (p > 1) ? estimator.estimate(buf, p) : 0.;
+      }
+      catch(ArithmeticException e) {
+        id = 0.;
+      }
 
       id_score.putDouble(iditer, id);
       minmax.put(id);

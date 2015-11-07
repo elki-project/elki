@@ -169,7 +169,14 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
           break;
         }
       }
-      intDims.putDouble(iter, estimator.estimate(dists, pos));
+      double id = 0.;
+      try {
+        id = (pos > 1) ? estimator.estimate(dists, pos) : 0.;
+      }
+      catch(ArithmeticException e) {
+        id = 0; // Too many duplicates, etc.
+      }
+      intDims.putDouble(iter, id);
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
