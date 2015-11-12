@@ -25,12 +25,13 @@ package de.lmu.ifi.dbs.elki.visualization;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.batik.util.SVGConstants;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
@@ -50,37 +51,19 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
  * Class that automatically generates all visualizations and exports them into
- * SVG files.
+ * SVG files. To configure the export, you <em>will</em> want to configure the
+ * {@link VisualizerParameterizer}, in particular the pattern for choosing which
+ * visualizers to run.
  *
  * @author Erich Schubert
  *
  * @apiviz.composedOf VisualizerParameterizer
  */
-// TODO: make more parameterizable, wrt. what to skip
 public class ExportVisualizations implements ResultHandler {
   /**
    * Get a logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(ExportVisualizations.class);
-
-  /**
-   * Parameter to specify the canvas ratio
-   * <p>
-   * Key: {@code -vis.ratio}
-   * </p>
-   * <p>
-   * Default value: 1.33
-   * </p>
-   */
-  public static final OptionID RATIO_ID = new OptionID("vis.ratio", "The width/heigh ratio of the output.");
-
-  /**
-   * Parameter to specify the output folder
-   * <p>
-   * Key: {@code -vis.output}
-   * </p>
-   */
-  public static final OptionID FOLDER_ID = new OptionID("vis.output", "The output folder.");
 
   /**
    * Output folder
@@ -108,9 +91,9 @@ public class ExportVisualizations implements ResultHandler {
   VisualizerContext context = null;
 
   /**
-   * Output counter
+   * Output counter.
    */
-  int counter = 0;
+  Map<String, Integer> counter = new HashMap<>();
 
   /**
    * Constructor.
@@ -119,7 +102,7 @@ public class ExportVisualizations implements ResultHandler {
    * @param manager Parameterizer
    * @param ratio Canvas ratio
    */
-  protected ExportVisualizations(File output, VisualizerParameterizer manager, double ratio) {
+  public ExportVisualizations(File output, VisualizerParameterizer manager, double ratio) {
     super();
     this.output = output;
     this.manager = manager;
@@ -139,8 +122,8 @@ public class ExportVisualizations implements ResultHandler {
     if(this.baseResult == null) {
       this.baseResult = newResult;
       context = null;
-      counter = 0;
-      LOG.verbose("Note: Reusing visualization exporter for more than one result is untested.");
+      counter = new HashMap<>();
+      LOG.warning("Note: Reusing visualization exporter for more than one result is untested.");
     }
     if(context == null) {
       context = manager.newContext(hier, baseResult);
@@ -181,21 +164,19 @@ public class ExportVisualizations implements ResultHandler {
   }
 
   private void processItem(PlotItem item) {
-    final double height = 1;
-    final double width = ratio * height;
     // Descend into subitems
     for(Iterator<PlotItem> iter = item.subitems.iterator(); iter.hasNext();) {
-      PlotItem subitem = iter.next();
-      processItem(subitem);
+      processItem(iter.next());
     }
     if(item.taskSize() <= 0) {
       return;
     }
     item.sort();
+    final double width = item.w, height = item.h;
 
     VisualizationPlot svgp = new VisualizationPlot();
     svgp.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
-    svgp.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 / ratio) + "cm");
+    svgp.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, (20 * height / width) + "cm");
     svgp.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + width + " " + height);
 
     ArrayList<Visualization> layers = new ArrayList<>();
@@ -210,10 +191,10 @@ public class ExportVisualizations implements ResultHandler {
       }
       catch(Exception e) {
         if(Logging.getLogger(task.getFactory().getClass()).isDebugging()) {
-          LoggingUtil.exception("Visualization failed.", e);
+          LOG.exception("Visualization failed.", e);
         }
         else {
-          LoggingUtil.warning("Visualizer " + task.getFactory().getClass().getName() + " failed - enable debugging to see details.");
+          LOG.warning("Visualizer " + task.getFactory().getClass().getName() + " failed - enable debugging to see details.");
         }
       }
     }
@@ -221,17 +202,22 @@ public class ExportVisualizations implements ResultHandler {
       return;
     }
     for(Visualization layer : layers) {
-      if(layer.getLayer() != null) {
-        svgp.getRoot().appendChild(layer.getLayer());
+      if(layer.getLayer() == null) {
+        LOG.warning("NULL layer seen.");
+        continue;
       }
-      else {
-        LoggingUtil.warning("NULL layer seen.");
-      }
+      svgp.getRoot().appendChild(layer.getLayer());
     }
     svgp.updateStyleElement();
 
+    String prefix = null;
+    prefix = (prefix == null && item.proj != null) ? item.proj.getMenuName() : prefix;
+    prefix = (prefix == null && item.tasks.size() > 0) ? item.tasks.get(0).name : prefix;
+    prefix = (prefix != null ? prefix : "plot");
     // TODO: generate names...
-    File outname = new File(output, "plot-" + counter + ".svg");
+    Integer count = counter.get(prefix);
+    counter.put(prefix, count = count == null ? 1 : (count + 1));
+    File outname = new File(output, prefix + "-" + count + ".svg");
     try {
       svgp.saveAsSVG(outname);
     }
@@ -241,7 +227,6 @@ public class ExportVisualizations implements ResultHandler {
     for(Visualization layer : layers) {
       layer.destroy();
     }
-    counter++;
   }
 
   /**
@@ -252,6 +237,25 @@ public class ExportVisualizations implements ResultHandler {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the canvas ratio
+     * <p>
+     * Key: {@code -vis.ratio}
+     * </p>
+     * <p>
+     * Default value: 1.33
+     * </p>
+     */
+    public static final OptionID RATIO_ID = new OptionID("vis.ratio", "The width/heigh ratio of the output.");
+
+    /**
+     * Parameter to specify the output folder
+     * <p>
+     * Key: {@code -vis.output}
+     * </p>
+     */
+    public static final OptionID FOLDER_ID = new OptionID("vis.output", "The output folder.");
+
     /**
      * Visualization manager.
      */

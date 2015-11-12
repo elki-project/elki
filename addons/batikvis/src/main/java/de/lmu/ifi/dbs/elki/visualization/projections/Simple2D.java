@@ -211,4 +211,9 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
     }
     return new Vector(r);
   }
+
+  @Override
+  public String getMenuName() {
+    return "Scatterplot";
+  }
 }

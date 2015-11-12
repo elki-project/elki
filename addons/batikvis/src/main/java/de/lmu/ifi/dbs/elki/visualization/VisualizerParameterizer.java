@@ -62,6 +62,10 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 /**
  * Utility class to determine the visualizers for a result class.
  *
+ * You <em>really</em> should use the parameterization API to configure this
+ * class. Manually populating the factory collection is cumbersome, and the
+ * parameterization API takes care of this.
+ *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  *
@@ -76,51 +80,9 @@ public class VisualizerParameterizer {
   private static final Logging LOG = Logging.getLogger(VisualizerParameterizer.class);
 
   /**
-   * Parameter to get the style properties file.
-   *
-   * <p>
-   * Key: -visualizer.stylesheet
-   *
-   * Default: default properties file <br>
-   * included stylesheets:
-   * <ul>
-   * <li>classic</li>
-   * <li>default</li>
-   * <li>greyscale</li>
-   * <li>neon</li>
-   * <li>presentation</li>
-   * <li>print</li>
-   * </ul>
-   * These are {@code *.properties} files in the package
-   * {@link de.lmu.ifi.dbs.elki.visualization.style}.
-   * </p>
+   * Default sample size to visualize.
    */
-  public static final OptionID STYLELIB_ID = new OptionID("visualizer.stylesheet", "Style properties file to use, included properties: classic, default, greyscale, neon, presentation, print");
-
-  /**
-   * Default pattern for visualizer enabling.
-   */
-  public static final String DEFAULT_ENABLEVIS = "^" + Pattern.quote(VisualizerParameterizer.class.getPackage().getName()) + "\\..*";
-
-  /**
-   * Parameter to enable visualizers
-   *
-   * <p>
-   * Key: -vis.enable
-   *
-   * Default: ELKI core
-   * </p>
-   */
-  public static final OptionID ENABLEVIS_ID = new OptionID("vis.enable", "Visualizers to enable by default.");
-
-  /**
-   * Parameter to set the sampling level
-   *
-   * <p>
-   * Key: -vis.sampling
-   * </p>
-   */
-  public static final OptionID SAMPLING_ID = new OptionID("vis.sampling", "Maximum number of objects to visualize by default (for performance reasons).");
+  public static final int DEFAULT_SAMPLE_SIZE = 10000;
 
   /**
    * Style library to use.
@@ -216,36 +178,39 @@ public class VisualizerParameterizer {
     }
     StringBuilder buf = new StringBuilder();
     if(algorithm != null) {
-      // shorten the algorithm
-      if(algorithm.contains(".")) {
-        algorithm = algorithm.substring(algorithm.lastIndexOf('.') + 1);
-      }
-      buf.append(algorithm);
+      buf.append(shortenClassname(algorithm, '.'));
     }
     if(distance != null) {
-      // shorten the distance
-      if(distance.contains(".")) {
-        distance = distance.substring(distance.lastIndexOf('.') + 1);
-      }
       if(buf.length() > 0) {
         buf.append(" using ");
       }
-      buf.append(distance);
+      buf.append(shortenClassname(distance, '.'));
     }
     if(dataset != null) {
-      // shorten the data set filename
-      if(dataset.contains(File.separator)) {
-        dataset = dataset.substring(dataset.lastIndexOf(File.separator) + 1);
-      }
       if(buf.length() > 0) {
         buf.append(" on ");
       }
-      buf.append(dataset);
+      buf.append(shortenClassname(dataset, File.separatorChar));
     }
     if(buf.length() > 0) {
       return buf.toString();
     }
     return null;
+  }
+
+  /**
+   * Shorten the class name.
+   *
+   * @param nam Class name
+   * @param c Splitting character
+   * @return Shortened name
+   */
+  protected static String shortenClassname(String nam, char c) {
+    final int lastdot = nam.lastIndexOf(c);
+    if(lastdot >= 0) {
+      nam = nam.substring(lastdot + 1);
+    }
+    return nam;
   }
 
   /**
@@ -256,6 +221,48 @@ public class VisualizerParameterizer {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to get the style properties file.
+     *
+     * <p>
+     * Key: -visualizer.stylesheet
+     *
+     * Default: default properties file <br>
+     * included stylesheets:
+     * <ul>
+     * <li>classic</li>
+     * <li>default</li>
+     * <li>greyscale</li>
+     * <li>neon</li>
+     * <li>presentation</li>
+     * <li>print</li>
+     * </ul>
+     * These are {@code *.properties} files in the package
+     * {@link de.lmu.ifi.dbs.elki.visualization.style}.
+     * </p>
+     */
+    public static final OptionID STYLELIB_ID = new OptionID("visualizer.stylesheet", "Style properties file to use, included properties: classic, default, greyscale, neon, presentation, print");
+
+    /**
+     * Parameter to enable visualizers
+     *
+     * <p>
+     * Key: -vis.enable
+     *
+     * Default: ELKI core
+     * </p>
+     */
+    public static final OptionID ENABLEVIS_ID = new OptionID("vis.enable", "Visualizers to enable by default.");
+
+    /**
+     * Parameter to set the sampling level
+     *
+     * <p>
+     * Key: -vis.sampling
+     * </p>
+     */
+    public static final OptionID SAMPLING_ID = new OptionID("vis.sampling", "Maximum number of objects to visualize by default (for performance reasons).");
+
     /**
      * Style library
      */
@@ -279,7 +286,7 @@ public class VisualizerParameterizer {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter samplingP = new IntParameter(SAMPLING_ID, 10000) //
+      IntParameter samplingP = new IntParameter(SAMPLING_ID, DEFAULT_SAMPLE_SIZE) //
       .addConstraint(CommonConstraints.GREATER_EQUAL_MINUSONE_INT);
       if(config.grab(samplingP)) {
         samplesize = samplingP.intValue();
@@ -288,13 +295,14 @@ public class VisualizerParameterizer {
       if(config.grab(stylelibP)) {
         String filename = stylelibP.getValue();
         try {
-          stylelib = new PropertiesBasedStyleLibrary(filename, "Command line style");
+          stylelib = new PropertiesBasedStyleLibrary(filename, filename);
         }
         catch(AbortException e) {
           config.reportError(new WrongParameterValueException(stylelibP, filename, e));
         }
       }
-      PatternParameter enablevisP = new PatternParameter(ENABLEVIS_ID, DEFAULT_ENABLEVIS);
+      PatternParameter enablevisP = new PatternParameter(ENABLEVIS_ID) //
+      .setOptional(true);
       if(config.grab(enablevisP)) {
         if(!"all".equals(enablevisP.getValueAsString())) {
           enableVisualizers = enablevisP.getValue();

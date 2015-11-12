@@ -108,4 +108,10 @@ public class Simple1D extends AbstractSimpleProjection implements Projection1D {
     }
     return new Vector(r);
   }
+
+
+  @Override
+  public String getMenuName() {
+    return "Axis";
+  }
 }
