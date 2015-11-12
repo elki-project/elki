@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.MergedParam
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.visualization.style.PropertiesBasedStyleLibrary;
@@ -166,19 +167,22 @@ public class VisualizerParameterizer {
     String dataset = null;
 
     for(TrackedParameter setting : settings) {
-      if(setting.getParameter().equals(AlgorithmStep.Parameterizer.ALGORITHM_ID)) {
-        algorithm = setting.getParameter().getValue().toString();
+      Parameter<?> param = setting.getParameter();
+      OptionID option = param.getOptionID();
+      String value = param.isDefined() ? param.getValueAsString() : null;
+      if(option.equals(AlgorithmStep.Parameterizer.ALGORITHM_ID)) {
+        algorithm = value;
       }
-      if(setting.getParameter().equals(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
-        distance = setting.getParameter().getValue().toString();
+      if(option.equals(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID)) {
+        distance = value;
       }
-      if(setting.getParameter().equals(FileBasedDatabaseConnection.Parameterizer.INPUT_ID)) {
-        dataset = setting.getParameter().getValue().toString();
+      if(option.equals(FileBasedDatabaseConnection.Parameterizer.INPUT_ID)) {
+        dataset = value;
       }
     }
     StringBuilder buf = new StringBuilder();
     if(algorithm != null) {
-      buf.append(shortenClassname(algorithm, '.'));
+      buf.append(shortenClassname(algorithm.split(",")[0], '.'));
     }
     if(distance != null) {
       if(buf.length() > 0) {
