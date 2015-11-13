@@ -240,8 +240,8 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
   }
 
   @Override
-  public double[] fastProjectRenderToDataSpace(double[] data) {
-    double[] ret = fastProjectRenderToScaledSpace(data);
+  public double[] fastProjectRenderToDataSpace(double x, double y) {
+    double[] ret = fastProjectRenderToScaledSpace(x, y);
     for(int d = 0; d < scales.length; d++) {
       ret[d] = scales[d].getUnscaled(ret[d]);
     }
@@ -249,14 +249,11 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
   }
 
   @Override
-  public double[] fastProjectRenderToScaledSpace(double[] v) {
-    if(v.length == scales.length) {
-      return projectRenderToScaled(v);
-    }
-    double[] c = Arrays.copyOf(v, scales.length);
-    for(int d = v.length; d < scales.length; d++) {
-      c[d] = 0.5;
-    }
+  public double[] fastProjectRenderToScaledSpace(double x, double y) {
+    double[] c = new double[scales.length];
+    c[0] = x;
+    c[1] = y;
+    Arrays.fill(c, 2, scales.length, 0.5);
     return projectRenderToScaled(c);
   }
 

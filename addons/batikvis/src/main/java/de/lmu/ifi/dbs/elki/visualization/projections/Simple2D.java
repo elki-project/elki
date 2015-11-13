@@ -100,35 +100,25 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  public double[] fastProjectRenderToDataSpace(double[] v) {
+  public double[] fastProjectRenderToDataSpace(double x, double y) {
     double[] ret = new double[scales.length];
     for(int d = 0; d < scales.length; d++) {
-      if(d == dim1) {
-        ret[d] = scales[d].getUnscaled((v[0] * INVSCALE) + 0.5);
-      }
-      else if(d == dim2) {
-        ret[d] = scales[d].getUnscaled((v[1] * -INVSCALE) + 0.5);
-      }
-      else {
-        ret[d] = scales[d].getUnscaled(0.5);
-      }
+      ret[d] = //
+      (d == dim1) ? scales[d].getUnscaled((x * INVSCALE) + 0.5) : //
+      (d == dim2) ? scales[d].getUnscaled((y * -INVSCALE) + 0.5) : //
+      scales[d].getUnscaled(0.5);
     }
     return ret;
   }
 
   @Override
-  public double[] fastProjectRenderToScaledSpace(double[] v) {
+  public double[] fastProjectRenderToScaledSpace(double x, double y) {
     double[] ret = new double[scales.length];
     for(int d = 0; d < scales.length; d++) {
-      if(d == dim1) {
-        ret[d] = (v[0] * INVSCALE) + 0.5;
-      }
-      else if(d == dim2) {
-        ret[d] = (v[1] * -INVSCALE) + 0.5;
-      }
-      else {
-        ret[d] = 0.5;
-      }
+      ret[d] = //
+      (d == dim1) ? (x * INVSCALE) + 0.5 : //
+      (d == dim2) ? (y * -INVSCALE) + 0.5 : //
+      0.5;
     }
     return ret;
   }

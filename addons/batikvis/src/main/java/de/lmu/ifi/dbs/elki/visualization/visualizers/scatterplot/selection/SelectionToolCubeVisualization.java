@@ -191,8 +191,8 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
      * @param ranges Ranges to update
      */
     private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, ModifiableHyperBoundingBox ranges) {
-      double[] nv1 = proj.fastProjectRenderToDataSpace(new double[] { x1, y1 });
-      double[] nv2 = proj.fastProjectRenderToDataSpace(new double[] { x2, y2 });
+      double[] nv1 = proj.fastProjectRenderToDataSpace(x1, y1);
+      double[] nv2 = proj.fastProjectRenderToDataSpace(x2, y2);
 
       long[] actDim = proj.getVisibleDimensions2D();
       for(int d = BitsUtil.nextSetBit(actDim, 0); d >= 0; d = BitsUtil.nextSetBit(actDim, d + 1)) {
