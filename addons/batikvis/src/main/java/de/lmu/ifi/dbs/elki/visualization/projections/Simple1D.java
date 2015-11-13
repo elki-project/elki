@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
@@ -52,8 +51,8 @@ public class Simple1D extends AbstractSimpleProjection implements Projection1D {
   }
 
   @Override
-  public double fastProjectDataToRenderSpace(Vector data) {
-    return (scales[dnum].getScaled(data.get(dnum)) - 0.5) * SCALE;
+  public double fastProjectDataToRenderSpace(double[] data) {
+    return (scales[dnum].getScaled(data[dnum]) - 0.5) * SCALE;
   }
 
   @Override
@@ -62,13 +61,13 @@ public class Simple1D extends AbstractSimpleProjection implements Projection1D {
   }
 
   @Override
-  public double fastProjectScaledToRender(Vector v) {
-    return (v.get(dnum) - 0.5) * SCALE;
+  public double fastProjectScaledToRender(double[] v) {
+    return (v[dnum] - 0.5) * SCALE;
   }
 
   @Override
-  public double fastProjectRelativeDataToRenderSpace(Vector data) {
-    return (scales[dnum].getScaled(data.get(dnum)) - 0.5) * SCALE;
+  public double fastProjectRelativeDataToRenderSpace(double[] data) {
+    return (scales[dnum].getScaled(data[dnum]) - 0.5) * SCALE;
   }
 
   @Override
@@ -77,36 +76,34 @@ public class Simple1D extends AbstractSimpleProjection implements Projection1D {
   }
 
   @Override
-  public double fastProjectRelativeScaledToRender(Vector v) {
-    return v.get(dnum) * SCALE;
+  public double fastProjectRelativeScaledToRender(double[] v) {
+    return v[dnum] * SCALE;
   }
 
   @Override
-  protected Vector rearrange(Vector v) {
-    final double[] s = v.getArrayRef();
-    final double[] r = new double[s.length];
-    r[0] = s[dnum];
+  protected double[] rearrange(double[] v) {
+    final double[] r = new double[v.length];
+    r[0] = v[dnum];
     if(dnum > 0) {
-      System.arraycopy(s, 0, r, 1, dnum);
+      System.arraycopy(v, 0, r, 1, dnum);
     }
-    if(dnum + 1 < s.length) {
-      System.arraycopy(s, dnum + 1, r, dnum + 1, s.length - (dnum + 1));
+    if(dnum + 1 < v.length) {
+      System.arraycopy(v, dnum + 1, r, dnum + 1, v.length - (dnum + 1));
     }
-    return new Vector(r);
+    return r;
   }
 
   @Override
-  protected Vector dearrange(Vector v) {
-    final double[] s = v.getArrayRef();
-    final double[] r = new double[s.length];
+  protected double[] dearrange(double[] v) {
+    final double[] r = new double[v.length];
     if(dnum > 0) {
-      System.arraycopy(s, 1, r, 0, dnum);
+      System.arraycopy(v, 1, r, 0, dnum);
     }
-    r[dnum] = s[0];
-    if(dnum + 1 < s.length) {
-      System.arraycopy(s, dnum + 1, r, dnum + 1, s.length - (dnum + 1));
+    r[dnum] = v[0];
+    if(dnum + 1 < v.length) {
+      System.arraycopy(v, dnum + 1, r, dnum + 1, v.length - (dnum + 1));
     }
-    return new Vector(r);
+    return r;
   }
 
 

@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
@@ -54,12 +53,11 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return vector in scaled space
    */
   @Override
-  public Vector projectDataToScaledSpace(NumberVector data) {
+  public double[] projectDataToScaledSpace(NumberVector data) {
     final int dim = data.getDimensionality();
-    Vector vec = new Vector(dim);
-    double[] ds = vec.getArrayRef();
+    double[] vec = new double[dim];
     for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d].getScaled(data.doubleValue(d));
+      vec[d] = scales[d].getScaled(data.doubleValue(d));
     }
     return vec;
   }
@@ -71,14 +69,13 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return vector in scaled space
    */
   @Override
-  public Vector projectDataToScaledSpace(Vector data) {
-    double[] src = data.getArrayRef();
+  public double[] projectDataToScaledSpace(double[] src) {
     final int dim = src.length;
     double[] dst = new double[dim];
     for(int d = 0; d < dim; d++) {
       dst[d] = scales[d].getScaled(src[d]);
     }
-    return new Vector(dst);
+    return dst;
   }
 
   /**
@@ -88,12 +85,11 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return relative vector in scaled space
    */
   @Override
-  public Vector projectRelativeDataToScaledSpace(NumberVector data) {
+  public double[] projectRelativeDataToScaledSpace(NumberVector data) {
     final int dim = data.getDimensionality();
-    Vector vec = new Vector(dim);
-    double[] ds = vec.getArrayRef();
+    double[] vec = new double[dim];
     for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d].getRelativeScaled(data.doubleValue(d));
+      vec[d] = scales[d].getRelativeScaled(data.doubleValue(d));
     }
     return vec;
   }
@@ -105,14 +101,13 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return relative vector in scaled space
    */
   @Override
-  public Vector projectRelativeDataToScaledSpace(Vector data) {
-    double[] src = data.getArrayRef();
+  public double[] projectRelativeDataToScaledSpace(double[] src) {
     final int dim = src.length;
     double[] dst = new double[dim];
     for(int d = 0; d < dim; d++) {
       dst[d] = scales[d].getRelativeScaled(src[d]);
     }
-    return new Vector(dst);
+    return dst;
   }
 
   /**
@@ -122,7 +117,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return vector in rendering space
    */
   @Override
-  public Vector projectDataToRenderSpace(NumberVector data) {
+  public double[] projectDataToRenderSpace(NumberVector data) {
     return projectScaledToRender(projectDataToScaledSpace(data));
   }
 
@@ -133,7 +128,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return vector in rendering space
    */
   @Override
-  public Vector projectDataToRenderSpace(Vector data) {
+  public double[] projectDataToRenderSpace(double[] data) {
     return projectScaledToRender(projectDataToScaledSpace(data));
   }
 
@@ -144,7 +139,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return relative vector in rendering space
    */
   @Override
-  public Vector projectRelativeDataToRenderSpace(NumberVector data) {
+  public double[] projectRelativeDataToRenderSpace(NumberVector data) {
     return projectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
   }
 
@@ -155,7 +150,7 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return relative vector in rendering space
    */
   @Override
-  public Vector projectRelativeDataToRenderSpace(Vector data) {
+  public double[] projectRelativeDataToRenderSpace(double[] data) {
     return projectRelativeScaledToRender(projectRelativeDataToScaledSpace(data));
   }
 
@@ -168,14 +163,13 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return vector in data space
    */
   @Override
-  public <NV extends NumberVector> NV projectScaledToDataSpace(Vector v, NumberVector.Factory<NV> factory) {
-    final int dim = v.getDimensionality();
-    Vector vec = v.copy();
-    double[] ds = vec.getArrayRef();
+  public <NV extends NumberVector> NV projectScaledToDataSpace(double[] v, NumberVector.Factory<NV> factory) {
+    final int dim = v.length;
+    double[] vec = new double[dim];
     for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d].getUnscaled(ds[d]);
+      vec[d] = scales[d].getUnscaled(v[d]);
     }
-    return factory.newNumberVector(vec.getArrayRef());
+    return factory.newNumberVector(vec);
   }
 
   /**
@@ -187,16 +181,15 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return vector in data space
    */
   @Override
-  public <NV extends NumberVector> NV projectRenderToDataSpace(Vector v, NumberVector.Factory<NV> prototype) {
-    final int dim = v.getDimensionality();
-    Vector vec = projectRenderToScaled(v);
-    double[] ds = vec.getArrayRef();
+  public <NV extends NumberVector> NV projectRenderToDataSpace(double[] v, NumberVector.Factory<NV> prototype) {
+    final int dim = v.length;
+    double[] vec = projectRenderToScaled(v);
     // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
     // vector.
     for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d].getUnscaled(ds[d]);
+      vec[d] = scales[d].getUnscaled(vec[d]);
     }
-    return prototype.newNumberVector(vec.getArrayRef());
+    return prototype.newNumberVector(vec);
   }
 
   /**
@@ -208,14 +201,13 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return relative vector in data space
    */
   @Override
-  public <NV extends NumberVector> NV projectRelativeScaledToDataSpace(Vector v, NumberVector.Factory<NV> prototype) {
-    final int dim = v.getDimensionality();
-    Vector vec = v.copy();
-    double[] ds = vec.getArrayRef();
+  public <NV extends NumberVector> NV projectRelativeScaledToDataSpace(double[] v, NumberVector.Factory<NV> prototype) {
+    final int dim = v.length;
+    double[] vec = new double[dim];
     for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d].getRelativeUnscaled(ds[d]);
+      vec[d] = scales[d].getRelativeUnscaled(v[d]);
     }
-    return prototype.newNumberVector(vec.getArrayRef());
+    return prototype.newNumberVector(vec);
   }
 
   /**
@@ -227,15 +219,14 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return relative vector in data space
    */
   @Override
-  public <NV extends NumberVector> NV projectRelativeRenderToDataSpace(Vector v, NumberVector.Factory<NV> prototype) {
-    final int dim = v.getDimensionality();
-    Vector vec = projectRelativeRenderToScaled(v);
-    double[] ds = vec.getArrayRef();
+  public <NV extends NumberVector> NV projectRelativeRenderToDataSpace(double[] v, NumberVector.Factory<NV> prototype) {
+    final int dim = v.length;
+    double[] vec = projectRelativeRenderToScaled(v);
     // Not calling {@link #projectScaledToDataSpace} to avoid extra copy of
     // vector.
     for(int d = 0; d < dim; d++) {
-      ds[d] = scales[d].getRelativeUnscaled(ds[d]);
+      vec[d] = scales[d].getRelativeUnscaled(vec[d]);
     }
-    return prototype.newNumberVector(vec.getArrayRef());
+    return prototype.newNumberVector(vec);
   }
 }

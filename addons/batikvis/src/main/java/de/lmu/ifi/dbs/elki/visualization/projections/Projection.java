@@ -48,6 +48,11 @@ public interface Projection extends VisualizationItem {
   public static final double SCALE = StyleLibrary.SCALE;
 
   /**
+   * Inverse scaling constant.
+   */
+  public static final double INVSCALE = 1. / SCALE;
+
+  /**
    * Get the input dimensionality of the projection.
    *
    * @return Input dimensionality

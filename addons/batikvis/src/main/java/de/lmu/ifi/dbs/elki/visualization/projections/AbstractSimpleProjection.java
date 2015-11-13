@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
@@ -46,34 +46,34 @@ public abstract class AbstractSimpleProjection extends AbstractFullProjection {
   }
 
   @Override
-  public Vector projectScaledToRender(Vector v) {
+  public double[] projectScaledToRender(double[] v) {
     v = rearrange(v);
-    v = v.minusEquals(.5);
+    VMath.minusEquals(v, .5);
     v = flipSecondEquals(v);
-    v = v.timesEquals(SCALE);
+    VMath.timesEquals(v, SCALE);
     return v;
   }
 
   @Override
-  public Vector projectRenderToScaled(Vector v) {
-    v = v.times(1. / SCALE);
+  public double[] projectRenderToScaled(double[] v) {
+    v = VMath.times(v, INVSCALE);
     v = flipSecondEquals(v);
-    v = v.plusEquals(.5);
+    VMath.plusEquals(v, .5);
     v = dearrange(v);
     return v;
   }
 
   @Override
-  public Vector projectRelativeScaledToRender(Vector v) {
+  public double[] projectRelativeScaledToRender(double[] v) {
     v = rearrange(v);
     v = flipSecondEquals(v);
-    v = v.timesEquals(SCALE);
+    VMath.timesEquals(v, SCALE);
     return v;
   }
 
   @Override
-  public Vector projectRelativeRenderToScaled(Vector v) {
-    v = v.times(1. / SCALE);
+  public double[] projectRelativeRenderToScaled(double[] v) {
+    v = VMath.times(v, INVSCALE);
     v = flipSecondEquals(v);
     v = dearrange(v);
     return v;
@@ -82,12 +82,12 @@ public abstract class AbstractSimpleProjection extends AbstractFullProjection {
   /**
    * Flip the y axis.
    *
-   * @param v Vector
+   * @param v double[]
    * @return modified v
    */
-  protected Vector flipSecondEquals(Vector v) {
-    if(v.getDimensionality() > 1) {
-      v.getArrayRef()[1] *= -1;
+  protected double[] flipSecondEquals(double[] v) {
+    if(v.length > 1) {
+      v[1] *= -1;
     }
     return v;
   }
@@ -95,16 +95,16 @@ public abstract class AbstractSimpleProjection extends AbstractFullProjection {
   /**
    * Method to rearrange components.
    *
-   * @param v Vector to rearrange
+   * @param v double[] to rearrange
    * @return rearranged copy
    */
-  protected abstract Vector rearrange(Vector v);
+  protected abstract double[] rearrange(double[] v);
 
   /**
    * Undo the rearrangement of components.
    *
-   * @param v Vector to undo the rearrangement
+   * @param v double[] to undo the rearrangement
    * @return rearranged-undone copy
    */
-  protected abstract Vector dearrange(Vector v);
+  protected abstract double[] dearrange(double[] v);
 }

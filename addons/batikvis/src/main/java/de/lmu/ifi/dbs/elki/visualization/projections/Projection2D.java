@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,9 +30,9 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 /**
  * Projections that have specialized methods to only compute the first two
  * dimensions of the projection.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  *
  * @apiviz.has CanvasSize
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 public interface Projection2D extends Projection {
   /**
    * Project a data vector from data space to rendering space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in rendering space
    */
@@ -48,7 +48,7 @@ public interface Projection2D extends Projection {
 
   /**
    * Project a data vector from data space to rendering space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in rendering space
    */
@@ -56,7 +56,7 @@ public interface Projection2D extends Projection {
 
   /**
    * Project a data vector from data space to scaled space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in scaled space
    */
@@ -64,7 +64,7 @@ public interface Projection2D extends Projection {
 
   /**
    * Project a data vector from data space to scaled space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in scaled space
    */
@@ -72,7 +72,7 @@ public interface Projection2D extends Projection {
 
   /**
    * Project a vector from scaled space to rendering space.
-   * 
+   *
    * @param v vector in scaled space
    * @return vector in rendering space
    */
@@ -80,7 +80,7 @@ public interface Projection2D extends Projection {
 
   /**
    * Project a data vector from rendering space to data space.
-   * 
+   *
    * @param data vector in rendering space
    * @return vector in data space
    */
@@ -88,7 +88,7 @@ public interface Projection2D extends Projection {
 
   /**
    * Project a data vector from rendering space to data space.
-   * 
+   *
    * @param data vector in rendering space
    * @param prototype Prototype to create vector from
    * @return vector in data space
@@ -97,7 +97,7 @@ public interface Projection2D extends Projection {
 
   /**
    * Project a vector from rendering space to scaled space.
-   * 
+   *
    * @param v vector in rendering space
    * @return vector in scaled space
    */
@@ -105,7 +105,7 @@ public interface Projection2D extends Projection {
 
   /**
    * Project a data vector from data space to rendering space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in rendering space
    */
@@ -113,7 +113,7 @@ public interface Projection2D extends Projection {
 
   /**
    * Project a data vector from data space to rendering space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in rendering space
    */
@@ -121,24 +121,24 @@ public interface Projection2D extends Projection {
 
   /**
    * Project a vector from scaled space to rendering space.
-   * 
+   *
    * @param v vector in scaled space
    * @return vector in rendering space
    */
   public double[] fastProjectRelativeScaledToRenderSpace(double[] v);
 
   // FIXME: add missing relative projection functions
-  
+
   /**
    * Estimate the viewport requirements
-   * 
+   *
    * @return Canvas size obtained from projecting scale endpoints
    */
   public CanvasSize estimateViewport();
 
   /**
    * Get a bit set of dimensions that are visible.
-   * 
+   *
    * @return Bit set, first dimension is bit 0.
    */
   public BitSet getVisibleDimensions2D();

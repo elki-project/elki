@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,27 +24,27 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
- * Interface for projections that have a specialization to only compute the first component.
- * 
+ * Interface for projections that have a specialization to only compute the
+ * first component.
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  */
 public interface Projection1D extends Projection {
   /**
    * Project a data vector from data space to rendering space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double fastProjectDataToRenderSpace(Vector data);
+  public double fastProjectDataToRenderSpace(double[] data);
 
   /**
    * Project a data vector from data space to rendering space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in rendering space
    */
@@ -52,23 +52,23 @@ public interface Projection1D extends Projection {
 
   /**
    * Project a vector from scaled space to rendering space.
-   * 
+   *
    * @param v vector in scaled space
    * @return vector in rendering space
    */
-  public double fastProjectScaledToRender(Vector v);
+  public double fastProjectScaledToRender(double[] v);
 
   /**
    * Project a data vector from data space to rendering space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in rendering space
    */
-  public double fastProjectRelativeDataToRenderSpace(Vector data);
+  public double fastProjectRelativeDataToRenderSpace(double[] data);
 
   /**
    * Project a data vector from data space to rendering space.
-   * 
+   *
    * @param data vector in data space
    * @return vector in rendering space
    */
@@ -76,9 +76,9 @@ public interface Projection1D extends Projection {
 
   /**
    * Project a vector from scaled space to rendering space.
-   * 
+   *
    * @param v vector in scaled space
    * @return vector in rendering space
    */
-  public double fastProjectRelativeScaledToRender(Vector v);
+  public double fastProjectRelativeScaledToRender(double[] v);
 }

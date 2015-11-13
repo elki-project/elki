@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
@@ -106,10 +105,10 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
     double[] ret = new double[scales.length];
     for(int d = 0; d < scales.length; d++) {
       if(d == dim1) {
-        ret[d] = scales[d].getUnscaled((v[0] / SCALE) + 0.5);
+        ret[d] = scales[d].getUnscaled((v[0] * INVSCALE) + 0.5);
       }
       else if(d == dim2) {
-        ret[d] = scales[d].getUnscaled((v[1] / -SCALE) + 0.5);
+        ret[d] = scales[d].getUnscaled((v[1] * -INVSCALE) + 0.5);
       }
       else {
         ret[d] = scales[d].getUnscaled(0.5);
@@ -123,10 +122,10 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
     double[] ret = new double[scales.length];
     for(int d = 0; d < scales.length; d++) {
       if(d == dim1) {
-        ret[d] = (v[0] / SCALE) + 0.5;
+        ret[d] = (v[0] * INVSCALE) + 0.5;
       }
       else if(d == dim2) {
-        ret[d] = (v[1] / -SCALE) + 0.5;
+        ret[d] = (v[1] * -INVSCALE) + 0.5;
       }
       else {
         ret[d] = 0.5;
@@ -170,46 +169,44 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  protected Vector rearrange(Vector v) {
-    final double[] s = v.getArrayRef();
-    final double[] r = new double[s.length];
-    r[0] = s[dim1];
-    r[1] = s[dim2];
+  protected double[] rearrange(double[] v) {
+    final double[] r = new double[v.length];
+    r[0] = v[dim1];
+    r[1] = v[dim2];
     final int ldim = Math.min(dim1, dim2);
     final int hdim = Math.max(dim1, dim2);
     if(ldim > 0) {
-      System.arraycopy(s, 0, r, 2, ldim);
+      System.arraycopy(v, 0, r, 2, ldim);
     }
     if(hdim - ldim > 1) {
-      System.arraycopy(s, ldim + 1, r, ldim + 2, hdim - (ldim + 1));
+      System.arraycopy(v, ldim + 1, r, ldim + 2, hdim - (ldim + 1));
     }
-    if(hdim + 1 < s.length) {
-      System.arraycopy(s, hdim + 1, r, hdim + 1, s.length - (hdim + 1));
+    if(hdim + 1 < v.length) {
+      System.arraycopy(v, hdim + 1, r, hdim + 1, v.length - (hdim + 1));
     }
-    return new Vector(r);
+    return r;
   }
 
   @Override
-  protected Vector dearrange(Vector v) {
-    final double[] s = v.getArrayRef();
-    final double[] r = new double[s.length];
-    r[dim1] = s[0];
-    r[dim2] = s[1];
+  protected double[] dearrange(double[] v) {
+    final double[] r = new double[v.length];
+    r[dim1] = v[0];
+    r[dim2] = v[1];
     // copy remainder
     final int ldim = Math.min(dim1, dim2);
     final int hdim = Math.max(dim1, dim2);
     if(ldim > 0) {
-      System.arraycopy(s, 2, r, 0, ldim);
+      System.arraycopy(v, 2, r, 0, ldim);
     }
     // ldim = s[0 or 1]
     if(hdim - ldim > 1) {
-      System.arraycopy(s, ldim + 2, r, ldim + 1, hdim - (ldim + 1));
+      System.arraycopy(v, ldim + 2, r, ldim + 1, hdim - (ldim + 1));
     }
     // hdim = s[0 or 1]
-    if(hdim + 1 < s.length) {
-      System.arraycopy(s, hdim + 1, r, hdim + 1, s.length - (hdim + 1));
+    if(hdim + 1 < v.length) {
+      System.arraycopy(v, hdim + 1, r, hdim + 1, v.length - (hdim + 1));
     }
-    return new Vector(r);
+    return r;
   }
 
   @Override

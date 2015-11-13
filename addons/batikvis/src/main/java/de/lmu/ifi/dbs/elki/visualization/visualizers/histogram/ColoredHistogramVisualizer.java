@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
+import java.util.Arrays;
 
 /*
  This file is part of ELKI:
@@ -33,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
@@ -63,6 +63,29 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2015
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
  * Generates a SVG-Element containing a histogram representing the distribution
@@ -210,7 +233,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
               continue; // TODO: can we test more efficiently than this?
             }
             try {
-              double pos = proj.fastProjectDataToRenderSpace(relation.get(iter)) / Projection.SCALE;
+              double pos = proj.fastProjectDataToRenderSpace(relation.get(iter)) * Projection.INVSCALE;
               histogram.increment(pos, inc);
             }
             catch(ObjectNotFoundException e) {
@@ -224,7 +247,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
         double[] inc = new double[cols];
         inc[0] = frac;
         for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-          double pos = proj.fastProjectDataToRenderSpace(relation.get(iditer)) / Projection.SCALE;
+          double pos = proj.fastProjectDataToRenderSpace(relation.get(iditer)) * Projection.INVSCALE;
           histogram.increment(pos, inc);
         }
       }
@@ -244,12 +267,13 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
         // draw axes that are non-trivial
         final int dimensionality = RelationUtil.dimensionality(relation);
-        double orig = proj.fastProjectScaledToRender(new Vector(dimensionality));
+        final double[] vec = new double[dimensionality];
+        double orig = proj.fastProjectScaledToRender(vec);
         for(int d = 0; d < dimensionality; d++) {
-          Vector v = new Vector(dimensionality);
-          v.set(d, 1);
+          Arrays.fill(vec, 0.);
+          vec[d] = 1;
           // projected endpoint of axis
-          double ax = proj.fastProjectScaledToRender(v);
+          double ax = proj.fastProjectScaledToRender(vec);
           if(ax < orig || ax > orig) {
             final double left = (orig / Projection.SCALE + 0.5) * xsize;
             final double right = (ax / Projection.SCALE + 0.5) * xsize;

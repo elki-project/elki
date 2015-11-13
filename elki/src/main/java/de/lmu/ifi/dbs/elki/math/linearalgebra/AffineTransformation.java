@@ -29,14 +29,14 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
  * Affine transformations implemented using homogeneous coordinates.
- * 
+ *
  * The use of homogeneous coordinates allows the combination of multiple affine
  * transformations (rotations, translations, scaling) into a single matrix
  * operation (of dimensionality dim+1), and also the construction of an inverse
  * transformation.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf Matrix
  * @apiviz.uses Matrix
  * @apiviz.uses Vector
@@ -59,7 +59,7 @@ public class AffineTransformation {
 
   /**
    * Constructor for an identity transformation.
-   * 
+   *
    * @param dim dimensionality
    */
   public AffineTransformation(int dim) {
@@ -70,7 +70,7 @@ public class AffineTransformation {
 
   /**
    * Trivial constructor with all fields, mostly for cloning
-   * 
+   *
    * @param dim dimensionality
    * @param trans transformation matrix
    * @param inv inverse matrix
@@ -84,12 +84,12 @@ public class AffineTransformation {
 
   /**
    * Generate a transformation that reorders axes in the given way.
-   * 
+   *
    * The list of axes to be used should not contain duplicates, or the resulting
    * matrix will not be invertible. It does not have to be complete however, in
    * particular an empty list will result in the identity transform: unmentioned
    * axes will be appended in their original order.
-   * 
+   *
    * @param dim Dimensionality of vector space (resulting Matrix will be dim+1 x
    *        dim+1)
    * @param axes (Partial) list of axes
@@ -127,7 +127,7 @@ public class AffineTransformation {
 
   /**
    * Return a clone of the affine transformation
-   * 
+   *
    * @return cloned affine transformation
    */
   @Override
@@ -140,7 +140,7 @@ public class AffineTransformation {
 
   /**
    * Query dimensionality of the transformation.
-   * 
+   *
    * @return dimensionality
    */
   public int getDimensionality() {
@@ -149,7 +149,7 @@ public class AffineTransformation {
 
   /**
    * Add a translation operation to the matrix
-   * 
+   *
    * @param v translation vector
    */
   public void addTranslation(Vector v) {
@@ -166,11 +166,29 @@ public class AffineTransformation {
   }
 
   /**
+   * Add a translation operation to the matrix
+   *
+   * @param v translation vector
+   */
+  public void addTranslation(double[] v) {
+    assert (v.length == dim);
+
+    // reset inverse transformation - needs recomputation.
+    inv = null;
+
+    Matrix homTrans = Matrix.unitMatrix(dim + 1);
+    for(int i = 0; i < dim; i++) {
+      homTrans.set(i, dim, v[i]);
+    }
+    trans = homTrans.times(trans);
+  }
+
+  /**
    * Add a matrix operation to the matrix.
-   * 
+   *
    * Be careful to use only invertible matrices if you want an invertible affine
    * transformation.
-   * 
+   *
    * @param m matrix (should be invertible)
    */
   public void addMatrix(Matrix m) {
@@ -195,7 +213,7 @@ public class AffineTransformation {
 
   /**
    * Convenience function to apply a rotation in 2 dimensions.
-   * 
+   *
    * @param axis1 first dimension
    * @param axis2 second dimension
    * @param angle rotation angle in radians.
@@ -228,7 +246,7 @@ public class AffineTransformation {
 
   /**
    * Add a reflection along the given axis.
-   * 
+   *
    * @param axis Axis number to do the reflection at.
    */
   public void addAxisReflection(int axis) {
@@ -248,7 +266,7 @@ public class AffineTransformation {
 
   /**
    * Simple linear (symmetric) scaling.
-   * 
+   *
    * @param scale Scaling factor
    */
   public void addScaling(double scale) {
@@ -266,7 +284,7 @@ public class AffineTransformation {
 
   /**
    * Get a copy of the transformation matrix
-   * 
+   *
    * @return copy of the transformation matrix
    */
   public Matrix getTransformation() {
@@ -275,7 +293,7 @@ public class AffineTransformation {
 
   /**
    * Get a copy of the inverse matrix
-   * 
+   *
    * @return a copy of the inverse transformation matrix
    */
   public Matrix getInverse() {
@@ -294,7 +312,7 @@ public class AffineTransformation {
 
   /**
    * Transform an absolute vector into homogeneous coordinates.
-   * 
+   *
    * @param v initial vector
    * @return vector of dim+1, with new column having the value 1.0
    */
@@ -307,7 +325,7 @@ public class AffineTransformation {
 
   /**
    * Transform an absolute vector into homogeneous coordinates.
-   * 
+   *
    * @param v initial vector
    * @return vector of dim+1, with new column having the value 1.0
    */
@@ -320,7 +338,7 @@ public class AffineTransformation {
 
   /**
    * Transform a relative vector into homogeneous coordinates.
-   * 
+   *
    * @param v initial vector
    * @return vector of dim+1, with new column having the value 0.0
    */
@@ -334,7 +352,7 @@ public class AffineTransformation {
 
   /**
    * Transform a relative vector into homogeneous coordinates.
-   * 
+   *
    * @param v initial vector
    * @return vector of dim+1, with new column having the value 0.0
    */
@@ -348,7 +366,7 @@ public class AffineTransformation {
 
   /**
    * Project an homogeneous vector back into the original space.
-   * 
+   *
    * @param v Matrix of 1 x dim+1 containing the homogeneous vector
    * @return vector of dimension dim
    */
@@ -366,7 +384,7 @@ public class AffineTransformation {
 
   /**
    * Project an homogeneous vector back into the original space.
-   * 
+   *
    * @param v Matrix of 1 x dim+1 containing the homogeneous vector
    * @return vector of dimension dim
    */
@@ -384,7 +402,7 @@ public class AffineTransformation {
 
   /**
    * Project an homogeneous vector back into the original space.
-   * 
+   *
    * @param v Matrix of 1 x dim+1 containing the homogeneous vector
    * @return vector of dimension dim
    */
@@ -400,7 +418,7 @@ public class AffineTransformation {
 
   /**
    * Project an homogeneous vector back into the original space.
-   * 
+   *
    * @param v Matrix of 1 x dim+1 containing the homogeneous vector
    * @return vector of dimension dim
    */
@@ -414,7 +432,7 @@ public class AffineTransformation {
 
   /**
    * Apply the transformation onto a vector
-   * 
+   *
    * @param v vector of dimensionality dim
    * @return transformed vector of dimensionality dim
    */
@@ -424,7 +442,7 @@ public class AffineTransformation {
 
   /**
    * Apply the transformation onto a vector
-   * 
+   *
    * @param v vector of dimensionality dim
    * @return transformed vector of dimensionality dim
    */
@@ -434,7 +452,7 @@ public class AffineTransformation {
 
   /**
    * Apply the inverse transformation onto a vector
-   * 
+   *
    * @param v vector of dimensionality dim
    * @return transformed vector of dimensionality dim
    */
@@ -447,7 +465,7 @@ public class AffineTransformation {
 
   /**
    * Apply the inverse transformation onto a vector
-   * 
+   *
    * @param v vector of dimensionality dim
    * @return transformed vector of dimensionality dim
    */
@@ -460,7 +478,7 @@ public class AffineTransformation {
 
   /**
    * Apply the transformation onto a vector
-   * 
+   *
    * @param v vector of dimensionality dim
    * @return transformed vector of dimensionality dim
    */
@@ -470,7 +488,7 @@ public class AffineTransformation {
 
   /**
    * Apply the transformation onto a vector
-   * 
+   *
    * @param v vector of dimensionality dim
    * @return transformed vector of dimensionality dim
    */
@@ -480,7 +498,7 @@ public class AffineTransformation {
 
   /**
    * Apply the inverse transformation onto a vector
-   * 
+   *
    * @param v vector of dimensionality dim
    * @return transformed vector of dimensionality dim
    */
@@ -492,7 +510,7 @@ public class AffineTransformation {
   }
   /**
    * Apply the inverse transformation onto a vector
-   * 
+   *
    * @param v vector of dimensionality dim
    * @return transformed vector of dimensionality dim
    */
