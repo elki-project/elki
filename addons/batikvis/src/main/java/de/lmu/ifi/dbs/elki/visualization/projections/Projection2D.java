@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 
 /**
@@ -141,5 +139,5 @@ public interface Projection2D extends Projection {
    *
    * @return Bit set, first dimension is bit 0.
    */
-  public BitSet getVisibleDimensions2D();
+  public long[] getVisibleDimensions2D();
 }

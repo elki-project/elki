@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.events.Event;
@@ -41,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -192,18 +191,11 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
      * @param ranges Ranges to update
      */
     private void updateSelectionRectKoordinates(double x1, double x2, double y1, double y2, ModifiableHyperBoundingBox ranges) {
-      BitSet actDim = proj.getVisibleDimensions2D();
-      double[] v1 = new double[dim];
-      double[] v2 = new double[dim];
-      v1[0] = x1;
-      v1[1] = y1;
-      v2[0] = x2;
-      v2[1] = y2;
+      double[] nv1 = proj.fastProjectRenderToDataSpace(new double[] { x1, y1 });
+      double[] nv2 = proj.fastProjectRenderToDataSpace(new double[] { x2, y2 });
 
-      double[] nv1 = proj.fastProjectRenderToDataSpace(v1);
-      double[] nv2 = proj.fastProjectRenderToDataSpace(v2);
-
-      for(int d = actDim.nextSetBit(0); d >= 0; d = actDim.nextSetBit(d + 1)) {
+      long[] actDim = proj.getVisibleDimensions2D();
+      for(int d = BitsUtil.nextSetBit(actDim, 0); d >= 0; d = BitsUtil.nextSetBit(actDim, d + 1)) {
         ranges.setMin(d, Math.min(nv1[d], nv2[d]));
         ranges.setMax(d, Math.max(nv1[d], nv2[d]));
       }

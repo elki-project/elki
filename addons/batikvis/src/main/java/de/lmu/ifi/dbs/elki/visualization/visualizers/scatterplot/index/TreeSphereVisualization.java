@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
 import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -202,7 +203,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
     public void fullRedraw() {
       setupCanvas();
       final StyleLibrary style = context.getStyleLibrary();
-      int projdim = proj.getVisibleDimensions2D().cardinality();
+      int projdim = BitsUtil.cardinality(proj.getVisibleDimensions2D());
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       p = getLPNormP(tree);

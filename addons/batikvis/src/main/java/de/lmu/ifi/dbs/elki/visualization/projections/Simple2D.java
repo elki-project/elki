@@ -23,10 +23,9 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.BitSet;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
 /**
@@ -156,10 +155,10 @@ public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   }
 
   @Override
-  public BitSet getVisibleDimensions2D() {
-    BitSet actDim = new BitSet();
-    actDim.set(dim1);
-    actDim.set(dim2);
+  public long[] getVisibleDimensions2D() {
+    long[] actDim = new long[super.scales.length];
+    BitsUtil.setI(actDim, dim1);
+    BitsUtil.setI(actDim, dim2);
     return actDim;
   }
 

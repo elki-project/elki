@@ -24,12 +24,12 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  */
 
 import java.util.Arrays;
-import java.util.BitSet;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
 /**
@@ -261,9 +261,9 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
   }
 
   @Override
-  public BitSet getVisibleDimensions2D() {
+  public long[] getVisibleDimensions2D() {
     final int dim = proj.getDimensionality();
-    BitSet actDim = new BitSet(dim);
+    long[] actDim = BitsUtil.zero(dim);
     double[] vScale = new double[dim];
     for(int d = 0; d < dim; d++) {
       Arrays.fill(vScale, 0);
@@ -272,7 +272,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
 
       // TODO: Can't we do this by inspecting the projection matrix directly?
       if(vRender[0] > 0.0 || vRender[0] < 0.0 || vRender[1] != 0) {
-        actDim.set(d);
+        BitsUtil.setI(actDim, d);
       }
     }
     return actDim;
