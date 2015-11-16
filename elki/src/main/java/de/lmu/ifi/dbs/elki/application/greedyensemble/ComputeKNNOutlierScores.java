@@ -300,7 +300,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       }
     });
     // Run ODIN
-    runForEachK("ODIN", startkmin2, stepk, maxk, new AlgRunner() {
+    runForEachK("ODIN", startk, stepk, maxk, new AlgRunner() {
       @Override
       public void run(int k, String kstr) {
         ODIN<O> odin = new ODIN<>(distf, k);
@@ -476,7 +476,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       return; // Disabled
     }
     LOG.verbose("Running " + prefix);
-    final int digits = (int) Math.ceil(Math.log10(maxk));
+    final int digits = (int) Math.ceil(Math.log10(maxk + 1));
     final String format = "%s-%0" + digits + "d";
     for(int k = startk; k <= maxk; k += stepk) {
       Duration time = LOG.newDuration(this.getClass().getCanonicalName() + "." + prefix + ".k" + k + ".runtime").begin();
