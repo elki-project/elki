@@ -26,7 +26,9 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
@@ -167,8 +169,17 @@ public class EvaluationVisualization extends AbstractVisFactory {
         @SuppressWarnings("unchecked")
         final Class<Object> c = (Class<Object>) o;
         Iter<?> it = VisualizationTree.filterResults(context, cpol.getClustering(), c);
-        if(it.valid()) {
+        candidates: for(; it.valid(); it.advance()) {
+          // This could be attached to a child clustering, in which case we
+          // may end up displaying the wrong evaluation.
+          Iter<Result> it2 = context.getHierarchy().iterAncestors((EvaluationResult) it.get());
+          for(; it2.valid(); it2.advance()) {
+            if(it2.get() instanceof Clustering && it2.get() != cpol.getClustering()) {
+              continue candidates;
+            }
+          }
           sr = (EvaluationResult) it.get();
+          break;
         }
       }
     }
