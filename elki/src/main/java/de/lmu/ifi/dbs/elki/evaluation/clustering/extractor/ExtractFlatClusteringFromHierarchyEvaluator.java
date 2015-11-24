@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
@@ -129,7 +128,8 @@ public class ExtractFlatClusteringFromHierarchyEvaluator implements Evaluator {
       ListParameterization overrides = new ListParameterization();
       overrides.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, DummyHierarchicalClusteringAlgorithm.class);
       ChainedParameterization list = new ChainedParameterization(overrides, config);
-      inner = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, list);
+      list.errorsTo(config);
+      inner = list.tryInstantiate(ExtractFlatClusteringFromHierarchy.class);
     }
 
     @Override

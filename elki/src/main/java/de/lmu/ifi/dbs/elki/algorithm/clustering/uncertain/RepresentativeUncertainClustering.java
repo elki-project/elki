@@ -111,7 +111,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 title = "Representative clustering of uncertain data", //
 booktitle = "Proc. 20th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining", //
 url = "http://dx.doi.org/10.1145/2623330.2623725")
-public class RepresentativeUncertainClustering extends AbstractAlgorithm<Clustering<Model>>implements ClusteringAlgorithm<Clustering<Model>> {
+public class RepresentativeUncertainClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Initialize a Logger.
    */
@@ -213,7 +213,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
         datastore.put(iter, it2.next());
       }
     }
-    assert(rids.size() == clusterings.size());
+    assert (rids.size() == clusterings.size());
 
     // Build a relation, and a distance matrix.
     Relation<Clustering<?>> crel = new MaterializedRelation<Clustering<?>>(TypeUtil.CLUSTERING, rids, "Clusterings", datastore);
@@ -463,6 +463,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       ListParameterization predef = new ListParameterization();
       predef.addParameter(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, distance);
       ChainedParameterization chain = new ChainedParameterization(predef, config);
+      chain.errorsTo(config);
       ObjectParameter<ClusteringAlgorithm<?>> malgorithm = new ObjectParameter<>(META_ALGORITHM_ID, ClusteringAlgorithm.class, KMedoidsEM.class);
       if(chain.grab(malgorithm)) {
         metaAlgorithm = malgorithm.instantiateClass(chain);
