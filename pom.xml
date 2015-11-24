@@ -29,6 +29,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<skipTests>true</skipTests>
 		<elki.projdir>${basedir}</elki.projdir>
+		<year>2015</year>
 	</properties>
 
 	<build>
@@ -148,8 +149,9 @@
 							<overview>${elki.projdir}/elki/src/main/javadoc/overview.html</overview>
 							<doctitle>ELKI</doctitle>
 							<windowtitle><![CDATA[ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures]]></windowtitle>
-							<!-- <docletPath>${elki.projdir}/lib/apiviz-1.3.1.GA+erich2.jar</docletPath> 
-								<doclet>org.jboss.apiviz.APIviz</doclet> <additionalparam>-nopackagediagram</additionalparam> -->
+							<docletPath>${doclet.path}</docletPath>
+							<doclet>${doclet.doclet}</doclet>
+							<additionalparam>${doclet.params}</additionalparam>
 							<groups>
 								<group>
 									<title>Algorithms</title>
@@ -182,7 +184,7 @@
 							</groups>
 							<header><![CDATA[<img src="{@docRoot}/figures/elki-logo-200.png" width="200">]]></header>
 							<footer><![CDATA[ELKI Version ${project.version}]]></footer>
-							<bottom><![CDATA[Copyright © 2014 <a href="http://elki.dbs.ifi.lmu.de/">ELKI Development Team</a>, <a href="http://www.dbs.ifi.lmu.de/">Lehr- und Forschungseinheit für Datenbanksysteme</a>, <a href="http://www.lmu.de/">Ludwig-Maximilians-Universität München</a>. <a href="http://elki.dbs.ifi.lmu.de/wiki/License">License information.</a>]]></bottom>
+							<bottom><![CDATA[Copyright © ${year} <a href="http://elki.dbs.ifi.lmu.de/">ELKI Development Team</a>, <a href="http://www.dbs.ifi.lmu.de/">Lehr- und Forschungseinheit für Datenbanksysteme</a>, <a href="http://www.lmu.de/">Ludwig-Maximilians-Universität München</a>. <a href="http://elki.dbs.ifi.lmu.de/wiki/License">License information.</a>]]></bottom>
 						</configuration>
 					</plugin>
 				</plugins>
