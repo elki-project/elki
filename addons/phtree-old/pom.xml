@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>de.lmu.ifi.dbs.elki</groupId>
+    <version>0.6.5-SNAPSHOT</version>
+    <artifactId>elki-project</artifactId>
+	<relativePath>../../</relativePath>
+  </parent>
+  <groupId>de.lmu.ifi.dbs.elki</groupId>
+  <artifactId>elki-phtree</artifactId>
+  <version>0.6.5-SNAPSHOT</version>
+  <packaging>jar</packaging>
+  
+  <name>ELKI Data Mining Framework - PH-Tree extension</name>
+
+	<licenses>
+		<license>
+			<name>GNU Affero General Public License (AGPL) version 3.0</name>
+			<url>http://www.gnu.org/licenses/agpl-3.0.txt</url>
+		</license>
+	</licenses>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencies>
+    <dependency>
+		<groupId>de.lmu.ifi.dbs.elki</groupId>
+		<artifactId>elki</artifactId>
+		<version>${project.version}</version>
+	</dependency>
+	<dependency>
+		<groupId>junit</groupId>
+		<artifactId>junit</artifactId>
+		<version>[4.8,)</version>
+		<scope>test</scope>
+	</dependency>
+  </dependencies>
+</project>
