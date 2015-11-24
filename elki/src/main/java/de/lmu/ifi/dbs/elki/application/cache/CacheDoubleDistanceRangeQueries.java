@@ -55,11 +55,11 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
  * Precompute the k nearest neighbors in a disk cache.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has DistanceFunction
- * 
+ *
  * @param <O> Object type
  */
 public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
@@ -90,7 +90,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
 
   /**
    * Magic number to identify files.
-   * 
+   *
    * Note, when cloning this class, and performing any incompatible change to
    * the file format, you should also change this magic ID!
    */
@@ -98,7 +98,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
 
   /**
    * Constructor.
-   * 
+   *
    * @param input Data source
    * @param distance Distance function
    * @param radius Query radius
@@ -139,6 +139,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
       ModifiableDoubleDBIDList nn = DBIDUtil.newDistanceDBIDList();
       DoubleDBIDListIter ni = nn.iter();
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        nn.clear();
         rangeQ.getRangeForDBID(it, radius, nn);
         nn.sort();
         final int nnsize = nn.size();
@@ -179,9 +180,9 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractApplication.Parameterizer {
@@ -258,7 +259,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
 
   /**
    * Main method, delegate to super class.
-   * 
+   *
    * @param args Command line arguments
    */
   public static void main(String[] args) {
