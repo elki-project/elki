@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Union-find algorithm for {@link StaticDBIDs}, with optimizations.
  *
- * To instantiate, use {@link UnionFindFactory#make}, which will automatically
+ * To instantiate, use {@link UnionFindUtil#make}, which will automatically
  * choose the best implementation available.
  *
  * This is the weighted quick union approach, weighted by count and using

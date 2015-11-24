@@ -69,11 +69,11 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return vector in scaled space
    */
   @Override
-  public double[] projectDataToScaledSpace(double[] src) {
-    final int dim = src.length;
+  public double[] projectDataToScaledSpace(double[] data) {
+    final int dim = data.length;
     double[] dst = new double[dim];
     for(int d = 0; d < dim; d++) {
-      dst[d] = scales[d].getScaled(src[d]);
+      dst[d] = scales[d].getScaled(data[d]);
     }
     return dst;
   }
@@ -101,11 +101,11 @@ public abstract class AbstractFullProjection extends AbstractProjection implemen
    * @return relative vector in scaled space
    */
   @Override
-  public double[] projectRelativeDataToScaledSpace(double[] src) {
-    final int dim = src.length;
+  public double[] projectRelativeDataToScaledSpace(double[] data) {
+    final int dim = data.length;
     double[] dst = new double[dim];
     for(int d = 0; d < dim; d++) {
-      dst[d] = scales[d].getRelativeScaled(src[d]);
+      dst[d] = scales[d].getRelativeScaled(data[d]);
     }
     return dst;
   }

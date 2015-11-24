@@ -141,7 +141,7 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
    * @param kernelMatrix Kernel matrix
    * @param pA Object A to compute ABOF for
    * @param pB Iterator over objects B
-   * @param pc Iterator over objects C
+   * @param pC Iterator over objects C
    * @param s Statistics tracker
    * @return ABOF value
    */
