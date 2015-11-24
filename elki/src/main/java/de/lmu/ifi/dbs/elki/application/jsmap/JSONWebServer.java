@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.jsmap;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -59,9 +59,11 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * A simple web server to serve data base contents to a JavaScript client.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
+ * TODO: use Jetty or something similar on the long run.
+ *
  * @apiviz.uses JSONBuffer
  */
 public class JSONWebServer implements HttpHandler {
@@ -97,7 +99,7 @@ public class JSONWebServer implements HttpHandler {
 
   /**
    * Constructor.
-   * 
+   *
    * @param port Port to listen on
    * @param hier Result hierarchy to serve
    */
@@ -132,7 +134,7 @@ public class JSONWebServer implements HttpHandler {
 
   /**
    * Parse a string into a DBID.
-   * 
+   *
    * @param query Query string
    * @return DBID
    */
@@ -142,7 +144,7 @@ public class JSONWebServer implements HttpHandler {
 
   /**
    * Serialize an object bundle to JSON.
-   * 
+   *
    * @param re Buffer to serialize to
    * @param id Object ID
    */
@@ -190,7 +192,7 @@ public class JSONWebServer implements HttpHandler {
 
   /**
    * Serialize an arbitrary result into JSON.
-   * 
+   *
    * @param re Buffer to serialize to
    * @param name Result requested
    */
@@ -346,7 +348,7 @@ public class JSONWebServer implements HttpHandler {
 
   /**
    * Serialize outlier metadata as JSON.
-   * 
+   *
    * @param re Output buffer
    * @param meta Metadata
    */

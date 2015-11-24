@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2015
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -44,12 +44,12 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Algorithm to materialize all the distances in a data set.
- * 
+ *
  * The result can then be used with the DoubleDistanceParser and
  * MultipleFileInput to use cached distances.
- * 
+ *
  * Symmetry is assumed.
- * 
+ *
  * @param <O> Object type
  */
 // TODO: use DBIDPair -> D map?
@@ -63,7 +63,7 @@ public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, C
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Parameterization
    */
   public MaterializeDistances(DistanceFunction<? super O> distanceFunction) {
@@ -72,7 +72,7 @@ public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, C
 
   /**
    * Iterates over all points in the database.
-   * 
+   *
    * @param database Database to process
    * @param relation Relation to process
    * @return Distance matrix
@@ -108,9 +108,9 @@ public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, C
 
   /**
    * Object representing a pairwise distance.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class DistanceEntry implements TextWriteable {
@@ -126,7 +126,7 @@ public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, C
 
     /**
      * Constructor.
-     * 
+     *
      * @param ids IDs
      * @param distance Distance
      */
@@ -135,6 +135,7 @@ public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, C
       this.distance = distance;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void writeToText(TextWriterStream out, String label) {
       // TODO: use less memory;
@@ -147,9 +148,9 @@ public class MaterializeDistances<O> extends AbstractDistanceBasedAlgorithm<O, C
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
