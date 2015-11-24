@@ -1,2 +1,5 @@
 /target/
 /local/
+/**/target
+/MiniGUI-saved-settings.txt
+/**/*~
