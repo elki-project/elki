@@ -29,7 +29,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -52,21 +51,21 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * The OPTICS algorithm for density-based hierarchical clustering.
- * 
+ *
  * This version is implemented using a list, always scanning the list for the
  * maximum. While this could be cheaper than the complex heap updates,
  * benchmarks indicate the heap version is usually still preferable.
- * 
+ *
  * Reference:
  * <p>
  * M. Ankerst, M. Breunig, H.-P. Kriegel, and J. Sander:<br />
  * OPTICS: Ordering Points to Identify the Clustering Structure. <br/>
  * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).
  * </p>
- * 
+ *
  * @author Elke Achtert
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf OPTICSList.Instance
  *
  * @param <O> the type of DatabaseObjects handled by the algorithm
@@ -85,7 +84,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param epsilon Epsilon value
    * @param minpts Minpts value
@@ -165,7 +164,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
 
     /**
      * Process the data set.
-     * 
+     *
      * @return Cluster order result.
      */
     public ClusterOrder run() {
@@ -181,7 +180,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
 
     /**
      * OPTICS-function expandClusterOrder.
-     * 
+     *
      * @param objectID the currently processed object
      */
     protected void expandClusterOrder(DBIDRef objectID) {
@@ -194,9 +193,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
       DBIDArrayMIter it = candidates.iter();
       DBIDVar cur = DBIDUtil.newVar(), prev = DBIDUtil.newVar();
       while(!candidates.isEmpty()) {
-        final int best = findMin(it);
-        candidates.assignVar(best, cur);
-        candidates.remove(best);
+        findBest(candidates, it, cur);
         processedIDs.add(cur);
         { // Build cluster order entry
           predecessor.assignVar(cur, prev);
@@ -205,6 +202,7 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
           LOG.incrementProcessed(progress);
         }
 
+        neighbors.clear();
         rangeQuery.getRangeForDBID(cur, epsilon, neighbors);
         if(neighbors.size() >= minpts) {
           neighbors.sort();
@@ -230,21 +228,24 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
 
     /**
      * Find the minimum in the candidates array.
-     * 
+     *
+     * @param candidates Candidates set
      * @param it Array iterator
-     * @return Position of minimum.
+     * @param out Output variable
      */
-    public int findMin(DBIDArrayIter it) {
-      int best = 0, i = 1;
+    public void findBest(ArrayModifiableDBIDs candidates, DBIDArrayMIter it, DBIDVar out) {
+      assert(candidates.size() > 0);
+      int best = 0;
       double min = reachability.doubleValue(it.seek(0));
-      for(it.advance(); it.valid(); it.advance(), ++i) {
+      for(it.advance(); it.valid(); it.advance()) {
         final double reach = reachability.doubleValue(it);
-        if(reach < min) { // Prefer last on ties: cheaper
+        if(reach < min) {
           min = reach;
-          best = i;
+          best = it.getOffset();
         }
       }
-      return best;
+      out.set(it.seek(best));
+      it.remove();
     }
   }
 
@@ -255,9 +256,9 @@ public class OPTICSList<O> extends AbstractOPTICS<O> {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O> extends AbstractOPTICS.Parameterizer<O> {
