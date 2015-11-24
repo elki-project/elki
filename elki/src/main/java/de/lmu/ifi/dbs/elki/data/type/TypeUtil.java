@@ -76,9 +76,14 @@ public final class TypeUtil {
   public static final SimpleTypeInformation<DBID> DBID = new SimpleTypeInformation<>(DBID.class, DBIDFactory.FACTORY.getDBIDSerializer());
 
   /**
-   * Database ID lists.
+   * Database ID lists (but not single DBIDs).
    */
-  public static final SimpleTypeInformation<DBIDs> DBIDS = new SimpleTypeInformation<>(DBIDs.class);
+  public static final SimpleTypeInformation<DBIDs> DBIDS = new SimpleTypeInformation<DBIDs>(DBIDs.class) {
+    @Override
+    public boolean isAssignableFromType(TypeInformation type) {
+      return super.isAssignableFromType(type) && !DBID.isAssignableFromType(type);
+    }
+  };
 
   /**
    * A string.
