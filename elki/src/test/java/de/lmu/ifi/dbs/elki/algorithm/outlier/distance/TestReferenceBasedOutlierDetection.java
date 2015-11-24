@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.GridBasedReferencePoints;
 
 /**
  * Tests the ReferenceBasedOutlierDetection algorithm.
- * 
+ *
  * @author Lucia Cichella
  */
 public class TestReferenceBasedOutlierDetection extends AbstractSimpleAlgorithmTest implements JUnit4Test {
@@ -55,7 +55,7 @@ public class TestReferenceBasedOutlierDetection extends AbstractSimpleAlgorithmT
     // run ReferenceBasedOutlierDetection on database
     OutlierResult result = referenceBasedOutlierDetection.run(db);
 
-    testAUC(db, "Noise", result, 0.969370370370);
-    testSingleScore(result, 945, 0.9335744552478);
+    testAUC(db, "Noise", result, 0.9418148148);
+    testSingleScore(result, 945, 0.87173403699);
   }
 }

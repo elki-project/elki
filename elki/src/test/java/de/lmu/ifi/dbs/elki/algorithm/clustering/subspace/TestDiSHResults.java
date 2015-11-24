@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * from the data set labels. This test ensures that DiSH performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
- * 
+ *
  * @author Elke Achtert
  * @author Katharina Rausch
  * @author Erich Schubert
@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Run DiSH with fixed parameters and compare the result to a golden standard.
-   * 
+   *
    * @throws ParameterException
    */
   @Test
@@ -73,7 +73,7 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
 
   /**
    * Run DiSH with fixed parameters and compare the result to a golden standard.
-   * 
+   *
    * @throws ParameterException
    */
   @Test
@@ -90,7 +90,7 @@ public class TestDiSHResults extends AbstractSimpleAlgorithmTest implements JUni
 
     // run DiSH on database
     Clustering<SubspaceModel> result = dish.run(db);
-    testFMeasure(db, result, 0.6549388);
-    testClusterSizes(result, new int[] { 60, 84, 148, 188, 289, 331 });
+    testFMeasure(db, result, 0.65368779);
+    testClusterSizes(result, new int[] { 60, 84, 148, 188, 290, 330 });
   }
 }

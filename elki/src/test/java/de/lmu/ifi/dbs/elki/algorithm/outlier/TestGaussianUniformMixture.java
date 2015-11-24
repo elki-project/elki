@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 
 /**
  * Tests the GaussianUniformMixture algorithm.
- * 
+ *
  * @author Lucia Cichella
  */
 public class TestGaussianUniformMixture extends AbstractSimpleAlgorithmTest implements JUnit4Test {
@@ -53,7 +53,7 @@ public class TestGaussianUniformMixture extends AbstractSimpleAlgorithmTest impl
     // run GaussianUniformMixture on database
     OutlierResult result = gaussianUniformMixture.run(db);
 
-    testSingleScore(result, 1025, -20.2862041);
-    testAUC(db, "Noise", result, 0.94404102);
+    testSingleScore(result, 1025, -20.27211494);
+    testAUC(db, "Noise", result, 0.97251282);
   }
 }

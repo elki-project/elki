@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * from the data set labels. This test ensures that ORCLUS performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
- * 
+ *
  * @author Elke Achtert
  * @author Katharina Rausch
  */
@@ -48,7 +48,7 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
   /**
    * Run ORCLUS with fixed parameters and compare the result to a golden
    * standard.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test
@@ -67,14 +67,14 @@ public class TestORCLUSResults extends AbstractSimpleAlgorithmTest implements JU
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
 
-    testFMeasure(db, result, 0.6361108); // Hierarchical pairs scored: 0.789113
-    testClusterSizes(result, new int[] { 19, 33, 398 });
+    testFMeasure(db, result, 0.6319449087);
+    testClusterSizes(result, new int[] { 26, 30, 394 });
   }
 
   /**
    * Run ORCLUS with fixed parameters and compare the result to a golden
    * standard.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test

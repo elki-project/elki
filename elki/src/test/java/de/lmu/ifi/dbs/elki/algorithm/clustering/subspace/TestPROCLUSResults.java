@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * derived from the data set labels. This test ensures that PROCLUS performance
  * doesn't unexpectedly drop on this data set (and also ensures that the
  * algorithms work, as a side effect).
- * 
+ *
  * @author Elke Achtert
  * @author Katharina Rausch
  * @author Erich Schubert
@@ -48,7 +48,7 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
   /**
    * Run PROCLUS with fixed parameters and compare the result to a golden
    * standard.
-   * 
+   *
    * @throws ParameterException
    */
   @Test
@@ -68,14 +68,14 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
     // run PROCLUS on database
     Clustering<?> result = proclus.run(db);
 
-    testFMeasure(db, result, 0.775218);
-    testClusterSizes(result, new int[] { 30, 90, 201, 279 });
+    testFMeasure(db, result, 0.75156834);
+    testClusterSizes(result, new int[] { 41, 95, 200, 264 });
   }
 
   /**
    * Run PROCLUS with fixed parameters and compare the result to a golden
    * standard.
-   * 
+   *
    * @throws ParameterException
    */
   @Test
@@ -93,7 +93,7 @@ public class TestPROCLUSResults extends AbstractSimpleAlgorithmTest implements J
 
     // run PROCLUS on database
     Clustering<?> result = proclus.run(db);
-    testFMeasure(db, result, 0.965731);
-    testClusterSizes(result, new int[] { 151, 290, 409 });
+    testFMeasure(db, result, 0.95856963);
+    testClusterSizes(result, new int[] { 151, 286, 413 });
   }
 }
