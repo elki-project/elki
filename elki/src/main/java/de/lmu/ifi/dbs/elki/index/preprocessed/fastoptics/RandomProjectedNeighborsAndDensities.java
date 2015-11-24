@@ -24,10 +24,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.fastoptics;
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.array.TIntArrayList;
+*/
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -46,8 +43,8 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -63,6 +60,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
+
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Random Projections used for computing neighbors and density estimates.
@@ -90,11 +90,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 title = "Fast parameterless density-based clustering via random projections", //
 booktitle = "Proc. 22nd ACM international conference on Conference on Information & Knowledge Management (CIKM)", //
 url = "http://dx.doi.org/10.1145/2505515.2505590")
-public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
+public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(RandomProjectedNeighborssAndDensities.class);
+  private static final Logging LOG = Logging.getLogger(RandomProjectedNeighborsAndDensities.class);
+
+  /**
+   * Statistics logging prefix.
+   */
+  private static final String PREFIX = RandomProjectedNeighborsAndDensities.class.getName();
 
   /**
    * Default constant used to compute number of projections as well as number of
@@ -137,16 +142,16 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
   RandomFactory rnd;
 
   /**
-   * random number generator
+   * Count the number of distance computations.
    */
-  Random rand;
+  long distanceComputations;
 
   /**
    * Constructor.
    *
    * @param rnd Random factory.
    */
-  public RandomProjectedNeighborssAndDensities(RandomFactory rnd) {
+  public RandomProjectedNeighborsAndDensities(RandomFactory rnd) {
     this.rnd = rnd;
   }
 
@@ -170,15 +175,15 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
     // perform O(log N+log dim) projections of the point set onto a random line
     int nProject1d = (int) (logOProjectionConst * MathUtil.log2(size * dim + 1));
 
-    LOG.statistics(new LongStatistic(RandomProjectedNeighborssAndDensities.class.getName() + ".partition-size", nPointSetSplits));
-    LOG.statistics(new LongStatistic(RandomProjectedNeighborssAndDensities.class.getName() + ".num-projections", nProject1d));
+    LOG.statistics(new LongStatistic(PREFIX + ".partition-size", nPointSetSplits));
+    LOG.statistics(new LongStatistic(PREFIX + ".num-projections", nProject1d));
     splitsets = new ArrayList<>();
 
     // perform projections of points
     projectedPoints = new DoubleDataStore[nProject1d];
     DoubleDataStore[] tmpPro = new DoubleDataStore[nProject1d];
 
-    rand = rnd.getSingleThreadedRandom();
+    Random rand = rnd.getSingleThreadedRandom();
     FiniteProgress projp = LOG.isVerbose() ? new FiniteProgress("Random projections", nProject1d, LOG) : null;
     for(int j = 0; j < nProject1d; j++) {
       double[] currRp = new double[dim];
@@ -207,6 +212,9 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
       LOG.incrementProcessed(projp);
     }
     LOG.ensureCompleted(projp);
+    // Log the number of scalar projections performed.
+    long numprod = nProject1d * ptList.size();
+    LOG.statistics(new LongStatistic(PREFIX + ".num-scalar-products", numprod));
 
     // split entire point set, reuse projections by shuffling them
     TIntArrayList proind = new TIntArrayList(nProject1d);
@@ -229,7 +237,7 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
       }
 
       // split point set
-      splitupNoSort(DBIDUtil.newArray(ptList), 0, size, 0);
+      splitupNoSort(DBIDUtil.newArray(ptList), 0, size, 0, rand);
       LOG.incrementProcessed(splitp);
     }
     LOG.ensureCompleted(splitp);
@@ -243,8 +251,9 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
    * @param end Interval end in the ind array
    * @param dim depth of projection (how many times point set has been split
    *        already)
+   * @param rand Random generator
    */
-  public void splitupNoSort(ArrayModifiableDBIDs ind, int begin, int end, int dim) {
+  public void splitupNoSort(ArrayModifiableDBIDs ind, int begin, int end, int dim, Random rand) {
     final int nele = end - begin;
     dim = dim % projectedPoints.length;// choose a projection of points
     DoubleDataStore tpro = projectedPoints[dim];
@@ -265,14 +274,14 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
       // outcome is similar
 
       // int minInd splitByDistance(ind, nele, tpro);
-      int minInd = splitRandomly(ind, begin, end, tpro);
+      int minInd = splitRandomly(ind, begin, end, tpro, rand);
 
       // split set recursively
       // position used for splitting the projected points into two
       // sets used for recursive splitting
       int splitpos = minInd + 1;
-      splitupNoSort(ind, begin, splitpos, dim + 1);
-      splitupNoSort(ind, splitpos, end, dim + 1);
+      splitupNoSort(ind, begin, splitpos, dim + 1, rand);
+      splitupNoSort(ind, splitpos, end, dim + 1, rand);
     }
   }
 
@@ -283,9 +292,10 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
    * @param begin Interval begin
    * @param end Interval end
    * @param tpro Projection
+   * @param rand Random generator
    * @return Splitting point
    */
-  public int splitRandomly(ArrayModifiableDBIDs ind, int begin, int end, DoubleDataStore tpro) {
+  public int splitRandomly(ArrayModifiableDBIDs ind, int begin, int end, DoubleDataStore tpro, Random rand) {
     final int nele = end - begin;
     DBIDArrayIter it = ind.iter();
     // pick random splitting element based on position
@@ -321,9 +331,10 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
    * @param begin Interval begin
    * @param end Interval end
    * @param tpro Projection
+   * @param rand Random generator
    * @return Splitting point
    */
-  public int splitByDistance(ArrayModifiableDBIDs ind, int begin, int end, DoubleDataStore tpro) {
+  public int splitByDistance(ArrayModifiableDBIDs ind, int begin, int end, DoubleDataStore tpro, Random rand) {
     DBIDArrayIter it = ind.iter();
     // pick random splitting point based on distance
     double rmin = Double.MAX_VALUE * .5, rmax = -Double.MAX_VALUE * .5;
@@ -378,17 +389,18 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
     FiniteProgress splitp = LOG.isVerbose() ? new FiniteProgress("Processing splits for neighborhoods", splitsets.size(), LOG) : null;
     // go through all sets
     Iterator<ArrayDBIDs> it1 = splitsets.iterator();
+    DBIDVar v = DBIDUtil.newVar();
     while(it1.hasNext()) {
       ArrayDBIDs pinSet = it1.next();
 
       final int indoff = pinSet.size() >> 1; // middle point of projection
-      DBIDRef oldind = pinSet.iter().seek(indoff);
+      pinSet.assignVar(indoff, v);
       // add all points as neighbors to middle point
-      neighs.get(oldind).addDBIDs(pinSet);
+      neighs.get(v).addDBIDs(pinSet);
 
       // and the the middle point to all other points in set
       for(DBIDIter it = pinSet.iter(); it.valid(); it.advance()) {
-        neighs.get(it).add(oldind);
+        neighs.get(it).add(v);
       }
       LOG.incrementProcessed(splitp);
     }
@@ -406,19 +418,21 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
     WritableDoubleDataStore davg = DataStoreUtil.makeDoubleStorage(points.getDBIDs(), DataStoreFactory.HINT_HOT);
     WritableIntegerDataStore nDists = DataStoreUtil.makeIntegerStorage(points.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress splitp = LOG.isVerbose() ? new FiniteProgress("Processing splits for density estimation", splitsets.size(), LOG) : null;
+    DBIDVar v = DBIDUtil.newVar();
     for(Iterator<ArrayDBIDs> it1 = splitsets.iterator(); it1.hasNext();) {
       ArrayDBIDs pinSet = it1.next();
       final int len = pinSet.size();
       final int indoff = len >> 1;
-      DBIDRef oldind = pinSet.iter().seek(indoff);
-      V midpoint = points.get(oldind);
+      pinSet.assignVar(indoff, v);
+      V midpoint = points.get(v);
       for(DBIDArrayIter it = pinSet.iter(); it.getOffset() < len; it.advance()) {
-        if(DBIDUtil.equal(it, oldind)) {
+        if(DBIDUtil.equal(it, v)) {
           continue;
         }
         double dist = EuclideanDistanceFunction.STATIC.distance(points.get(it), midpoint);
-        davg.increment(oldind, dist);
-        nDists.increment(oldind, 1);
+        ++distanceComputations;
+        davg.increment(v, dist);
+        nDists.increment(v, 1);
         davg.increment(it, dist);
         nDists.increment(it, 1);
       }
@@ -435,6 +449,13 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
     }
     nDists.destroy(); // No longer needed after normalization
     return davg;
+  }
+
+  /**
+   * Log some statistics.
+   */
+  public void logStatistics() {
+    LOG.statistics(new LongStatistic(PREFIX + ".distance-computations", distanceComputations));
   }
 
   /**
@@ -465,8 +486,8 @@ public class RandomProjectedNeighborssAndDensities<V extends NumberVector> {
     }
 
     @Override
-    protected RandomProjectedNeighborssAndDensities<NumberVector> makeInstance() {
-      return new RandomProjectedNeighborssAndDensities<>(rnd);
+    protected RandomProjectedNeighborsAndDensities<NumberVector> makeInstance() {
+      return new RandomProjectedNeighborsAndDensities<>(rnd);
     }
   }
 }
