@@ -26,9 +26,9 @@ import java.util.Comparator;
 
 /**
  * Array-oriented implementation of a modifiable DBID collection.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has DBIDArrayMIter
  */
 public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
@@ -39,14 +39,14 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
 
   /**
    * Sort the DBID set.
-   * 
+   *
    * @param comparator Comparator to use
    */
   void sort(Comparator<? super DBIDRef> comparator);
 
   /**
    * Sort the DBID set.
-   * 
+   *
    * @param start Starting index, for partial sorting
    * @param end End index, for partial sorting (exclusive)
    * @param comparator Comparator to use
@@ -55,26 +55,24 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
 
   /**
    * Remove the i'th entry (starting at 0)
-   * 
+   *
    * @param i Index
-   * @return value removed
    */
-  DBID remove(int i);
+  void remove(int i);
 
   /**
    * Replace the i'th entry (starting at 0)
-   * 
+   *
    * @param i Index
    * @param newval New value
-   * @return previous value
    */
-  DBID set(int i, DBIDRef newval);
+  void set(int i, DBIDRef newval);
 
   /**
    * Insert at position i (starting at 0, moving the remainder by one position).
-   * 
+   *
    * Note: this operation has linear time complexity on average: O(n/2)
-   * 
+   *
    * @param i Index
    * @param newval New value
    */
@@ -82,7 +80,7 @@ public interface ArrayModifiableDBIDs extends ModifiableDBIDs, ArrayDBIDs {
 
   /**
    * Swap DBIDs add positions a and b.
-   * 
+   *
    * @param a First position
    * @param b Second position
    */

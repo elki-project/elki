@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import gnu.trove.list.array.TIntArrayList;
-
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
@@ -41,9 +39,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -61,20 +59,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Locally scaled Density Based Clustering.
- * 
+ *
  * This is a variant of DBSCAN which starts with the most dense point first,
  * then expands clusters until density has dropped below a threshold.
- * 
+ *
  * Reference:
  * <p>
  * E. Biçici and D. Yuret<br />
  * Locally Scaled Density Based Clustering<br />
- * Adaptive and Natural Computing Algorithms<br />
+ * Adaptive and Natural Computing Algorithms
  * </p>
- * 
+ *
  * @author Erich Schubert
  *
  * @param <O> Object type
@@ -120,7 +119,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
 
   /**
    * Run the LSDBC algorithm
-   * 
+   *
    * @param database Database to process
    * @param relation Data relation
    * @return Clustering result
@@ -231,14 +230,14 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
 
   /**
    * Set-based expand cluster implementation.
-   * 
+   *
    * @param clusterid ID of the current cluster.
    * @param clusterids Current object to cluster mapping.
    * @param knnq kNNQuery
    * @param neighbors Neighbors acquired by initial getNeighbors call.
    * @param maxkdist Maximum k-distance
    * @param progress Progress logging
-   * 
+   *
    * @return cluster size
    */
   protected int expandCluster(final int clusterid, final WritableIntegerDataStore clusterids, final KNNQuery<O> knnq, final DBIDs neighbors, final double maxkdist, final FiniteProgress progress) {
@@ -247,8 +246,9 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
     activeSet.addDBIDs(neighbors);
     // run expandCluster as long as this set is non-empty (non-recursive
     // implementation)
+    DBIDVar id = DBIDUtil.newVar();
     while(!activeSet.isEmpty()) {
-      final DBID id = activeSet.remove(activeSet.size() - 1);
+      activeSet.pop(id);
       // Assign object to cluster
       final int oldclus = clusterids.intValue(id);
       if(oldclus == NOISE) {
@@ -274,7 +274,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
 
   /**
    * Collect all densities into an array for sorting.
-   * 
+   *
    * @param knnq kNN query
    * @param ids DBIDs to process
    * @param dens Density storage
@@ -301,9 +301,9 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

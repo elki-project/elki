@@ -36,10 +36,10 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -66,15 +66,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Sizes, Shapes, and Densities in Noisy, High Dimensional Data. <br>
  * In: Proc. of SIAM Data Mining (SDM), 2003.
  * </p>
- * 
+ *
  * @author Arthur Zimek
- * 
+ *
  * @apiviz.uses SharedNearestNeighborSimilarityFunction
- * 
+ *
  * @param <O> the type of Object the algorithm is applied on
  */
 @Title("SNN: Shared Nearest Neighbor Clustering")
-@Description("Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " + "parameters 'minPts' and 'epsilon' (specifying a volume). " + "These two parameters determine a density threshold for clustering.")
+@Description("Algorithm to find shared-nearest-neighbors-density-connected sets in a database based on the " //
++ "parameters 'minPts' and 'epsilon' (specifying a volume). " //
++ "These two parameters determine a density threshold for clustering.")
 @Reference(authors = "L. Ertöz, M. Steinbach, V. Kumar", //
 title = "Finding Clusters of Different Sizes, Shapes, and Densities in Noisy, High Dimensional Data", //
 booktitle = "Proc. of SIAM Data Mining (SDM), 2003", //
@@ -117,7 +119,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
   /**
    * Constructor.
-   * 
+   *
    * @param similarityFunction Similarity function
    * @param epsilon Epsilon
    * @param minpts Minpts
@@ -131,7 +133,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
   /**
    * Perform SNN clustering
-   * 
+   *
    * @param database Database
    * @param relation Relation
    * @return Result
@@ -183,7 +185,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
   /**
    * Returns the shared nearest neighbors of the specified query object in the
    * given database.
-   * 
+   *
    * @param snnInstance shared nearest neighbors
    * @param queryObject the query object
    * @return the shared nearest neighbors of the specified query object in the
@@ -204,7 +206,7 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
    * <p/>
    * <p/>
    * Border-Objects become members of the first possible cluster.
-   * 
+   *
    * @param snnInstance shared nearest neighbors
    * @param startObjectID potential seed of a new potential cluster
    * @param objprog the progress object to report about the progress of
@@ -237,8 +239,9 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
       }
     }
 
+    DBIDVar o = DBIDUtil.newVar();
     while(seeds.size() > 0) {
-      DBID o = seeds.remove(seeds.size() - 1);
+      seeds.pop(o);
       ArrayModifiableDBIDs neighborhood = findSNNNeighbors(snnInstance, o);
 
       if(neighborhood.size() >= minpts) {
@@ -290,11 +293,11 @@ public class SNNClustering<O> extends AbstractAlgorithm<Clustering<Model>> imple
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> object type
    */
   public static class Parameterizer<O> extends AbstractParameterizer {

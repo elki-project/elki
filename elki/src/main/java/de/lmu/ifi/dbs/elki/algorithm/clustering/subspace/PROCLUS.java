@@ -46,8 +46,8 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
@@ -86,11 +86,11 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Algorithms for Projected Clustering. <br>
  * In: Proc. ACM SIGMOD Int. Conf. on Management of Data (SIGMOD '99).
  * </p>
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.has SubspaceModel
- * 
+ *
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("PROCLUS: PROjected CLUStering")
@@ -117,7 +117,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
   /**
    * Java constructor.
-   * 
+   *
    * @param k k Parameter
    * @param k_i k_i Parameter
    * @param l l Parameter
@@ -132,7 +132,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
   /**
    * Performs the PROCLUS algorithm on the given database.
-   * 
+   *
    * @param database Database to process
    * @param relation Relation to process
    */
@@ -231,7 +231,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
   /**
    * Returns a piercing set of k medoids from the specified sample set.
-   * 
+   *
    * @param distFunc the distance function
    * @param sampleSet the sample set
    * @param m the number of medoids to be returned
@@ -304,7 +304,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
   /**
    * Returns a set of k elements from the specified sample set.
-   * 
+   *
    * @param sampleSet the sample set
    * @param k the number of samples to be returned
    * @param random random number generator
@@ -316,7 +316,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
   /**
    * Computes the set of medoids in current iteration.
-   * 
+   *
    * @param m the medoids
    * @param m_best the best set of medoids found so far
    * @param m_bad the bad medoids
@@ -326,14 +326,15 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   private ArrayDBIDs computeM_current(DBIDs m, DBIDs m_best, DBIDs m_bad, Random random) {
     ArrayModifiableDBIDs m_list = DBIDUtil.newArray(m);
     m_list.removeDBIDs(m_best);
+    DBIDArrayMIter it = m_list.iter();
 
     ArrayModifiableDBIDs m_current = DBIDUtil.newArray();
     for(DBIDIter iter = m_best.iter(); iter.valid(); iter.advance()) {
       if(m_bad.contains(iter)) {
         int currentSize = m_current.size();
         while(m_current.size() == currentSize) {
-          DBID next = m_list.remove(random.nextInt(m_list.size()));
-          m_current.add(next);
+          m_current.add(it.seek(random.nextInt(m_list.size())));
+          it.remove();
         }
       }
       else {
@@ -349,7 +350,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * objects in the sphere centered at m with radius minDist are determined,
    * where minDist is the minimum distance between medoid m and any other medoid
    * m_i.
-   * 
+   *
    * @param medoids the ids of the medoids
    * @param database the database holding the objects
    * @param distFunc the distance function
@@ -384,7 +385,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   /**
    * Determines the set of correlated dimensions for each medoid in the
    * specified medoid set.
-   * 
+   *
    * @param medoids the set of medoids
    * @param database the database containing the objects
    * @param distFunc the distance function
@@ -462,7 +463,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   /**
    * Refinement step that determines the set of correlated dimensions for each
    * cluster centroid.
-   * 
+   *
    * @param clusters the list of clusters
    * @param database the database containing the objects
    * @return the set of correlated dimensions for each specified cluster
@@ -546,7 +547,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
   /**
    * Assigns the objects to the clusters.
-   * 
+   *
    * @param m_current Current centers
    * @param dimensions set of correlated dimensions for each medoid of the
    *        cluster
@@ -602,7 +603,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
   /**
    * Refinement step to assign the objects to the final clusters.
-   * 
+   *
    * @param dimensions pair containing the centroid and the set of correlated
    *        dimensions for the centroid
    * @param database the database containing the objects
@@ -656,7 +657,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   /**
    * Returns the Manhattan segmental distance between o1 and o2 relative to the
    * specified dimensions.
-   * 
+   *
    * @param o1 the first object
    * @param o2 the second object
    * @param dimensions the dimensions to be considered
@@ -676,7 +677,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
   /**
    * Evaluates the quality of the clusters.
-   * 
+   *
    * @param clusters the clusters to be evaluated
    * @param dimensions the dimensions associated with each cluster
    * @param database the database holding the objects
@@ -704,7 +705,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   /**
    * Computes the average distance of the objects to the centroid along the
    * specified dimension.
-   * 
+   *
    * @param centroid the centroid
    * @param objectIDs the set of objects ids
    * @param database the database holding the objects
@@ -724,7 +725,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
   /**
    * Computes the bad medoids, where the medoid of a cluster with less than the
    * specified threshold of objects is bad.
-   * 
+   *
    * @param m_current Current medoids
    * @param clusters the clusters
    * @param threshold the threshold
@@ -754,9 +755,9 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
   /**
    * Simple triple.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private static class DoubleIntInt implements Comparable<DoubleIntInt> {
@@ -784,7 +785,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
   /**
    * Encapsulates the attributes of a cluster.
-   * 
+   *
    * @apiviz.exclude
    */
   private class PROCLUSCluster {
@@ -805,7 +806,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
     /**
      * Constructor.
-     * 
+     *
      * @param objectIDs the ids of the objects belonging to this cluster
      * @param dimensions the correlated dimensions of this cluster
      * @param centroid the centroid of this cluster
@@ -838,7 +839,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
     /**
      * Returns the correlated dimensions of this cluster as BitSet.
-     * 
+     *
      * @return the correlated dimensions of this cluster as BitSet
      */
     public long[] getDimensions() {
@@ -848,9 +849,9 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractProjectedClustering.Parameterizer {

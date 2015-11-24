@@ -202,10 +202,8 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
   }
 
   @Override
-  public DBID set(int index, DBIDRef element) {
-    int prev = store[index];
+  public void set(int index, DBIDRef element) {
     store[index] = element.internalGetIndex();
-    return new IntegerDBID(prev);
   }
 
   @Override
@@ -219,13 +217,13 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
   }
 
   @Override
-  public DBID remove(int index) {
-    DBID ret = new IntegerDBID(store[index]);
-    --size;
-    if(size > 0) {
+  public void remove(int index) {
+    if(index < 0 || index >= size) {
+      throw new ArrayIndexOutOfBoundsException(index);
+    }
+    if(--size > 0) {
       store[index] = store[size];
     }
-    return ret;
   }
 
   @Override
