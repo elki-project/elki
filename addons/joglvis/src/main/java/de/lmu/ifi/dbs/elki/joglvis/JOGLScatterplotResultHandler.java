@@ -32,15 +32,15 @@ import javax.swing.JFrame;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.joglvis.scatterplot.ScatterData;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
+import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 
 public class JOGLScatterplotResultHandler implements ResultHandler {
   @Override
-  public void processNewResult(HierarchicalResult baseResult, Result newResult) {
-    Database db = ResultUtil.findDatabase(newResult);
+  public void processNewResult(ResultHierarchy baseResult, Result newResult) {
+    Database db = ResultUtil.findDatabase(baseResult);
     if(db == null) {
       return;
     }
