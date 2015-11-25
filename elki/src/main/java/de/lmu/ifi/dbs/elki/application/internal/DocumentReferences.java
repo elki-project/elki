@@ -374,11 +374,6 @@ public class DocumentReferences {
         }
       }
     }
-    catch(NoClassDefFoundError e) {
-      if(!cls.getCanonicalName().startsWith("experimentalcode.")) {
-        LOG.warning("Exception in finding references for class " + cls.getCanonicalName() + " - missing referenced class?");
-      }
-    }
     catch(Error e) {
       LOG.warning("Exception in finding references for class " + cls.getCanonicalName() + ": " + e, e);
     }
