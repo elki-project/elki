@@ -52,22 +52,25 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Outlier detection based on the in-degree of the kNN graph.
- * 
+ *
  * This is a curried version: instead of using a threshold T to obtain a binary
  * decision, we use the computed value as outlier score.
- * 
+ *
  * Reference:
  * <p>
- * V. Hautamäki and I. Kärkkäinen and P Fränti<br />
+ * V. Hautamäki and I. Kärkkäinen and P. Fränti<br />
  * Outlier detection using k-nearest neighbour graph<br />
- * Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004 <br />
+ * Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004
  * </p>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @param <O> Object type
  */
-@Reference(authors = "V. Hautamäki and I. Kärkkäinen and P Fränti", title = "Outlier detection using k-nearest neighbour graph", booktitle = "Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004", url = "http://dx.doi.org/10.1109/ICPR.2004.1334558")
+@Reference(authors = "V. Hautamäki and I. Kärkkäinen and P. Fränti", //
+title = "Outlier detection using k-nearest neighbour graph", //
+booktitle = "Proc. 17th Int. Conf. Pattern Recognition, ICPR 2004", //
+url = "http://dx.doi.org/10.1109/ICPR.2004.1334558")
 public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
@@ -81,7 +84,7 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param k k parameter
    */
@@ -92,12 +95,12 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Run the ODIN algorithm
-   * 
+   *
    * Tutorial note: the <em>signature</em> of this method depends on the types
    * that we requested in the {@link #getInputTypeRestriction} method. Here we
    * requested a single relation of type {@code O} , the data type of our
    * distance function.
-   * 
+   *
    * @param database Database to run on.
    * @param relation Relation to process.
    * @return ODIN outlier result.
@@ -150,17 +153,17 @@ public class ODIN<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter for the number of nearest neighbors:
-     * 
+     *
      * <pre>
      * -odin.k &lt;int&gt;
      * </pre>
