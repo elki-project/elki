@@ -72,7 +72,7 @@ import gnu.trove.list.array.TIntArrayList;
  *
  * Reference:
  * <p>
- * Schneider, J., & Vlachos, M<br />
+ * J. Schneider and M. Vlachos<br />
  * Fast parameterless density-based clustering via random projections<br />
  * Proc. 22nd ACM international conference on Conference on Information &
  * Knowledge Management (CIKM)
@@ -86,7 +86,7 @@ import gnu.trove.list.array.TIntArrayList;
  * @author Johannes Schneider
  * @author Erich Schubert
  */
-@Reference(authors = "Schneider, J., & Vlachos, M", //
+@Reference(authors = "J. Schneider and M. Vlachos", //
 title = "Fast parameterless density-based clustering via random projections", //
 booktitle = "Proc. 22nd ACM international conference on Conference on Information & Knowledge Management (CIKM)", //
 url = "http://dx.doi.org/10.1145/2505515.2505590")
