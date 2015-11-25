@@ -1,6 +1,6 @@
 ELKI: Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2014 Lehr- und Forschungseinheit für Datenbanksysteme, Ludwig-Maximilians-Universität München
+Copyright (C) 2015 Lehr- und Forschungseinheit für Datenbanksysteme, Ludwig-Maximilians-Universität München
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
@@ -27,9 +27,11 @@ or via email at elki@dbs.ifi.lmu.de
 
 Disclaimer:
 This license applies only to the software developed by the authors named above
-in the "de.lmu.ifi.dbs.elki" Java namespace. You could have received this code
-as part of a bundle that also contains code by other authors where other
-license terms apply, and it is up to you to verify this is the correct file.
+in the "de.lmu.ifi.dbs.elki" Java namespace. If you have received this code
+as part of a bundle, it may also contain code by other authors where other
+license terms apply. You will need to check for additional license statements.
+Furthermore, ELKI uses libraries such as GNU Trove that use different license
+terms, a copy of which should be included in this package as LICENSE-trove4j.
 
 ---
 

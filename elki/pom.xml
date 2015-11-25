@@ -65,6 +65,92 @@
 					</archive>
 				</configuration>
 			</plugin>
+			<!-- copy additional javadoc resources -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/apidocs/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/main/javadoc</directory>
+									<excludes>
+										<exclude>${basedir}/src/main/javadoc/overview.html</exclude>
+									</excludes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Generate additional files for javadoc -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.3.2</version>
+				<executions>
+					<execution>
+						<id>generate-javadoc-parameters</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>java</executable>
+							<arguments>
+								<argument>-cp</argument>
+								<classpath />
+								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentParameters</argument>
+								<argument>${project.build.directory}/apidocs/parameters-byclass.html</argument>
+								<argument>${project.build.directory}/apidocs/parameters-byopt.html</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-javadoc-references</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>java</executable>
+							<arguments>
+								<argument>-cp</argument>
+								<classpath />
+								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentReferences</argument>
+								<argument>${project.build.directory}/apidocs/references.html</argument>
+								<argument>${project.build.directory}/apidocs/references.trac</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Build JavaDoc -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>javadoc-no-fork</goal>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<overview>${elki.projdir}/elki/src/main/javadoc/overview.html</overview>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -80,145 +166,4 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
-	<profiles>
-		<profile>
-			<id>javadoc</id>
-			<build>
-				<plugins>
-					<!-- copy additional javadoc resources -->
-					<plugin>
-						<artifactId>maven-resources-plugin</artifactId>
-						<version>2.7</version>
-						<executions>
-							<execution>
-								<id>copy-resources</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}/apidocs/</outputDirectory>
-									<resources>
-										<resource>
-											<directory>${basedir}/src/main/javadoc</directory>
-											<excludes>
-												<exclude>${basedir}/src/main/javadoc/overview.html</exclude>
-											</excludes>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- Generate additional files for javadoc -->
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.3.2</version>
-						<executions>
-							<execution>
-								<id>generate-javadoc-parameters</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>java</executable>
-									<arguments>
-										<argument>-cp</argument>
-										<classpath />
-										<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentParameters</argument>
-										<argument>${project.build.directory}/apidocs/parameters-byclass.html</argument>
-										<argument>${project.build.directory}/apidocs/parameters-byopt.html</argument>
-									</arguments>
-								</configuration>
-							</execution>
-							<execution>
-								<id>generate-javadoc-references</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>exec</goal>
-								</goals>
-								<configuration>
-									<executable>java</executable>
-									<arguments>
-										<argument>-cp</argument>
-										<classpath />
-										<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentReferences</argument>
-										<argument>${project.build.directory}/apidocs/references.html</argument>
-										<argument>${project.build.directory}/apidocs/references.trac</argument>
-									</arguments>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- Build JavaDoc -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.10.1</version>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<phase>package</phase>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<notree>false</notree>
-							<noindex>false</noindex>
-							<nonavbar>false</nonavbar>
-							<nohelp>true</nohelp>
-							<splitindex>true</splitindex>
-							<author>true</author>
-							<use>true</use>
-							<show>private</show>
-							<quiet>true</quiet>
-							<nodeprecated>false</nodeprecated>
-							<nodeprecatedlist>false</nodeprecatedlist>
-							<docfilessubdirs>true</docfilessubdirs>
-							<overview>${basedir}/src/main/javadoc/overview.html</overview>
-							<doctitle>ELKI</doctitle>
-							<windowtitle><![CDATA[ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures]]></windowtitle>
-							<groups>
-								<group>
-									<title>Algorithms</title>
-									<packages>de.lmu.ifi.dbs.elki.algorithm*</packages>
-								</group>
-								<group>
-									<title>Databases and Index Structures</title>
-									<packages>de.lmu.ifi.dbs.elki.database*:de.lmu.ifi.dbs.elki.index*:de.lmu.ifi.dbs.elki.datasource*:de.lmu.ifi.dbs.elki.persistent*</packages>
-								</group>
-								<group>
-									<title>Datatypes and Distance Functions</title>
-									<packages>de.lmu.ifi.dbs.elki.data:de.lmu.ifi.dbs.elki.data.*:de.lmu.ifi.dbs.elki.distance*</packages>
-								</group>
-								<group>
-									<title>Evaluation</title>
-									<packages>de.lmu.ifi.dbs.elki.evalu*</packages>
-								</group>
-								<group>
-									<title>GUI and Visualization</title>
-									<packages>de.lmu.ifi.dbs.elki.gui*:de.lmu.ifi.dbs.elki.vis*</packages>
-								</group>
-								<group>
-									<title>Utilities and Miscellaneous</title>
-									<packages>de.lmu.ifi.dbs.elki:de.lmu.ifi.dbs.elki.*</packages>
-								</group>
-								<group>
-									<title>Tutorial Code and Examples</title>
-									<packages>tutorial:tutorial.*</packages>
-								</group>
-							</groups>
-							<header><![CDATA[<img src="{@docRoot}/figures/elki-logo-200.png" width="200">]]></header>
-							<footer><![CDATA[ELKI Version ${project.version}]]></footer>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>

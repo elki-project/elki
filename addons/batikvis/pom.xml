@@ -43,6 +43,67 @@
 					</archive>
 				</configuration>
 			</plugin>
+			<!-- Ensure the directory exists, for code below. -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>createJavadocDir</id>
+						<phase>prepare-package</phase>
+						<configuration>
+							<tasks>
+								<mkdir dir="${project.build.directory}/apidocs" />
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Generate additional files for javadoc -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.3.2</version>
+				<executions>
+					<execution>
+						<id>generate-javadoc-parameters</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>java</executable>
+							<arguments>
+								<argument>-cp</argument>
+								<classpath />
+								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentParameters</argument>
+								<argument>${project.build.directory}/apidocs/parameters-byclass-vis.html</argument>
+								<argument>${project.build.directory}/apidocs/parameters-byopt-vis.html</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-javadoc-references</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>java</executable>
+							<arguments>
+								<argument>-cp</argument>
+								<classpath />
+								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentReferences</argument>
+								<argument>${project.build.directory}/apidocs/references-vis.html</argument>
+								<argument>${project.build.directory}/apidocs/references-vis.trac</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 

@@ -23,6 +23,8 @@
 
 	<modules>
 		<module>elki</module>
+		<module>addons/tutorial</module>
+		<!-- Use PROFILES to enable further modules! -->
 	</modules>
 
 	<properties>
@@ -61,7 +63,21 @@
 					<skipTests>${skipTests}</skipTests>
 				</configuration>
 			</plugin>
-			<!-- packaging -->
+			<!-- Include more metadata in the jar -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifestFile>${elki.projdir}/elki/src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+			<!-- Dependencies -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -69,164 +85,185 @@
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
-						<phase>package</phase>
+						<phase>process-sources</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
 						<configuration>
 							<outputDirectory>${outputDir}</outputDirectory>
+							<excludeArtifactIds>junit:*,org.hamcrest:*</excludeArtifactIds>
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<!-- Source code packaging -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Additional JavaDoc resources to install -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<!-- <phase>prepare-package</phase> -->
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/apidocs/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${elki.projdir}/elki/src/main/javadoc</directory>
+									<excludes>
+										<exclude>**/overview.html</exclude>
+									</excludes>
+								</resource>
+								<resource>
+									<directory>${elki.projdir}/elki/target/apidocs</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- JavaDoc generation -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>aggregate</goal>
+							<goal>javadoc-no-fork</goal>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<reportOutputDirectory>${project.build.directory}/apidocs</reportOutputDirectory>
+					<aggregate>true</aggregate>
+					<stylesheetfile>${elki.projdir}/elki/src/main/javadoc/stylesheet.css</stylesheetfile>
+					<notree>false</notree>
+					<noindex>false</noindex>
+					<nonavbar>false</nonavbar>
+					<nohelp>true</nohelp>
+					<splitindex>true</splitindex>
+					<author>true</author>
+					<use>true</use>
+					<show>private</show>
+					<quiet>true</quiet>
+					<nodeprecated>false</nodeprecated>
+					<nodeprecatedlist>false</nodeprecatedlist>
+					<docfilessubdirs>true</docfilessubdirs>
+					<doctitle>ELKI</doctitle>
+					<windowtitle><![CDATA[ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures]]></windowtitle>
+					<docletPath>${doclet.path}</docletPath>
+					<doclet>${doclet.doclet}</doclet>
+					<additionalparam>${doclet.params}</additionalparam>
+					<groups>
+						<group>
+							<title>Algorithms</title>
+							<packages>de.lmu.ifi.dbs.elki.algorithm*</packages>
+						</group>
+						<group>
+							<title>Databases and Index Structures</title>
+							<packages>de.lmu.ifi.dbs.elki.database*:de.lmu.ifi.dbs.elki.index*:de.lmu.ifi.dbs.elki.datasource*:de.lmu.ifi.dbs.elki.persistent*</packages>
+						</group>
+						<group>
+							<title>Datatypes and Distance Functions</title>
+							<packages>de.lmu.ifi.dbs.elki.data:de.lmu.ifi.dbs.elki.data.*:de.lmu.ifi.dbs.elki.distance*</packages>
+						</group>
+						<group>
+							<title>Evaluation</title>
+							<packages>de.lmu.ifi.dbs.elki.evalu*</packages>
+						</group>
+						<group>
+							<title>GUI and Visualization</title>
+							<packages>de.lmu.ifi.dbs.elki.gui*:de.lmu.ifi.dbs.elki.vis*</packages>
+						</group>
+						<group>
+							<title>Utilities and Miscellaneous</title>
+							<packages>de.lmu.ifi.dbs.elki:de.lmu.ifi.dbs.elki.*</packages>
+						</group>
+						<group>
+							<title>Tutorial Code and Examples</title>
+							<packages>tutorial:tutorial.*</packages>
+						</group>
+					</groups>
+					<header><![CDATA[<img src="{@docRoot}/figures/elki-logo-200.png" width="200">]]></header>
+					<footer><![CDATA[ELKI Version ${project.version}]]></footer>
+					<bottom><![CDATA[Copyright © ${year} <a href="http://elki.dbs.ifi.lmu.de/">ELKI Development Team</a>, <a href="http://www.dbs.ifi.lmu.de/">Lehr- und Forschungseinheit für Datenbanksysteme</a>, <a href="http://www.lmu.de/">Ludwig-Maximilians-Universität München</a>. <a href="http://elki.dbs.ifi.lmu.de/wiki/License">License information.</a>]]></bottom>
+					<links>
+						<!-- To link to related (external) JavaDoc -->
+						<link>http://trove4j.sourceforge.net/javadocs/</link>
+						<link>http://www.w3.org/2003/01/dom2-javadoc/</link>
+						<link>https://xmlgraphics.apache.org/batik/javadoc/</link>
+					</links>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
 
 	<profiles>
+		<!-- Bundle: build a standalone "fat jar" version -->
 		<profile>
-			<id>javadoc</id>
-			<build>
-				<plugins>
-					<!-- copy additional javadoc resources -->
-					<plugin>
-						<artifactId>maven-resources-plugin</artifactId>
-						<version>2.7</version>
-						<executions>
-							<execution>
-								<id>copy-resources</id>
-								<phase>prepare-package</phase>
-								<goals>
-									<goal>copy-resources</goal>
-								</goals>
-								<configuration>
-									<outputDirectory>${project.build.directory}/apidocs/</outputDirectory>
-									<resources>
-										<resource>
-											<directory>${elki.projdir}/elki/src/main/javadoc</directory>
-											<excludes>
-												<exclude>${elki.projdir}/elki/src/main/javadoc/overview.html</exclude>
-											</excludes>
-										</resource>
-										<resource>
-											<directory>${elki.projdir}/elki/target/apidocs</directory>
-										</resource>
-									</resources>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- Build JavaDoc -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<version>2.10.1</version>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<phase>package</phase>
-								<goals>
-									<goal>aggregate</goal>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<reportOutputDirectory>${project.build.directory}/apidocs</reportOutputDirectory>
-							<aggregate>true</aggregate>
-							<stylesheetfile>${elki.projdir}/elki/src/main/javadoc/stylesheet.css</stylesheetfile>
-							<notree>false</notree>
-							<noindex>false</noindex>
-							<nonavbar>false</nonavbar>
-							<nohelp>true</nohelp>
-							<splitindex>true</splitindex>
-							<author>true</author>
-							<use>true</use>
-							<show>private</show>
-							<quiet>true</quiet>
-							<nodeprecated>false</nodeprecated>
-							<nodeprecatedlist>false</nodeprecatedlist>
-							<docfilessubdirs>true</docfilessubdirs>
-							<overview>${elki.projdir}/elki/src/main/javadoc/overview.html</overview>
-							<doctitle>ELKI</doctitle>
-							<windowtitle><![CDATA[ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures]]></windowtitle>
-							<docletPath>${doclet.path}</docletPath>
-							<doclet>${doclet.doclet}</doclet>
-							<additionalparam>${doclet.params}</additionalparam>
-							<groups>
-								<group>
-									<title>Algorithms</title>
-									<packages>de.lmu.ifi.dbs.elki.algorithm*</packages>
-								</group>
-								<group>
-									<title>Databases and Index Structures</title>
-									<packages>de.lmu.ifi.dbs.elki.database*:de.lmu.ifi.dbs.elki.index*:de.lmu.ifi.dbs.elki.datasource*:de.lmu.ifi.dbs.elki.persistent*</packages>
-								</group>
-								<group>
-									<title>Datatypes and Distance Functions</title>
-									<packages>de.lmu.ifi.dbs.elki.data:de.lmu.ifi.dbs.elki.data.*:de.lmu.ifi.dbs.elki.distance*</packages>
-								</group>
-								<group>
-									<title>Evaluation</title>
-									<packages>de.lmu.ifi.dbs.elki.evalu*</packages>
-								</group>
-								<group>
-									<title>GUI and Visualization</title>
-									<packages>de.lmu.ifi.dbs.elki.gui*:de.lmu.ifi.dbs.elki.vis*</packages>
-								</group>
-								<group>
-									<title>Utilities and Miscellaneous</title>
-									<packages>de.lmu.ifi.dbs.elki:de.lmu.ifi.dbs.elki.*</packages>
-								</group>
-								<group>
-									<title>Tutorial Code and Examples</title>
-									<packages>tutorial:tutorial.*</packages>
-								</group>
-							</groups>
-							<header><![CDATA[<img src="{@docRoot}/figures/elki-logo-200.png" width="200">]]></header>
-							<footer><![CDATA[ELKI Version ${project.version}]]></footer>
-							<bottom><![CDATA[Copyright © ${year} <a href="http://elki.dbs.ifi.lmu.de/">ELKI Development Team</a>, <a href="http://www.dbs.ifi.lmu.de/">Lehr- und Forschungseinheit für Datenbanksysteme</a>, <a href="http://www.lmu.de/">Ludwig-Maximilians-Universität München</a>. <a href="http://elki.dbs.ifi.lmu.de/wiki/License">License information.</a>]]></bottom>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
+			<id>bundle</id>
+			<modules>
+				<module>addons/bundle</module>
+			</modules>
 		</profile>
+		<!-- Batik visualization -->
 		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<!-- attach sources -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<version>2.4</version>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<phase>package</phase>
-								<goals>
-									<goal>aggregate</goal>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<!-- jar plugin -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-jar-plugin</artifactId>
-						<version>2.4</version>
-						<configuration>
-							<archive>
-								<manifestFile>${elki.projdir}/elki/src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-								<manifest>
-									<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-								</manifest>
-							</archive>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
+			<id>svg</id>
+			<modules>
+				<module>addons/batikvis</module>
+			</modules>
 		</profile>
+		<!-- LibSVM outlier detection -->
+		<profile>
+			<id>svm</id>
+			<modules>
+				<module>addons/libsvm</module>
+			</modules>
+		</profile>
+		<!-- Image search -->
+		<profile>
+			<id>imagesearch</id>
+			<modules>
+				<module>addons/imagesearch</module>
+			</modules>
+		</profile>
+		<!-- Luence backend for text mining -->
+		<profile>
+			<id>lucene</id>
+			<modules>
+				<module>addons/lucene</module>
+			</modules>
+		</profile>
+		<!-- OpenGL based visualization -->
+		<profile>
+			<id>jogl</id>
+			<modules>
+				<module>addons/batikvis</module>
+				<module>addons/3dpc</module>
+				<module>addons/joglviz</module>
+			</modules>
+		</profile>
+		<!-- Profile for publishing to Sonatype Maven repository. -->
 		<profile>
 			<id>publish</id>
 			<build>
@@ -239,49 +276,11 @@
 						<configuration>
 							<serverId>ossrh</serverId>
 							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+							<autoReleaseAfterClose>false</autoReleaseAfterClose>
 						</configuration>
 					</plugin>
 				</plugins>
 			</build>
-		</profile>
-		<profile>
-			<id>svg</id>
-			<modules>
-				<module>addons/batikvis</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>imagesearch</id>
-			<modules>
-				<module>addons/imagesearch</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>svm</id>
-			<modules>
-				<module>addons/libsvm</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>lucene</id>
-			<modules>
-				<module>addons/lucene</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>jogl</id>
-			<modules>
-				<module>addons/batikvis</module>
-				<module>addons/3dpc</module>
-				<module>addons/joglviz</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>bundle</id>
-			<modules>
-				<module>addons/bundle</module>
-			</modules>
 		</profile>
 	</profiles>
 

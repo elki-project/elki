@@ -12,7 +12,7 @@
 	<artifactId>elki-bundle</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - Bundle</name>
+	<name>ELKI Data Mining Framework - Single-jar Bundle</name>
 
 	<url>http://elki.dbs.ifi.lmu.de/</url>
 	<issueManagement>
@@ -51,25 +51,26 @@
 
 	<build>
 		<plugins>
-			<!-- Make sure we copy dependencies first: -->
+			<!-- Ensure the directory exists, for code below. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<version>2.8</version>
+				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>copy-dependencies</id>
+						<id>createJavadocDir</id>
 						<phase>prepare-package</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
 						<configuration>
-							<outputDirectory>${outputDir}</outputDirectory>
+							<tasks>
+								<mkdir dir="${project.build.directory}/apidocs" />
+							</tasks>
 						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
-			<!-- Extract (and rename) licensing information -->
+			<!-- Extract (and rename) licensing information; build additional documentation -->
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -87,6 +88,50 @@
 								<argument>${basedir}/install-licenses.py</argument>
 								<argument>${project.build.directory}/classes</argument>
 								<argument>${project.build.directory}/dependency</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-javadoc-parameters</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>java</executable>
+							<arguments>
+								<!-- <argument>-cp</argument>
+								<classpath/> -->
+								<!-- This is a hack, because these applications will currently ignore 
+									jars, so we need the folders on the classpath, too -->
+								<argument>-cp</argument>
+								<argument>${project.build.directory}/dependency/*:${elki.projdir}/elki/target/classes:${elki.projdir}/addons/batikvis/target/classes:${elki.projdir}/addons/libsvm/target/classes</argument>
+								<!-- Generate algorithm parameter documentations -->
+								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentParameters</argument>
+								<argument>${project.build.directory}/apidocs/parameters-byclass.html</argument>
+								<argument>${project.build.directory}/apidocs/parameters-byopt.html</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>generate-javadoc-references</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>java</executable>
+							<arguments>
+								<!-- <argument>-cp</argument>
+								<classpath/> -->
+								<!-- This is a hack, because these applications will currently ignore 
+									jars, so we need the folders on the classpath, too -->
+								<argument>-cp</argument>
+								<argument>${project.build.directory}/dependency/*:${elki.projdir}/elki/target/classes:${elki.projdir}/addons/batikvis/target/classes:${elki.projdir}/addons/libsvm/target/classes</argument>
+								<!-- Generate literature reference documentations -->
+								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentReferences</argument>
+								<argument>${project.build.directory}/apidocs/references.html</argument>
+								<argument>${project.build.directory}/apidocs/references.trac</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -122,6 +167,7 @@
 						<configuration>
 							<artifactSet>
 								<excludes>
+									<!-- Exclude JUnit -->
 									<exclude>junit:*</exclude>
 									<exclude>org.hamcrest:*</exclude>
 								</excludes>
@@ -129,6 +175,8 @@
 							<transformers>
 								<!-- <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer"> 
 									<mainClass>de.lmu.ifi.dbs.elki.application.ELKILauncher</mainClass> </transformer> -->
+								<!-- Unfortunately, we cannot use wildcards here, we need to list 
+									every resource that has multiple implementations. -->
 								<transformer
 									implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
 									<resource>META-INF/elki/de.lmu.ifi.dbs.elki.application.AbstractApplication</resource>
@@ -158,12 +206,22 @@
 								</transformer>
 							</transformers>
 							<filters>
+								<!-- We ship a cleaned-up license documentation -->
 								<filter>
 									<artifact>xml-apis:*</artifact>
 									<excludes>
 										<exclude>license/**</exclude>
 									</excludes>
 								</filter>
+								<!-- libsvm contains some odd classes that don't belong into a library -->
+								<filter>
+									<artifact>tw.edu.ntu.csie:*</artifact>
+									<excludes>
+										<exclude>%regex[^svm_[^/]*class]</exclude>
+										<exclude>%regex[^Applet[^/]*class]</exclude>
+									</excludes>
+								</filter>
+								<!-- We ship a cleaned-up license documentation -->
 								<filter>
 									<artifact>*:*</artifact>
 									<excludes>
@@ -174,8 +232,6 @@
 										<exclude>NOTICE</exclude>
 										<exclude>%regex[^[^/]*LICENSE.txt]</exclude>
 										<exclude>%regex[^[^/]*README.txt]</exclude>
-										<exclude>%regex[^svm_[^/]*class]</exclude>
-										<exclude>%regex[^Applet[^/]*class]</exclude>
 									</excludes>
 								</filter>
 							</filters>
@@ -183,29 +239,73 @@
 					</execution>
 				</executions>
 			</plugin>
+			<!-- copy additional javadoc resources -->
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.7</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${project.build.directory}/apidocs/</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${elki.projdir}/elki/src/main/javadoc</directory>
+									<excludes>
+										<exclude>**/overview.html</exclude>
+									</excludes>
+								</resource>
+								<resource>
+									<directory>${elki.projdir}/elki/target/apidocs</directory>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Build JavaDoc -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.3</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>aggregate</goal>
+							<goal>javadoc-no-fork</goal>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<overview>${elki.projdir}/elki/src/main/javadoc/overview.html</overview>
+					<includeDependencySources>true</includeDependencySources>
+					<dependencySourceIncludes>
+						<dependencySourceInclude>de.lmu.ifi.dbs.elki:*</dependencySourceInclude>
+					</dependencySourceIncludes>
+				</configuration>
+			</plugin>
+			<!-- Fake source code packaging -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>release-source</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-shade-plugin</artifactId>
-						<version>2.3</version>
-						<configuration>
-							<createSourcesJar>true</createSourcesJar>
-							<artifactSet>
-								<includes>
-									<include>de.lmu.ifi.dbs.elki:*</include>
-								</includes>
-							</artifactSet>
-						</configuration>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
