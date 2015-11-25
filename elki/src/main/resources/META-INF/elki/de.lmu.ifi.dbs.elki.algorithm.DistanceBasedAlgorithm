@@ -74,10 +74,3 @@ de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator
 de.lmu.ifi.dbs.elki.algorithm.KNNDistancesSampler
 de.lmu.ifi.dbs.elki.algorithm.KNNJoin
 de.lmu.ifi.dbs.elki.algorithm.MaterializeDistances
-tutorial.clustering.NaiveAgglomerativeHierarchicalClustering1
-tutorial.clustering.NaiveAgglomerativeHierarchicalClustering2
-tutorial.clustering.NaiveAgglomerativeHierarchicalClustering3
-tutorial.clustering.NaiveAgglomerativeHierarchicalClustering4
-tutorial.clustering.SameSizeKMeansAlgorithm
-tutorial.outlier.DistanceStddevOutlier
-tutorial.outlier.ODIN

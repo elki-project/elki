@@ -4,4 +4,3 @@ de.lmu.ifi.dbs.elki.result.DiscardResultHandler
 de.lmu.ifi.dbs.elki.result.KMLOutputHandler
 de.lmu.ifi.dbs.elki.application.jsmap.JSONResultHandler
 de.lmu.ifi.dbs.elki.result.LogResultStructureResultHandler
-tutorial.outlier.SimpleScoreDumper

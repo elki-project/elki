@@ -277,6 +277,12 @@
 				<module>addons/joglviz</module>
 			</modules>
 		</profile>
+		<profile>
+			<id>bundle</id>
+			<modules>
+				<module>addons/bundle</module>
+			</modules>
+		</profile>
 	</profiles>
 
 	<distributionManagement>

@@ -77,5 +77,3 @@ de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringAdjustedRandIn
 de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringRandIndexSimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringBCubedF1SimilarityFunction
 de.lmu.ifi.dbs.elki.distance.similarityfunction.cluster.ClusteringFowlkesMallowsSimilarityFunction
-# tutorial.distancefunction.MultiLPNorm
-# tutorial.distancefunction.TutorialDistanceFunction
