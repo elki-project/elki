@@ -150,11 +150,22 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       minHeap.clear();
       for(int i=0; i<k; i++)
         clusters.get(i).clear();
+      double oldvarsum = 0.0;
+      if(iteration==0){
+        oldvarsum = Double.MAX_VALUE;
+      } else {
+        for(int i=0; i< varsum.length; i++)
+          oldvarsum += varsum[i];
+      }
       LOG.incrementProcessed(prog);
       boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum, heapsize);
       logVarstat(varstat, varsum);
-      // Stop if no cluster assignment changed.
-      if(!changed) {
+      double newvarsum = 0;
+      for(int i=0; i< varsum.length; i++)
+        newvarsum += varsum[i];
+   // Stop if no cluster assignment changed, or the new varsum ist higher than old
+      System.out.println("old: "+oldvarsum+" new: "+newvarsum);
+      if(!changed || newvarsum > oldvarsum) {
         break;
       }
       
