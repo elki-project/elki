@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import java.awt.image.DataBufferUShort;
+
 
 /*
  This file is part of ELKI:
@@ -27,34 +27,26 @@ import java.awt.image.DataBufferUShort;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListMIter;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
@@ -63,7 +55,6 @@ import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -129,8 +120,6 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     //initialisieren vom Heap
     minHeap = new DoubleMinHeap();
     int heapsize = (int) (relation.size()*rate);
-    System.out.println("Punkte insgesamt: " + relation.size());
-    System.out.println("Größe des Heaps: " + heapsize);
     
     // Setup cluster assignment store
     List<ModifiableDoubleDBIDList> clusters = new ArrayList<>();
@@ -164,7 +153,6 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       for(int i=0; i< varsum.length; i++)
         newvarsum += varsum[i];
    // Stop if no cluster assignment changed, or the new varsum ist higher than old
-      System.out.println("old: "+oldvarsum+" new: "+newvarsum);
       if(!changed || newvarsum > oldvarsum) {
         break;
       }
@@ -175,18 +163,14 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
 
     //create noisecluster if wanted
     if(noiseFlag){
-      ArrayList<Double> all = new ArrayList<Double>();
-      ArrayList<Double> deleted = new ArrayList<Double>();
       clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
       double tresh = minHeap.peek();
       for(int i = 0; i < k; i++)
       {
         for(DoubleDBIDListMIter it = clusters.get(i).iter(); it.valid(); it.advance())
         {
-          all.add(it.doubleValue());
           if(it.doubleValue() >= tresh)
           {
-            deleted.add(it.doubleValue());
             //zuweisung an den noise Cluster
             clusters.get(k).add(it.getPair());
             assignment.putInt(it, k);
@@ -195,15 +179,6 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
           }
         }
       }
-      all.sort(null);
-      deleted.sort(null);
-      Collections.reverse(all);
-      Collections.reverse(deleted);
-      System.out.println("Hier alle Distanzen absteigend sortiert:");
-      System.out.println(all);
-      System.out.println("Und hier die gelöschten:");
-      System.out.println(deleted);
-      System.out.println(deleted.size() + " wurden insgesamt gelöscht" );
     }
    
     LOG.setCompleted(prog);
