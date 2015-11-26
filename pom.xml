@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>de.lmu.ifi.dbs.elki</groupId>
-	<version>0.7.0-SNAPSHOT</version>
+	<version>0.7.0</version>
 	<artifactId>elki-project</artifactId>
 	<packaging>pom</packaging>
 
@@ -277,6 +277,26 @@
 							<serverId>ossrh</serverId>
 							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+							<useReleaseProfile>false</useReleaseProfile>
+							<releaseProfiles>release</releaseProfiles>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<keyname>elki@dbs.ifi.lmu.de</keyname>
+							<useAgent>false</useAgent>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -336,6 +356,16 @@
 		<system>trac</system>
 		<url>http://elki.dbs.ifi.lmu.de/newticket</url>
 	</issueManagement>
+	<developers>
+		<developer>
+			<email>schube@dbs.ifi.lmu.de</email>
+			<name>Erich Schubert</name>
+		</developer>
+		<developer>
+			<email>zimek@dbs.ifi.lmu.de</email>
+			<name>Arthur Zimek</name>
+		</developer>
+	</developers>
 	<description>ELKI is an open source (AGPLv3) data mining software written in Java. The focus of ELKI is research in algorithms, with an emphasis on unsupervised methods in cluster analysis and outlier detection.
 In order to achieve high performance and scalability, ELKI offers many data index structures such as the R*-tree that can provide major performance gains.
 ELKI is designed to be easy to extend for researchers and students in this domain, and welcomes contributions in particular of new methods.
