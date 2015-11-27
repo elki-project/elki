@@ -85,7 +85,7 @@
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
-						<phase>process-sources</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
@@ -148,7 +148,7 @@
 						<id>attach-javadocs</id>
 						<goals>
 							<goal>aggregate</goal>
-							<goal>javadoc-no-fork</goal>
+							<goal>javadoc</goal>
 							<goal>jar</goal>
 						</goals>
 					</execution>
