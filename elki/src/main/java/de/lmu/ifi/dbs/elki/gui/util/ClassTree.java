@@ -31,15 +31,15 @@ import javax.swing.tree.TreeNode;
 
 /**
  * Build a tree of available classes for use in Swing UIs.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has TreeNode
  */
 public class ClassTree {
   /**
    * Build the class tree for a given set of choices.
-   * 
+   *
    * @param choices Class choices
    * @param rootpkg Root package name (to strip / hide)
    * @return Root node.
@@ -59,7 +59,8 @@ public class ClassTree {
     for(Class<?> impl : choices) {
       String name = impl.getName();
       name = (prefix != null && name.startsWith(prefix)) ? name.substring(prefix.length()) : name;
-      MutableTreeNode c = new ClassNode(impl.getName().substring(impl.getPackage().getName().length() + 1), name);
+      int plen = (impl.getPackage() != null) ? impl.getPackage().getName().length() + 1 : 0;
+      MutableTreeNode c = new ClassNode(impl.getName().substring(plen), name);
 
       MutableTreeNode p = null;
       int l = name.lastIndexOf('.');
@@ -96,7 +97,7 @@ public class ClassTree {
 
   /**
    * Simplify the tree.
-   * 
+   *
    * @param cur Current node
    * @param prefix Prefix to add
    * @return Replacement node
@@ -133,9 +134,9 @@ public class ClassTree {
 
   /**
    * Tree node representing a single class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class PackageNode extends DefaultMutableTreeNode {
@@ -151,7 +152,7 @@ public class ClassTree {
 
     /**
      * Current class name.
-     * 
+     *
      * @param display Displayed name
      * @param pkgname Actual class name
      */
@@ -162,7 +163,7 @@ public class ClassTree {
 
     /**
      * Return the package name.
-     * 
+     *
      * @return Package name
      */
     public String getPackageName() {
@@ -172,9 +173,9 @@ public class ClassTree {
 
   /**
    * Tree node representing a single class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class ClassNode extends DefaultMutableTreeNode {
@@ -190,7 +191,7 @@ public class ClassTree {
 
     /**
      * Current class name.
-     * 
+     *
      * @param display Displayed name
      * @param clsname Actual class name
      */
@@ -201,7 +202,7 @@ public class ClassTree {
 
     /**
      * Return the class name.
-     * 
+     *
      * @return Class name
      */
     public String getClassName() {
