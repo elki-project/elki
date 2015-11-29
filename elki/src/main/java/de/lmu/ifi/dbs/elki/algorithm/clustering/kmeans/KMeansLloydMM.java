@@ -336,7 +336,7 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter rateP = new DoubleParameter(RATE_ID, 0.05)//
-          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE)//
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE)//
           .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
           if(config.grab(rateP)) {
             rate = rateP.doubleValue();
