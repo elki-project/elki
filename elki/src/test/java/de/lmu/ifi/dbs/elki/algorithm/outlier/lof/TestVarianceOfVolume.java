@@ -54,7 +54,7 @@ public class TestVarianceOfVolume extends AbstractSimpleAlgorithmTest implements
     // run LOF on database
     OutlierResult result = lof.run(db);
 
-    testSingleScore(result, 1293, 848349.0186);
-    testAUC(db, "Noise", result, 0.936448179271);
+    testSingleScore(result, 1293, 2.0733100852601836e13);
+    testAUC(db, "Noise", result, 0.9306946778);
   }
 }
