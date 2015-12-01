@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 
 /**
  * Unit test for some basic math functions.
- * 
+ *
  * @author Erich Schubert
  */
 public class TestMathUtil implements JUnit4Test {
@@ -48,7 +48,7 @@ public class TestMathUtil implements JUnit4Test {
     double[] weight2 = new double[size];
 
     Random r = new Random(seed);
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       data1[i] = r.nextDouble();
       data2[i] = r.nextDouble();
       weight1[i] = 1.0;
@@ -88,7 +88,7 @@ public class TestMathUtil implements JUnit4Test {
   @Test
   public void testFloatToDouble() {
     Random r = new Random(1l);
-    for (int i = 0; i < 10000; i++) {
+    for(int i = 0; i < 10000; i++) {
       final double dbl = Double.longBitsToDouble(r.nextLong());
       final float flt = (float) dbl;
       final double uppd = MathUtil.floatToDoubleUpper(flt);
@@ -100,5 +100,13 @@ public class TestMathUtil implements JUnit4Test {
       assertTrue("Expected value to become smaller, but " + lowd + " > " + dbl, lowd <= dbl || Double.isNaN(dbl));
       assertTrue("Expected value to round to the same float.", flt == lowf || Double.isNaN(flt));
     }
+  }
+
+  @Test
+  public void testPowi() {
+    assertEquals("Power incorrect", 0.01, MathUtil.powi(0.1, 2), 1e-13);
+    assertEquals("Power incorrect", 0.001, MathUtil.powi(0.1, 3), 1e-13);
+    assertEquals("Power incorrect", 0.0001, MathUtil.powi(0.1, 4), 1e-13);
+    assertEquals("Power incorrect", 0.00001, MathUtil.powi(0.1, 5), 1e-13);
   }
 }

@@ -1046,16 +1046,15 @@ public final class MathUtil {
       return Math.pow(x, p);
     }
     double tmp = x, ret = (p & 1) == 1 ? x : 1.;
-    p >>= 1;
     while(true) {
+      tmp *= tmp;
+      p >>= 1;
       if(p == 1) {
         return ret * tmp;
       }
       if((p & 1) != 0) {
         ret *= tmp;
       }
-      tmp *= tmp;
-      p >>= 1;
     }
   }
 
