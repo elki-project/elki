@@ -137,6 +137,8 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     //*****************************************************************************\\
     for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       minHeap.clear();
+      if(heapsize==0)
+        minHeap.add(Double.MAX_VALUE);
       for(int i=0; i<k; i++)
         clusters.get(i).clear();
       double oldvarsum = 0.0;
@@ -158,6 +160,7 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
       
       // Recompute means.
+//      System.out.println(minHeap.peek());
       means = meansWithTreshhold(clusters, means, relation, minHeap.peek());
     }
 
@@ -288,6 +291,7 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
         // Update with remaining instances
         for(DoubleDBIDListIter iter = list.iter(); iter.valid(); iter.advance()) {
           if(iter.doubleValue() >= tresh) {
+//            System.out.println("Hier stimmt was nicht: " + iter.doubleValue() + " " + tresh );
             continue;
           }
           NumberVector vec = database.get(iter);
