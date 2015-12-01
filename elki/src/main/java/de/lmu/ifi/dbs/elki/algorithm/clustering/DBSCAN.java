@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
@@ -70,6 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  *
  * @author Arthur Zimek
+ * @author Erich Schubert
  * @param <O> the type of Object the algorithm is applied to
  */
 @Title("DBSCAN: Density-Based Clustering of Applications with Noise")
@@ -248,10 +250,13 @@ public class DBSCAN<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Mode
    * @param currentCluster Current cluster
    * @param seeds Seed set
    */
-  private void processNeighbors(DBIDIter neighbor, ModifiableDBIDs currentCluster, HashSetModifiableDBIDs seeds) {
+  private void processNeighbors(DoubleDBIDListIter neighbor, ModifiableDBIDs currentCluster, HashSetModifiableDBIDs seeds) {
+    final boolean ismetric = getDistanceFunction().isMetric();
     for(; neighbor.valid(); neighbor.advance()) {
       if(processedIDs.add(neighbor)) {
-        seeds.add(neighbor);
+        if(!ismetric || neighbor.doubleValue() > 0.) {
+          seeds.add(neighbor);
+        }
       }
       else if(!noise.remove(neighbor)) {
         continue;
