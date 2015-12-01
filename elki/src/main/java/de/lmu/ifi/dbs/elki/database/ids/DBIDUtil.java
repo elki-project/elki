@@ -41,11 +41,11 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 
 /**
  * DBID Utility functions.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.has DBIDs
  * @apiviz.has DBIDRef
  * @apiviz.composedOf DBIDFactory
@@ -65,7 +65,7 @@ public final class DBIDUtil {
 
   /**
    * Get the invalid special ID.
-   * 
+   *
    * @return invalid ID value
    */
   public static DBIDRef invalid() {
@@ -74,9 +74,9 @@ public final class DBIDUtil {
 
   /**
    * Import and integer as DBID.
-   * 
+   *
    * Note: this may not be possible for some factories!
-   * 
+   *
    * @param id Integer ID to import
    * @return DBID
    */
@@ -86,9 +86,9 @@ public final class DBIDUtil {
 
   /**
    * Export a DBID as int.
-   * 
+   *
    * Note: this may not be possible for some factories!
-   * 
+   *
    * @param id DBID to export
    * @return integer value
    */
@@ -98,7 +98,7 @@ public final class DBIDUtil {
 
   /**
    * Compare two DBIDs.
-   * 
+   *
    * @param id1 First ID
    * @param id2 Second ID
    * @return Comparison result
@@ -109,7 +109,7 @@ public final class DBIDUtil {
 
   /**
    * Test two DBIDs for equality.
-   * 
+   *
    * @param id1 First ID
    * @param id2 Second ID
    * @return Comparison result
@@ -120,7 +120,7 @@ public final class DBIDUtil {
 
   /**
    * Dereference a DBID reference.
-   * 
+   *
    * @param ref DBID reference
    * @return DBID
    */
@@ -133,7 +133,7 @@ public final class DBIDUtil {
 
   /**
    * Format a DBID as string.
-   * 
+   *
    * @param id DBID
    * @return String representation
    */
@@ -143,7 +143,7 @@ public final class DBIDUtil {
 
   /**
    * Format a DBID as string.
-   * 
+   *
    * @param ids DBIDs
    * @return String representation
    */
@@ -163,7 +163,7 @@ public final class DBIDUtil {
 
   /**
    * Get a serializer for DBIDs.
-   * 
+   *
    * @return DBID serializer
    */
   public static ByteBufferSerializer<DBID> getDBIDSerializer() {
@@ -172,7 +172,7 @@ public final class DBIDUtil {
 
   /**
    * Get a serializer for DBIDs with static size.
-   * 
+   *
    * @return DBID serializer
    */
   public static ByteBufferSerializer<DBID> getDBIDSerializerStatic() {
@@ -181,7 +181,7 @@ public final class DBIDUtil {
 
   /**
    * Generate a single DBID.
-   * 
+   *
    * @return A single DBID
    */
   public static DBID generateSingleDBID() {
@@ -190,7 +190,7 @@ public final class DBIDUtil {
 
   /**
    * Return a single DBID for reuse.
-   * 
+   *
    * @param id DBID to deallocate
    */
   public static void deallocateSingleDBID(DBID id) {
@@ -199,7 +199,7 @@ public final class DBIDUtil {
 
   /**
    * Generate a static DBID range.
-   * 
+   *
    * @param size Requested size
    * @return DBID range
    */
@@ -209,7 +209,7 @@ public final class DBIDUtil {
 
   /**
    * Deallocate a static DBID range.
-   * 
+   *
    * @param range Range to deallocate
    */
   public static void deallocateDBIDRange(DBIDRange range) {
@@ -218,7 +218,7 @@ public final class DBIDUtil {
 
   /**
    * Make a new DBID variable.
-   * 
+   *
    * @param val Initial value.
    * @return Variable
    */
@@ -228,7 +228,7 @@ public final class DBIDUtil {
 
   /**
    * Make a new DBID variable.
-   * 
+   *
    * @return Variable
    */
   public static DBIDVar newVar() {
@@ -237,7 +237,7 @@ public final class DBIDUtil {
 
   /**
    * Make a new (modifiable) array of DBIDs.
-   * 
+   *
    * @return New array
    */
   public static ArrayModifiableDBIDs newArray() {
@@ -246,7 +246,7 @@ public final class DBIDUtil {
 
   /**
    * Make a new (modifiable) hash set of DBIDs.
-   * 
+   *
    * @return New hash set
    */
   public static HashSetModifiableDBIDs newHashSet() {
@@ -255,7 +255,7 @@ public final class DBIDUtil {
 
   /**
    * Make a new (modifiable) array of DBIDs.
-   * 
+   *
    * @param size Size hint
    * @return New array
    */
@@ -265,7 +265,7 @@ public final class DBIDUtil {
 
   /**
    * Make a new (modifiable) hash set of DBIDs.
-   * 
+   *
    * @param size Size hint
    * @return New hash set
    */
@@ -275,7 +275,7 @@ public final class DBIDUtil {
 
   /**
    * Make a new (modifiable) array of DBIDs.
-   * 
+   *
    * @param existing Existing DBIDs
    * @return New array
    */
@@ -285,7 +285,7 @@ public final class DBIDUtil {
 
   /**
    * Make a new (modifiable) hash set of DBIDs.
-   * 
+   *
    * @param existing Existing DBIDs
    * @return New hash set
    */
@@ -295,7 +295,7 @@ public final class DBIDUtil {
 
   /**
    * Compute the set intersection of two sets.
-   * 
+   *
    * @param first First set
    * @param second Second set
    * @return result.
@@ -316,7 +316,7 @@ public final class DBIDUtil {
 
   /**
    * Compute the set intersection size of two sets.
-   * 
+   *
    * @param first First set
    * @param second Second set
    * @return size
@@ -345,7 +345,7 @@ public final class DBIDUtil {
 
   /**
    * Compute the set intersection size of two sets.
-   * 
+   *
    * @param first First set
    * @param second Second set
    * @return size
@@ -362,7 +362,7 @@ public final class DBIDUtil {
 
   /**
    * Compute the set symmetric intersection of two sets.
-   * 
+   *
    * @param first First set
    * @param second Second set
    * @param firstonly OUTPUT: elements only in first. MUST BE EMPTY
@@ -393,7 +393,7 @@ public final class DBIDUtil {
 
   /**
    * Returns the union of the two specified collection of IDs.
-   * 
+   *
    * @param ids1 the first collection
    * @param ids2 the second collection
    * @return the union of ids1 and ids2 without duplicates
@@ -407,7 +407,7 @@ public final class DBIDUtil {
 
   /**
    * Returns the difference of the two specified collection of IDs.
-   * 
+   *
    * @param ids1 the first collection
    * @param ids2 the second collection
    * @return the difference of ids1 minus ids2
@@ -420,7 +420,7 @@ public final class DBIDUtil {
 
   /**
    * Wrap an existing DBIDs collection to be unmodifiable.
-   * 
+   *
    * @param existing Existing collection
    * @return Unmodifiable collection
    */
@@ -442,7 +442,7 @@ public final class DBIDUtil {
 
   /**
    * Ensure that the given DBIDs are array-indexable.
-   * 
+   *
    * @param ids IDs
    * @return Array DBIDs.
    */
@@ -457,7 +457,7 @@ public final class DBIDUtil {
 
   /**
    * Ensure that the given DBIDs support fast "contains" operations.
-   * 
+   *
    * @param ids IDs
    * @return Set DBIDs.
    */
@@ -472,7 +472,7 @@ public final class DBIDUtil {
 
   /**
    * Ensure modifiable.
-   * 
+   *
    * @param ids IDs
    * @return Modifiable DBIDs.
    */
@@ -493,10 +493,10 @@ public final class DBIDUtil {
 
   /**
    * Make a DBID pair.
-   * 
+   *
    * @param id1 first ID
    * @param id2 second ID
-   * 
+   *
    * @return DBID pair
    */
   public static DBIDPair newPair(DBIDRef id1, DBIDRef id2) {
@@ -505,7 +505,7 @@ public final class DBIDUtil {
 
   /**
    * Make a DoubleDBIDPair.
-   * 
+   *
    * @param val double value
    * @param id ID
    * @return new pair
@@ -516,9 +516,9 @@ public final class DBIDUtil {
 
   /**
    * Create an appropriate heap for the distance type.
-   * 
+   *
    * This will use a double heap if appropriate.
-   * 
+   *
    * @param k K value
    * @return New heap of size k, appropriate for this distance type.
    */
@@ -528,7 +528,7 @@ public final class DBIDUtil {
 
   /**
    * Build a new heap from a given list.
-   * 
+   *
    * @param exist Existing result
    * @return New heap
    */
@@ -538,7 +538,7 @@ public final class DBIDUtil {
 
   /**
    * Produce a random shuffling of the given DBID array.
-   * 
+   *
    * @param ids Original DBIDs
    * @param rnd Random generator
    */
@@ -548,7 +548,7 @@ public final class DBIDUtil {
 
   /**
    * Produce a random shuffling of the given DBID array.
-   * 
+   *
    * @param ids Original DBIDs
    * @param random Random generator
    */
@@ -558,22 +558,24 @@ public final class DBIDUtil {
 
   /**
    * Produce a random shuffling of the given DBID array.
-   * 
-   * Only the first {@code limit} elements will be randomized.
-   * 
+   *
+   * Only the first {@code limit} elements will be fully randomized, but the
+   * remaining objects will also be changed.
+   *
    * @param ids Original DBIDs
    * @param random Random generator
    * @param limit Shuffling limit.
    */
   public static void randomShuffle(ArrayModifiableDBIDs ids, Random random, final int limit) {
+    final int end = ids.size();
     for(int i = 1; i < limit; i++) {
-      ids.swap(i - 1, i + random.nextInt(limit - i));
+      ids.swap(i - 1, i + random.nextInt(end - i));
     }
   }
 
   /**
    * Produce a random sample of the given DBIDs.
-   * 
+   *
    * @param source Original DBIDs
    * @param k k Parameter
    * @param seed Random generator seed
@@ -585,7 +587,7 @@ public final class DBIDUtil {
 
   /**
    * Produce a random sample of the given DBIDs.
-   * 
+   *
    * @param source Original DBIDs
    * @param k k Parameter
    * @param seed Random generator seed
@@ -602,7 +604,7 @@ public final class DBIDUtil {
 
   /**
    * Produce a random sample of the given DBIDs.
-   * 
+   *
    * @param source Original DBIDs
    * @param k k Parameter
    * @param rnd Random generator
@@ -614,7 +616,7 @@ public final class DBIDUtil {
 
   /**
    * Produce a random sample of the given DBIDs.
-   * 
+   *
    * @param source Original DBIDs
    * @param k k Parameter
    * @param random Random generator
@@ -645,7 +647,7 @@ public final class DBIDUtil {
       ArrayModifiableDBIDs sample = DBIDUtil.newArray(source);
       randomShuffle(sample, random, k);
       // Delete trailing elements
-      for(int i = sample.size() - 1; i > k; i--) {
+      for(int i = sample.size() - 1; i >= k; i--) {
         sample.remove(i);
       }
       return sample;
@@ -654,7 +656,7 @@ public final class DBIDUtil {
 
   /**
    * Produce a random sample of the given DBIDs.
-   * 
+   *
    * @param ids Original ids
    * @param rate Sampling rate
    * @param random Random generator
@@ -666,7 +668,7 @@ public final class DBIDUtil {
 
   /**
    * Produce a random sample of the given DBIDs.
-   * 
+   *
    * @param ids Original ids
    * @param rate Sampling rate
    * @param random Random generator
@@ -711,7 +713,7 @@ public final class DBIDUtil {
 
   /**
    * Randomly split IDs into {@code p} partitions of almost-equal size.
-   * 
+   *
    * @param ids Original DBIDs
    * @param p Desired number of partitions.
    * @param rnd Random generator
@@ -722,7 +724,7 @@ public final class DBIDUtil {
 
   /**
    * Randomly split IDs into {@code p} partitions of almost-equal size.
-   * 
+   *
    * @param oids Original DBIDs
    * @param p Desired number of partitions.
    * @param random Random generator
@@ -752,7 +754,7 @@ public final class DBIDUtil {
 
   /**
    * Get a subset of the KNN result.
-   * 
+   *
    * @param list Existing list
    * @param k k
    * @return Subset
@@ -769,7 +771,7 @@ public final class DBIDUtil {
 
   /**
    * Create a modifiable list to store distance-DBID pairs.
-   * 
+   *
    * @param size Estimated upper list size
    * @return Empty list
    */
@@ -779,7 +781,7 @@ public final class DBIDUtil {
 
   /**
    * Create a modifiable list to store distance-DBID pairs.
-   * 
+   *
    * @return Empty list
    */
   public static ModifiableDoubleDBIDList newDistanceDBIDList() {
@@ -788,7 +790,7 @@ public final class DBIDUtil {
 
   /**
    * Assert that the presented ids constitute a continuous {@link DBIDRange}.
-   * 
+   *
    * @param ids ID range.
    * @return DBID range.
    * @throws AbortException
