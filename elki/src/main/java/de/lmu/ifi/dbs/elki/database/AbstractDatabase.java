@@ -51,12 +51,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * Abstract base class for database API implementations. Provides default
  * management of relations, indexes and events as well as default query
  * matching.
- * 
+ *
  * Note: when debugging index usage, set logging for this package to FINEST via
  * <tt>-enableDebug de.lmu.ifi.dbs.elki.database=FINEST</tt>
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf DatabaseEventManager
  * @apiviz.has IndexFactory
  */
@@ -150,6 +150,13 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
   }
 
   @Override
+  public <O> RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints) {
+    @SuppressWarnings("unchecked")
+    final Relation<O> relation = (Relation<O>) simQuery.getRelation();
+    return relation.getSimilarityRangeQuery(simQuery, hints);
+  }
+
+  @Override
   public <O> RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     @SuppressWarnings("unchecked")
     final Relation<O> relation = (Relation<O>) distanceQuery.getRelation();
@@ -188,22 +195,22 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
 
   /**
    * Get the class logger.
-   * 
+   *
    * @return Class logger
    */
   protected abstract Logging getLogger();
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public abstract static class Parameterizer extends AbstractParameterizer {
     /**
      * Option to specify the data source for the database.
-     * 
+     *
      * Key:
      * <p>
      * {@code -dbc}

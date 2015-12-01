@@ -36,8 +36,11 @@ import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuer
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanEuclideanDistanceRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveDistanceRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveSimilarityRangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.LinearScanSimilarityRangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.PrimitiveSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -254,6 +257,22 @@ public final class QueryUtil {
       return new LinearScanPrimitiveDistanceRangeQuery<>(pdq);
     }
     return new LinearScanDistanceRangeQuery<>(distanceQuery);
+  }
+
+  /**
+   * Get a linear scan query for the given similarity query.
+   *
+   * @param <O> Object type
+   * @param simQuery similarity query
+   * @return Range query
+   */
+  public static <O> RangeQuery<O> getLinearScanSimilarityRangeQuery(SimilarityQuery<O> simQuery) {
+    // Slight optimizations of linear scans
+    if(simQuery instanceof PrimitiveSimilarityQuery) {
+      final PrimitiveSimilarityQuery<O> pdq = (PrimitiveSimilarityQuery<O>) simQuery;
+      return new LinearScanPrimitiveSimilarityRangeQuery<>(pdq);
+    }
+    return new LinearScanSimilarityRangeQuery<>(simQuery);
   }
 
   /**

@@ -123,8 +123,7 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
+   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    *
    * @param distanceQuery Distance query
@@ -142,8 +141,7 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
+   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    *
    * @param distanceFunction Distance function to use
@@ -153,7 +151,8 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
   KNNQuery<O> getKNNQuery(DistanceFunction<? super O> distanceFunction, Object... hints);
 
   /**
-   * Get a range query object for the given distance query.
+   * Get a range query object for the given distance query. (Range queries in
+   * ELKI refers to radius-based ranges, not rectangular query windows.)
    *
    * When possible, this will use an index, but it may default to an expensive
    * linear scan.
@@ -161,8 +160,7 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
-   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
+   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    *
    * @param distanceQuery Distance query
@@ -172,7 +170,8 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
   RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints);
 
   /**
-   * Get a range query object for the given distance query.
+   * Get a range query object for the given distance query. (Range queries in
+   * ELKI refers to radius-based ranges, not rectangular query windows.)
    *
    * When possible, this will use an index, but it may default to an expensive
    * linear scan.
@@ -180,8 +179,7 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * Hints include:
    * <ul>
    * <li>Distance object: Maximum query range</li>
-   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
+   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    *
    * @param distanceFunction Distance function to use
@@ -189,6 +187,44 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * @return KNN Query object
    */
   RangeQuery<O> getRangeQuery(DistanceFunction<? super O> distanceFunction, Object... hints);
+
+  /**
+   * Get a range query object for the given similarity query. (Range queries in
+   * ELKI refers to radius-based ranges, not rectangular query windows.)
+   *
+   * When possible, this will use an index, but it may default to an expensive
+   * linear scan.
+   *
+   * Hints include:
+   * <ul>
+   * <li>Distance object: Maximum query range</li>
+   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * </ul>
+   *
+   * @param simQuery Similarity query
+   * @param hints Optimizer hints (optional)
+   * @return KNN Query object
+   */
+  RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints);
+
+  /**
+   * Get a range query object for the given similarity query. (Range queries in
+   * ELKI refers to radius-based ranges, not rectangular query windows.)
+   *
+   * When possible, this will use an index, but it may default to an expensive
+   * linear scan.
+   *
+   * Hints include:
+   * <ul>
+   * <li>Double: Maximum query range</li>
+   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
+   * </ul>
+   *
+   * @param simFunction Similarity function to use
+   * @param hints Optimizer hints (optional)
+   * @return KNN Query object
+   */
+  RangeQuery<O> getSimilarityRangeQuery(SimilarityFunction<? super O> simFunction, Object... hints);
 
   /**
    * Get a rKNN query object for the given distance query.
@@ -199,8 +235,7 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
+   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    *
    * @param distanceQuery Distance query
@@ -218,8 +253,7 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * Hints include:
    * <ul>
    * <li>Integer: maximum value for k needed</li>
-   * <li>{@link de.lmu.ifi.dbs.elki.database.query.DatabaseQuery#HINT_BULK} bulk
-   * query needed</li>
+   * <li>{@link DatabaseQuery#HINT_BULK} bulk query needed</li>
    * </ul>
    *
    * @param distanceFunction Distance function to use

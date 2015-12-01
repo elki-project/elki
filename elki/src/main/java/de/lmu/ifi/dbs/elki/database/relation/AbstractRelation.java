@@ -194,6 +194,40 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
   }
 
   @Override
+  public RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints) {
+    if(simQuery == null) {
+      throw new AbortException("Range query requested for 'null' distance!");
+    }
+    // FIXME: Add similarity index support.
+
+    // Default
+    for(Object hint : hints) {
+      if(hint == DatabaseQuery.HINT_OPTIMIZED_ONLY) {
+        return null;
+      }
+    }
+    if(getLogger().isDebuggingFinest()) {
+      StringBuilder buf = new StringBuilder();
+      buf.append("Fallback to linear scan - no index was able to accelerate this query.\n");
+      buf.append("Distance query: ").append(simQuery).append('\n');
+      if(hints.length > 0) {
+        buf.append("Hints:");
+        for(Object o : hints) {
+          buf.append(' ').append(o);
+        }
+      }
+      getLogger().debugFinest(buf.toString());
+    }
+    return QueryUtil.getLinearScanSimilarityRangeQuery(simQuery);
+  }
+
+  @Override
+  public RangeQuery<O> getSimilarityRangeQuery(SimilarityFunction<? super O> simFunction, Object... hints) {
+    SimilarityQuery<O> simQuery = getSimilarityQuery(simFunction, hints);
+    return getSimilarityRangeQuery(simQuery, hints);
+  }
+
+  @Override
   public RKNNQuery<O> getRKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
