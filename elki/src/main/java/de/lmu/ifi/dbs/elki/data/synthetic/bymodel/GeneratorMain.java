@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
@@ -91,6 +92,11 @@ public class GeneratorMain {
   protected Pattern relabelClusters = null;
 
   /**
+   * Relabel objects by distance.
+   */
+  protected boolean relabelDistance = false;
+
+  /**
    * Add a cluster to the cluster list.
    *
    * @param c cluster to add
@@ -129,37 +135,33 @@ public class GeneratorMain {
     ClassLabel[] labels = new ClassLabel[generators.size()];
     Model[] models = new Model[generators.size()];
     initLabelsAndModels(generators, labels, models, relabelClusters);
+    final AssignPoint assignment;
+    if(!testAgainstModel) {
+      assignment = new AssignPoint();
+    }
+    else if(relabelClusters == null) {
+      assignment = new TestModel();
+    }
+    else if(!relabelDistance) {
+      assignment = new AssignLabelsByDensity(labels);
+    }
+    else {
+      assignment = new AssignLabelsByDistance(labels);
+    }
     for(int i = 0; i < labels.length; i++) {
       final GeneratorInterface curclus = generators.get(i);
+      assignment.newCluster(i, curclus);
       // Only dynamic generators allow rejection / model testing:
       GeneratorInterfaceDynamic cursclus = (curclus instanceof GeneratorInterfaceDynamic) ? (GeneratorInterfaceDynamic) curclus : null;
-      boolean doreassign = (labels[i] == null);
       int kept = 0;
       while(kept < curclus.getSize()) {
         // generate the "missing" number of points
         List<Vector> newp = curclus.generate(curclus.getSize() - kept);
-        points: for(Vector p : newp) {
-          int bestc = i;
-          if(cursclus != null && (testAgainstModel || doreassign)) {
-            double is = curclus.getDensity(p) * curclus.getSize();
-            double rem = Double.NEGATIVE_INFINITY; // Best assignment
-            for(int j = 0; j < generators.size(); j++) {
-              // Compute density by each (non-reassigned) generator:
-              if(testAgainstModel || labels[j] != null) {
-                final GeneratorInterface other = generators.get(j);
-                final double d = other.getDensity(p) * other.getSize();
-                // Model testing:
-                if(d > is) {
-                  cursclus.incrementDiscarded();
-                  continue points;
-                }
-                // Reassignment logic:
-                if(doreassign && labels[j] != null && d > rem) {
-                  rem = d;
-                  bestc = j;
-                }
-              }
-            }
+        for(Vector p : newp) {
+          int bestc = assignment.getAssignment(i, p);
+          if(bestc < 0) {
+            cursclus.incrementDiscarded();
+            continue;
           }
           bundle.appendSimple(new DoubleVector(p), labels[bestc], models[bestc]);
           ++kept;
@@ -167,6 +169,192 @@ public class GeneratorMain {
       }
     }
     return bundle;
+  }
+
+  /**
+   * Point (re-)assignment strategy. Default: no change.
+   *
+   * @author Erich Schubert
+   * @apiviz.exclude
+   */
+  private static class AssignPoint {
+    /**
+     * Assign a point to a cluster.
+     *
+     * @param i Cluster number
+     * @param p Point
+     * @return New cluster number.
+     */
+    public int getAssignment(int i, Vector p) {
+      return i;
+    }
+
+    /**
+     * Set the current cluster.
+     *
+     * @param i Current cluster.
+     * @param curclus Generator
+     */
+    public void newCluster(int i, GeneratorInterface curclus) {
+      // Ignore by default.
+    }
+  }
+
+  /**
+   * Reject objects with a higher density in another generator.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  private class TestModel extends AssignPoint {
+    @Override
+    public int getAssignment(int i, Vector p) {
+      int bestc = i;
+      GeneratorInterface curclus = generators.get(i);
+      double is = curclus.getDensity(p) * curclus.getSize();
+      for(int j = 0; j < generators.size(); j++) {
+        if(j == i) {
+          continue;
+        }
+        // Compute density by each (non-reassigned) generator:
+        final GeneratorInterface other = generators.get(j);
+        final double dens = other.getDensity(p) * other.getSize();
+        // Model testing:
+        if(dens > is) {
+          return -1;
+        }
+      }
+      return bestc;
+    }
+  }
+
+  /**
+   * Reassign objects in certain labels; but also always test against the model.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  private class AssignLabelsByDensity extends AssignPoint {
+    /**
+     * Cluster labels.
+     */
+    private ClassLabel[] labels;
+
+    /**
+     * Current cluster generator.
+     */
+    private GeneratorInterface curclus;
+
+    /**
+     * Constructor.
+     *
+     * @param labels Cluster labels
+     */
+    public AssignLabelsByDensity(ClassLabel[] labels) {
+      this.labels = labels;
+    }
+
+    @Override
+    public void newCluster(int i, GeneratorInterface curclus) {
+      this.curclus = curclus;
+    }
+
+    @Override
+    public int getAssignment(int i, Vector p) {
+      double is = curclus.getDensity(p) * curclus.getSize();
+      int bestc = i;
+      boolean reassign = labels[i] == null;
+      double bestd = reassign ? Double.NEGATIVE_INFINITY : is;
+      for(int j = 0; j < generators.size(); j++) {
+        if(j == i) {
+          continue;
+        }
+        // Compute density by each (non-reassigned) generator:
+        final GeneratorInterface other = generators.get(j);
+        final double dens = other.getDensity(p) * other.getSize();
+        // Model testing:
+        if(dens > is) {
+          return -1;
+        }
+        // Reassignment logic:
+        if(reassign && labels[j] != null) {
+          if(dens > bestd) {
+            bestd = dens;
+            bestc = j;
+          }
+        }
+      }
+      return bestc;
+    }
+  }
+
+  /**
+   * Reassign objects in certain labels; but also always test against the model.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  private class AssignLabelsByDistance extends AssignPoint {
+    /**
+     * Cluster centers.
+     */
+    private Vector[] centers;
+
+    /**
+     * Constructor.
+     *
+     * @param labels Cluster labels
+     */
+    public AssignLabelsByDistance(ClassLabel[] labels) {
+      // Compute cluster centers *except* for those to be reassigned.
+      this.centers = clusterCenters(generators, labels);
+    }
+
+    /**
+     * Compute the cluster centers for each cluster.
+     *
+     * @param generators Generators
+     * @param labels Labels ({@code null} if not needed)
+     * @return
+     */
+    private Vector[] clusterCenters(ArrayList<GeneratorInterface> generators, ClassLabel[] labels) {
+      final int l = generators.size();
+      Vector[] vs = new Vector[l];
+      for(int i = 0; i < l; i++) {
+        if(labels[i] == null) {
+          continue; // Will be reassigned
+        }
+        vs[i] = generators.get(i).computeMean();
+      }
+      return vs;
+    }
+
+    @Override
+    public int getAssignment(int i, Vector p) {
+      int bestc = i;
+      boolean reassign = (centers[i] == null);
+      double is = reassign ? 0. : SquaredEuclideanDistanceFunction.STATIC.distance(centers[i], p);
+      double bestd = reassign ? Double.POSITIVE_INFINITY : is;
+      for(int j = 0; j < generators.size(); j++) {
+        if(centers[j] == null) {
+          continue;
+        }
+        // Compute distance by each (non-reassigned) generator:
+        final double dist = SquaredEuclideanDistanceFunction.STATIC.distance(centers[j], p);
+        // Model testing:
+        if(dist < bestd) {
+          if(!reassign) {
+            return -1;
+          }
+          bestd = dist;
+          bestc = j;
+        }
+      }
+      return bestc;
+    }
   }
 
   /**
@@ -252,5 +440,14 @@ public class GeneratorMain {
    */
   public void setReassignPattern(Pattern reassign) {
     this.relabelClusters = reassign;
+  }
+
+  /**
+   * Relabel objects by distance, instead of by density.
+   *
+   * @param bydistance Boolean when to use distances.
+   */
+  public void setReassignByDistance(boolean bydistance) {
+    this.relabelDistance = bydistance;
   }
 }

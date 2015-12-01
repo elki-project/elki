@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
@@ -200,19 +201,26 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   private Boolean testAgainstModel;
 
   /**
+   * Reassign objects by distance instead of density
+   */
+  private boolean reassignByDistance;
+
+  /**
    * Constructor.
    *
    * @param filters Filters.
    * @param specfile Specification file
    * @param sizescale Size scaling
    * @param reassign Reassignment pattern
+   * @param reassignByDistance Reassign objects by distance instead of density
    * @param clusterRandom Random number generator
    */
-  public GeneratorXMLDatabaseConnection(List<ObjectFilter> filters, File specfile, double sizescale, Pattern reassign, RandomFactory clusterRandom) {
+  public GeneratorXMLDatabaseConnection(List<ObjectFilter> filters, File specfile, double sizescale, Pattern reassign, boolean reassignByDistance, RandomFactory clusterRandom) {
     super(filters);
     this.specfile = specfile;
     this.sizescale = sizescale;
     this.reassign = reassign;
+    this.reassignByDistance = reassignByDistance;
     this.clusterRandom = clusterRandom.getSingleThreadedRandom();
   }
 
@@ -232,6 +240,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
       gen.setTestAgainstModel(testAgainstModel.booleanValue());
     }
     gen.setReassignPattern(reassign);
+    gen.setReassignByDistance(reassignByDistance);
     if(LOG.isVerbose()) {
       LOG.verbose("Generating clusters ...");
     }
@@ -760,6 +769,11 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     public static final OptionID REASSIGN_ID = new OptionID("bymodel.reassign", "Pattern to specify clusters to reassign.");
 
     /**
+     * Reassign by cluster distance
+     */
+    public static final OptionID REASSIGN_DISTANCE_ID = new OptionID("bymodel.reassign-bydistance", "Reassign by distance, not by density.");
+
+    /**
      * Parameter to give the configuration file
      */
     public static final OptionID RANDOMSEED_ID = new OptionID("bymodel.randomseed", "The random generator seed.");
@@ -780,9 +794,14 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     Pattern reassign = null;
 
     /**
+     * Reassign by distance, not density.
+     */
+    boolean reassignByDistance = false;
+
+    /**
      * Random generator used for initializing cluster generators.
      */
-    private RandomFactory clusterRandom;
+    RandomFactory clusterRandom;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -803,6 +822,12 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
       if(config.grab(reassignP)) {
         reassign = reassignP.getValue();
       }
+      if (reassign != null) {
+        final Flag bydistanceF = new Flag(REASSIGN_DISTANCE_ID);
+        if (config.grab(bydistanceF)) {
+          reassignByDistance = bydistanceF.isTrue();
+        }
+      }
       // Random generator
       final RandomParameter rndP = new RandomParameter(RANDOMSEED_ID);
       if(config.grab(rndP)) {
@@ -814,7 +839,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
 
     @Override
     protected GeneratorXMLDatabaseConnection makeInstance() {
-      return new GeneratorXMLDatabaseConnection(filters, specfile, sizescale, reassign, clusterRandom);
+      return new GeneratorXMLDatabaseConnection(filters, specfile, sizescale, reassign, reassignByDistance, clusterRandom);
     }
   }
 }

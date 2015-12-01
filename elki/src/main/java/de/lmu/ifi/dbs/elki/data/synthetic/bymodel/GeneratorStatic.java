@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 /**
  * Class for static clusters, that is an implementation of GeneratorInterface
  * that will return only a given set of points.
- * 
+ *
  * @author Erich Schubert
  */
 public class GeneratorStatic implements GeneratorInterface {
@@ -49,7 +49,7 @@ public class GeneratorStatic implements GeneratorInterface {
 
   /**
    * Construct generator using given name and points
-   * 
+   *
    * @param name Cluster name
    * @param points Cluster points
    */
@@ -62,7 +62,7 @@ public class GeneratorStatic implements GeneratorInterface {
   /**
    * "Generate" new cluster points. Static generators always return their
    * predefined set of points.
-   * 
+   *
    * @param count parameter is ignored.
    */
   @Override
@@ -98,5 +98,11 @@ public class GeneratorStatic implements GeneratorInterface {
   @Override
   public Model makeModel() {
     return ClusterModel.CLUSTER;
+  }
+
+  @Override
+  public Vector computeMean() {
+    // Not supported except for singletons.
+    return points.size() == 1 ? points.get(1) : null;
   }
 }

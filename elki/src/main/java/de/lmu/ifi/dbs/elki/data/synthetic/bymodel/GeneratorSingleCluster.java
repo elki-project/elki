@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.data.model.GeneratorModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
@@ -37,13 +38,13 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * Class to generate a single cluster according to a model as well as getting
  * the density of a given model at that point (to evaluate generated points
  * according to the same model)
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf Distribution
  * @apiviz.composedOf AffineTransformation
  */
-public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model {
+public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
   /**
    * The distribution generators for each axis
    */
@@ -62,9 +63,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
   /**
    * Clipping vectors. Note: currently, either both or none have to be set!
    */
-  private Vector clipmin;
-
-  private Vector clipmax;
+  private Vector clipmin, clipmax;
 
   /**
    * Correction factor for probability computation
@@ -84,7 +83,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
   /**
    * Retry count
    */
-  // TODO: make configureable.
+  // TODO: make configurable?
   private int retries = 1000;
 
   /**
@@ -99,7 +98,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Generator (without axes)
-   * 
+   *
    * @param name Cluster name
    * @param size Cluster size
    * @param densitycorrection Density correction factor
@@ -116,7 +115,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
   /**
    * Add a new generator to the cluster. No transformations must have been added
    * so far!
-   * 
+   *
    * @param gen Distribution generator
    * @throws UnableToComplyException thrown when no new generators may be added
    *         anymore
@@ -131,7 +130,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Apply a rotation to the generator
-   * 
+   *
    * @param axis1 First axis (0 <= axis1 < dim)
    * @param axis2 Second axis (0 <= axis2 < dim)
    * @param angle Angle in Radians
@@ -145,7 +144,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Add a translation to the generator
-   * 
+   *
    * @param v translation vector
    */
   public void addTranslation(Vector v) {
@@ -159,7 +158,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
    * Set a clipping box. min needs to be smaller than max in each component.
    * Note: Clippings are not 'modified' by translation / rotation /
    * transformation operations.
-   * 
+   *
    * @param min Minimum values for clipping
    * @param max Maximum values for clipping
    * @throws UnableToComplyException thrown when invalid vectors were given.
@@ -195,7 +194,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Get the cluster dimensionality
-   * 
+   *
    * @return dimensionality
    */
   @Override
@@ -205,7 +204,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Test if a point is to be clipped
-   * 
+   *
    * @param p point
    * @return true if the point is to be clipped
    */
@@ -226,7 +225,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Generate the given number of additional points.
-   * 
+   *
    * @see de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface#generate(int)
    */
   @Override
@@ -234,18 +233,15 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
     ArrayList<Vector> result = new ArrayList<>(count);
     while(result.size() < count) {
       double[] d = new double[dim];
-      int i = 0;
-      for(Distribution axis : axes) {
-        d[i] = axis.nextRandom();
-        i++;
+      for(int i = 0; i < dim; i++) {
+        d[i] = axes.get(i).nextRandom();
       }
       Vector p = new Vector(d);
       if(trans != null) {
         p = trans.apply(p);
       }
       if(testClipping(p)) {
-        retries--;
-        if(retries < 0) {
+        if(--retries < 0) {
           throw new UnableToComplyException("Maximum retry count in generator exceeded.");
         }
         continue;
@@ -257,28 +253,25 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Compute density for cluster model at given vector p-
-   * 
+   *
    * @see de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface#getDensity(de.lmu.ifi.dbs.elki.math.linearalgebra.Vector)
    */
   @Override
   public double getDensity(Vector p) {
-    Vector o = p;
     if(trans != null) {
-      o = trans.applyInverse(p);
+      p = trans.applyInverse(p);
     }
 
-    double density = 1.0;
-    int i = 0;
-    for(Distribution axis : axes) {
-      density = density * axis.pdf(o.get(i));
-      i++;
+    double density = densitycorrection;
+    for(int i = 0; i < dim; i++) {
+      density *= axes.get(i).pdf(p.get(i));
     }
-    return density * densitycorrection;
+    return density;
   }
 
   /**
    * Get transformation
-   * 
+   *
    * @return transformation matrix, may be null.
    */
   public AffineTransformation getTransformation() {
@@ -287,7 +280,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Return a copy of the 'clipping minimum' vector.
-   * 
+   *
    * @return vector with lower clipping bounds. May be null.
    */
   public Vector getClipmin() {
@@ -299,7 +292,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Return a copy of the 'clipping maximum' vector
-   * 
+   *
    * @return vector with upper clipping bounds. May be null.
    */
   public Vector getClipmax() {
@@ -311,7 +304,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Return the size
-   * 
+   *
    * @return size of this cluster.
    */
   @Override
@@ -321,7 +314,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Get cluster name.
-   * 
+   *
    * @return name of this cluster.
    */
   @Override
@@ -331,7 +324,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Get number of discarded points
-   * 
+   *
    * @return number of discarded points
    */
   @Override
@@ -349,7 +342,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Return number of remaining retries.
-   * 
+   *
    * @return Number of retries left in this cluster.
    */
   @Override
@@ -359,7 +352,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Return density correction factor
-   * 
+   *
    * @return density correction factor
    */
   public double getDensityCorrection() {
@@ -368,7 +361,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Set density correction factor.
-   * 
+   *
    * @param densitycorrection new density correction factor.
    */
   public void setDensityCorrection(double densitycorrection) {
@@ -377,7 +370,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Create a new random generator (reproducible)
-   * 
+   *
    * @return new random generator derived from cluster master random.
    */
   public Random getNewRandomGenerator() {
@@ -386,21 +379,34 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic, Model 
 
   /**
    * Make a cluster model for this cluster.
-   * 
+   *
    * @return Model
    */
   @Override
   public Model makeModel() {
-    return this;
+    return new GeneratorModel(this, computeMean());
   }
 
   /**
    * Get distribution along (generator) axis i.
-   * 
+   *
    * @param i Generator axis i
    * @return Distribution
    */
   public Distribution getDistribution(int i) {
     return axes.get(i);
+  }
+
+  @Override
+  public Vector computeMean() {
+    double[] v = new double[dim];
+    for(int i = 0; i < dim; i++) {
+      v[i] = axes.get(i).quantile(0.5);
+    }
+    Vector o = new Vector(v);
+    if(trans != null) {
+      o = trans.apply(o);
+    }
+    return o;
   }
 }
