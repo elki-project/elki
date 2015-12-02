@@ -55,7 +55,7 @@ public class TestReferenceBasedOutlierDetection extends AbstractSimpleAlgorithmT
     // run ReferenceBasedOutlierDetection on database
     OutlierResult result = referenceBasedOutlierDetection.run(db);
 
-    testAUC(db, "Noise", result, 0.9418148148);
-    testSingleScore(result, 945, 0.87173403699);
+    testAUC(db, "Noise", result, 0.9693703703703);
+    testSingleScore(result, 945, 0.933574455);
   }
 }
