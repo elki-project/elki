@@ -339,32 +339,32 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult>im
     /**
      * Parameter to specify the kernel density function.
      */
-    private static final OptionID KERNEL_ID = new OptionID("kdeos.kernel", "Kernel density function to use.");
+    public static final OptionID KERNEL_ID = new OptionID("kdeos.kernel", "Kernel density function to use.");
 
     /**
      * Parameter to specify the minimum bandwidth.
      */
-    private static final OptionID KERNEL_MIN_ID = new OptionID("kdeos.kernel.minbw", "Minimum bandwidth for kernel density estimation.");
+    public static final OptionID KERNEL_MIN_ID = new OptionID("kdeos.kernel.minbw", "Minimum bandwidth for kernel density estimation.");
 
     /**
      * Parameter to specify the kernel scaling factor.
      */
-    private static final OptionID KERNEL_SCALE_ID = new OptionID("kdeos.kernel.scale", "Scaling factor for the kernel function.");
+    public static final OptionID KERNEL_SCALE_ID = new OptionID("kdeos.kernel.scale", "Scaling factor for the kernel function.");
 
     /**
      * Minimum value of k to analyze.
      */
-    private static final OptionID KMIN_ID = new OptionID("kdeos.k.min", "Minimum value of k to analyze.");
+    public static final OptionID KMIN_ID = new OptionID("kdeos.k.min", "Minimum value of k to analyze.");
 
     /**
      * Maximum value of k to analyze.
      */
-    private static final OptionID KMAX_ID = new OptionID("kdeos.k.max", "Maximum value of k to analyze.");
+    public static final OptionID KMAX_ID = new OptionID("kdeos.k.max", "Maximum value of k to analyze.");
 
     /**
      * Intrinsic dimensionality.
      */
-    private static final OptionID IDIM_ID = new OptionID("kdeos.idim", "Intrinsic dimensionality of this data set. Use -1 for using the true data dimensionality, but values such as 0-2 often offer better performance.");
+    public static final OptionID IDIM_ID = new OptionID("kdeos.idim", "Intrinsic dimensionality of this data set. Use -1 for using the true data dimensionality, but values such as 0-2 often offer better performance.");
 
     /**
      * Kernel function to use for density estimation.
