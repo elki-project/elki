@@ -63,6 +63,7 @@
 			<groupId>de.lmu.ifi.dbs.elki</groupId>
 			<artifactId>elki-batik-visualization</artifactId>
 			<version>${project.version}</version>
+			<optional>true</optional>
 		</dependency>
 	</dependencies>
 </project>
