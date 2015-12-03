@@ -1,5 +1,8 @@
 # ELKI
 ##### Environment for Developing KDD-Applications Supported by Index-Structures
+[![DBLP:journals/pvldb/SchubertKEZSZ15](https://img.shields.io/badge/DBLP--BibTeX-journals%2Fpvldb%2FSchubertKEZSZ15-brightgreen.svg)](http://dblp.uni-trier.de/rec/bibtex/journals/pvldb/SchubertKEZSZ15)
+[![License AGPL-3.0](https://img.shields.io/badge/License-AGPL--3-brightgreen.svg)](http://elki.dbs.ifi.lmu.de/wiki/License)
+[![Build Status](https://travis-ci.org/elki-project/elki.svg?branch=master)](https://travis-ci.org/elki-project/elki)
 
 ## Quick Summary
 ELKI is an open source (AGPLv3) data mining software written in Java. The focus of ELKI is research in algorithms, with an emphasis on unsupervised methods in cluster analysis and outlier detection.
