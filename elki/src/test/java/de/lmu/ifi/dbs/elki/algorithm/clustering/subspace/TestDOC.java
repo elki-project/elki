@@ -29,70 +29,62 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Performs a full CLIQUE run, and compares the result with a clustering derived
- * from the data set labels. This test ensures that CLIQUE performance doesn't
- * unexpectedly drop on this data set (and also ensures that the algorithms
- * work, as a side effect).
- * 
- * @author Elke Achtert
- * @author Katharina Rausch
+ * Test DOC on a simple test data set.
+ *
+ * On the first set, its an all-or-nothing depending on the parameters.
+ *
  * @author Erich Schubert
  */
-public class TestCLIQUEResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestDOC extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
-   * Run CLIQUE with fixed parameters and compare the result to a golden
-   * standard.
-   * 
-   * @throws ParameterException
+   * Run DOC with fixed parameters and compare the result to a golden standard.
    */
   @Test
-  public void testCLIQUEResults() {
+  public void testDOCSimple() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-simple.csv", 600);
 
     ListParameterization params = new ListParameterization();
-    params.addParameter(CLIQUE.TAU_ID, "0.1");
-    params.addParameter(CLIQUE.XSI_ID, 20);
+    params.addParameter(DOC.Parameterizer.RANDOM_ID, 0);
+    params.addParameter(DOC.Parameterizer.ALPHA_ID, 0.4);
+    params.addParameter(DOC.Parameterizer.BETA_ID, 0.85);
 
     // setup algorithm
-    CLIQUE<DoubleVector> clique = ClassGenericsUtil.parameterizeOrAbort(CLIQUE.class, params);
+    DOC<DoubleVector> doc = ClassGenericsUtil.parameterizeOrAbort(DOC.class, params);
     testParameterizationOk(params);
 
-    // run CLIQUE on database
-    Clustering<SubspaceModel> result = clique.run(db);
+    // run DOC on database
+    Clustering<?> result = doc.run(db);
 
-    // PairCounting is not appropriate here: overlapping clusterings!
-    // testFMeasure(db, result, 0.9882);
-    testClusterSizes(result, new int[] { 200, 200, 216, 400 });
+    testClusterSizes(result, new int[] { 200, 400 });
+    testFMeasure(db, result, 1.0);
   }
 
   /**
-   * Run CLIQUE with fixed parameters and compare the result to a golden
-   * standard.
-   * 
-   * @throws ParameterException
+   * Run DOC with fixed parameters and compare the result to a golden standard.
    */
   @Test
-  public void testCLIQUESubspaceOverlapping() {
+  public void testDOCOverlapping() {
     Database db = makeSimpleDatabase(UNITTEST + "subspace-overlapping-3-4d.ascii", 850);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(CLIQUE.TAU_ID, 0.2);
-    params.addParameter(CLIQUE.XSI_ID, 6);
-    CLIQUE<DoubleVector> clique = ClassGenericsUtil.parameterizeOrAbort(CLIQUE.class, params);
+    params.addParameter(DOC.Parameterizer.RANDOM_ID, 0);
+    params.addParameter(DOC.Parameterizer.ALPHA_ID, 0.4);
+    params.addParameter(DOC.Parameterizer.BETA_ID, 0.95);
+    params.addFlag(DOC.Parameterizer.HEURISTICS_ID);
+    params.addParameter(DOC.Parameterizer.D_ZERO_ID, 1);
+
+    DOC<DoubleVector> doc = ClassGenericsUtil.parameterizeOrAbort(DOC.class, params);
     testParameterizationOk(params);
 
-    // run CLIQUE on database
-    Clustering<SubspaceModel> result = clique.run(db);
-    // PairCounting is not appropriate here: overlapping clusterings!
-    // testFMeasure(db, result, 0.433661);
-    testClusterSizes(result, new int[] { 255, 409, 458, 458, 480 });
+    // run DOC on database
+    Clustering<?> result = doc.run(db);
+    testFMeasure(db, result, .54271816);
+    testClusterSizes(result, new int[] { 1, 20, 33, 40, 56, 104, 274, 322 });
   }
 }
