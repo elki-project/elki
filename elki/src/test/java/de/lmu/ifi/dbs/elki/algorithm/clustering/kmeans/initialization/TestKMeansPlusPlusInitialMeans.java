@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
+package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 
 /*
  This file is part of ELKI:
@@ -27,40 +27,43 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.AbstractKMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Performs a full KMeans run, and compares the result with a clustering derived
- * from the data set labels. This test ensures that KMeans's performance doesn't
- * unexpectedly drop on this data set (and also ensures that the algorithms
- * work, as a side effect).
+ * Performs a single assignment with different k-means initializations.
  *
  * @author Erich Schubert
  */
-public class TestSingleAssignmentKMeans extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestKMeansPlusPlusInitialMeans extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.
+   *
+   * @throws ParameterException
    */
   @Test
-  public void testSingleAssignmentKMeans() {
+  public void testSingleAssignmentKMeansPlusPlus() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
     params.addParameter(KMeans.SEED_ID, 3);
+    params.addParameter(KMeans.INIT_ID, KMeansPlusPlusInitialMeans.class);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(SingleAssignmentKMeans.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);
-    // Unsurprisingly, these results are much worse than normal k-means
-    testFMeasure(db, result, 0.7936860577);
-    testClusterSizes(result, new int[] { 52, 151, 200, 201, 396 });
+    testFMeasure(db, result, 0.99800500);
+    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
 }
