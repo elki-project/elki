@@ -35,11 +35,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Regression test for Elkan k-means.
+ * Performs a full KMeans run, and compares the result with a clustering derived
+ * from the data set labels. This test ensures that KMeans's performance doesn't
+ * unexpectedly drop on this data set (and also ensures that the algorithms
+ * work, as a side effect).
  *
+ * @author Katharina Rausch
  * @author Erich Schubert
  */
-public class TestKMeansElkan extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestSingleAssignmentKMeans extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.
@@ -47,19 +51,20 @@ public class TestKMeansElkan extends AbstractSimpleAlgorithmTest implements JUni
    * @throws ParameterException
    */
   @Test
-  public void testKMeansElkan() {
+  public void testSingleAssignmentKMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 2);
-    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansElkan.class, params);
+    params.addParameter(KMeans.SEED_ID, 3);
+    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(SingleAssignmentKMeans.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);
-    testFMeasure(db, result, 0.998005);
-    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
+    // Unsurprisingly, these results are much worse than normal k-means
+    testFMeasure(db, result, 0.7936860577);
+    testClusterSizes(result, new int[] { 52, 151, 200, 201, 396 });
   }
 }

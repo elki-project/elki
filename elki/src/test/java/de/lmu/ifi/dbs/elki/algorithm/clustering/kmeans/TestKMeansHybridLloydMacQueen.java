@@ -35,11 +35,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Regression test for Elkan k-means.
+ * Performs a full KMeans run, and compares the result with a clustering derived
+ * from the data set labels. This test ensures that KMeans's performance doesn't
+ * unexpectedly drop on this data set (and also ensures that the algorithms
+ * work, as a side effect).
  *
+ * @author Katharina Rausch
  * @author Erich Schubert
  */
-public class TestKMeansElkan extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestKMeansHybridLloydMacQueen extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.
@@ -47,14 +51,14 @@ public class TestKMeansElkan extends AbstractSimpleAlgorithmTest implements JUni
    * @throws ParameterException
    */
   @Test
-  public void testKMeansElkan() {
+  public void testKMeansHybridLloydMacQueen() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
     params.addParameter(KMeans.SEED_ID, 2);
-    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansElkan.class, params);
+    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansHybridLloydMacQueen.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
