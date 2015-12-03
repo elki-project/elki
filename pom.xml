@@ -23,7 +23,6 @@
 
 	<modules>
 		<module>elki</module>
-		<module>addons/tutorial</module>
 		<!-- Use PROFILES to enable further modules! -->
 	</modules>
 
@@ -230,6 +229,15 @@
 		<profile>
 			<id>svg</id>
 			<modules>
+				<module>addons/batikvis</module>
+			</modules>
+		</profile>
+		<!-- Tutorial code profile -->
+		<profile>
+			<id>tutorial</id>
+			<modules>
+				<module>addons/tutorial</module>
+				<!-- since tutorial users will want to see visualizations: -->
 				<module>addons/batikvis</module>
 			</modules>
 		</profile>
