@@ -1,5 +1,5 @@
 language: java
 install: mvn -Psvg,tutorial,svm -DskipTests=true -Dmaven.javadoc.skip=true -B -V clean install
-script: mvn -DskipTests=false -Dmaven.javadoc.skip=true -B -V test
+script: mvn -Pcodecov -DskipTests=false -Dmaven.javadoc.skip=true -B -V test
 before_install: pip install --user codecov
 after_success: codecov
