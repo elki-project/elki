@@ -35,11 +35,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Regression test for Elkan k-means.
+ * Regression test for batched Lloyd k-means.
  *
  * @author Erich Schubert
  */
-public class TestKMeansElkan extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestKMeansBatchedLloyd extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.
@@ -47,14 +47,16 @@ public class TestKMeansElkan extends AbstractSimpleAlgorithmTest implements JUni
    * @throws ParameterException
    */
   @Test
-  public void testKMeansElkan() {
+  public void testKMeansBatchedLloyd() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
     params.addParameter(KMeans.SEED_ID, 2);
-    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansElkan.class, params);
+    params.addParameter(KMeansBatchedLloyd.Parameterizer.BLOCKS_ID, 10);
+    params.addParameter(KMeansBatchedLloyd.Parameterizer.RANDOM_ID, 0);
+    AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBatchedLloyd.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
