@@ -34,27 +34,28 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Tests the LOCI algorithm.
+ * Tests the ALOCI algorithm.
  *
  * @author Lucia Cichella
  */
-public class TestLOCI extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class TestALOCI extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
   public void testLOCI() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(LOCI.Parameterizer.RMAX_ID, 0.5);
+    params.addParameter(ALOCI.Parameterizer.SEED_ID, 0);
+    params.addParameter(ALOCI.Parameterizer.GRIDS_ID, 3);
 
     // setup Algorithm
-    LOCI<DoubleVector> loci = ClassGenericsUtil.parameterizeOrAbort(LOCI.class, params);
+    ALOCI<DoubleVector> aloci = ClassGenericsUtil.parameterizeOrAbort(ALOCI.class, params);
     testParameterizationOk(params);
 
     // run LOCI on database
-    OutlierResult result = loci.run(db);
+    OutlierResult result = aloci.run(db);
 
-    testAUC(db, "Noise", result, 0.982444);
-    testSingleScore(result, 146, 3.8054382);
+    testAUC(db, "Noise", result, 0.77011111);
+    testSingleScore(result, 146, 1.1242238186577);
   }
 }

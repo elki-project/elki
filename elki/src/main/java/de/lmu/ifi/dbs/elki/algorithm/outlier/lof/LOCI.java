@@ -63,48 +63,38 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Fast Outlier Detection Using the "Local Correlation Integral".
- * 
+ *
  * Exact implementation only, not aLOCI. See {@link ALOCI}.
- * 
+ *
  * Outlier detection using multiple epsilon neighborhoods.
- * 
+ *
  * This implementation has O(n<sup>3</sup> log n) runtime complexity!
- * 
- * Based on: S. Papadimitriou, H. Kitagawa, P. B. Gibbons and C. Faloutsos:
- * LOCI: Fast Outlier Detection Using the Local Correlation Integral. In: Proc.
- * 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003.
- * 
+ *
+ * Reference:
+ * <p>
+ * S. Papadimitriou, H. Kitagawa, P. B. Gibbons and C. Faloutsos: <br />
+ * LOCI: Fast Outlier Detection Using the Local Correlation Integral. <br />
+ * In: Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)
+ * </p>
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has RangeQuery
- * 
+ *
  * @param <O> Object type
  */
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
-@Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
+@Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", //
+title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", //
+booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)", //
+url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI" })
 public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(LOCI.class);
-
-  /**
-   * Parameter to specify the maximum radius of the neighborhood to be
-   * considered, must be suitable to the distance function specified.
-   */
-  public static final OptionID RMAX_ID = new OptionID("loci.rmax", "The maximum radius of the neighborhood to be considered.");
-
-  /**
-   * Parameter to specify the minimum neighborhood size
-   */
-  public static final OptionID NMIN_ID = new OptionID("loci.nmin", "Minimum neighborhood size to be considered.");
-
-  /**
-   * Parameter to specify the averaging neighborhood scaling.
-   */
-  public static final OptionID ALPHA_ID = new OptionID("loci.alpha", "Scaling factor for averaging neighborhood");
 
   /**
    * Holds the value of {@link #RMAX_ID}.
@@ -123,7 +113,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param rmax Maximum radius
    * @param nmin Minimum neighborhood size
@@ -138,7 +128,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param database Database to process
    * @param relation Relation to process
    * @return Outlier result
@@ -228,7 +218,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Preprocessing step: determine the radii of interest for each point.
-   * 
+   *
    * @param ids IDs to process
    * @param rangeQuery Range query
    * @param interestingDistances Distances of interest
@@ -284,7 +274,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Array of double-int values.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.exclude
@@ -307,7 +297,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     /**
      * Constructor.
-     * 
+     *
      * @param alloc Initial allocation.
      */
     public DoubleIntArrayList(int alloc) {
@@ -318,7 +308,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     /**
      * Collection size.
-     * 
+     *
      * @return Size
      */
     public int size() {
@@ -327,7 +317,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     /**
      * Get the key at the given position.
-     * 
+     *
      * @param i Position
      * @return Key
      */
@@ -337,7 +327,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     /**
      * Get the value at the given position.
-     * 
+     *
      * @param i Position
      * @return Value
      */
@@ -347,7 +337,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     /**
      * Get the value at the given position.
-     * 
+     *
      * @param i Position
      * @param val New value
      */
@@ -357,7 +347,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     /**
      * Append a key-value pair.
-     * 
+     *
      * @param key Key to append
      * @param val Value to append.
      */
@@ -373,7 +363,7 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
     /**
      * Find the last position with a smaller or equal key.
-     * 
+     *
      * @param search Key
      * @return Position
      */
@@ -412,14 +402,30 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+    /**
+     * Parameter to specify the maximum radius of the neighborhood to be
+     * considered, must be suitable to the distance function specified.
+     */
+    public static final OptionID RMAX_ID = new OptionID("loci.rmax", "The maximum radius of the neighborhood to be considered.");
+
+    /**
+     * Parameter to specify the minimum neighborhood size
+     */
+    public static final OptionID NMIN_ID = new OptionID("loci.nmin", "Minimum neighborhood size to be considered.");
+
+    /**
+     * Parameter to specify the averaging neighborhood scaling.
+     */
+    public static final OptionID ALPHA_ID = new OptionID("loci.alpha", "Scaling factor for averaging neighborhood");
+
     protected double rmax;
 
     protected int nmin = 0;
