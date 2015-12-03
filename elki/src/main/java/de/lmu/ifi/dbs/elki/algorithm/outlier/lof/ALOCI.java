@@ -67,27 +67,29 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Fast Outlier Detection Using the "approximate Local Correlation Integral".
- * 
+ *
  * Outlier detection using multiple epsilon neighborhoods.
- * 
+ *
  * Reference:
  * <p>
- * S. Papadimitriou, H. Kitagawa, P. B. Gibbons and C. Faloutsos:<br />
- * LOCI: Fast Outlier Detection Using the Local Correlation Integral.<br />
- * In: Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore,
- * India, 2003.
+ * S. Papadimitriou, H. Kitagawa, P. B. Gibbons and C. Faloutsos: <br />
+ * LOCI: Fast Outlier Detection Using the Local Correlation Integral. <br />
+ * In: Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)
  * </p>
- * 
+ *
  * @author Jonathan von Brünken
  * @author Erich Schubert
- * 
+ *
  * @apiviz.composedOf ALOCIQuadTree
- * 
+ *
  * @param <O> Object type
  */
 @Title("LOCI: Fast Outlier Detection Using the Local Correlation Integral")
 @Description("Algorithm to compute outliers based on the Local Correlation Integral")
-@Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03), Bangalore, India, 2003", url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
+@Reference(authors = "S. Papadimitriou, H. Kitagawa, P. B. Gibbons, C. Faloutsos", //
+title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", //
+booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)", //
+url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
 public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -121,7 +123,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param nmin Minimum neighborhood size
    * @param alpha Alpha value
@@ -246,10 +248,10 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
   /**
    * Method for the MDEF calculation
-   * 
+   *
    * @param sn Sampling Neighborhood
    * @param cg Counting Neighborhood
-   * 
+   *
    * @return MDEF norm
    */
   private static double calculate_MDEF_norm(Node sn, Node cg) {
@@ -294,13 +296,13 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
   /**
    * Simple quadtree for ALOCI. Not storing the actual objects, just the counts.
-   * 
+   *
    * Furthermore, the quadtree can be shifted by a specified vector, wrapping
    * around min/max
-   * 
+   *
    * @author Jonathan von Brünken
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.composedOf Node
    */
   static class ALOCIQuadTree {
@@ -326,7 +328,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
     /**
      * Constructor.
-     * 
+     *
      * @param min Minimum coordinates
      * @param max Maximum coordinates
      * @param shift Tree shift offset
@@ -364,7 +366,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
     /**
      * Bulk load the tree
-     * 
+     *
      * @param lmin Subtree minimum (unshifted, will be modified)
      * @param lmax Subtree maximum (unshifted, will be modified)
      * @param children List of children for current parent
@@ -461,7 +463,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
     /**
      * Shift and wrap a single dimension.
-     * 
+     *
      * @param obj Object
      * @param dim Dimension
      * @param level Level (controls scaling/wraping!)
@@ -476,7 +478,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     /**
      * Find the closest node (of depth tlevel or above, if there is no node at
      * this depth) for the given vector.
-     * 
+     *
      * @param vec Query vector
      * @param tlevel Target level
      * @return Node
@@ -511,7 +513,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
   /**
    * Node of the ALOCI Quadtree
-   * 
+   *
    * @author Erich Schubert
    */
   static class Node {
@@ -547,7 +549,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
     /**
      * Constructor.
-     * 
+     *
      * @param code Node code
      * @param center Center vector
      * @param count Element count
@@ -569,7 +571,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
     /**
      * Get level of node.
-     * 
+     *
      * @return Level of node
      */
     public int getLevel() {
@@ -578,7 +580,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
     /**
      * Get count of subtree
-     * 
+     *
      * @return subtree count
      */
     public int getCount() {
@@ -587,7 +589,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
     /**
      * Return center vector
-     * 
+     *
      * @return center vector
      */
     public Vector getCenter() {
@@ -596,7 +598,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
     /**
      * Get sum of squares, recursively
-     * 
+     *
      * @param levels Depth to collect
      * @return Sum of squares
      */
@@ -613,7 +615,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
     /**
      * Get cubic sum.
-     * 
+     *
      * @param levels Level to collect
      * @return sum of cubes
      */
@@ -631,9 +633,9 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
