@@ -38,14 +38,14 @@ import org.junit.Test;
 /**
  * Unit test to ensure that our heap is not significantly worse than SUN javas
  * regular PriorityQueue.
- * 
+ *
  * @author Erich Schubert
  */
 public class TestHeapPerformance {
   final private int queueSize = 200000;
 
   final private int preiterations = 20;
-  
+
   final private int iterations = 200;
 
   final private long seed = 123456L;
@@ -93,8 +93,8 @@ public class TestHeapPerformance {
     long htime = System.nanoTime() - hstart;
 
     System.err.println("Heap performance test: us: " + htime*1E-9 + " java: " + pqtime*1E-9);
-    assertTrue("Heap performance regression - run test individually, since the hotspot optimizations may make the difference! " + htime + " >>= " + pqtime, htime < 1.05 * pqtime);
-    // 1.05 allows some difference in measuring
+    assertTrue("Heap performance regression - run test individually, since the hotspot optimizations may make the difference! " + htime + " >>= " + pqtime, htime < 1.1 * pqtime);
+    // 1.1 allows some difference in measuring, which can occur e.g. due to Jacoco instrumentation
   }
 
   private void testHeap(final List<Integer> elements, ComparableMinHeap<Integer> pq) {
