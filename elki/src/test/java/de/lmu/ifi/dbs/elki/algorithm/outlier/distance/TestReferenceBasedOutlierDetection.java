@@ -31,12 +31,17 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
+import de.lmu.ifi.dbs.elki.utilities.referencepoints.AxisBasedReferencePoints;
 import de.lmu.ifi.dbs.elki.utilities.referencepoints.GridBasedReferencePoints;
+import de.lmu.ifi.dbs.elki.utilities.referencepoints.RandomGeneratedReferencePoints;
+import de.lmu.ifi.dbs.elki.utilities.referencepoints.RandomSampleReferencePoints;
+import de.lmu.ifi.dbs.elki.utilities.referencepoints.StarBasedReferencePoints;
 
 /**
  * Tests the ReferenceBasedOutlierDetection algorithm.
  *
  * @author Lucia Cichella
+ * @author Erich Schubert
  */
 public class TestReferenceBasedOutlierDetection extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
@@ -57,5 +62,89 @@ public class TestReferenceBasedOutlierDetection extends AbstractSimpleAlgorithmT
 
     testAUC(db, "Noise", result, 0.9693703703703);
     testSingleScore(result, 945, 0.933574455);
+  }
+
+  @Test
+  public void testReferenceBasedOutlierDetectionStar() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
+
+    // Parameterization
+    ListParameterization params = new ListParameterization();
+    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11);
+    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, StarBasedReferencePoints.class);
+
+    // setup Algorithm
+    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
+    testParameterizationOk(params);
+
+    // run ReferenceBasedOutlierDetection on database
+    OutlierResult result = referenceBasedOutlierDetection.run(db);
+
+    testAUC(db, "Noise", result, 0.910722222);
+    testSingleScore(result, 945, 0.920950222);
+  }
+
+  @Test
+  public void testReferenceBasedOutlierDetectionAxis() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
+
+    // Parameterization
+    ListParameterization params = new ListParameterization();
+    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11);
+    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, AxisBasedReferencePoints.class);
+
+    // setup Algorithm
+    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
+    testParameterizationOk(params);
+
+    // run ReferenceBasedOutlierDetection on database
+    OutlierResult result = referenceBasedOutlierDetection.run(db);
+
+    testAUC(db, "Noise", result, 0.8110555);
+    testSingleScore(result, 945, 0.9523053);
+  }
+
+  @Test
+  public void testReferenceBasedOutlierDetectionGenerated() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
+
+    // Parameterization
+    ListParameterization params = new ListParameterization();
+    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11);
+    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, RandomGeneratedReferencePoints.class);
+    params.addParameter(RandomGeneratedReferencePoints.Parameterizer.N_ID, 15);
+    params.addParameter(RandomGeneratedReferencePoints.Parameterizer.RANDOM_ID, 0);
+
+    // setup Algorithm
+    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
+    testParameterizationOk(params);
+
+    // run ReferenceBasedOutlierDetection on database
+    OutlierResult result = referenceBasedOutlierDetection.run(db);
+
+    testAUC(db, "Noise", result, 0.817407407);
+    testSingleScore(result, 945, 0.911353060);
+  }
+
+  @Test
+  public void testReferenceBasedOutlierDetectionSample() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);
+
+    // Parameterization
+    ListParameterization params = new ListParameterization();
+    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.K_ID, 11);
+    params.addParameter(ReferenceBasedOutlierDetection.Parameterizer.REFP_ID, RandomSampleReferencePoints.class);
+    params.addParameter(RandomSampleReferencePoints.Parameterizer.N_ID, 15);
+    params.addParameter(RandomSampleReferencePoints.Parameterizer.RANDOM_ID, 0);
+
+    // setup Algorithm
+    ReferenceBasedOutlierDetection referenceBasedOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(ReferenceBasedOutlierDetection.class, params);
+    testParameterizationOk(params);
+
+    // run ReferenceBasedOutlierDetection on database
+    OutlierResult result = referenceBasedOutlierDetection.run(db);
+
+    testAUC(db, "Noise", result, 0.848472222);
+    testSingleScore(result, 945, 0.894389944);
   }
 }

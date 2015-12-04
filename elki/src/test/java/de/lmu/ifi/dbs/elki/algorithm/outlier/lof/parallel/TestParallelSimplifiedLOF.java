@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
+package de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel;
 
 /*
  This file is part of ELKI:
@@ -27,43 +27,35 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
-import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Performs a full EM run, and compares the result with a clustering derived
- * from the data set labels. This test ensures that EM's performance doesn't
- * unexpectedly drop on this data set (and also ensures that the algorithms
- * work, as a side effect).
- * 
- * @author Katharina Rausch
+ * Regression tests the parallel SimplifiedLOF algorithm.
+ *
  * @author Erich Schubert
  */
-public class TestEMResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
-  /**
-   * Run EM with fixed parameters and compare the result to a golden standard.
-   * 
-   * @throws ParameterException
-   */
+public class TestParallelSimplifiedLOF extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test
-  public void testEMResults() {
-    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);
+  public void testParallelSimplifiedLOF() {
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);
 
-    // Setup algorithm
+    // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.SEED_ID, 0);
-    params.addParameter(EM.Parameterizer.K_ID, 6);
-    EM<DoubleVector, ?> em = ClassGenericsUtil.parameterizeOrAbort(EM.class, params);
+    params.addParameter(LOF.Parameterizer.K_ID, 10);
+
+    // setup Algorithm
+    ParallelSimplifiedLOF<DoubleVector> lof = ClassGenericsUtil.parameterizeOrAbort(ParallelSimplifiedLOF.class, params);
     testParameterizationOk(params);
 
-    // run EM on database
-    Clustering<?> result = em.run(db);
-    testFMeasure(db, result, 0.781737);
-    testClusterSizes(result, new int[] { 2, 5, 17, 175, 200, 311 });
+    // run LOF on database
+    OutlierResult result = lof.run(db);
+
+    testAUC(db, "Noise", result, 0.8892549019);
+    testSingleScore(result, 1293, 1.3025894);
   }
 }
