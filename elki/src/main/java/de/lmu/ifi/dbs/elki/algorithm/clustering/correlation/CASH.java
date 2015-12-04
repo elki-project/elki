@@ -116,54 +116,6 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   private static final Logging LOG = Logging.getLogger(CASH.class);
 
   /**
-   * Parameter to specify the threshold for minimum number of points in a
-   * cluster, must be an integer greater than 0.
-   * <p>
-   * Key: {@code -cash.minpts}
-   * </p>
-   */
-  public static final OptionID MINPTS_ID = new OptionID("cash.minpts", "Threshold for minimum number of points in a cluster.");
-
-  /**
-   * Parameter to specify the maximum level for splitting the hypercube, must be
-   * an integer greater than 0.
-   * <p>
-   * Key: {@code -cash.maxlevel}
-   * </p>
-   */
-  public static final OptionID MAXLEVEL_ID = new OptionID("cash.maxlevel", "The maximum level for splitting the hypercube.");
-
-  /**
-   * Parameter to specify the minimum dimensionality of the subspaces to be
-   * found, must be an integer greater than 0.
-   * <p>
-   * Default value: {@code 1}
-   * </p>
-   * <p>
-   * Key: {@code -cash.mindim}
-   * </p>
-   */
-  public static final OptionID MINDIM_ID = new OptionID("cash.mindim", "The minimum dimensionality of the subspaces to be found.");
-
-  /**
-   * Parameter to specify the maximum jitter for distance values, must be a
-   * double greater than 0.
-   * <p>
-   * Key: {@code -cash.jitter}
-   * </p>
-   */
-  public static final OptionID JITTER_ID = new OptionID("cash.jitter", "The maximum jitter for distance values.");
-
-  /**
-   * Flag to indicate that an adjustment of the applied heuristic for choosing
-   * an interval is performed after an interval is selected.
-   * <p>
-   * Key: {@code -cash.adjust}
-   * </p>
-   */
-  public static final OptionID ADJUST_ID = new OptionID("cash.adjust", "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " + "is performed after an interval is selected.");
-
-  /**
    * Holds the value of {@link #MINPTS_ID}.
    */
   private int minPts;
@@ -711,7 +663,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     // set the parameters
     ListParameterization parameters = new ListParameterization();
     parameters.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
-    parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
+    parameters.addParameter(FirstNEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
     DependencyDerivator<DoubleVector> derivator = null;
     Class<DependencyDerivator<DoubleVector>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
     derivator = parameters.tryInstantiate(cls);
@@ -784,7 +736,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
       ListParameterization parameters = new ListParameterization();
       parameters.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
-      parameters.addParameter(FirstNEigenPairFilter.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
+      parameters.addParameter(FirstNEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
       DependencyDerivator<DoubleVector> derivator = null;
       Class<DependencyDerivator<DoubleVector>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
       derivator = parameters.tryInstantiate(cls);
@@ -841,6 +793,54 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the threshold for minimum number of points in a
+     * cluster, must be an integer greater than 0.
+     * <p>
+     * Key: {@code -cash.minpts}
+     * </p>
+     */
+    public static final OptionID MINPTS_ID = new OptionID("cash.minpts", "Threshold for minimum number of points in a cluster.");
+
+    /**
+     * Parameter to specify the maximum level for splitting the hypercube, must be
+     * an integer greater than 0.
+     * <p>
+     * Key: {@code -cash.maxlevel}
+     * </p>
+     */
+    public static final OptionID MAXLEVEL_ID = new OptionID("cash.maxlevel", "The maximum level for splitting the hypercube.");
+
+    /**
+     * Parameter to specify the minimum dimensionality of the subspaces to be
+     * found, must be an integer greater than 0.
+     * <p>
+     * Default value: {@code 1}
+     * </p>
+     * <p>
+     * Key: {@code -cash.mindim}
+     * </p>
+     */
+    public static final OptionID MINDIM_ID = new OptionID("cash.mindim", "The minimum dimensionality of the subspaces to be found.");
+
+    /**
+     * Parameter to specify the maximum jitter for distance values, must be a
+     * double greater than 0.
+     * <p>
+     * Key: {@code -cash.jitter}
+     * </p>
+     */
+    public static final OptionID JITTER_ID = new OptionID("cash.jitter", "The maximum jitter for distance values.");
+
+    /**
+     * Flag to indicate that an adjustment of the applied heuristic for choosing
+     * an interval is performed after an interval is selected.
+     * <p>
+     * Key: {@code -cash.adjust}
+     * </p>
+     */
+    public static final OptionID ADJUST_ID = new OptionID("cash.adjust", "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " + "is performed after an interval is selected.");
+
     protected int minpts;
 
     protected int maxlevel;

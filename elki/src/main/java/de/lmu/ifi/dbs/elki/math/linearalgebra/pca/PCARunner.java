@@ -53,18 +53,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 public class PCARunner {
   /**
-   * Parameter to specify the class to compute the covariance matrix, must be a
-   * subclass of {@link CovarianceMatrixBuilder}.
-   * <p>
-   * Default value: {@link CovarianceMatrixBuilder}
-   * </p>
-   * <p>
-   * Key: {@code -pca.covariance}
-   * </p>
-   */
-  public static final OptionID PCA_COVARIANCE_MATRIX = new OptionID("pca.covariance", "Class used to compute the covariance matrix.");
-
-  /**
    * The covariance computation class.
    */
   protected CovarianceMatrixBuilder covarianceMatrixBuilder;
@@ -160,6 +148,17 @@ public class PCARunner {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the class to compute the covariance matrix, must be a
+     * subclass of {@link CovarianceMatrixBuilder}.
+     * <p>
+     * Default value: {@link CovarianceMatrixBuilder}
+     * </p>
+     * <p>
+     * Key: {@code -pca.covariance}
+     * </p>
+     */
+    public static final OptionID PCA_COVARIANCE_MATRIX = new OptionID("pca.covariance", "Class used to compute the covariance matrix.");
     /**
      * The covariance computation class.
      */

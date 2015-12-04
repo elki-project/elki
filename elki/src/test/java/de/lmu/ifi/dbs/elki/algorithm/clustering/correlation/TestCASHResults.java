@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * from the data set labels. This test ensures that CASH performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
- * 
+ *
  * @author Erich Schubert
  * @author Katharina Rausch
  */
@@ -54,10 +54,10 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
 
     // CASH parameters
     ListParameterization params = new ListParameterization();
-    params.addParameter(CASH.JITTER_ID, 0.7);
-    params.addParameter(CASH.MINPTS_ID, 50);
-    params.addParameter(CASH.MAXLEVEL_ID, 25);
-    params.addFlag(CASH.ADJUST_ID);
+    params.addParameter(CASH.Parameterizer.JITTER_ID, 0.7);
+    params.addParameter(CASH.Parameterizer.MINPTS_ID, 50);
+    params.addParameter(CASH.Parameterizer.MAXLEVEL_ID, 25);
+    params.addFlag(CASH.Parameterizer.ADJUST_ID);
 
     // setup algorithm
     CASH<DoubleVector> cash = ClassGenericsUtil.parameterizeOrAbort(CASH.class, params);
@@ -80,9 +80,9 @@ public class TestCASHResults extends AbstractSimpleAlgorithmTest implements JUni
 
     // CASH parameters
     ListParameterization params = new ListParameterization();
-    params.addParameter(CASH.JITTER_ID, 0.7);
-    params.addParameter(CASH.MINPTS_ID, 160);
-    params.addParameter(CASH.MAXLEVEL_ID, 40);
+    params.addParameter(CASH.Parameterizer.JITTER_ID, 0.7);
+    params.addParameter(CASH.Parameterizer.MINPTS_ID, 160);
+    params.addParameter(CASH.Parameterizer.MAXLEVEL_ID, 40);
 
     // setup algorithm
     CASH<DoubleVector> cash = ClassGenericsUtil.parameterizeOrAbort(CASH.class, params);

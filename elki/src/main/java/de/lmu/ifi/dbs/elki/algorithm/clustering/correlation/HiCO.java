@@ -74,11 +74,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * In: Proc. Int. Conf. on Scientific and Statistical Database Management
  * (SSDBM'06), Vienna, Austria, 2006.
  * </p>
- * 
+ *
  * @author Elke Achtert
- * 
+ *
  * @apiviz.composedOf HiCO.Instance
- * 
+ *
  * @param <V> the type of NumberVector handled by the algorithm
  */
 @Title("Mining Hierarchies of Correlation Clusters")
@@ -117,7 +117,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
   /**
    * Constructor.
-   * 
+   *
    * @param indexfactory Index factory
    * @param mu Mu parameter
    */
@@ -138,7 +138,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
   /**
    * Instance of the OPTICS algorithm.
-   * 
+   *
    * @author Erich Schubert
    *
    * @apiviz.uses FilteredLocalPCAIndex
@@ -275,7 +275,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
     /**
      * Sort new candidates by their distance, for determining the core size.
-     * 
+     *
      * @author Erich Schubert
      *
      * @apiviz.exclude
@@ -298,7 +298,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
   /**
    * Computes the correlation distance between the two subspaces defined by the
    * specified PCAs.
-   * 
+   *
    * @param pca1 first PCA
    * @param pca2 second PCA
    * @param dimensionality the dimensionality of the data space
@@ -370,7 +370,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * <code>v</code> at column <code>corrDim</code>. After insertion the matrix
    * <code>v</code> is orthonormalized and column <code>corrDim</code> of matrix
    * <code>e_czech</code> is set to the <code>corrDim</code>-th unit vector.
-   * 
+   *
    * @param v the orthonormal matrix of the eigenvectors
    * @param e_czech the selection matrix of the strong eigenvectors
    * @param vector the vector to be inserted
@@ -411,9 +411,9 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
@@ -421,7 +421,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
      * Parameter to specify the smoothing factor, must be an integer greater
      * than 0. The {link {@link #MU_ID}-nearest neighbor is used to compute the
      * correlation reachability of an object.
-     * 
+     *
      * <p>
      * Key: {@code -hico.mu}
      * </p>
@@ -515,7 +515,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       ListParameterization params = new ListParameterization();
       // preprocessor
       params.addParameter(KNNQueryFilteredPCAIndex.Factory.Parameterizer.K_ID, k);
-      params.addParameter(PercentageEigenPairFilter.ALPHA_ID, alpha);
+      params.addParameter(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, alpha);
 
       ChainedParameterization chain = new ChainedParameterization(params, config);
       chain.errorsTo(config);
