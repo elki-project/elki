@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.utilities.referencepoints;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -41,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
  * Reference points generated randomly within the used data space.
- * 
+ *
  * @author Erich Schubert
  */
 public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic {
@@ -62,7 +63,7 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
 
   /**
    * Constructor.
-   * 
+   *
    * @param samplesize Size of desired sample set
    * @param scale Scaling factor
    * @param rnd Random generator
@@ -86,14 +87,14 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
       mean[d] -= delta[d] * .5;
     }
 
+    Random rand = rnd.getSingleThreadedRandom();
     ArrayList<Vector> result = new ArrayList<>(samplesize);
     double[] vec = new double[dim];
     for(int i = 0; i < samplesize; i++) {
       for(int d = 0; d < dim; d++) {
-        vec[d] = mean[d] + (Math.random() - 0.5) * scale * delta[d];
+        vec[d] = mean[d] + (rand.nextDouble() - 0.5) * scale * delta[d];
       }
       Vector newp = new Vector(vec);
-      // logger.debug("New reference point: " + FormatUtil.format(vec));
       result.add(newp);
     }
 
@@ -102,9 +103,9 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
