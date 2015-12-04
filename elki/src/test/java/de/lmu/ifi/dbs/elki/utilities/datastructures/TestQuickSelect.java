@@ -24,8 +24,10 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import org.junit.Test;
@@ -107,6 +109,11 @@ public class TestQuickSelect implements JUnit4Test {
   public void testTies() {
     double data[] = new double[] { 0.1, 0.1, 0.9, 0.9, 0.5, 0.9, 0.1, 0.1, 0.1, 0.9, 0.9, 0.9, 0.9, 0.1, 0.1 };
     assertEquals("Full median incorrect.", 0.5, QuickSelect.median(data), Double.MIN_VALUE);
+    int half = data.length >> 1;
+    for (int i = 0; i < data.length; i++) {
+      assertTrue("Not partially sorted.", data[i] <= data[half] || i > half);
+      assertTrue("Not partially sorted.", data[i] >= data[half] || i < half);
+    }
   }
 
   @Test(timeout = 500)
@@ -116,5 +123,35 @@ public class TestQuickSelect implements JUnit4Test {
 
     // Run QuickSelect
     QuickSelect.median(data);
+    int half = data.length >> 1;
+    for (int i = 0; i < data.length; i++) {
+      assertTrue("Not partially sorted.", data[i] <= data[half] || i > half);
+      assertTrue("Not partially sorted.", data[i] >= data[half] || i < half);
+    }
   }
+
+  @Test
+  public void testTiesInteger() {
+    int data[] = new int[] { 1, 1, 9, 9, 5, 9, 1, 1, 1, 9, 9, 9, 9, 1, 1 };
+    final int half = data.length >> 1;
+    QuickSelect.quickSelect(data, QuickSelect.INTEGER_ADAPTER, 0, data.length, half);
+    for (int i = 0; i < data.length; i++) {
+      assertTrue("Not partially sorted.", data[i] <= data[half] || i > half);
+      assertTrue("Not partially sorted.", data[i] >= data[half] || i < half);
+    }
+    assertEquals("Full median incorrect.", 5, data[half]);
+  }
+
+  @Test
+  public void testTiesIntegerList() {
+    List<Integer> data = Arrays.asList(new Integer[] { 1, 1, 9, 9, 5, 9, 1, 1, 1, 9, 9, 9, 9, 1, 1 });
+    final int half = data.size() >> 1;
+    QuickSelect.quickSelect(data, half);
+    for (int i = 0; i < data.size(); i++) {
+      assertTrue("Not partially sorted.", data.get(i) <= data.get(half) || i > half);
+      assertTrue("Not partially sorted.", data.get(i) >= data.get(half) || i < half);
+    }
+    assertEquals("Full median incorrect.", 5, data.get(half).intValue());
+  }
+
 }
