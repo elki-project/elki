@@ -46,47 +46,42 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * gives better results when clusters of different dimensionality exist, since
  * different percentage alpha levels might be appropriate for different
  * dimensionalities.
- * 
+ *
  * Example calculations of alpha levels:
- * 
+ *
  * In a 3D space, a progressive alpha value of 0.5 equals:
- * 
+ *
  * - 1D subspace: 50 % + 1/3 of remainder = 0.667
- * 
+ *
  * - 2D subspace: 50 % + 2/3 of remainder = 0.833
- * 
+ *
  * In a 4D space, a progressive alpha value of 0.5 equals:
- * 
+ *
  * - 1D subspace: 50% + 1/4 of remainder = 0.625
- * 
+ *
  * - 2D subspace: 50% + 2/4 of remainder = 0.750
- * 
+ *
  * - 3D subspace: 50% + 3/4 of remainder = 0.875
- * 
+ *
  * Reasoning why this improves over PercentageEigenPairFilter:
- * 
+ *
  * In a 100 dimensional space, a single Eigenvector representing over 85% of the
  * total variance is highly significant, whereas the strongest 85 Eigenvectors
  * together will by definition always represent at least 85% of the variance.
  * PercentageEigenPairFilter can thus not be used with these parameters and
  * detect both dimensionalities correctly.
- * 
+ *
  * The second parameter introduced here, walpha, serves a different function: It
  * prevents the eigenpair filter to use a statistically weak Eigenvalue just to
  * reach the intended level, e.g. 84% + 1% >= 85% when 1% is statistically very
  * weak.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  */
 @Title("Progressive Eigenpair Filter")
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns the first eigenpairs, whose sum of eigenvalues explains more than the a certain percentage of the unexpected variance, where the percentage increases with subspace dimensionality.")
 public class ProgressiveEigenPairFilter implements EigenPairFilter {
-  /**
-   * Parameter progressive alpha.
-   */
-  public static final OptionID EIGENPAIR_FILTER_PALPHA = new OptionID("pca.filter.progressivealpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
-
   /**
    * The default value for alpha.
    */
@@ -110,7 +105,7 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
 
   /**
    * Constructor.
-   * 
+   *
    * @param palpha palpha
    * @param walpha walpha
    */
@@ -177,12 +172,17 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter progressive alpha.
+     */
+    public static final OptionID EIGENPAIR_FILTER_PALPHA = new OptionID("pca.filter.progressivealpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
+
     /**
      * The threshold for strong eigenvectors: the strong eigenvectors explain a
      * portion of at least alpha of the total variance.
@@ -204,7 +204,7 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
         palpha = palphaP.getValue();
       }
 
-      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
+      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
       walphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(walphaP)) {
         walpha = walphaP.getValue();

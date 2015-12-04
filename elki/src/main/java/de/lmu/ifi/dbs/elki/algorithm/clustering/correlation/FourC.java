@@ -47,19 +47,19 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 4C identifies local subgroups of data objects sharing a uniform correlation.
  * The algorithm is based on a combination of PCA and density-based clustering
  * (DBSCAN).
- * 
+ *
  * Reference:
  * <p>
  * C. Böhm, K. Kailing, P. Kröger, A. Zimek:<br />
  * Computing Clusters of Correlation Connected Objects. <br>
  * In Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004.
  * </p>
- * 
+ *
  * @author Arthur Zimek
- * 
+ *
  * @apiviz.composedOf FourCNeighborPredicate
  * @apiviz.composedOf FourCCorePredicate
- * 
+ *
  * @param <V> type of NumberVector handled by this Algorithm
  */
 @Title("4C: Computing Correlation Connected Clusters")
@@ -77,7 +77,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
 
   /**
    * Constructor.
-   * 
+   *
    * @param settings FourC settings.
    */
   public FourC(FourC.Settings settings) {
@@ -96,9 +96,9 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
 
   /**
    * Class wrapping the 4C parameter settings.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Settings {
@@ -135,9 +135,9 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
 
     /**
      * Parameterization class for 4C settings.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer extends AbstractParameterizer {
@@ -178,7 +178,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
 
       /**
        * Configure the epsilon radius parameter.
-       * 
+       *
        * @param config Parameter source
        */
       protected void configEpsilon(Parameterization config) {
@@ -191,7 +191,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
 
       /**
        * Configure the minPts aka "mu" parameter.
-       * 
+       *
        * @param config Parameter source
        */
       protected void configMinPts(Parameterization config) {
@@ -204,18 +204,18 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
 
       /**
        * Configure the delta parameter.
-       * 
+       *
        * @param config Parameter source
        */
       protected void configDelta(Parameterization config) {
         // Flag for using absolute variances
-        Flag absoluteF = new Flag(LimitEigenPairFilter.EIGENPAIR_FILTER_ABSOLUTE);
+        Flag absoluteF = new Flag(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_ABSOLUTE);
         if(config.grab(absoluteF)) {
           settings.absolute = absoluteF.isTrue();
         }
 
         // Parameter delta
-        DoubleParameter deltaP = new DoubleParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA) //
+        DoubleParameter deltaP = new DoubleParameter(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA) //
         .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
         if(!settings.absolute) {
           deltaP.setDefaultValue(DEFAULT_DELTA);
@@ -230,7 +230,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
 
       /**
        * Configure the kappa parameter.
-       * 
+       *
        * @param config Parameter source
        */
       protected void configKappa(Parameterization config) {
@@ -244,7 +244,7 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
 
       /**
        * Configure the delta parameter.
-       * 
+       *
        * @param config Parameter source
        */
       protected void configLambda(Parameterization config) {
@@ -265,9 +265,9 @@ public class FourC<V extends NumberVector> extends GeneralizedDBSCAN {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {

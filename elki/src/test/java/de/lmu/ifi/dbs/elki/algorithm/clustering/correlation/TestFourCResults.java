@@ -42,14 +42,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * the data set labels. This test ensures that 4C performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
- * 
+ *
  * @author Erich Schubert
  * @author Katharina Rausch
  */
 public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Run 4F with fixed parameters and compare the result to a golden standard.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test
@@ -60,7 +60,7 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
     ListParameterization params = new ListParameterization();
     params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 0.30);
     params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 50);
-    params.addParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, 0.5);
+    params.addParameter(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA, 0.5);
     params.addParameter(FourC.Settings.Parameterizer.LAMBDA_ID, 1);
 
     FourC<DoubleVector> fourc = ClassGenericsUtil.parameterizeOrAbort(FourC.class, params);
@@ -75,7 +75,7 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
 
   /**
    * Run ERiC with fixed parameters and compare the result to a golden standard.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test
@@ -87,7 +87,7 @@ public class TestFourCResults extends AbstractSimpleAlgorithmTest implements JUn
     // 4C
     params.addParameter(DBSCAN.Parameterizer.EPSILON_ID, 3);
     params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 50);
-    params.addParameter(LimitEigenPairFilter.EIGENPAIR_FILTER_DELTA, 0.5);
+    params.addParameter(LimitEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_DELTA, 0.5);
     params.addParameter(FourC.Settings.Parameterizer.LAMBDA_ID, 3);
 
     FourC<DoubleVector> fourc = ClassGenericsUtil.parameterizeOrAbort(FourC.class, params);

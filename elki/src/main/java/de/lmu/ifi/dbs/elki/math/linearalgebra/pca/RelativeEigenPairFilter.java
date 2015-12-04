@@ -55,11 +55,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is " + "above the average ('expected') eigenvalue of the remaining eigenvectors.")
 public class RelativeEigenPairFilter implements EigenPairFilter {
   /**
-   * Parameter relative alpha.
-   */
-  public static final OptionID EIGENPAIR_FILTER_RALPHA = new OptionID("pca.filter.relativealpha", "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + "the given share of the statistical average variance is considered weak.");
-
-  /**
    * The default value for ralpha.
    */
   public static final double DEFAULT_RALPHA = 1.1;
@@ -123,6 +118,10 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter relative alpha.
+     */
+    public static final OptionID EIGENPAIR_FILTER_RALPHA = new OptionID("pca.filter.relativealpha", "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + "the given share of the statistical average variance is considered weak.");
     protected double ralpha;
 
     @Override

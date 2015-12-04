@@ -53,11 +53,6 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
   private static final Logging LOG = Logging.getLogger(FirstNEigenPairFilter.class);
 
   /**
-   * Paremeter n
-   */
-  public static final OptionID EIGENPAIR_FILTER_N = new OptionID("pca.filter.n", "The number of strong eigenvectors: n eigenvectors with the n highest" + "eigenvalues are marked as strong eigenvectors.");
-
-  /**
    * The threshold for strong eigenvectors: n eigenvectors with the n highest
    * eigenvalues are marked as strong eigenvectors.
    */
@@ -113,6 +108,10 @@ public class FirstNEigenPairFilter implements EigenPairFilter {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Paremeter n
+     */
+    public static final OptionID EIGENPAIR_FILTER_N = new OptionID("pca.filter.n", "The number of strong eigenvectors: n eigenvectors with the n highest" + "eigenvalues are marked as strong eigenvectors.");
     /**
      * The number of eigenpairs to keep.
      */

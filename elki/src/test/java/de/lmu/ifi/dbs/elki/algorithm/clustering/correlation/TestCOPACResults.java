@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * from the data set labels. This test ensures that COPAC performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
- * 
+ *
  * @author Erich Schubert
  * @author Katharina Rausch
  */
@@ -54,7 +54,7 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
   /**
    * Run COPAC with fixed parameters and compare the result to a golden
    * standard.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test
@@ -80,7 +80,7 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
   /**
    * Run COPAC with fixed parameters and compare the result to a golden
    * standard.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test
@@ -93,10 +93,10 @@ public class TestCOPACResults extends AbstractSimpleAlgorithmTest implements JUn
     params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 20);
     params.addParameter(COPAC.Settings.Parameterizer.K_ID, 45);
     // PCA
-    params.addParameter(PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
-    params.addParameter(WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class);
+    params.addParameter(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
+    params.addParameter(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class);
     params.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
-    params.addParameter(PercentageEigenPairFilter.ALPHA_ID, 0.8);
+    params.addParameter(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, 0.8);
 
     COPAC<DoubleVector> copac = ClassGenericsUtil.parameterizeOrAbort(COPAC.class, params);
     testParameterizationOk(params);

@@ -54,18 +54,6 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
   private static final Logging LOG = Logging.getLogger(PercentageEigenPairFilter.class);
 
   /**
-   * The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain
-   * a portion of at least alpha of the total variance.
-   * <p>
-   * Default value: {@link #DEFAULT_ALPHA}
-   * </p>
-   * <p>
-   * Key: {@code -pca.filter.alpha}
-   * </p>
-   */
-  public static final OptionID ALPHA_ID = new OptionID("pca.filter.alpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
-
-  /**
    * The default value for alpha.
    */
   public static final double DEFAULT_ALPHA = 0.85;
@@ -144,6 +132,17 @@ public class PercentageEigenPairFilter implements EigenPairFilter {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The threshold for 'strong' eigenvectors: the 'strong' eigenvectors explain
+     * a portion of at least alpha of the total variance.
+     * <p>
+     * Default value: {@link #DEFAULT_ALPHA}
+     * </p>
+     * <p>
+     * Key: {@code -pca.filter.alpha}
+     * </p>
+     */
+    public static final OptionID ALPHA_ID = new OptionID("pca.filter.alpha", "The share (0.0 to 1.0) of variance that needs to be explained by the 'strong' eigenvectors." + "The filter class will choose the number of strong eigenvectors by this share.");
     /**
      * The threshold for strong eigenvectors: the strong eigenvectors explain a
      * portion of at least alpha of the total variance.

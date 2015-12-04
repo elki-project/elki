@@ -73,17 +73,6 @@ booktitle = "Proceedings of the 20th International Conference on Scientific and 
 url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
 public class WeightedCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuilder {
   /**
-   * Parameter to specify the weight function to use in weighted PCA, must
-   * implement
-   * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction}
-   * .
-   * <p>
-   * Key: {@code -pca.weight}
-   * </p>
-   */
-  public static final OptionID WEIGHT_ID = new OptionID("pca.weight", "Weight function to use in weighted PCA.");
-
-  /**
    * Holds the weight function.
    */
   protected WeightFunction weightfunction;
@@ -204,6 +193,16 @@ public class WeightedCovarianceMatrixBuilder extends AbstractCovarianceMatrixBui
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the weight function to use in weighted PCA, must
+     * implement
+     * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction}
+     * .
+     * <p>
+     * Key: {@code -pca.weight}
+     * </p>
+     */
+    public static final OptionID WEIGHT_ID = new OptionID("pca.weight", "Weight function to use in weighted PCA.");
     /**
      * Weight function.
      */

@@ -37,15 +37,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 /**
  * The "drop" filter looks for the largest drop in normalized relative
  * eigenvalues.
- * 
+ *
  * Let s_1 .. s_n be the eigenvalues.
- * 
+ *
  * Let a_k := 1/(n-k) sum_{i=k..n} s_i
- * 
+ *
  * Then r_k := s_k / a_k is the relative eigenvalue.
- * 
+ *
  * The drop filter searches for argmax_k r_k / r_{k+1}
- * 
+ *
  * @author Erich Schubert
  */
 @Title("Drop EigenPair Filter")
@@ -63,7 +63,7 @@ public class DropEigenPairFilter implements EigenPairFilter {
 
   /**
    * Constructor.
-   * 
+   *
    * @param walpha
    */
   public DropEigenPairFilter(double walpha) {
@@ -121,9 +121,9 @@ public class DropEigenPairFilter implements EigenPairFilter {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -132,7 +132,7 @@ public class DropEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
+      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
       walphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if (config.grab(walphaP)) {
         walpha = walphaP.getValue();

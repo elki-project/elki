@@ -47,14 +47,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is above the average ('expected') eigenvalue.")
 public class WeakEigenPairFilter implements EigenPairFilter {
   /**
-   * OptionID for the weak alpha value of {@link WeakEigenPairFilter},
-   * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.ProgressiveEigenPairFilter}
-   * and
-   * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SignificantEigenPairFilter}
-   */
-  public static final OptionID EIGENPAIR_FILTER_WALPHA = new OptionID("pca.filter.weakalpha", "The minimum strength of the statistically expected variance (1/n) share an eigenvector " + "needs to have to be considered 'strong'.");
-
-  /**
    * The default value for walpha.
    */
   public static final double DEFAULT_WALPHA = 0.95;
@@ -118,6 +110,13 @@ public class WeakEigenPairFilter implements EigenPairFilter {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * OptionID for the weak alpha value of {@link WeakEigenPairFilter},
+     * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.ProgressiveEigenPairFilter}
+     * and
+     * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SignificantEigenPairFilter}
+     */
+    public static final OptionID EIGENPAIR_FILTER_WALPHA = new OptionID("pca.filter.weakalpha", "The minimum strength of the statistically expected variance (1/n) share an eigenvector " + "needs to have to be considered 'strong'.");
     /**
      * The threshold for strong eigenvectors: the strong eigenvectors explain a
      * portion of at least alpha of the total variance.

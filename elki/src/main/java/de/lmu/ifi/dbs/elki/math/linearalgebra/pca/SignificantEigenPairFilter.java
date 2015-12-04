@@ -39,17 +39,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * The SignificantEigenPairFilter sorts the eigenpairs in descending order of
  * their eigenvalues and chooses the contrast of an Eigenvalue to the remaining
  * Eigenvalues is maximal.
- * 
+ *
  * It is closely related to the WeakEigenPairFilter and RelativeEigenPairFilter.
  * But while the RelativeEigenPairFilter chooses the highest dimensionality that
  * satisfies the relative alpha levels, the SignificantEigenPairFilter will
  * chose the local dimensionality such that the 'contrast' is maximal.
- * 
+ *
  * There are some situations where one or the other is superior, especially when
  * it comes to handling nested clusters and strong global correlations that are
  * not too interesting. These benefits usually only make a difference at higher
  * dimensionalities.
- * 
+ *
  * @author Erich Schubert
  */
 @Title("Significant EigenPair Filter")
@@ -68,7 +68,7 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
 
   /**
    * Constructor.
-   * 
+   *
    * @param walpha
    */
   public SignificantEigenPairFilter(double walpha) {
@@ -122,9 +122,9 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
@@ -133,7 +133,7 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
+      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
       walphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(walphaP)) {
         walpha = walphaP.getValue();

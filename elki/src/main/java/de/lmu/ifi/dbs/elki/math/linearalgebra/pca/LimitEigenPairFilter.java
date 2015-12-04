@@ -58,16 +58,6 @@ public class LimitEigenPairFilter implements EigenPairFilter {
   private static final Logging LOG = Logging.getLogger(LimitEigenPairFilter.class);
 
   /**
-   * "absolute" Flag
-   */
-  public static final OptionID EIGENPAIR_FILTER_ABSOLUTE = new OptionID("pca.filter.absolute", "Flag to mark delta as an absolute value.");
-
-  /**
-   * Parameter delta
-   */
-  public static final OptionID EIGENPAIR_FILTER_DELTA = new OptionID("pca.filter.delta", "The threshold for strong Eigenvalues. If not otherwise specified, delta " + "is a relative value w.r.t. the (absolute) highest Eigenvalues and has to be " + "a double between 0 and 1. To mark delta as an absolute value, use " + "the option -" + EIGENPAIR_FILTER_ABSOLUTE.getName() + ".");
-
-  /**
    * The default value for delta.
    */
   public static final double DEFAULT_DELTA = 0.01;
@@ -153,6 +143,16 @@ public class LimitEigenPairFilter implements EigenPairFilter {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * "absolute" Flag
+     */
+    public static final OptionID EIGENPAIR_FILTER_ABSOLUTE = new OptionID("pca.filter.absolute", "Flag to mark delta as an absolute value.");
+
+    /**
+     * Parameter delta
+     */
+    public static final OptionID EIGENPAIR_FILTER_DELTA = new OptionID("pca.filter.delta", "The threshold for strong Eigenvalues. If not otherwise specified, delta " + "is a relative value w.r.t. the (absolute) highest Eigenvalues and has to be " + "a double between 0 and 1. To mark delta as an absolute value, use " + "the option -" + EIGENPAIR_FILTER_ABSOLUTE.getName() + ".");
+
     /**
      * Threshold for strong eigenpairs, can be absolute or relative.
      */

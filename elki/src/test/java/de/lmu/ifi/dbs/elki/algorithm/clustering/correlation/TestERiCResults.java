@@ -47,14 +47,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * from the data set labels. This test ensures that ERiC performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
- * 
+ *
  * @author Erich Schubert
  * @author Katharina Rausch
  */
 public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Run ERiC with fixed parameters and compare the result to a golden standard.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test
@@ -69,10 +69,10 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
     params.addParameter(ERiC.Settings.Parameterizer.TAU_ID, 0.04);
     params.addParameter(ERiC.Settings.Parameterizer.K_ID, 50);
     // PCA
-    params.addParameter(PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
-    params.addParameter(WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class);
+    params.addParameter(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
+    params.addParameter(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class);
     params.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class);
-    params.addParameter(RelativeEigenPairFilter.EIGENPAIR_FILTER_RALPHA, 1.60);
+    params.addParameter(RelativeEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_RALPHA, 1.60);
 
     ERiC<DoubleVector> eric = ClassGenericsUtil.parameterizeOrAbort(ERiC.class, params);
     testParameterizationOk(params);
@@ -86,7 +86,7 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
 
   /**
    * Run ERiC with fixed parameters and compare the result to a golden standard.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test
@@ -102,10 +102,10 @@ public class TestERiCResults extends AbstractSimpleAlgorithmTest implements JUni
     params.addParameter(ERiC.Settings.Parameterizer.TAU_ID, 1.0);
     params.addParameter(ERiC.Settings.Parameterizer.K_ID, 45);
     // PCA
-    params.addParameter(PCARunner.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
-    params.addParameter(WeightedCovarianceMatrixBuilder.WEIGHT_ID, ErfcWeight.class);
+    params.addParameter(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
+    params.addParameter(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class);
     params.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
-    params.addParameter(PercentageEigenPairFilter.ALPHA_ID, 0.6);
+    params.addParameter(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, 0.6);
 
     ERiC<DoubleVector> eric = ClassGenericsUtil.parameterizeOrAbort(ERiC.class, params);
     testParameterizationOk(params);
