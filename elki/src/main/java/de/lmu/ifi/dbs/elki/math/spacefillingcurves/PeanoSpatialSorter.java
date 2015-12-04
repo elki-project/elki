@@ -31,9 +31,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Bulk-load an R-tree index by presorting the objects with their position on
  * the Peano curve.
- * 
+ *
  * The basic shape of this space-filling curve looks like this:
- * 
+ *
  * <pre>
  *   3---4   9
  *   |   |   |
@@ -41,14 +41,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *   |   |   |
  *   1   6---7
  * </pre>
- * 
+ *
  * Which then expands to the next level as:
- * 
+ *
  * <pre>
  *   +-+ +-+ +-+ +-+ E
  *   | | | | | | | | |
  *   | +-+ +-+ | | +-+
- *   |         | |    
+ *   |         | |
  *   | +-+ +-+ | | +-+
  *   | | | | | | | | |
  *   +-+ | | +-+ +-+ |
@@ -57,19 +57,21 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *   | | | | | | | | |
  *   S +-+ +-+ +-+ +-+
  * </pre>
- * 
+ *
  * and so on.
- * 
+ *
  * Reference:
  * <p>
  * G. Peano<br />
  * Sur une courbe, qui remplit toute une aire plane<br />
  * Mathematische Annalen, 36(1)
  * </p>
- * 
+ *
  * @author Erich Schubert
  */
-@Reference(authors = "G. Peano", title = "Sur une courbe, qui remplit toute une aire plane", booktitle = "Mathematische Annalen, 36(1)")
+@Reference(authors = "G. Peano", //
+title = "Sur une courbe, qui remplit toute une aire plane", //
+booktitle = "Mathematische Annalen, 36(1)")
 public class PeanoSpatialSorter extends AbstractSpatialSorter {
   /**
    * Constructor.
@@ -80,12 +82,12 @@ public class PeanoSpatialSorter extends AbstractSpatialSorter {
 
   @Override
   public <T extends SpatialComparable> void sort(List<T> objs, int start, int end, double[] minmax, int[] dims) {
-    peanoSort(objs, start, end, minmax, dims, 0, BitsUtil.zero(dims.length), false);
+    peanoSort(objs, start, end, minmax, dims, 0, BitsUtil.zero(minmax.length >> 1), false);
   }
 
   /**
    * Sort by Peano curve.
-   * 
+   *
    * @param objs Objects
    * @param start Start index
    * @param end End
