@@ -26,14 +26,15 @@ package de.lmu.ifi.dbs.elki.database.datastore;
 import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
  * Storage utility class. Mostly a shorthand for
  * {@link DataStoreFactory#FACTORY}.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.landmark
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory
  */
@@ -41,7 +42,7 @@ public final class DataStoreUtil {
   /**
    * Make a new storage, to associate the given ids with an object of class
    * dataclass.
-   * 
+   *
    * @param <T> stored data type
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
@@ -55,7 +56,7 @@ public final class DataStoreUtil {
   /**
    * Make a new storage, to associate the given ids with an object of class
    * dataclass.
-   * 
+   *
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @return new data store
@@ -67,7 +68,7 @@ public final class DataStoreUtil {
   /**
    * Make a new storage, to associate the given ids with an object of class
    * dataclass.
-   * 
+   *
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @return new data store
@@ -79,7 +80,7 @@ public final class DataStoreUtil {
   /**
    * Make a new storage, to associate the given ids with an object of class
    * dataclass.
-   * 
+   *
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @param def Default value
@@ -92,7 +93,7 @@ public final class DataStoreUtil {
   /**
    * Make a new storage, to associate the given ids with an object of class
    * dataclass.
-   * 
+   *
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @return new data store
@@ -104,7 +105,7 @@ public final class DataStoreUtil {
   /**
    * Make a new storage, to associate the given ids with an object of class
    * dataclass.
-   * 
+   *
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @param def Default value
@@ -117,7 +118,7 @@ public final class DataStoreUtil {
   /**
    * Make a new record storage, to associate the given ids with an object of
    * class dataclass.
-   * 
+   *
    * @param ids DBIDs to store data for
    * @param hints Hints for the storage manager
    * @param dataclasses classes to store
@@ -129,9 +130,9 @@ public final class DataStoreUtil {
 
   /**
    * Sort objects by a double relation
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class AscendingByDoubleDataStore implements Comparator<DBIDRef> {
@@ -139,7 +140,7 @@ public final class DataStoreUtil {
      * Scores to use for sorting.
      */
     private final DoubleDataStore scores;
-    
+
     /**
      * Constructor.
      *
@@ -158,9 +159,9 @@ public final class DataStoreUtil {
 
   /**
    * Sort objects by a double relation
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class DescendingByDoubleDataStore implements Comparator<DBIDRef> {
@@ -168,7 +169,7 @@ public final class DataStoreUtil {
      * Scores to use for sorting.
      */
     private final DoubleDataStore scores;
-    
+
     /**
      * Constructor.
      *
@@ -182,6 +183,66 @@ public final class DataStoreUtil {
     @Override
     public int compare(DBIDRef id1, DBIDRef id2) {
       return Double.compare(scores.doubleValue(id2), scores.doubleValue(id1));
+    }
+  }
+
+  /**
+   * Sort objects by a double relation
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class AscendingByDoubleDataStoreAndId implements Comparator<DBIDRef> {
+    /**
+     * Scores to use for sorting.
+     */
+    private final DoubleDataStore scores;
+
+    /**
+     * Constructor.
+     *
+     * @param scores Scores for sorting
+     */
+    public AscendingByDoubleDataStoreAndId(DoubleDataStore scores) {
+      super();
+      this.scores = scores;
+    }
+
+    @Override
+    public int compare(DBIDRef id1, DBIDRef id2) {
+      int c = Double.compare(scores.doubleValue(id1), scores.doubleValue(id2));
+      return c != 0 ? c : DBIDUtil.compare(id1, id2);
+    }
+  }
+
+  /**
+   * Sort objects by a double relation
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class DescendingByDoubleDataStoreAndId implements Comparator<DBIDRef> {
+    /**
+     * Scores to use for sorting.
+     */
+    private final DoubleDataStore scores;
+
+    /**
+     * Constructor.
+     *
+     * @param scores Scores for sorting
+     */
+    public DescendingByDoubleDataStoreAndId(DoubleDataStore scores) {
+      super();
+      this.scores = scores;
+    }
+
+    @Override
+    public int compare(DBIDRef id1, DBIDRef id2) {
+      int c = Double.compare(scores.doubleValue(id2), scores.doubleValue(id1));
+      return c != 0 ? c : DBIDUtil.compare(id1, id2);
     }
   }
 }
