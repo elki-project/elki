@@ -48,6 +48,7 @@ de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.PixmapVisualizer
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SimilarityMatrixVisualizer
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.KeyVisualization
+de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.DendrogramVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.SettingsVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSClusterVisualization
 de.lmu.ifi.dbs.elki.visualization.visualizers.optics.OPTICSPlotCutVisualization
