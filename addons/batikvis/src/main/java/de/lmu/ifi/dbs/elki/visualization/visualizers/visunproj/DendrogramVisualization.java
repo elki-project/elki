@@ -39,10 +39,13 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -115,25 +118,26 @@ public class DendrogramVisualization extends AbstractVisFactory {
 
     @Override
     public void fullRedraw() {
-      setupCSS(svgp);
       layer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 
-      PointerHierarchyRepresentationResult p = task.getResult();
       StyleLibrary style = context.getStyleLibrary();
+      StylingPolicy spol = context.getStylingPolicy();
+
+      PointerHierarchyRepresentationResult p = task.getResult();
 
       DBIDs ids = p.getDBIDs();
       DBIDDataStore par = p.getParentStore();
       DoubleDataStore pdi = p.getParentDistanceStore();
       IntegerDataStore pos = p.getPositions();
-      DBIDVar v1 = DBIDUtil.newVar();
+      DBIDVar pa = DBIDUtil.newVar();
 
       int size = ids.size();
-      double width = 10. * Math.log1p(size),
+      double width = 16. * Math.log1p(size),
           height = width / getWidth() * getHeight();
       double xscale = width / size, xoff = xscale * .5;
       double maxh = Double.MIN_NORMAL;
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-        if(DBIDUtil.equal(it, par.assignVar(it, v1))) {
+        if(DBIDUtil.equal(it, par.assignVar(it, pa))) {
           continue; // Root
         }
         double v = pdi.doubleValue(it);
@@ -144,8 +148,6 @@ public class DendrogramVisualization extends AbstractVisFactory {
       }
       double yscale = height / maxh;
 
-      SVGPath dendrogram = new SVGPath();
-
       // Initial positions:
       double[] xy = new double[size << 1];
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
@@ -153,28 +155,76 @@ public class DendrogramVisualization extends AbstractVisFactory {
         xy[off] = off * xscale + xoff;
         xy[off + size] = height;
       }
-
       // Draw ascending by distance
       ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
       order.sort(new DataStoreUtil.AscendingByDoubleDataStoreAndId(pdi));
 
-      for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
-        final int o1 = pos.intValue(it);
-        double x1 = xy[o1], y1 = xy[o1 + size];
-        if(DBIDUtil.equal(it, par.assignVar(it, v1))) {
-          dendrogram.moveTo(x1, y1).verticalLineTo(0);
-          continue; // Root
+      if(spol instanceof ClassStylingPolicy) {
+        ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
+        setupCSS(svgp, cspol);
+        int mins = cspol.getMinStyle() - 1, maxs = cspol.getMaxStyle();
+        SVGPath[] paths = new SVGPath[maxs - mins + 1];
+        for(int i = 0; i < paths.length; i++) {
+          paths[i] = new SVGPath();
         }
-        final int o2 = pos.intValue(v1);
-        double x2 = xy[o2], y2 = xy[o2 + size];
-        double x3 = (x1 + x2) * .5, y3 = height - pdi.doubleValue(it) * yscale;
-        dendrogram.moveTo(x1, y1).verticalLineTo(y3).horizontalLineTo(x2).verticalLineTo(y2);
-        xy[o2] = x3;
-        xy[o2 + size] = y3;
+        for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
+          par.assignVar(it, pa); // Get parent.
+          final int o1 = pos.intValue(it);
+          final int p1 = cspol.getStyleForDBID(it);
+          double x1 = xy[o1], y1 = xy[o1 + size];
+          if(DBIDUtil.equal(it, pa)) {
+            paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(0);
+            continue; // Root
+          }
+          final int o2 = pos.intValue(pa);
+          final int p2 = cspol.getStyleForDBID(pa);
+          double x2 = xy[o2], y2 = xy[o2 + size];
+          double x3 = (x1 + x2) * .5,
+              y3 = height - pdi.doubleValue(it) * yscale;
+          if(p1 == p2) {
+            paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(y3).horizontalLineTo(x2).verticalLineTo(y2);
+          }
+          else {
+            paths[y1 == height ? p1 - mins + 1 : 0].moveTo(x1, y1).verticalLineTo(y3);
+            paths[y2 == height ? p2 - mins + 1 : 0].moveTo(x2, y2).verticalLineTo(y3);
+            paths[0].moveTo(x1, y3).horizontalLineTo(x2);
+          }
+          xy[o2] = x3;
+          xy[o2 + size] = y3;
+        }
+        for(int i = 0; i < paths.length; i++) {
+          SVGPath path = paths[i];
+          if(!path.isStarted()) {
+            continue;
+          }
+          Element elem = path.makeElement(svgp);
+          SVGUtil.setCSSClass(elem, (i > 0 ? KEY_HIERLINE + "_" + (i + mins - 1) : KEY_HIERLINE));
+          layer.appendChild(elem);
+        }
       }
-      Element elem = dendrogram.makeElement(svgp);
-      SVGUtil.setCSSClass(elem, KEY_HIERLINE);
-      layer.appendChild(elem);
+      else {
+        setupCSS(svgp);
+        SVGPath dendrogram = new SVGPath();
+
+        for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
+          final int o1 = pos.intValue(it);
+          double x1 = xy[o1], y1 = xy[o1 + size];
+          if(DBIDUtil.equal(it, par.assignVar(it, pa))) {
+            dendrogram.moveTo(x1, y1).verticalLineTo(0);
+            continue; // Root
+          }
+          final int o2 = pos.intValue(pa);
+          double x2 = xy[o2], y2 = xy[o2 + size];
+          double x3 = (x1 + x2) * .5,
+              y3 = height - pdi.doubleValue(it) * yscale;
+          dendrogram.moveTo(x1, y1).verticalLineTo(y3).horizontalLineTo(x2).verticalLineTo(y2);
+          xy[o2] = x3;
+          xy[o2 + size] = y3;
+        }
+        Element elem = dendrogram.makeElement(svgp);
+        SVGUtil.setCSSClass(elem, KEY_HIERLINE);
+        layer.appendChild(elem);
+      }
 
       final double margin = style.getSize(StyleLibrary.MARGIN);
       final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), width, height, margin / StyleLibrary.SCALE);
@@ -182,9 +232,9 @@ public class DendrogramVisualization extends AbstractVisFactory {
     }
 
     /**
-     * Registers the Tooltip-CSS-Class at a SVGPlot.
+     * Register the CSS classes.
      *
-     * @param svgp the SVGPlot to register the Tooltip-CSS-Class.
+     * @param svgp the SVGPlot to register the CSS classes.
      */
     protected void setupCSS(SVGPlot svgp) {
       final StyleLibrary style = context.getStyleLibrary();
@@ -204,6 +254,28 @@ public class DendrogramVisualization extends AbstractVisFactory {
       hierline.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth("key.hierarchy") / StyleLibrary.SCALE);
       hierline.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(hierline);
+
+      svgp.updateStyleElement();
+    }
+
+    /**
+     * Register the CSS classes.
+     *
+     * @param svgp the SVGPlot to register the CSS classes.
+     * @param cspol Class styling policy
+     */
+    protected void setupCSS(SVGPlot svgp, ClassStylingPolicy cspol) {
+      setupCSS(svgp);
+      StyleLibrary style = context.getStyleLibrary();
+      ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
+
+      for(int i = cspol.getMinStyle(); i <= cspol.getMaxStyle(); i++) {
+        CSSClass hierline = new CSSClass(svgp, KEY_HIERLINE + "_" + i);
+        hierline.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
+        hierline.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth("key.hierarchy") / StyleLibrary.SCALE);
+        hierline.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+        svgp.addCSSClassOrLogError(hierline);
+      }
 
       svgp.updateStyleElement();
     }
