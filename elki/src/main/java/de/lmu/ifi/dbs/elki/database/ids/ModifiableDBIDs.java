@@ -25,43 +25,45 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 /**
  * Interface for a generic modifiable DBID collection.
- * 
+ *
  * Note: we had this use the Java Collections API for a long time, however this
  * prevented certain optimizations. So it now only mimics the Collections API
  * <em>deliberately</em>.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has DBIDMIter
  */
 public interface ModifiableDBIDs extends DBIDs {
   /**
    * Add DBIDs to collection.
-   * 
+   *
    * @param ids IDs to add.
-   * @return {@code true} when modified
+   * @return {@code true} if the collection changed.
    */
   boolean addDBIDs(DBIDs ids);
 
   /**
    * Remove DBIDs from collection.
-   * 
+   *
    * @param ids IDs to remove.
-   * @return {@code true} when modified
+   * @return {@code true} if the collection changed.
    */
   boolean removeDBIDs(DBIDs ids);
 
   /**
    * Add a single DBID to the collection.
-   * 
+   *
    * @param id ID to add
+   * @return {@code true} if the collection changed.
    */
   boolean add(DBIDRef id);
 
   /**
    * Remove a single DBID from the collection.
-   * 
+   *
    * @param id ID to remove
+   * @return {@code true} if the collection changed.
    */
   boolean remove(DBIDRef id);
 
@@ -72,9 +74,9 @@ public interface ModifiableDBIDs extends DBIDs {
 
   /**
    * Get a <em>modifiable</em> DBID iterator (a more efficient API).
-   * 
+   *
    * usage example:
-   * 
+   *
    * <pre>
    * {@code
    * for(DBIDMIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -83,7 +85,7 @@ public interface ModifiableDBIDs extends DBIDs {
    * }
    * }
    * </pre>
-   * 
+   *
    * @return modifiable iterator
    */
   @Override
