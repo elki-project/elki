@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuAction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -134,6 +135,62 @@ public class VoronoiVisualization extends AbstractVisFactory {
       task.level = VisualizationTask.LEVEL_DATA + 3;
       task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
       context.addVis(p, task);
+      context.addVis(p, new SwitchModeAction(task, context));
+    }
+  }
+
+  /**
+   * Menu item to change visualization styles.
+   *
+   * @author Erich Schubert
+   */
+  public class SwitchModeAction implements VisualizationMenuAction {
+    /**
+     * Task we represent.
+     */
+    private VisualizationTask task;
+
+    /**
+     * Visualizer context.
+     */
+    private VisualizerContext context;
+
+    /**
+     * Constructor.
+     *
+     * @param task Task
+     * @param context Visualizer context
+     */
+    public SwitchModeAction(VisualizationTask task, VisualizerContext context) {
+      super();
+      this.task = task;
+      this.context = context;
+    }
+
+    @Override
+    public String getMenuName() {
+      return "Switch Voronoi Mode";
+    }
+
+    @Override
+    public void activate() {
+      switch(mode){
+      case VORONOI:
+        mode = Mode.DELAUNAY;
+        break;
+      case DELAUNAY:
+        mode = Mode.V_AND_D;
+        break;
+      case V_AND_D:
+        mode = Mode.VORONOI;
+        break;
+      }
+      context.visChanged(task);
+    }
+
+    @Override
+    public boolean enabled() {
+      return true;
     }
   }
 

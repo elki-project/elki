@@ -200,7 +200,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   @Override
   public void resultChanged(Result current) {
     // Default is to redraw when the result we are attached to changed.
-    if(task.getResult() == current) {
+    if(task == current || task.getResult() == current) {
       refreshThumbnail();
       return;
     }
@@ -216,7 +216,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   @Override
   public void visualizationChanged(VisualizationItem item) {
-    if(task.updateOnAny(VisualizationTask.ON_STYLEPOLICY) && item instanceof StylingPolicy) {
+    if(task == item || (task.updateOnAny(VisualizationTask.ON_STYLEPOLICY) && item instanceof StylingPolicy)) {
       refreshThumbnail();
       return;
     }
