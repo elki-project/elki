@@ -35,12 +35,20 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuAction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
@@ -48,6 +56,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
+import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
@@ -67,6 +76,33 @@ public class DendrogramVisualization extends AbstractVisFactory {
    */
   private static final String NAME = "Dendrogram";
 
+  /**
+   * Styles for dendrograms.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static enum Style {
+    RECTANGULAR, //
+    TRIANGULAR, //
+  }
+
+  /**
+   * Drawing style.
+   */
+  private Style style = Style.RECTANGULAR;
+
+  /**
+   * Constructor.
+   *
+   * @param style Visualization style.
+   */
+  public DendrogramVisualization(Style style) {
+    super();
+    this.style = style;
+  }
+
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     // Ensure there is a clustering result:
@@ -79,6 +115,7 @@ public class DendrogramVisualization extends AbstractVisFactory {
       task.reqwidth = 1.;
       task.reqheight = 1.;
       context.addVis(context.getStylingPolicy(), task);
+      context.addVis(pi, new SwitchStyleAction(task, context));
     }
   }
 
@@ -88,11 +125,63 @@ public class DendrogramVisualization extends AbstractVisFactory {
   }
 
   /**
+   * Menu item to change visualization styles.
+   *
+   * @author Erich Schubert
+   */
+  public class SwitchStyleAction implements VisualizationMenuAction {
+    /**
+     * Task we represent.
+     */
+    private VisualizationTask task;
+
+    /**
+     * Visualizer context.
+     */
+    private VisualizerContext context;
+
+    /**
+     * Constructor.
+     *
+     * @param task Task
+     * @param context Visualizer context
+     */
+    public SwitchStyleAction(VisualizationTask task, VisualizerContext context) {
+      super();
+      this.task = task;
+      this.context = context;
+    }
+
+    @Override
+    public String getMenuName() {
+      return "Switch Dendrogram Style";
+    }
+
+    @Override
+    public void activate() {
+      switch(style){
+      case RECTANGULAR:
+        style = Style.TRIANGULAR;
+        break;
+      case TRIANGULAR:
+        style = Style.RECTANGULAR;
+        break;
+      }
+      context.visChanged(task);
+    }
+
+    @Override
+    public boolean enabled() {
+      return true;
+    }
+  }
+
+  /**
    * Visualization instance.
    *
    * @author Erich Schubert
    */
-  public static class Instance extends AbstractVisualization {
+  public class Instance extends AbstractVisualization {
     /**
      * CSS class for key captions.
      */
@@ -131,8 +220,9 @@ public class DendrogramVisualization extends AbstractVisFactory {
       IntegerDataStore pos = p.getPositions();
       DBIDVar pa = DBIDUtil.newVar();
 
-      int size = ids.size();
-      double width = 16. * Math.log1p(size),
+      final int size = ids.size();
+      double linew = StyleLibrary.SCALE * .1 / Math.log1p(size);
+      double width = StyleLibrary.SCALE,
           height = width / getWidth() * getHeight();
       double xscale = width / size, xoff = xscale * .5;
       double maxh = Double.MIN_NORMAL;
@@ -146,7 +236,14 @@ public class DendrogramVisualization extends AbstractVisFactory {
         }
         maxh = v > maxh ? v : maxh;
       }
-      double yscale = height / maxh;
+      LinearScale yscale = new LinearScale(0, maxh);
+      // add axes
+      try {
+        SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, height, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
+      }
+      catch(CSSNamingConflict e) {
+        LoggingUtil.exception(e);
+      }
 
       // Initial positions:
       double[] xy = new double[size << 1];
@@ -161,7 +258,7 @@ public class DendrogramVisualization extends AbstractVisFactory {
 
       if(spol instanceof ClassStylingPolicy) {
         ClassStylingPolicy cspol = (ClassStylingPolicy) spol;
-        setupCSS(svgp, cspol);
+        setupCSS(svgp, cspol, linew);
         int mins = cspol.getMinStyle() - 1, maxs = cspol.getMaxStyle();
         SVGPath[] paths = new SVGPath[maxs - mins + 1];
         for(int i = 0; i < paths.length; i++) {
@@ -169,25 +266,38 @@ public class DendrogramVisualization extends AbstractVisFactory {
         }
         for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
           par.assignVar(it, pa); // Get parent.
+          double h = pdi.doubleValue(it);
           final int o1 = pos.intValue(it);
           final int p1 = cspol.getStyleForDBID(it);
           double x1 = xy[o1], y1 = xy[o1 + size];
           if(DBIDUtil.equal(it, pa)) {
-            paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(0);
+            paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(height * (1 - yscale.getScaled(h)));
             continue; // Root
           }
           final int o2 = pos.intValue(pa);
           final int p2 = cspol.getStyleForDBID(pa);
           double x2 = xy[o2], y2 = xy[o2 + size];
-          double x3 = (x1 + x2) * .5,
-              y3 = height - pdi.doubleValue(it) * yscale;
-          if(p1 == p2) {
-            paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(y3).horizontalLineTo(x2).verticalLineTo(y2);
-          }
-          else {
-            paths[y1 == height ? p1 - mins + 1 : 0].moveTo(x1, y1).verticalLineTo(y3);
-            paths[y2 == height ? p2 - mins + 1 : 0].moveTo(x2, y2).verticalLineTo(y3);
-            paths[0].moveTo(x1, y3).horizontalLineTo(x2);
+          double x3 = (x1 + x2) * .5, y3 = height * (1 - yscale.getScaled(h));
+          switch(DendrogramVisualization.this.style){
+          case RECTANGULAR:
+            if(p1 == p2) {
+              paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(y3).horizontalLineTo(x2).verticalLineTo(y2);
+            }
+            else {
+              paths[y1 == height ? p1 - mins + 1 : 0].moveTo(x1, y1).verticalLineTo(y3);
+              paths[y2 == height ? p2 - mins + 1 : 0].moveTo(x2, y2).verticalLineTo(y3);
+              paths[0].moveTo(x1, y3).horizontalLineTo(x2);
+            }
+            break;
+          case TRIANGULAR:
+            if(p1 == p2) {
+              paths[p1 - mins + 1].moveTo(x1, y1).drawTo(x3, y3).drawTo(x2, y2);
+            }
+            else {
+              paths[y1 == height ? p1 - mins + 1 : 0].moveTo(x1, y1).drawTo(x3, y3);
+              paths[y2 == height ? p2 - mins + 1 : 0].moveTo(x2, y2).drawTo(x3, y3);
+            }
+            break;
           }
           xy[o2] = x3;
           xy[o2 + size] = y3;
@@ -203,21 +313,28 @@ public class DendrogramVisualization extends AbstractVisFactory {
         }
       }
       else {
-        setupCSS(svgp);
+        setupCSS(svgp, linew);
         SVGPath dendrogram = new SVGPath();
 
         for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
+          double h = pdi.doubleValue(it);
           final int o1 = pos.intValue(it);
           double x1 = xy[o1], y1 = xy[o1 + size];
           if(DBIDUtil.equal(it, par.assignVar(it, pa))) {
-            dendrogram.moveTo(x1, y1).verticalLineTo(0);
+            dendrogram.moveTo(x1, y1).verticalLineTo(height * (1 - yscale.getScaled(h)));
             continue; // Root
           }
           final int o2 = pos.intValue(pa);
           double x2 = xy[o2], y2 = xy[o2 + size];
-          double x3 = (x1 + x2) * .5,
-              y3 = height - pdi.doubleValue(it) * yscale;
-          dendrogram.moveTo(x1, y1).verticalLineTo(y3).horizontalLineTo(x2).verticalLineTo(y2);
+          double x3 = (x1 + x2) * .5, y3 = height * (1 - yscale.getScaled(h));
+          switch(DendrogramVisualization.this.style){
+          case RECTANGULAR:
+            dendrogram.moveTo(x1, y1).verticalLineTo(y3).horizontalLineTo(x2).verticalLineTo(y2);
+            break;
+          case TRIANGULAR:
+            dendrogram.moveTo(x1, y1).drawTo(x3, y3).drawTo(x2, y2);
+            break;
+          }
           xy[o2] = x3;
           xy[o2 + size] = y3;
         }
@@ -227,7 +344,7 @@ public class DendrogramVisualization extends AbstractVisFactory {
       }
 
       final double margin = style.getSize(StyleLibrary.MARGIN);
-      final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), width, height, margin / StyleLibrary.SCALE);
+      final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), width, height, margin);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     }
 
@@ -235,8 +352,9 @@ public class DendrogramVisualization extends AbstractVisFactory {
      * Register the CSS classes.
      *
      * @param svgp the SVGPlot to register the CSS classes.
+     * @param linew Line width adjustment
      */
-    protected void setupCSS(SVGPlot svgp) {
+    protected void setupCSS(SVGPlot svgp, double linew) {
       final StyleLibrary style = context.getStyleLibrary();
       final double fontsize = style.getTextSize(StyleLibrary.KEY);
       final String fontfamily = style.getFontFamily(StyleLibrary.KEY);
@@ -251,7 +369,8 @@ public class DendrogramVisualization extends AbstractVisFactory {
 
       CSSClass hierline = new CSSClass(svgp, KEY_HIERLINE);
       hierline.setStatement(SVGConstants.CSS_STROKE_PROPERTY, color);
-      hierline.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth("key.hierarchy") / StyleLibrary.SCALE);
+      hierline.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, linew * style.getLineWidth("key.hierarchy") / StyleLibrary.SCALE);
+      hierline.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
       hierline.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
       svgp.addCSSClassOrLogError(hierline);
 
@@ -263,21 +382,56 @@ public class DendrogramVisualization extends AbstractVisFactory {
      *
      * @param svgp the SVGPlot to register the CSS classes.
      * @param cspol Class styling policy
+     * @param linew Line width adjustment
      */
-    protected void setupCSS(SVGPlot svgp, ClassStylingPolicy cspol) {
-      setupCSS(svgp);
+    protected void setupCSS(SVGPlot svgp, ClassStylingPolicy cspol, double linew) {
+      setupCSS(svgp, linew);
       StyleLibrary style = context.getStyleLibrary();
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
       for(int i = cspol.getMinStyle(); i <= cspol.getMaxStyle(); i++) {
         CSSClass hierline = new CSSClass(svgp, KEY_HIERLINE + "_" + i);
         hierline.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colors.getColor(i));
-        hierline.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, style.getLineWidth("key.hierarchy") / StyleLibrary.SCALE);
+        hierline.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, linew * style.getLineWidth("key.hierarchy") / StyleLibrary.SCALE);
+        hierline.setStatement(SVGConstants.CSS_STROKE_LINECAP_PROPERTY, SVGConstants.CSS_ROUND_VALUE);
         hierline.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
         svgp.addCSSClassOrLogError(hierline);
       }
 
       svgp.updateStyleElement();
+    }
+  }
+
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Dendrogram drawing style.
+     */
+    public static final OptionID STYLE_ID = new OptionID("dendrogram.style", "Drawing style for dendrograms.");
+
+    /**
+     * Drawing style.
+     */
+    private Style style = Style.RECTANGULAR;
+
+    @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      EnumParameter<Style> styleP = new EnumParameter<>(STYLE_ID, Style.class, Style.RECTANGULAR);
+      if(config.grab(styleP)) {
+        style = styleP.getValue();
+      }
+    }
+
+    @Override
+    protected DendrogramVisualization makeInstance() {
+      return new DendrogramVisualization(style);
     }
   }
 }
