@@ -182,8 +182,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
     // Sort DBIDs by lambda. We need this for two things:
     // a) to determine the stop distance from "minclusters" parameter
     // b) to process arrows in decreasing / increasing order
-    ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
-    order.sort(new DataStoreUtil.AscendingByDoubleDataStore(lambda));
+    ArrayDBIDs order = PointerHierarchyRepresentationResult.topologicalSort(ids, pi, lambda);
     DBIDArrayIter it = order.iter(); // Used multiple times!
 
     final int split = findSplit(order, it, lambda);

@@ -29,11 +29,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.IntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 
 /**
@@ -121,9 +124,8 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
     if(positions != null) {
       return positions; // Return cached.
     }
-    ArrayModifiableDBIDs order = DBIDUtil.newArray(ids);
-    order.sort(new DataStoreUtil.AscendingByDoubleDataStoreAndId(parentDistance));
-    DBIDArrayMIter it = order.iter();
+    ArrayDBIDs order = topologicalSort(ids, parent, parentDistance);
+    DBIDArrayIter it = order.iter();
     final int last = order.size() - 1;
     // Subtree sizes of each element:
     WritableIntegerDataStore siz = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB, 1);
@@ -134,7 +136,8 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
       }
       siz.increment(v1, siz.intValue(it));
     }
-    assert (siz.intValue(it.seek(last)) == ids.size());
+    // Assertion only holds for exact e.g. single linkage
+    //assert (siz.intValue(it.seek(last)) == ids.size());
     WritableIntegerDataStore pos = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB, -1);
     WritableIntegerDataStore ins = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
     int defins = 0;
@@ -142,7 +145,10 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
     for(it.seek(last); it.valid(); it.retract()) {
       int size = siz.intValue(it);
       parent.assignVar(it, v1); // v1 = parent
-      if(DBIDUtil.equal(it, v1)) {
+      final int ipos = ins.intValue(v1);
+      // Assertion only holds for exact e.g. single linkage
+      // assert (ipos >= 0);
+      if(ipos < 0 || DBIDUtil.equal(it, v1)) {
         // Root: use interval [defins; defins + size]
         ins.putInt(it, defins);
         pos.putInt(it, defins + size - 1);
@@ -150,13 +156,50 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
         continue;
       }
       // Insertion position of parent = leftmost
-      final int ipos = ins.intValue(v1);
-      assert (ipos >= 0);
       pos.putInt(it, ipos + size - 1);
       ins.putInt(it, ipos);
       ins.increment(v1, size);
     }
     ins.destroy();
     return positions = pos;
+  }
+
+  /**
+   * Perform topological sorting based on the successor order.
+   *
+   * @param ids IDs to sort
+   * @param parent Parent relationship.
+   * @param parentDistance Distance to parent.
+   * @return Sorted order
+   */
+  public static ArrayDBIDs topologicalSort(DBIDs oids, DBIDDataStore parent, DoubleDataStore parentDistance) {
+    // We used to simply use this:
+    // But for e.g. Median Linkage, this would lead to problems, as links are
+    // not necessarily performed in ascending order anymore!
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(oids);
+    ids.sort(new DataStoreUtil.DescendingByDoubleDataStoreAndId(parentDistance));
+    final int size = ids.size();
+    ModifiableDBIDs seen = DBIDUtil.newHashSet(size);
+    ArrayModifiableDBIDs order = DBIDUtil.newArray(size);
+    DBIDVar v1 = DBIDUtil.newVar(), prev = DBIDUtil.newVar();
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+      if(!seen.add(it)) {
+        continue;
+      }
+      order.add(it);
+      prev.set(it); // Copy
+      while(!DBIDUtil.equal(prev, parent.assignVar(prev, v1))) {
+        if(!seen.add(v1)) {
+          break;
+        }
+        order.add(v1);
+        prev.set(v1); // Copy
+      }
+    }
+    // Reverse the array:
+    for(int i = 0, j = size - 1; i < j; i++, j--) {
+      order.swap(i, j);
+    }
+    return order;
   }
 }
