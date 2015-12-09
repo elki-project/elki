@@ -197,7 +197,7 @@ public abstract class AbstractVisualization implements Visualization, ResultList
 
   @Override
   public void visualizationChanged(VisualizationItem item) {
-    if(task.getResult() == item) {
+    if(task == item || task.getResult() == item) {
       svgp.requestRedraw(this.task, this);
       return;
     }
