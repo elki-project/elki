@@ -23,17 +23,31 @@ package de.lmu.ifi.dbs.elki.index.distancematrix;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
 import de.lmu.ifi.dbs.elki.index.DistanceIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
+import de.lmu.ifi.dbs.elki.index.KNNIndex;
+import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
@@ -45,21 +59,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Distance matrix, for precomputing similarity for a small data set.
- * 
+ *
  * This class uses a linear memory layout (not a ragged array), and assumes
  * symmetry as well as strictness. This way, it only stores the upper triangle
  * matrix with double precision. It has to store (n-1) * (n-2) distance values
  * in memory, requiring 8 * (n-1) * (n-2) bytes. Since Java has a size limit of
  * arrays of 31 bits (signed integer), we can store at most 2^16 objects
  * (precisely, 65536 objects) in a single array, which needs about 16 GB of RAM.
- * 
+ *
  * @author Erich Schubert
- * 
+ *
  * @apiviz.has PrecomputedDistanceQuery
- * 
+ *
  * @param <O> Object type
  */
-public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O>implements DistanceIndex<O> {
+public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements DistanceIndex<O>, RangeIndex<O>, KNNIndex<O> {
   /**
    * Class logger.
    */
@@ -92,7 +106,7 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O>implements Dis
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Data relation
    * @param distanceFunction Distance function
    */
@@ -119,7 +133,7 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O>implements Dis
 
     distanceQuery = distanceFunction.instantiate(relation);
 
-    int msize = triangleSize(size);
+    final int msize = triangleSize(size);
     matrix = new double[msize];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
 
@@ -140,7 +154,7 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O>implements Dis
 
   /**
    * Compute the size of a complete x by x triangle (minus diagonal)
-   * 
+   *
    * @param x Offset
    * @return Size of complete triangle
    */
@@ -150,7 +164,7 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O>implements Dis
 
   /**
    * Array offset computation.
-   * 
+   *
    * @param x X parameter
    * @param y Y parameter
    * @return Array offset
@@ -184,9 +198,25 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O>implements Dis
     return null;
   }
 
+  @Override
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    if(this.distanceQuery.getDistanceFunction().equals(distanceQuery.getDistanceFunction())) {
+      return new PrecomputedKNNQuery();
+    }
+    return null;
+  }
+
+  @Override
+  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    if(this.distanceQuery.getDistanceFunction().equals(distanceQuery.getDistanceFunction())) {
+      return new PrecomputedRangeQuery();
+    }
+    return null;
+  }
+
   /**
    * Distance query using the precomputed matrix.
-   * 
+   *
    * @author Erich Schubert
    */
   private class PrecomputedDistanceQuery implements DistanceQuery<O> {
@@ -223,12 +253,115 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O>implements Dis
   }
 
   /**
-   * Factory for the index.
-   * 
+   * Range query using the distance matrix.
+   *
    * @author Erich Schubert
-   * 
+   */
+  private class PrecomputedRangeQuery implements RangeQuery<O> {
+    @Override
+    public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
+      ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
+      getRangeForDBID(id, range, ret);
+      ret.sort();
+      return ret;
+    }
+
+    @Override
+    public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList result) {
+      result.add(0., id);
+      DBIDArrayIter it = ids.iter();
+
+      final int x = ids.getOffset(id);
+      // Case y < x: triangleSize(x) + y
+      int pos = triangleSize(x);
+      for(int y = 0; y < x; y++) {
+        final double dist = matrix[pos];
+        if(dist <= range) {
+          result.add(dist, it.seek(y));
+        }
+        pos++;
+      }
+      assert (pos == triangleSize(x + 1));
+      // Case y > x: triangleSize(y) + x
+      pos = triangleSize(x + 1) + x;
+      for(int y = x + 1; y < size; y++) {
+        final double dist = matrix[pos];
+        if(dist <= range) {
+          result.add(dist, it.seek(y));
+        }
+        pos += y;
+      }
+    }
+
+    @Override
+    public DoubleDBIDList getRangeForObject(O obj, double range) {
+      throw new AbortException("Preprocessor KNN query only supports ID queries.");
+    }
+
+    @Override
+    public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList result) {
+      throw new AbortException("Preprocessor KNN query only supports ID queries.");
+    }
+  }
+
+  /**
+   * kNN query using the distance matrix.
+   *
+   * @author Erich Schubert
+   */
+  private class PrecomputedKNNQuery implements KNNQuery<O> {
+    @Override
+    public KNNList getKNNForDBID(DBIDRef id, int k) {
+      KNNHeap heap = DBIDUtil.newHeap(k);
+      heap.insert(0., id);
+      DBIDArrayIter it = ids.iter();
+      double max = Double.POSITIVE_INFINITY;
+      final int x = ids.getOffset(id);
+      // Case y < x: triangleSize(x) + y
+      int pos = triangleSize(x);
+      for(int y = 0; y < x; y++) {
+        final double dist = matrix[pos];
+        if(dist <= max) {
+          max = heap.insert(dist, it.seek(y));
+        }
+        pos++;
+      }
+      assert (pos == triangleSize(x + 1));
+      // Case y > x: triangleSize(y) + x
+      pos = triangleSize(x + 1) + x;
+      for(int y = x + 1; y < size; y++) {
+        final double dist = matrix[pos];
+        if(dist <= max) {
+          max = heap.insert(dist, it.seek(y));
+        }
+        pos += y;
+      }
+      return heap.toKNNList();
+    }
+
+    @Override
+    public List<? extends KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+      // TODO: optimize
+      List<KNNList> ret = new ArrayList<>(ids.size());
+      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
+        ret.add(getKNNForDBID(iter, k));
+      }
+      return ret;
+    }
+
+    @Override
+    public KNNList getKNNForObject(O obj, int k) {
+      throw new AbortException("Preprocessor KNN query only supports ID queries.");
+    }
+  }
+
+  /**
+   * Factory for the index.
+   *
+   * @author Erich Schubert
+   *
    * @apiviz.has PrecomputedDistanceMatrix
-   * 
+   *
    * @param <O> Object type
    */
   public static class Factory<O> implements IndexFactory<O, PrecomputedDistanceMatrix<O>> {
@@ -239,7 +372,7 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O>implements Dis
 
     /**
      * Constructor.
-     * 
+     *
      * @param distanceFunction Distance function
      */
     public Factory(DistanceFunction<? super O> distanceFunction) {
@@ -259,11 +392,11 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O>implements Dis
 
     /**
      * Parameterizer.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
-     * 
+     *
      * @param <O> Object type
      */
     public static class Parameterizer<O> extends AbstractParameterizer {
