@@ -85,7 +85,7 @@ public abstract class AbstractDatabase extends AbstractHierarchicalResult implem
 
   @Override
   public SingleObjectBundle getBundle(DBIDRef id) {
-    assert(id != null);
+    assert (id != null);
     // TODO: ensure that the ID actually exists in the database?
     try {
       // Build an object package

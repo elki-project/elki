@@ -23,31 +23,22 @@ package de.lmu.ifi.dbs.elki.index.distancematrix;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.AbstractIndex;
-import de.lmu.ifi.dbs.elki.index.DistanceIndex;
+import de.lmu.ifi.dbs.elki.index.SimilarityIndex;
+import de.lmu.ifi.dbs.elki.index.SimilarityRangeIndex;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
-import de.lmu.ifi.dbs.elki.index.KNNIndex;
-import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
@@ -58,39 +49,39 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Distance matrix, for precomputing similarity for a small data set.
+ * Precomputed similarity matrix, for a small data set.
  *
  * This class uses a linear memory layout (not a ragged array), and assumes
  * symmetry as well as strictness. This way, it only stores the upper triangle
- * matrix with double precision. It has to store (n-1) * (n-2) distance values
+ * matrix with double precision. It has to store (n-1) * (n-2) similarity values
  * in memory, requiring 8 * (n-1) * (n-2) bytes. Since Java has a size limit of
  * arrays of 31 bits (signed integer), we can store at most 2^16 objects
  * (precisely, 65536 objects) in a single array, which needs about 16 GB of RAM.
  *
  * @author Erich Schubert
  *
- * @apiviz.has PrecomputedDistanceQuery
+ * @apiviz.has PrecomputedSimilarityQuery
  *
  * @param <O> Object type
  */
-public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements DistanceIndex<O>, RangeIndex<O>, KNNIndex<O> {
+public class PrecomputedSimilarityMatrix<O> extends AbstractIndex<O> implements SimilarityIndex<O>, SimilarityRangeIndex<O> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(PrecomputedDistanceMatrix.class);
+  private static final Logging LOG = Logging.getLogger(PrecomputedSimilarityMatrix.class);
 
   /**
-   * Nested distance function.
+   * Nested similarity function.
    */
-  final protected DistanceFunction<? super O> distanceFunction;
+  final protected SimilarityFunction<? super O> similarityFunction;
 
   /**
-   * Nested distance query.
+   * Nested similarity query.
    */
-  protected DistanceQuery<O> distanceQuery;
+  protected SimilarityQuery<O> similarityQuery;
 
   /**
-   * Distance matrix.
+   * Similarity matrix.
    */
   private double[] matrix = null;
 
@@ -108,14 +99,14 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements Di
    * Constructor.
    *
    * @param relation Data relation
-   * @param distanceFunction Distance function
+   * @param similarityFunction Similarity function
    */
-  public PrecomputedDistanceMatrix(Relation<O> relation, DistanceFunction<? super O> distanceFunction) {
+  public PrecomputedSimilarityMatrix(Relation<O> relation, SimilarityFunction<? super O> similarityFunction) {
     super(relation);
-    this.distanceFunction = distanceFunction;
+    this.similarityFunction = similarityFunction;
 
-    if(!distanceFunction.isSymmetric()) {
-      throw new AbortException("Distance matrixes currently only support symmetric distance functions (Patches welcome).");
+    if(!similarityFunction.isSymmetric()) {
+      throw new AbortException("Similarity matrixes currently only support symmetric similarity functions (Patches welcome).");
     }
   }
 
@@ -123,26 +114,26 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements Di
   public void initialize() {
     DBIDs rids = relation.getDBIDs();
     if(!(rids instanceof DBIDRange)) {
-      throw new AbortException("Distance matrixes are currently only supported for DBID ranges (as used by static databases) for performance reasons (Patches welcome).");
+      throw new AbortException("Similarity matrixes are currently only supported for DBID ranges (as used by static databases) for performance reasons (Patches welcome).");
     }
     ids = (DBIDRange) rids;
     size = ids.size();
     if(size > 65536) {
-      throw new AbortException("Distance matrixes currently have a limit of 65536 objects (~16 GB). After this, the array size exceeds the Java integer range, and a different data structure needs to be used.");
+      throw new AbortException("Similarity matrixes currently have a limit of 65536 objects (~16 GB). After this, the array size exceeds the Java integer range, and a different data structure needs to be used.");
     }
 
-    distanceQuery = distanceFunction.instantiate(relation);
+    similarityQuery = similarityFunction.instantiate(relation);
 
-    final int msize = triangleSize(size);
+    int msize = triangleSize(size);
     matrix = new double[msize];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
 
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Precomputing distance matrix", msize, LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Precomputing similarity matrix", msize, LOG) : null;
     int pos = 0;
     for(ix.seek(0); ix.valid(); ix.advance()) {
       // y < x -- must match {@link #getOffset}!
       for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
-        matrix[pos] = distanceQuery.distance(ix, iy);
+        matrix[pos] = similarityQuery.similarity(ix, iy);
         pos++;
       }
       if(prog != null) {
@@ -182,68 +173,60 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements Di
 
   @Override
   public String getLongName() {
-    return "Precomputed Distance Matrix";
+    return "Precomputed Similarity Matrix";
   }
 
   @Override
   public String getShortName() {
-    return "distance-matrix";
+    return "similarity-matrix";
   }
 
   @Override
-  public DistanceQuery<O> getDistanceQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
-    if(this.distanceFunction.equals(distanceFunction)) {
-      return new PrecomputedDistanceQuery();
+  public SimilarityQuery<O> getSimilarityQuery(SimilarityFunction<? super O> similarityFunction, Object... hints) {
+    if(this.similarityFunction.equals(similarityFunction)) {
+      return new PrecomputedSimilarityQuery();
     }
     return null;
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
-      return new PrecomputedKNNQuery();
-    }
-    return null;
-  }
-
-  @Override
-  public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
-    if(this.distanceFunction.equals(distanceQuery.getDistanceFunction())) {
-      return new PrecomputedRangeQuery();
+  public RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints) {
+    if(this.similarityFunction.equals(simQuery.getSimilarityFunction())) {
+      return new PrecomputedSimilarityRangeQuery();
     }
     return null;
   }
 
   /**
-   * Distance query using the precomputed matrix.
+   * Similarity query using the precomputed matrix.
    *
    * @author Erich Schubert
    */
-  private class PrecomputedDistanceQuery implements DistanceQuery<O> {
+  private class PrecomputedSimilarityQuery implements SimilarityQuery<O> {
     @Override
-    public double distance(DBIDRef id1, DBIDRef id2) {
+    public double similarity(DBIDRef id1, DBIDRef id2) {
       final int x = ids.getOffset(id1), y = ids.getOffset(id2);
       return (x != y) ? matrix[getOffset(x, y)] : 0.;
     }
 
     @Override
-    public double distance(O o1, DBIDRef id2) {
-      return distanceQuery.distance(o1, id2);
+    public double similarity(O o1, DBIDRef id2) {
+      return similarityQuery.similarity(o1, id2);
     }
 
     @Override
-    public double distance(DBIDRef id1, O o2) {
-      return distanceQuery.distance(id1, o2);
+    public double similarity(DBIDRef id1, O o2) {
+      return similarityQuery.similarity(id1, o2);
     }
 
     @Override
-    public double distance(O o1, O o2) {
-      return distanceQuery.distance(o1, o2);
+    public double similarity(O o1, O o2) {
+      return similarityQuery.similarity(o1, o2);
     }
 
     @Override
-    public DistanceFunction<? super O> getDistanceFunction() {
-      return distanceQuery.getDistanceFunction();
+    public SimilarityFunction<? super O> getSimilarityFunction() {
+      return similarityQuery.getSimilarityFunction();
     }
 
     @Override
@@ -257,7 +240,7 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements Di
    *
    * @author Erich Schubert
    */
-  private class PrecomputedRangeQuery implements RangeQuery<O> {
+  private class PrecomputedSimilarityRangeQuery implements RangeQuery<O> {
     @Override
     public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
       ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
@@ -275,9 +258,9 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements Di
       // Case y < x: triangleSize(x) + y
       int pos = triangleSize(x);
       for(int y = 0; y < x; y++) {
-        final double dist = matrix[pos];
-        if(dist <= range) {
-          result.add(dist, it.seek(y));
+        final double sim = matrix[pos];
+        if(sim >= range) {
+          result.add(sim, it.seek(y));
         }
         pos++;
       }
@@ -285,9 +268,9 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements Di
       // Case y > x: triangleSize(y) + x
       pos = triangleSize(x + 1) + x;
       for(int y = x + 1; y < size; y++) {
-        final double dist = matrix[pos];
-        if(dist <= range) {
-          result.add(dist, it.seek(y));
+        final double sim = matrix[pos];
+        if(sim >= range) {
+          result.add(sim, it.seek(y));
         }
         pos += y;
       }
@@ -305,89 +288,38 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements Di
   }
 
   /**
-   * kNN query using the distance matrix.
-   *
-   * @author Erich Schubert
-   */
-  private class PrecomputedKNNQuery implements KNNQuery<O> {
-    @Override
-    public KNNList getKNNForDBID(DBIDRef id, int k) {
-      KNNHeap heap = DBIDUtil.newHeap(k);
-      heap.insert(0., id);
-      DBIDArrayIter it = ids.iter();
-      double max = Double.POSITIVE_INFINITY;
-      final int x = ids.getOffset(id);
-      // Case y < x: triangleSize(x) + y
-      int pos = triangleSize(x);
-      for(int y = 0; y < x; y++) {
-        final double dist = matrix[pos];
-        if(dist <= max) {
-          max = heap.insert(dist, it.seek(y));
-        }
-        pos++;
-      }
-      assert (pos == triangleSize(x + 1));
-      // Case y > x: triangleSize(y) + x
-      pos = triangleSize(x + 1) + x;
-      for(int y = x + 1; y < size; y++) {
-        final double dist = matrix[pos];
-        if(dist <= max) {
-          max = heap.insert(dist, it.seek(y));
-        }
-        pos += y;
-      }
-      return heap.toKNNList();
-    }
-
-    @Override
-    public List<? extends KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
-      // TODO: optimize
-      List<KNNList> ret = new ArrayList<>(ids.size());
-      for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        ret.add(getKNNForDBID(iter, k));
-      }
-      return ret;
-    }
-
-    @Override
-    public KNNList getKNNForObject(O obj, int k) {
-      throw new AbortException("Preprocessor KNN query only supports ID queries.");
-    }
-  }
-
-  /**
    * Factory for the index.
    *
    * @author Erich Schubert
    *
-   * @apiviz.has PrecomputedDistanceMatrix
+   * @apiviz.has PrecomputedSimilarityMatrix
    *
    * @param <O> Object type
    */
-  public static class Factory<O> implements IndexFactory<O, PrecomputedDistanceMatrix<O>> {
+  public static class Factory<O> implements IndexFactory<O, PrecomputedSimilarityMatrix<O>> {
     /**
-     * Nested distance function.
+     * Nested similarity function.
      */
-    final protected DistanceFunction<? super O> distanceFunction;
+    final protected SimilarityFunction<? super O> similarityFunction;
 
     /**
      * Constructor.
      *
-     * @param distanceFunction Distance function
+     * @param similarityFunction Similarity function
      */
-    public Factory(DistanceFunction<? super O> distanceFunction) {
+    public Factory(SimilarityFunction<? super O> similarityFunction) {
       super();
-      this.distanceFunction = distanceFunction;
+      this.similarityFunction = similarityFunction;
     }
 
     @Override
-    public PrecomputedDistanceMatrix<O> instantiate(Relation<O> relation) {
-      return new PrecomputedDistanceMatrix<>(relation, distanceFunction);
+    public PrecomputedSimilarityMatrix<O> instantiate(Relation<O> relation) {
+      return new PrecomputedSimilarityMatrix<>(relation, similarityFunction);
     }
 
     @Override
     public TypeInformation getInputTypeRestriction() {
-      return distanceFunction.getInputTypeRestriction();
+      return similarityFunction.getInputTypeRestriction();
     }
 
     /**
@@ -401,27 +333,27 @@ public class PrecomputedDistanceMatrix<O> extends AbstractIndex<O> implements Di
      */
     public static class Parameterizer<O> extends AbstractParameterizer {
       /**
-       * Option parameter for the precomputed distance matrix.
+       * Option parameter for the precomputed similarity matrix.
        */
-      public static final OptionID DISTANCE_ID = new OptionID("matrix.distance", "Distance function for the precomputed distance matrix.");
+      public static final OptionID DISTANCE_ID = new OptionID("matrix.similarity", "Similarity function for the precomputed similarity matrix.");
 
       /**
-       * Nested distance function.
+       * Nested similarity function.
        */
-      protected DistanceFunction<? super O> distanceFunction;
+      protected SimilarityFunction<? super O> similarityFunction;
 
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
-        ObjectParameter<DistanceFunction<? super O>> distanceP = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
-        if(config.grab(distanceP)) {
-          distanceFunction = distanceP.instantiateClass(config);
+        ObjectParameter<SimilarityFunction<? super O>> similarityP = new ObjectParameter<>(DISTANCE_ID, SimilarityFunction.class);
+        if(config.grab(similarityP)) {
+          similarityFunction = similarityP.instantiateClass(config);
         }
       }
 
       @Override
       protected Factory<O> makeInstance() {
-        return new Factory<>(distanceFunction);
+        return new Factory<>(similarityFunction);
       }
     }
   }

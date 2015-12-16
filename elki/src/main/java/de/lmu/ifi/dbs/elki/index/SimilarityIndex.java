@@ -23,29 +23,30 @@ package de.lmu.ifi.dbs.elki.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 
 /**
- * Index with support for range queries (<i>radius</i> queries).
+ * Index with support for similarity queries (e.g. precomputed similarity
+ * matrixes, caches)
  *
  * @author Erich Schubert
  *
  * @apiviz.landmark
  * @apiviz.excludeSubtypes
- * @apiviz.has RangeQuery oneway - - «provides»
+ * @apiviz.has SimilarityQuery oneway - - «provides»
  *
- * @param <O> Database Object type
+ * @param <O> Object type
  */
-public interface RangeIndex<O> extends Index {
+public interface SimilarityIndex<O> extends Index {
   /**
-   * Get a range query object for the given distance query and k.
+   * Get a KNN query object for the given distance query and k.
    *
    * This function MAY return null, when the given distance is not supported!
    *
-   * @param distanceQuery Distance query
+   * @param distanceFunction Distance function to use.
    * @param hints Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints);
+  SimilarityQuery<O> getSimilarityQuery(SimilarityFunction<? super O> simFunction, Object... hints);
 }

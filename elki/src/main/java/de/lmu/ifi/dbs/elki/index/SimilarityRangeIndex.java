@@ -23,11 +23,11 @@ package de.lmu.ifi.dbs.elki.index;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 
 /**
- * Index with support for range queries (<i>radius</i> queries).
+ * Index with support for similarity range queries.
  *
  * @author Erich Schubert
  *
@@ -37,15 +37,15 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
  *
  * @param <O> Database Object type
  */
-public interface RangeIndex<O> extends Index {
+public interface SimilarityRangeIndex<O> extends Index {
   /**
    * Get a range query object for the given distance query and k.
    *
    * This function MAY return null, when the given distance is not supported!
    *
-   * @param distanceQuery Distance query
+   * @param simQuery Similarity query
    * @param hints Hints for the optimizer
    * @return KNN Query object or {@code null}
    */
-  RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints);
+  RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints);
 }

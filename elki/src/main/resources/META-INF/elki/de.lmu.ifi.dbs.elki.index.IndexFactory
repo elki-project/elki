@@ -1,4 +1,5 @@
 de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix$Factory
+de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedSimilarityMatrix$Factory
 de.lmu.ifi.dbs.elki.index.tree.metrical.covertree.CoverTree$Factory
 de.lmu.ifi.dbs.elki.index.tree.metrical.covertree.SimplifiedCoverTree$Factory
 de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFactory rstar r*

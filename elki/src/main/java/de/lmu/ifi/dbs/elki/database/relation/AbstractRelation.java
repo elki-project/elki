@@ -33,12 +33,15 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.DBIDSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.DistanceIndex;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.KNNIndex;
 import de.lmu.ifi.dbs.elki.index.RKNNIndex;
 import de.lmu.ifi.dbs.elki.index.RangeIndex;
+import de.lmu.ifi.dbs.elki.index.SimilarityIndex;
+import de.lmu.ifi.dbs.elki.index.SimilarityRangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -95,7 +98,28 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
     if(similarityFunction == null) {
       throw new AbortException("Similarity query requested for 'null' similarity!");
     }
-    // TODO: add indexing support for similarities!
+    for(Iter<Result> it = getHierarchy().iterChildrenReverse(this); it.valid(); it.advance()) {
+      if(!(it.get() instanceof Index)) {
+        continue;
+      }
+      Index idx = (Index) it.get();
+      if(idx instanceof SimilarityIndex) {
+        @SuppressWarnings("unchecked")
+        final SimilarityIndex<O> simIndex = (SimilarityIndex<O>) idx;
+        SimilarityQuery<O> q = simIndex.getSimilarityQuery(similarityFunction, hints);
+        if(getLogger().isDebuggingFinest()) {
+          getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for similarity query: " + idx);
+        }
+        if(q != null) {
+          return q;
+        }
+      }
+    }
+    for(Object o : hints) {
+      if(o == DatabaseQuery.HINT_OPTIMIZED_ONLY && !(similarityFunction instanceof DBIDSimilarityFunction)) {
+        return null; // Linear scan is not desirable.
+      }
+    }
     return similarityFunction.instantiate(this);
   }
 
@@ -198,7 +222,20 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
     if(simQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
-    // FIXME: Add similarity index support.
+    for(Iter<Result> it = getHierarchy().iterChildrenReverse(this); it.valid(); it.advance()) {
+      if(!(it.get() instanceof RangeIndex)) {
+        continue;
+      }
+      @SuppressWarnings("unchecked")
+      final SimilarityRangeIndex<O> rangeIndex = (SimilarityRangeIndex<O>) it.get();
+      RangeQuery<O> q = rangeIndex.getSimilarityRangeQuery(simQuery, hints);
+      if(getLogger().isDebuggingFinest()) {
+        getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + rangeIndex);
+      }
+      if(q != null) {
+        return q;
+      }
+    }
 
     // Default
     for(Object hint : hints) {
