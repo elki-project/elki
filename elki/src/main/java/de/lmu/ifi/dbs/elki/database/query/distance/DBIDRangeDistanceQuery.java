@@ -59,6 +59,7 @@ public class DBIDRangeDistanceQuery extends DBIDDistanceQuery {
   public DBIDRangeDistanceQuery(Relation<DBID> relation, DBIDRangeDistanceFunction distanceFunction) {
     super(relation, distanceFunction);
     this.range = DBIDUtil.assertRange(relation.getDBIDs());
+    distanceFunction.checkRange(this.range);
     this.distanceFunction = distanceFunction;
   }
 

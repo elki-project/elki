@@ -1,5 +1,27 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.FileUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import gnu.trove.impl.Constants;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,25 +48,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 import gnu.trove.map.TLongFloatMap;
 import gnu.trove.map.hash.TLongFloatHashMap;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.FileUtil;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-
 /**
  * Distance function that is based on float distances given by a distance matrix
  * of an external ASCII file.
@@ -64,6 +67,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Description("Loads float distance values from an external text file.")
 public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFunction {
   /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(FileBasedFloatDistanceFunction.class);
+
+  /**
    * The distance cache
    */
   private TLongFloatMap cache;
@@ -77,6 +85,11 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
    * Input file of distance matrix
    */
   private File matrixfile;
+
+  /**
+   * Minimum and maximum IDs seen.
+   */
+  private int min, max;
 
   /**
    * Constructor.
@@ -105,15 +118,25 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
 
   @Override
   public double distance(int i1, int i2) {
-    return (i1 == i2) ? 0. : cache.get(makeKey(i1, i2));
+    return (i1 == i2) ? 0. : cache.get(makeKey(i1 + min, i2 + min));
   }
 
   private void loadCache(DistanceParser parser, File matrixfile) throws IOException {
     InputStream in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile)));
-    cache = new TLongFloatHashMap();
+    cache = new TLongFloatHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1L, Float.POSITIVE_INFINITY);
+    min = Integer.MAX_VALUE;
+    max = Integer.MIN_VALUE;
     parser.parse(in, new DistanceCacheWriter() {
       @Override
       public void put(int id1, int id2, double distance) {
+        if(id1 < id2) {
+          min = id1 < min ? id1 : min;
+          max = id2 > max ? id2 : max;
+        }
+        else {
+          min = id2 < min ? id2 : min;
+          max = id1 > max ? id1 : max;
+        }
         cache.put(makeKey(id1, id2), (float) distance);
       }
 
@@ -122,6 +145,9 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
         return cache.containsKey(makeKey(id1, id2));
       }
     });
+    if(min != 0) {
+      LOG.verbose("Distance matrix is supposed to be 0-indexed. Choosing offset " + min + " to compensate.");
+    }
   }
 
   /**
@@ -135,6 +161,14 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
     return (i1 < i2) //
     ? ((((long) i1) << 32) | i2)//
     : ((((long) i2) << 32) | i1);
+  }
+
+  @Override
+  public void checkRange(DBIDRange range) {
+    final int size = max + 1 - min;
+    if(size < range.size()) {
+      LOG.warning("Distance matrix has size " + size + " but range has size: " + range.size());
+    }
   }
 
   @Override
