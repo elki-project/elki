@@ -165,7 +165,7 @@ class IntegerDBIDVar implements DBIDVar, IntegerDBIDs {
 
   @Override
   public String toString() {
-    return Integer.toString(id);
+    return (id != Integer.MIN_VALUE) ? Integer.toString(id) : "null";
   }
 
   @Override
