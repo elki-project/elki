@@ -100,7 +100,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   @Override
   public String toString() {
-    return Integer.toString(id);
+    return (id != Integer.MIN_VALUE) ? Integer.toString(id) : "null";
   }
 
   @Override
@@ -111,11 +111,11 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
   @Override
   @Deprecated
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if(this == obj) {
       return true;
     }
-    if (!(obj instanceof IntegerDBID)) {
-      if (obj instanceof DBIDRef) {
+    if(!(obj instanceof IntegerDBID)) {
+      if(obj instanceof DBIDRef) {
         LoggingUtil.warning("Programming error: DBID.equals(DBIDRef) is not well-defined. Use DBIDUtil.equal() instead!", new Throwable());
       }
       return false;
@@ -137,7 +137,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   @Override
   public DBID get(int i) {
-    if (i != 0) {
+    if(i != 0) {
       throw new ArrayIndexOutOfBoundsException();
     }
     return this;
@@ -145,7 +145,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   @Override
   public DBIDVar assignVar(int index, DBIDVar var) {
-    if (index != 0) {
+    if(index != 0) {
       throw new ArrayIndexOutOfBoundsException();
     }
     var.set(this);
@@ -165,9 +165,10 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
   @Override
   public ArrayDBIDs slice(int begin, int end) {
-    if (begin == 0 && end == 1) {
+    if(begin == 0 && end == 1) {
       return this;
-    } else {
+    }
+    else {
       return DBIDUtil.EMPTYDBIDS;
     }
   }
@@ -232,7 +233,7 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
 
     @Override
     public boolean equals(Object other) {
-      if (other instanceof DBID) {
+      if(other instanceof DBID) {
         LoggingUtil.warning("Programming error detected: DBIDItr.equals(DBID). Use sameDBID()!", new Throwable());
       }
       return super.equals(other);

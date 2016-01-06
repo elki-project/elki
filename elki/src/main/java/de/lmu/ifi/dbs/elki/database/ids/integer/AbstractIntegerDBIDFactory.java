@@ -83,7 +83,8 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
 
   @Override
   public String toString(DBIDRef id) {
-    return (id != null) ? Integer.toString(id.internalGetIndex()) : "null";
+    return (id != null && id.internalGetIndex() != Integer.MIN_VALUE) //
+    ? Integer.toString(id.internalGetIndex()) : "null";
   }
 
   @Override
