@@ -41,8 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Parser for parsing one distance value per line.
  *
  * A line must have the following format: {@code id1 id2 distanceValue}, where
- * id1 and id2 are integers representing the two ids belonging to the distance
- * value. Lines starting with &quot;#&quot; will be ignored.
+ * id1 and id2 are integers starting at 0 representing the two ids belonging to
+ * the distance value. Lines starting with &quot;#&quot; will be ignored.
  *
  * @author Elke Achtert
  * @author Erich Schubert
@@ -54,8 +54,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 @Title("Number Distance Parser")
 @Description("Parser for the following line format:\n" //
-    + "id1 id2 distanceValue, where id1 and is2 are integers representing the two ids belonging to the distance value.\n" //
-    + "The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
++ "id1 id2 distanceValue, where id1 and is2 are integers starting at 0 representing the two ids belonging to the distance value.\n" //
++ "The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
 public class AsciiDistanceParser implements DistanceParser {
   /**
    * The logger for this class.

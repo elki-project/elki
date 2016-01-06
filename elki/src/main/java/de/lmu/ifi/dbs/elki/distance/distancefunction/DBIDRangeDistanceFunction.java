@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -47,4 +49,12 @@ public interface DBIDRangeDistanceFunction extends DBIDDistanceFunction {
    * @return Distance
    */
   double distance(int i1, int i2);
+
+  /**
+   * Validate the range of DBIDs to use. This will log a warning if an obvious
+   * mismatch was found.
+   * 
+   * @param range DBID range
+   */
+  void checkRange(DBIDRange range);
 }

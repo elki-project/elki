@@ -26,7 +26,9 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 import java.io.File;
 import java.io.IOException;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -46,7 +48,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external matrix.")
 public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFunction {
-  // TODO: constructor with file.
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(DiskCacheBasedDoubleDistanceFunction.class);
 
   /**
    * Magic to identify double cache matrices
@@ -68,6 +73,17 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
     this.cache = cache;
   }
 
+  /**
+   * Constructor.
+   *
+   * @param matrixfile File name
+   * @throws IOException
+   */
+  public DiskCacheBasedDoubleDistanceFunction(File matrixfile) throws IOException {
+    super();
+    this.cache = new OnDiskUpperTriangleMatrix(matrixfile, DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, false);
+  }
+
   @Override
   public double distance(int i1, int i2) {
     // the smaller id is the first key
@@ -80,6 +96,13 @@ public class DiskCacheBasedDoubleDistanceFunction extends AbstractDBIDRangeDista
     }
     catch(IOException e) {
       throw new RuntimeException("Read error when loading distance " + i1 + "," + i2 + " from cache file.", e);
+    }
+  }
+
+  @Override
+  public void checkRange(DBIDRange range) {
+    if(cache.getMatrixSize() < range.size()) {
+      LOG.warning("Distance matrix has size " + cache.getMatrixSize() + " but range has size: " + range.size());
     }
   }
 

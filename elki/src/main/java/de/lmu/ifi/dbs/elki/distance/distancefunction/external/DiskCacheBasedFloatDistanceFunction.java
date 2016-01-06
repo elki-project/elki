@@ -26,7 +26,9 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 import java.io.File;
 import java.io.IOException;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractDBIDRangeDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -45,7 +47,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 @Title("File based float distance for database objects.")
 @Description("Loads float distance values from an external matrix.")
 public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFunction {
-  // TODO: constructor with file.
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(DiskCacheBasedFloatDistanceFunction.class);
 
   /**
    * Magic to identify double cache matrices
@@ -65,6 +70,17 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDRangeDistan
   public DiskCacheBasedFloatDistanceFunction(OnDiskUpperTriangleMatrix cache) {
     super();
     this.cache = cache;
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param matrixfile File name
+   * @throws IOException
+   */
+  public DiskCacheBasedFloatDistanceFunction(File matrixfile) throws IOException {
+    super();
+    this.cache = new OnDiskUpperTriangleMatrix(matrixfile, FLOAT_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_FLOAT, false);
   }
 
   @Override
@@ -92,6 +108,13 @@ public class DiskCacheBasedFloatDistanceFunction extends AbstractDBIDRangeDistan
     }
     DiskCacheBasedFloatDistanceFunction other = (DiskCacheBasedFloatDistanceFunction) obj;
     return this.cache.equals(other.cache);
+  }
+
+  @Override
+  public void checkRange(DBIDRange range) {
+    if(cache.getMatrixSize() < range.size()) {
+      LOG.warning("Distance matrix has size " + cache.getMatrixSize() + " but range has size: " + range.size());
+    }
   }
 
   /**
