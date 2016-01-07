@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
@@ -43,7 +44,9 @@ import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -115,15 +118,8 @@ public class EvaluateCIndex<O> implements Evaluator {
   public double evaluateClustering(Database db, Relation<? extends O> rel, DistanceQuery<O> dq, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
 
-    // theta is the sum, w the number of within group distances
-    double theta = 0;
-    int w = 0;
-    int ignorednoise = 0;
-    int isize = clusters.size() <= 1 ? rel.size() : rel.size() / (clusters.size() - 1);
-    DoubleArray pairDists = new DoubleArray(isize * rel.size());
-
-    for(int i = 0; i < clusters.size(); i++) {
-      Cluster<?> cluster = clusters.get(i);
+    int ignorednoise = 0, w = 0;
+    for(Cluster<?> cluster : clusters) {
       if(cluster.size() <= 1 || cluster.isNoise()) {
         switch(noiseOption){
         case IGNORE_NOISE:
@@ -135,41 +131,43 @@ public class EvaluateCIndex<O> implements Evaluator {
           break; // Treat like a cluster
         }
       }
-      for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
-        O obj = rel.get(it1);
-        // Compare object to every cluster, but only once
-        for(int j = i; j < clusters.size(); j++) {
-          Cluster<?> ocluster = clusters.get(j);
-          if(ocluster.size() <= 1 || ocluster.isNoise()) {
-            switch(noiseOption){
-            case IGNORE_NOISE:
-              continue; // Ignore this cluster.
-            case TREAT_NOISE_AS_SINGLETONS:
-            case MERGE_NOISE:
-              break; // Treat like a cluster
-            }
-          }
-          for(DBIDIter it2 = ocluster.getIDs().iter(); it2.valid(); it2.advance()) {
-            if(DBIDUtil.compare(it1, it2) <= 0) { // Only once.
-              continue;
-            }
-            double dist = dq.distance(obj, rel.get(it2));
-            pairDists.add(dist);
-            if(ocluster == cluster) { // Within-cluster distances.
-              theta += dist;
-              w++;
-            }
-          }
-        }
-      }
+      w += (cluster.size() * (cluster.size() - 1)) >>> 1;
     }
 
+    // theta is the sum, w the number of within group distances
+    double theta = 0;
+    DoubleHeap maxDists = new DoubleMinHeap(w); // Careful: REALLY minHeap!
+    DoubleHeap minDists = new DoubleMaxHeap(w); // Careful: REALLY maxHeap!
+
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing clusters for C-Index", clusters.size(), LOG) : null;
+    for(int i = 0; i < clusters.size(); i++) {
+      Cluster<?> cluster = clusters.get(i);
+      if(cluster.size() <= 1 || cluster.isNoise()) {
+        switch(noiseOption){
+        case IGNORE_NOISE:
+          LOG.incrementProcessed(prog);
+          continue; // Ignore
+        case TREAT_NOISE_AS_SINGLETONS:
+          processSingleton(cluster, rel, dq, maxDists, minDists, w);
+          continue;
+        case MERGE_NOISE:
+          break; // Treat like a cluster
+        }
+      }
+      theta += processCluster(cluster, clusters, i, dq, maxDists, minDists, w);
+      LOG.incrementProcessed(prog);
+    }
+    LOG.ensureCompleted(prog);
+
     // Simulate best and worst cases:
-    pairDists.sort();
+    assert (minDists.size() == w);
+    assert (maxDists.size() == w);
     double min = 0, max = 0;
-    for(int i = 0, j = pairDists.size() - 1; i < w; i++, j--) {
-      min += pairDists.get(i);
-      max += pairDists.get(j);
+    for(DoubleHeap.UnsortedIter it = minDists.unsortedIter(); it.valid(); it.advance()) {
+      min += it.get();
+    }
+    for(DoubleHeap.UnsortedIter it = maxDists.unsortedIter(); it.valid(); it.advance()) {
+      max += it.get();
     }
 
     double cIndex = (max > min) ? (theta - min) / (max - min) : 0.;
@@ -187,6 +185,52 @@ public class EvaluateCIndex<O> implements Evaluator {
     g.addMeasure("C-Index", cIndex, 0., 1., 0., true);
     db.getHierarchy().resultChanged(ev);
     return cIndex;
+  }
+
+  protected double processCluster(Cluster<?> cluster, List<? extends Cluster<?>> clusters, int i, DistanceQuery<O> dq, DoubleHeap maxDists, DoubleHeap minDists, int w) {
+    double theta = 0.;
+    for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
+      // Compare object to every cluster, but only once
+      for(int j = i; j < clusters.size(); j++) {
+        Cluster<?> ocluster = clusters.get(j);
+        if(ocluster.size() <= 1 || ocluster.isNoise()) {
+          switch(noiseOption){
+          case IGNORE_NOISE:
+            continue; // Ignore this cluster.
+          case TREAT_NOISE_AS_SINGLETONS:
+            break; // Treat like a cluster
+          case MERGE_NOISE:
+            break; // Treat like a cluster
+          }
+        }
+        for(DBIDIter it2 = ocluster.getIDs().iter(); it2.valid(); it2.advance()) {
+          if(DBIDUtil.compare(it1, it2) <= 0) { // Only once.
+            continue;
+          }
+          double dist = dq.distance(it1, it2);
+          minDists.add(dist, w);
+          maxDists.add(dist, w);
+          if(ocluster == cluster) { // Within-cluster distances.
+            theta += dist;
+          }
+        }
+      }
+    }
+    return theta;
+  }
+
+  protected void processSingleton(Cluster<?> cluster, Relation<? extends O> rel, DistanceQuery<O> dq, DoubleHeap maxDists, DoubleHeap minDists, int w) {
+    // All other objects are in other clusters!
+    for(DBIDIter it1 = cluster.getIDs().iter(); it1.valid(); it1.advance()) {
+      for(DBIDIter it2 = rel.iterDBIDs(); it2.valid(); it2.advance()) {
+        if(DBIDUtil.compare(it1, it2) <= 0) { // Only once.
+          continue;
+        }
+        double dist = dq.distance(it1, it2);
+        minDists.add(dist, w);
+        maxDists.add(dist, w);
+      }
+    }
   }
 
   @Override
