@@ -44,7 +44,12 @@ public class RandomFactory {
   /**
    * Global default factory
    */
-  public static RandomFactory DEFAULT = new RandomFactory(getGlobalSeed());
+  public static RandomFactory DEFAULT = new RandomFactory(getGlobalSeed()) {
+    @Override
+    public String toString() {
+      return "GlobalRandom[" + Long.toString(this.seed) + "]";
+    }
+  };
 
   /**
    * Initialize the default random.
@@ -59,7 +64,7 @@ public class RandomFactory {
   /**
    * Seed.
    */
-  private long seed;
+  protected long seed;
 
   /**
    * Factory method: Get a random factory for the given seed.
@@ -100,5 +105,10 @@ public class RandomFactory {
    */
   public Random getSingleThreadedRandom() {
     return new FastNonThreadsafeRandom(seed++);
+  }
+
+  @Override
+  public String toString() {
+    return "Random[" + Long.toString(seed) + "]";
   }
 }
