@@ -56,10 +56,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Compute the C-index of a data set.
+ * 
+ * Note: This requires pairwise distance computations, so it is not recommended
+ * to use this on larger data sets.
  *
  * Reference:
  * <p>
- * L. J. Hubert and J.R. Levin <br />
+ * L. J. Hubert and J. R. Levin <br />
  * A general statistical framework for assessing categorical clustering in free
  * recall<br />
  * Psychological Bulletin, Vol. 83(6)
@@ -136,40 +139,48 @@ public class EvaluateCIndex<O> implements Evaluator {
     }
 
     double theta = 0.; // Sum of within-cluster distances
-    DoubleHeap maxDists = new DoubleMinHeap(w); // Careful: REALLY minHeap!
-    DoubleHeap minDists = new DoubleMaxHeap(w); // Careful: REALLY maxHeap!
+    double min = 0, max = 0; // Sum of larges and smallest
+    if(w <= (rel.size() * (rel.size() - 1L)) >>> 2) {
+      DoubleHeap maxDists = new DoubleMinHeap(w); // Careful: REALLY minHeap!
+      DoubleHeap minDists = new DoubleMaxHeap(w); // Careful: REALLY maxHeap!
 
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing clusters for C-Index", clusters.size(), LOG) : null;
-    for(int i = 0; i < clusters.size(); i++) {
-      Cluster<?> cluster = clusters.get(i);
-      if(cluster.size() <= 1 || cluster.isNoise()) {
-        switch(noiseOption){
-        case IGNORE_NOISE:
-          LOG.incrementProcessed(prog);
-          continue; // Ignore
-        case TREAT_NOISE_AS_SINGLETONS:
-          processSingleton(cluster, rel, dq, maxDists, minDists, w);
-          continue;
-        case MERGE_NOISE:
-          break; // Treat like a cluster
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing clusters for C-Index", clusters.size(), LOG) : null;
+      for(int i = 0; i < clusters.size(); i++) {
+        Cluster<?> cluster = clusters.get(i);
+        if(cluster.size() <= 1 || cluster.isNoise()) {
+          switch(noiseOption){
+          case IGNORE_NOISE:
+            LOG.incrementProcessed(prog);
+            continue; // Ignore
+          case TREAT_NOISE_AS_SINGLETONS:
+            processSingleton(cluster, rel, dq, maxDists, minDists, w);
+            LOG.incrementProcessed(prog);
+            continue;
+          case MERGE_NOISE:
+            break; // Treat like a cluster, below
+          }
         }
+        theta += processCluster(cluster, clusters, i, dq, maxDists, minDists, w);
+        LOG.incrementProcessed(prog);
       }
-      theta += processCluster(cluster, clusters, i, dq, maxDists, minDists, w);
-      LOG.incrementProcessed(prog);
-    }
-    LOG.ensureCompleted(prog);
+      LOG.ensureCompleted(prog);
 
-    // Simulate best and worst cases:
-    assert (minDists.size() == w);
-    assert (maxDists.size() == w);
-    double min = 0, max = 0;
-    for(DoubleHeap.UnsortedIter it = minDists.unsortedIter(); it.valid(); it.advance()) {
-      min += it.get();
+      // Simulate best and worst cases:
+      assert (minDists.size() == w);
+      assert (maxDists.size() == w);
+      for(DoubleHeap.UnsortedIter it = minDists.unsortedIter(); it.valid(); it.advance()) {
+        min += it.get();
+      }
+      for(DoubleHeap.UnsortedIter it = maxDists.unsortedIter(); it.valid(); it.advance()) {
+        max += it.get();
+      }
+      assert (max >= min);
     }
-    for(DoubleHeap.UnsortedIter it = maxDists.unsortedIter(); it.valid(); it.advance()) {
-      max += it.get();
+    else {
+      // Since we have fewer cross-cluster distances than within-cluster
+      // distances, min=max and cIndex = 0.
+      theta = min = max = 0;
     }
-    assert (max >= min);
 
     double cIndex = (max > min) ? (theta - min) / (max - min) : 0.;
 
