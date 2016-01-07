@@ -33,6 +33,18 @@ import java.util.Arrays;
  */
 public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
   /**
+   * Maximum array size permitted by Java.
+   * 
+   * This is JVM dependent, but 2^31 - 5 is the usual OpenJDK8 value.
+   */
+  private static final int MAX_ARRAY_SIZE = Integer.MAX_VALUE - 5;
+
+  /**
+   * Last value where we can double the array size.
+   */
+  private static final int LAST_DOUBLE_SIZE = MAX_ARRAY_SIZE >> 1;
+
+  /**
    * (Reused) store for numerical attributes.
    */
   public double[] data;
@@ -55,6 +67,12 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
    * @param initialsize Initial size.
    */
   public DoubleArray(int initialsize) {
+    if(initialsize < 0) {
+      initialsize = 11;
+    }
+    else if(initialsize > MAX_ARRAY_SIZE) {
+      initialsize = MAX_ARRAY_SIZE;
+    }
     this.data = new double[initialsize];
     this.size = 0;
   }
@@ -86,9 +104,22 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
    */
   public void add(double attribute) {
     if(data.length == size) {
-      data = Arrays.copyOf(data, size << 1);
+      grow();
     }
     data[size++] = attribute;
+  }
+
+  /**
+   * Grow the current array.
+   * 
+   * @throws OutOfMemoryError
+   */
+  private void grow() throws OutOfMemoryError {
+    if(data.length == MAX_ARRAY_SIZE) {
+      throw new OutOfMemoryError("Array size has reached the Java maximum.");
+    }
+    final int newsize = (size >= LAST_DOUBLE_SIZE) ? MAX_ARRAY_SIZE : (size << 1);
+    data = Arrays.copyOf(data, newsize);
   }
 
   /**
