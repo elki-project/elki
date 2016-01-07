@@ -105,7 +105,7 @@ public class DocumentReferences {
       try {
         File refwiki = new File(args[1]);
         FileOutputStream reffow = new FileOutputStream(refwiki);
-        PrintStream refstreamW = new PrintStream(reffow);
+        PrintStream refstreamW = new PrintStream(reffow, false, "UTF-8");
         documentReferencesWiki(refs, refstreamW);
         refstreamW.flush();
         refstreamW.close();
