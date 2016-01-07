@@ -120,7 +120,7 @@ public class EvaluateCIndex<O> implements Evaluator {
     int w = 0;
     int ignorednoise = 0;
     int isize = clusters.size() <= 1 ? rel.size() : rel.size() / (clusters.size() - 1);
-    DoubleArray pairDists = new DoubleArray(isize);
+    DoubleArray pairDists = new DoubleArray(isize * rel.size());
 
     for(int i = 0; i < clusters.size(); i++) {
       Cluster<?> cluster = clusters.get(i);
