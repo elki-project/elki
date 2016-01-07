@@ -107,7 +107,7 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
   protected WritableDoubleDataStore computeCoreDists(DBIDs ids, KNNQuery<O> knnQ, int minPts) {
     final Logging LOG = getLogger();
     final WritableDoubleDataStore coredists = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB);
-    FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Computing core sizes.", ids.size(), LOG) : null;
+    FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Computing core sizes", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       coredists.put(iter, knnQ.getKNNForDBID(iter, minPts).getKNNDistance());
       LOG.incrementProcessed(cprog);
@@ -234,7 +234,7 @@ public abstract class AbstractHDBSCAN<O, R extends Result> extends AbstractDista
       pi.put(iter, iter); // Initialize
     }
     DBIDVar p = DBIDUtil.newVar(), q = DBIDUtil.newVar(), n = DBIDUtil.newVar();
-    FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Converting MST to pointer representation.", heap.size(), LOG) : null;
+    FiniteProgress pprog = LOG.isVerbose() ? new FiniteProgress("Converting MST to pointer representation", heap.size(), LOG) : null;
     while(!heap.isEmpty()) {
       final double dist = heap.peekKey();
       final long pair = heap.peekValue();

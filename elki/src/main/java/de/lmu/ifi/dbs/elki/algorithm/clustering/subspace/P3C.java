@@ -363,7 +363,7 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    * @return p-signatures
    */
   private ArrayList<Signature> mergeClusterCores(final int binCount, ArrayList<Signature> signatures) {
-    MutableProgress mergeProgress = LOG.isVerbose() ? new MutableProgress("Merging signatures.", signatures.size(), LOG) : null;
+    MutableProgress mergeProgress = LOG.isVerbose() ? new MutableProgress("Merging signatures", signatures.size(), LOG) : null;
 
     // Annotate dimensions to 1-signatures for quick stopping.
     int[] firstdim = new int[signatures.size()];

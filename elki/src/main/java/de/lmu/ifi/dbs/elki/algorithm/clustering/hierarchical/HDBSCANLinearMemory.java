@@ -119,7 +119,7 @@ public class HDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensityHie
     final int numedges = ids.size() - 1;
     DoubleLongHeap heap = new DoubleLongMinHeap(numedges);
     // 2. Build spanning tree.
-    FiniteProgress mprog = LOG.isVerbose() ? new FiniteProgress("Computing minimum spanning tree (n-1 edges).", numedges, LOG) : null;
+    FiniteProgress mprog = LOG.isVerbose() ? new FiniteProgress("Computing minimum spanning tree (n-1 edges)", numedges, LOG) : null;
     PrimsMinimumSpanningTree.processDense(ids,//
         new HDBSCANAdapter(ids, coredists, distQ), //
         new HeapMSTCollector(heap, mprog, LOG));

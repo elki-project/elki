@@ -125,7 +125,7 @@ public class KNNWeightOutlier<O> extends AbstractDistanceBasedAlgorithm<O, Outli
     final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, k + 1); // + query point
 
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute kNN weights.", relation.size(), LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Compute kNN weights", relation.size(), LOG) : null;
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore knnw_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);

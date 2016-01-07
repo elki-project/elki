@@ -158,7 +158,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
     neighs = index.getNeighs(); // get neighbors of points
 
     // compute ordering as for OPTICS
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("OPTICS clustering.", ids.size(), LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("FastOPTICS clustering", ids.size(), LOG) : null;
     processed = DBIDUtil.newHashSet(ids.size());
     order = new ClusterOrder(ids, "FastOPTICS Cluster Order", "fast-optics");
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {

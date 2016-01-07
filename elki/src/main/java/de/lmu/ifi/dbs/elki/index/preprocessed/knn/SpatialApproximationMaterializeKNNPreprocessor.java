@@ -105,7 +105,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     }
 
     List<E> leaves = index.getLeaves();
-    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Processing leaf nodes.", leaves.size(), getLogger()) : null;
+    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Processing leaf nodes", leaves.size(), getLogger()) : null;
     for(E leaf : leaves) {
       N node = index.getNode(leaf);
       int size = node.getNumEntries();

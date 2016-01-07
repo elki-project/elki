@@ -124,7 +124,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     WritableIntegerDataStore bestclusters = null;
 
     Random rnd = random.getSingleThreadedRandom();
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Random samples.", numsamples, LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Processing random samples", numsamples, LOG) : null;
     for(int j = 0; j < numsamples; j++) {
       DBIDs rids = DBIDUtil.randomSample(ids, sampling, rnd);
       // Choose initial medoids
