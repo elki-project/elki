@@ -74,7 +74,7 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
 
       // When necessary, perform an initialization scan
       if(prepareStart(castType)) {
-        FiniteProgress pprog = logger.isVerbose() ? new FiniteProgress("Preparing normalization.", objects.dataLength(), logger) : null;
+        FiniteProgress pprog = logger.isVerbose() ? new FiniteProgress("Preparing normalization", objects.dataLength(), logger) : null;
         for(Object o : column) {
           @SuppressWarnings("unchecked")
           final I obj = (I) o;
@@ -90,7 +90,7 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
       bundle.appendColumn(convertedType(castType), castColumn);
 
       // Normalization scan
-      FiniteProgress nprog = logger.isVerbose() ? new FiniteProgress("Data normalization.", objects.dataLength(), logger) : null;
+      FiniteProgress nprog = logger.isVerbose() ? new FiniteProgress("Data normalization", objects.dataLength(), logger) : null;
       for(int i = 0; i < objects.dataLength(); i++) {
         @SuppressWarnings("unchecked")
         final I obj = (I) column.get(i);

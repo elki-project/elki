@@ -194,7 +194,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
    */
   private int[] countItemSupport(final Relation<BitVector> relation, final int dim) {
     final int[] counts = new int[dim];
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Finding frequent 1-items.", relation.size(), LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Finding frequent 1-items", relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       SparseFeatureVector<?> bv = relation.get(iditer);
       // TODO: only count those which satisfy minlength?

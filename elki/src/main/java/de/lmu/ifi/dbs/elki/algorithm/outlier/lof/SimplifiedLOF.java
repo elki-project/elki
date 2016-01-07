@@ -172,7 +172,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
    * @param lofminmax Minimum and maximum scores
    */
   private void computeSimplifiedLOFs(DBIDs ids, KNNQuery<O> knnq, WritableDoubleDataStore slrds, WritableDoubleDataStore lofs, DoubleMinMax lofminmax) {
-    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Simplified LOF scores.", ids.size(), LOG) : null;
+    FiniteProgress progressLOFs = LOG.isVerbose() ? new FiniteProgress("Simplified LOF scores", ids.size(), LOG) : null;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double lof;
       final double lrdp = slrds.doubleValue(iter);

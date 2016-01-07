@@ -111,7 +111,7 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
       // Scratch space for testing:
       double[] test = new double[castColumn.size()];
 
-      FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Analyzing data.", dim, LOG) : null;
+      FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Analyzing data", dim, LOG) : null;
       // We iterate over dimensions, this kind of filter needs fast random
       // access.
       for(int d = 0; d < dim; d++) {
@@ -147,7 +147,7 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
       }
       LOG.ensureCompleted(dprog);
 
-      FiniteProgress nprog = LOG.isVerbose() ? new FiniteProgress("Data normalization.", objects.dataLength(), LOG) : null;
+      FiniteProgress nprog = LOG.isVerbose() ? new FiniteProgress("Data normalization", objects.dataLength(), LOG) : null;
       // Normalization scan
       double[] buf = new double[dim];
       for(int i = 0; i < objects.dataLength(); i++) {

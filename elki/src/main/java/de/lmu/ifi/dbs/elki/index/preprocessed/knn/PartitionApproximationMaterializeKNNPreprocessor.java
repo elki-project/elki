@@ -103,7 +103,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
     // Produce a random shuffling of the IDs:
     ArrayDBIDs[] parts = DBIDUtil.randomSplit(relation.getDBIDs(), partitions, rnd);
 
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Processing partitions.", partitions, LOG) : null;
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Processing partitions", partitions, LOG) : null;
     for(int part = 0; part < partitions; part++) {
       final ArrayDBIDs ids = parts[part];
       final int size = ids.size();

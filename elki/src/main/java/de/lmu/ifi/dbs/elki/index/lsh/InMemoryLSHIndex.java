@@ -169,7 +169,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
 
       // TODO: We assume all hash functions have the same dimensionality.
       double[] buf = new double[hashfunctions.get(0).getNumberOfProjections()];
-      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Building LSH index.", relation.size(), LOG) : null;
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Building LSH index", relation.size(), LOG) : null;
       int expect = Math.max(2, (int) Math.ceil(relation.size() / (double) numberOfBuckets));
       for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
         V obj = relation.get(iter);

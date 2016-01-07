@@ -115,7 +115,7 @@ public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KN
     final int size = (int) ((sample <= 1.) ? Math.ceil(relation.size() * sample) : sample);
     DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), size, rnd);
 
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Sampling kNN distances.", size, LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Sampling kNN distances", size, LOG) : null;
     double[] knnDistances = new double[size];
     int i = 0;
     for(DBIDIter iditer = sample.iter(); iditer.valid(); iditer.advance(), i++) {

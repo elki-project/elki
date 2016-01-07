@@ -203,7 +203,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult>im
       densities.put(iter, new double[knum]);
     }
     // Distribute densities:
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing densities.", ids.size(), LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing densities", ids.size(), LOG) : null;
     double iminbw = (minBandwidth > 0.) ? 1. / (minBandwidth * scale) : Double.POSITIVE_INFINITY;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       KNNList neighbors = knnq.getKNNForDBID(iter, kmax + 1);
@@ -269,7 +269,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult>im
    */
   protected void computeOutlierScores(KNNQuery<O> knnq, final DBIDs ids, WritableDataStore<double[]> densities, WritableDoubleDataStore kdeos, DoubleMinMax minmax) {
     final int knum = kmax + 1 - kmin;
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing KDEOS scores.", ids.size(), LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing KDEOS scores", ids.size(), LOG) : null;
 
     double[][] scratch = new double[knum][kmax + 5];
     MeanVariance mv = new MeanVariance();
