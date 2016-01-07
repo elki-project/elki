@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceScanner;
@@ -70,6 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.UnParameter
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
 
@@ -182,7 +184,7 @@ public class DocumentParameters {
         throw new RuntimeException(e);
       }
       try {
-        PrintStream byclassstream = new PrintStream(new BufferedOutputStream(byclassfo));
+        PrintStream byclassstream = new PrintStream(new BufferedOutputStream(byclassfo), false, "UTF-8");
         makeByClassOverviewWiki(byclass, new WikiStream(byclassstream));
         byclassstream.flush();
         byclassstream.close();
@@ -245,7 +247,9 @@ public class DocumentParameters {
   private static void buildParameterIndex(Map<Class<?>, List<Parameter<?>>> byclass, Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) {
     final ArrayList<TrackedParameter> options = new ArrayList<>();
     ExecutorService es = Executors.newSingleThreadExecutor();
-    for(final Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, false, true)) {
+    List<Class<?>> objs = ELKIServiceRegistry.findAllImplementations(Object.class, false, true);
+    Collections.sort(objs, new ELKIServiceScanner.ClassSorter());
+    for(final Class<?> cls : objs) {
       // Doesn't have a proper name?
       if(cls.getCanonicalName() == null) {
         continue;
@@ -1020,6 +1024,9 @@ public class DocumentParameters {
       if(par instanceof ClassParameter<?>) {
         appendDefaultClassLink(htmldoc, par, p);
       }
+      else if(par instanceof RandomParameter && par.getDefaultValue() == RandomFactory.DEFAULT) {
+        p.appendChild(htmldoc.createTextNode("use global random seed"));
+      }
       else {
         Object def = par.getDefaultValue();
         p.appendChild(htmldoc.createTextNode(def.toString()));
@@ -1046,6 +1053,9 @@ public class DocumentParameters {
     if(par instanceof ClassParameter<?>) {
       final Class<?> name = ((ClassParameter<?>) par).getDefaultValue();
       out.javadocLink(name, null);
+    }
+    else if(par instanceof RandomParameter && par.getDefaultValue() == RandomFactory.DEFAULT) {
+      out.print("use global random seed");
     }
     else {
       Object def = par.getDefaultValue();
