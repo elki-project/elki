@@ -118,6 +118,7 @@ public class EvaluateCIndex<O> implements Evaluator {
   public double evaluateClustering(Database db, Relation<? extends O> rel, DistanceQuery<O> dq, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
 
+    // Count ignored noise, and within-cluster distances
     int ignorednoise = 0, w = 0;
     for(Cluster<?> cluster : clusters) {
       if(cluster.size() <= 1 || cluster.isNoise()) {
@@ -134,8 +135,7 @@ public class EvaluateCIndex<O> implements Evaluator {
       w += (cluster.size() * (cluster.size() - 1)) >>> 1;
     }
 
-    // theta is the sum, w the number of within group distances
-    double theta = 0;
+    double theta = 0.; // Sum of within-cluster distances
     DoubleHeap maxDists = new DoubleMinHeap(w); // Careful: REALLY minHeap!
     DoubleHeap minDists = new DoubleMaxHeap(w); // Careful: REALLY maxHeap!
 
@@ -169,6 +169,7 @@ public class EvaluateCIndex<O> implements Evaluator {
     for(DoubleHeap.UnsortedIter it = maxDists.unsortedIter(); it.valid(); it.advance()) {
       max += it.get();
     }
+    assert (max >= min);
 
     double cIndex = (max > min) ? (theta - min) / (max - min) : 0.;
 
