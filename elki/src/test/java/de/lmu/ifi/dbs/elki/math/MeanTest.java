@@ -1,5 +1,4 @@
-package de.lmu.ifi.dbs.elki;
-
+package de.lmu.ifi.dbs.elki.math;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -23,15 +22,29 @@ package de.lmu.ifi.dbs.elki;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+import de.lmu.ifi.dbs.elki.JUnit4Test;
 
 /**
- * This interface is used for test-discovery by the {@link AllTestsTestSuite} TestSuite.
- * 
+ * Test the Mean class.
+ *
  * @author Erich Schubert
  */
-@RunWith(JUnit4.class)
-public interface JUnit4Test {
-  // empty marker interface
+public class MeanTest implements JUnit4Test {
+  @Test
+  public void testInfinity() {
+    Mean m = new Mean();
+    m.put(Double.POSITIVE_INFINITY);
+    m.put(0.);
+    assertEquals(2, m.getCount(), 0);
+    assertEquals("Sensitive to infinity", Double.POSITIVE_INFINITY, m.getMean(), 0);
+    m = new Mean();
+    m.put(Double.NEGATIVE_INFINITY);
+    m.put(0.);
+    assertEquals(2, m.getCount(), 0);
+    assertEquals("Sensitive to infinity", Double.NEGATIVE_INFINITY, m.getMean(), 0);
+  }
 }
