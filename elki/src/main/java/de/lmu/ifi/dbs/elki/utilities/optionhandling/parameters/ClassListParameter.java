@@ -96,6 +96,23 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
     return buf.toString();
   }
 
+  @Override
+  public String getDefaultValueAsString() {
+    StringBuilder buf = new StringBuilder();
+    final String defPackage = restrictionClass.getPackage().getName() + ".";
+    for(Class<? extends C> c : getDefaultValue()) {
+      if(buf.length() > 0) {
+        buf.append(LIST_SEP);
+      }
+      String name = c.getName();
+      if(name.startsWith(defPackage)) {
+        name = name.substring(defPackage.length());
+      }
+      buf.append(name);
+    }
+    return buf.toString();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   protected List<Class<? extends C>> parseValue(Object obj) throws ParameterException {
