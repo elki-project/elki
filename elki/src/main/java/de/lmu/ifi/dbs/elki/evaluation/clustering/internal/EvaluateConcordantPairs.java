@@ -312,7 +312,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     /**
      * Parameter for the option, how noise should be treated.
      */
-    public static final OptionID NOISE_ID = new OptionID("davies-bouldin.noisehandling", "option, how noise should be treated.");
+    public static final OptionID NOISE_ID = new OptionID("concordant-pairs.noisehandling", "Control how noise should be treated.");
 
     /**
      * Distance function to use.
