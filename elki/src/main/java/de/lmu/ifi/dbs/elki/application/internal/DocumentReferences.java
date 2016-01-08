@@ -330,7 +330,28 @@ public class DocumentReferences {
       @Override
       public int compare(Pair<Reference, TreeSet<Object>> p1, Pair<Reference, TreeSet<Object>> p2) {
         final Object o1 = p1.second.first(), o2 = p2.second.first();
-        return COMPARATOR.compare(o1, o2);
+        int c = COMPARATOR.compare(o1, o2);
+        if(c == 0) {
+          Reference r1 = p1.first, r2 = p2.first;
+          c = compareNull(r1.title(), r2.title());
+          c = (c != 0) ? c : compareNull(r1.authors(), r2.authors());
+          c = (c != 0) ? c : compareNull(r1.booktitle(), r2.booktitle());
+        }
+        return c;
+      }
+
+      /**
+       * Null-tolerant String comparison.
+       * 
+       * @param s1 First string
+       * @param s2 Second string
+       * @return Order
+       */
+      private int compareNull(String s1, String s2) {
+        return (s1 == s2) ? 0 //
+        : (s1 == null) ? -1 //
+        : (s2 == null) ? +1 //
+        : s1.compareTo(s2);
       }
     });
     return refs;
