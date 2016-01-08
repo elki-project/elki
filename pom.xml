@@ -30,7 +30,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<skipTests>false</skipTests>
-		<excludeTests>TestHeapPerformance</excludeTests>
+		<excludeTests>HeapPerformanceTest</excludeTests>
 		<elki.projdir>${basedir}</elki.projdir>
 		<year>2015</year>
 	</properties>
