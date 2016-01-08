@@ -33,6 +33,7 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -50,6 +51,7 @@ public class HeapPerformanceTest {
 
   final private long seed = 123456L;
 
+  @Ignore
   @Test
   public void testRuntime() throws Exception {
     // prepare the data set
