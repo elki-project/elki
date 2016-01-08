@@ -724,9 +724,18 @@ public class DocumentParameters {
     Element maindl = htmldoc.createElement(HTMLUtil.HTML_DL_TAG);
     body.appendChild(maindl);
 
-    List<OptionID> opts = new ArrayList<>(byopt.keySet());
-    Collections.sort(opts, new SortByOption());
+    final Comparator<OptionID> osort = new SortByOption();
+    final Comparator<Class<?>> csort = new ELKIServiceScanner.ClassSorter();
+    Comparator<Pair<Parameter<?>, Class<?>>> psort = new Comparator<Pair<Parameter<?>, Class<?>>>() {
+      @Override
+      public int compare(Pair<Parameter<?>, Class<?>> o1, Pair<Parameter<?>, Class<?>> o2) {
+        int c = osort.compare(o1.first.getOptionID(), o2.first.getOptionID());
+        return (c != 0) ? c : csort.compare(o1.second, o2.second);
+      }
+    };
 
+    List<OptionID> opts = new ArrayList<>(byopt.keySet());
+    Collections.sort(opts, osort);
     for(OptionID oid : opts) {
       final Parameter<?> firstopt = byopt.get(oid).get(0).getFirst();
       // DT = definition term
@@ -791,7 +800,9 @@ public class DocumentParameters {
         optdd.appendChild(p);
       }
       optdd.appendChild(classesul);
-      for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
+      List<Pair<Parameter<?>, Class<?>>> plist = byopt.get(oid);
+      Collections.sort(plist, psort);
+      for(Pair<Parameter<?>, Class<?>> clinst : plist) {
         // DT definition term: option name, in TT for typewriter optics
         Element classli = htmldoc.createElement(HTMLUtil.HTML_LI_TAG);
 
