@@ -1,4 +1,10 @@
-package de.lmu.ifi.dbs.elki;
+package de.lmu.ifi.dbs.elki.math;
+
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
+import de.lmu.ifi.dbs.elki.JUnit4Test;
 
 /*
  This file is part of ELKI:
@@ -23,15 +29,22 @@ package de.lmu.ifi.dbs.elki;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+public class SinCosTableTest implements JUnit4Test {
 
-/**
- * This interface is used for test-discovery by the {@link AllTestsTestSuite} TestSuite.
- * 
- * @author Erich Schubert
- */
-@RunWith(JUnit4.class)
-public interface JUnit4Test {
-  // empty marker interface
+  @Test
+  public void testSinCosTable() {
+    doSinCosTableTest(360);
+    doSinCosTableTest(142); // Divisible by two
+    doSinCosTableTest(17);
+    doSinCosTableTest(131); // Prime.
+  }
+
+  protected void doSinCosTableTest(int steps) {
+    SinCosTable table = SinCosTable.make(steps);
+    for (int i = -steps; i < 2 * steps; i++) {
+      double angle = Math.toRadians(360. * i / steps);
+      assertEquals("Cosine does not match at i=" + i + " a=" + angle, Math.cos(angle), table.cos(i), 1E-10);
+      assertEquals("Sine does not match at i=" + i + " a=" + angle, Math.sin(angle), table.sin(i), 1E-10);
+    }
+  }
 }

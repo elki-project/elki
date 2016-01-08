@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki;
+package de.lmu.ifi.dbs.elki.index.vafile;
 
 /*
  This file is part of ELKI:
@@ -23,15 +23,26 @@ package de.lmu.ifi.dbs.elki;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.junit.Test;
+
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
+import de.lmu.ifi.dbs.elki.index.AbstractIndexStructureTest;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * This interface is used for test-discovery by the {@link AllTestsTestSuite} TestSuite.
+ * Unit test for the VAfile index.
  * 
  * @author Erich Schubert
  */
-@RunWith(JUnit4.class)
-public interface JUnit4Test {
-  // empty marker interface
+public class VAFileTest extends AbstractIndexStructureTest {
+  /**
+   * Test {@link VAFile} using a file based database connection.
+   */
+  @Test
+  public void testVAFile() {
+    ListParameterization spatparams = new ListParameterization();
+    spatparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, VAFile.Factory.class);
+    spatparams.addParameter(VAFile.Factory.PARTITIONS_ID, 4);
+    testExactEuclidean(spatparams, VAFile.VAFileKNNQuery.class, VAFile.VAFileRangeQuery.class);
+  }
 }

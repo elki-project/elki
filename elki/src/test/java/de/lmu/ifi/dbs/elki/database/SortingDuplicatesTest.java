@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki;
+package de.lmu.ifi.dbs.elki.database;
 
 /*
  This file is part of ELKI:
@@ -22,16 +22,30 @@ package de.lmu.ifi.dbs.elki;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import org.junit.Test;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 
 /**
- * This interface is used for test-discovery by the {@link AllTestsTestSuite} TestSuite.
+ * Test a corner case when sorting: duplicate keys.
  * 
  * @author Erich Schubert
  */
-@RunWith(JUnit4.class)
-public interface JUnit4Test {
-  // empty marker interface
+public class SortingDuplicatesTest implements JUnit4Test {
+  @Test(timeout = 100)
+  public void testDuplicateKeys() {
+    // We need an ide, but no real data.
+    DBID id = DBIDUtil.importInteger(1);
+    int size = 100000;
+
+    ModifiableDoubleDBIDList list = DBIDUtil.newDistanceDBIDList(size);
+    for(int i = 0; i < size; i++) {
+      double distance = 0. + (i % 2);
+      list.add(distance, id);
+    }
+    list.sort();
+  }
 }
