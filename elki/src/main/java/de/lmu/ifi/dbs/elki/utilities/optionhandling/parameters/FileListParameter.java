@@ -89,6 +89,20 @@ public class FileListParameter extends ListParameter<FileListParameter, List<Fil
     return buf.toString();
   }
 
+  @Override
+  public String getDefaultValueAsString() {
+    StringBuilder buf = new StringBuilder();
+    List<File> val = getDefaultValue();
+    Iterator<File> veciter = val.iterator();
+    while(veciter.hasNext()) {
+      buf.append(veciter.next());
+      if (veciter.hasNext()) {
+        buf.append(LIST_SEP);
+      }
+    }
+    return buf.toString();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   protected List<File> parseValue(Object obj) throws ParameterException {

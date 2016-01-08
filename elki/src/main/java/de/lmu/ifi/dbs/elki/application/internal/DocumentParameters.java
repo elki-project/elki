@@ -1039,8 +1039,7 @@ public class DocumentParameters {
         p.appendChild(htmldoc.createTextNode("use global random seed"));
       }
       else {
-        Object def = par.getDefaultValue();
-        p.appendChild(htmldoc.createTextNode(def.toString()));
+        p.appendChild(htmldoc.createTextNode(par.getDefaultValueAsString()));
       }
       optdd.appendChild(p);
     }
@@ -1069,8 +1068,7 @@ public class DocumentParameters {
       out.print("use global random seed");
     }
     else {
-      Object def = par.getDefaultValue();
-      out.print(def.toString());
+      out.print(par.getDefaultValueAsString());
     }
     out.println();
   }

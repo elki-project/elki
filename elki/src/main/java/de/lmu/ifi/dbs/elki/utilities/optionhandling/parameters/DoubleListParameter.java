@@ -60,6 +60,11 @@ public class DoubleListParameter extends ListParameter<DoubleListParameter, doub
   }
 
   @Override
+  public String getDefaultValueAsString() {
+    return FormatUtil.format(getDefaultValue(), LIST_SEP);
+  }
+
+  @Override
   protected double[] parseValue(Object obj) throws ParameterException {
     if(obj instanceof double[]) {
       return double[].class.cast(obj);

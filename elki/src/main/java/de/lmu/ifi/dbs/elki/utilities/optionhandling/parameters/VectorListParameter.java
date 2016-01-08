@@ -122,6 +122,21 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
     return buf.toString();
   }
 
+  @Override
+  public String getDefaultValueAsString() {
+    StringBuilder buf = new StringBuilder();
+    List<Vector> val = getDefaultValue();
+    Iterator<Vector> valiter = val.iterator();
+    while(valiter.hasNext()) {
+      buf.append(FormatUtil.format(valiter.next().getArrayRef(), LIST_SEP));
+      // Append separation character
+      if(valiter.hasNext()) {
+        buf.append(VECTOR_SEP);
+      }
+    }
+    return buf.toString();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   protected List<Vector> parseValue(Object obj) throws ParameterException {

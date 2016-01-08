@@ -70,6 +70,21 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
   }
 
   @Override
+  public String getDefaultValueAsString() {
+    int[] val = getDefaultValue();
+    if(val.length == 0) {
+      return "";
+    }
+    StringBuilder buf = new StringBuilder();
+    buf.append(val[0]);
+    for(int i = 1; i < val.length; i++) {
+      buf.append(LIST_SEP);
+      buf.append(val[i]);
+    }
+    return buf.toString();
+  }
+
+  @Override
   protected int[] parseValue(Object obj) throws ParameterException {
     if(obj instanceof int[]) {
       return (int[]) obj;
