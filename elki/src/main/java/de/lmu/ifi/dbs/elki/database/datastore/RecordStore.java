@@ -40,5 +40,5 @@ public interface RecordStore {
    * @param datatype data class
    * @return writable storage
    */
-  public <T> DataStore<T> getStorage(int col, Class<? super T> datatype);
+  <T> DataStore<T> getStorage(int col, Class<? super T> datatype);
 }

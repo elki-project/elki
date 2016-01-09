@@ -38,7 +38,7 @@ public interface WritableDoubleDataStore extends DoubleDataStore, WritableDataSt
    */
   @Override
   @Deprecated
-  public Double put(DBIDRef id, Double value);
+  Double put(DBIDRef id, Double value);
 
   /**
    * Associates the specified value with the specified id in this storage. If
@@ -49,7 +49,7 @@ public interface WritableDoubleDataStore extends DoubleDataStore, WritableDataSt
    * @param value Value to store.
    * @return previous value
    */
-  public double putDouble(DBIDRef id, double value);
+  double putDouble(DBIDRef id, double value);
 
   /**
    * Associates the specified value with the specified id in this storage. If
@@ -60,8 +60,7 @@ public interface WritableDoubleDataStore extends DoubleDataStore, WritableDataSt
    * @param value Value to store.
    * @return previous value
    */
-  public double put(DBIDRef id, double value);
-
+  double put(DBIDRef id, double value);
 
   /**
    * Increment the specified value with the specified id in this storage.
@@ -69,10 +68,5 @@ public interface WritableDoubleDataStore extends DoubleDataStore, WritableDataSt
    * @param id Database ID.
    * @param value Value to add to the previous value.
    */
-  public void increment(DBIDRef id, double value);
-
-  /**
-   * Reinitialize (reset to default value).
-   */
-  public void clear();
+  void increment(DBIDRef id, double value);
 }

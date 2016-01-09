@@ -48,6 +48,11 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
   private DataStoreIDMap idmap;
 
   /**
+   * Default value (for {@link #clear()}).
+   */
+  private int def;
+
+  /**
    * Constructor.
    * 
    * @param size Size
@@ -67,6 +72,7 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
   public ArrayIntegerStore(int size, DataStoreIDMap idmap, int def) {
     super();
     this.data = new int[size];
+    this.def = def;
     if(def != 0) {
       Arrays.fill(this.data, def);
     }
@@ -123,7 +129,12 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
 
   @Override
   public void delete(DBIDRef id) {
-    throw new UnsupportedOperationException("Can't delete from a static array storage.");
+    put(id, def);
+  }
+
+  @Override
+  public void clear() {
+    Arrays.fill(data, def);
   }
 
   @Override

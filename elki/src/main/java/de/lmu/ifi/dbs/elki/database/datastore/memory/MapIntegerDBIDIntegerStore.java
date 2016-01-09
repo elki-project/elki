@@ -112,4 +112,9 @@ public class MapIntegerDBIDIntegerStore implements WritableIntegerDataStore {
   public void increment(DBIDRef id, int adjust) {
     map.adjustOrPutValue(DBIDUtil.asInteger(id), adjust, adjust);
   }
+
+  @Override
+  public void clear() {
+    map.clear();
+  }
 }

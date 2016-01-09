@@ -41,5 +41,5 @@ public interface DataStore<T> extends Result {
    * @param id Database ID.
    * @return Object or {@code null}
    */
-  public T get(DBIDRef id);
+  T get(DBIDRef id);
 }

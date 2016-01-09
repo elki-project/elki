@@ -76,17 +76,6 @@ public class MapIntegerDBIDDBIDStore implements WritableDBIDDataStore {
   }
 
   @Override
-  public void destroy() {
-    map.clear();
-    map = null;
-  }
-
-  @Override
-  public void delete(DBIDRef id) {
-    map.remove(DBIDUtil.asInteger(id));
-  }
-
-  @Override
   public void put(DBIDRef id, DBIDRef value) {
     map.put(DBIDUtil.asInteger(id), DBIDUtil.asInteger(value));
   }
@@ -101,5 +90,21 @@ public class MapIntegerDBIDDBIDStore implements WritableDBIDDataStore {
     final int val = map.get(DBIDUtil.asInteger(id));
     DBIDFactory.FACTORY.assignVar(var, val);
     return var;
+  }
+
+  @Override
+  public void delete(DBIDRef id) {
+    map.remove(DBIDUtil.asInteger(id));
+  }
+
+  @Override
+  public void destroy() {
+    map.clear();
+    map = null;
+  }
+
+  @Override
+  public void clear() {
+    map.clear();
   }
 }

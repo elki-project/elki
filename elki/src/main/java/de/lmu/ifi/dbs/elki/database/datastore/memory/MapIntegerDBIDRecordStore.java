@@ -165,7 +165,12 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
 
     @Override
     public void delete(DBIDRef id) {
-      throw new UnsupportedOperationException("Record storage values cannot be deleted.");
+      throw new UnsupportedOperationException("Record storage accessors cannot be deleted.");
+    }
+
+    @Override
+    public void clear() {
+      throw new UnsupportedOperationException("Record storage accessors cannot be cleared.");
     }
 
     @Override

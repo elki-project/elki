@@ -44,7 +44,7 @@ public interface WritableRecordStore extends RecordStore {
    * @return writable storage
    */
   @Override
-  public <T> WritableDataStore<T> getStorage(int col, Class<? super T> datatype);
+  <T> WritableDataStore<T> getStorage(int col, Class<? super T> datatype);
   
   /**
    * Remove an object from the store, all columns.
@@ -52,5 +52,5 @@ public interface WritableRecordStore extends RecordStore {
    * @param id object ID to remove
    * @return success code
    */
-  public boolean remove(DBIDRef id);
+  boolean remove(DBIDRef id);
 }

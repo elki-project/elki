@@ -40,7 +40,7 @@ public interface DBIDDataStore extends DataStore<DBID> {
    */
   @Override
   @Deprecated
-  public DBID get(DBIDRef id);
+  DBID get(DBIDRef id);
 
   /**
    * Retrieves an object from the storage.
@@ -49,5 +49,5 @@ public interface DBIDDataStore extends DataStore<DBID> {
    * @param var Variable to update.
    * @return {@code var}
    */
-  public DBIDVar assignVar(DBIDRef id, DBIDVar var);
+  DBIDVar assignVar(DBIDRef id, DBIDVar var);
 }

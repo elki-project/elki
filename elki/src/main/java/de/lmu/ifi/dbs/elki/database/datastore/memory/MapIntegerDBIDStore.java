@@ -94,6 +94,11 @@ public class MapIntegerDBIDStore<T> implements WritableDataStore<T> {
   }
 
   @Override
+  public void clear() {
+    data.clear();
+  }
+
+  @Override
   public String getLongName() {
     return "raw";
   }
