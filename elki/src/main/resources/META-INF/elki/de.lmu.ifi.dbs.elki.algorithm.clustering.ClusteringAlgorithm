@@ -10,6 +10,8 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.SimplifiedHiera
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansElkan
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansSort
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansCompare
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel.ParallelLloydKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
