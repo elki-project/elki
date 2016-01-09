@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
 
+import java.util.Arrays;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -86,7 +88,12 @@ public class ArrayStore<T> implements WritableDataStore<T> {
 
   @Override
   public void delete(DBIDRef id) {
-    throw new UnsupportedOperationException("Can't delete from a static array storage.");
+    put(id, null);
+  }
+
+  @Override
+  public void clear() {
+    Arrays.fill(data, null);
   }
 
   @Override

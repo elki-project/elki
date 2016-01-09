@@ -38,7 +38,7 @@ public interface IntegerDataStore extends DataStore<Integer> {
    */
   @Override
   @Deprecated
-  public Integer get(DBIDRef id);
+  Integer get(DBIDRef id);
 
   /**
    * Retrieves a value from the storage.
@@ -46,5 +46,5 @@ public interface IntegerDataStore extends DataStore<Integer> {
    * @param id Database ID.
    * @return Double value
    */
-  public int intValue(DBIDRef id);
+  int intValue(DBIDRef id);
 }

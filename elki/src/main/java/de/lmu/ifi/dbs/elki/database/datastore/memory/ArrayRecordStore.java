@@ -128,12 +128,17 @@ public class ArrayRecordStore implements WritableRecordStore {
 
     @Override
     public void destroy() {
-      throw new UnsupportedOperationException("ArrayStore record columns cannot be destroyed.");
+      throw new UnsupportedOperationException("ArrayStore record columns cannot (yet) be destroyed.");
     }
 
     @Override
     public void delete(DBIDRef id) {
-      throw new UnsupportedOperationException("ArrayStore record values cannot be deleted.");
+      put(id, null);
+    }
+
+    @Override
+    public void clear() {
+      throw new UnsupportedOperationException("ArrayStore record columns cannot (yet) be cleared.");
     }
 
     @Override

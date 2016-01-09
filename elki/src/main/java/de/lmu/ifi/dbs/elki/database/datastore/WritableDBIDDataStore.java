@@ -39,7 +39,7 @@ public interface WritableDBIDDataStore extends DBIDDataStore, WritableDataStore<
    */
   @Override
   @Deprecated
-  public DBID put(DBIDRef id, DBID value);
+  DBID put(DBIDRef id, DBID value);
 
   /**
    * Associates the specified value with the specified id in this storage. If
@@ -49,7 +49,7 @@ public interface WritableDBIDDataStore extends DBIDDataStore, WritableDataStore<
    * @param id Database ID.
    * @param value Value to store.
    */
-  public void putDBID(DBIDRef id, DBIDRef value);
+  void putDBID(DBIDRef id, DBIDRef value);
 
   /**
    * Associates the specified value with the specified id in this storage. If
@@ -59,5 +59,5 @@ public interface WritableDBIDDataStore extends DBIDDataStore, WritableDataStore<
    * @param id Database ID.
    * @param value Value to store.
    */
-  public void put(DBIDRef id, DBIDRef value);
+  void put(DBIDRef id, DBIDRef value);
 }

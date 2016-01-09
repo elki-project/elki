@@ -60,7 +60,7 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
     this.data = DBIDUtil.newArray(size);
     // Initialize
     DBIDRef inv = DBIDUtil.invalid();
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       data.add(inv);
     }
     this.idmap = idmap;
@@ -106,8 +106,19 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
   }
 
   @Override
+  public void clear() {
+    // Re-initialize
+    DBIDRef inv = DBIDUtil.invalid();
+    final int size = data.size();
+    data.clear();
+    for(int i = 0; i < size; i++) {
+      data.add(inv);
+    }
+  }
+
+  @Override
   public void delete(DBIDRef id) {
-    throw new UnsupportedOperationException("Can't delete from a static array storage.");
+    put(id, DBIDUtil.invalid());
   }
 
   @Override

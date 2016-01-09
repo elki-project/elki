@@ -38,7 +38,7 @@ public interface WritableIntegerDataStore extends IntegerDataStore, WritableData
    */
   @Override
   @Deprecated
-  public Integer put(DBIDRef id, Integer value);
+  Integer put(DBIDRef id, Integer value);
 
   /**
    * Associates the specified value with the specified id in this storage. If
@@ -49,7 +49,7 @@ public interface WritableIntegerDataStore extends IntegerDataStore, WritableData
    * @param value Value to store.
    * @return previous value
    */
-  public int putInt(DBIDRef id, int value);
+  int putInt(DBIDRef id, int value);
 
   /**
    * Associates the specified value with the specified id in this storage. If
@@ -60,7 +60,7 @@ public interface WritableIntegerDataStore extends IntegerDataStore, WritableData
    * @param value Value to store.
    * @return previous value
    */
-  public int put(DBIDRef id, int value);
+  int put(DBIDRef id, int value);
 
   /**
    * Increment a value.
@@ -68,5 +68,5 @@ public interface WritableIntegerDataStore extends IntegerDataStore, WritableData
    * @param id Database ID.
    * @param adjust Value to add to the previous value.
    */
-  public void increment(DBIDRef id, int adjust);
+  void increment(DBIDRef id, int adjust);
 }

@@ -44,13 +44,13 @@ public interface WritableDataStore<T> extends DataStore<T> {
    * @param value Value to store.
    * @return previous value
    */
-  public T put(DBIDRef id, T value);
+  T put(DBIDRef id, T value);
 
   /**
    * Deallocate the storage, freeing the memory and notifies the registered
    * listeners.
    */
-  public void destroy();
+  void destroy();
 
   /**
    * Delete the contents for a particular ID and notifies the registered
@@ -58,5 +58,10 @@ public interface WritableDataStore<T> extends DataStore<T> {
    * 
    * @param id Database ID.
    */
-  public void delete(DBIDRef id);
+  void delete(DBIDRef id);
+
+  /**
+   * Clear the storage (resetting it to the default value).
+   */
+  void clear();
 }

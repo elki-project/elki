@@ -38,7 +38,7 @@ public interface DoubleDataStore extends DataStore<Double> {
    */
   @Override
   @Deprecated
-  public Double get(DBIDRef id);
+  Double get(DBIDRef id);
 
   /**
    * Retrieves an object from the storage.
@@ -46,5 +46,5 @@ public interface DoubleDataStore extends DataStore<Double> {
    * @param id Database ID.
    * @return Double value
    */
-  public double doubleValue(DBIDRef id);
+  double doubleValue(DBIDRef id);
 }

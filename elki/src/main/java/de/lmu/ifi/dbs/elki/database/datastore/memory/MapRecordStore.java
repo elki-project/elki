@@ -90,7 +90,7 @@ public class MapRecordStore implements WritableRecordStore {
   @SuppressWarnings("unchecked")
   protected <T> T get(DBIDRef id, int index) {
     Object[] d = data.get(DBIDUtil.deref(id));
-    if (d == null) {
+    if(d == null) {
       return null;
     }
     return (T) d[index];
@@ -108,7 +108,7 @@ public class MapRecordStore implements WritableRecordStore {
   @SuppressWarnings("unchecked")
   protected <T> T set(DBIDRef id, int index, T value) {
     Object[] d = data.get(DBIDUtil.deref(id));
-    if (d == null) {
+    if(d == null) {
       d = new Object[rlen];
       data.put(DBIDUtil.deref(id), d);
     }
@@ -154,6 +154,11 @@ public class MapRecordStore implements WritableRecordStore {
     @Override
     public void destroy() {
       throw new UnsupportedOperationException("Record storage accessors cannot be destroyed.");
+    }
+
+    @Override
+    public void clear() {
+      throw new UnsupportedOperationException("Record storage accessors cannot (yet) be cleared.");
     }
 
     @Override
