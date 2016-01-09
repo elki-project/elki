@@ -158,7 +158,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
   }
 
   @Override
-  public void pop(DBIDVar outvar) {
+  public DBIDVar pop(DBIDVar outvar) {
     if(store.size() == 0) {
       throw new ArrayIndexOutOfBoundsException("Cannot pop() from an empty array.");
     }
@@ -167,9 +167,8 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
     while(i-- > 0 && (states[i] != TPrimitiveHash.FULL)) {
       ; // Not occupied. Continue
     }
-    if(i < 0) {
-      outvar.unset();
-      return;
+    if(i < 0) { // Should never happen because size > 0
+      throw new ArrayIndexOutOfBoundsException("Cannot pop() from an empty array.");
     }
     final int val = store._set[i];
     if(outvar instanceof IntegerDBIDVar) {
@@ -180,6 +179,7 @@ class TroveHashSetModifiableDBIDs implements HashSetModifiableDBIDs, IntegerDBID
     }
     // Unfortunately, not visible: store.removeAt(i);
     store.remove(val);
+    return outvar;
   }
 
   /**

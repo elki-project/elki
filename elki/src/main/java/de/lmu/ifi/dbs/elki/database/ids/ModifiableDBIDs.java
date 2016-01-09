@@ -95,6 +95,8 @@ public interface ModifiableDBIDs extends DBIDs {
    * Pop (get and remove) one DBID from the set, into a variable.
    *
    * @param outvar Output variable
+   * @return Always {@code outvar}, for inlining
+   * @throws ArrayIndexOutOfBoundsException when empty.
    */
-  void pop(DBIDVar outvar);
+  DBIDVar pop(DBIDVar outvar);
 }
