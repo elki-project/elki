@@ -47,7 +47,7 @@ public class KMeansHamerlyTest extends AbstractSimpleAlgorithmTest implements JU
    * @throws ParameterException
    */
   @Test
-  public void testKMeansLloyd() {
+  public void testKMeansHamerly() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
     // Setup algorithm
