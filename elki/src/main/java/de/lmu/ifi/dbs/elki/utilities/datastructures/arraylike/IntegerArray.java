@@ -25,11 +25,11 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
 import java.util.Arrays;
 
 /**
- * Array of double values.
+ * Array of int values.
  *
  * @author Erich Schubert
  */
-public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
+public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
   /**
    * Maximum array size permitted by Java.
    * 
@@ -50,7 +50,7 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
   /**
    * (Reused) store for numerical attributes.
    */
-  public double[] data;
+  public int[] data;
 
   /**
    * Number of numerical attributes.
@@ -60,7 +60,7 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
   /**
    * Constructor.
    */
-  public DoubleArray() {
+  public IntegerArray() {
     this(11);
   }
 
@@ -69,14 +69,14 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
    *
    * @param initialsize Initial size.
    */
-  public DoubleArray(int initialsize) {
+  public IntegerArray(int initialsize) {
     if(initialsize < 0) {
       initialsize = 11;
     }
     else if(initialsize > MAX_ARRAY_SIZE) {
       initialsize = MAX_ARRAY_SIZE;
     }
-    this.data = new double[initialsize];
+    this.data = new int[initialsize];
     this.size = 0;
   }
 
@@ -88,7 +88,7 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
    *
    * @param existing Existing array
    */
-  public DoubleArray(DoubleArray existing) {
+  public IntegerArray(IntegerArray existing) {
     this.data = Arrays.copyOf(existing.data, existing.size);
     this.size = existing.size;
   }
@@ -105,7 +105,7 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
    *
    * @param attribute Attribute value.
    */
-  public void add(double attribute) {
+  public void add(int attribute) {
     if(data.length == size) {
       grow();
     }
@@ -131,7 +131,7 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
    * @param pos Position
    * @return Value
    */
-  public double get(int pos) {
+  public int get(int pos) {
     if(pos < 0 || pos >= size) {
       throw new ArrayIndexOutOfBoundsException(pos);
     }
@@ -144,7 +144,7 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
    * @param pos Position
    * @param value Value
    */
-  public void set(int pos, double value) {
+  public void set(int pos, int value) {
     if(pos < 0 || pos > size) {
       throw new ArrayIndexOutOfBoundsException(pos);
     }
@@ -176,14 +176,14 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
    * @param pos Insert position
    * @param val Value to insert
    */
-  public void insert(int pos, double val) {
+  public void insert(int pos, int val) {
     if(size == data.length) {
       if(data.length == MAX_ARRAY_SIZE) {
         throw new OutOfMemoryError("Array size has reached the Java maximum.");
       }
       final int newsize = (size >= LAST_GROW_SIZE) ? MAX_ARRAY_SIZE : (size + (size >> 1) + 1);
-      final double[] oldd = data;
-      data = new double[newsize];
+      final int[] oldd = data;
+      data = new int[newsize];
       System.arraycopy(oldd, 0, data, 0, pos);
       System.arraycopy(oldd, pos, data, pos + 1, size - pos);
     }
@@ -213,42 +213,42 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
   // NumberArrayAdapter:
 
   @Override
-  public int size(DoubleArray array) {
+  public int size(IntegerArray array) {
     return array.size;
   }
 
   @Override
-  public Double get(DoubleArray array, int off) throws IndexOutOfBoundsException {
+  public Integer get(IntegerArray array, int off) throws IndexOutOfBoundsException {
     return array.data[off];
   }
 
   @Override
-  public double getDouble(DoubleArray array, int off) throws IndexOutOfBoundsException {
-    return array.data[off];
+  public double getDouble(IntegerArray array, int off) throws IndexOutOfBoundsException {
+    return (double) array.data[off];
   }
 
   @Override
-  public float getFloat(DoubleArray array, int off) throws IndexOutOfBoundsException {
+  public float getFloat(IntegerArray array, int off) throws IndexOutOfBoundsException {
     return (float) array.data[off];
   }
 
   @Override
-  public int getInteger(DoubleArray array, int off) throws IndexOutOfBoundsException {
-    return (int) array.data[off];
+  public int getInteger(IntegerArray array, int off) throws IndexOutOfBoundsException {
+    return array.data[off];
   }
 
   @Override
-  public short getShort(DoubleArray array, int off) throws IndexOutOfBoundsException {
+  public short getShort(IntegerArray array, int off) throws IndexOutOfBoundsException {
     return (short) array.data[off];
   }
 
   @Override
-  public long getLong(DoubleArray array, int off) throws IndexOutOfBoundsException {
+  public long getLong(IntegerArray array, int off) throws IndexOutOfBoundsException {
     return (long) array.data[off];
   }
 
   @Override
-  public byte getByte(DoubleArray array, int off) throws IndexOutOfBoundsException {
+  public byte getByte(IntegerArray array, int off) throws IndexOutOfBoundsException {
     return (byte) array.data[off];
   }
 
@@ -257,7 +257,7 @@ public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
    *
    * @return Copy of the contents.
    */
-  public double[] toArray() {
+  public int[] toArray() {
     return Arrays.copyOf(data, size);
   }
 }
