@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 /**
- * Union-find implementations in ELKI
+ * Union-find implementations in ELKI, for DBID objects.
  *
  * @author Erich Schubert
  */
