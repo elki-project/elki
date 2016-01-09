@@ -271,7 +271,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
   }
 
   @Override
-  public void pop(DBIDVar var) {
+  public DBIDVar pop(DBIDVar var) {
     if(size == 0) {
       throw new ArrayIndexOutOfBoundsException("Cannot pop() from an empty array.");
     }
@@ -282,6 +282,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
       // less efficient, involves object creation.
       var.set(get(--size));
     }
+    return var;
   }
 
   @Override
