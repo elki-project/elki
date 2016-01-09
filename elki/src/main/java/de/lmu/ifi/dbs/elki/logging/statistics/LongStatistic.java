@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.logging.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -61,6 +61,15 @@ public class LongStatistic extends AbstractStatistic {
    */
   public void setLong(long value) {
     this.value = value;
+  }
+
+  /**
+   * Increment counter.
+   * 
+   * @param inc Increment
+   */
+  public void increment(long inc) {
+    this.value += inc;
   }
 
   @Override
