@@ -108,7 +108,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
     }
     // Choose initial means
     if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initializer", initializer.toString()));
+      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     }
     List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
     // Setup cluster assignment store
@@ -136,7 +136,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
     double[][] cdist = new double[k][k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    LongStatistic varstat = LOG.isStatistics() ? new LongStatistic(this.getClass().getName() + ".reassignments") : null;
+    LongStatistic rstat = LOG.isStatistics() ? new LongStatistic(this.getClass().getName() + ".reassignments") : null;
     int iteration = 0;
     for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
@@ -148,9 +148,9 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
         recomputeSeperation(means, sep, cdist); // #1
         changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, cdist, upper, lower);
       }
-      if(varstat != null) {
-        varstat.setLong(changed);
-        LOG.statistics(varstat);
+      if(rstat != null) {
+        rstat.setLong(changed);
+        LOG.statistics(rstat);
       }
       // Stop if no cluster assignment changed.
       if(changed == 0) {

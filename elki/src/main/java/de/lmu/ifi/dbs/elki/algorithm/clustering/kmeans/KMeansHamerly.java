@@ -102,7 +102,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     }
     // Choose initial means
     if(LOG.isStatistics()) {
-      LOG.statistics(new StringStatistic(KEY + ".initializer", initializer.toString()));
+      LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     }
     List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
     // Setup cluster assignment store
@@ -124,7 +124,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     double[] sep = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    LongStatistic varstat = LOG.isStatistics() ? new LongStatistic(KEY + ".reassignments") : null;
+    LongStatistic rstat = LOG.isStatistics() ? new LongStatistic(KEY + ".reassignments") : null;
     int iteration = 0;
     for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
@@ -136,9 +136,9 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
         recomputeSeperation(means, sep);
         changed = assignToNearestCluster(relation, means, sums, clusters, assignment, sep, upper, lower);
       }
-      if(varstat != null) {
-        varstat.setLong(changed);
-        LOG.statistics(varstat);
+      if(rstat != null) {
+        rstat.setLong(changed);
+        LOG.statistics(rstat);
       }
       // Stop if no cluster assignment changed.
       if(changed == 0) {
