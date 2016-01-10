@@ -23,6 +23,7 @@
 	</licenses>
 
 	<modules>
+		<module>elki-logging</module>
 		<module>elki</module>
 		<!-- Use PROFILES to enable further modules! -->
 	</modules>

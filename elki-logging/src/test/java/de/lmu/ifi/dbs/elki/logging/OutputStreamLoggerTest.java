@@ -31,8 +31,6 @@ import java.io.Writer;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Small experiment to assert the console output logger works as expected.
  * 
@@ -40,7 +38,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * @since 0.2
  * 
  */
-public class OutputStreamLoggerTest implements JUnit4Test {
+public class OutputStreamLoggerTest {
   /**
    * Write a couple of messages to the console output writer and compare the
    * resulting characters.
