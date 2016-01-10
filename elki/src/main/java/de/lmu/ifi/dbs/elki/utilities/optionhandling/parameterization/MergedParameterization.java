@@ -23,17 +23,16 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.InternalParameterizationErrors;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GlobalParameterConstraint;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization.ParameterPair;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * This configuration can be "rewound" to allow the same values to be consumed
@@ -58,7 +57,7 @@ public class MergedParameterization implements Parameterization {
   /**
    * Parameters to rewind.
    */
-  final private List<Pair<OptionID, Object>> used;
+  final private List<ParameterPair> used;
 
   /**
    * Constructor.
@@ -79,7 +78,7 @@ public class MergedParameterization implements Parameterization {
    * @param current Current parameterization to re-used
    * @param used Used parameters list.
    */
-  private MergedParameterization(Parameterization inner, ListParameterization current, List<Pair<OptionID, Object>> used) {
+  private MergedParameterization(Parameterization inner, ListParameterization current, List<ParameterPair> used) {
     super();
     this.inner = inner;
     this.current = current;
@@ -91,8 +90,8 @@ public class MergedParameterization implements Parameterization {
    */
   public void rewind() {
     synchronized(used) {
-      for(Pair<OptionID, Object> pair : used) {
-        current.addParameter(pair.first, pair.second);
+      for(ParameterPair pair : used) {
+        current.addParameter(pair.option, pair.value);
       }
       used.clear();
     }
@@ -102,7 +101,7 @@ public class MergedParameterization implements Parameterization {
   public boolean setValueForOption(Parameter<?> opt) throws ParameterException {
     try {
       if(current.setValueForOption(opt)) {
-        used.add(new Pair<OptionID, Object>(opt.getOptionID(), opt.getValue()));
+        used.add(new ParameterPair(opt.getOptionID(), opt.getValue()));
         return true;
       }
     }
@@ -110,10 +109,10 @@ public class MergedParameterization implements Parameterization {
       current.reportError(e);
     }
     if(inner.setValueForOption(opt)) {
-      used.add(new Pair<OptionID, Object>(opt.getOptionID(), opt.getValue()));
+      used.add(new ParameterPair(opt.getOptionID(), opt.getValue()));
       return true;
     }
-    used.add(new Pair<OptionID, Object>(opt.getOptionID(), opt.getDefaultValue()));
+    used.add(new ParameterPair(opt.getOptionID(), opt.getDefaultValue()));
     return false;
   }
 
@@ -128,7 +127,7 @@ public class MergedParameterization implements Parameterization {
   public Collection<ParameterException> getErrors() {
     return current.getErrors();
   }
-  
+
   @Override
   public boolean hasErrors() {
     return current.hasErrors();
@@ -142,11 +141,11 @@ public class MergedParameterization implements Parameterization {
   @Override
   public boolean grab(Parameter<?> opt) {
     try {
-      if (setValueForOption(opt)) {
+      if(setValueForOption(opt)) {
         return true;
       }
       // Try default value instead.
-      if (opt.tryDefaultValue()) {
+      if(opt.tryDefaultValue()) {
         return true;
       }
       // No value available.
@@ -175,7 +174,7 @@ public class MergedParameterization implements Parameterization {
       return ClassGenericsUtil.tryInstantiate(r, c, this);
     }
     catch(Exception e) {
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
       return null;
     }
   }
@@ -186,7 +185,7 @@ public class MergedParameterization implements Parameterization {
       return ClassGenericsUtil.tryInstantiate(c, c, this);
     }
     catch(Exception e) {
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
       return null;
     }
   }
