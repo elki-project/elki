@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,11 +23,11 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -81,11 +81,9 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
    * @param optionID Option ID
    * @param defaultValue Default value
    */
-  // Indiscernible from optionID, constraints
-  /*
-   * public VectorListParameter(OptionID optionID, List<Vector> defaultValue) {
-   * super(optionID, defaultValue); }
-   */
+  public DoubleArrayListParameter(OptionID optionID, List<double[]> defaultValue) {
+    super(optionID, defaultValue);
+  }
 
   /**
    * Constructs a vector list parameter with the given name and description.
@@ -145,19 +143,23 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
       }
       ArrayList<double[]> vecs = new ArrayList<>();
 
-      DoubleArray vectorCoord = new DoubleArray();
+      double[] buf = new double[11];
+      int used = 0;
       for(String vector : vectors) {
-        vectorCoord.clear();
+        used = 0;
         String[] coordinates = SPLIT.split(vector);
         for(String coordinate : coordinates) {
           try {
-            vectorCoord.add(FormatUtil.parseDouble(coordinate));
+            if(used == buf.length) {
+              buf = Arrays.copyOf(buf, buf.length << 1);
+            }
+            buf[used++] = FormatUtil.parseDouble(coordinate);
           }
           catch(NumberFormatException e) {
             throw new WrongParameterValueException("Wrong parameter format! Coordinates of vector \"" + vector + "\" are not valid!");
           }
         }
-        vecs.add(vectorCoord.toArray());
+        vecs.add(Arrays.copyOf(buf, used));
       }
       return vecs;
     }
