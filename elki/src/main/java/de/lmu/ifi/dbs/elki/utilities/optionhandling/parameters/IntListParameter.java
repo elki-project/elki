@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -110,7 +109,7 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
 
   /**
    * Returns a string representation of the parameter's type.
-   * 
+   *
    * @return &quot;&lt;int_1,...,int_n&gt;&quot;
    */
   @Override
@@ -120,7 +119,9 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
 
   /**
    * Get the values as a bitmask.
-   * 
+   *
+   * {@see de.lmu.ifi.dbs.elki.utilities.BitsUtil}
+   *
    * @return Bitmask
    */
   public long[] getValueAsBitSet() {
@@ -129,9 +130,9 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
     for(int d : value) {
       maxd = (d > maxd) ? d : maxd;
     }
-    long[] dimensions = BitsUtil.zero(maxd);
+    long[] dimensions = new long[(maxd >>> 6) + 1];
     for(int d : value) {
-      BitsUtil.setI(dimensions, d);
+      dimensions[d >>> 6] |= 1L << (d & 0x3F);
     }
     return dimensions;
   }
