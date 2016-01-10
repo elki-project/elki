@@ -26,11 +26,11 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.VectorListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleArrayListParameter;
 
 /**
  * Global parameter constraint for testing if the dimensions of each vector
- * specified by a given vector list parameter ({@link VectorListParameter})
+ * specified by a given vector list parameter ({@link DoubleArrayListParameter})
  * correspond to the value of a integer parameter ({@link IntParameter}) given.
  * 
  * @author Steffi Wanka
@@ -39,7 +39,7 @@ public class GlobalVectorListElementSizeConstraint implements GlobalParameterCon
   /**
    * Vector list parameter.
    */
-  private VectorListParameter vector;
+  private DoubleArrayListParameter vector;
 
   /**
    * Integer parameter providing the size constraint.
@@ -55,7 +55,7 @@ public class GlobalVectorListElementSizeConstraint implements GlobalParameterCon
    * @param vector the vector list parameter
    * @param sizeConstraint the integer parameter providing the size constraint
    */
-  public GlobalVectorListElementSizeConstraint(VectorListParameter vector, IntParameter sizeConstraint) {
+  public GlobalVectorListElementSizeConstraint(DoubleArrayListParameter vector, IntParameter sizeConstraint) {
     this.vector = vector;
     this.size = sizeConstraint;
   }
@@ -74,7 +74,10 @@ public class GlobalVectorListElementSizeConstraint implements GlobalParameterCon
 
     for(double[] vec : vector.getValue()) {
       if(vec.length != size.intValue()) {
-        throw new WrongParameterValueException("Global Parameter Constraint Error.\n" + "The vectors of vector list parameter " + vector.getName() + " have not the required dimension of " + size.getValue() + " given by integer parameter " + size.getName() + ".");
+        throw new WrongParameterValueException("Global Parameter Constraint Error.\n" //
+        + "The vectors of vector list parameter " + vector.getName() //
+        + " have not the required dimension of " + size.getValue() //
+        + " given by integer parameter " + size.getName() + ".");
       }
     }
   }

@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ParameterConstra
  * @author Steffi Wanka
  * @author Erich Schubert
  */
-public class VectorListParameter extends ListParameter<VectorListParameter, List<double[]>> {
+public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParameter, List<double[]>> {
   /**
    * Constructs a vector list parameter with the given name and description.
    *
@@ -47,7 +47,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
    * @param constraint Constraint
    * @param defaultValue Default value
    */
-  public VectorListParameter(OptionID optionID, ParameterConstraint<List<double[]>> constraint, List<double[]> defaultValue) {
+  public DoubleArrayListParameter(OptionID optionID, ParameterConstraint<List<double[]>> constraint, List<double[]> defaultValue) {
     super(optionID, defaultValue);
     addConstraint(constraint);
   }
@@ -59,7 +59,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
    * @param constraint Constraint
    * @param optional Optional flag
    */
-  public VectorListParameter(OptionID optionID, ParameterConstraint<List<double[]>> constraint, boolean optional) {
+  public DoubleArrayListParameter(OptionID optionID, ParameterConstraint<List<double[]>> constraint, boolean optional) {
     super(optionID, optional);
     addConstraint(constraint);
   }
@@ -70,7 +70,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
    * @param optionID Option ID
    * @param constraint Constraint
    */
-  public VectorListParameter(OptionID optionID, ParameterConstraint<List<double[]>> constraint) {
+  public DoubleArrayListParameter(OptionID optionID, ParameterConstraint<List<double[]>> constraint) {
     super(optionID);
     addConstraint(constraint);
   }
@@ -93,7 +93,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
    * @param optionID Option ID
    * @param optional Optional flag
    */
-  public VectorListParameter(OptionID optionID, boolean optional) {
+  public DoubleArrayListParameter(OptionID optionID, boolean optional) {
     super(optionID, optional);
   }
 
@@ -102,7 +102,7 @@ public class VectorListParameter extends ListParameter<VectorListParameter, List
    *
    * @param optionID Option ID
    */
-  public VectorListParameter(OptionID optionID) {
+  public DoubleArrayListParameter(OptionID optionID) {
     super(optionID);
   }
 

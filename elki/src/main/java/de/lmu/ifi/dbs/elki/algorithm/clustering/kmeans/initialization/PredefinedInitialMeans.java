@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.VectorListParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleArrayListParameter;
 
 /**
  * Run k-means with prespecified initial means.
@@ -129,7 +129,7 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      VectorListParameter meansP = new VectorListParameter(INITIAL_MEANS);
+      DoubleArrayListParameter meansP = new DoubleArrayListParameter(INITIAL_MEANS);
       if(config.grab(meansP)) {
         initialMeans = meansP.getValue().toArray(new double[0][]);
       }
