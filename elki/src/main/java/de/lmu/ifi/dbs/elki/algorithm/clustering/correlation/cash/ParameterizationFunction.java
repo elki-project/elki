@@ -400,7 +400,8 @@ public class ParameterizationFunction {
     StringBuilder result = new StringBuilder();
     for(int d = 0; d < vec.getDimensionality(); d++) {
       if(d != 0) {
-        result.append(" + \n").append(FormatUtil.whitespace(offset));
+        result.append(" + \n");
+        FormatUtil.whitespace(result, offset);
       }
       result.append(vec.doubleValue(d));
       for(int j = 0; j < d; j++) {

@@ -212,9 +212,9 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
       if(LOG.isDebugging()) {
         StringBuilder log = new StringBuilder();
         log.append("Strong Eigenvectors:\n");
-        log.append(FormatUtil.format(pcares.getEigenvectors().times(pcares.selectionMatrixOfStrongEigenvectors()), nf)).append('\n');
+        FormatUtil.formatTo(log, pcares.getStrongEigenvectors().getArrayRef(), " [", "]\n", ", ", nf).append('\n');
         log.append("Transposed weak Eigenvectors:\n");
-        log.append(FormatUtil.format(transposedWeakEigenvectors, nf)).append('\n');
+        FormatUtil.formatTo(log, transposedWeakEigenvectors.getArrayRef(), " [", "]\n", ", ", nf).append('\n');
         log.append("Eigenvalues:\n");
         log.append(FormatUtil.format(pcares.getEigenvalues(), ", ", nf));
         LOG.debugFine(log.toString());
@@ -234,7 +234,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
       gaussJordan.setCol(transposedWeakEigenvectors.getColumnDimensionality(), b);
 
       if(LOG.isDebuggingFiner()) {
-        LOG.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan, nf));
+        LOG.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan.getArrayRef(), " [", "]\n", ", ", nf));
       }
 
       double[][] a = new double[transposedWeakEigenvectors.getRowDimensionality()][transposedWeakEigenvectors.getColumnDimensionality()];

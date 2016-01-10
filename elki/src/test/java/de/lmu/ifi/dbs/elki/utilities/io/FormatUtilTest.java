@@ -29,7 +29,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 public class FormatUtilTest implements JUnit4Test {
   @Test
@@ -135,5 +134,24 @@ public class FormatUtilTest implements JUnit4Test {
     for(int x : specialI) {
       assertEquals("String length does not match for " + x, String.valueOf(x).length(), FormatUtil.stringSize(x));
     }
+  }
+
+  @Test
+  public void testFormatVector() {
+    double[] v1 = { 1, 2, 3, Double.POSITIVE_INFINITY, Double.NaN };
+    String expect = "1.0, 2.0, 3.0, Infinity, NaN";
+    assertEquals("Vector not formatted as expected.", expect, FormatUtil.format(v1));
+    double[] v2 = { 1, 2, 3 };
+    String expect2 = "1.000,2.000,3.000";
+    assertEquals("Vector not formatted as expected.", expect2, FormatUtil.format(v2, ",", FormatUtil.NF3));
+  }
+
+  @Test
+  public void testFormatMatrix() {
+    double[][] m = { { 1, 2 }, { 3, 11 } };
+    String expect = "[\n [1.00, 2.00]\n [3.00, 11.00]\n]";
+    assertEquals("Matrix not formatted as expected.", expect, FormatUtil.format(m));
+    String expect2 = "[  1.00,  2.00][  3.00, 11.00]";
+    assertEquals("Matrix not formatted as expected.", expect2, FormatUtil.format(m, 6, 2, "[", "]", ","));
   }
 }

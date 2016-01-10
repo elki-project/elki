@@ -1530,6 +1530,6 @@ public class Matrix {
    */
   @Override
   public String toString() {
-    return FormatUtil.format(this);
+    return FormatUtil.format(this.elements);
   }
 }

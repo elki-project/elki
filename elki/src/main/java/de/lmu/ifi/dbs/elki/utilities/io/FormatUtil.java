@@ -33,11 +33,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
  * Utility methods for output formatting of various number objects
+ * 
+ * FIXME: Handle formatting of infinity and NaN better.
  */
 public final class FormatUtil {
   /**
@@ -105,6 +106,11 @@ public final class FormatUtil {
   private static final String WHITESPACE_BUFFER = "                                                                                ";
 
   /**
+   * Length of the whitespace buffer.
+   */
+  private static final int WHITESPACE_BUFFER_LENGTH = WHITESPACE_BUFFER.length();
+
+  /**
    * The system newline setting.
    */
   public static final String NEWLINE = System.getProperty("line.separator");
@@ -132,7 +138,7 @@ public final class FormatUtil {
   /**
    * Initialize a number format with ELKI standard options (US locale, no
    * grouping).
-   * 
+   *
    * @param digits Number of digits to use
    * @return Number format
    */
@@ -161,23 +167,31 @@ public final class FormatUtil {
   }
 
   /**
-   * Formats the double array d with the specified separator.
-   * 
+   * Formats the double array d with ', ' as separator and default precision.
+   *
    * @param d the double array to be formatted
-   * @param sep the separator between the single values of the double array,
-   *        e.g. ','
+   * @return a String representing the double array d
+   */
+  public static String format(double[] d) {
+    return d == null ? "null" : (d.length == 0) ? "" : //
+    formatTo(new StringBuilder(), d, ", ").toString();
+  }
+
+  /**
+   * Formats the double array d with the specified separator.
+   *
+   * @param d the double array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
    * @return a String representing the double array d
    */
   public static String format(double[] d, String sep) {
-    if(d.length == 0) {
-      return "";
-    }
-    return formatTo(new StringBuilder(), d, sep).toString();
+    return d == null ? "null" : (d.length == 0) ? "" : //
+    formatTo(new StringBuilder(), d, sep).toString();
   }
 
   /**
    * Formats the double array d with the specified number format.
-   * 
+   *
    * @param d the double array to be formatted
    * @param nf the number format to be used for formatting
    * @return a String representing the double array d
@@ -188,346 +202,24 @@ public final class FormatUtil {
 
   /**
    * Formats the double array d with the specified number format.
-   * 
+   *
    * @param d the double array to be formatted
-   * @param sep the separator between the single values of the double array,
-   *        e.g. ','
+   * @param sep separator between the single values of the array, e.g. ','
    * @param nf the number format to be used for formatting
    * @return a String representing the double array d
    */
   public static String format(double[] d, String sep, NumberFormat nf) {
-    if(d.length == 0) {
-      return "";
-    }
-    return formatTo(new StringBuilder(), d, sep, nf).toString();
+    return d == null ? "null" : (d.length == 0) ? "" : //
+    formatTo(new StringBuilder(), d, sep, nf).toString();
   }
 
   /**
-   * Formats the double array d with the specified number format.
-   * 
-   * @param d the double array to be formatted
-   * @param sep the separator between the single values of the double array,
-   *        e.g. ','
-   * @return a String representing the double array d
-   */
-  public static StringBuilder formatTo(StringBuilder a, double[] d, String sep) {
-    if(d.length == 0) {
-      return a;
-    }
-    a.append(d[0]);
-    for(int i = 1; i < d.length; i++) {
-      a.append(sep);
-      a.append(d[i]);
-    }
-    return a;
-  }
-
-  /**
-   * Formats the double array d with the specified number format.
-   * 
-   * @param d the double array to be formatted
-   * @param sep the separator between the single values of the double array,
-   *        e.g. ','
-   * @param nf the number format to be used for formatting
-   * @return a String representing the double array d
-   */
-  public static StringBuilder formatTo(StringBuilder a, double[] d, String sep, NumberFormat nf) {
-    if(d.length == 0) {
-      return a;
-    }
-    a.append(nf.format(d[0]));
-    for(int i = 1; i < d.length; i++) {
-      a.append(sep);
-      a.append(nf.format(d[i]));
-    }
-    return a;
-  }
-
-  /**
-   * Formats the double array d with ', ' as separator and 2 fraction digits.
-   * 
-   * @param d the double array to be formatted
-   * @return a String representing the double array d
-   */
-  public static String format(double[] d) {
-    return formatTo(new StringBuilder(), d, ", ").toString();
-  }
-
-  /**
-   * Formats the double array d with ',' as separator and 2 fraction digits.
-   * 
-   * @param d the double array to be formatted
-   * @return a String representing the double array d
-   */
-  public static String format(double[][] d) {
-    return format(d, "\n", ", ", NF2);
-  }
-
-  /**
-   * Formats the array of double arrays d with 'the specified separators and
-   * fraction digits.
-   * 
-   * @param d the double array to be formatted
-   * @param sep1 the first separator of the outer array
-   * @param sep2 the second separator of the inner array
-   * @param nf the number format to use
-   * @return a String representing the double array d
-   */
-  public static String format(double[][] d, String sep1, String sep2, NumberFormat nf) {
-    if(d.length == 0) {
-      return "";
-    }
-    StringBuilder buffer = new StringBuilder();
-    formatTo(buffer, d[0], sep2, nf);
-    for(int i = 1; i < d.length; i++) {
-      buffer.append(sep1);
-      formatTo(buffer, d[i], sep2, nf);
-    }
-    return buffer.toString();
-  }
-
-  /**
-   * Formats the double array d with the specified number format.
-   * 
-   * @param d the double array to be formatted
-   * @param sep the separator between the single values of the double array,
-   *        e.g. ','
-   * @param nf the number format to be used for formatting
-   * @return a String representing the double array d
-   */
-  public static String format(float[] d, String sep, NumberFormat nf) {
-    if(d.length == 0) {
-      return "";
-    }
-    StringBuilder buffer = new StringBuilder();
-    buffer.append(nf.format((double) d[0]));
-    for(int i = 1; i < d.length; i++) {
-      buffer.append(sep);
-      buffer.append(nf.format((double) d[i]));
-    }
-    return buffer.toString();
-  }
-
-  /**
-   * Formats the float array f with ',' as separator and 2 fraction digits.
-   * 
-   * @param f the float array to be formatted
-   * @return a String representing the float array f
-   */
-  public static String format(float[] f) {
-    return format(f, ", ", NF2);
-  }
-
-  /**
-   * Formats the int array a for printing purposes.
-   * 
-   * @param buf The buffer to serialize to
-   * @param a the int array to be formatted
-   * @param sep the separator between the single values of the array, e.g. ','
-   * @return The output buffer {@code buf}
-   */
-  public static StringBuilder formatTo(StringBuilder buf, int[] a, String sep) {
-    if(a.length == 0) {
-      return buf;
-    }
-    buf.append(a[0]);
-    for(int i = 1; i < a.length; i++) {
-      buf.append(sep);
-      buf.append(a[i]);
-    }
-    return buf;
-  }
-
-  /**
-   * Formats the int array a for printing purposes.
-   * 
-   * @param a the int array to be formatted
-   * @param sep the separator between the single values of the array, e.g. ','
-   * @return a String representing the int array a
-   */
-  public static String format(int[] a, String sep) {
-    return (a == null) ? "null" : (a.length == 0) ? "" : //
-    formatTo(new StringBuilder(), a, sep).toString();
-  }
-
-  /**
-   * Formats the int array a for printing purposes.
-   * 
-   * @param a the int array to be formatted
-   * @return a String representing the int array a
-   */
-  public static String format(int[] a) {
-    return format(a, ", ");
-  }
-
-  /**
-   * Formats the long array a for printing purposes.
-   * 
-   * @param a the long array to be formatted
-   * @return a String representing the long array a
-   */
-  public static String format(long[] a) {
-    if(a.length == 0) {
-      return "";
-    }
-    StringBuilder buffer = new StringBuilder();
-    buffer.append(a[0]);
-    for(int i = 1; i < a.length; i++) {
-      buffer.append(", ");
-      buffer.append(a[i]);
-    }
-    return buffer.toString();
-  }
-
-  /**
-   * Formats the byte array a for printing purposes.
-   * 
-   * @param a the byte array to be formatted
-   * @return a String representing the byte array a
-   */
-  public static String format(byte[] a) {
-    if(a.length == 0) {
-      return "";
-    }
-    StringBuilder buffer = new StringBuilder();
-    buffer.append(a[0]);
-    for(int i = 1; i < a.length; i++) {
-      buffer.append(", ");
-      buffer.append(a[i]);
-    }
-    return buffer.toString();
-  }
-
-  /**
-   * Formats the boolean array b with ',' as separator.
-   * 
-   * @param b the boolean array to be formatted
-   * @param sep the separator between the single values of the double array,
-   *        e.g. ','
-   * @return a String representing the boolean array b
-   */
-  public static String format(boolean[] b, final String sep) {
-    if(b.length == 0) {
-      return "";
-    }
-    StringBuilder buffer = new StringBuilder();
-    buffer.append(format(b[0]));
-    for(int i = 1; i < b.length; i++) {
-      buffer.append(sep);
-      buffer.append(format(b[i]));
-    }
-    return buffer.toString();
-  }
-
-  /**
-   * Formats the boolean b.
-   * 
-   * @param b the boolean to be formatted
-   * @return a String representing of the boolean b
-   */
-  public static String format(final boolean b) {
-    return b ? "1" : "0";
-  }
-
-  /**
-   * Returns a string representation of the specified bit set.
-   * 
-   * @param bitSet the bitSet
-   * @param dim the overall dimensionality of the bit set
-   * @param sep the separator
-   * @return a string representation of the specified bit set.
-   */
-  public static String format(long[] bitSet, int dim, String sep) {
-    StringBuilder msg = new StringBuilder();
-    msg.append(BitsUtil.get(bitSet, 0) ? '1' : '0');
-    for(int d = 1; d < dim; d++) {
-      msg.append(sep);
-      msg.append(BitsUtil.get(bitSet, d) ? '1' : '0');
-    }
-    return msg.toString();
-  }
-
-  /**
-   * Returns a string representation of the specified bit set.
-   * 
-   * @param dim the overall dimensionality of the bit set
-   * @param bitSet the bitSet
-   * @return a string representation of the specified bit set.
-   */
-  public static String format(int dim, long[] bitSet) {
-    // TODO: removed whitespace - hierarchy reading to be adapted!
-    return format(bitSet, dim, ",");
-  }
-
-  /**
-   * Formats the String collection with the specified separator.
-   * 
-   * @param d the String collection to format
-   * @param sep the separator between the single values of the double array,
-   *        e.g. ' '
-   * @return a String representing the String Collection d
-   */
-  public static String format(Collection<String> d, String sep) {
-    if(d.size() == 0) {
-      return "";
-    }
-    if(d.size() == 1) {
-      return d.iterator().next();
-    }
-    StringBuilder buffer = new StringBuilder();
-    Iterator<String> it = d.iterator();
-    buffer.append(it.next());
-    while(it.hasNext()) {
-      buffer.append(sep);
-      buffer.append(it.next());
-    }
-    return buffer.toString();
-  }
-
-  /**
-   * Returns a string representation of this matrix.
-   * 
+   * Returns a string representation of this vector.
+   *
    * @param w column width
    * @param d number of digits after the decimal
    * @return a string representation of this matrix
    */
-  // TODO: in use?
-  public static String format(Matrix m, int w, int d) {
-    DecimalFormat format = new DecimalFormat();
-    format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
-    format.setMinimumIntegerDigits(1);
-    format.setMaximumFractionDigits(d);
-    format.setMinimumFractionDigits(d);
-    format.setGroupingUsed(false);
-
-    int width = w + 1;
-    StringBuilder msg = new StringBuilder();
-    msg.append('\n'); // start on new line.
-    for(int i = 0; i < m.getRowDimensionality(); i++) {
-      for(int j = 0; j < m.getColumnDimensionality(); j++) {
-        String s = format.format(m.get(i, j)); // format the number
-        int padding = Math.max(1, width - s.length()); // At _least_ 1
-        // space
-        for(int k = 0; k < padding; k++) {
-          msg.append(' ');
-        }
-        msg.append(s);
-      }
-      msg.append('\n');
-    }
-    // msg.append("\n");
-
-    return msg.toString();
-  }
-
-  /**
-   * Returns a string representation of this matrix.
-   * 
-   * @param w column width
-   * @param d number of digits after the decimal
-   * @return a string representation of this matrix
-   */
-  // TODO: in use?
   public static String format(double[] v, int w, int d) {
     DecimalFormat format = new DecimalFormat();
     format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
@@ -554,127 +246,510 @@ public final class FormatUtil {
   }
 
   /**
+   * Formats the double array d with the default number format.
+   *
+   * @param buf String builder to append to
+   * @param d the double array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @return Output buffer buf
+   */
+  public static StringBuilder formatTo(StringBuilder buf, double[] d, String sep) {
+    if(d == null) {
+      return buf.append("null");
+    }
+    if(d.length == 0) {
+      return buf;
+    }
+    buf.append(d[0]);
+    for(int i = 1; i < d.length; i++) {
+      buf.append(sep);
+      buf.append(d[i]);
+    }
+    return buf;
+  }
+
+  /**
+   * Formats the double array d with the specified number format.
+   *
+   * @param buf String builder to append to
+   * @param d the double array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @param nf the number format to be used for formatting
+   * @return Output buffer buf
+   */
+  public static StringBuilder formatTo(StringBuilder buf, double[] d, String sep, NumberFormat nf) {
+    if(d == null) {
+      return buf.append("null");
+    }
+    if(d.length == 0) {
+      return buf;
+    }
+    buf.append(nf.format(d[0]));
+    for(int i = 1; i < d.length; i++) {
+      buf.append(sep);
+      buf.append(nf.format(d[i]));
+    }
+    return buf;
+  }
+
+  /**
+   * Formats the float array d with the default number format.
+   *
+   * @param buf String builder to append to
+   * @param d the float array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @return Output buffer buf
+   */
+  public static StringBuilder formatTo(StringBuilder buf, float[] d, String sep) {
+    if(d == null) {
+      return buf.append("null");
+    }
+    if(d.length == 0) {
+      return buf;
+    }
+    buf.append(d[0]);
+    for(int i = 1; i < d.length; i++) {
+      buf.append(sep);
+      buf.append(d[i]);
+    }
+    return buf;
+  }
+
+  /**
+   * Formats the float array d with the specified number format.
+   *
+   * @param buf String builder to append to
+   * @param d the float array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @param nf the number format to be used for formatting
+   * @return Output buffer buf
+   */
+  public static StringBuilder formatTo(StringBuilder buf, float[] d, String sep, NumberFormat nf) {
+    if(d == null) {
+      return buf.append("null");
+    }
+    if(d.length == 0) {
+      return buf;
+    }
+    buf.append(nf.format(d[0]));
+    for(int i = 1; i < d.length; i++) {
+      buf.append(sep);
+      buf.append(nf.format(d[i]));
+    }
+    return buf;
+  }
+
+  /**
+   * Formats the int array d.
+   *
+   * @param buf String builder to append to
+   * @param d the int array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @return Output buffer buf
+   */
+  public static StringBuilder formatTo(StringBuilder buf, int[] d, String sep) {
+    if(d == null) {
+      return buf.append("null");
+    }
+    if(d.length == 0) {
+      return buf;
+    }
+    buf.append(d[0]);
+    for(int i = 1; i < d.length; i++) {
+      buf.append(sep);
+      buf.append(d[i]);
+    }
+    return buf;
+  }
+
+  /**
+   * Formats the long array d.
+   *
+   * @param buf String builder to append to
+   * @param d the long array to be formatted
+   * @param sep separator between the single values of the long array, e.g. ','
+   * @return Output buffer buf
+   */
+  public static StringBuilder formatTo(StringBuilder buf, long[] d, String sep) {
+    if(d == null) {
+      return buf.append("null");
+    }
+    if(d.length == 0) {
+      return buf;
+    }
+    buf.append(d[0]);
+    for(int i = 1; i < d.length; i++) {
+      buf.append(sep);
+      buf.append(d[i]);
+    }
+    return buf;
+  }
+
+  /**
+   * Formats the short array d.
+   *
+   * @param buf String builder to append to
+   * @param d the int array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @return Output buffer buf
+   */
+  public static StringBuilder formatTo(StringBuilder buf, short[] d, String sep) {
+    if(d == null) {
+      return buf.append("null");
+    }
+    if(d.length == 0) {
+      return buf;
+    }
+    buf.append(d[0]);
+    for(int i = 1; i < d.length; i++) {
+      buf.append(sep);
+      buf.append(d[i]);
+    }
+    return buf;
+  }
+
+  /**
+   * Formats the byte array d.
+   *
+   * @param buf String builder to append to
+   * @param d the byte array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @return Output buffer buf
+   */
+  public static StringBuilder formatTo(StringBuilder buf, byte[] d, String sep) {
+    if(d == null) {
+      return buf.append("null");
+    }
+    if(d.length == 0) {
+      return buf;
+    }
+    buf.append(d[0]);
+    for(int i = 1; i < d.length; i++) {
+      buf.append(sep);
+      buf.append(d[i]);
+    }
+    return buf;
+  }
+
+  /**
+   * Formats the boolean array d.
+   *
+   * @param buf String builder to append to
+   * @param d the boolean array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @return Output buffer buf
+   */
+  public static StringBuilder formatTo(StringBuilder buf, boolean[] d, String sep) {
+    if(d == null) {
+      return buf.append("null");
+    }
+    if(d.length == 0) {
+      return buf;
+    }
+    buf.append(d[0]);
+    for(int i = 1; i < d.length; i++) {
+      buf.append(sep);
+      buf.append(format(d[i]));
+    }
+    return buf;
+  }
+
+  /**
+   * Format a boolean value as string "true" or "false".
+   *
+   * @param buf Buffer to append to
+   * @param b Boolean to Format
+   * @return Same buffer
+   */
+  public static StringBuilder formatTo(StringBuilder buf, boolean b) {
+    return buf.append(b ? "true" : "false");
+  }
+
+  /**
+   * Format a boolean value as string "1" or "0".
+   *
+   * @param buf Buffer to append to
+   * @param b Boolean to Format
+   * @return Same buffer
+   */
+  public static StringBuilder formatBit(StringBuilder buf, boolean b) {
+    return buf.append(b ? '1' : '0');
+  }
+
+  /**
+   * Formats the float array d with the specified number format.
+   *
+   * @param d the float array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @param nf the number format to be used for formatting
+   * @return a String representing the double array d
+   */
+  public static String format(float[] d, String sep, NumberFormat nf) {
+    return (d == null) ? "null" : (d.length == 0) ? "" : //
+    formatTo(new StringBuilder(), d, sep, nf).toString();
+  }
+
+  /**
+   * Formats the float array d with the specified number format.
+   *
+   * @param d the float array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @param nf the number format to be used for formatting
+   * @return a String representing the double array d
+   */
+  public static String format(float[] d, String sep) {
+    return (d == null) ? "null" : (d.length == 0) ? "" : //
+    formatTo(new StringBuilder(), d, sep).toString();
+  }
+
+  /**
+   * Formats the float array f with ',' as separator and default precision.
+   *
+   * @param f the float array to be formatted
+   * @return a String representing the float array f
+   */
+  public static String format(float[] f) {
+    return (f == null) ? "null" : (f.length == 0) ? "" : //
+    formatTo(new StringBuilder(), f, ", ").toString();
+  }
+
+  /**
+   * Formats the int array a for printing purposes.
+   * 
+   * @param a the int array to be formatted
+   * @param sep the separator between the single values of the array, e.g. ','
+   * @return a String representing the int array a
+   */
+  public static String format(int[] a, String sep) {
+    return (a == null) ? "null" : (a.length == 0) ? "" : //
+    formatTo(new StringBuilder(), a, sep).toString();
+  }
+
+  /**
+   * Formats the int array a for printing purposes.
+   *
+   * @param a the int array to be formatted
+   * @return a String representing the int array a
+   */
+  public static String format(int[] a) {
+    return (a == null) ? "null" : (a.length == 0) ? "" : //
+    formatTo(new StringBuilder(), a, ", ").toString();
+  }
+
+  /**
+   * Formats the long array a for printing purposes.
+   *
+   * @param a the long array to be formatted
+   * @return a String representing the long array a
+   */
+  public static String format(long[] a) {
+    return (a == null) ? "null" : (a.length == 0) ? "" : //
+    formatTo(new StringBuilder(), a, ", ").toString();
+  }
+
+  /**
+   * Formats the byte array a for printing purposes.
+   *
+   * @param a the byte array to be formatted
+   * @return a String representing the byte array a
+   */
+  public static String format(byte[] a) {
+    return (a == null) ? "null" : (a.length == 0) ? "" : //
+    formatTo(new StringBuilder(), a, ", ").toString();
+  }
+
+  /**
+   * Formats the boolean array b with ',' as separator.
+   *
+   * @param b the boolean array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @return a String representing the boolean array b
+   */
+  public static String format(boolean[] b, final String sep) {
+    return (b == null) ? "null" : (b.length == 0) ? "" : //
+    formatTo(new StringBuilder(), b, ", ").toString();
+  }
+
+  /**
+   * Formats the boolean b.
+   *
+   * @param b the boolean to be formatted
+   * @return a String representing of the boolean b
+   */
+  public static String format(final boolean b) {
+    return b ? "1" : "0";
+  }
+
+  /**
+   * Formats the array of double arrays d with the specified separators and
+   * fraction digits.
+   *
+   * @param buf Output buffer
+   * @param d the double array to be formatted
+   * @param pre Row prefix (e.g. " [")
+   * @param pos Row postfix (e.g. "]\n")
+   * @param csep Separator for columns (e.g. ", ")
+   * @param nf the number format to use
+   * @return Output buffer buf
+   */
+  public static StringBuilder formatTo(StringBuilder buf, double[][] d, String pre, String pos, String csep, NumberFormat nf) {
+    if(d == null) {
+      return buf.append("null");
+    }
+    if(d.length == 0) {
+      return buf;
+    }
+    for(int i = 0; i < d.length; i++) {
+      buf.append(pre);
+      formatTo(buf, d[i], csep, nf);
+      buf.append(pos);
+    }
+    return buf;
+  }
+
+  /**
+   * Formats the double array d with ',' as separator and 2 fraction digits.
+   *
+   * @param d the double array to be formatted
+   * @return a String representing the double array d
+   */
+  public static String format(double[][] d) {
+    return d == null ? "null" : (d.length == 0) ? "[]" : //
+    formatTo(new StringBuilder().append("[\n"), d, " [", "]\n", ", ", NF2).append(']').toString();
+  }
+
+  /**
+   * Formats the array of double arrays d with 'the specified separators and
+   * fraction digits.
+   *
+   * @param d the double matrix to be formatted
+   * @param pre Row prefix (e.g. " [")
+   * @param pos Row postfix (e.g. "]\n")
+   * @param csep Separator for columns (e.g. ", ")
+   * @param nf the number format to use
+   * @return a String representing the double array d
+   */
+  public static String format(double[][] d, String pre, String pos, String csep, NumberFormat nf) {
+    return d == null ? "null" : (d.length == 0) ? "" : //
+    formatTo(new StringBuilder(), d, pre, pos, csep, nf).toString();
+  }
+
+  /**
+   * Returns a string representation of this matrix.
+   *
+   * @param w column width
+   * @param d number of digits after the decimal
+   * @param pre Row prefix (e.g. " [")
+   * @param pos Row postfix (e.g. "]\n")
+   * @param csep Column separator (e.g. ", ")
+   * @return a string representation of this matrix
+   */
+  public static String format(double[][] m, int w, int d, String pre, String pos, String csep) {
+    DecimalFormat format = new DecimalFormat();
+    format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
+    format.setMinimumIntegerDigits(1);
+    format.setMaximumFractionDigits(d);
+    format.setMinimumFractionDigits(d);
+    format.setGroupingUsed(false);
+
+    StringBuilder msg = new StringBuilder();
+    for(int i = 0; i < m.length; i++) {
+      double[] row = m[i];
+      msg.append(pre);
+      for(int j = 0; j < row.length; j++) {
+        if(j > 0) {
+          msg.append(csep);
+        }
+        String s = format.format(row[j]); // format the number
+        whitespace(msg, w - s.length());
+        msg.append(s);
+      }
+      msg.append(pos);
+    }
+    return msg.toString();
+  }
+
+  /**
    * Returns a string representation of this matrix. In each line the specified
    * String <code>pre</code> is prefixed.
-   * 
+   *
    * @param pre the prefix of each line
    * @return a string representation of this matrix
    */
-  public static String format(Matrix m, String pre) {
+  public static String format(double[][] m, String pre) {
     StringBuilder output = new StringBuilder();
     output.append(pre).append("[\n").append(pre);
-    for(int i = 0; i < m.getRowDimensionality(); i++) {
+    for(int i = 0; i < m.length; i++) {
+      double[] row = m[i];
       output.append(" [");
-      for(int j = 0; j < m.getColumnDimensionality(); j++) {
-        output.append(' ').append(m.get(i, j));
-        if(j < m.getColumnDimensionality() - 1) {
-          output.append(',');
-        }
-      }
-      output.append(" ]\n").append(pre);
+      formatTo(output, row, ", ");
+      output.append("]\n").append(pre);
     }
-    output.append("]\n").append(pre);
-
-    return (output.toString());
+    output.append("]\n");
+    return output.toString();
   }
 
   /**
    * returns String-representation of Matrix.
-   * 
+   *
    * @param nf NumberFormat to specify output precision
    * @return String representation of this Matrix in precision as specified by
    *         given NumberFormat
    */
-  public static String format(Matrix m, NumberFormat nf) {
-    int[] colMax = new int[m.getColumnDimensionality()];
-    String[][] entries = new String[m.getRowDimensionality()][m.getColumnDimensionality()];
-    for(int i = 0; i < m.getRowDimensionality(); i++) {
-      for(int j = 0; j < m.getColumnDimensionality(); j++) {
-        entries[i][j] = nf.format(m.get(i, j));
-        if(entries[i][j].length() > colMax[j]) {
-          colMax[j] = entries[i][j].length();
-        }
-      }
-    }
-    StringBuilder output = new StringBuilder();
-    output.append("[\n");
-    for(int i = 0; i < m.getRowDimensionality(); i++) {
-      output.append(" [");
-      for(int j = 0; j < m.getColumnDimensionality(); j++) {
-        output.append(' ');
-        int space = colMax[j] - entries[i][j].length();
-        for(int s = 0; s < space; s++) {
-          output.append(' ');
-        }
-        output.append(entries[i][j]);
-        if(j < m.getColumnDimensionality() - 1) {
-          output.append(',');
-        }
-      }
-      output.append(" ]\n");
-    }
-    output.append("]\n");
-
-    return (output.toString());
+  public static String format(double[][] m, NumberFormat nf) {
+    return formatTo(new StringBuilder().append("[\n"), m, " [", "]\n", ", ", nf).append("]").toString();
   }
 
   /**
-   * returns String-representation of Matrix.
-   * 
-   * @return String representation of this Matrix
+   * Formats the String collection with the specified separator.
+   *
+   * @param d the String collection to format
+   * @param sep separator between the single values of the array, e.g. ' '
+   * @return a String representing the String Collection d
    */
-  public static String format(Matrix m) {
-    return format(m, FormatUtil.NF);
+  public static String format(Collection<String> d, String sep) {
+    if(d == null) {
+      return "null";
+    }
+    if(d.size() == 0) {
+      return "";
+    }
+    if(d.size() == 1) {
+      return d.iterator().next();
+    }
+    StringBuilder buffer = new StringBuilder();
+    Iterator<String> it = d.iterator();
+    buffer.append(it.next());
+    while(it.hasNext()) {
+      buffer.append(sep);
+      buffer.append(it.next());
+    }
+    return buffer.toString();
   }
 
   /**
-   * Returns a string representation of this matrix. In each line the specified
-   * String <code>pre<\code> is prefixed.
-   * 
-   * @param nf number format for output accuracy
-   * @param pre the prefix of each line
-   * @return a string representation of this matrix
+   * Formats the string array d with the specified separator.
+   *
+   * @param d the string array to be formatted
+   * @param sep separator between the single values of the array, e.g. ','
+   * @return a String representing the string array d
    */
-  public static String format(Matrix m, String pre, NumberFormat nf) {
-    if(nf == null) {
-      return FormatUtil.format(m, pre);
-    }
-
-    int[] colMax = new int[m.getColumnDimensionality()];
-    String[][] entries = new String[m.getRowDimensionality()][m.getColumnDimensionality()];
-    for(int i = 0; i < m.getRowDimensionality(); i++) {
-      for(int j = 0; j < m.getColumnDimensionality(); j++) {
-        entries[i][j] = nf.format(m.get(i, j));
-        if(entries[i][j].length() > colMax[j]) {
-          colMax[j] = entries[i][j].length();
-        }
+  public static String format(String[] d, String sep) {
+    StringBuilder buffer = new StringBuilder();
+    for(int i = 0; i < d.length; i++) {
+      if(i > 0) {
+        buffer.append(sep).append(d[i]);
+      }
+      else {
+        buffer.append(d[i]);
       }
     }
-    StringBuilder output = new StringBuilder();
-    output.append(pre).append("[\n").append(pre);
-    for(int i = 0; i < m.getRowDimensionality(); i++) {
-      output.append(" [");
-      for(int j = 0; j < m.getColumnDimensionality(); j++) {
-        output.append(' ');
-        int space = colMax[j] - entries[i][j].length();
-        for(int s = 0; s < space; s++) {
-          output.append(' ');
-        }
-        output.append(entries[i][j]);
-        if(j < m.getColumnDimensionality() - 1) {
-          output.append(',');
-        }
-      }
-      output.append(" ]\n").append(pre);
-    }
-    output.append("]\n").append(pre);
-
-    return (output.toString());
+    return buffer.toString();
   }
 
   /**
    * Find the first space before position w or if there is none after w.
-   * 
+   *
    * @param s String
    * @param width Width
    * @return index of best whitespace or <code>-1</code> if no whitespace was
@@ -708,7 +783,7 @@ public final class FormatUtil {
   /**
    * Helper that is similar to {@code Math.min(a,b)}, except that negative
    * values are considered "invalid".
-   * 
+   *
    * @param a String position
    * @param b String position
    * @return {@code Math.min(a,b)} if {@code a >= 0} and {@code b >= 0},
@@ -727,7 +802,7 @@ public final class FormatUtil {
   /**
    * Splits the specified string at the last blank before width. If there is no
    * blank before the given width, it is split at the next.
-   * 
+   *
    * @param s the string to be split
    * @param width int
    * @return string fragments
@@ -759,12 +834,12 @@ public final class FormatUtil {
 
   /**
    * Returns a string with the specified number of whitespace.
-   * 
+   *
    * @param n the number of whitespace characters
    * @return a string with the specified number of blanks
    */
   public static String whitespace(int n) {
-    if(n < WHITESPACE_BUFFER.length()) {
+    if(n < WHITESPACE_BUFFER_LENGTH) {
       return WHITESPACE_BUFFER.substring(0, n);
     }
     char[] buf = new char[n];
@@ -775,8 +850,22 @@ public final class FormatUtil {
   }
 
   /**
+   * Returns a string with the specified number of whitespace.
+   *
+   * @param n the number of whitespace characters
+   * @return a string with the specified number of blanks
+   */
+  public static StringBuilder whitespace(StringBuilder buf, int n) {
+    while(n >= WHITESPACE_BUFFER_LENGTH) {
+      buf.append(WHITESPACE_BUFFER);
+      n -= WHITESPACE_BUFFER_LENGTH;
+    }
+    return n > 0 ? buf.append(WHITESPACE_BUFFER, 0, n) : buf;
+  }
+
+  /**
    * Pad a string to a given length by adding whitespace to the right.
-   * 
+   *
    * @param o original string
    * @param len destination length
    * @return padded string of at least length len (and o otherwise)
@@ -790,7 +879,7 @@ public final class FormatUtil {
 
   /**
    * Pad a string to a given length by adding whitespace to the left.
-   * 
+   *
    * @param o original string
    * @param len destination length
    * @return padded string of at least length len (and o otherwise)
@@ -805,7 +894,7 @@ public final class FormatUtil {
   /**
    * Get the width of the terminal window (on Unix xterms), with a default of 78
    * characters.
-   * 
+   *
    * @return Terminal width
    */
   public static int getConsoleWidth() {
@@ -823,7 +912,7 @@ public final class FormatUtil {
 
   /**
    * Formats a time delta in human readable format.
-   * 
+   *
    * @param time time delta in ms
    * @return Formatted string
    */
@@ -848,27 +937,6 @@ public final class FormatUtil {
     }
     fmt.close();
     return sb.toString();
-  }
-
-  /**
-   * Formats the string array d with the specified separator.
-   * 
-   * @param d the string array to be formatted
-   * @param sep the separator between the single values of the double array,
-   *        e.g. ','
-   * @return a String representing the string array d
-   */
-  public static String format(String[] d, String sep) {
-    StringBuilder buffer = new StringBuilder();
-    for(int i = 0; i < d.length; i++) {
-      if(i > 0) {
-        buffer.append(sep).append(d[i]);
-      }
-      else {
-        buffer.append(d[i]);
-      }
-    }
-    return buffer.toString();
   }
 
   /**
@@ -945,12 +1013,12 @@ public final class FormatUtil {
 
   /**
    * Parse a double from a character sequence.
-   * 
+   *
    * In contrast to Javas {@link Double#parseDouble}, this will <em>not</em>
    * create an object and thus is expected to put less load on the garbage
    * collector. It will accept some more spellings of NaN and infinity, thus
    * removing the need for checking for these independently.
-   * 
+   *
    * @param str String
    * @return Double value
    */
@@ -960,12 +1028,12 @@ public final class FormatUtil {
 
   /**
    * Parse a double from a character sequence.
-   * 
+   *
    * In contrast to Javas {@link Double#parseDouble}, this will <em>not</em>
    * create an object and thus is expected to put less load on the garbage
    * collector. It will accept some more spellings of NaN and infinity, thus
    * removing the need for checking for these independently.
-   * 
+   *
    * @param str String
    * @param start Begin
    * @param end End
@@ -1076,12 +1144,12 @@ public final class FormatUtil {
 
   /**
    * Parse a double from a character sequence.
-   * 
+   *
    * In contrast to Javas {@link Double#parseDouble}, this will <em>not</em>
    * create an object and thus is expected to put less load on the garbage
    * collector. It will accept some more spellings of NaN and infinity, thus
    * removing the need for checking for these independently.
-   * 
+   *
    * @param str String
    * @param start Begin
    * @param end End
@@ -1192,7 +1260,7 @@ public final class FormatUtil {
 
   /**
    * Match "NaN" in a number of different capitalizations.
-   * 
+   *
    * @param str String to match
    * @param firstchar First character
    * @param start Interval begin
@@ -1224,7 +1292,7 @@ public final class FormatUtil {
 
   /**
    * Match "NaN" in a number of different capitalizations.
-   * 
+   *
    * @param str String to match
    * @param firstchar First character
    * @param start Interval begin
@@ -1276,7 +1344,7 @@ public final class FormatUtil {
 
   /**
    * Match "inf", "infinity" in a number of different capitalizations.
-   * 
+   *
    * @param str String to match
    * @param firstchar First character
    * @param start Interval begin
@@ -1310,7 +1378,7 @@ public final class FormatUtil {
 
   /**
    * Match "inf", "infinity" in a number of different capitalizations.
-   * 
+   *
    * @param str String to match
    * @param firstchar First character
    * @param start Interval begin
@@ -1344,7 +1412,7 @@ public final class FormatUtil {
 
   /**
    * Parse a long integer from a character sequence.
-   * 
+   *
    * @param str String
    * @param start Begin
    * @param end End
@@ -1396,52 +1464,6 @@ public final class FormatUtil {
   }
 
   /**
-   * Format a boolean value as string "true" or "false".
-   * 
-   * @param b Boolean to Format
-   * @param buf Buffer to append to
-   * @return Same buffer
-   */
-  public static StringBuilder format(boolean b, StringBuilder buf) {
-    return buf.append(b ? "true" : "false");
-  }
-
-  /**
-   * Format a boolean value as string "1" or "0".
-   * 
-   * @param b Boolean to Format
-   * @param buf Buffer to append to
-   * @return Same buffer
-   */
-  public static StringBuilder formatBit(boolean b, StringBuilder buf) {
-    return buf.append(b ? '1' : '0');
-  }
-
-  /**
-   * Format an integer value as decimal.
-   * 
-   * @param i Integer value to format.
-   * @param buf Buffer to append to
-   * @return Same buffer
-   */
-  public static StringBuilder format(int i, StringBuilder buf) {
-    // Int seems to be well optimized
-    return buf.append(i);
-  }
-
-  /**
-   * Format a long value as decimal.
-   * 
-   * @param i Long value to format.
-   * @param buf Buffer to append to
-   * @return Same buffer
-   */
-  public static StringBuilder format(long i, StringBuilder buf) {
-    // Long seems to be well optimized
-    return buf.append(i);
-  }
-
-  /**
    * Buffer for zero padding.
    */
   private static final char[] ZEROPADDING = new char[] { '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0' };
@@ -1453,7 +1475,7 @@ public final class FormatUtil {
 
   /**
    * Append zeros to a buffer.
-   * 
+   *
    * @param buf Buffer to append to
    * @param zeros Number of zeros to append.
    * @return Buffer
@@ -1467,7 +1489,7 @@ public final class FormatUtil {
 
   /**
    * Append whitespace to a buffer.
-   * 
+   *
    * @param buf Buffer to append to
    * @param spaces Number of spaces to append.
    * @return Buffer
@@ -1481,9 +1503,9 @@ public final class FormatUtil {
 
   /**
    * Compute the number of characters needed to represent the integer x.
-   * 
+   *
    * Reimplementation of {@link Long#stringSize}, but public and without loop.
-   * 
+   *
    * @param x Integer value
    * @return Number of digits needed
    */
@@ -1509,9 +1531,9 @@ public final class FormatUtil {
 
   /**
    * Compute the number of characters needed to represent the integer x.
-   * 
+   *
    * Reimplementation of {@link Long#stringSize}, but public and without loop.
-   * 
+   *
    * @param x Integer value
    * @return Number of digits needed
    */

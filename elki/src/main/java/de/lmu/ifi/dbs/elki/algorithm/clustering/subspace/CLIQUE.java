@@ -333,7 +333,7 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
     }
     if(LOG.isDebuggingFiner()) {
       StringBuilder msg = new StringBuilder();
-      msg.append("   unit bounds ").append(FormatUtil.format(new Matrix(unit_bounds), "   "));
+      msg.append("   unit bounds ").append(FormatUtil.format(unit_bounds, "   "));
       LOG.debugFiner(msg.toString());
     }
 
