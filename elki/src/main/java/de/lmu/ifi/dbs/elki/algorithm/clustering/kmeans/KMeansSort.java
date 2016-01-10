@@ -223,15 +223,14 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
       double sqrtmin = issquared ? Math.sqrt(u) : u, min = u;
       int minIndex = ini;
       for(int i : cnum[ini]) {
-        if(i == ini || cdist[minIndex][i] >= 2 * sqrtmin) { // Compare pruning
-          continue;
+        if(cdist[minIndex][i] >= 2 * sqrtmin) {
+          break; // All following can only be worse.
         }
         double dist = df.distance(fv, means.get(i));
         ++dists;
         if(dist < min) {
           minIndex = i;
           min = dist;
-          sqrtmin = issquared ? Math.sqrt(dist) : dist;
         }
       }
       if(minIndex != cur) {
