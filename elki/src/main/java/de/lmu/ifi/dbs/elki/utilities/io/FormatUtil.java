@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
  * Utility methods for output formatting of various number objects

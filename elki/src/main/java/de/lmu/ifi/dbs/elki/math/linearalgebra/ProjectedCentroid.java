@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
  * Centroid only using a subset of dimensions.

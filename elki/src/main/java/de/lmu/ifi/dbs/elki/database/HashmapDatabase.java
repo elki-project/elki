@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;

@@ -52,8 +52,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.OnedimensionalDist
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;

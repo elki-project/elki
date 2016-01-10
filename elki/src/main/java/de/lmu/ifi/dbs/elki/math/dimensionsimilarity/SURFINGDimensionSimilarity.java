@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.Mean;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 

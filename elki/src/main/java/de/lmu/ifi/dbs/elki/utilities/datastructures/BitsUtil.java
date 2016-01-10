@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
 /*
  This file is part of ELKI:

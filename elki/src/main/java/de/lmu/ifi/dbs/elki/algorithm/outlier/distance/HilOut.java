@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparatorMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ObjectHeap;

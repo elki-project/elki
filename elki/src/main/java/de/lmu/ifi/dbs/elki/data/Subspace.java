@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.data;
 import java.util.Comparator;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
  * Represents a subspace of the original data space.

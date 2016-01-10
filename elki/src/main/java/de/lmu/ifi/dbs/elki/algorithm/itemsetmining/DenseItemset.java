@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
  */
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
  * APRIORI itemset.

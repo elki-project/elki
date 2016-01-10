@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 
 /**

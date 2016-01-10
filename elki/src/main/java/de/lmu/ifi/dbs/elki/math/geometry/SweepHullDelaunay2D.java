@@ -34,7 +34,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;

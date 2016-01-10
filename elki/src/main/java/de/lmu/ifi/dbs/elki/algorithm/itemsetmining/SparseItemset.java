@@ -27,7 +27,7 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**

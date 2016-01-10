@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;

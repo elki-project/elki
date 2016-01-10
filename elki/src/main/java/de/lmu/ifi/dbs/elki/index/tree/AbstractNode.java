@@ -35,8 +35,8 @@ import java.util.NoSuchElementException;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.AbstractExternalizablePage;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**

@@ -1,15 +1,5 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
-import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -33,6 +23,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import gnu.trove.iterator.TIntDoubleIterator;
 import gnu.trove.map.TIntDoubleMap;
 

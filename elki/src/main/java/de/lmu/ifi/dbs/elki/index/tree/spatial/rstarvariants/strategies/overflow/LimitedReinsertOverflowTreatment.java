@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNod
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.CloseReinsert;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert.ReinsertStrategy;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.NodeArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;

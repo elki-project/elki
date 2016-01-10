@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 
 /**

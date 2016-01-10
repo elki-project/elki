@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;

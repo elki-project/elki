@@ -26,6 +26,8 @@ package de.lmu.ifi.dbs.elki.utilities;
 import java.util.Comparator;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
+
 /**
  * This class collects various static helper methods.
  * 

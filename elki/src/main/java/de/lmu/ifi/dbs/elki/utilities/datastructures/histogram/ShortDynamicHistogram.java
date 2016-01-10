@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
  * A flexible histogram storing short, that can dynamically adapt the number of

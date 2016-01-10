@@ -32,7 +32,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
 
 /**

@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
  * Compute the alpha-Shape of a point set, using Delaunay triangulation.

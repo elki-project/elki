@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanD
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;

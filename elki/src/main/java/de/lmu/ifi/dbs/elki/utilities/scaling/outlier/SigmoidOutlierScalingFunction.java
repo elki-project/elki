@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 

@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
  * Maximum distance function between {@link NumberVector}s only in specified

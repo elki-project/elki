@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 

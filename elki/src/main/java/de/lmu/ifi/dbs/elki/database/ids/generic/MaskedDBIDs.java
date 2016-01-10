@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
  * View on an ArrayDBIDs masked using a BitMask for efficient mask changing.

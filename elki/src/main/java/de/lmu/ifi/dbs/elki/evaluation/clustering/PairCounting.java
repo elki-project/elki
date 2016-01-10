@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
  */
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.utilities.datastructures;
 
 /*
  This file is part of ELKI:
@@ -32,7 +32,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 public class BitsUtilTest implements JUnit4Test {
   @Test

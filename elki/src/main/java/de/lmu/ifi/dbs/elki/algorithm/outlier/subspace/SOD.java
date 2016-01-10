@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.TiedTopBoundedHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;

@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;

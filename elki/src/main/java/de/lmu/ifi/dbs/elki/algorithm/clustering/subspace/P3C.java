@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.PoissonDistribution;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
