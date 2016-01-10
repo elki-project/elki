@@ -27,9 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-import de.lmu.ifi.dbs.elki.application.AbstractApplication;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.AbstractParameterization;
-
 /**
  * Base {@link LogRecord} class used in ELKI.
  * 
@@ -52,7 +49,15 @@ public class ELKILogRecord extends LogRecord {
   /**
    * Classes to ignore when finding the relevant caller.
    */
-  public static final String[] IGNORE_CLASSES = { Logger.class.getCanonicalName(), Logging.class.getCanonicalName(), LoggingUtil.class.getCanonicalName(), ELKILogRecord.class.getCanonicalName(), AbstractParameterization.class.getCanonicalName(), AbstractApplication.class.getCanonicalName() };
+  public static final String[] IGNORE_CLASSES = { //
+      Logger.class.getCanonicalName(), //
+      Logging.class.getCanonicalName(), //
+      LoggingUtil.class.getCanonicalName(), //
+      ELKILogRecord.class.getCanonicalName(), //
+      // Avoid dependencies on these packages:
+      "de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.AbstractParameterization", //
+      "de.lmu.ifi.dbs.elki.application.AbstractApplication", //
+  };
 
   /**
    * Name of this class.

@@ -30,7 +30,6 @@ import java.util.Properties;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -41,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
@@ -152,7 +152,7 @@ public abstract class AbstractApplication {
         return;
       }
       if(debugP.isDefined()) {
-        LoggingUtil.parseDebugParameter(debugP);
+        Parameterizer.parseDebugParameter(debugP);
       }
     }
     catch(Exception e) {
@@ -374,6 +374,40 @@ public abstract class AbstractApplication {
         return inputP.getValue();
       }
       return null;
+    }
+    
+    /**
+     * Parse the option string to configure logging.
+     * 
+     * @param param Parameter to process.
+     * 
+     * @throws WrongParameterValueException On parsing errors
+     */
+    public static final void parseDebugParameter(StringParameter param) throws WrongParameterValueException {
+      String[] opts = param.getValue().split(",");
+      for(String opt : opts) {
+        try {
+          String[] chunks = opt.split("=");
+          if(chunks.length == 1) {
+            try {
+              java.util.logging.Level level = Level.parse(chunks[0]);
+              LoggingConfiguration.setDefaultLevel(level);
+            }
+            catch(IllegalArgumentException e) {
+              LoggingConfiguration.setLevelFor(chunks[0], Level.FINEST.getName());
+            }
+          }
+          else if(chunks.length == 2) {
+            LoggingConfiguration.setLevelFor(chunks[0], chunks[1]);
+          }
+          else {
+            throw new WrongParameterValueException(param, param.getValue(), "More than one '=' in debug parameter.");
+          }
+        }
+        catch(IllegalArgumentException e) {
+          throw (new WrongParameterValueException(param, param.getValue(), "Could not process value.", e));
+        }
+      }
     }
 
     @Override

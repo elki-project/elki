@@ -24,9 +24,8 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
  */
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
-import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
+import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -62,7 +61,7 @@ public class LoggingTabPanel extends ParameterTabPanel {
     // FIXME: add second level of verbosity!
     if (config.grab(debugParam)) {
       try {
-        LoggingUtil.parseDebugParameter(debugParam);
+        AbstractApplication.Parameterizer.parseDebugParameter(debugParam);
       } catch (WrongParameterValueException e) {
         de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
       }

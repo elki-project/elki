@@ -138,6 +138,31 @@ public final class LoggingConfiguration {
       logger.log(Level.SEVERE, "Failed to configure logging from file: " + cfgfile, e);
     }
   }
+  
+  /**
+   * Try to open a file, first trying the file system, then falling back to the
+   * classpath.
+   * 
+   * Copied from {@code FileUtils}, to untangle dependencies.
+   * 
+   * @param filename File name in system notation
+   * @return Input stream
+   * @throws FileNotFoundException When no file was found.
+   */
+  private static InputStream openSystemFile(String filename) throws FileNotFoundException {
+    try {
+      return new FileInputStream(filename);
+    }
+    catch(FileNotFoundException e) {
+      // try with classloader
+      String resname = filename.replace(File.separatorChar, '/');
+      InputStream result = ClassLoader.getSystemResourceAsStream(resname);
+      if(result == null) {
+        throw e;
+      }
+      return result;
+    }
+  }
 
   /**
    * Private copy from FileUtil, to avoid cross-dependencies. Try to open a
