@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Parameterization handler using a List and OptionIDs, for programmatic use.
@@ -44,13 +43,14 @@ public class ListParameterization extends AbstractParameterization {
   /**
    * The actual parameters, for storage
    */
-  LinkedList<Pair<OptionID, Object>> parameters = new LinkedList<>();
+  List<ParameterPair> parameters;
 
   /**
    * Default constructor.
    */
   public ListParameterization() {
     super();
+    this.parameters = new LinkedList<>();
   }
 
   /**
@@ -58,10 +58,11 @@ public class ListParameterization extends AbstractParameterization {
    * 
    * @param dbParameters existing parameter collection
    */
-  public ListParameterization(Collection<Pair<OptionID, Object>> dbParameters) {
+  public ListParameterization(Collection<ParameterPair> dbParameters) {
     this();
-    for (Pair<OptionID, Object> pair : dbParameters) {
-      addParameter(pair.first, pair.second);
+    this.parameters = new LinkedList<>();
+    for(ParameterPair pair : dbParameters) {
+      addParameter(pair.option, pair.value);
     }
   }
 
@@ -71,7 +72,7 @@ public class ListParameterization extends AbstractParameterization {
    * @param optionid Option ID
    */
   public void addFlag(OptionID optionid) {
-    parameters.add(new Pair<OptionID, Object>(optionid, Flag.SET));
+    parameters.add(new ParameterPair(optionid, Flag.SET));
   }
 
   /**
@@ -81,7 +82,7 @@ public class ListParameterization extends AbstractParameterization {
    * @param value Value
    */
   public void addParameter(OptionID optionid, Object value) {
-    parameters.add(new Pair<>(optionid, value));
+    parameters.add(new ParameterPair(optionid, value));
   }
 
   /**
@@ -90,7 +91,7 @@ public class ListParameterization extends AbstractParameterization {
    * @param flag Flag to add, if set
    */
   public void forwardOption(Flag flag) {
-    if (flag.isDefined() && flag.getValue().booleanValue()) {
+    if(flag.isDefined() && flag.getValue().booleanValue()) {
       addFlag(flag.getOptionID());
     }
   }
@@ -101,19 +102,19 @@ public class ListParameterization extends AbstractParameterization {
    * @param param Parameter to add
    */
   public void forwardOption(Parameter<?> param) {
-    if (param.isDefined()) {
+    if(param.isDefined()) {
       addParameter(param.getOptionID(), param.getValue());
     }
   }
 
   @Override
   public boolean setValueForOption(Parameter<?> opt) throws ParameterException {
-    Iterator<Pair<OptionID, Object>> iter = parameters.iterator();
-    while (iter.hasNext()) {
-      Pair<OptionID, Object> pair = iter.next();
-      if (pair.first == opt.getOptionID()) {
+    Iterator<ParameterPair> iter = parameters.iterator();
+    while(iter.hasNext()) {
+      ParameterPair pair = iter.next();
+      if(pair.option == opt.getOptionID()) {
         iter.remove();
-        opt.setValue(pair.second);
+        opt.setValue(pair.value);
         return true;
       }
     }
@@ -125,7 +126,7 @@ public class ListParameterization extends AbstractParameterization {
    * 
    * @return Unused parameters.
    */
-  public List<Pair<OptionID, Object>> getRemainingParameters() {
+  public List<ParameterPair> getRemainingParameters() {
     return parameters;
   }
 
@@ -145,9 +146,9 @@ public class ListParameterization extends AbstractParameterization {
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    for (Pair<OptionID, Object> pair : parameters) {
-      buf.append('-').append(pair.getFirst().toString()).append(' ');
-      buf.append(pair.getSecond().toString()).append(' ');
+    for(ParameterPair pair : parameters) {
+      buf.append('-').append(pair.option.toString()).append(' ');
+      buf.append(pair.value.toString()).append(' ');
     }
     return buf.toString();
   }
@@ -159,16 +160,48 @@ public class ListParameterization extends AbstractParameterization {
    */
   public ArrayList<String> serialize() {
     ArrayList<String> params = new ArrayList<>();
-    for (Pair<OptionID, Object> pair : parameters) {
-      params.add("-" + pair.getFirst().toString());
-      if (pair.getSecond() instanceof String) {
-        params.add((String) pair.getSecond());
-      } else if (pair.getSecond() instanceof Class) {
-        params.add(((Class<?>) pair.getSecond()).getCanonicalName());
-      } else { // Fallback:
-        params.add(pair.getSecond().toString());
+    for(ParameterPair pair : parameters) {
+      params.add("-" + pair.option.toString());
+      if(pair.value instanceof String) {
+        params.add((String) pair.value);
+      }
+      else if(pair.value instanceof Class) {
+        params.add(((Class<?>) pair.value).getCanonicalName());
+      }
+      else { // Fallback:
+        params.add(pair.value.toString());
       }
     }
     return params;
+  }
+
+  /**
+   * Parameter pair, package-private.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  static final class ParameterPair {
+    /**
+     * Option key.
+     */
+    public OptionID option;
+
+    /**
+     * Option value.
+     */
+    public Object value;
+
+    /**
+     * Constructor.
+     *
+     * @param key Option key
+     * @param value Option value
+     */
+    public ParameterPair(OptionID key, Object value) {
+      this.option = key;
+      this.value = value;
+    }
   }
 }
