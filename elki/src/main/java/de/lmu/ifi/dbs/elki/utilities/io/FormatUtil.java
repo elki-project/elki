@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities;
+package de.lmu.ifi.dbs.elki.utilities.io;
 
 /*
  This file is part of ELKI:
@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
  * Utility methods for output formatting of various number objects

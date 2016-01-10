@@ -41,9 +41,9 @@ import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWM2Estimator
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.RVEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.ZipfEstimator;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;

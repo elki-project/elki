@@ -60,8 +60,8 @@ import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CloneInlineImages;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailTranscoder;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;

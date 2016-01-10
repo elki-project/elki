@@ -31,7 +31,7 @@ import java.text.NumberFormat;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**

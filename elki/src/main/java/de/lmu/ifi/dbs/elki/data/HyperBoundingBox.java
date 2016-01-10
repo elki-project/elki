@@ -31,7 +31,7 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
  * HyperBoundingBox represents a hyperrectangle in the multidimensional space.

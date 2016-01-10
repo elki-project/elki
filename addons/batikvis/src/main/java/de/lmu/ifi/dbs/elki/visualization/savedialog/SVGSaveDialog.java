@@ -35,7 +35,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import org.apache.batik.transcoder.TranscoderException;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.FileUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
 /**

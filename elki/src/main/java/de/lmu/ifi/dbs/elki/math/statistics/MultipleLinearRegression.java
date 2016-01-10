@@ -27,7 +27,7 @@ import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
  * Multiple linear regression attempts to model the relationship between two or

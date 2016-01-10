@@ -30,8 +30,8 @@ import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
  * A two-dimensional matrix class, where the data is stored as two-dimensional

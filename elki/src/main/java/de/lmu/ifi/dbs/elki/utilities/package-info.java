@@ -13,7 +13,7 @@
  * <li>{@link de.lmu.ifi.dbs.elki.data.VectorUtil}: Vector and Matrix functions.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil}: Spatial MBR computations (intersection, union etc.).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil}: byte array processing (low-level IO via byte arrays).</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.FileUtil}: File and file name utility functions.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.io.FileUtil}: File and file name utility functions.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil}: Generic classes (instantiation, arrays of arrays, sets that require safe but unchecked casts).</li>
  * </ul></li>
  * <li>Database-related:<ul>
@@ -25,7 +25,7 @@
  * <li>{@link de.lmu.ifi.dbs.elki.result.ResultUtil}: result processing functions (e.g. extracting sub-results).</li>
  * </ul></li>
  * <li>Output-related:<ul>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.FormatUtil}: output formatting.</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.utilities.io.FormatUtil}: output formatting.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil}: HTML (with XML DOM) generation.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil}: SVG generation (XML DOM based).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.visualization.batikutil.BatikUtil}: Apache Batik SVG utilities (coordinate transforms screen to canvas).</li>
