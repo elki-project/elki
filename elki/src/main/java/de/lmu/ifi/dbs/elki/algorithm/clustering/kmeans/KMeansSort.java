@@ -169,12 +169,10 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
    */
   private void recomputeSeperation(List<Vector> means, double[][] cdist, int[][] cnum, LongStatistic diststat) {
     final int k = means.size();
-    boolean issquared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
     for(int i = 1; i < k; i++) {
       Vector mi = means.get(i);
       for(int j = 0; j < i; j++) {
         double d = distanceFunction.distance(mi, means.get(j));
-        d = issquared ? Math.sqrt(d) : d;
         cdist[i][j] = d;
         cdist[j][i] = d;
       }
@@ -211,36 +209,36 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
     assert (k == means.size());
     long dists = 0;
     boolean changed = false;
+    // Reset all clusters
     Arrays.fill(varsum, 0.);
-    final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
-    boolean issquared = (df instanceof SquaredEuclideanDistanceFunction);
-    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      final int cur = assignment.intValue(it), ini = cur >= 0 ? cur : 0;
+    for(ModifiableDBIDs cluster : clusters) {
+      cluster.clear();
+    }
+    final NumberVectorDistanceFunction<?> df = getDistanceFunction();
+    double mult = (df instanceof SquaredEuclideanDistanceFunction) ? 4 : 2;
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      final int cur = assignment.intValue(iditer), ini = cur >= 0 ? cur : 0;
       // Distance to current mean:
-      V fv = relation.get(it);
-      double u = df.distance(fv, means.get(ini));
+      V fv = relation.get(iditer);
+      double mindist = df.distance(fv, means.get(ini));
       ++dists;
-      double sqrtmin = issquared ? Math.sqrt(u) : u, min = u;
+      final double threshold = mult * mindist;
       int minIndex = ini;
       for(int i : cnum[ini]) {
-        if(cdist[minIndex][i] >= 2 * sqrtmin) {
+        if(cdist[minIndex][i] >= threshold) { // Sort pruning
           break; // All following can only be worse.
         }
         double dist = df.distance(fv, means.get(i));
         ++dists;
-        if(dist < min) {
+        if(dist < mindist) {
           minIndex = i;
-          min = dist;
+          mindist = dist;
         }
       }
-      if(minIndex != cur) {
-        assignment.putInt(it, minIndex);
-        if(cur >= 0) {
-          clusters.get(cur).remove(it);
-        }
-        clusters.get(minIndex).add(it);
-        changed = true;
-      }
+      varsum[minIndex] += mindist;
+      clusters.get(minIndex).add(iditer);
+      changed |= assignment.putInt(iditer, minIndex) != minIndex;
+      varsum[minIndex] += mindist;
     }
     // Increment distance computations counter.
     if(diststat != null) {
