@@ -245,20 +245,19 @@ public class VoronoiVisualization extends AbstractVisFactory {
       final List<Cluster<Model>> clusters = clustering.getAllClusters();
 
       // Collect cluster means
-      ArrayList<Vector> vmeans = new ArrayList<>(clusters.size());
       ArrayList<double[]> means = new ArrayList<>(clusters.size());
       {
         for(Cluster<Model> clus : clusters) {
           Model model = clus.getModel();
-          Vector mean;
+          double[] mean;
           try {
             if(model instanceof KMeansModel) {
               Vector mmean = ((KMeansModel) model).getMean();
               if(mmean == null) {
                 continue;
               }
-              mean = new Vector(mmean.toArray());
-              if(mean.getDimensionality() != dim) {
+              mean = mmean.toArray();
+              if(mean.length != dim) {
                 continue;
               }
             }
@@ -271,8 +270,8 @@ public class VoronoiVisualization extends AbstractVisFactory {
               if(v == null) {
                 continue;
               }
-              mean = new Vector(v.toArray());
-              if(mean.getDimensionality() != dim) {
+              mean = v.toArray();
+              if(mean.length != dim) {
                 continue;
               }
             }
@@ -283,8 +282,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
           catch(ObjectNotFoundException e) {
             continue; // Element not found.
           }
-          vmeans.add(mean);
-          means.add(mean.getArrayRef());
+          means.add(mean);
         }
       }
 
@@ -306,7 +304,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
       }
       else {
         // Compute Delaunay Triangulation
-        ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(vmeans).getDelaunay();
+        ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(means).getDelaunay();
         if(mode == Mode.VORONOI || mode == Mode.V_AND_D) {
           Element path = VoronoiDraw.drawVoronoi(proj, delaunay, means).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);

@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.data.spatial;
 import java.util.Iterator;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 
 /**
@@ -36,13 +35,13 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.composedOf Vector
+ * @apiviz.composedOf double[]
  */
 public class Polygon implements SpatialComparable {
   /**
    * The actual points
    */
-  private List<Vector> points;
+  private List<double[]> points;
 
   /**
    * Minimum values
@@ -59,20 +58,20 @@ public class Polygon implements SpatialComparable {
    * 
    * @param points Polygon points
    */
-  public Polygon(List<Vector> points) {
+  public Polygon(List<double[]> points) {
     super();
     this.points = points;
     // Compute the bounds.
     if (points.size() > 0) {
-      final Iterator<Vector> iter = points.iterator();
-      final Vector first = iter.next();
-      final int dim = first.getDimensionality();
-      min = first.getArrayCopy();
-      max = first.getArrayCopy();
+      final Iterator<double[]> iter = points.iterator();
+      final double[] first = iter.next();
+      final int dim = first.length;
+      min = first.clone();
+      max = first.clone();
       while (iter.hasNext()) {
-        Vector next = iter.next();
+        double[] next = iter.next();
         for (int i = 0; i < dim; i++) {
-          final double cur = next.get(i);
+          final double cur = next[i];
           min[i] = Math.min(min[i], cur);
           max[i] = Math.max(max[i], cur);
         }
@@ -80,7 +79,7 @@ public class Polygon implements SpatialComparable {
     }
   }
 
-  public Polygon(List<Vector> points, double minx, double maxx, double miny, double maxy) {
+  public Polygon(List<double[]> points, double minx, double maxx, double miny, double maxy) {
     super();
     this.points = points;
     this.min = new double[] { minx, miny };
@@ -88,11 +87,11 @@ public class Polygon implements SpatialComparable {
   }
 
   /**
-   * Get an iterator to the vector contents.
+   * Get an iterator to the double[] contents.
    * 
    * @return Iterator
    */
-  public ArrayListIter<Vector> iter() {
+  public ArrayListIter<double[]> iter() {
     return new ArrayListIter<>(points);
   }
 
@@ -102,9 +101,9 @@ public class Polygon implements SpatialComparable {
    * @param buf Buffer to append to
    */
   public void appendToBuffer(StringBuilder buf) {
-    Iterator<Vector> iter = points.iterator();
+    Iterator<double[]> iter = points.iterator();
     while (iter.hasNext()) {
-      double[] data = iter.next().getArrayRef();
+      double[] data = iter.next();
       for (int i = 0; i < data.length; i++) {
         if (i > 0) {
           buf.append(",");
@@ -134,12 +133,12 @@ public class Polygon implements SpatialComparable {
   }
 
   /**
-   * Get a vector by index.
+   * Get a double[] by index.
    * 
    * @param idx Index to get
-   * @return Vector
+   * @return double[]
    */
-  public Vector get(int idx) {
+  public double[] get(int idx) {
     return points.get(idx);
   }
 
@@ -176,10 +175,10 @@ public class Polygon implements SpatialComparable {
       // Three consecutive points
       final int j = (i + 1) % size;
       final int k = (i + 2) % size;
-      final double dxji = points.get(j).get(0) - points.get(i).get(0);
-      final double dykj = points.get(k).get(1) - points.get(j).get(1);
-      final double dyji = points.get(j).get(1) - points.get(i).get(1);
-      final double dxkj = points.get(k).get(0) - points.get(j).get(0);
+      final double dxji = points.get(j)[0] - points.get(i)[0];
+      final double dykj = points.get(k)[1] - points.get(j)[1];
+      final double dyji = points.get(j)[1] - points.get(i)[1];
+      final double dxkj = points.get(k)[0] - points.get(j)[0];
       final double z = (dxji * dykj) - (dyji * dxkj);
       if (z < 0) {
         c--;
@@ -218,12 +217,12 @@ public class Polygon implements SpatialComparable {
   public boolean intersects2DIncomplete(Polygon other) {
     assert (this.getDimensionality() == 2);
     assert (other.getDimensionality() == 2);
-    for (Vector v : this.points) {
+    for (double[] v : this.points) {
       if (other.containsPoint2D(v)) {
         return true;
       }
     }
-    for (Vector v : other.points) {
+    for (double[] v : other.points) {
       if (this.containsPoint2D(v)) {
         return true;
       }
@@ -241,20 +240,20 @@ public class Polygon implements SpatialComparable {
    * @param v Point to test
    * @return True when contained.
    */
-  public boolean containsPoint2D(Vector v) {
-    assert (v.getDimensionality() == 2);
-    final double testx = v.get(0);
-    final double testy = v.get(1);
+  public boolean containsPoint2D(double[] v) {
+    assert (v.length == 2);
+    final double testx = v[0];
+    final double testy = v[1];
     boolean c = false;
 
-    Iterator<Vector> it = points.iterator();
-    Vector pre = points.get(points.size() - 1);
+    Iterator<double[]> it = points.iterator();
+    double[] pre = points.get(points.size() - 1);
     while (it.hasNext()) {
-      final Vector cur = it.next();
-      final double curx = cur.get(0);
-      final double cury = cur.get(1);
-      final double prex = pre.get(0);
-      final double prey = pre.get(1);
+      final double[] cur = it.next();
+      final double curx = cur[0],
+      cury = cur[1];
+      final double prex = pre[0],
+      prey = pre[1];
       if (((cury > testy) != (prey > testy))) {
         if ((testx < (prex - curx) * (testy - cury) / (prey - cury) + curx)) {
           c = !c;

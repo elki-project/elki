@@ -136,9 +136,8 @@ public class SVGPath {
    */
   public SVGPath(Polygon vectors) {
     this();
-    for(ArrayListIter<Vector> it = vectors.iter(); it.valid(); it.advance()) {
-      Vector vec = it.get();
-      this.drawTo(vec.doubleValue(0), vec.doubleValue(1));
+    for(ArrayListIter<double[]> it = vectors.iter(); it.valid(); it.advance()) {
+      this.drawTo(it.get());
     }
     this.close();
   }

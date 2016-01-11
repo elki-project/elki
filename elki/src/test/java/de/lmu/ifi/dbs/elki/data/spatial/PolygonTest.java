@@ -22,8 +22,8 @@ package de.lmu.ifi.dbs.elki.data.spatial;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,36 +31,35 @@ import java.util.List;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 public class PolygonTest implements JUnit4Test {
   @Test
   public void testPolygonContainment() {
     final Polygon p1, p2, p3;
     {
-      List<Vector> v1 = new ArrayList<>();
-      v1.add(new Vector(0, 0));
-      v1.add(new Vector(.9, 0));
-      v1.add(new Vector(0, .9));
+      List<double[]> v1 = new ArrayList<>();
+      v1.add(new double[] { 0, 0 });
+      v1.add(new double[] { .9, 0 });
+      v1.add(new double[] { 0, .9 });
       p1 = new Polygon(v1);
     }
     {
-      List<Vector> v2 = new ArrayList<>();
-      v2.add(new Vector(1, 1));
-      v2.add(new Vector(1, .1));
-      v2.add(new Vector(.1, 1));
+      List<double[]> v2 = new ArrayList<>();
+      v2.add(new double[] { 1, 1 });
+      v2.add(new double[] { 1, .1 });
+      v2.add(new double[] { .1, 1 });
       p2 = new Polygon(v2);
     }
     {
-      List<Vector> v3 = new ArrayList<>();
-      v3.add(new Vector(.1, .1));
-      v3.add(new Vector(.1, .9));
-      v3.add(new Vector(.9, .9));
-      v3.add(new Vector(.9, .1));
+      List<double[]> v3 = new ArrayList<>();
+      v3.add(new double[] { .1, .1 });
+      v3.add(new double[] { .1, .9 });
+      v3.add(new double[] { .9, .9 });
+      v3.add(new double[] { .9, .1 });
       p3 = new Polygon(v3);
     }
-    Vector pou = new Vector(-1, -1);
-    Vector p22 = new Vector(.2, .2);
+    double[] pou = new double[] { -1, -1 };
+    double[] p22 = new double[] { .2, .2 };
     assertFalse("P2 not in p1", p1.containsPoint2D(pou));
     assertFalse("P2 not in p2", p2.containsPoint2D(pou));
     assertFalse("P2 not in p3", p3.containsPoint2D(pou));

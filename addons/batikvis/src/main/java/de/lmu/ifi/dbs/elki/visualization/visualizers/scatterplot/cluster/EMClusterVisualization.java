@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -206,15 +207,15 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
         Matrix covmat = model.getCovarianceMatrix();
         Vector centroid = model.getMean();
-        Vector cent = new Vector(proj.fastProjectDataToRenderSpace(centroid));
+        double[] cent = proj.fastProjectDataToRenderSpace(centroid);
 
         // Compute the eigenvectors
         SortedEigenPairs eps = pcarun.processCovarMatrix(covmat).getEigenPairs();
-        Vector[] pc = new Vector[eps.size()];
+        double[][] pc = new double[eps.size()][];
         for(int i = 0; i < eps.size(); i++) {
           EigenPair ep = eps.getEigenPair(i);
           Vector sev = ep.getEigenvector().times(Math.sqrt(ep.getEigenvalue()));
-          pc[i] = new Vector(proj.fastProjectRelativeDataToRenderSpace(sev.getArrayRef()));
+          pc[i] = proj.fastProjectRelativeDataToRenderSpace(sev);
         }
         if(drawStyle != 0 || eps.size() == 2) {
           drawSphere2D(sname, cent, pc);
@@ -233,34 +234,34 @@ public class EMClusterVisualization extends AbstractVisFactory {
      * @param cent center
      * @param pc Principal components
      */
-    protected void drawSphere2D(String sname, Vector cent, Vector[] pc) {
+    protected void drawSphere2D(String sname, double[] cent, double[][] pc) {
       CSSClass cls = opacStyle == 1 ? new CSSClass(null, "temp") : null;
       for(int dim1 = 0; dim1 < pc.length - 1; dim1++) {
         for(int dim2 = dim1 + 1; dim2 < pc.length; dim2++) {
           for(int i = 1; i <= times; i++) {
             SVGPath path = new SVGPath();
 
-            Vector p1 = cent.plusTimes(pc[dim1], i);
-            Vector p2 = cent.plusTimes(pc[dim2], i);
-            Vector p3 = cent.minusTimes(pc[dim1], i);
-            Vector p4 = cent.minusTimes(pc[dim2], i);
+            double[] p1 = plusTimes(cent, pc[dim1], i);
+            double[] p2 = plusTimes(cent, pc[dim2], i);
+            double[] p3 = minusTimes(cent, pc[dim1], i);
+            double[] p4 = minusTimes(cent, pc[dim2], i);
 
             path.moveTo(p1);
             path.cubicTo(//
-            p1.plusTimes(pc[dim2], KAPPA * i), //
-            p2.plusTimes(pc[dim1], KAPPA * i), //
+            plusTimes(p1, pc[dim2], KAPPA * i), //
+            plusTimes(p2, pc[dim1], KAPPA * i), //
             p2);
             path.cubicTo(//
-            p2.minusTimes(pc[dim1], KAPPA * i), //
-            p3.plusTimes(pc[dim2], KAPPA * i), //
+            minusTimes(p2, pc[dim1], KAPPA * i), //
+            plusTimes(p3, pc[dim2], KAPPA * i), //
             p3);
             path.cubicTo(//
-            p3.minusTimes(pc[dim2], KAPPA * i), //
-            p4.minusTimes(pc[dim1], KAPPA * i), //
+            minusTimes(p3, pc[dim2], KAPPA * i), //
+            minusTimes(p4, pc[dim1], KAPPA * i), //
             p4);
             path.cubicTo(//
-            p4.plusTimes(pc[dim1], KAPPA * i), //
-            p1.minusTimes(pc[dim2], KAPPA * i), //
+            plusTimes(p4, pc[dim1], KAPPA * i), //
+            minusTimes(p1, pc[dim2], KAPPA * i), //
             p1);
             path.close();
 
@@ -284,7 +285,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
      * @param cent center
      * @param chres Polygon around center
      */
-    protected void drawHullLines(String sname, Vector cent, Polygon chres) {
+    protected void drawHullLines(String sname, double[] cent, Polygon chres) {
       if(chres.size() <= 1) {
         return;
       }
@@ -292,7 +293,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
       for(int i = 1; i <= times; i++) {
         SVGPath path = new SVGPath();
         for(int p = 0; p < chres.size(); p++) {
-          path.drawTo(cent.plusTimes(chres.get(p), i));
+          path.drawTo(plusTimes(cent, chres.get(p), i));
         }
         path.close();
         Element ellipse = path.makeElement(svgp);
@@ -312,27 +313,27 @@ public class EMClusterVisualization extends AbstractVisFactory {
      * @param pc Principal components
      * @return Polygon
      */
-    protected Polygon makeHull(Vector[] pc) {
+    protected Polygon makeHull(double[][] pc) {
       GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
 
-      Vector diag = new Vector(0, 0);
+      double[] diag = new double[] { 0, 0 };
       for(int j = 0; j < pc.length; j++) {
         hull.add(pc[j]);
-        hull.add(pc[j].times(-1));
+        hull.add(times(pc[j], -1));
         for(int k = j + 1; k < pc.length; k++) {
-          Vector q = pc[k];
-          Vector ppq = pc[j].plus(q).timesEquals(MathUtil.SQRTHALF);
-          Vector pmq = pc[j].minus(q).timesEquals(MathUtil.SQRTHALF);
+          double[] q = pc[k];
+          double[] ppq = timesEquals(plus(pc[j], q), MathUtil.SQRTHALF);
+          double[] pmq = timesEquals(minus(pc[j], q), MathUtil.SQRTHALF);
           hull.add(ppq);
-          hull.add(ppq.times(-1));
+          hull.add(times(ppq, -1));
           hull.add(pmq);
-          hull.add(pmq.times(-1));
+          hull.add(times(pmq, -1));
         }
-        diag.plusEquals(pc[j]);
+        plusEquals(diag, pc[j]);
       }
-      diag.timesEquals(1.0 / Math.sqrt(pc.length));
+      timesEquals(diag, 1.0 / Math.sqrt(pc.length));
       hull.add(diag);
-      hull.add(diag.times(-1));
+      hull.add(times(diag, -1));
 
       return hull.getHull();
     }
@@ -343,42 +344,42 @@ public class EMClusterVisualization extends AbstractVisFactory {
      * @param pc Principal components
      * @return Polygon
      */
-    protected Polygon makeHullComplex(Vector[] pc) {
+    protected Polygon makeHullComplex(double[][] pc) {
       GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
 
-      Vector diag = new Vector(0, 0);
+      double[] diag = new double[] { 0, 0 };
       for(int j = 0; j < pc.length; j++) {
         hull.add(pc[j]);
-        hull.add(pc[j].times(-1));
+        hull.add(times(pc[j], -1));
         for(int k = j + 1; k < pc.length; k++) {
-          Vector q = pc[k];
-          Vector ppq = pc[j].plus(q).timesEquals(MathUtil.SQRTHALF);
-          Vector pmq = pc[j].minus(q).timesEquals(MathUtil.SQRTHALF);
+          double[] q = pc[k];
+          double[] ppq = timesEquals(plus(pc[j], q), MathUtil.SQRTHALF);
+          double[] pmq = timesEquals(minus(pc[j], q), MathUtil.SQRTHALF);
           hull.add(ppq);
-          hull.add(ppq.times(-1));
+          hull.add(times(ppq, -1));
           hull.add(pmq);
-          hull.add(pmq.times(-1));
+          hull.add(times(pmq, -1));
           for(int l = k + 1; l < pc.length; l++) {
-            Vector r = pc[k];
-            Vector ppqpr = ppq.plus(r).timesEquals(Math.sqrt(1 / 3.));
-            Vector pmqpr = pmq.plus(r).timesEquals(Math.sqrt(1 / 3.));
-            Vector ppqmr = ppq.minus(r).timesEquals(Math.sqrt(1 / 3.));
-            Vector pmqmr = pmq.minus(r).timesEquals(Math.sqrt(1 / 3.));
+            double[] r = pc[k];
+            double[] ppqpr = timesEquals(plus(ppq, r), Math.sqrt(1 / 3.));
+            double[] pmqpr = timesEquals(plus(pmq, r), Math.sqrt(1 / 3.));
+            double[] ppqmr = timesEquals(minus(ppq, r), Math.sqrt(1 / 3.));
+            double[] pmqmr = timesEquals(minus(pmq, r), Math.sqrt(1 / 3.));
             hull.add(ppqpr);
-            hull.add(ppqpr.times(-1));
+            hull.add(times(ppqpr, -1));
             hull.add(pmqpr);
-            hull.add(pmqpr.times(-1));
+            hull.add(times(pmqpr, -1));
             hull.add(ppqmr);
-            hull.add(ppqmr.times(-1));
+            hull.add(times(ppqmr, -1));
             hull.add(pmqmr);
-            hull.add(pmqmr.times(-1));
+            hull.add(times(pmqmr, -1));
           }
         }
-        diag.plusEquals(pc[j]);
+        plusEquals(diag, pc[j]);
       }
-      diag.timesEquals(1.0 / Math.sqrt(pc.length));
+      timesEquals(diag, 1.0 / Math.sqrt(pc.length));
       hull.add(diag);
-      hull.add(diag.times(-1));
+      hull.add(times(diag, -1));
       return hull.getHull();
     }
 
@@ -389,7 +390,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
      * @param cent Center
      * @param chres Polygon
      */
-    protected void drawHullArc(String sname, Vector cent, Polygon chres) {
+    protected void drawHullArc(String sname, double[] cent, Polygon chres) {
       if(chres.size() <= 1) {
         return;
       }
@@ -397,22 +398,22 @@ public class EMClusterVisualization extends AbstractVisFactory {
       for(int i = 1; i <= times; i++) {
         SVGPath path = new SVGPath();
 
-        ArrayList<Vector> delta = new ArrayList<>(chres.size());
+        ArrayList<double[]> delta = new ArrayList<>(chres.size());
         for(int p = 0; p < chres.size(); p++) {
-          Vector prev = chres.get((p - 1 + chres.size()) % chres.size());
-          Vector curr = chres.get(p);
-          Vector next = chres.get((p + 1) % chres.size());
-          Vector d1 = next.minus(curr).normalize();
-          Vector d2 = curr.minus(prev).normalize();
-          delta.add(d1.plus(d2));
+          double[] prev = chres.get((p - 1 + chres.size()) % chres.size());
+          double[] curr = chres.get(p);
+          double[] next = chres.get((p + 1) % chres.size());
+          double[] d1 = normalize(minus(next, curr));
+          double[] d2 = normalize(minus(curr, prev));
+          delta.add(plus(d1, d2));
           // delta.add(next.minus(prev));
         }
 
         for(int p = 0; p < chres.size(); p++) {
-          Vector cur = cent.plus(chres.get(p));
-          Vector nex = cent.plus(chres.get((p + 1) % chres.size()));
-          Vector dcur = delta.get(p);
-          Vector dnex = delta.get((p + 1) % chres.size());
+          double[] cur = plus(cent, chres.get(p));
+          double[] nex = plus(cent, chres.get((p + 1) % chres.size()));
+          double[] dcur = delta.get(p);
+          double[] dnex = delta.get((p + 1) % chres.size());
           drawArc(path, cent, cur, nex, dcur, dnex, i);
         }
         path.close();
@@ -438,26 +439,26 @@ public class EMClusterVisualization extends AbstractVisFactory {
      * @param nex Next point
      * @param scale Scaling factor
      */
-    private void drawArc(SVGPath path, Vector cent, Vector pre, Vector nex, Vector oPrev, Vector oNext, double scale) {
+    private void drawArc(SVGPath path, double[] cent, double[] pre, double[] nex, double[] oPrev, double[] oNext, double scale) {
       // Delta vectors
-      final Vector rPrev = pre.minus(cent);
-      final Vector rNext = nex.minus(cent);
-      final Vector rPrNe = pre.minus(nex);
+      final double[] rPrev = minus(pre, cent);
+      final double[] rNext = minus(nex, cent);
+      final double[] rPrNe = minus(pre, nex);
       // Scaled fix points
-      final Vector sPrev = cent.plusTimes(rPrev, scale);
-      final Vector sNext = cent.plusTimes(rNext, scale);
-      // Orthogonal vectors to the relative vectors
-      // final Vector oPrev = new Vector(rPrev.get(1), -rPrev.get(0));
-      // final Vector oNext = new Vector(-rNext.get(1), rNext.get(0));
+      final double[] sPrev = plusTimes(cent, rPrev, scale);
+      final double[] sNext = plusTimes(cent, rNext, scale);
+      // Orthogonal double[]s to the relative double[]s
+      // final double[] oPrev = new double[](rPrev.get(1), -rPrev.get(0));
+      // final double[] oNext = new double[](-rNext.get(1), rNext.get(0));
 
       // Compute the intersection of rPrev+tp*oPrev and rNext+tn*oNext
       // rPrNe == rPrev - rNext
-      final double zp = rPrNe.get(0) * oNext.get(1) - rPrNe.get(1) * oNext.get(0);
-      final double zn = rPrNe.get(0) * oPrev.get(1) - rPrNe.get(1) * oPrev.get(0);
-      final double n = oPrev.get(1) * oNext.get(0) - oPrev.get(0) * oNext.get(1);
+      final double zp = rPrNe[0] * oNext[1] - rPrNe[1] * oNext[0];
+      final double zn = rPrNe[0] * oPrev[1] - rPrNe[1] * oPrev[0];
+      final double n = oPrev[1] * oNext[0] - oPrev[0] * oNext[1];
       if(n == 0) {
         LoggingUtil.warning("Parallel?!?");
-        path.drawTo(sNext.get(0), sNext.get(1));
+        path.drawTo(sNext[0], sNext[1]);
         return;
       }
       final double tp = Math.abs(zp / n);
@@ -465,8 +466,8 @@ public class EMClusterVisualization extends AbstractVisFactory {
       // LoggingUtil.warning("tp: "+tp+" tn: "+tn);
 
       // Guide points
-      final Vector gPrev = sPrev.plusTimes(oPrev, KAPPA * scale * tp);
-      final Vector gNext = sNext.minusTimes(oNext, KAPPA * scale * tn);
+      final double[] gPrev = plusTimes(sPrev, oPrev, KAPPA * scale * tp);
+      final double[] gNext = minusTimes(sNext, oNext, KAPPA * scale * tn);
 
       if(!path.isStarted()) {
         path.moveTo(sPrev);

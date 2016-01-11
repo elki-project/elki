@@ -32,7 +32,6 @@ import java.util.Stack;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -50,7 +49,7 @@ public class GrahamScanConvexHull2D {
   /**
    * The current set of points
    */
-  private List<Vector> points;
+  private List<double[]> points;
 
   /**
    * Min/Max in X
@@ -86,15 +85,15 @@ public class GrahamScanConvexHull2D {
    * 
    * @param point Point to add
    */
-  public void add(Vector point) {
+  public void add(double[] point) {
     if(this.ok) {
       this.points = new LinkedList<>(this.points);
       this.ok = false;
     }
     this.points.add(point);
     // Update data set extends
-    minmaxX.put(point.get(0));
-    minmaxY.put(point.get(1));
+    minmaxX.put(point[0]);
+    minmaxY.put(point[1]);
   }
 
   /**
@@ -118,10 +117,10 @@ public class GrahamScanConvexHull2D {
     // Find the new origin point
     findStartingPoint();
     // Sort points for the scan
-    final Vector origin = points.get(0);
-    Collections.sort(this.points, new Comparator<Vector>() {
+    final double[] origin = points.get(0);
+    Collections.sort(this.points, new Comparator<double[]>() {
       @Override
-      public int compare(Vector o1, Vector o2) {
+      public int compare(double[] o1, double[] o2) {
         return isLeft(o1, o2, origin);
       }
     });
@@ -139,11 +138,11 @@ public class GrahamScanConvexHull2D {
     final double bestY = minmaxY.getMin();
     double bestX = Double.POSITIVE_INFINITY;
     int bestI = -1;
-    Iterator<Vector> iter = this.points.iterator();
+    Iterator<double[]> iter = this.points.iterator();
     for(int i = 0; iter.hasNext(); i++) {
-      Vector vec = iter.next();
-      if(vec.get(1) == bestY && vec.get(0) < bestX) {
-        bestX = vec.get(0);
+      double[] vec = iter.next();
+      if(vec[1] == bestY && vec[0] < bestX) {
+        bestX = vec[0];
         bestI = i;
       }
     }
@@ -158,33 +157,33 @@ public class GrahamScanConvexHull2D {
    * Get the relative X coordinate to the origin.
    * 
    * @param a
-   * @param origin origin vector
+   * @param origin origin double[]
    * @return relative X coordinate
    */
-  private final double getRX(Vector a, Vector origin) {
-    return (a.get(0) - origin.get(0)) * factor;
+  private final double getRX(double[] a, double[] origin) {
+    return (a[0] - origin[0]) * factor;
   }
 
   /**
    * Get the relative Y coordinate to the origin.
    * 
    * @param a
-   * @param origin origin vector
+   * @param origin origin double[]
    * @return relative Y coordinate
    */
-  private final double getRY(Vector a, Vector origin) {
-    return (a.get(1) - origin.get(1)) * factor;
+  private final double getRY(double[] a, double[] origin) {
+    return (a[1] - origin[1]) * factor;
   }
 
   /**
    * Test whether a point is left of the other wrt. the origin.
    * 
-   * @param a Vector A
-   * @param b Vector B
-   * @param o Origin vector
+   * @param a double[] A
+   * @param b double[] B
+   * @param o Origin double[]
    * @return +1 when left, 0 when same, -1 when right
    */
-  protected final int isLeft(Vector a, Vector b, Vector o) {
+  protected final int isLeft(double[] a, double[] b, double[] o) {
     final double cross = getRX(a, o) * getRY(b, o) - getRY(a, o) * getRX(b, o);
     if(cross == 0) {
       // Compare manhattan distances - same angle!
@@ -198,25 +197,25 @@ public class GrahamScanConvexHull2D {
   /**
    * Manhattan distance.
    * 
-   * @param a Vector A
-   * @param b Vector B
+   * @param a double[] A
+   * @param b double[] B
    * @return Manhattan distance
    */
-  private double mdist(Vector a, Vector b) {
-    return Math.abs(a.get(0) * factor - b.get(0) * factor) + Math.abs(a.get(1) * factor - b.get(1) * factor);
+  private double mdist(double[] a, double[] b) {
+    return Math.abs(a[0] * factor - b[0] * factor) + Math.abs(a[1] * factor - b[1] * factor);
   }
 
   /**
    * Simple convexity test.
    * 
-   * @param a Vector A
-   * @param b Vector B
-   * @param c Vector C
+   * @param a double[] A
+   * @param b double[] B
+   * @param c double[] C
    * @return convexity
    */
-  private final boolean isConvex(Vector a, Vector b, Vector c) {
+  private final boolean isConvex(double[] a, double[] b, double[] c) {
     // We're using factor to improve numerical contrast for small polygons.
-    double area = (b.get(0) * factor - a.get(0) * factor) * (c.get(1) * factor - a.get(1) * factor) - (c.get(0) * factor - a.get(0) * factor) * (b.get(1) * factor - a.get(1) * factor);
+    double area = (b[0] * factor - a[0] * factor) * (c[1] * factor - a[1] * factor) - (c[0] * factor - a[0] * factor) * (b[1] * factor - a[1] * factor);
     if(area == 0) {
       return (mdist(b, c) >= mdist(a, b) + mdist(a, c));
     }
@@ -230,15 +229,15 @@ public class GrahamScanConvexHull2D {
     if(points.size() < 3) {
       return;
     }
-    Iterator<Vector> iter = points.iterator();
-    Stack<Vector> stack = new Stack<>();
+    Iterator<double[]> iter = points.iterator();
+    Stack<double[]> stack = new Stack<>();
     // Start with the first two points on the stack
     stack.add(iter.next());
     stack.add(iter.next());
     while(iter.hasNext()) {
-      Vector next = iter.next();
-      Vector curr = stack.pop();
-      Vector prev = stack.peek();
+      double[] next = iter.next();
+      double[] curr = stack.pop();
+      double[] prev = stack.peek();
       while((stack.size() > 1) && !isConvex(prev, curr, next)) {
         curr = stack.pop();
         prev = stack.peek();

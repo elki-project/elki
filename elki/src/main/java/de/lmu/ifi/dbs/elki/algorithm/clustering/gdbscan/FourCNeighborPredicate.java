@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
@@ -147,7 +148,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
     int cordim = pcares.getCorrelationDimension();
     Matrix m_hat = pcares.similarityMatrix();
 
-    Vector obj = new Vector(relation.get(id).toArray());
+    double[] obj = relation.get(id).toArray();
 
     // To save computing the square root below.
     double sqeps = settings.epsilon * settings.epsilon;
@@ -155,7 +156,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
     HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet(neighbors.size());
     for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
       // Compute weighted / projected distance:
-      Vector diff = new Vector(relation.get(iter).toArray()).minusEquals(obj);
+      Vector diff = new Vector(VMath.minusEquals(relation.get(iter).toArray(), obj));
       double dist = diff.transposeTimesTimes(m_hat, diff);
       if(dist <= sqeps) {
         survivors.add(iter);

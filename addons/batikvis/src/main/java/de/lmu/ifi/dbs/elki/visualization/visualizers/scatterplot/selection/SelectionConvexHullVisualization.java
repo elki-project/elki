@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
@@ -139,7 +138,7 @@ public class SelectionConvexHullVisualization extends AbstractVisFactory {
             if(v[0] != v[0] || v[1] != v[1]) {
               continue; // NaN!
             }
-            hull.add(new Vector(v));
+            hull.add(v);
           }
           catch(ObjectNotFoundException e) {
             // ignore

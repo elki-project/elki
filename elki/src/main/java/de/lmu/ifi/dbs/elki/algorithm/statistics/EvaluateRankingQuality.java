@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
@@ -143,7 +144,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
       Matrix covm = covmats.get(clus);
 
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
-        double d = MathUtil.mahalanobisDistance(covm, new Vector(relation.get(iter).toArray()).minusEquals(av));
+        double d = MathUtil.mahalanobisDistance(covm.getArrayRef(), VMath.minusEquals(relation.get(iter).toArray(), av.getArrayRef()));
         cmem.add(DBIDUtil.newPair(d, iter));
       }
       Collections.sort(cmem);
@@ -193,6 +194,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
      * Option to configure the number of bins to use.
      */
     public static final OptionID HISTOGRAM_BINS_ID = new OptionID("rankqual.bins", "Number of bins to use in the histogram");
+
     /**
      * Number of bins to use.
      */

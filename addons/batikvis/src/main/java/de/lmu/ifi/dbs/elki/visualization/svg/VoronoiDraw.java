@@ -72,11 +72,11 @@ public class VoronoiDraw {
     CanvasSize viewport = proj.estimateViewport();
     for(int i = 0; i < delaunay.size(); i++) {
       SweepHullDelaunay2D.Triangle del = delaunay.get(i);
-      final double[] projcx = proj.fastProjectDataToRenderSpace(del.m.getArrayRef());
+      final double[] projcx = proj.fastProjectDataToRenderSpace(del.m);
       if(del.ab > i) {
         Triangle oth = delaunay.get(del.ab);
         path.moveTo(projcx);
-        path.drawTo(proj.fastProjectDataToRenderSpace(oth.m.getArrayRef()));
+        path.drawTo(proj.fastProjectDataToRenderSpace(oth.m));
       }
       else if(del.ab < 0) {
         double[] dirv = VMath.minus(means.get(del.a), means.get(del.b));
@@ -92,7 +92,7 @@ public class VoronoiDraw {
       if(del.bc > i) {
         Triangle oth = delaunay.get(del.bc);
         path.moveTo(projcx);
-        path.drawTo(proj.fastProjectDataToRenderSpace(oth.m.getArrayRef()));
+        path.drawTo(proj.fastProjectDataToRenderSpace(oth.m));
       }
       else if(del.bc < 0) {
         double[] dirv = VMath.minus(means.get(del.b), means.get(del.c));
@@ -108,7 +108,7 @@ public class VoronoiDraw {
       if(del.ca > i) {
         Triangle oth = delaunay.get(del.ca);
         path.moveTo(projcx);
-        path.drawTo(proj.fastProjectDataToRenderSpace(oth.m.getArrayRef()));
+        path.drawTo(proj.fastProjectDataToRenderSpace(oth.m));
       }
       else if(del.ca < 0) {
         double[] dirv = VMath.minus(means.get(del.c), means.get(del.a));

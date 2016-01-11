@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -109,7 +108,7 @@ public class SimplePolygonParser extends AbstractStreamingParser {
   /**
    * (Reused) storage of coordinates.
    */
-  final private List<Vector> coords = new ArrayList<>();
+  final private List<double[]> coords = new ArrayList<>();
 
   /**
    * (Reused) storage of polygons.
@@ -199,10 +198,10 @@ public class SimplePolygonParser extends AbstractStreamingParser {
           double c2 = FormatUtil.parseDouble(m.group(2));
           if(m.group(3) != null) {
             double c3 = FormatUtil.parseDouble(m.group(3));
-            coords.add(new Vector(new double[] { c1, c2, c3 }));
+            coords.add(new double[] { c1, c2, c3 });
           }
           else {
-            coords.add(new Vector(new double[] { c1, c2 }));
+            coords.add(new double[] { c1, c2 });
           }
           continue;
         }

@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -211,8 +212,8 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      Vector v1_minus_v2 = new Vector(v1.toArray()).minusEquals(new Vector(v2.toArray()));
-      return MathUtil.mahalanobisDistance(pca1.similarityMatrix(), v1_minus_v2) <= settings.tau && MathUtil.mahalanobisDistance(pca2.similarityMatrix(), v1_minus_v2) <= settings.tau;
+      double[] v1_minus_v2 = VMath.minusEquals(v1.toArray(), v2.toArray());
+      return MathUtil.mahalanobisDistance(pca1.similarityMatrix().getArrayRef(), v1_minus_v2) <= settings.tau && MathUtil.mahalanobisDistance(pca2.similarityMatrix().getArrayRef(), v1_minus_v2) <= settings.tau;
     }
 
     /**

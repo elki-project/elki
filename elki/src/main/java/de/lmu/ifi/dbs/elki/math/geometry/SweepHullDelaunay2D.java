@@ -34,7 +34,6 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
@@ -65,7 +64,7 @@ public class SweepHullDelaunay2D {
    * Note: this list should not be changed after running the algorithm, since we
    * use it for object indexing, and the ids should not change
    */
-  private List<Vector> points;
+  private List<double[]> points;
 
   /**
    * Triangles
@@ -81,7 +80,7 @@ public class SweepHullDelaunay2D {
    * Constructor.
    */
   public SweepHullDelaunay2D() {
-    this(new ArrayList<Vector>());
+    this(new ArrayList<double[]>());
   }
 
   /**
@@ -89,7 +88,7 @@ public class SweepHullDelaunay2D {
    * 
    * @param points Existing points
    */
-  public SweepHullDelaunay2D(List<Vector> points) {
+  public SweepHullDelaunay2D(List<double[]> points) {
     this.points = points;
   }
 
@@ -99,7 +98,7 @@ public class SweepHullDelaunay2D {
    * 
    * @param point Point to add
    */
-  public void add(Vector point) {
+  public void add(double[] point) {
     this.points.add(point);
     // Invalidate
     hull = null;
@@ -119,18 +118,18 @@ public class SweepHullDelaunay2D {
     hull = new LinkedList<>();
     tris = hullonly ? null : new ArrayList<Triangle>(len);
 
-    final Vector seed;
+    final double[] seed;
     final int seedid = 0;
     final DoubleIntPair[] sort = new DoubleIntPair[len];
     // TODO: remove duplicates.
 
     // Select seed, sort by squared euclidean distance
     {
-      Iterator<Vector> iter = points.iterator();
+      Iterator<double[]> iter = points.iterator();
       seed = iter.next();
       for(int i = 0; iter.hasNext(); i++) {
         assert (i < len);
-        Vector p = iter.next();
+        double[] p = iter.next();
         // Pair with distance, list-position
         sort[i] = new DoubleIntPair(quadraticEuclidean(seed, p), i + 1);
       }
@@ -138,7 +137,7 @@ public class SweepHullDelaunay2D {
       Arrays.sort(sort);
     }
     assert (sort[0].first > 0);
-    // final Vector seed2 = points.get(sort[0].second);
+    // final double[] seed2 = points.get(sort[0].second);
     final int seed2id = sort[0].second;
     int start = 1;
 
@@ -186,7 +185,7 @@ public class SweepHullDelaunay2D {
     }
 
     // Resort from triangle center
-    Vector center = besttri.m;
+    double[] center = besttri.m;
     for(int i = start; i < len; i++) {
       sort[i].first = quadraticEuclidean(center, points.get(sort[i].second));
     }
@@ -195,7 +194,7 @@ public class SweepHullDelaunay2D {
     // Grow hull and triangles
     for(int i = start; i < len; i++) {
       final int pointId = sort[i].second;
-      final Vector newpoint = points.get(pointId);
+      final double[] newpoint = points.get(pointId);
 
       LinkedList<Triangle> newtris = hullonly ? null : new LinkedList<Triangle>();
       // We identify edges by their starting point. -1 is invalid.
@@ -204,10 +203,10 @@ public class SweepHullDelaunay2D {
       {
         Iterator<IntIntPair> iter = hull.descendingIterator();
         IntIntPair next = hull.getFirst();
-        Vector nextV = points.get(next.first);
+        double[] nextV = points.get(next.first);
         for(int pos = hull.size() - 1; iter.hasNext(); pos--) {
           IntIntPair prev = iter.next();
-          Vector prevV = points.get(prev.first);
+          double[] prevV = points.get(prev.first);
           // Not yet visible:
           if(hend < 0) {
             if(leftOf(prevV, nextV, newpoint)) {
@@ -250,10 +249,10 @@ public class SweepHullDelaunay2D {
       if(hend == hull.size() - 1) {
         Iterator<IntIntPair> iter = hull.iterator();
         IntIntPair prev = iter.next();
-        Vector prevV = points.get(prev.first);
+        double[] prevV = points.get(prev.first);
         while(iter.hasNext()) {
           IntIntPair next = iter.next();
-          Vector nextV = points.get(next.first);
+          double[] nextV = points.get(next.first);
           if(leftOf(prevV, nextV, newpoint)) {
             hend++;
             // Add triad:
@@ -617,12 +616,12 @@ public class SweepHullDelaunay2D {
     }
     DoubleMinMax minmaxX = new DoubleMinMax();
     DoubleMinMax minmaxY = new DoubleMinMax();
-    List<Vector> hullp = new ArrayList<>(hull.size());
+    List<double[]> hullp = new ArrayList<>(hull.size());
     for(IntIntPair pair : hull) {
-      Vector v = points.get(pair.first);
+      double[] v = points.get(pair.first);
       hullp.add(v);
-      minmaxX.put(v.get(0));
-      minmaxY.put(v.get(1));
+      minmaxX.put(v[0]);
+      minmaxY.put(v[1]);
     }
     return new Polygon(hullp, minmaxX.getMin(), minmaxX.getMax(), minmaxY.getMin(), minmaxY.getMax());
   }
@@ -642,29 +641,29 @@ public class SweepHullDelaunay2D {
   /**
    * Squared euclidean distance. 2d.
    * 
-   * @param v1 First vector
-   * @param v2 Second vector
+   * @param v1 First double[]
+   * @param v2 Second double[]
    * @return Quadratic distance
    */
-  public static double quadraticEuclidean(Vector v1, Vector v2) {
-    final double d1 = v1.get(0) - v2.get(0);
-    final double d2 = v1.get(1) - v2.get(1);
+  public static double quadraticEuclidean(double[] v1, double[] v2) {
+    final double d1 = v1[0] - v2[0];
+    final double d2 = v1[1] - v2[1];
     return (d1 * d1) + (d2 * d2);
   }
 
   /**
-   * Test if the vector AD is right of AB.
+   * Test if the double[] AD is right of AB.
    * 
    * @param a Starting point
    * @param b Reference point
    * @param d Test point
    * @return true when on the left side
    */
-  boolean leftOf(Vector a, Vector b, Vector d) {
-    final double bax = b.get(0) - a.get(0);
-    final double bay = b.get(1) - a.get(1);
-    final double dax = d.get(0) - a.get(0);
-    final double day = d.get(1) - a.get(1);
+  boolean leftOf(double[] a, double[] b, double[] d) {
+    final double bax = b[0] - a[0];
+    final double bay = b[1] - a[1];
+    final double dax = d[0] - a[0];
+    final double day = d[1] - a[1];
     final double cross = bax * day - bay * dax;
     return cross > 0;
   }
@@ -705,9 +704,9 @@ public class SweepHullDelaunay2D {
     public double r2 = -1;
 
     /**
-     * Center vector
+     * Center double[]
      */
-    public Vector m = new Vector(2);
+    public double[] m = new double[2];
 
     /**
      * Constructor.
@@ -770,12 +769,12 @@ public class SweepHullDelaunay2D {
     /**
      * Test whether a point is within the circumference circle.
      * 
-     * @param opp Test vector
+     * @param opp Test double[]
      * @return true when contained
      */
-    public boolean inCircle(Vector opp) {
-      double dx = opp.get(0) - m.get(0);
-      double dy = opp.get(1) - m.get(1);
+    public boolean inCircle(double[] opp) {
+      double dx = opp[0] - m[0];
+      double dy = opp[1] - m[1];
       return (dx * dx + dy * dy) <= r2;
     }
 
@@ -831,7 +830,7 @@ public class SweepHullDelaunay2D {
     /**
      * Make the triangle clockwise
      */
-    void makeClockwise(List<Vector> points) {
+    void makeClockwise(List<double[]> points) {
       if(!isClockwise(points)) {
         // Swap points B, C
         int t = b;
@@ -847,13 +846,13 @@ public class SweepHullDelaunay2D {
     /**
      * Verify that the triangle is clockwise
      */
-    boolean isClockwise(List<Vector> points) {
+    boolean isClockwise(List<double[]> points) {
       // Mean
-      double centX = (points.get(a).get(0) + points.get(b).get(0) + points.get(c).get(0)) / 3.0f;
-      double centY = (points.get(a).get(1) + points.get(b).get(1) + points.get(c).get(1)) / 3.0f;
+      double centX = (points.get(a)[0] + points.get(b)[0] + points.get(c)[0]) / 3.0f;
+      double centY = (points.get(a)[1] + points.get(b)[1] + points.get(c)[1]) / 3.0f;
 
-      double dr0 = points.get(a).get(0) - centX, dc0 = points.get(a).get(1) - centY;
-      double dx01 = points.get(b).get(0) - points.get(a).get(0), dy01 = points.get(b).get(1) - points.get(a).get(1);
+      double dr0 = points.get(a)[0] - centX, dc0 = points.get(a)[1] - centY;
+      double dx01 = points.get(b)[0] - points.get(a)[0], dy01 = points.get(b)[1] - points.get(a)[1];
 
       double df = -dx01 * dc0 + dy01 * dr0;
       return (df <= 0);
@@ -869,8 +868,8 @@ public class SweepHullDelaunay2D {
       this.b = o.b;
       this.c = o.c;
       this.r2 = o.r2;
-      this.m.set(0, o.m.get(0));
-      this.m.set(1, o.m.get(1));
+      this.m[0] = o.m[0];
+      this.m[1] = o.m[1];
     }
 
     /**
@@ -880,12 +879,12 @@ public class SweepHullDelaunay2D {
      * 
      * @return success
      */
-    boolean updateCircumcircle(List<Vector> points) {
-      Vector pa = points.get(a), pb = points.get(b), pc = points.get(c);
+    boolean updateCircumcircle(List<double[]> points) {
+      double[] pa = points.get(a), pb = points.get(b), pc = points.get(c);
 
       // Compute vectors from A: AB, AC:
-      final double abx = pb.get(0) - pa.get(0), aby = pb.get(1) - pa.get(1);
-      final double acx = pc.get(0) - pa.get(0), acy = pc.get(1) - pa.get(1);
+      final double abx = pb[0] - pa[0], aby = pb[1] - pa[1];
+      final double acx = pc[0] - pa[0], acy = pc[1] - pa[1];
 
       // Squared euclidean lengths
       final double ablen = abx * abx + aby * aby;
@@ -909,8 +908,8 @@ public class SweepHullDelaunay2D {
         return false;
       }
 
-      m.set(0, pa.get(0) + offx);
-      m.set(1, pa.get(1) + offy);
+      m[0] = pa[0] + offx;
+      m[1] = pa[1] + offy;
       return true;
     }
 
@@ -926,7 +925,7 @@ public class SweepHullDelaunay2D {
     Random r = new Random(1);
     final int num = 100000;
     for(int i = 0; i < num; i++) {
-      final Vector v = new Vector(r.nextDouble(), r.nextDouble());
+      final double[] v = new double[]{r.nextDouble(), r.nextDouble()};
       // System.err.println(i + ": " + FormatUtil.format(v.getArrayRef(), " "));
       d.add(v);
     }

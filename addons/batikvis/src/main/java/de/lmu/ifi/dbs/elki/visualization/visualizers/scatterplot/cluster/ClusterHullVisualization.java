@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.geometry.AlphaShape;
 import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
@@ -228,7 +227,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
         // For alpha shapes we can't use the shortcut of convex hulls,
         // but have to revisit all child clusters.
         for(Cluster<Model> clu : clusters) {
-          ArrayList<Vector> ps = new ArrayList<>();
+          ArrayList<double[]> ps = new ArrayList<>();
           double weight = addRecursively(ps, hier, clu);
           List<Polygon> polys;
           if(ps.size() < 1) {
@@ -277,10 +276,9 @@ public class ClusterHullVisualization extends AbstractVisFactory {
         if(projv[0] != projv[0] || projv[1] != projv[1]) {
           continue; // NaN!
         }
-        Vector projP = new Vector(projv);
-        hull.add(projP);
+        hull.add(projv);
         if(coremodel && cids.contains(iter)) {
-          hull2.add(projP);
+          hull2.add(projv);
         }
       }
       double weight = ids.size(), cweight = coremodel ? cids.size() : 0.0;
@@ -294,14 +292,14 @@ public class ClusterHullVisualization extends AbstractVisFactory {
               poly = buildHullsRecursively(iclu, hier, hulls);
             }
             // Add inner convex hull to outer convex hull.
-            for(ArrayListIter<Vector> vi = poly.second.iter(); vi.valid(); vi.advance()) {
+            for(ArrayListIter<double[]> vi = poly.second.iter(); vi.valid(); vi.advance()) {
               hull.add(vi.get());
             }
             // For a core model, include the inner core, too.
             if(coremodel) {
               DoubleObjPair<Polygon> ipoly = hulls.get(iclu.getModel());
               if(ipoly != null) {
-                for(ArrayListIter<Vector> vi = ipoly.second.iter(); vi.valid(); vi.advance()) {
+                for(ArrayListIter<double[]> vi = ipoly.second.iter(); vi.valid(); vi.advance()) {
                   hull2.add(vi.get());
                 }
                 cweight += ipoly.first / numc;
@@ -327,7 +325,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
      * @param clus Current cluster
      * @return Weight for visualization
      */
-    private double addRecursively(ArrayList<Vector> hull, Hierarchy<Cluster<Model>> hier, Cluster<Model> clus) {
+    private double addRecursively(ArrayList<double[]> hull, Hierarchy<Cluster<Model>> hier, Cluster<Model> clus) {
       final DBIDs ids = clus.getIDs();
       double weight = ids.size();
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -335,7 +333,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
         if(projP[0] != projP[0] || projP[1] != projP[1]) {
           continue; // NaN!
         }
-        hull.add(new Vector(projP));
+        hull.add(projP);
       }
       for(Iter<Cluster<Model>> iter = hier.iterChildren(clus); iter.valid(); iter.advance()) {
         weight += .5 * addRecursively(hull, hier, iter.get());

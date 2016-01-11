@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -152,14 +151,14 @@ public class PolygonVisualization extends AbstractVisFactory {
           }
           SVGPath path = new SVGPath();
           for(Polygon ppoly : poly.getPolygons()) {
-            Vector first = ppoly.get(0);
-            double[] f = proj.fastProjectDataToRenderSpace(first.getArrayRef());
+            double[] first = ppoly.get(0);
+            double[] f = proj.fastProjectDataToRenderSpace(first);
             path.moveTo(f[0], f[1]);
-            for(ArrayListIter<Vector> it = ppoly.iter(); it.valid(); it.advance()) {
+            for(ArrayListIter<double[]> it = ppoly.iter(); it.valid(); it.advance()) {
               if(it.getOffset() == 0) {
                 continue;
               }
-              double[] p = proj.fastProjectDataToRenderSpace(it.get().getArrayRef());
+              double[] p = proj.fastProjectDataToRenderSpace(it.get());
               path.drawTo(p[0], p[1]);
             }
             // close path.

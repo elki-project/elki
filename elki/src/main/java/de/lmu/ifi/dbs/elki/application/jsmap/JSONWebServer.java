@@ -169,8 +169,7 @@ public class JSONWebServer implements HttpHandler {
           for(Polygon p : ((PolygonsObject) data).getPolygons()) {
             re.startArray();
             for(int i = 0; i < p.size(); i++) {
-              Vector point = p.get(i);
-              re.append(point.getArrayRef());
+              re.append(p.get(i));
             }
             re.closeArray();
           }

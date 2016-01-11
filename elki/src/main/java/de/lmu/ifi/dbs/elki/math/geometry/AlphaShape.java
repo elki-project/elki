@@ -26,7 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 
 /**
@@ -46,14 +45,14 @@ public class AlphaShape {
   /**
    * Points
    */
-  private List<Vector> points;
+  private List<double[]> points;
 
   /**
    * Delaunay triangulation
    */
   private ArrayList<SweepHullDelaunay2D.Triangle> delaunay = null;
 
-  public AlphaShape(List<Vector> points, double alpha) {
+  public AlphaShape(List<double[]> points, double alpha) {
     this.alpha2 = alpha * alpha;
     this.points = points;
   }
@@ -66,7 +65,7 @@ public class AlphaShape {
 
     // Working data
     long[] used = BitsUtil.zero(delaunay.size());
-    List<Vector> cur = new ArrayList<>();
+    List<double[]> cur = new ArrayList<>();
 
     for(int i = 0 /* = used.nextClearBit(0) */; i < delaunay.size() && i >= 0; i = BitsUtil.nextClearBit(used, i + 1)) {
       if(!BitsUtil.get(used, i)) {
@@ -88,7 +87,7 @@ public class AlphaShape {
     return polys;
   }
 
-  private void processNeighbor(List<Vector> cur, long[] used, int i, int ab, int b) {
+  private void processNeighbor(List<double[]> cur, long[] used, int i, int ab, int b) {
     if(ab >= 0) {
       if(BitsUtil.get(used, ab)) {
         return;

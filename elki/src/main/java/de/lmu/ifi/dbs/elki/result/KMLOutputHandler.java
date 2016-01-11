@@ -60,7 +60,6 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -328,14 +327,14 @@ public class KMLOutputHandler implements ResultHandler {
 
           // Reverse anti-clockwise polygons.
           boolean reverse = (p.testClockwise() >= 0);
-          ArrayListIter<Vector> it = p.iter();
+          ArrayListIter<double[]> it = p.iter();
           if(reverse) {
             it.seek(p.size() - 1);
           }
           while(it.valid()) {
-            Vector v = it.get();
-            xmlw.writeCharacters(FormatUtil.format(v.getArrayRef(), ","));
-            if(compat && (v.getDimensionality() == 2)) {
+            double[] v = it.get();
+            xmlw.writeCharacters(FormatUtil.format(v, ","));
+            if(compat && (v.length == 2)) {
               xmlw.writeCharacters(",50");
             }
             xmlw.writeCharacters(" ");
@@ -473,14 +472,14 @@ public class KMLOutputHandler implements ResultHandler {
 
           // Reverse anti-clockwise polygons.
           boolean reverse = (p.testClockwise() >= 0);
-          ArrayListIter<Vector> itp = p.iter();
+          ArrayListIter<double[]> itp = p.iter();
           if(reverse) {
             itp.seek(p.size() - 1);
           }
           while(itp.valid()) {
-            Vector v = itp.get();
-            xmlw.writeCharacters(FormatUtil.format(v.getArrayRef(), ","));
-            if(compat && (v.getDimensionality() == 2)) {
+            double[] v = itp.get();
+            xmlw.writeCharacters(FormatUtil.format(v, ","));
+            if(compat && (v.length == 2)) {
               xmlw.writeCharacters(",100");
             }
             xmlw.writeCharacters(" ");
@@ -518,7 +517,7 @@ public class KMLOutputHandler implements ResultHandler {
 
     GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      hull.add(new Vector(coords.get(iter).toArray()));
+      hull.add(coords.get(iter).toArray());
     }
     double weight = ids.size();
     if(hier != null && hulls != null) {
@@ -531,7 +530,7 @@ public class KMLOutputHandler implements ResultHandler {
             poly = buildHullsRecursively(iclu, hier, hulls, coords);
           }
           // Add inner convex hull to outer convex hull.
-          for(ArrayListIter<Vector> vi = poly.second.iter(); vi.valid(); vi.advance()) {
+          for(ArrayListIter<double[]> vi = poly.second.iter(); vi.valid(); vi.advance()) {
             hull.add(vi.get());
           }
           weight += poly.first / numc;
