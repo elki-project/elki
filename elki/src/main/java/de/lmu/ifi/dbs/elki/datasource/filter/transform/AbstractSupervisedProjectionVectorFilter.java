@@ -1,5 +1,27 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,29 +47,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
-import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Base class for supervised projection methods.
@@ -127,7 +126,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
         Matrix proj = computeProjectionMatrix(vectorcolumn, classcolumn, dim);
         for(int i = 0; i < dataLength; i++) {
           final Vector pv = proj.times(new Vector(vectorcolumn.get(i).toArray()));
-          V filteredObj = factory.newNumberVector(pv, ArrayLikeUtil.VECTORADAPTER);
+          V filteredObj = factory.newNumberVector(pv);
           vectorcolumn.set(i, filteredObj);
         }
         bundle.appendColumn(convertedType(type, factory), column);
