@@ -1,5 +1,28 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2016
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
@@ -384,19 +407,21 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
           throw new AbortException("Dimension " + d + " contains non-finite values.");
         }
         int c = cells[d] = Math.max(1, (int) Math.ceil(wi / gridwidth));
-        offset[d] = mi - (wi - c * gridwidth) * .5;
+        offset[d] = mi - (c * gridwidth - wi) * .5;
+        assert (offset[d] <= mi) : "Grid inconsistent.";
+        assert (offset[d] + c * gridwidth >= ma) : "Grid inconsistent.";
         total *= c;
         if(total < 0) {
           throw new AbortException("Excessive amount of grid cells! Use larger grid cells.");
         }
         if(buf != null) {
-          buf.append(d).append(':');
-          double s = offset[d] + gridwidth;
-          for(int i = 1; i < c; i++) {
+          buf.append(d).append(": min=").append(mi).append(" max=").append(ma);
+          double s = offset[d];
+          for(int i = 0; i <= c; i++) {
             buf.append(' ').append(s);
             s += gridwidth;
           }
-          buf.append("   ");
+          buf.append('\n');
         }
       }
       if(buf != null) {
@@ -432,8 +457,9 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     private void insertIntoGrid(DBIDRef id, V obj, int d, int v) {
       final int cn = cells[d]; // Number of cells in this dimension
       final int nd = d + 1; // Next dimension
-      int mi = Math.max(0, (int) Math.floor((obj.doubleValue(d) - offset[0] - epsilon) / gridwidth));
-      int ma = Math.min(cn - 1, (int) Math.floor((obj.doubleValue(d) - offset[0] + epsilon) / gridwidth));
+      int mi = Math.max(0, (int) Math.floor((obj.doubleValue(d) - offset[d] - epsilon) / gridwidth));
+      int ma = Math.min(cn - 1, (int) Math.floor((obj.doubleValue(d) - offset[d] + epsilon) / gridwidth));
+      assert (mi <= ma) : "Grid inconsistent.";
       for(int i = mi; i <= ma; i++) {
         int c = v * cn + i;
         if(nd == cells.length) {
@@ -459,21 +485,29 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     protected int checkGridCellSizes(int size, long numcell) {
       int tcount = 0;
       int hasmin = 0;
+      long sqcount = 0;
       for(TIntObjectIterator<ModifiableDBIDs> it = grid.iterator(); it.hasNext();) {
         it.advance();
-        if(it.value().size() >= size >> 1) {
-          LOG.warning("A single cell contains half of the database (" + it.value().size()//
+        final int s = it.value().size();
+        if(s >= size >> 1) {
+          LOG.warning("A single cell contains half of the database (" + s//
           + " objects). This will not scale very well.");
         }
-        tcount += it.value().size();
-        if(it.value().size() >= minpts) {
+        tcount += s;
+        sqcount += s * s;
+        if(s >= minpts) {
           hasmin++;
         }
+      }
+      double savings = sqcount / (double) size / (double) size;
+      if(savings >= 1) {
+        LOG.warning("Pairwise distances within each cells are more expensive than a full DBSCAN run due to overlap!");
       }
       LOG.statistics(new LongStatistic(GriDBSCAN.class.getName() + ".all-cells", numcell));
       LOG.statistics(new LongStatistic(GriDBSCAN.class.getName() + ".used-cells", grid.size()));
       LOG.statistics(new LongStatistic(GriDBSCAN.class.getName() + ".minpts-cells", hasmin));
       LOG.statistics(new DoubleStatistic(GriDBSCAN.class.getName() + ".redundancy", tcount / (double) size));
+      LOG.statistics(new DoubleStatistic(GriDBSCAN.class.getName() + ".relative-cost", savings));
       return hasmin;
     }
 
