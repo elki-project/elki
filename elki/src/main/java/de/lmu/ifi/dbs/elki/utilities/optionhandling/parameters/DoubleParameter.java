@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
-import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 
@@ -41,7 +41,7 @@ public class DoubleParameter extends NumberParameter<DoubleParameter, Double> {
       return (Double) obj;
     }
     try {
-      return FormatUtil.parseDouble(obj.toString());
+      return ParseUtil.parseDouble(obj.toString());
     }
     catch(NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");

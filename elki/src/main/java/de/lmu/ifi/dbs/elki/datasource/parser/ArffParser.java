@@ -1,5 +1,34 @@
 package de.lmu.ifi.dbs.elki.datasource.parser;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StreamTokenizer;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.ExternalID;
+import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
+import de.lmu.ifi.dbs.elki.data.SparseDoubleVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,35 +55,6 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 import gnu.trove.iterator.TIntObjectIterator;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StreamTokenizer;
-import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.ExternalID;
-import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
-import de.lmu.ifi.dbs.elki.data.SparseDoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 
 /**
  * Parser to load WEKA .arff files into ELKI.
@@ -244,7 +244,7 @@ public class ArffParser implements Parser {
         nextToken(tokenizer);
         if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
           if(TypeUtil.NUMBER_VECTOR_FIELD.equals(elkitypes[targ[dim]])) {
-            map.put(dim, FormatUtil.parseDouble(tokenizer.sval));
+            map.put(dim, ParseUtil.parseDouble(tokenizer.sval));
           }
           else {
             map.put(dim, tokenizer.sval);
@@ -341,7 +341,7 @@ public class ArffParser implements Parser {
           }
           else if(tokenizer.ttype == StreamTokenizer.TT_WORD) {
             try {
-              cur[k] = FormatUtil.parseDouble(tokenizer.sval);
+              cur[k] = ParseUtil.parseDouble(tokenizer.sval);
             }
             catch(NumberFormatException e) {
               throw new AbortException("Expected number value, got: " + tokenizer.sval);

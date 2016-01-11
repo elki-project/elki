@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -172,7 +173,7 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
             if(used == buf.length) {
               buf = Arrays.copyOf(buf, buf.length << 1);
             }
-            buf[used++] = FormatUtil.parseDouble(coordinate);
+            buf[used++] = ParseUtil.parseDouble(coordinate);
           }
           catch(NumberFormatException e) {
             throw new WrongParameterValueException("Wrong parameter format! Coordinates of vector \"" + vector + "\" are not valid!");

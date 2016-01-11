@@ -196,7 +196,7 @@ public class Tokenizer implements Iter {
    *         value.
    */
   public double getDouble() throws NumberFormatException {
-    return FormatUtil.parseDouble(input, start, end);
+    return ParseUtil.parseDouble(input, start, end);
   }
 
   /**
@@ -207,7 +207,7 @@ public class Tokenizer implements Iter {
    *         value.
    */
   public long getLongBase10() throws NumberFormatException {
-    return FormatUtil.parseLongBase10(input, start, end);
+    return ParseUtil.parseLongBase10(input, start, end);
   }
 
   /**

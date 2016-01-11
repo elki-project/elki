@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 
 /**
  * A two-dimensional matrix class, where the data is stored as two-dimensional
@@ -1400,7 +1401,7 @@ public class Matrix {
       throw new java.io.IOException("Unexpected EOF on matrix read.");
     }
     do {
-      v.add(FormatUtil.parseDouble(tokenizer.sval)); // Read & store 1st
+      v.add(ParseUtil.parseDouble(tokenizer.sval)); // Read & store 1st
       // row.
     }
     while(tokenizer.nextToken() == StreamTokenizer.TT_WORD);
@@ -1417,7 +1418,7 @@ public class Matrix {
         if(j >= n) {
           throw new java.io.IOException("Row " + v.size() + " is too long.");
         }
-        row[j++] = FormatUtil.parseDouble(tokenizer.sval);
+        row[j++] = ParseUtil.parseDouble(tokenizer.sval);
       }
       while(tokenizer.nextToken() == StreamTokenizer.TT_WORD);
       if(j < n) {

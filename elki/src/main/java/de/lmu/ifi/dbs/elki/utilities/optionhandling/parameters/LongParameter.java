@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -64,10 +66,11 @@ public class LongParameter extends NumberParameter<LongParameter, Long> {
       return (Long) obj;
     }
     if(obj instanceof Number) {
-      return Long.valueOf(((Number) obj).longValue());
+      return ((Number) obj).longValue();
     }
     try {
-      return Long.valueOf(obj.toString());
+      String v = obj.toString();
+      return ParseUtil.parseLongBase10(v);
     }
     catch(NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long value, read: " + obj + "!\n");

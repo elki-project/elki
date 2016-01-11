@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 
 /**
  * Parser to load polygon data (2D and 3D only) from a simple format. One record
@@ -194,10 +194,10 @@ public class SimplePolygonParser extends AbstractStreamingParser {
       m.region(tokenizer.getStart(), tokenizer.getEnd());
       if(m.find()) {
         try {
-          double c1 = FormatUtil.parseDouble(m.group(1));
-          double c2 = FormatUtil.parseDouble(m.group(2));
+          double c1 = ParseUtil.parseDouble(m.group(1));
+          double c2 = ParseUtil.parseDouble(m.group(2));
           if(m.group(3) != null) {
-            double c3 = FormatUtil.parseDouble(m.group(3));
+            double c3 = ParseUtil.parseDouble(m.group(3));
             coords.add(new double[] { c1, c2, c3 });
           }
           else {

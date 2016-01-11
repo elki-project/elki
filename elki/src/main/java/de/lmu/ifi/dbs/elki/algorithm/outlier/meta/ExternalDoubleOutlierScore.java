@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
-import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.TokenizedReader;
 import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -176,7 +176,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
             if(!Double.isNaN(score)) {
               throw new AbortException("Score pattern matched twice: previous value " + score + " second value: " + tokenizer.getSubstring());
             }
-            score = FormatUtil.parseDouble((buf.subSequence(ms.end(), tokenizer.getEnd()).toString()));
+            score = ParseUtil.parseDouble(buf, ms.end(), tokenizer.getEnd());
           }
         }
         if(id != null && !Double.isNaN(score)) {

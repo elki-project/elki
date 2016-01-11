@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -92,7 +94,7 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
       String[] values = SPLIT.split((String) obj);
       int[] intValue = new int[values.length];
       for(int i = 0; i < values.length; i++) {
-        intValue[i] = Integer.valueOf(values[i]);
+        intValue[i] = (int) ParseUtil.parseLongBase10(values[i]);
       }
       return intValue;
     }

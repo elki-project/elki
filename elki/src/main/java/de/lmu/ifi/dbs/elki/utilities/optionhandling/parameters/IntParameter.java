@@ -1,6 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
-import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -43,7 +43,7 @@ public class IntParameter extends NumberParameter<IntParameter, Integer> {
     }
     try {
       final String s = obj.toString();
-      return (int) FormatUtil.parseLongBase10(s, 0, s.length());
+      return (int) ParseUtil.parseLongBase10(s);
     }
     catch(NullPointerException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires an integer value, read: " + obj + "!\n");
