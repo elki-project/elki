@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -42,12 +39,13 @@ import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Base class for supervised projection methods.
@@ -113,7 +111,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
       List<V> vectorcolumn = (List<V>) column;
       final VectorFieldTypeInformation<?> vtype = (VectorFieldTypeInformation<?>) type;
       @SuppressWarnings("unchecked")
-      NumberVector.Factory<V>  factory = (NumberVector.Factory<V> ) vtype.getFactory();
+      NumberVector.Factory<V> factory = (NumberVector.Factory<V>) vtype.getFactory();
       int dim = vtype.getDimensionality();
 
       if(tdim > dim) {
@@ -127,7 +125,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
         Matrix proj = computeProjectionMatrix(vectorcolumn, classcolumn, dim);
         for(int i = 0; i < dataLength; i++) {
           final Vector pv = proj.times(vectorcolumn.get(i).getColumnVector());
-          V filteredObj = factory.newNumberVector(pv, ArrayLikeUtil.VECTORADAPTER);
+          V filteredObj = factory.newNumberVector(pv);
           vectorcolumn.set(i, filteredObj);
         }
         bundle.appendColumn(convertedType(type, factory), column);
