@@ -142,7 +142,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
     double variance = 0;
     DBIDs ids = db.getDBIDs();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      double distance = distance(db.get(iter).getColumnVector());
+      double distance = distance(db.get(iter).toArray());
       variance += distance * distance;
     }
     standardDeviation = Math.sqrt(variance / ids.size());
@@ -186,7 +186,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the distance of p from the hyperplane underlying this solution
    */
   public double distance(V p) {
-    return distance(p.getColumnVector());
+    return distance(p.toArray());
   }
 
   /**
@@ -196,12 +196,12 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @param p a vector in the space underlying this solution
    * @return the distance of p from the hyperplane underlying this solution
    */
-  private double distance(Vector p) {
+  private double distance(double[] p) {
     // TODO: Is there a particular reason not to do this:
     // return p.minus(centroid).projection(weakEigenvectors).euclideanNorm(0);
     // V_affin = V + a
     // dist(p, V_affin) = d(p-a, V) = ||p - a - proj_V(p-a) ||
-    Vector p_minus_a = p.minus(centroid);
+    Vector p_minus_a = new Vector(p).minus(centroid);
     Vector proj = p_minus_a.projection(strongEigenvectors);
     return p_minus_a.minus(proj).euclideanLength();
   }
@@ -213,7 +213,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public Vector errorVector(V p) {
-    return p.getColumnVector().minusEquals(centroid).projection(weakEigenvectors);
+    return new Vector(p.toArray()).minusEquals(centroid).projection(weakEigenvectors);
   }
 
   /**
@@ -223,7 +223,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the data projections
    */
   public Matrix dataProjections(V p) {
-    Vector centered = p.getColumnVector().minusEquals(centroid);
+    Vector centered = new Vector(p.toArray()).minusEquals(centroid);
     Matrix sum = new Matrix(p.getDimensionality(), strongEigenvectors.getColumnDimensionality());
     for(int i = 0; i < strongEigenvectors.getColumnDimensionality(); i++) {
       Vector v_i = strongEigenvectors.getCol(i);
@@ -240,7 +240,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public Vector dataVector(V p) {
-    return p.getColumnVector().minusEquals(centroid).projection(strongEigenvectors);
+    return new Vector(p.toArray()).minusEquals(centroid).projection(strongEigenvectors);
   }
 
   /**
@@ -301,16 +301,18 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
     try {
       if(getNormalizedLinearEquationSystem(null) != null) {
         // TODO: more elegant way of doing normalization here?
-        /*if(out instanceof TextWriterStreamNormalizing) {
-          TextWriterStreamNormalizing<V> nout = (TextWriterStreamNormalizing<V>) out;
-          LinearEquationSystem lq = getNormalizedLinearEquationSystem(nout.getNormalization());
-          out.commentPrint("Linear Equation System: ");
-          out.commentPrintLn(lq.equationsToString(nf));
-        } else { */
+        /*
+         * if(out instanceof TextWriterStreamNormalizing) {
+         * TextWriterStreamNormalizing<V> nout =
+         * (TextWriterStreamNormalizing<V>) out; LinearEquationSystem lq =
+         * getNormalizedLinearEquationSystem(nout.getNormalization());
+         * out.commentPrint("Linear Equation System: ");
+         * out.commentPrintLn(lq.equationsToString(nf)); } else {
+         */
         LinearEquationSystem lq = getNormalizedLinearEquationSystem(null);
         out.commentPrint("Linear Equation System: ");
         out.commentPrintLn(lq.equationsToString(nf));
-        //}
+        // }
       }
     }
     catch(NonNumericFeaturesException e) {

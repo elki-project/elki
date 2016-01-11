@@ -684,8 +684,8 @@ public class Vector implements NumberVector {
   }
 
   @Override
-  public Vector getColumnVector() {
-    return copy();
+  public double[] toArray() {
+    return elements.clone();
   }
 
   /**

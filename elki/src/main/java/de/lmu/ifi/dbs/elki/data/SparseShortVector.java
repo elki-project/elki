@@ -1,5 +1,15 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,17 +35,6 @@ package de.lmu.ifi.dbs.elki.data;
 
 import gnu.trove.iterator.TIntDoubleIterator;
 import gnu.trove.map.TIntDoubleMap;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
-import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Sparse vector type, using {@code short[]} for storing the values, and
@@ -247,8 +246,12 @@ public class SparseShortVector extends AbstractNumberVector implements SparseNum
   }
 
   @Override
-  public Vector getColumnVector() {
-    return new Vector(getValues());
+  public double[] toArray() {
+    double[] vals = new double[dimensionality];
+    for(int i = 0; i < indexes.length; i++) {
+      vals[this.indexes[i]] = this.values[i];
+    }
+    return vals;
   }
 
   /**
@@ -279,19 +282,6 @@ public class SparseShortVector extends AbstractNumberVector implements SparseNum
     }
 
     return featureLine.toString();
-  }
-
-  /**
-   * Returns an array consisting of the values of this feature vector.
-   * 
-   * @return an array consisting of the values of this feature vector
-   */
-  private double[] getValues() {
-    double[] vals = new double[dimensionality];
-    for(int i = 0; i < indexes.length; i++) {
-      vals[this.indexes[i]] = this.values[i];
-    }
-    return vals;
   }
 
   @Override

@@ -424,7 +424,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     }
     else {
       NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
-      Vector cent = c1.centroid.getColumnVector().plusEquals(c2.centroid.getColumnVector()).timesEquals(0.5);
+      Vector cent = new Vector(c1.centroid.toArray()).plusEquals(new Vector(c2.centroid.toArray())).timesEquals(0.5);
       c.centroid = factory.newNumberVector(cent.getArrayRef());
       double[][] doubles = new double[c1.basis.getRowDimensionality()][dim];
       for(int i = 0; i < dim; i++) {
@@ -445,7 +445,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @return the projection of double vector o in the subspace of cluster c
    */
   private V projection(ORCLUSCluster c, V o, NumberVector.Factory<V> factory) {
-    Matrix o_proj = o.getColumnVector().transposeTimes(c.basis);
+    Matrix o_proj = new Vector(o.toArray()).transposeTimes(c.basis);
     double[] values = o_proj.getColumnPackedCopy();
     return factory.newNumberVector(values);
   }
@@ -504,7 +504,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
       this.basis = Matrix.unitMatrix(dim);
 
       // initially the centroid is the value array of o
-      double[] values = o.getColumnVector().getArrayRef();
+      double[] values = o.toArray();
       // FIXME: avoid going through 'values'
       this.centroid = factory.newNumberVector(values);
     }

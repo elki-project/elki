@@ -55,7 +55,7 @@ public class SVGHyperSphere {
    * @return path element
    */
   public static Element drawManhattan(SVGPlot svgp, Projection2D proj, NumberVector mid, double radius) {
-    final double[] v_mid = mid.getColumnVector().getArrayRef(); // a copy
+    final double[] v_mid = mid.toArray(); // a copy
     final long[] dims = proj.getVisibleDimensions2D();
 
     SVGPath path = new SVGPath();
@@ -100,7 +100,7 @@ public class SVGHyperSphere {
    * @return path element
    */
   public static Element drawEuclidean(SVGPlot svgp, Projection2D proj, NumberVector mid, double radius) {
-    double[] v_mid = mid.getColumnVector().getArrayRef(); // a copy
+    double[] v_mid = mid.toArray(); // a copy
     long[] dims = proj.getVisibleDimensions2D();
 
     SVGPath path = new SVGPath();
@@ -151,7 +151,7 @@ public class SVGHyperSphere {
    * @return path element
    */
   public static Element drawLp(SVGPlot svgp, Projection2D proj, NumberVector mid, double radius, double p) {
-    final double[] v_mid = mid.getColumnVector().getArrayRef();
+    final double[] v_mid = mid.toArray();
     final long[] dims = proj.getVisibleDimensions2D();
 
     final double kappax, kappay;
@@ -269,7 +269,7 @@ public class SVGHyperSphere {
    * @return path element
    */
   public static Element drawCross(SVGPlot svgp, Projection2D proj, NumberVector mid, double radius) {
-    final double[] v_mid = mid.getColumnVector().getArrayRef();
+    final double[] v_mid = mid.toArray();
     final long[] dims = proj.getVisibleDimensions2D();
 
     SVGPath path = new SVGPath();

@@ -73,7 +73,7 @@ public class InstanceMinMaxNormalization<V extends NumberVector> extends Abstrac
 
   @Override
   protected V filterSingleObject(V featureVector) {
-    double[] raw = featureVector.getColumnVector().getArrayRef();
+    double[] raw = featureVector.toArray();
     // Multivariate codepath:
     if(multiplicity > 1) {
       assert (raw.length % multiplicity == 0) : "Vector length is not divisible by multiplicity?";

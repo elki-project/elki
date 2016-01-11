@@ -52,7 +52,7 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
 
   @Override
   protected V filterSingleObject(V featureVector) {
-    double[] raw = featureVector.getColumnVector().getArrayRef();
+    double[] raw = featureVector.toArray();
     if(raw.length == 0) {
       return factory.newNumberVector(new double[] {});
     }

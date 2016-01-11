@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -497,7 +498,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   private ParameterizationFunction project(Matrix basis, ParameterizationFunction f) {
     // Matrix m = new Matrix(new
     // double[][]{f.getPointCoordinates()}).times(basis);
-    Matrix m = f.getColumnVector().transposeTimes(basis);
+    Matrix m = new Vector(f.getColumnVector()).transposeTimes(basis);
     ParameterizationFunction f_t = new ParameterizationFunction(new DoubleVector(m.getColumnPackedCopy()));
     return f_t;
   }
@@ -707,7 +708,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
     // Project
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      prep.put(iter, new DoubleVector(relation.get(iter).getColumnVector().getArrayRef()));
+      prep.put(iter, new DoubleVector(relation.get(iter).getColumnVector()));
     }
 
     if(LOG.isDebugging()) {
@@ -768,7 +769,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
     // Project
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DoubleVector v = new DoubleVector(relation.get(iter).getColumnVector().getArrayRef());
+      DoubleVector v = new DoubleVector(relation.get(iter).getColumnVector());
       prep.insert(iter, v);
     }
 

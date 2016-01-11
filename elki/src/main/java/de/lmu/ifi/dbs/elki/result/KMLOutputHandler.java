@@ -518,7 +518,7 @@ public class KMLOutputHandler implements ResultHandler {
 
     GrahamScanConvexHull2D hull = new GrahamScanConvexHull2D();
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      hull.add(coords.get(iter).getColumnVector());
+      hull.add(new Vector(coords.get(iter).toArray()));
     }
     double weight = ids.size();
     if(hier != null && hulls != null) {

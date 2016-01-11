@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
@@ -164,7 +165,7 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(NumberVector vec) {
-    double[] difference = vec.getColumnVector().minusEquals(mean).getArrayRef();
+    double[] difference = VMath.minusEquals(vec.toArray(), mean.getArrayRef());
     double agg = 0.;
     for(int i = 0; i < variances.length; i++) {
       agg += difference[i] / variances[i] * difference[i];

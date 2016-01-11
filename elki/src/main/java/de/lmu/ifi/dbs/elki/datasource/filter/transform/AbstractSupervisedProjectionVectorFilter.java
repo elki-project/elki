@@ -126,7 +126,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
       try {
         Matrix proj = computeProjectionMatrix(vectorcolumn, classcolumn, dim);
         for(int i = 0; i < dataLength; i++) {
-          final Vector pv = proj.times(vectorcolumn.get(i).getColumnVector());
+          final Vector pv = proj.times(new Vector(vectorcolumn.get(i).toArray()));
           V filteredObj = factory.newNumberVector(pv, ArrayLikeUtil.VECTORADAPTER);
           vectorcolumn.set(i, filteredObj);
         }

@@ -28,7 +28,6 @@ import java.nio.ByteBuffer;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
@@ -120,8 +119,12 @@ public class FloatVector extends AbstractNumberVector {
   }
 
   @Override
-  public Vector getColumnVector() {
-    return new Vector(ArrayLikeUtil.toPrimitiveDoubleArray(values, ArrayLikeUtil.FLOATARRAYADAPTER));
+  public double[] toArray() {
+    double[] data = new double[values.length];
+    for(int i = 0; i < data.length; i++) {
+      data[i] = values[i];
+    }
+    return data;
   }
 
   @Override

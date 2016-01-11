@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -63,7 +64,7 @@ public class LengthNormalization<V extends NumberVector> extends AbstractStreamN
   @Override
   protected V filterSingleObject(V featureVector) {
     final double d = norm.norm(featureVector);
-    return factory.newNumberVector(featureVector.getColumnVector().timesEquals(1 / d).getArrayRef());
+    return factory.newNumberVector(VMath.timesEquals(featureVector.toArray(),1 / d));
   }
 
   @Override

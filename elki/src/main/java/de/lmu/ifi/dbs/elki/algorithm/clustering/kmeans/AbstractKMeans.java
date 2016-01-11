@@ -160,7 +160,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       if(list.size() > 0) {
         DBIDIter iter = list.iter();
         // Initialize with first.
-        mean = database.get(iter).getColumnVector();
+        mean = new Vector(database.get(iter).toArray());
         double[] raw = mean.getArrayRef();
         iter.advance();
         // Update with remaining instances
@@ -174,7 +174,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       }
       else {
         // Keep degenerated means as-is for now.
-        mean = means.get(i).getColumnVector();
+        mean = new Vector(means.get(i).toArray());
       }
       newMeans.add(mean);
     }
@@ -224,7 +224,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     if(newsize == 0) {
       return; // Keep old mean
     }
-    Vector delta = vec.getColumnVector().minusEquals(mean);
+    Vector delta = new Vector(vec.toArray()).minusEquals(mean);
     mean.plusTimesEquals(delta, op / newsize);
   }
 

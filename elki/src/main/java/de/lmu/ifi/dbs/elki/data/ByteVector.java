@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.data;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
@@ -123,12 +122,12 @@ public class ByteVector extends AbstractNumberVector {
   }
 
   @Override
-  public Vector getColumnVector() {
+  public double[] toArray() {
     double[] data = new double[values.length];
     for(int i = 0; i < values.length; i++) {
       data[i] = values[i];
     }
-    return new Vector(data);
+    return data;
   }
 
   @Override

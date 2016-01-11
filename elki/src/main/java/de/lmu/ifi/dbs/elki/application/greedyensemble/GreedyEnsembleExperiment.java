@@ -525,7 +525,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
     WritableDataStore<NumberVector> contents = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT, NumberVector.class);
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       NumberVector v = relation.get(iter);
-      double[] raw = v.getColumnVector().getArrayRef();
+      double[] raw = v.toArray();
       if(!skip.contains(iter)) {
         applyScaling(raw, scaling);
       }

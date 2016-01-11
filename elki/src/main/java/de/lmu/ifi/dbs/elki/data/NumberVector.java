@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.data;
  */
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
@@ -34,7 +33,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * @author Arthur Zimek
  * 
  * @apiviz.landmark
- * @apiviz.has Vector
  * @apiviz.exclude de.lmu.ifi.dbs.elki.(datasource.filter|data.projection).*
  */
 public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
@@ -121,14 +119,11 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
   byte byteValue(int dimension);
 
   /**
-   * Returns a Vector representing in one column and
-   * <code>getDimensionality()</code> rows the values of this NumberVector of V.
+   * Returns a double array <i>copy</i> of this vector.
    * 
-   * @return a Matrix representing in one column and
-   *         <code>getDimensionality()</code> rows the values of this
-   *         NumberVector of V
+   * @return Copy as {@code double[]}
    */
-  Vector getColumnVector();
+  double[] toArray();
 
   /**
    * Factory API for this feature vector.

@@ -100,7 +100,7 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
         // TODO: different weighting strategies? Sampling?
         // Note: GNU Trove iterator, not ELKI style!
         for (TIntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
-          Vector delta = vectorcolumn.get(it.next()).getColumnVector().minusEquals(c);
+          Vector delta = new Vector(vectorcolumn.get(it.next()).toArray()).minusEquals(c);
           covmake.put(delta);
         }
       }

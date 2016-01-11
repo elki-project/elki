@@ -185,7 +185,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
           }
           ModifiableDBIDs subset = DBIDUtil.newArray(current.size());
           for(DBIDIter iter = current.iter(); iter.valid(); iter.advance()) {
-            if(deviation(relation.get(iter).getColumnVector().minusEquals(separation.originV), separation.basis) < separation.threshold) {
+            if(deviation(new Vector(relation.get(iter).toArray()).minusEquals(separation.originV), separation.basis) < separation.threshold) {
               subset.add(iter);
             }
           }
@@ -275,14 +275,14 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
       DBIDs sample = DBIDUtil.randomSample(currentids, dimension + 1, r);
       final DBIDIter iter = sample.iter();
       // Use first as origin
-      Vector originV = relation.get(iter).getColumnVector();
+      Vector originV = new Vector(relation.get(iter).toArray());
       iter.advance();
       // Build orthogonal basis from remainder
       Matrix basis;
       {
         List<Vector> vectors = new ArrayList<>(sample.size() - 1);
         for(; iter.valid(); iter.advance()) {
-          Vector vec = relation.get(iter).getColumnVector();
+          Vector vec = new Vector(relation.get(iter).toArray());
           vectors.add(vec.minusEquals(originV));
         }
         // generate orthogonal basis
@@ -305,7 +305,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
         if(sample.contains(iter2)) {
           continue;
         }
-        Vector vec = relation.get(iter2).getColumnVector().minusEquals(originV);
+        Vector vec = new Vector(relation.get(iter2).toArray()).minusEquals(originV);
         final double distance = deviation(vec, basis);
         histogram.increment(distance, w);
       }

@@ -113,7 +113,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
               for(int i = 0; i < v.getDimensionality(); i++) {
                 if(Double.isNaN(v.doubleValue(i))) {
                   if(ro != null) {
-                    ro = v.getColumnVector().getArrayRef();
+                    ro = v.toArray();
                   }
                   ro[i] = dist.nextRandom();
                 }
@@ -174,7 +174,7 @@ public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
             for(int d = 0; d < v.getDimensionality(); d++) {
               if(Double.isNaN(v.doubleValue(d))) {
                 if(ro != null) {
-                  ro = v.getColumnVector().getArrayRef();
+                  ro = v.toArray();
                 }
                 ro[d] = dist.nextRandom();
               }

@@ -146,7 +146,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
     for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double score = 1.;
       // Convert to a math vector
-      Vector v = vecs.get(iditer).getColumnVector();
+      Vector v = new Vector(vecs.get(iditer).toArray());
       for(GeneratorSingleCluster gen : generators) {
         Vector tv = v;
         // Transform backwards

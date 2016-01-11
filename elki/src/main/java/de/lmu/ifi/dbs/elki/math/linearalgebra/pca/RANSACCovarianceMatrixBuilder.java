@@ -118,7 +118,7 @@ public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuild
 
       ModifiableDBIDs support = DBIDUtil.newHashSet();
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        Vector vec = relation.get(id).getColumnVector().minusEquals(centroid);
+        Vector vec = new Vector(relation.get(id).toArray()).minusEquals(centroid);
         double sqlen = vec.transposeTimesTimes(p, vec);
         if(sqlen < tresh) {
           support.add(id);

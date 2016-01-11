@@ -257,7 +257,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
               if(mmean == null) {
                 continue;
               }
-              mean = mmean.getColumnVector();
+              mean = new Vector(mmean.toArray());
               if(mean.getDimensionality() != dim) {
                 continue;
               }
@@ -271,7 +271,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
               if(v == null) {
                 continue;
               }
-              mean = v.getColumnVector();
+              mean = new Vector(v.toArray());
               if(mean.getDimensionality() != dim) {
                 continue;
               }

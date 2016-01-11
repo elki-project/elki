@@ -118,7 +118,7 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
       // Mean vector "g"
       Vector mean = Centroid.make(attributes, neighbors);
       // Delta vector "h"
-      Vector delta = obj.getColumnVector().minusEquals(mean);
+      Vector delta = new Vector(obj.toArray()).minusEquals(mean);
       deltas.put(iditer, delta);
       covmaker.put(delta);
     }

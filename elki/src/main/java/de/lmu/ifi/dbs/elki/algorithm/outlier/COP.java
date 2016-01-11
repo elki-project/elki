@@ -251,7 +251,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       nids.remove(id); // Do not use query object
 
       Vector centroid = Centroid.make(relation, nids);
-      Vector relative = relation.get(id).getColumnVector().minusEquals(centroid);
+      Vector relative = new Vector(relation.get(id).toArray()).minusEquals(centroid);
 
       PCAResult pcares = pca.processIds(nids, relation);
       Matrix evecs = pcares.getEigenvectors();

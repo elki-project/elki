@@ -147,7 +147,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
     int cordim = pcares.getCorrelationDimension();
     Matrix m_hat = pcares.similarityMatrix();
 
-    Vector obj = relation.get(id).getColumnVector();
+    Vector obj = new Vector(relation.get(id).toArray());
 
     // To save computing the square root below.
     double sqeps = settings.epsilon * settings.epsilon;
@@ -155,7 +155,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
     HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet(neighbors.size());
     for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
       // Compute weighted / projected distance:
-      Vector diff = relation.get(iter).getColumnVector().minusEquals(obj);
+      Vector diff = new Vector(relation.get(iter).toArray()).minusEquals(obj);
       double dist = diff.transposeTimesTimes(m_hat, diff);
       if(dist <= sqeps) {
         survivors.add(iter);

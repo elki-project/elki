@@ -1,5 +1,15 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+
+import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,17 +35,6 @@ package de.lmu.ifi.dbs.elki.data;
 
 import gnu.trove.iterator.TIntDoubleIterator;
 import gnu.trove.map.TIntDoubleMap;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
-import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Vector using a dense bit set encoding, based on {@code long[]} storage.
@@ -172,15 +171,15 @@ public class BitVector extends AbstractNumberVector implements SparseNumberVecto
    *         <code>getDimensionality()</code> rows the values of this BitVector
    *         as double values
    * 
-   * @see de.lmu.ifi.dbs.elki.data.NumberVector#getColumnVector()
+   * @see de.lmu.ifi.dbs.elki.data.NumberVector#toArray()
    */
   @Override
-  public Vector getColumnVector() {
-    double[] values = new double[dimensionality];
-    for(int i = 0; i < dimensionality; i++) {
-      values[i] = BitsUtil.get(bits, i) ? 1 : 0;
+  public double[] toArray() {
+    double[] data = new double[dimensionality];
+    for(int i = BitsUtil.nextSetBit(bits, 0); i >= 0; i = BitsUtil.nextSetBit(bits, i + 1)) {
+      data[i] = 1;
     }
-    return new Vector(values);
+    return data;
   }
 
   /**

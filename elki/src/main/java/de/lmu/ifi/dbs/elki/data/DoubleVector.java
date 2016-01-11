@@ -125,10 +125,8 @@ public class DoubleVector extends AbstractNumberVector {
   }
 
   @Override
-  public Vector getColumnVector() {
-    // TODO: can we sometimes save this copy?
-    // Is this worth the more complex API?
-    return new Vector(values.clone());
+  public double[] toArray() {
+    return values.clone();
   }
 
   @Override

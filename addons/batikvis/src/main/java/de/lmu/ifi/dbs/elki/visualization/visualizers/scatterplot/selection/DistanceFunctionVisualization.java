@@ -166,7 +166,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
       // Rotation plane:
       double[] p1 = proj.fastProjectRenderToDataSpace(selPoint[0] + 10, selPoint[1]);
       double[] p2 = proj.fastProjectRenderToDataSpace(selPoint[0], selPoint[1] + 10);
-      double[] pm = mid.getColumnVector().getArrayRef();
+      double[] pm = mid.toArray();
       // Compute relative vectors
       VMath.minusEquals(p1, pm);
       VMath.minusEquals(p2, pm);

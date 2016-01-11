@@ -234,7 +234,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
       this.means = new Vector[k];
       Iterator<? extends NumberVector> iter = means.iterator();
       for(int i = 0; i < k; i++) {
-        this.means[i] = iter.next().getColumnVector(); // Make local copy!
+        this.means[i] = new Vector(iter.next().toArray()); // Make local copy!
       }
       // Storage for updated means.
       final int dim = this.means[0].getDimensionality();

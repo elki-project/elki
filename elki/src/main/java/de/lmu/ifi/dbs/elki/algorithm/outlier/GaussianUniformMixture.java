@@ -197,14 +197,14 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
    * Computes the loglikelihood of all normal objects. Gaussian model
    *
    * @param objids Object IDs for 'normal' objects.
-   * @param database Database
+   * @param relation Database
    * @return loglikelihood for normal objects
    */
-  private double loglikelihoodNormal(DBIDs objids, Relation<V> database) {
+  private double loglikelihoodNormal(DBIDs objids, Relation<V> relation) {
     if(objids.isEmpty()) {
       return 0;
     }
-    CovarianceMatrix builder = CovarianceMatrix.make(database, objids);
+    CovarianceMatrix builder = CovarianceMatrix.make(relation, objids);
     Vector mean = builder.getMeanVector();
     Matrix covarianceMatrix = builder.destroyToSampleMatrix();
 
@@ -212,11 +212,11 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     Matrix covInv = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
 
     double covarianceDet = covarianceMatrix.det();
-    double fakt = 1.0 / Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(database)) * covarianceDet);
+    double fakt = 1.0 / Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * covarianceDet);
     // for each object compute probability and sum
     double prob = 0;
     for(DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
-      Vector x = database.get(iter).getColumnVector().minusEquals(mean);
+      Vector x = new Vector(relation.get(iter).toArray()).minusEquals(mean);
       double mDist = x.transposeTimesTimes(covInv, x);
       prob += Math.log(fakt * Math.exp(-mDist / 2.0));
     }

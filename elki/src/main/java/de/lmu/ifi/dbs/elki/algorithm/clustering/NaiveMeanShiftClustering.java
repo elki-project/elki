@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.EpanechnikovKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -200,7 +201,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
 
     ArrayList<Cluster<MeanModel>> cs = new ArrayList<>(clusters.size());
     for(Pair<V, ModifiableDBIDs> pair : clusters) {
-      cs.add(new Cluster<>(pair.second, new MeanModel(pair.first.getColumnVector())));
+      cs.add(new Cluster<>(pair.second, new MeanModel(new Vector(pair.first.toArray()))));
     }
     if(noise.size() > 0) {
       cs.add(new Cluster<MeanModel>(noise, true));

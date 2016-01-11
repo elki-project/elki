@@ -184,7 +184,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(NumberVector vec) {
-    Vector difference = vec.getColumnVector().minusEquals(mean);
+    Vector difference = new Vector(vec.toArray()).minusEquals(mean);
     return (invCovMatr != null) ? difference.transposeTimesTimes(invCovMatr, difference) : difference.transposeTimes(difference);
   }
 

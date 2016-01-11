@@ -30,7 +30,6 @@ import java.io.ObjectOutput;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Represents an entry in a leaf node of a spatial index. A SpatialLeafEntry
@@ -178,7 +177,7 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
   }
 
   @Override
-  public Vector getColumnVector() {
-    return new Vector(values.clone());
+  public double[] toArray() {
+    return values.clone();
   }
 }

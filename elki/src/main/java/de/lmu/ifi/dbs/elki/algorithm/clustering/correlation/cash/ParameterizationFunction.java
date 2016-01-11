@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -222,7 +221,7 @@ public class ParameterizationFunction {
       return ExtremumType.CONSTANT;
     }
 
-    throw new IllegalArgumentException("Houston, we have a problem!\n" + this + "\n" + "f_l " + f_l + "\n" + "f_c " + f_c + "\n" + "f_r " + f_r + "\n" + "p " + vec.getColumnVector() + "\n" + "alpha   " + FormatUtil.format(alpha_extreme_c) + "\n" + "alpha_l " + FormatUtil.format(alpha_extreme_l) + "\n" + "alpha_r " + FormatUtil.format(alpha_extreme_r) + "\n" + "n " + n);
+    throw new IllegalArgumentException("Houston, we have a problem!\n" + this + "\n" + "f_l " + f_l + "\n" + "f_c " + f_c + "\n" + "f_r " + f_r + "\n" + "p " + vec.toArray() + "\n" + "alpha   " + FormatUtil.format(alpha_extreme_c) + "\n" + "alpha_l " + FormatUtil.format(alpha_extreme_l) + "\n" + "alpha_r " + FormatUtil.format(alpha_extreme_r) + "\n" + "n " + n);
     // + "box min " + FormatUtil.format(interval.getMin()) + "\n"
     // + "box max " + FormatUtil.format(interval.getMax()) + "\n"
   }
@@ -440,7 +439,7 @@ public class ParameterizationFunction {
     for(int n = alphaExtremum.length - 1; n >= 0; n--) {
       alphaExtremum[n] = extremum_alpha_n(n, alphaExtremum);
       if(Double.isNaN(alphaExtremum[n])) {
-        throw new IllegalStateException("Houston, we have a problem!" + "\n" + this + "\n" + vec.getColumnVector() + "\n" + FormatUtil.format(alphaExtremum));
+        throw new IllegalStateException("Houston, we have a problem!" + "\n" + this + "\n" + vec.toArray() + "\n" + FormatUtil.format(alphaExtremum));
       }
     }
 
@@ -515,8 +514,8 @@ public class ParameterizationFunction {
    * 
    * @return Vector, for projection
    */
-  public Vector getColumnVector() {
-    return vec.getColumnVector();
+  public double[] getColumnVector() {
+    return vec.toArray();
   }
 
   /**

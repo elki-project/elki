@@ -150,7 +150,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
     int pdim = pcares.getCorrelationDimension();
     Matrix mat = pcares.similarityMatrix();
 
-    Vector vecP = relation.get(id).getColumnVector();
+    Vector vecP = new Vector(relation.get(id).toArray());
 
     if(pdim == vecP.getDimensionality()) {
       // Full dimensional - noise!
@@ -160,7 +160,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
     // Check which neighbors survive
     HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet();
     for(DBIDIter neighbor = relation.iterDBIDs(); neighbor.valid(); neighbor.advance()) {
-      Vector diff = relation.get(neighbor).getColumnVector().minusEquals(vecP);
+      Vector diff = new Vector(relation.get(neighbor).toArray()).minusEquals(vecP);
       double cdistP = diff.transposeTimesTimes(mat, diff);
 
       if(cdistP <= epsilonsq) {

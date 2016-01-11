@@ -211,7 +211,7 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      Vector v1_minus_v2 = v1.getColumnVector().minusEquals(v2.getColumnVector());
+      Vector v1_minus_v2 = new Vector(v1.toArray()).minusEquals(new Vector(v2.toArray()));
       return MathUtil.mahalanobisDistance(pca1.similarityMatrix(), v1_minus_v2) <= settings.tau && MathUtil.mahalanobisDistance(pca2.similarityMatrix(), v1_minus_v2) <= settings.tau;
     }
 
@@ -238,7 +238,7 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      Vector v1_minus_v2 = v1.getColumnVector().minusEquals(v2.getColumnVector());
+      Vector v1_minus_v2 = new Vector(v1.toArray()).minusEquals(new Vector(v2.toArray()));
       if(MathUtil.mahalanobisDistance(pca1.similarityMatrix(), v1_minus_v2) > settings.tau) {
         return false;
       }

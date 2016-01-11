@@ -281,7 +281,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
       }
       else {
         // Keep degenerated means as-is for now.
-        mean = means.get(i).getColumnVector();
+        mean = new Vector(means.get(i).toArray());
       }
       newMeans.add(mean);
     }

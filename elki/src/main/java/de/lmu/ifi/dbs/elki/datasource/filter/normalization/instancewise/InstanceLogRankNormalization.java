@@ -55,7 +55,7 @@ public class InstanceLogRankNormalization<V extends NumberVector> extends Abstra
 
   @Override
   protected V filterSingleObject(V featureVector) {
-    double[] raw = featureVector.getColumnVector().getArrayRef();
+    double[] raw = featureVector.toArray();
     // TODO: reduce memory consumption?
     double[] tmp = raw.clone();
     Arrays.sort(tmp);

@@ -172,7 +172,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
         sod = subspaceOutlierDegree(relation.get(iter), center, weightVector);
       }
       else {
-        center = relation.get(iter).getColumnVector();
+        center = new Vector(relation.get(iter).toArray());
         weightVector = null;
         sod = 0.;
       }

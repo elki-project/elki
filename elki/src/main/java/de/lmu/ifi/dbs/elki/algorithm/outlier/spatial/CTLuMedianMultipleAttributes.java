@@ -137,7 +137,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends Abs
       }
 
       // Delta vector "h"
-      Vector delta = obj.getColumnVector().minusEquals(median);
+      Vector delta = new Vector(obj.toArray()).minusEquals(median);
       deltas.put(iditer, delta);
       covmaker.put(delta);
     }
