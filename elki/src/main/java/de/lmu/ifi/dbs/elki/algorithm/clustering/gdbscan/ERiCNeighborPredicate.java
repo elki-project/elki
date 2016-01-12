@@ -74,7 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @param <V> the type of NumberVector handled by this Algorithm
  */
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek",//
+@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek", //
 title = "On Exploring Complex Relationships of Correlation Clusters", //
 booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", //
 url = "http://dx.doi.org/10.1109/SSDBM.2007.21")
@@ -239,12 +239,12 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      Vector v1_minus_v2 = new Vector(v1.toArray()).minusEquals(new Vector(v2.toArray()));
-      if(MathUtil.mahalanobisDistance(pca1.similarityMatrix(), v1_minus_v2) > settings.tau) {
+      double[] v1_minus_v2 = VMath.minusEquals(v1.toArray(), v2.toArray());
+      if(MathUtil.mahalanobisDistance(pca1.similarityMatrix().getArrayRef(), v1_minus_v2) > settings.tau) {
         return false;
       }
       if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
-        return MathUtil.mahalanobisDistance(pca2.similarityMatrix(), v1_minus_v2) <= settings.tau;
+        return MathUtil.mahalanobisDistance(pca2.similarityMatrix().getArrayRef(), v1_minus_v2) <= settings.tau;
       }
       return true;
     }

@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -156,8 +155,8 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
     HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet(neighbors.size());
     for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
       // Compute weighted / projected distance:
-      Vector diff = new Vector(VMath.minusEquals(relation.get(iter).toArray(), obj));
-      double dist = diff.transposeTimesTimes(m_hat, diff);
+      double[] diff = VMath.minusEquals(relation.get(iter).toArray(), obj);
+      double dist = VMath.transposeTimesTimes(diff, m_hat.getArrayRef(), diff);
       if(dist <= sqeps) {
         survivors.add(iter);
       }

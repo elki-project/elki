@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
@@ -250,12 +251,12 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       ModifiableDBIDs nids = DBIDUtil.newHashSet(neighbors);
       nids.remove(id); // Do not use query object
 
-      Vector centroid = Centroid.make(relation, nids);
-      Vector relative = new Vector(relation.get(id).toArray()).minusEquals(centroid);
+      double[] centroid = Centroid.make(relation, nids).getArrayRef();
+      double[] relative = VMath.minusEquals(relation.get(id).toArray(), centroid);
 
       PCAResult pcares = pca.processIds(nids, relation);
       Matrix evecs = pcares.getEigenvectors();
-      Vector projected = evecs.transposeTimes(relative);
+      double[] projected = VMath.transposeTimes(evecs.getArrayRef(), relative);
       double[] evs = pcares.getEigenvalues();
 
       double min = Double.POSITIVE_INFINITY;
@@ -265,7 +266,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
         double sqdevs = 0;
         for(int d = 0; d < dim; d++) {
           // Scale with Stddev
-          double dev = projected.get(d);
+          double dev = projected[d];
           // Accumulate
           sqdevs += dev * dev / evs[d];
           // Evaluate
@@ -284,7 +285,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
         for(DBIDIter s = nids.iter(); s.valid() && j < nids.size(); s.advance()) {
           V vec = relation.get(s);
           for(int d = 0; d < dim; d++) {
-            srel.set(d, vec.doubleValue(d) - centroid.get(d));
+            srel.set(d, vec.doubleValue(d) - centroid[d]);
           }
           Vector serr = evecs.transposeTimes(srel);
           double sqdist = 0.0;
@@ -297,7 +298,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
         double sqdevs = 0;
         for(int d = 0; d < dim; d++) {
           // Scale with Stddev
-          final double dev = projected.get(d);
+          final double dev = projected[d];
           // Accumulate
           sqdevs += dev * dev / evs[d];
           // Sort, so we can trim the top 15% below.
@@ -316,13 +317,13 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       final double prob = expect * (1 - min) / (expect + min);
       // Construct the error vector:
       for(int d = vdim; d < dim; d++) {
-        projected.set(d, 0.0);
+        projected[d] = 0.;
       }
-      Vector ev = evecs.times(projected).timesEquals(-1 * prob);
+      double[] ev = VMath.timesEquals(VMath.times(evecs.getArrayRef(), projected), -1 * prob);
 
       cop_score.putDouble(id, prob);
       if(models) {
-        cop_err_v.put(id, ev);
+        cop_err_v.put(id, new Vector(ev));
         cop_dim.putInt(id, dim + 1 - vdim);
       }
 

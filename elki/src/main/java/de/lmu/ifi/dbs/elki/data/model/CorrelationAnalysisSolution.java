@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
@@ -90,7 +91,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * The centroid if the objects belonging to the hyperplane induced by the
    * correlation.
    */
-  private final Vector centroid;
+  private final double[] centroid;
 
   /**
    * Provides a new CorrelationAnalysisSolution holding the specified matrix.
@@ -135,7 +136,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
     this.strongEigenvectors = strongEigenvectors;
     this.weakEigenvectors = weakEigenvectors;
     this.similarityMatrix = similarityMatrix;
-    this.centroid = centroid;
+    this.centroid = centroid.getArrayRef();
     this.nf = nf;
 
     // determine standard deviation
@@ -201,9 +202,9 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
     // return p.minus(centroid).projection(weakEigenvectors).euclideanNorm(0);
     // V_affin = V + a
     // dist(p, V_affin) = d(p-a, V) = ||p - a - proj_V(p-a) ||
-    Vector p_minus_a = new Vector(p).minus(centroid);
-    Vector proj = p_minus_a.projection(strongEigenvectors);
-    return p_minus_a.minus(proj).euclideanLength();
+    double[] p_minus_a = VMath.minus(p, centroid);
+    double[] proj = VMath.project(p_minus_a, strongEigenvectors.getArrayRef());
+    return VMath.euclideanLength(VMath.minusEquals(p_minus_a, proj));
   }
 
   /**
@@ -213,7 +214,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public Vector errorVector(V p) {
-    return new Vector(p.toArray()).minusEquals(centroid).projection(weakEigenvectors);
+    return new Vector(VMath.project(VMath.minusEquals(p.toArray(), centroid), weakEigenvectors.getArrayRef()));
   }
 
   /**
@@ -223,11 +224,11 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the data projections
    */
   public Matrix dataProjections(V p) {
-    Vector centered = new Vector(p.toArray()).minusEquals(centroid);
+    double[] centered = VMath.minusEquals(p.toArray(), centroid);
     Matrix sum = new Matrix(p.getDimensionality(), strongEigenvectors.getColumnDimensionality());
     for(int i = 0; i < strongEigenvectors.getColumnDimensionality(); i++) {
       Vector v_i = strongEigenvectors.getCol(i);
-      v_i.timesEquals(centered.transposeTimes(v_i));
+      VMath.timesEquals(v_i.getArrayRef(), VMath.transposeTimes(centered, v_i.getArrayRef()));
       sum.setCol(i, v_i);
     }
     return sum;
@@ -240,7 +241,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public Vector dataVector(V p) {
-    return new Vector(p.toArray()).minusEquals(centroid).projection(strongEigenvectors);
+    return new Vector(VMath.project(VMath.minusEquals(p.toArray(), centroid), strongEigenvectors.getArrayRef()));
   }
 
   /**
@@ -285,7 +286,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * 
    * @return the centroid of this model
    */
-  public Vector getCentroid() {
+  public double[] getCentroid() {
     return centroid;
   }
 

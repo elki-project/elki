@@ -622,11 +622,11 @@ public final class VMath {
    * @return normalized copy of v1
    */
   public static final double[] normalize(final double[] v1) {
-    double norm = euclideanLength(v1);
+    double norm = 1. / euclideanLength(v1);
     double[] re = new double[v1.length];
-    if(norm != 0) {
+    if(norm < Double.POSITIVE_INFINITY) {
       for(int row = 0; row < v1.length; row++) {
-        re[row] = v1[row] / norm;
+        re[row] = v1[row] * norm;
       }
     }
     return re;
@@ -639,10 +639,10 @@ public final class VMath {
    * @return normalized v1
    */
   public static final double[] normalizeEquals(final double[] v1) {
-    double norm = euclideanLength(v1);
-    if(norm != 0) {
+    double norm = 1. / euclideanLength(v1);
+    if(norm < Double.POSITIVE_INFINITY) {
       for(int row = 0; row < v1.length; row++) {
-        v1[row] /= norm;
+        v1[row] *= norm;
       }
     }
     return v1;

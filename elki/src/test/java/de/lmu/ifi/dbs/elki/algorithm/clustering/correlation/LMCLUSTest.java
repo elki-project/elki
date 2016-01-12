@@ -58,8 +58,8 @@ public class LMCLUSTest extends AbstractSimpleAlgorithmTest implements JUnit4Tes
     testParameterizationOk(params);
 
     Clustering<Model> result = lmclus.run(db);
-    testFMeasure(db, result, 0.43327638);
-    testClusterSizes(result, new int[] { 201, 399 });
+    testFMeasure(db, result, 0.483841911);
+    testClusterSizes(result, new int[] { 40, 560 });
   }
 
   /**
@@ -80,7 +80,7 @@ public class LMCLUSTest extends AbstractSimpleAlgorithmTest implements JUnit4Tes
     testParameterizationOk(params);
 
     Clustering<Model> result = lmclus.run(db);
-    testClusterSizes(result, new int[] { 196, 454 });
-    testFMeasure(db, result, 0.6547222);
+    testClusterSizes(result, new int[] { 201, 449 });
+    testFMeasure(db, result, 0.669966145);
   }
 }

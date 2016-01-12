@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -116,7 +117,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends Abs
       final O obj = attributes.get(iditer);
       final DBIDs neighbors = npred.getNeighborDBIDs(iditer);
       // Compute the median vector
-      final Vector median;
+      final double[] median = new double[dim];
       {
         double[][] data = new double[dim][neighbors.size()];
         int i = 0;
@@ -129,15 +130,13 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends Abs
           }
           i++;
         }
-        double[] md = new double[dim];
         for(int d = 0; d < dim; d++) {
-          md[d] = QuickSelect.median(data[d]);
+          median[d] = QuickSelect.median(data[d]);
         }
-        median = new Vector(md);
       }
 
       // Delta vector "h"
-      Vector delta = new Vector(obj.toArray()).minusEquals(median);
+      Vector delta = new Vector(VMath.minusEquals(obj.toArray(), median));
       deltas.put(iditer, delta);
       covmaker.put(delta);
     }

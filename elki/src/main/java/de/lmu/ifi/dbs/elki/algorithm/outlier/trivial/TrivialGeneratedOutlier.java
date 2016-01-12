@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
@@ -145,22 +144,21 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
 
     for(DBIDIter iditer = models.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double score = 1.;
-      // Convert to a math vector
-      Vector v = new Vector(vecs.get(iditer).toArray());
+      double[] v = vecs.get(iditer).toArray();
       for(GeneratorSingleCluster gen : generators) {
-        Vector tv = v;
+        double[] tv = v;
         // Transform backwards
         if(gen.getTransformation() != null) {
           tv = gen.getTransformation().applyInverse(v);
         }
-        final int dim = tv.getDimensionality();
+        final int dim = tv.length;
         double lensq = 0.0;
         int norm = 0;
         for(int i = 0; i < dim; i++) {
           Distribution dist = gen.getDistribution(i);
           if(dist instanceof NormalDistribution) {
             NormalDistribution d = (NormalDistribution) dist;
-            double delta = (tv.get(i) - d.getMean()) / d.getStddev();
+            double delta = (tv[i] - d.getMean()) / d.getStddev();
             lensq += delta * delta;
             norm += 1;
           }

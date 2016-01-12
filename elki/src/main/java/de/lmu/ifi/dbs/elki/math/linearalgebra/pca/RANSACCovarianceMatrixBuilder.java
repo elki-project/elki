@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -119,8 +118,8 @@ public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuild
 
       ModifiableDBIDs support = DBIDUtil.newHashSet();
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        Vector vec = new Vector(VMath.minusEquals(relation.get(id).toArray(), centroid));
-        double sqlen = vec.transposeTimesTimes(p, vec);
+        double[] vec = VMath.minusEquals(relation.get(id).toArray(), centroid);
+        double sqlen = VMath.transposeTimesTimes(vec, p.getArrayRef(), vec);
         if(sqlen < tresh) {
           support.add(id);
         }

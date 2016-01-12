@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -112,11 +113,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @return true when the object was reassigned
    */
   protected boolean assignToNearestCluster(Relation<? extends V> relation, List<? extends NumberVector> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
-    assert(k == means.size());
+    assert (k == means.size());
     boolean changed = false;
     // Reset all clusters
     Arrays.fill(varsum, 0.);
-    for (ModifiableDBIDs cluster : clusters) {
+    for(ModifiableDBIDs cluster : clusters) {
       cluster.clear();
     }
     final NumberVectorDistanceFunction<?> df = getDistanceFunction();
@@ -224,8 +225,8 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     if(newsize == 0) {
       return; // Keep old mean
     }
-    Vector delta = new Vector(vec.toArray()).minusEquals(mean);
-    mean.plusTimesEquals(delta, op / newsize);
+    double[] delta = VMath.minusEquals(vec.toArray(), mean.getArrayRef());
+    mean.plusTimesEquals(new Vector(delta), op / newsize);
   }
 
   /**

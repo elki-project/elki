@@ -15,7 +15,7 @@ import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -125,9 +125,8 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
       try {
         Matrix proj = computeProjectionMatrix(vectorcolumn, classcolumn, dim);
         for(int i = 0; i < dataLength; i++) {
-          final Vector pv = proj.times(new Vector(vectorcolumn.get(i).toArray()));
-          V filteredObj = factory.newNumberVector(pv);
-          vectorcolumn.set(i, filteredObj);
+          double[] pv = VMath.times(proj.getArrayRef(), vectorcolumn.get(i).toArray());
+          vectorcolumn.set(i, factory.newNumberVector(pv));
         }
         bundle.appendColumn(convertedType(type, factory), column);
         somesuccess = true;

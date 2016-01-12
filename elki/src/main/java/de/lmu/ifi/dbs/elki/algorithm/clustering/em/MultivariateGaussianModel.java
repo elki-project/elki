@@ -22,6 +22,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -155,7 +159,8 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
       det = lu.det();
       if(!(det > 0.)) {
         LOG.warning("Singularity cheat did not resolve zero determinant.");
-        // assert (det > 0) : "Singularity cheat did not resolve zero determinant.";
+        // assert (det > 0) : "Singularity cheat did not resolve zero
+        // determinant.";
         det = 1.;
       }
     }
@@ -184,8 +189,8 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(NumberVector vec) {
-    Vector difference = new Vector(VMath.minusEquals(vec.toArray(), mref));
-    return (invCovMatr != null) ? difference.transposeTimesTimes(invCovMatr, difference) : difference.transposeTimes(difference);
+    double[] difference = minusEquals(vec.toArray(), mref);
+    return (invCovMatr != null) ? transposeTimesTimes(difference, invCovMatr.getArrayRef(), difference) : transposeTimes(difference, difference);
   }
 
   @Override

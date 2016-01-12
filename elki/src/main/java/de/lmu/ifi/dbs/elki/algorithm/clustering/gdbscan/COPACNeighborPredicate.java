@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -161,8 +160,8 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
     // Check which neighbors survive
     HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet();
     for(DBIDIter neighbor = relation.iterDBIDs(); neighbor.valid(); neighbor.advance()) {
-      Vector diff = new Vector(VMath.minusEquals(relation.get(neighbor).toArray(), vecP));
-      double cdistP = diff.transposeTimesTimes(mat, diff);
+      double[] diff = VMath.minusEquals(relation.get(neighbor).toArray(), vecP);
+      double cdistP = VMath.transposeTimesTimes(diff, mat.getArrayRef(), diff);
 
       if(cdistP <= epsilonsq) {
         survivors.add(neighbor);

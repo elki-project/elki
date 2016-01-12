@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -116,9 +117,9 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
       // TODO: remove object itself from neighbors?
 
       // Mean vector "g"
-      Vector mean = Centroid.make(attributes, neighbors);
+      double[] mean = Centroid.make(attributes, neighbors).getArrayRef();
       // Delta vector "h"
-      Vector delta = new Vector(obj.toArray()).minusEquals(mean);
+      Vector delta = new Vector(VMath.minusEquals(obj.toArray(), mean));
       deltas.put(iditer, delta);
       covmaker.put(delta);
     }

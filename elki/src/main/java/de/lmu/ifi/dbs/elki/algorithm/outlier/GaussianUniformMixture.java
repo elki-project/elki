@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -68,7 +68,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Reference:
  * <p>
  * E. Eskin<br />
- * Anomaly detection over noisy data using learned probability distributions.<br />
+ * Anomaly detection over noisy data using learned probability distributions.
+ * <br />
  * In Proc. of the Seventeenth International Conference on Machine Learning
  * (ICML-2000).
  * </p>
@@ -142,7 +143,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     WritableDoubleDataStore oscores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT);
     // compute loglikelihood
     double logLike = relation.size() * logml + loglikelihoodNormal(normalObjs, relation);
-    // LOG.debugFine("normalsize   " + normalObjs.size() + " anormalsize  " +
+    // LOG.debugFine("normalsize " + normalObjs.size() + " anormalsize " +
     // anomalousObjs.size() + " all " + (anomalousObjs.size() +
     // normalObjs.size()));
     // LOG.debugFine(logLike + " loglike beginning" +
@@ -151,7 +152,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
 
     DBIDIter iter = objids.iter();
     for(int i = 0; i < objids.size(); i++, iter.advance()) {
-      // LOG.debugFine("i     " + i);
+      // LOG.debugFine("i " + i);
       // Change mask to make the current object anomalous
       BitsUtil.setI(bits, i);
       // Compute new likelihoods
@@ -205,7 +206,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
       return 0;
     }
     CovarianceMatrix builder = CovarianceMatrix.make(relation, objids);
-    Vector mean = builder.getMeanVector();
+    double[] mean = builder.getMeanVector().getArrayRef();
     Matrix covarianceMatrix = builder.destroyToSampleMatrix();
 
     // test singulaere matrix
@@ -216,9 +217,9 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     // for each object compute probability and sum
     double prob = 0;
     for(DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
-      Vector x = new Vector(relation.get(iter).toArray()).minusEquals(mean);
-      double mDist = x.transposeTimesTimes(covInv, x);
-      prob += Math.log(fakt * Math.exp(-mDist / 2.0));
+      double[] x = VMath.minusEquals(relation.get(iter).toArray(), mean);
+      double mDist = VMath.transposeTimesTimes(x, covInv.getArrayRef(), x);
+      prob += Math.log(fakt * Math.exp(-mDist * .5));
     }
     return prob;
   }

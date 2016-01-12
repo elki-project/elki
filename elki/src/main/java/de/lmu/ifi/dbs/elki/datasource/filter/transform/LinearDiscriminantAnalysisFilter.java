@@ -1,5 +1,21 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,22 +41,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
-import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Linear Discriminant Analysis (LDA) / Fisher's linear discriminant.
@@ -96,12 +96,11 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
       CovarianceMatrix covmake = new CovarianceMatrix(dim);
       int numc = keys.size();
       for (int i = 0; i < numc; i++) {
-        Centroid c = centroids.get(i);
+        double[] c = centroids.get(i).getArrayRef();
         // TODO: different weighting strategies? Sampling?
         // Note: GNU Trove iterator, not ELKI style!
         for (TIntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
-          Vector delta = new Vector(vectorcolumn.get(it.next()).toArray()).minusEquals(c);
-          covmake.put(delta);
+          covmake.put(VMath.minusEquals(vectorcolumn.get(it.next()).toArray(), c));
         }
       }
       sigmaI = covmake.destroyToSampleMatrix();
@@ -128,10 +127,10 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
   protected List<Centroid> computeCentroids(int dim, List<V> vectorcolumn, List<ClassLabel> keys, Map<ClassLabel, TIntList> classes) {
     final int numc = keys.size();
     List<Centroid> centroids = new ArrayList<>(numc);
-    for (int i = 0; i < numc; i++) {
+    for(int i = 0; i < numc; i++) {
       Centroid c = new Centroid(dim);
       // Note: GNU Trove iterator, not ELKI style!
-      for (TIntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
+      for(TIntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
         c.put(vectorcolumn.get(it.next()));
       }
       centroids.add(c);

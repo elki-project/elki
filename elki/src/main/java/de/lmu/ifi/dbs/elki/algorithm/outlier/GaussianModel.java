@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -106,7 +106,7 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
 
     // Compute mean and covariance Matrix
     CovarianceMatrix temp = CovarianceMatrix.make(relation);
-    Vector mean = new Vector(temp.getMeanVector(relation).toArray());
+    double[] mean = temp.getMeanVector(relation).toArray();
     // debugFine(mean.toString());
     Matrix covarianceMatrix = temp.destroyToNaiveMatrix();
     // debugFine(covarianceMatrix.toString());
@@ -117,10 +117,10 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
 
     // for each object compute Mahalanobis distance
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      Vector x = new Vector(relation.get(iditer).toArray()).minusEquals(mean);
+      double[] x = VMath.minusEquals(relation.get(iditer).toArray(), mean);
       // Gaussian PDF
-      final double mDist = x.transposeTimesTimes(covarianceTransposed, x);
-      final double prob = fakt * Math.exp(-mDist / 2.0);
+      final double mDist = VMath.transposeTimesTimes(x, covarianceTransposed.getArrayRef(), x);
+      final double prob = fakt * Math.exp(-mDist * .5);
 
       mm.put(prob);
       oscores.putDouble(iditer, prob);

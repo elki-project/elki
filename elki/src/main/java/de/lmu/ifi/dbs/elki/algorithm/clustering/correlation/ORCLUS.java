@@ -23,6 +23,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -51,7 +54,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
@@ -424,8 +427,8 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     }
     else {
       NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
-      Vector cent = new Vector(c1.centroid.toArray()).plusEquals(new Vector(c2.centroid.toArray())).timesEquals(0.5);
-      c.centroid = factory.newNumberVector(cent.getArrayRef());
+      double[] cent = timesEquals(plusEquals(c1.centroid.toArray(), c2.centroid.toArray()), .5);
+      c.centroid = factory.newNumberVector(cent);
       double[][] doubles = new double[c1.basis.getRowDimensionality()][dim];
       for(int i = 0; i < dim; i++) {
         doubles[i][i] = 1;
@@ -445,8 +448,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @return the projection of double vector o in the subspace of cluster c
    */
   private V projection(ORCLUSCluster c, V o, NumberVector.Factory<V> factory) {
-    Matrix o_proj = new Vector(o.toArray()).transposeTimes(c.basis);
-    double[] values = o_proj.getColumnPackedCopy();
+    double[] values = VMath.transposeTimes(c.basis.getArrayRef(), o.toArray());
     return factory.newNumberVector(values);
   }
 

@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
  * Weighted distance for feature vectors.
@@ -55,8 +55,8 @@ public class MatrixWeightedDistanceFunction extends AbstractNumberVectorDistance
   @Override
   public double distance(NumberVector o1, NumberVector o2) {
     dimensionality(o1, o2, weightMatrix.getColumnDimensionality());
-    Vector o1_minus_o2 = new Vector(o1.toArray()).minusEquals(new Vector(o2.toArray()));
-    return MathUtil.mahalanobisDistance(weightMatrix, o1_minus_o2);
+    double[] o1_minus_o2 = VMath.minusEquals(o1.toArray(), o2.toArray());
+    return MathUtil.mahalanobisDistance(weightMatrix.getArrayRef(), o1_minus_o2);
   }
 
   @Override
