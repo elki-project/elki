@@ -101,25 +101,6 @@ public class Centroid implements NumberVector {
    * 
    * @param val Value
    */
-  public final void put(Vector val) {
-    put(val.getArrayRef());
-  }
-
-  /**
-   * Add data with a given weight.
-   * 
-   * @param val data
-   * @param weight weight
-   */
-  public final void put(Vector val, double weight) {
-    put(val.getArrayRef(), weight);
-  }
-
-  /**
-   * Add a single value with weight 1.0.
-   * 
-   * @param val Value
-   */
   public void put(NumberVector val) {
     assert (val.getDimensionality() == elements.length);
     wsum += 1.0;

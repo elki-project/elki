@@ -23,6 +23,9 @@ package de.lmu.ifi.dbs.elki.math;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.euclideanLength;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -31,7 +34,6 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * JUnit Test for the class {@link AffineTransformation}
@@ -56,14 +58,11 @@ public class AffineTransformationTest implements JUnit4Test {
     for(int i = 0; i < testdim; i++) {
       dv[i] = i * i + testdim;
     }
-    Vector v1 = new Vector(dv.clone());
-    Vector v2 = new Vector(dv.clone());
+    double[] v3 = t.apply(dv);
+    assertEquals("identity transformation wasn't identical", dv, v3);
 
-    Vector v3 = t.apply(v1);
-    assertEquals("identity transformation wasn't identical", v2, v3);
-
-    Vector v4 = t.applyInverse(v2);
-    assertEquals("inverse of identity wasn't identity", v1, v4);
+    double[] v4 = t.applyInverse(dv);
+    assertEquals("inverse of identity wasn't identity", dv, v4);
   }
 
   /**
@@ -82,7 +81,7 @@ public class AffineTransformationTest implements JUnit4Test {
     for(int i = 0; i < testdim; i++) {
       tv[i] = i + testdim;
     }
-    t.addTranslation(new Vector(tv));
+    t.addTranslation(tv);
 
     Matrix tm2 = t.getTransformation();
     // Manually do the same changes to the matrix tm
@@ -93,25 +92,23 @@ public class AffineTransformationTest implements JUnit4Test {
     assertEquals("Translation wasn't added correctly to matrix.", tm, tm2);
 
     // test application to a vector
-    double[] dv1 = new double[testdim];
-    double[] dv2 = new double[testdim];
+    double[] v1 = new double[testdim];
+    double[] v2t = new double[testdim];
     for(int i = 0; i < testdim; i++) {
-      dv1[i] = i * i + testdim;
-      dv2[i] = i * i + i + 2 * testdim;
+      v1[i] = i * i + testdim;
+      v2t[i] = i * i + i + 2 * testdim;
     }
-    Vector v1 = new Vector(dv1);
-    Vector v2t = new Vector(dv2);
 
-    Vector v1t = t.apply(v1);
+    double[] v1t = t.apply(v1);
     assertEquals("Vector wasn't translated properly forward.", v2t, v1t);
-    Vector v2b = t.applyInverse(v2t);
+    double[] v2b = t.applyInverse(v2t);
     assertEquals("Vector wasn't translated properly backwards.", v1, v2b);
-    Vector v1b = t.applyInverse(v1t);
+    double[] v1b = t.applyInverse(v1t);
     assertEquals("Vector wasn't translated properly back and forward.", v1, v1b);
 
     // Translation
-    Vector vd = v1.minus(v2b);
-    Vector vtd = v1t.minus(v2t);
+    double[] vd = minus(v1, v2b);
+    double[] vtd = minus(v1t, v2t);
     assertEquals("Translation changed vector difference.", vd, vtd);
 
     // Translation shouldn't change relative vectors.
@@ -164,16 +161,15 @@ public class AffineTransformationTest implements JUnit4Test {
     assertEquals("Rotation wasn't added correctly to matrix.", tm, tm2);
 
     // test application to a vector
-    double[] dv = new double[testdim];
+    double[] v1 = new double[testdim];
     for(int i = 0; i < testdim; i++) {
-      dv[i] = i * i + testdim;
+      v1[i] = i * i + testdim;
     }
-    Vector v1 = new Vector(dv);
-    Vector v2 = t.apply(v1);
-    Vector v3 = t.applyInverse(v2);
-    assertTrue("Forward-Backward didn't work correctly.", v1.minus(v3).euclideanLength() < 0.0001);
-    Vector v4 = t.apply(t.apply(t.apply(v1)));
-    assertTrue("Triple-Rotation by 120 degree didn't work", v1.minus(v4).euclideanLength() < 0.0001);
+    double[] v2 = t.apply(v1);
+    double[] v3 = t.applyInverse(v2);
+    assertTrue("Forward-Backward didn't work correctly.", euclideanLength(minus(v1, v3)) < 0.0001);
+    double[] v4 = t.apply(t.apply(t.apply(v1)));
+    assertTrue("Triple-Rotation by 120 degree didn't work", euclideanLength(minus(v1, v4)) < 0.0001);
 
     // Rotation shouldn't disagree for relative vectors.
     // (they just are not affected by translation!)
@@ -182,8 +178,8 @@ public class AffineTransformationTest implements JUnit4Test {
     // should do the same as built-in rotation!
     AffineTransformation t2 = new AffineTransformation(testdim);
     t2.addRotation(axis1, axis2, angle);
-    Vector t2v2 = t2.apply(v1);
-    assertTrue("Manual rotation and AffineTransformation.addRotation disagree.", v2.minus(t2v2).euclideanLength() < 0.0001);
+    double[] t2v2 = t2.apply(v1);
+    assertTrue("Manual rotation and AffineTransformation.addRotation disagree.", euclideanLength(minus(v2, t2v2)) < 0.0001);
   }
 
   /**
@@ -191,36 +187,36 @@ public class AffineTransformationTest implements JUnit4Test {
    */
   @Test
   public void testReorder() {
-    Vector v = new Vector(new double[] { 3, 5, 7 });
+    double[] v = new double[] { 3, 5, 7 };
     // all permutations
-    Vector p1 = new Vector(new double[] { 3, 5, 7 });
-    Vector p2 = new Vector(new double[] { 3, 7, 5 });
-    Vector p3 = new Vector(new double[] { 5, 3, 7 });
-    Vector p4 = new Vector(new double[] { 5, 7, 3 });
-    Vector p5 = new Vector(new double[] { 7, 3, 5 });
-    Vector p6 = new Vector(new double[] { 7, 5, 3 });
-    Vector[] ps = new Vector[] {
+    double[] p1 = new double[] { 3, 5, 7 };
+    double[] p2 = new double[] { 3, 7, 5 };
+    double[] p3 = new double[] { 5, 3, 7 };
+    double[] p4 = new double[] { 5, 7, 3 };
+    double[] p5 = new double[] { 7, 3, 5 };
+    double[] p6 = new double[] { 7, 5, 3 };
+    double[][] ps = new double[][] {
         // with no arguments.
-    p1,
+        p1,
         // with just one argument.
-    p1, p3, p5,
+        p1, p3, p5,
         // with two arguments.
-    p1, p2, p3, p4, p5, p6, };
+        p1, p2, p3, p4, p5, p6, };
 
     // index in reference array
     int idx = 0;
     // with 0 arguments
     {
-      AffineTransformation aff = AffineTransformation.reorderAxesTransformation(v.getDimensionality(), new int[] {});
-      Vector n = aff.apply(v).minus(ps[idx]);
-      assertEquals("Permutation " + idx + " doesn't match.", n.euclideanLength(), 0.0, 0.001);
+      AffineTransformation aff = AffineTransformation.reorderAxesTransformation(v.length, new int[] {});
+      double[] n = minusEquals(aff.apply(v), ps[idx]);
+      assertEquals("Permutation " + idx + " doesn't match.", euclideanLength(n), 0.0, 0.001);
       idx++;
     }
     // with one argument
     for(int d1 = 1; d1 <= 3; d1++) {
-      AffineTransformation aff = AffineTransformation.reorderAxesTransformation(v.getDimensionality(), new int[] { d1 });
-      Vector n = aff.apply(v).minus(ps[idx]);
-      assertEquals("Permutation " + idx + " doesn't match.", n.euclideanLength(), 0.0, 0.001);
+      AffineTransformation aff = AffineTransformation.reorderAxesTransformation(v.length, new int[] { d1 });
+      double[] n = minusEquals(aff.apply(v), ps[idx]);
+      assertEquals("Permutation " + idx + " doesn't match.", euclideanLength(n), 0.0, 0.001);
       idx++;
     }
     // with two arguments
@@ -229,9 +225,9 @@ public class AffineTransformationTest implements JUnit4Test {
         if(d1 == d2) {
           continue;
         }
-        AffineTransformation aff = AffineTransformation.reorderAxesTransformation(v.getDimensionality(), new int[] { d1, d2 });
-        Vector n = aff.apply(v).minus(ps[idx]);
-        assertEquals("Permutation " + idx + " doesn't match.", n.euclideanLength(), 0.0, 0.001);
+        AffineTransformation aff = AffineTransformation.reorderAxesTransformation(v.length, new int[] { d1, d2 });
+        double[] n = minusEquals(aff.apply(v), ps[idx]);
+        assertEquals("Permutation " + idx + " doesn't match.", euclideanLength(n), 0.0, 0.001);
         idx++;
       }
     }

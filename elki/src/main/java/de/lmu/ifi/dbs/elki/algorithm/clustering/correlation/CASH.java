@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -110,7 +110,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 title = "Robust clustering in arbitraily oriented subspaces", //
 booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", //
 url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
-public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>>implements ClusteringAlgorithm<Clustering<Model>> {
+public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
    */
@@ -498,9 +498,8 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   private ParameterizationFunction project(Matrix basis, ParameterizationFunction f) {
     // Matrix m = new Matrix(new
     // double[][]{f.getPointCoordinates()}).times(basis);
-    Matrix m = new Vector(f.getColumnVector()).transposeTimes(basis);
-    ParameterizationFunction f_t = new ParameterizationFunction(new DoubleVector(m.getColumnPackedCopy()));
-    return f_t;
+    double[] m = VMath.transposeTimes(basis.getArrayRef(), f.getColumnVector());
+    return new ParameterizationFunction(new DoubleVector(m));
   }
 
   /**
@@ -804,8 +803,8 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     public static final OptionID MINPTS_ID = new OptionID("cash.minpts", "Threshold for minimum number of points in a cluster.");
 
     /**
-     * Parameter to specify the maximum level for splitting the hypercube, must be
-     * an integer greater than 0.
+     * Parameter to specify the maximum level for splitting the hypercube, must
+     * be an integer greater than 0.
      * <p>
      * Key: {@code -cash.maxlevel}
      * </p>

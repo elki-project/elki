@@ -27,9 +27,7 @@ import java.math.BigInteger;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * A collection of math related utility functions.
@@ -247,55 +245,8 @@ public final class MathUtil {
    * @param o1_minus_o2 Delta vector
    * @return Mahalanobis distance
    */
-  public static double mahalanobisDistance(Matrix weightMatrix, Vector o1_minus_o2) {
-    double sqrDist = o1_minus_o2.transposeTimesTimes(weightMatrix, o1_minus_o2);
-    if(sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
-      sqrDist = Math.abs(sqrDist);
-    }
-    return Math.sqrt(sqrDist);
-  }
-
-  /**
-   * Compute the Mahalanobis distance using the given weight matrix.
-   *
-   * @param weightMatrix Weight Matrix
-   * @param o1_minus_o2 Delta vector
-   * @return Mahalanobis distance
-   */
   public static double mahalanobisDistance(double[][] weightMatrix, double[] o1_minus_o2) {
     double sqrDist = VMath.transposeTimesTimes(o1_minus_o2, weightMatrix, o1_minus_o2);
-    if(sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
-      sqrDist = Math.abs(sqrDist);
-    }
-    return Math.sqrt(sqrDist);
-  }
-
-  /**
-   * Compute the Mahalanobis distance using the given weight matrix.
-   *
-   * @param weightMatrix Weight Matrix
-   * @param o1 First vector
-   * @param o2 Center vector
-   * @return Mahalanobis distance
-   */
-  public static double mahalanobisDistance(Matrix weightMatrix, Vector o1, Vector o2) {
-    double sqrDist = VMath.mahalanobisDistance(weightMatrix.getArrayRef(), o1.getArrayRef(), o2.getArrayRef());
-    if(sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
-      sqrDist = Math.abs(sqrDist);
-    }
-    return Math.sqrt(sqrDist);
-  }
-
-  /**
-   * Compute the Mahalanobis distance using the given weight matrix.
-   *
-   * @param weightMatrix Weight Matrix
-   * @param o1 First vector
-   * @param o2 Center vector
-   * @return Mahalanobis distance
-   */
-  public static double mahalanobisDistance(double[][] weightMatrix, double[] o1, double[] o2) {
-    double sqrDist = VMath.mahalanobisDistance(weightMatrix, o1, o2);
     if(sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
       sqrDist = Math.abs(sqrDist);
     }
@@ -698,17 +649,6 @@ public final class MathUtil {
    * @param v2 second vector
    * @return Angle
    */
-  public static double angle(Vector v1, Vector v2) {
-    return angle(v1.getArrayRef(), v2.getArrayRef());
-  }
-
-  /**
-   * Compute the angle between two vectors.
-   *
-   * @param v1 first vector
-   * @param v2 second vector
-   * @return Angle
-   */
   public static double angle(double[] v1, double[] v2) {
     final int mindim = (v1.length >= v2.length) ? v1.length : v2.length;
     // Essentially, we want to compute this:
@@ -731,18 +671,6 @@ public final class MathUtil {
       e2 += r2 * r2;
     }
     return Math.sqrt((s / e1) * (s / e2));
-  }
-
-  /**
-   * Compute the angle between two vectors.
-   *
-   * @param v1 first vector
-   * @param v2 second vector
-   * @param o Origin
-   * @return Angle
-   */
-  public static double angle(Vector v1, Vector v2, Vector o) {
-    return angle(v1.getArrayRef(), v2.getArrayRef(), o.getArrayRef());
   }
 
   /**

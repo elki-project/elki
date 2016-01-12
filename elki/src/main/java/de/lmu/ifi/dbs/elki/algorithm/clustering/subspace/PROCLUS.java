@@ -62,7 +62,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -621,9 +620,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
       int best = -1;
       for(int i = 0; i < dimensions.size(); i++) {
         Pair<double[], long[]> pair_i = dimensions.get(i);
-        Vector c_i = new Vector(pair_i.first);
-        long[] dimensions_i = pair_i.second;
-        double currentDist = manhattanSegmentalDistance(p, c_i, dimensions_i);
+        double currentDist = manhattanSegmentalDistance(p, pair_i.first, pair_i.second);
         if(best < 0 || currentDist < minDist) {
           minDist = currentDist;
           best = i;
@@ -669,6 +666,27 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     int card = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       result += Math.abs(o1.doubleValue(d) - o2.doubleValue(d));
+      ++card;
+    }
+    result /= card;
+    return result;
+  }
+
+  /**
+   * Returns the Manhattan segmental distance between o1 and o2 relative to the
+   * specified dimensions.
+   *
+   * @param o1 the first object
+   * @param o2 the second object
+   * @param dimensions the dimensions to be considered
+   * @return the Manhattan segmental distance between o1 and o2 relative to the
+   *         specified dimensions
+   */
+  private double manhattanSegmentalDistance(NumberVector o1, double[] o2, long[] dimensions) {
+    double result = 0;
+    int card = 0;
+    for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
+      result += Math.abs(o1.doubleValue(d) - o2[d]);
       ++card;
     }
     result /= card;

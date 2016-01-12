@@ -262,21 +262,6 @@ public class Matrix {
   }
 
   /**
-   * Returns a quadratic Matrix consisting of zeros and of the given values on
-   * the diagonal.
-   *
-   * @param diagonal the values on the diagonal
-   * @return the resulting matrix
-   */
-  public static final Matrix diagonal(final Vector diagonal) {
-    final Matrix result = new Matrix(diagonal.elements.length, diagonal.elements.length);
-    for(int i = 0; i < diagonal.elements.length; i++) {
-      result.elements[i][i] = diagonal.elements[i];
-    }
-    return result;
-  }
-
-  /**
    * Make a deep copy of a matrix.
    *
    * @return a new matrix containing the same values as this matrix

@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * 
  * @author Erich Schubert
  * 
- * @apiviz.uses Vector oneway
  * @apiviz.uses NumberVector oneway
  * @apiviz.has Matrix oneway - - «produces»
  */
@@ -163,25 +162,6 @@ public class CovarianceMatrix {
     // Use new values.
     wsum = nwsum;
     System.arraycopy(nmea, 0, mean, 0, nmea.length);
-  }
-
-  /**
-   * Add a single value with weight 1.0.
-   * 
-   * @param val Value
-   */
-  public final void put(Vector val) {
-    put(val.getArrayRef());
-  }
-
-  /**
-   * Add data with a given weight.
-   * 
-   * @param val data
-   * @param weight weight
-   */
-  public final void put(Vector val, double weight) {
-    put(val.getArrayRef(), weight);
   }
 
   /**

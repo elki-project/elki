@@ -1,9 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import java.util.Arrays;
-
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -27,6 +23,10 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
+
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /**
  * Affine transformations implemented using homogeneous coordinates.
  *
@@ -39,7 +39,6 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  *
  * @apiviz.composedOf Matrix
  * @apiviz.uses Matrix
- * @apiviz.uses Vector
  */
 public class AffineTransformation {
   /**
@@ -145,24 +144,6 @@ public class AffineTransformation {
    */
   public int getDimensionality() {
     return dim;
-  }
-
-  /**
-   * Add a translation operation to the matrix
-   *
-   * @param v translation vector
-   */
-  public void addTranslation(Vector v) {
-    assert (v.getDimensionality() == dim);
-
-    // reset inverse transformation - needs recomputation.
-    inv = null;
-
-    Matrix homTrans = Matrix.unitMatrix(dim + 1);
-    for(int i = 0; i < dim; i++) {
-      homTrans.set(i, dim, v.get(i));
-    }
-    trans = homTrans.times(trans);
   }
 
   /**
@@ -316,38 +297,11 @@ public class AffineTransformation {
    * @param v initial vector
    * @return vector of dim+1, with new column having the value 1.0
    */
-  public Vector homogeneVector(Vector v) {
-    assert (v.getDimensionality() == dim);
-    double[] dv = Arrays.copyOf(v.getArrayRef(), dim + 1);
-    dv[dim] = 1.0;
-    return new Vector(dv);
-  }
-
-  /**
-   * Transform an absolute vector into homogeneous coordinates.
-   *
-   * @param v initial vector
-   * @return vector of dim+1, with new column having the value 1.0
-   */
   public double[] homogeneVector(double[] v) {
     assert (v.length == dim);
     double[] dv = Arrays.copyOf(v, dim + 1);
     dv[dim] = 1.0;
     return dv;
-  }
-
-  /**
-   * Transform a relative vector into homogeneous coordinates.
-   *
-   * @param v initial vector
-   * @return vector of dim+1, with new column having the value 0.0
-   */
-  public Vector homogeneRelativeVector(Vector v) {
-    assert (v.getDimensionality() == dim);
-    // TODO: this only works properly when trans[dim][dim] == 1.0, right?
-    double[] dv = Arrays.copyOf(v.getArrayRef(), dim + 1);
-    dv[dim] = 0.0;
-    return new Vector(dv);
   }
 
   /**
@@ -362,24 +316,6 @@ public class AffineTransformation {
     double[] dv = Arrays.copyOf(v, dim + 1);
     dv[dim] = 0.0;
     return dv;
-  }
-
-  /**
-   * Project an homogeneous vector back into the original space.
-   *
-   * @param v Matrix of 1 x dim+1 containing the homogeneous vector
-   * @return vector of dimension dim
-   */
-  public Vector unhomogeneVector(Vector v) {
-    assert (v.getDimensionality() == dim + 1);
-    // TODO: this only works properly when trans[dim][dim] == 1.0, right?
-    double[] dv = new double[dim];
-    double scale = v.get(dim);
-    assert (Math.abs(scale) > 0.0);
-    for(int i = 0; i < dim; i++) {
-      dv[i] = v.get(i) / scale;
-    }
-    return new Vector(dv);
   }
 
   /**
@@ -406,22 +342,6 @@ public class AffineTransformation {
    * @param v Matrix of 1 x dim+1 containing the homogeneous vector
    * @return vector of dimension dim
    */
-  public Vector unhomogeneRelativeVector(Vector v) {
-    assert (v.getDimensionality() == dim + 1);
-    double[] dv = new double[dim];
-    assert (Math.abs(v.get(dim))  < Double.MIN_NORMAL);
-    for(int i = 0; i < dim; i++) {
-      dv[i] = v.get(i);
-    }
-    return new Vector(dv);
-  }
-
-  /**
-   * Project an homogeneous vector back into the original space.
-   *
-   * @param v Matrix of 1 x dim+1 containing the homogeneous vector
-   * @return vector of dimension dim
-   */
   public double[] unhomogeneRelativeVector(double[] v) {
     assert (v.length == dim + 1);
     double[] dv = new double[dim];
@@ -436,31 +356,8 @@ public class AffineTransformation {
    * @param v vector of dimensionality dim
    * @return transformed vector of dimensionality dim
    */
-  public Vector apply(Vector v) {
-    return unhomogeneVector(trans.times(homogeneVector(v)));
-  }
-
-  /**
-   * Apply the transformation onto a vector
-   *
-   * @param v vector of dimensionality dim
-   * @return transformed vector of dimensionality dim
-   */
   public double[] apply(double[] v) {
     return unhomogeneVector(VMath.times(trans.elements, homogeneVector(v)));
-  }
-
-  /**
-   * Apply the inverse transformation onto a vector
-   *
-   * @param v vector of dimensionality dim
-   * @return transformed vector of dimensionality dim
-   */
-  public Vector applyInverse(Vector v) {
-    if(inv == null) {
-      updateInverse();
-    }
-    return unhomogeneVector(inv.times(homogeneVector(v)));
   }
 
   /**
@@ -482,32 +379,10 @@ public class AffineTransformation {
    * @param v vector of dimensionality dim
    * @return transformed vector of dimensionality dim
    */
-  public Vector applyRelative(Vector v) {
-    return unhomogeneRelativeVector(trans.times(homogeneRelativeVector(v)));
-  }
-
-  /**
-   * Apply the transformation onto a vector
-   *
-   * @param v vector of dimensionality dim
-   * @return transformed vector of dimensionality dim
-   */
   public double[] applyRelative(double[] v) {
     return unhomogeneRelativeVector(VMath.times(trans.elements, homogeneRelativeVector(v)));
   }
 
-  /**
-   * Apply the inverse transformation onto a vector
-   *
-   * @param v vector of dimensionality dim
-   * @return transformed vector of dimensionality dim
-   */
-  public Vector applyRelativeInverse(Vector v) {
-    if(inv == null) {
-      updateInverse();
-    }
-    return unhomogeneRelativeVector(inv.times(homogeneRelativeVector(v)));
-  }
   /**
    * Apply the inverse transformation onto a vector
    *
