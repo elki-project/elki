@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * 
  * @author Erich Schubert
  */
-public class SlidingVarianceTest implements JUnit4Test {
+public class MeanVarianceTest implements JUnit4Test {
   /**
    * Size of test data set.
    */
