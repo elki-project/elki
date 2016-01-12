@@ -23,11 +23,11 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
@@ -94,7 +94,7 @@ public final class ModelUtil {
   public static NumberVector getPrototype(Model model, Relation<? extends NumberVector> relation) {
     // Mean model contains a numeric Vector
     if(model instanceof MeanModel) {
-      return new Vector(((MeanModel) model).getMean());
+      return new DoubleVector(((MeanModel) model).getMean());
     }
     // Handle medoid models
     if(model instanceof MedoidModel) {

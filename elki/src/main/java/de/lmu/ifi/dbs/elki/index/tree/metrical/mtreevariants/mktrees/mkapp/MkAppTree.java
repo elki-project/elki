@@ -340,22 +340,22 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
       }
     }
 
-    de.lmu.ifi.dbs.elki.math.linearalgebra.Vector x = new de.lmu.ifi.dbs.elki.math.linearalgebra.Vector(settings.k_max - k_0);
-    de.lmu.ifi.dbs.elki.math.linearalgebra.Vector y = new de.lmu.ifi.dbs.elki.math.linearalgebra.Vector(settings.k_max - k_0);
+    double[] x = new double[settings.k_max - k_0];
+    double[] y = new double[settings.k_max - k_0];
 
     for(int k = 0; k < settings.k_max - k_0; k++) {
       if(settings.log) {
-        x.set(k, Math.log(k + k_0));
-        y.set(k, Math.log(knnDistances[k + k_0]));
+        x[k] = Math.log(k + k_0);
+        y[k] = Math.log(knnDistances[k + k_0]);
       }
       else {
-        x.set(k, k + k_0);
-        y.set(k, knnDistances[k + k_0]);
+        x[k] = k + k_0;
+        y[k] = knnDistances[k + k_0];
       }
     }
 
     PolynomialRegression regression = new PolynomialRegression(y, x, settings.p);
-    PolynomialApproximation approximation = new PolynomialApproximation(regression.getEstimatedCoefficients().getArrayCopy());
+    PolynomialApproximation approximation = new PolynomialApproximation(regression.getEstimatedCoefficients());
 
     if(LOG.isDebugging()) {
       msg.append("approximation ").append(approximation);

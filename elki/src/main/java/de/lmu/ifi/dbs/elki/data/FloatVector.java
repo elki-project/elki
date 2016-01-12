@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.data;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
@@ -82,19 +81,6 @@ public class FloatVector extends AbstractNumberVector {
    */
   public FloatVector(float[] values) {
     this.values = values.clone();
-  }
-
-  /**
-   * Expects a matrix of one column.
-   * 
-   * @param columnMatrix a matrix of one column
-   */
-  public FloatVector(Vector columnMatrix) {
-    final double[] src = columnMatrix.getArrayRef();
-    values = new float[src.length];
-    for(int i = 0; i < src.length; i++) {
-      values[i] = (float) src[i];
-    }
   }
 
   @Override

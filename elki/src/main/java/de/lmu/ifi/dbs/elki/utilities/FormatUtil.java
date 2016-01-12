@@ -517,7 +517,7 @@ public final class FormatUtil {
    * @return a string representation of this matrix
    */
   // TODO: in use?
-  public static String format(Vector v, int w, int d) {
+  public static String format(double[] v, int w, int d) {
     DecimalFormat format = new DecimalFormat();
     format.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));
     format.setMinimumIntegerDigits(1);
@@ -528,8 +528,8 @@ public final class FormatUtil {
     int width = w + 1;
     StringBuilder msg = new StringBuilder();
     msg.append('\n'); // start on new line.
-    for(int i = 0; i < v.getDimensionality(); i++) {
-      String s = format.format(v.get(i)); // format the number
+    for(int i = 0; i < v.length; i++) {
+      String s = format.format(v[i]); // format the number
       int padding = Math.max(1, width - s.length()); // At _least_ 1
       // space
       for(int k = 0; k < padding; k++) {

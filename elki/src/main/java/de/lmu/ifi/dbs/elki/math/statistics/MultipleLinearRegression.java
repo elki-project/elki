@@ -23,8 +23,11 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesTranspose;
+
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
@@ -40,9 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  */
 public class MultipleLinearRegression {
   /**
-   * The (n x 1) - vector holding the y-values (y1, ..., yn)^T.
+   * The (n x 1) - double[] holding the y-values (y1, ..., yn)^T.
    */
-  private final Vector y;
+  private final double[] y;
 
   /**
    * Holds the mean value of the y-values.
@@ -56,14 +59,15 @@ public class MultipleLinearRegression {
   private final Matrix x;
 
   /**
-   * The (p+1 x 1) - vector holding the estimated b-values (b0, b1, ..., bp)^T.
+   * The (p+1 x 1) - double[] holding the estimated b-values (b0, b1, ...,
+   * bp)^T.
    */
-  private final Vector b;
+  private final double[] b;
 
   /**
-   * The (n x 1) - vector holding the estimated residuals (e1, ..., en)^T.
+   * The (n x 1) - double[] holding the estimated residuals (e1, ..., en)^T.
    */
-  private final Vector e;
+  private final double[] e;
 
   /**
    * The error variance.
@@ -88,47 +92,48 @@ public class MultipleLinearRegression {
   /**
    * Constructor.
    * 
-   * @param y the (n x 1) - vector holding the response values (y1, ..., yn)^T.
+   * @param y the (n x 1) - double[] holding the response values (y1, ...,
+   *        yn)^T.
    * @param x the (n x p+1)-matrix holding the explanatory values, where the
    *        i-th row has the form (1 x1i ... x1p).
    */
-  public MultipleLinearRegression(Vector y, Matrix x) {
-    if(y.getDimensionality() <= x.getColumnDimensionality()) {
-      throw new IllegalArgumentException("Number of observed data has to be greater than " + "number of regressors: " + y.getDimensionality() + " > " + x.getColumnDimensionality());
+  public MultipleLinearRegression(double[] y, Matrix x) {
+    if(y.length <= x.getColumnDimensionality()) {
+      throw new IllegalArgumentException("Number of observed data has to be greater than " + "number of regressors: " + y.length + " > " + x.getColumnDimensionality());
     }
 
     this.y = y;
     this.x = x;
 
     double sum = 0;
-    for(int i = 0; i < y.getDimensionality(); i++) {
-      sum += y.get(i);
+    for(int i = 0; i < y.length; i++) {
+      sum += y[i];
     }
-    y_mean = sum / y.getDimensionality();
+    y_mean = sum / y.length;
 
     // estimate b, e
     xx_inverse = x.transposeTimes(x).inverse();
-    b = xx_inverse.timesTranspose(x).times(y);
-    // b = new Vector(x.solve(y).getColumnPackedCopy());
-    e = y.minus(x.times(b));
+    b = times(timesTranspose(xx_inverse.getArrayRef(), x.getArrayRef()), y);
+    // b = new double[](x.solve(y).getColumnPackedCopy());
+    e = minus(y, times(x.getArrayRef(), b));
 
     // sum of square residuals: ssr
     sum = 0;
-    for(int i = 0; i < e.getDimensionality(); i++) {
-      sum += e.get(i) * e.get(i);
+    for(int i = 0; i < e.length; i++) {
+      sum += e[i] * e[i];
     }
     ssr = sum;
 
     // sum of square totals: sst
     sum = 0;
-    for(int i = 0; i < y.getDimensionality(); i++) {
-      final double diff = y.get(i) - y_mean;
+    for(int i = 0; i < y.length; i++) {
+      final double diff = y[i] - y_mean;
       sum += diff * diff;
     }
     sst = sum;
 
     // variance
-    variance = ssr / (y.getDimensionality() - x.getColumnDimensionality() - 1);
+    variance = ssr / (y.length - x.getColumnDimensionality() - 1);
   }
 
   /**
@@ -170,7 +175,7 @@ public class MultipleLinearRegression {
    * 
    * @return the estimated coefficients
    */
-  public Vector getEstimatedCoefficients() {
+  public double[] getEstimatedCoefficients() {
     return b;
   }
 
@@ -179,7 +184,7 @@ public class MultipleLinearRegression {
    * 
    * @return the estimated residuals
    */
-  public Vector getEstimatedResiduals() {
+  public double[] getEstimatedResiduals() {
     return e;
   }
 
@@ -199,7 +204,7 @@ public class MultipleLinearRegression {
    * @return the estimation of y
    */
   public double estimateY(Matrix x) {
-    return x.times(b).get(0);
+    return times(x.getArrayRef(), b)[0];
   }
 
   /**

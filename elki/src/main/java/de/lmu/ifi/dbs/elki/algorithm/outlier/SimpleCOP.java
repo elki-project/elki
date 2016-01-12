@@ -138,7 +138,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
         cop_score.putDouble(id, prob);
 
-        Vector errv = depsol.errorVector(data.get(id)).timesEquals(-1);
+        Vector errv = new Vector(depsol.errorVector(data.get(id))).timesEquals(-1);
         cop_err_v.put(id, errv);
 
         Matrix datav = depsol.dataProjections(data.get(id));

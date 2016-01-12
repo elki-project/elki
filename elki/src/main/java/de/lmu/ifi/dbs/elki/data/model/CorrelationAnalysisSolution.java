@@ -23,6 +23,13 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.euclideanLength;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.project;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -35,8 +42,6 @@ import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
@@ -213,8 +218,8 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public Vector errorVector(V p) {
-    return new Vector(project(minusEquals(p.toArray(), centroid), weakEigenvectors.getArrayRef()));
+  public double[] errorVector(V p) {
+    return project(minusEquals(p.toArray(), centroid), weakEigenvectors.getArrayRef());
   }
 
   /**
@@ -240,8 +245,8 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @param p a vector in the space underlying this solution
    * @return the error vectors
    */
-  public Vector dataVector(V p) {
-    return new Vector(project(minusEquals(p.toArray(), centroid), strongEigenvectors.getArrayRef()));
+  public double[] dataVector(V p) {
+    return project(minusEquals(p.toArray(), centroid), strongEigenvectors.getArrayRef());
   }
 
   /**

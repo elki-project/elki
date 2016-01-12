@@ -28,7 +28,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 
 /**
@@ -130,7 +129,7 @@ public class SVGPath {
   }
 
   /**
-   * Constructor from a vector collection (e.g. a polygon)
+   * Constructor from a double[] collection (e.g. a polygon)
    * 
    * @param vectors vectors
    */
@@ -170,19 +169,6 @@ public class SVGPath {
   }
 
   /**
-   * Draw a line given a series of coordinates.
-   * 
-   * Helper function that will use "move" for the first point, "lineto" for the
-   * remaining.
-   * 
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath drawTo(Vector xy) {
-    return !isStarted() ? moveTo(xy.doubleValue(0), xy.doubleValue(1)) : lineTo(xy.doubleValue(0), xy.doubleValue(1));
-  }
-
-  /**
    * Test whether the path drawing has already started.
    * 
    * @return Path freshness
@@ -217,16 +203,6 @@ public class SVGPath {
   }
 
   /**
-   * Draw a line to the given coordinates.
-   * 
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath lineTo(Vector xy) {
-    return lineTo(xy.doubleValue(0), xy.doubleValue(1));
-  }
-
-  /**
    * Draw a line to the given relative coordinates.
    * 
    * @param x relative coordinates
@@ -249,16 +225,6 @@ public class SVGPath {
    */
   public SVGPath relativeLineTo(double[] xy) {
     return relativeLineTo(xy[0], xy[1]);
-  }
-
-  /**
-   * Draw a line to the given relative coordinates.
-   * 
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath relativeLineTo(Vector xy) {
-    return relativeLineTo(xy.doubleValue(0), xy.doubleValue(1));
   }
 
   /**
@@ -339,16 +305,6 @@ public class SVGPath {
   }
 
   /**
-   * Move to the given coordinates.
-   * 
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath moveTo(Vector xy) {
-    return moveTo(xy.doubleValue(0), xy.doubleValue(1));
-  }
-
-  /**
    * Move to the given relative coordinates.
    * 
    * @param x new coordinates
@@ -371,16 +327,6 @@ public class SVGPath {
    */
   public SVGPath relativeMoveTo(double[] xy) {
     return relativeMoveTo(xy[0], xy[1]);
-  }
-
-  /**
-   * Move to the given relative coordinates.
-   * 
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath relativeMoveTo(Vector xy) {
-    return relativeMoveTo(xy.doubleValue(0), xy.doubleValue(1));
   }
 
   /**
@@ -409,19 +355,6 @@ public class SVGPath {
    */
   public SVGPath cubicTo(double[] c1xy, double[] c2xy, double[] xy) {
     append(SVGConstants.PATH_CUBIC_TO, c1xy[0], c1xy[1], c2xy[0], c2xy[1], xy[0], xy[1]);
-    return this;
-  }
-
-  /**
-   * Cubic Bezier line to the given coordinates.
-   * 
-   * @param c1xy first control point
-   * @param c2xy second control point
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath cubicTo(Vector c1xy, Vector c2xy, Vector xy) {
-    append(SVGConstants.PATH_CUBIC_TO, c1xy.doubleValue(0), c1xy.doubleValue(1), c2xy.doubleValue(0), c2xy.doubleValue(1), xy.doubleValue(0), xy.doubleValue(1));
     return this;
   }
 
@@ -455,19 +388,6 @@ public class SVGPath {
   }
 
   /**
-   * Cubic Bezier line to the given relative coordinates.
-   * 
-   * @param c1xy first control point
-   * @param c2xy second control point
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath relativeCubicTo(Vector c1xy, Vector c2xy, Vector xy) {
-    append(PATH_CUBIC_TO_RELATIVE, c1xy.doubleValue(0), c1xy.doubleValue(1), c2xy.doubleValue(0), c2xy.doubleValue(1), xy.doubleValue(0), xy.doubleValue(1));
-    return this;
-  }
-
-  /**
    * Smooth Cubic Bezier line to the given coordinates.
    * 
    * @param c2x second control point x
@@ -490,18 +410,6 @@ public class SVGPath {
    */
   public SVGPath smoothCubicTo(double[] c2xy, double[] xy) {
     append(PATH_SMOOTH_CUBIC_TO, c2xy[0], c2xy[1], xy[0], xy[1]);
-    return this;
-  }
-
-  /**
-   * Smooth Cubic Bezier line to the given coordinates.
-   * 
-   * @param c2xy second control point
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath smoothCubicTo(Vector c2xy, Vector xy) {
-    append(PATH_SMOOTH_CUBIC_TO, c2xy.doubleValue(0), c2xy.doubleValue(1), xy.doubleValue(0), xy.doubleValue(1));
     return this;
   }
 
@@ -532,18 +440,6 @@ public class SVGPath {
   }
 
   /**
-   * Smooth Cubic Bezier line to the given relative coordinates.
-   * 
-   * @param c2xy second control point
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath relativeSmoothCubicTo(Vector c2xy, Vector xy) {
-    append(PATH_SMOOTH_CUBIC_TO_RELATIVE, c2xy.doubleValue(0), c2xy.doubleValue(1), xy.doubleValue(0), xy.doubleValue(1));
-    return this;
-  }
-
-  /**
    * Quadratic Bezier line to the given coordinates.
    * 
    * @param c1x first control point x
@@ -566,18 +462,6 @@ public class SVGPath {
    */
   public SVGPath quadTo(double[] c1xy, double[] xy) {
     append(SVGConstants.PATH_QUAD_TO, c1xy[0], c1xy[1], xy[0], xy[1]);
-    return this;
-  }
-
-  /**
-   * Quadratic Bezier line to the given coordinates.
-   * 
-   * @param c1xy first control point
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath quadTo(Vector c1xy, Vector xy) {
-    append(SVGConstants.PATH_QUAD_TO, c1xy.doubleValue(0), c1xy.doubleValue(1), xy.doubleValue(0), xy.doubleValue(1));
     return this;
   }
 
@@ -608,18 +492,6 @@ public class SVGPath {
   }
 
   /**
-   * Quadratic Bezier line to the given relative coordinates.
-   * 
-   * @param c1xy first control point
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath relativeQuadTo(Vector c1xy, Vector xy) {
-    append(PATH_QUAD_TO_RELATIVE, c1xy.doubleValue(0), c1xy.doubleValue(1), xy.doubleValue(0), xy.doubleValue(1));
-    return this;
-  }
-
-  /**
    * Smooth quadratic Bezier line to the given coordinates.
    * 
    * @param x new coordinates
@@ -643,17 +515,6 @@ public class SVGPath {
   }
 
   /**
-   * Smooth quadratic Bezier line to the given coordinates.
-   * 
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath smoothQuadTo(Vector xy) {
-    append(SVGConstants.PATH_SMOOTH_QUAD_TO, xy.doubleValue(0), xy.doubleValue(1));
-    return this;
-  }
-
-  /**
    * Smooth quadratic Bezier line to the given relative coordinates.
    * 
    * @param x new coordinates
@@ -673,17 +534,6 @@ public class SVGPath {
    */
   public SVGPath relativeSmoothQuadTo(double[] xy) {
     append(PATH_SMOOTH_QUAD_TO_RELATIVE, xy[0], xy[1]);
-    return this;
-  }
-
-  /**
-   * Smooth quadratic Bezier line to the given relative coordinates.
-   * 
-   * @param xy new coordinates
-   * @return path object, for compact syntax.
-   */
-  public SVGPath relativeSmoothQuadTo(Vector xy) {
-    append(PATH_SMOOTH_QUAD_TO_RELATIVE, xy.doubleValue(0), xy.doubleValue(1));
     return this;
   }
 
@@ -727,8 +577,8 @@ public class SVGPath {
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param xy new coordinates
    */
-  public SVGPath ellipticalArc(Vector rxy, double ar, double la, double sp, Vector xy) {
-    append(SVGConstants.PATH_ARC, rxy.doubleValue(0), rxy.doubleValue(1), ar, la, sp, xy.doubleValue(0), xy.doubleValue(1));
+  public SVGPath ellipticalArc(double[] rxy, double ar, double la, double sp, double[] xy) {
+    append(SVGConstants.PATH_ARC, rxy[0], rxy[1], ar, la, sp, xy[0], xy[1]);
     return this;
   }
 
@@ -772,8 +622,8 @@ public class SVGPath {
    * @param sp sweep flag, if arc will be drawn in positive-angle direction
    * @param xy new coordinates
    */
-  public SVGPath relativeEllipticalArc(Vector rxy, double ar, double la, double sp, Vector xy) {
-    append(PATH_ARC_RELATIVE, rxy.doubleValue(0), rxy.doubleValue(1), ar, la, sp, xy.doubleValue(0), xy.doubleValue(1));
+  public SVGPath relativeEllipticalArc(double[] rxy, double ar, double la, double sp, double[] xy) {
+    append(PATH_ARC_RELATIVE, rxy[0], rxy[1], ar, la, sp, xy[0], xy[1]);
     return this;
   }
 

@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -164,7 +163,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
      * @param movingVector - Vector for moving object
      */
     // TODO: move to DatabaseUtil?
-    private void updateDB(DBIDs dbids, Vector movingVector) {
+    private void updateDB(DBIDs dbids, double[] movingVector) {
       throw new AbortException("FIXME: INCOMPLETE TRANSITION");
       /*
        * NumberVector nv = null; database.accumulateDataStoreEvents();
@@ -226,9 +225,9 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
 
     @Override
     public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
-      Vector movingVector = new Vector(2);
-      movingVector.set(0, dragPoint.getX() - startPoint.getX());
-      movingVector.set(1, dragPoint.getY() - startPoint.getY());
+      double[] movingVector = new double[] { //
+          dragPoint.getX() - startPoint.getX(), //
+          dragPoint.getY() - startPoint.getY() };
       if(context.getSelection() != null) {
         updateDB(context.getSelection().getSelectedIds(), movingVector);
       }

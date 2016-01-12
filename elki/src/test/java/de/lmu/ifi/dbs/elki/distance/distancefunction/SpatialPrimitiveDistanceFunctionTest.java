@@ -143,7 +143,7 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
     }
   }
 
-  protected void compareDistances(Vector v1, ModifiableHyperBoundingBox mbr, Vector v2, SpatialPrimitiveDistanceFunction<? super NumberVector> dist) {
+  protected void compareDistances(NumberVector v1, ModifiableHyperBoundingBox mbr, NumberVector v2, SpatialPrimitiveDistanceFunction<? super NumberVector> dist) {
     double exact = dist.distance(v1, v2);
     double mind = dist.minDist(v1, v2);
     double mbrd = dist.minDist(v1, mbr);
