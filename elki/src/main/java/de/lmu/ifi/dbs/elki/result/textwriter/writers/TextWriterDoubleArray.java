@@ -25,27 +25,25 @@ package de.lmu.ifi.dbs.elki.result.textwriter.writers;
 
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 
 /**
- * Write an object into the inline section, using the objects toString method.
+ * Write a double array.
  * 
  * @author Erich Schubert
- * 
  */
-public class TextWriterObjectArray<T> extends TextWriterWriterInterface<T[]> {
+public class TextWriterDoubleArray extends TextWriterWriterInterface<double[]> {
   /**
    * Serialize an object into the inline section.
    */
   @Override
-  public void write(TextWriterStream out, String label, T[] v) {
+  public void write(TextWriterStream out, String label, double[] v) {
     StringBuilder buf = new StringBuilder();
     if(label != null) {
       buf.append(label).append('=');
     }
     if(v != null) {
-      for (T o : v) {
-        buf.append(o.toString());
-      }
+      FormatUtil.formatTo(buf, v, " ");
     }
     out.inlinePrintNoQuotes(buf.toString());
   }
