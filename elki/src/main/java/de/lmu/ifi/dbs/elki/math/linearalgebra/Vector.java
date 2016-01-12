@@ -551,8 +551,8 @@ public class Vector implements NumberVector {
     Vector sum = new Vector(elements.length);
     for(int i = 0; i < v.columndimension; i++) {
       // TODO: optimize - copy less?
-      Vector v_i = v.getCol(i);
-      sum.plusTimesEquals(v_i, this.transposeTimes(v_i));
+      double[] v_i = v.getCol(i);
+      VMath.plusTimesEquals(sum.elements, v_i, VMath.transposeTimes(elements, v_i));
     }
     return sum;
   }

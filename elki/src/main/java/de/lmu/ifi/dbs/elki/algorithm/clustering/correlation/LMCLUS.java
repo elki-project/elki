@@ -53,7 +53,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleDynamicHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleHistogram;
@@ -346,14 +345,14 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   private Matrix generateOrthonormalBasis(List<double[]> vectors) {
     double[] first = normalizeEquals(vectors.get(0));
     Matrix ret = new Matrix(first.length, vectors.size());
-    ret.setCol(0, new Vector(first));
+    ret.setCol(0, first);
     for(int i = 1; i < vectors.size(); i++) {
       // System.out.println("Matrix:" + ret);
       double[] v_i = vectors.get(i);
       double[] u_i = v_i.clone();
       // System.out.println("Vector " + i + ":" + partialSol);
       for(int j = 0; j < i; j++) {
-        double[] v_j = ret.getCol(j).getArrayRef();
+        double[] v_j = ret.getCol(j); // Must have length 1!
         double f = transposeTimes(v_i, v_j); // / transposeTimes(v_j, v_j);
         if(Double.isNaN(f)) {
           if(LOG.isDebuggingFine()) {
@@ -371,9 +370,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
         }
         return null;
       }
-      // System.out.println("Vector " + i + ":" + partialSol);
       timesEquals(u_i, 1 / len_u_i);
-      ret.setCol(i, new Vector(u_i));
+      ret.setCol(i, u_i);
     }
     return ret;
   }

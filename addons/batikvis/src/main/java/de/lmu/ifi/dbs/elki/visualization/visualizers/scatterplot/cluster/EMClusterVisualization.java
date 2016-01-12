@@ -23,6 +23,15 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.normalize;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plus;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -42,8 +51,6 @@ import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -214,7 +221,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
         double[][] pc = new double[eps.size()][];
         for(int i = 0; i < eps.size(); i++) {
           EigenPair ep = eps.getEigenPair(i);
-          Vector sev = ep.getEigenvector().times(Math.sqrt(ep.getEigenvalue()));
+          double[] sev = times(ep.getEigenvector(), Math.sqrt(ep.getEigenvalue()));
           pc[i] = proj.fastProjectRelativeDataToRenderSpace(sev);
         }
         if(drawStyle != 0 || eps.size() == 2) {

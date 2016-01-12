@@ -23,6 +23,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.squareSum;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.ERiC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -48,8 +52,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -212,7 +214,7 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      double[] v1_minus_v2 = VMath.minusEquals(v1.toArray(), v2.toArray());
+      double[] v1_minus_v2 = minusEquals(v1.toArray(), v2.toArray());
       return MathUtil.mahalanobisDistance(pca1.similarityMatrix().getArrayRef(), v1_minus_v2) <= settings.tau && MathUtil.mahalanobisDistance(pca2.similarityMatrix().getArrayRef(), v1_minus_v2) <= settings.tau;
     }
 
@@ -239,7 +241,7 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      double[] v1_minus_v2 = VMath.minusEquals(v1.toArray(), v2.toArray());
+      double[] v1_minus_v2 = minusEquals(v1.toArray(), v2.toArray());
       if(MathUtil.mahalanobisDistance(pca1.similarityMatrix().getArrayRef(), v1_minus_v2) > settings.tau) {
         return false;
       }
@@ -263,10 +265,10 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
       Matrix m1_czech = pca1.dissimilarityMatrix();
       Matrix v2_strong = pca2.adapatedStrongEigenvectors();
       for(int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
-        Vector v2_i = v2_strong.getCol(i);
+        double[] v2_i = v2_strong.getCol(i);
         // check, if distance of v2_i to the space of pca_1 > delta
         // (i.e., if v2_i spans up a new dimension)
-        double distsq = v2_i.transposeTimes(v2_i) - v2_i.transposeTimesTimes(m1_czech, v2_i);
+        double distsq = squareSum(v2_i) - transposeTimesTimes(v2_i, m1_czech.getArrayRef(), v2_i);
 
         // if so, return false
         if(distsq > deltasq) {

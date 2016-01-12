@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
@@ -202,9 +202,9 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
     // return p.minus(centroid).projection(weakEigenvectors).euclideanNorm(0);
     // V_affin = V + a
     // dist(p, V_affin) = d(p-a, V) = ||p - a - proj_V(p-a) ||
-    double[] p_minus_a = VMath.minus(p, centroid);
-    double[] proj = VMath.project(p_minus_a, strongEigenvectors.getArrayRef());
-    return VMath.euclideanLength(VMath.minusEquals(p_minus_a, proj));
+    double[] p_minus_a = minus(p, centroid);
+    double[] proj = project(p_minus_a, strongEigenvectors.getArrayRef());
+    return euclideanLength(minusEquals(p_minus_a, proj));
   }
 
   /**
@@ -214,7 +214,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public Vector errorVector(V p) {
-    return new Vector(VMath.project(VMath.minusEquals(p.toArray(), centroid), weakEigenvectors.getArrayRef()));
+    return new Vector(project(minusEquals(p.toArray(), centroid), weakEigenvectors.getArrayRef()));
   }
 
   /**
@@ -224,11 +224,11 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the data projections
    */
   public Matrix dataProjections(V p) {
-    double[] centered = VMath.minusEquals(p.toArray(), centroid);
+    double[] centered = minusEquals(p.toArray(), centroid);
     Matrix sum = new Matrix(p.getDimensionality(), strongEigenvectors.getColumnDimensionality());
     for(int i = 0; i < strongEigenvectors.getColumnDimensionality(); i++) {
-      Vector v_i = strongEigenvectors.getCol(i);
-      VMath.timesEquals(v_i.getArrayRef(), VMath.transposeTimes(centered, v_i.getArrayRef()));
+      double[] v_i = strongEigenvectors.getCol(i);
+      timesEquals(v_i, transposeTimes(centered, v_i));
       sum.setCol(i, v_i);
     }
     return sum;
@@ -241,7 +241,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public Vector dataVector(V p) {
-    return new Vector(VMath.project(VMath.minusEquals(p.toArray(), centroid), strongEigenvectors.getArrayRef()));
+    return new Vector(project(minusEquals(p.toArray(), centroid), strongEigenvectors.getArrayRef()));
   }
 
   /**

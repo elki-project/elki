@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -126,7 +125,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
    */
   public OutlierResult run(Relation<P> spatial, Relation<? extends NumberVector> relation) {
     DistanceQuery<P> distFunc = getDistanceFunction().instantiate(spatial);
-    WritableDataStore<Vector> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
+    WritableDataStore<double[]> similarityVectors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, double[].class);
     WritableDataStore<DBIDs> neighbors = DataStoreUtil.makeStorage(spatial.getDBIDs(), DataStoreFactory.HINT_TEMP, DBIDs.class);
 
     // Make a static IDs array for matrix column indexing
@@ -198,7 +197,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
       int i = 0;
       for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
         // Note: matrix times ith unit vector = ith column
-        Vector sim = E.getCol(i);
+        double[] sim = E.getCol(i);
         similarityVectors.put(id, sim);
       }
     }

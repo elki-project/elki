@@ -65,7 +65,7 @@ public class SortedEigenPairs {
     this.eigenPairs = new EigenPair[eigenvalues.length];
     for(int i = 0; i < eigenvalues.length; i++) {
       double e = java.lang.Math.abs(eigenvalues[i]);
-      Vector v = eigenvectors.getCol(i);
+      double[] v = eigenvectors.getCol(i);
       eigenPairs[i] = new EigenPair(v, e);
     }
 

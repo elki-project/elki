@@ -37,7 +37,7 @@ public class EigenPair implements Comparable<EigenPair> {
   /**
    * The eigenvector as a matrix.
    */
-  private Vector eigenvector;
+  private double[] eigenvector;
 
   /**
    * The corresponding eigenvalue.
@@ -50,7 +50,7 @@ public class EigenPair implements Comparable<EigenPair> {
    * @param eigenvector the eigenvector as a matrix
    * @param eigenvalue the corresponding eigenvalue
    */
-  public EigenPair(Vector eigenvector, double eigenvalue) {
+  public EigenPair(double[] eigenvector, double eigenvalue) {
     this.eigenvalue = eigenvalue;
     this.eigenvector = eigenvector;
   }
@@ -81,7 +81,7 @@ public class EigenPair implements Comparable<EigenPair> {
    * 
    * @return the eigenvector
    */
-  public Vector getEigenvector() {
+  public double[] getEigenvector() {
     return eigenvector;
   }
 

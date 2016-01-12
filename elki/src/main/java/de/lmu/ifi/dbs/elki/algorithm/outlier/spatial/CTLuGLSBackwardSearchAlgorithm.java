@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -242,7 +243,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     double worstscore = Double.NEGATIVE_INFINITY;
     int i = 0;
     for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
-      double err = E.getRow(i).squaredEuclideanLength();
+      double err = VMath.squareSum(E.getRow(i));
       // double err = Math.abs(E.get(i, 0));
       if(err > worstscore) {
         worstscore = err;

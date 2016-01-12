@@ -587,9 +587,8 @@ public class Matrix {
    * @param i the index of the row to be returned
    * @return the <code>i</code>th row of this matrix
    */
-  public final Vector getRow(final int i) {
-    double[] row = elements[i].clone();
-    return new Vector(row);
+  public final double[] getRow(final int i) {
+    return elements[i].clone();
   }
 
   /**
@@ -598,11 +597,11 @@ public class Matrix {
    * @param j the index of the column to be set
    * @param row the value of the column to be set
    */
-  public final void setRow(final int j, final Vector row) {
-    if(row.elements.length != columndimension) {
+  public final void setRow(final int j, final double[] row) {
+    if(row.length != columndimension) {
       throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
-    System.arraycopy(row.elements, 0, elements[j], 0, columndimension);
+    System.arraycopy(row, 0, elements[j], 0, columndimension);
   }
 
   /**
@@ -611,10 +610,10 @@ public class Matrix {
    * @param j the index of the column to be returned
    * @return the <code>j</code>th column of this matrix
    */
-  public final Vector getCol(final int j) {
-    final Vector v = new Vector(elements.length);
+  public final double[] getCol(final int j) {
+    final double[] v = new double[elements.length];
     for(int i = 0; i < elements.length; i++) {
-      v.elements[i] = elements[i][j];
+      v[i] = elements[i][j];
     }
     return v;
   }
@@ -625,12 +624,12 @@ public class Matrix {
    * @param j the index of the column to be set
    * @param column the value of the column to be set
    */
-  public final void setCol(final int j, final Vector column) {
-    if(column.elements.length != elements.length) {
+  public final void setCol(final int j, final double[] column) {
+    if(column.length != elements.length) {
       throw new IllegalArgumentException(ERR_MATRIX_DIMENSIONS);
     }
     for(int i = 0; i < elements.length; i++) {
-      elements[i][j] = column.elements[i];
+      elements[i][j] = column[i];
     }
   }
 
@@ -1350,14 +1349,14 @@ public class Matrix {
 
     // FIXME: optimize - excess copying!
     for(int i = 1; i < columndimension; i++) {
-      final Vector u_i = getCol(i);
-      final Vector sum = new Vector(elements.length);
+      final double[] u_i = getCol(i);
+      final double[] sum = new double[elements.length];
       for(int j = 0; j < i; j++) {
-        final Vector v_j = v.getCol(j);
-        double scalar = u_i.transposeTimes(v_j) / v_j.transposeTimes(v_j);
-        sum.plusTimesEquals(v_j, scalar);
+        final double[] v_j = v.getCol(j);
+        double scalar = VMath.transposeTimes(u_i, v_j) / VMath.squareSum(v_j);
+        VMath.plusTimesEquals(sum, v_j, scalar);
       }
-      final Vector v_i = u_i.minus(sum);
+      final double[] v_i = VMath.minus(u_i, sum);
       v.setCol(i, v_i);
     }
 

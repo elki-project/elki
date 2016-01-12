@@ -23,13 +23,15 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.euclideanLength;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -83,8 +85,8 @@ public class NormalizingEigenPairFilter implements EigenPairFilter {
    * 
    */
   private void normalizeEigenPair(final EigenPair eigenPair) {
-    final Vector eigenvector = eigenPair.getEigenvector();
-    final double scaling = 1.0 / Math.sqrt(eigenPair.getEigenvalue()) * eigenvector.euclideanLength();
-    eigenvector.timesEquals(scaling);
+    final double[] eigenvector = eigenPair.getEigenvector();
+    final double scaling = 1.0 / Math.sqrt(eigenPair.getEigenvalue()) * euclideanLength(eigenvector);
+    timesEquals(eigenvector, scaling);
   }
 }

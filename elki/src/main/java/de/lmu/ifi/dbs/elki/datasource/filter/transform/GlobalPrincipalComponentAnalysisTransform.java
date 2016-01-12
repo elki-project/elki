@@ -110,7 +110,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
 
   @Override
   protected boolean prepareStart(SimpleTypeInformation<O> in) {
-    if (!(in instanceof VectorFieldTypeInformation)) {
+    if(!(in instanceof VectorFieldTypeInformation)) {
       throw new AbortException("PCA can only applied to fixed dimensionality vectors");
     }
     dim = ((VectorFieldTypeInformation<?>) in).getDimensionality();
@@ -130,31 +130,32 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
     SortedEigenPairs eps = pcares.getEigenPairs();
     covmat = null;
 
-    if (filter == null) {
+    if(filter == null) {
       proj = new double[dim][dim];
-      for (int d = 0; d < dim; d++) {
+      for(int d = 0; d < dim; d++) {
         EigenPair ep = eps.getEigenPair(d);
-        double[] ev = ep.getEigenvector().getArrayRef();
-        double eval = Math.sqrt(ep.getEigenvalue());
+        double[] ev = ep.getEigenvector();
+        double mult = 1. / Math.sqrt(ep.getEigenvalue());
         // Fill weighted and transposed:
-        for (int i = 0; i < dim; i++) {
-          proj[d][i] = ev[i] / eval;
+        for(int i = 0; i < dim; i++) {
+          proj[d][i] = ev[i] * mult;
         }
       }
-    } else {
+    }
+    else {
       List<EigenPair> axes = filter.filter(eps).getStrongEigenPairs();
       final int pdim = axes.size(); // Projection dimensionality
-      if (LOG.isVerbose()) {
+      if(LOG.isVerbose()) {
         LOG.verbose("Reducing dimensionality from " + dim + " to " + pdim + " via PCA.");
       }
       proj = new double[pdim][dim];
-      for (int d = 0; d < pdim; d++) {
+      for(int d = 0; d < pdim; d++) {
         EigenPair ep = axes.get(d);
-        double[] ev = ep.getEigenvector().getArrayRef();
-        double eval = Math.sqrt(ep.getEigenvalue());
+        double[] ev = ep.getEigenvector();
+        double mult = 1. / Math.sqrt(ep.getEigenvalue());
         // Fill weighted and transposed:
-        for (int i = 0; i < dim; i++) {
-          proj[d][i] = ev[i] / eval;
+        for(int i = 0; i < dim; i++) {
+          proj[d][i] = ev[i] * mult;
         }
       }
     }
@@ -164,7 +165,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
   @Override
   protected O filterSingleObject(O obj) {
     // Shift by mean and copy
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       buf[i] = obj.doubleValue(i) - mean[i];
     }
     double[] p = VMath.times(proj, buf);
@@ -210,7 +211,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
       super.makeOptions(config);
 
       ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(FILTER_ID, EigenPairFilter.class, true);
-      if (config.grab(filterP)) {
+      if(config.grab(filterP)) {
         filter = filterP.instantiateClass(config);
       }
     }

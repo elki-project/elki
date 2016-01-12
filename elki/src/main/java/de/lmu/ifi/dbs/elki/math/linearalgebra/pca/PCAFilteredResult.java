@@ -104,7 +104,7 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
   public PCAFilteredResult(SortedEigenPairs eigenPairs, FilteredEigenPairs filteredEigenPairs, double big, double small) {
     super(eigenPairs);
 
-    int dim = eigenPairs.getEigenPair(0).getEigenvector().getDimensionality();
+    int dim = eigenPairs.getEigenPair(0).getEigenvector().length;
 
     double sumStrongEigenvalues = 0;
     double sumWeakEigenvalues = 0;

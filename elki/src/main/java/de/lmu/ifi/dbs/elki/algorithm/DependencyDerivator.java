@@ -42,7 +42,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
@@ -237,7 +236,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
       // +1 == + B.getColumnDimensionality()
       Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(), transposedWeakEigenvectors.getColumnDimensionality() + 1);
       gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimensionality() - 1, 0, transposedWeakEigenvectors.getColumnDimensionality() - 1, transposedWeakEigenvectors);
-      gaussJordan.setCol(transposedWeakEigenvectors.getColumnDimensionality(), new Vector(b));
+      gaussJordan.setCol(transposedWeakEigenvectors.getColumnDimensionality(), b);
 
       if(LOG.isDebuggingFiner()) {
         LOG.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan, nf));
