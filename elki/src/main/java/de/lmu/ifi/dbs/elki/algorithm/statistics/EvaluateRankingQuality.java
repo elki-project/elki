@@ -23,9 +23,10 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.mahalanobisDistance;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
@@ -38,10 +39,11 @@ import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -49,11 +51,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.MeanVarianceStaticHistogram;
@@ -138,21 +138,21 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
 
     // sort neighbors
     for(Cluster<?> clus : split) {
-      ArrayList<DoubleDBIDPair> cmem = new ArrayList<>(clus.size());
+      ModifiableDoubleDBIDList cmem = DBIDUtil.newDistanceDBIDList(clus.size());
       double[] av = averages.get(clus);
       Matrix covm = covmats.get(clus);
 
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
-        double d = MathUtil.mahalanobisDistance(covm.getArrayRef(), minusEquals(relation.get(iter).toArray(), av));
-        cmem.add(DBIDUtil.newPair(d, iter));
+        double d = mahalanobisDistance(covm.getArrayRef(), relation.get(iter).toArray(), av);
+        cmem.add(d, iter);
       }
-      Collections.sort(cmem);
+      cmem.sort();
 
-      for(int ind = 0; ind < cmem.size(); ind++) {
-        KNNList knn = knnQuery.getKNNForDBID(cmem.get(ind), relation.size());
+      for(DBIDArrayIter it = cmem.iter(); it.valid(); it.advance()) {
+        KNNList knn = knnQuery.getKNNForDBID(it, relation.size());
         double result = new ROCEvaluation().evaluate(clus, knn);
 
-        hist.put(((double) ind) / clus.size(), result);
+        hist.put(((double) it.getOffset()) / clus.size(), result);
 
         LOG.incrementProcessed(rocloop);
       }

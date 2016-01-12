@@ -55,8 +55,7 @@ public class MatrixWeightedDistanceFunction extends AbstractNumberVectorDistance
   @Override
   public double distance(NumberVector o1, NumberVector o2) {
     dimensionality(o1, o2, weightMatrix.getColumnDimensionality());
-    double[] o1_minus_o2 = VMath.minusEquals(o1.toArray(), o2.toArray());
-    return MathUtil.mahalanobisDistance(weightMatrix.getArrayRef(), o1_minus_o2);
+    return VMath.mahalanobisDistance(weightMatrix.getArrayRef(), o1.toArray(), o2.toArray());
   }
 
   @Override

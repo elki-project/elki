@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.mahalanobisDistance;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.squareSum;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -214,8 +213,8 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      double[] v1_minus_v2 = minusEquals(v1.toArray(), v2.toArray());
-      return MathUtil.mahalanobisDistance(pca1.similarityMatrix().getArrayRef(), v1_minus_v2) <= settings.tau && MathUtil.mahalanobisDistance(pca2.similarityMatrix().getArrayRef(), v1_minus_v2) <= settings.tau;
+      return mahalanobisDistance(pca1.similarityMatrix().getArrayRef(), v1.toArray(), v2.toArray()) <= settings.tau //
+      && mahalanobisDistance(pca2.similarityMatrix().getArrayRef(), v1.toArray(), v2.toArray()) <= settings.tau;
     }
 
     /**
@@ -241,12 +240,11 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      double[] v1_minus_v2 = minusEquals(v1.toArray(), v2.toArray());
-      if(MathUtil.mahalanobisDistance(pca1.similarityMatrix().getArrayRef(), v1_minus_v2) > settings.tau) {
+      if(mahalanobisDistance(pca1.similarityMatrix().getArrayRef(), v1.toArray(), v2.toArray()) > settings.tau) {
         return false;
       }
       if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
-        return MathUtil.mahalanobisDistance(pca2.similarityMatrix().getArrayRef(), v1_minus_v2) <= settings.tau;
+        return mahalanobisDistance(pca2.similarityMatrix().getArrayRef(), v1.toArray(), v2.toArray()) <= settings.tau;
       }
       return true;
     }

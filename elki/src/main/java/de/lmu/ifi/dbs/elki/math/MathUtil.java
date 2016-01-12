@@ -27,7 +27,6 @@ import java.math.BigInteger;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
  * A collection of math related utility functions.
@@ -236,21 +235,6 @@ public final class MathUtil {
     b = b / m;
     c = c / m;
     return m * Math.sqrt(a * a + b * b + c * c);
-  }
-
-  /**
-   * Compute the Mahalanobis distance using the given weight matrix.
-   *
-   * @param weightMatrix Weight Matrix
-   * @param o1_minus_o2 Delta vector
-   * @return Mahalanobis distance
-   */
-  public static double mahalanobisDistance(double[][] weightMatrix, double[] o1_minus_o2) {
-    double sqrDist = VMath.transposeTimesTimes(o1_minus_o2, weightMatrix, o1_minus_o2);
-    if(sqrDist < 0 && Math.abs(sqrDist) < 0.000000001) {
-      sqrDist = Math.abs(sqrDist);
-    }
-    return Math.sqrt(sqrDist);
   }
 
   /**
