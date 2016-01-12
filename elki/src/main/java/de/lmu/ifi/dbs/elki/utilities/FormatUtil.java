@@ -321,22 +321,33 @@ public final class FormatUtil {
   /**
    * Formats the int array a for printing purposes.
    * 
+   * @param buf The buffer to serialize to
    * @param a the int array to be formatted
-   * @param sep the separator between the single values of the float array, e.g.
-   *        ','
+   * @param sep the separator between the single values of the array, e.g. ','
+   * @return The output buffer {@code buf}
+   */
+  public static StringBuilder formatTo(StringBuilder buf, int[] a, String sep) {
+    if(a.length == 0) {
+      return buf;
+    }
+    buf.append(a[0]);
+    for(int i = 1; i < a.length; i++) {
+      buf.append(sep);
+      buf.append(a[i]);
+    }
+    return buf;
+  }
+
+  /**
+   * Formats the int array a for printing purposes.
+   * 
+   * @param a the int array to be formatted
+   * @param sep the separator between the single values of the array, e.g. ','
    * @return a String representing the int array a
    */
   public static String format(int[] a, String sep) {
-    if(a.length == 0) {
-      return "";
-    }
-    StringBuilder buffer = new StringBuilder();
-    buffer.append(a[0]);
-    for(int i = 1; i < a.length; i++) {
-      buffer.append(sep);
-      buffer.append(a[i]);
-    }
-    return buffer.toString();
+    return (a == null) ? "null" : (a.length == 0) ? "" : //
+    formatTo(new StringBuilder(), a, sep).toString();
   }
 
   /**
@@ -1302,8 +1313,8 @@ public final class FormatUtil {
    * Infinity pattern, with any capitalization
    */
   private static final char[] INFINITY_PATTERN = { //
-  'I', 'n', 'f', 'i', 'n', 'i', 't', 'y', //
-  'i', 'N', 'F', 'I', 'N', 'I', 'T', 'Y' };
+      'I', 'n', 'f', 'i', 'n', 'i', 't', 'y', //
+      'i', 'N', 'F', 'I', 'N', 'I', 'T', 'Y' };
 
   /** Length of pattern */
   private static final int INFINITY_LENGTH = INFINITY_PATTERN.length >> 1;
