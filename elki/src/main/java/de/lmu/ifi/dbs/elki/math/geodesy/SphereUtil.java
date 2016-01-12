@@ -87,8 +87,8 @@ public final class SphereUtil {
    * @return Distance on unit sphere
    */
   public static double cosineFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
-    return cosineFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1),//
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
+    return cosineFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
+    MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
   }
 
   /**
@@ -138,8 +138,8 @@ public final class SphereUtil {
    */
   @Reference(authors = "Sinnott, R. W.", title = "Virtues of the Haversine", booktitle = "Sky and telescope, 68-2, 1984")
   public static double haversineFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
-    return haversineFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1),//
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
+    return haversineFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
+    MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
   }
 
   /**
@@ -195,8 +195,8 @@ public final class SphereUtil {
    */
   @Reference(authors = "T. Vincenty", title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double sphericalVincentyFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
-    return sphericalVincentyFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1),//
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
+    return sphericalVincentyFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
+    MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
   }
 
   /**
@@ -256,7 +256,7 @@ public final class SphereUtil {
   @Reference(authors = "T. Vincenty", title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double ellipsoidVincentyFormulaDeg(double f, double lat1, double lon1, double lat2, double lon2) {
     return ellipsoidVincentyFormulaRad(f, MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
+    MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
   }
 
   /**
@@ -296,8 +296,9 @@ public final class SphereUtil {
     // Eqn (13) - initial value
     double lambda = dlon;
 
-    for (int i = 0;; i++) {
-      final double slon = Math.sin(lambda), clon = MathUtil.sinToCos(lambda, slon);
+    for(int i = 0;; i++) {
+      final double slon = Math.sin(lambda),
+          clon = MathUtil.sinToCos(lambda, slon);
 
       // Eqn (14) - \sin \sigma
       final double term1 = cu2 * slon, term2 = cu1 * su2 - su1 * cu2 * clon;
@@ -308,7 +309,7 @@ public final class SphereUtil {
       final double sigma = Math.atan2(ssig, csig);
 
       // Two identical points?
-      if (!(ssig > 0)) {
+      if(!(ssig > 0)) {
         return 0.;
       }
       // Eqn (17) - \sin \alpha, and this way \cos^2 \alpha
@@ -325,7 +326,7 @@ public final class SphereUtil {
       lambda = dlon + (1.0 - cc) * f * salp * //
       (sigma + cc * ssig * (ctwosigm + cc * csig * (-1.0 + 2.0 * c2twosigm)));
       // Check for convergence:
-      if (Math.abs(prevlambda - lambda) < PRECISION || i >= MAX_ITER) {
+      if(Math.abs(prevlambda - lambda) < PRECISION || i >= MAX_ITER) {
         // TODO: what is the proper result to return on MAX_ITER (antipodal
         // points)?
         // Definition of u^2, rewritten to use second eccentricity.
@@ -357,9 +358,9 @@ public final class SphereUtil {
    * @return Cross-track distance in km. May be negative - this gives the side.
    */
   public static double crossTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ) {
-    return crossTrackDistanceRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1),//
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2),//
-        MathUtil.deg2rad(latQ), MathUtil.deg2rad(lonQ));
+    return crossTrackDistanceRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
+    MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2), //
+    MathUtil.deg2rad(latQ), MathUtil.deg2rad(lonQ));
   }
 
   /**
@@ -386,8 +387,10 @@ public final class SphereUtil {
 
     // / Compute the course
     // y = sin(dlon) * cos(lat2)
-    final double sdlon12 = Math.sin(dlon12), cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
-    final double sdlon1Q = Math.sin(dlon1Q), cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
+    final double sdlon12 = Math.sin(dlon12),
+        cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
+    final double sdlon1Q = Math.sin(dlon1Q),
+        cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
 
     final double yE = sdlon12 * clat2;
     final double yQ = sdlon1Q * clatQ;
@@ -418,10 +421,10 @@ public final class SphereUtil {
    *         the side.
    */
   public static double crossTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q) {
-    return crossTrackDistanceRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1),//
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2),//
-        MathUtil.deg2rad(latQ), MathUtil.deg2rad(lonQ),//
-        dist1Q);
+    return crossTrackDistanceRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
+    MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2), //
+    MathUtil.deg2rad(latQ), MathUtil.deg2rad(lonQ), //
+    dist1Q);
   }
 
   /**
@@ -456,8 +459,10 @@ public final class SphereUtil {
 
     // Compute the course
     // y = sin(dlon) * cos(lat2)
-    final double sdlon12 = Math.sin(dlon12), cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
-    final double sdlon1Q = Math.sin(dlon1Q), cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
+    final double sdlon12 = Math.sin(dlon12),
+        cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
+    final double sdlon1Q = Math.sin(dlon1Q),
+        cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
     final double yE = sdlon12 * clat2;
     final double yQ = sdlon1Q * clatQ;
 
@@ -582,8 +587,7 @@ public final class SphereUtil {
    * <p>
    * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
    * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
-   * Advances in Spatial and Temporal Databases - 13th International Symposium,
-   * SSTD 2013, Munich, Germany
+   * 13th Int. Symposium on Advances in Spatial and Temporal Databases
    * </p>
    * 
    * @param plat Latitude of query point.
@@ -594,11 +598,14 @@ public final class SphereUtil {
    * @param rmaxlng Max longitude of rectangle.
    * @return Distance in radians.
    */
-  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
+  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", //
+  title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
+  booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
+  url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
   public static double latlngMinDistDeg(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
-    return latlngMinDistRad(MathUtil.deg2rad(plat), MathUtil.deg2rad(plng),//
-        MathUtil.deg2rad(rminlat), MathUtil.deg2rad(rminlng), //
-        MathUtil.deg2rad(rmaxlat), MathUtil.deg2rad(rmaxlng));
+    return latlngMinDistRad(MathUtil.deg2rad(plat), MathUtil.deg2rad(plng), //
+    MathUtil.deg2rad(rminlat), MathUtil.deg2rad(rminlng), //
+    MathUtil.deg2rad(rmaxlat), MathUtil.deg2rad(rmaxlng));
   }
 
   /**
@@ -615,8 +622,7 @@ public final class SphereUtil {
    * <p>
    * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
    * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
-   * Advances in Spatial and Temporal Databases - 13th International Symposium,
-   * SSTD 2013, Munich, Germany
+   * 13th Int. Symposium on Advances in Spatial and Temporal Databases
    * </p>
    * 
    * @param plat Latitude of query point.
@@ -627,25 +633,29 @@ public final class SphereUtil {
    * @param rmaxlng Max longitude of rectangle.
    * @return Distance on unit sphere.
    */
-  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
+  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", //
+  title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
+  booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
+  url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
   public static double latlngMinDistRad(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
 
     // Degenerate rectangles:
-    if ((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
+    if((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
       return haversineFormulaRad(rminlat, rminlng, plat, plng);
     }
 
     // The simplest case is when the query point is in the same "slice":
-    if (rminlng <= plng && plng <= rmaxlng) {
+    if(rminlng <= plng && plng <= rmaxlng) {
       // Inside rectangle:
-      if (rminlat <= plat && plat <= rmaxlat) {
+      if(rminlat <= plat && plat <= rmaxlat) {
         return 0;
       }
       // South:
-      if (plat < rminlat) {
+      if(plat < rminlat) {
         return rminlat - plat;
-      } else {
+      }
+      else {
         // plat > rmaxlat
         return plat - rmaxlat;
       }
@@ -653,54 +663,57 @@ public final class SphereUtil {
 
     // Determine whether going east or west is shorter.
     double lngE = rminlng - plng;
-    if (lngE < 0) {
+    if(lngE < 0) {
       lngE += MathUtil.TWOPI;
     }
     double lngW = rmaxlng - plng; // we keep this negative!
-    if (lngW > 0) {
+    if(lngW > 0) {
       lngW -= MathUtil.TWOPI;
     }
 
     // East, to min edge:
-    if (lngE <= -lngW) {
+    if(lngE <= -lngW) {
       final double clngD = Math.cos(lngE);
       final double tlatQ = Math.tan(plat);
-      if (lngE > MathUtil.HALFPI) {
+      if(lngE > MathUtil.HALFPI) {
         final double tlatm = Math.tan((rmaxlat + rminlat) * .5);
-        if (tlatQ >= tlatm * clngD) {
+        if(tlatQ >= tlatm * clngD) {
           return haversineFormulaRad(plat, plng, rmaxlat, rminlng);
-        } else {
+        }
+        else {
           return haversineFormulaRad(plat, plng, rminlat, rminlng);
         }
       }
       final double tlatN = Math.tan(rmaxlat);
-      if (tlatQ >= tlatN * clngD) { // North corner
+      if(tlatQ >= tlatN * clngD) { // North corner
         return haversineFormulaRad(plat, plng, rmaxlat, rminlng);
       }
       final double tlatS = Math.tan(rminlat);
-      if (tlatQ <= tlatS * clngD) { // South corner
+      if(tlatQ <= tlatS * clngD) { // South corner
         return haversineFormulaRad(plat, plng, rminlat, rminlng);
       }
       // Cross-track-distance to longitude line.
       final double slngD = MathUtil.cosToSin(lngE, clngD);
       return Math.asin(Math.cos(plat) * slngD);
-    } else { // West, to max edge:
+    }
+    else { // West, to max edge:
       final double clngD = Math.cos(lngW);
       final double tlatQ = Math.tan(plat);
-      if (-lngW > MathUtil.HALFPI) {
+      if(-lngW > MathUtil.HALFPI) {
         final double tlatm = Math.tan((rmaxlat + rminlat) * .5);
-        if (tlatQ >= tlatm * clngD) {
+        if(tlatQ >= tlatm * clngD) {
           return haversineFormulaRad(plat, plng, rmaxlat, rmaxlng);
-        } else {
+        }
+        else {
           return haversineFormulaRad(plat, plng, rminlat, rmaxlng);
         }
       }
       final double tlatN = Math.tan(rmaxlat);
-      if (tlatQ >= tlatN * clngD) { // North corner
+      if(tlatQ >= tlatN * clngD) { // North corner
         return haversineFormulaRad(plat, plng, rmaxlat, rmaxlng);
       }
       final double tlatS = Math.tan(rminlat);
-      if (tlatQ <= tlatS * clngD) { // South corner
+      if(tlatQ <= tlatS * clngD) { // South corner
         return haversineFormulaRad(plat, plng, rminlat, rmaxlng);
       }
       // Cross-track-distance to longitude line.
@@ -725,8 +738,7 @@ public final class SphereUtil {
    * <p>
    * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
    * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
-   * Advances in Spatial and Temporal Databases - 13th International Symposium,
-   * SSTD 2013, Munich, Germany
+   * 13th Int. Symposium on Advances in Spatial and Temporal Databases
    * </p>
    * 
    * @param plat Latitude of query point.
@@ -737,25 +749,29 @@ public final class SphereUtil {
    * @param rmaxlng Max longitude of rectangle.
    * @return Distance in radians
    */
-  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
+  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", //
+  title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
+  booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
+  url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
   public static double latlngMinDistRadFull(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
     // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
 
     // Degenerate rectangles:
-    if ((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
+    if((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
       return haversineFormulaRad(rminlat, rminlng, plat, plng);
     }
 
     // The simplest case is when the query point is in the same "slice":
-    if (rminlng <= plng && plng <= rmaxlng) {
+    if(rminlng <= plng && plng <= rmaxlng) {
       // Inside rectangle:
-      if (rminlat <= plat && plat <= rmaxlat) {
+      if(rminlat <= plat && plat <= rmaxlat) {
         return 0;
       }
       // South:
-      if (plat < rminlat) {
+      if(plat < rminlat) {
         return rminlat - plat;
-      } else {
+      }
+      else {
         // plat > rmaxlat
         return plat - rmaxlat;
       }
@@ -763,21 +779,23 @@ public final class SphereUtil {
 
     // Determine whether going east or west is shorter.
     double lngE = rminlng - plng;
-    if (lngE < 0) {
+    if(lngE < 0) {
       lngE += MathUtil.TWOPI;
     }
     double lngW = rmaxlng - plng; // we keep this negative!
-    if (lngW > 0) {
+    if(lngW > 0) {
       lngW -= MathUtil.TWOPI;
     }
 
     // Compute sine and cosine values we will certainly need below:
     final double slatQ = Math.sin(plat), clatQ = MathUtil.sinToCos(plat, slatQ);
-    final double slatN = Math.sin(rmaxlat), clatN = MathUtil.sinToCos(rmaxlat, slatN);
-    final double slatS = Math.sin(rminlat), clatS = MathUtil.sinToCos(rminlat, slatS);
+    final double slatN = Math.sin(rmaxlat),
+        clatN = MathUtil.sinToCos(rmaxlat, slatN);
+    final double slatS = Math.sin(rminlat),
+        clatS = MathUtil.sinToCos(rminlat, slatS);
 
     // East, to min edge:
-    if (lngE <= -lngW) {
+    if(lngE <= -lngW) {
       final double slngD = Math.sin(lngE);
       final double clngD = MathUtil.sinToCos(lngE, slngD);
 
@@ -789,8 +807,8 @@ public final class SphereUtil {
       // Math.atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
       // Bearing from north
       final double bn = Math.atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
-      if (bs < MathUtil.HALFPI) {
-        if (bn > MathUtil.HALFPI) {
+      if(bs < MathUtil.HALFPI) {
+        if(bn > MathUtil.HALFPI) {
           // Radians from south pole = abs(ATD)
           final double radFromS = -MathUtil.HALFPI - plat;
 
@@ -798,14 +816,15 @@ public final class SphereUtil {
           return Math.asin(Math.sin(radFromS) * -slngD);
         }
       }
-      if (bs - MathUtil.HALFPI < MathUtil.HALFPI - bn) {
+      if(bs - MathUtil.HALFPI < MathUtil.HALFPI - bn) {
         // Haversine to north corner.
         final double slatN2 = Math.sin((plat - rmaxlat) * .5);
         final double slon = Math.sin(lngE * .5);
         final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
         final double distN = 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
         return distN;
-      } else {
+      }
+      else {
         // Haversine to south corner.
         final double slatS2 = Math.sin((plat - rminlat) * .5);
         final double slon = Math.sin(lngE * .5);
@@ -813,7 +832,8 @@ public final class SphereUtil {
         final double distS = 2 * Math.atan2(Math.sqrt(aS), Math.sqrt(1 - aS));
         return distS;
       }
-    } else { // West, to max edge
+    }
+    else { // West, to max edge
       final double slngD = Math.sin(lngW);
       final double clngD = MathUtil.sinToCos(lngW, slngD);
 
@@ -825,22 +845,23 @@ public final class SphereUtil {
       // Math.atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
       // Bearing from north
       final double bn = Math.atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
-      if (bs > -MathUtil.HALFPI) {
-        if (bn < -MathUtil.HALFPI) {
+      if(bs > -MathUtil.HALFPI) {
+        if(bn < -MathUtil.HALFPI) {
           // Radians from south = abs(ATD) = distance from pole
           final double radFromS = -MathUtil.HALFPI - plat;
           // Cross-track-distance to longitude line.
           return Math.asin(Math.sin(radFromS) * slngD);
         }
       }
-      if (-MathUtil.HALFPI - bs < bn + MathUtil.HALFPI) {
+      if(-MathUtil.HALFPI - bs < bn + MathUtil.HALFPI) {
         // Haversine to north corner.
         final double slatN2 = Math.sin((plat - rmaxlat) * .5);
         final double slon = Math.sin(lngW * .5);
         final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
         final double distN = 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
         return distN;
-      } else {
+      }
+      else {
         // Haversine to south corner.
         final double slatS2 = Math.sin((plat - rminlat) * .5);
         final double slon = Math.sin(lngW * .5);

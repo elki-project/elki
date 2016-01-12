@@ -126,20 +126,6 @@ public class EDRDistanceFunction extends DTWDistanceFunction {
   }
 
   @Override
-  protected void firstRow(double[] buf, int band, NumberVector v1, NumberVector v2, int dim2) {
-    // First cell:
-    final double val1 = v1.doubleValue(0);
-    buf[0] = delta(val1, v2.doubleValue(0));
-
-    // Width of valid area:
-    final int w = (band >= dim2) ? dim2 - 1 : band;
-    // Fill remaining part of buffer:
-    for(int j = 1; j <= w; j++) {
-      buf[j] = buf[j - 1] + delta(val1, v2.doubleValue(j));
-    }
-  }
-
-  @Override
   protected double delta(double val1, double val2) {
     return (Math.abs(val1 - val2) < delta) ? 0. : 1.;
   }

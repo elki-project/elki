@@ -42,7 +42,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Title("Color histogram intersection distance")
 @Description("Distance function for color histograms that emphasizes 'strong' bins.")
-@Reference(authors = "M. J. Swain, D. H. Ballard", title = "Color Indexing", booktitle = "International Journal of Computer Vision, 7(1), 32, 1991")
+@Reference(authors = "M. J. Swain, D. H. Ballard", //
+title = "Color Indexing", //
+booktitle = "International Journal of Computer Vision, 7(1), 32, 1991")
 public class HistogramIntersectionDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance
@@ -63,7 +65,7 @@ public class HistogramIntersectionDistanceFunction extends AbstractSpatialDistan
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double agg = 0., norm1 = 0., norm2 = 0.;
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       final double val1 = v1.doubleValue(i);
       final double val2 = v2.doubleValue(i);
       agg += Math.min(val1, val2);
@@ -77,7 +79,7 @@ public class HistogramIntersectionDistanceFunction extends AbstractSpatialDistan
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2);
     double agg = 0., norm1 = 0, norm2 = 0.;
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       final double min1 = mbr1.getMin(i);
       final double max1 = mbr1.getMax(i);
       final double min2 = mbr2.getMin(i);
@@ -96,7 +98,7 @@ public class HistogramIntersectionDistanceFunction extends AbstractSpatialDistan
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
     return this.getClass().equals(obj.getClass());

@@ -47,7 +47,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "S. Kullback", title = "Information theory and statistics", booktitle = "Information theory and statistics, Courier Dover Publications, 1997.")
+@Reference(authors = "S. Kullback", //
+title = "Information theory and statistics", //
+booktitle = "Information theory and statistics, Courier Dover Publications, 1997.")
 @Alias("kl")
 public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
@@ -69,12 +71,12 @@ public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends Abstrac
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      if (yd <= 0.) {
+      if(yd <= 0.) {
         return Double.POSITIVE_INFINITY;
       }
-      if (xd > 0.) {
+      if(xd > 0.) {
         agg += xd * Math.log(xd / yd);
       }
     }
@@ -93,13 +95,13 @@ public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends Abstrac
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (obj == this) {
+    if(obj == this) {
       return true;
     }
-    if (this.getClass().equals(obj.getClass())) {
+    if(this.getClass().equals(obj.getClass())) {
       return true;
     }
     return super.equals(obj);

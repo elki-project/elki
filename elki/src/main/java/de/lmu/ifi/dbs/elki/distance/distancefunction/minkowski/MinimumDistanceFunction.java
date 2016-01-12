@@ -58,9 +58,7 @@ public class MinimumDistanceFunction extends AbstractSpatialNorm {
     for(int d = 0; d < dim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double val = (xd >= yd) ? xd - yd : yd - xd;
-      if(val < agg) {
-        agg = val;
-      }
+      agg = val > agg ? agg : val;
     }
     return agg;
   }
@@ -72,9 +70,7 @@ public class MinimumDistanceFunction extends AbstractSpatialNorm {
     for(int d = 0; d < dim; d++) {
       final double xd = v.doubleValue(d);
       final double val = (xd >= 0.) ? xd : -xd;
-      if(val < agg) {
-        agg = val;
-      }
+      agg = val > agg ? agg : val;
     }
     return agg;
   }
@@ -106,9 +102,7 @@ public class MinimumDistanceFunction extends AbstractSpatialNorm {
           return 0.;
         }
       }
-      if(diff < agg) {
-        agg = diff;
-      }
+      agg = diff > agg ? agg : diff;
     }
     return agg;
   }

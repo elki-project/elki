@@ -57,15 +57,6 @@ public class OnedimensionalDistanceFunction extends AbstractSpatialNorm implemen
     this.dim = dim;
   }
 
-  /**
-   * Computes the distance between two given DatabaseObjects according to this
-   * distance function.
-   * 
-   * @param v1 first DatabaseObject
-   * @param v2 second DatabaseObject
-   * @return the distance between two given DatabaseObjects according to this
-   *         distance function
-   */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     if(dim >= v1.getDimensionality() || dim >= v2.getDimensionality() || dim < 0) {

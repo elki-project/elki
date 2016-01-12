@@ -69,19 +69,13 @@ public class ArcCosineDistanceFunction extends AbstractSpatialDistanceFunction {
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     double d = Math.acos(VectorUtil.cosAngle(v1, v2));
-    if(d < 0) {
-      d = 0;
-    }
-    return d;
+    return (d > 0) ? d : 0;
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     double d = Math.acos(VectorUtil.minCosAngle(mbr1, mbr2));
-    if(d < 0) {
-      d = 0;
-    }
-    return d;
+    return (d > 0) ? d : 0;
   }
 
   @Override

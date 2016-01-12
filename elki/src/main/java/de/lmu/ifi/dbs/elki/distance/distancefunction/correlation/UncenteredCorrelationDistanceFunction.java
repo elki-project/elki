@@ -59,14 +59,39 @@ public class UncenteredCorrelationDistanceFunction extends AbstractNumberVectorD
    * @return the uncentered correlation coefficient for x and y
    */
   public static double uncenteredCorrelation(NumberVector x, NumberVector y) {
-    final int xdim = x.getDimensionality();
-    final int ydim = y.getDimensionality();
+    final int xdim = x.getDimensionality(), ydim = y.getDimensionality();
     if(xdim != ydim) {
       throw new IllegalArgumentException("Invalid arguments: number vectors differ in dimensionality.");
     }
     double sumXX = 0., sumYY = 0., sumXY = 0.;
     for(int i = 0; i < xdim; i++) {
       final double xv = x.doubleValue(i), yv = y.doubleValue(i);
+      sumXX += xv * xv;
+      sumYY += yv * yv;
+      sumXY += xv * yv;
+    }
+    // One or both series were constant:
+    if(!(sumXX > 0. && sumYY > 0.)) {
+      return (sumXX == sumYY) ? 1. : 0.;
+    }
+    return sumXY / Math.sqrt(sumXX * sumYY);
+  }
+
+  /**
+   * Compute the uncentered correlation of two vectors.
+   * 
+   * @param x first NumberVector
+   * @param y second NumberVector
+   * @return the uncentered correlation coefficient for x and y
+   */
+  public static double uncenteredCorrelation(double[] x, double[] y) {
+    final int xdim = x.length, ydim = y.length;
+    if(xdim != ydim) {
+      throw new IllegalArgumentException("Invalid arguments: number vectors differ in dimensionality.");
+    }
+    double sumXX = 0., sumYY = 0., sumXY = 0.;
+    for(int i = 0; i < xdim; i++) {
+      final double xv = x[i], yv = y[i];
       sumXX += xv * xv;
       sumYY += yv * yv;
       sumXY += xv * yv;

@@ -66,8 +66,8 @@ public class CASHTest extends AbstractSimpleAlgorithmTest implements JUnit4Test 
     // run CASH on database
     Clustering<Model> result = cash.run(db);
 
-    testFMeasure(db, result, 0.490551); // with hierarchical pairs: 0.64102
-    testClusterSizes(result, new int[] { 37, 71, 76, 442 });
+    testFMeasure(db, result, 0.50074); // with hierarchical pairs: 0.64102
+    testClusterSizes(result, new int[] { 18, 80, 252, 468 });
   }
 
   /**

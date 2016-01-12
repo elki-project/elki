@@ -85,7 +85,7 @@ public class JaccardSimilarityDistanceFunction<O extends FeatureVector<?>> exten
       Object v1 = o1.getValue(d), v2 = o2.getValue(d);
       final boolean n1 = isNull(v1), n2 = isNull(v2);
       if(v1 instanceof Double && Double.isNaN((Double) v1) //
-          || v2 instanceof Double && Double.isNaN((Double) v2)) {
+      || v2 instanceof Double && Double.isNaN((Double) v2)) {
         continue;
       }
       if(!n1 || !n2) {

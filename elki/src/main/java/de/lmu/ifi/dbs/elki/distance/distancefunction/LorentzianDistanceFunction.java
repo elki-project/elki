@@ -39,7 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "M.-M. Deza and E. Deza", title = "Dictionary of distances", booktitle = "Dictionary of distances")
+@Reference(authors = "M.-M. Deza and E. Deza", //
+title = "Dictionary of distances", //
+booktitle = "Dictionary of distances")
 public class LorentzianDistanceFunction extends AbstractSpatialNorm {
   /**
    * Static instance.
@@ -60,9 +62,9 @@ public class LorentzianDistanceFunction extends AbstractSpatialNorm {
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      agg += Math.log(1 + Math.abs(xd - yd));
+      agg += Math.log1p(Math.abs(xd - yd));
     }
     return agg;
   }
@@ -71,7 +73,7 @@ public class LorentzianDistanceFunction extends AbstractSpatialNorm {
   public double norm(NumberVector v1) {
     final int dim = v1.getDimensionality();
     double agg = 0.;
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       final double xi = v1.doubleValue(i);
       agg += Math.log(1. + Math.abs(xi));
     }
@@ -82,15 +84,17 @@ public class LorentzianDistanceFunction extends AbstractSpatialNorm {
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2);
     double agg = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
       final double diff;
-      if (max1 < min2) {
+      if(max1 < min2) {
         diff = min2 - max1;
-      } else if (min1 > max2) {
+      }
+      else if(min1 > max2) {
         diff = min1 - max2;
-      } else {
+      }
+      else {
         // Minimum difference is 0
         continue;
       }

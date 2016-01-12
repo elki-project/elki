@@ -40,8 +40,8 @@ public interface NumberVectorDistanceFunction<O> extends PrimitiveDistanceFuncti
    * Computes the distance between two given vectors according to this distance
    * function.
    *
-   * @param o1 first DatabaseObject
-   * @param o2 second DatabaseObject
+   * @param o1 first vector
+   * @param o2 second vector
    * @return the distance between two given vectors according to this distance
    *         function
    */

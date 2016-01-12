@@ -22,6 +22,9 @@ package de.lmu.ifi.dbs.elki.math;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+
 /**
  * Class to incrementally compute pearson correlation.
  * 
@@ -247,5 +250,240 @@ public class PearsonCorrelation {
     meanX = 0.;
     meanY = 0.;
     sumWe = 0.;
+  }
+
+  /**
+   * Compute the Pearson product-moment correlation coefficient for two
+   * FeatureVectors.
+   *
+   * @param x first FeatureVector
+   * @param y second FeatureVector
+   * @return the Pearson product-moment correlation coefficient for x and y
+   */
+  public static double coefficient(double[] x, double[] y) {
+    final int xdim = x.length;
+    final int ydim = y.length;
+    if(xdim != ydim) {
+      throw new IllegalArgumentException("Invalid arguments: arrays differ in length.");
+    }
+    // Inlined computation of Pearson correlation, to avoid allocating objects!
+    // This is a numerically stabilized version, avoiding sum-of-squares.
+    double sumXX = 0., sumYY = 0., sumXY = 0.;
+    double meanX = x[0], meanY = y[0];
+    int i = 1;
+    while(i < xdim) {
+      final double xv = x[i], yv = y[i];
+      // Delta to previous mean
+      final double deltaX = xv - meanX;
+      final double deltaY = yv - meanY;
+      // Increment count first
+      ++i;
+      // Update means
+      meanX += deltaX / i;
+      meanY += deltaY / i;
+      // Delta to new mean
+      final double neltaX = xv - meanX;
+      final double neltaY = yv - meanY;
+      // Update
+      sumXX += deltaX * neltaX;
+      sumYY += deltaY * neltaY;
+      // should equal deltaY * neltaX!
+      sumXY += deltaX * neltaY;
+    }
+    // One or both series were constant:
+    if(!(sumXX > 0. && sumYY > 0.)) {
+      return (sumXX == sumYY) ? 1. : 0.;
+    }
+    return sumXY / Math.sqrt(sumXX * sumYY);
+  }
+
+  /**
+   * Compute the Pearson product-moment correlation coefficient for two
+   * NumberVectors.
+   *
+   * @param x first NumberVector
+   * @param y second NumberVector
+   * @return the Pearson product-moment correlation coefficient for x and y
+   */
+  public static double coefficient(NumberVector x, NumberVector y) {
+    final int xdim = x.getDimensionality();
+    final int ydim = y.getDimensionality();
+    if(xdim != ydim) {
+      throw new IllegalArgumentException("Invalid arguments: number vectors differ in dimensionality.");
+    }
+    // Inlined computation of Pearson correlation, to avoid allocating objects!
+    // This is a numerically stabilized version, avoiding sum-of-squares.
+    double sumXX = 0., sumYY = 0., sumXY = 0.;
+    double meanX = x.doubleValue(0), meanY = y.doubleValue(0);
+    int i = 1;
+    while(i < xdim) {
+      final double xv = x.doubleValue(i), yv = y.doubleValue(i);
+      // Delta to previous mean
+      final double deltaX = xv - meanX;
+      final double deltaY = yv - meanY;
+      // Increment count first
+      ++i;
+      // Update means
+      meanX += deltaX / i;
+      meanY += deltaY / i;
+      // Delta to new mean
+      final double neltaX = xv - meanX;
+      final double neltaY = yv - meanY;
+      // Update
+      sumXX += deltaX * neltaX;
+      sumYY += deltaY * neltaY;
+      // should equal deltaY * neltaX!
+      sumXY += deltaX * neltaY;
+    }
+    // One or both series were constant:
+    if(!(sumXX > 0. && sumYY > 0.)) {
+      return (sumXX == sumYY) ? 1. : 0.;
+    }
+    return sumXY / Math.sqrt(sumXX * sumYY);
+  }
+
+  /**
+   * Compute the Pearson product-moment correlation coefficient for two
+   * FeatureVectors.
+   *
+   * @param x first FeatureVector
+   * @param y second FeatureVector
+   * @param weights Weights
+   * @return the Pearson product-moment correlation coefficient for x and y
+   */
+  public static double weightedCoefficient(double[] x, double[] y, double[] weights) {
+    final int xdim = x.length;
+    final int ydim = y.length;
+    if(xdim != ydim) {
+      throw new IllegalArgumentException("Invalid arguments: arrays differ in length.");
+    }
+    if(xdim != weights.length) {
+      throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
+    }
+    // Inlined computation of Pearson correlation, to avoid allocating objects!
+    // This is a numerically stabilized version, avoiding sum-of-squares.
+    double sumXX = 0., sumYY = 0., sumXY = 0., sumWe = weights[0];
+    double meanX = x[0], meanY = y[0];
+    for(int i = 1; i < xdim; ++i) {
+      final double xv = x[i], yv = y[i], w = weights[i];
+      // Delta to previous mean
+      final double deltaX = xv - meanX;
+      final double deltaY = yv - meanY;
+      // Increment weight first
+      sumWe += w;
+      // Update means
+      meanX += deltaX * w / sumWe;
+      meanY += deltaY * w / sumWe;
+      // Delta to new mean
+      final double neltaX = xv - meanX;
+      final double neltaY = yv - meanY;
+      // Update
+      sumXX += w * deltaX * neltaX;
+      sumYY += w * deltaY * neltaY;
+      // should equal weight * deltaY * neltaX!
+      sumXY += w * deltaX * neltaY;
+    }
+    // One or both series were constant:
+    if(!(sumXX > 0. && sumYY > 0.)) {
+      return (sumXX == sumYY) ? 1. : 0.;
+    }
+    return sumXY / Math.sqrt(sumXX * sumYY);
+  }
+
+  /**
+   * Compute the Pearson product-moment correlation coefficient for two
+   * NumberVectors.
+   *
+   * @param x first NumberVector
+   * @param y second NumberVector
+   * @param weights Weights
+   * @return the Pearson product-moment correlation coefficient for x and y
+   */
+  public static double weightedCoefficient(NumberVector x, NumberVector y, double[] weights) {
+    final int xdim = x.getDimensionality();
+    final int ydim = y.getDimensionality();
+    if(xdim != ydim) {
+      throw new IllegalArgumentException("Invalid arguments: number vectors differ in dimensionality.");
+    }
+    if(xdim != weights.length) {
+      throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
+    }
+    // Inlined computation of Pearson correlation, to avoid allocating objects!
+    // This is a numerically stabilized version, avoiding sum-of-squares.
+    double sumXX = 0., sumYY = 0., sumXY = 0., sumWe = weights[0];
+    double meanX = x.doubleValue(0), meanY = y.doubleValue(0);
+    for(int i = 1; i < xdim; ++i) {
+      final double xv = x.doubleValue(i), yv = y.doubleValue(i), w = weights[i];
+      // Delta to previous mean
+      final double deltaX = xv - meanX;
+      final double deltaY = yv - meanY;
+      // Increment weight first
+      sumWe += w;
+      // Update means
+      meanX += deltaX * w / sumWe;
+      meanY += deltaY * w / sumWe;
+      // Delta to new mean
+      final double neltaX = xv - meanX;
+      final double neltaY = yv - meanY;
+      // Update
+      sumXX += w * deltaX * neltaX;
+      sumYY += w * deltaY * neltaY;
+      // should equal weight * deltaY * neltaX!
+      sumXY += w * deltaX * neltaY;
+    }
+    // One or both series were constant:
+    if(!(sumXX > 0. && sumYY > 0.)) {
+      return (sumXX == sumYY) ? 1. : 0.;
+    }
+    return sumXY / Math.sqrt(sumXX * sumYY);
+  }
+
+  /**
+   * Compute the Pearson product-moment correlation coefficient for two
+   * FeatureVectors.
+   *
+   * @param x first FeatureVector
+   * @param y second FeatureVector
+   * @param weights Weights
+   * @return the Pearson product-moment correlation coefficient for x and y
+   */
+  public static double weightedPearsonCorrelationCoefficient(NumberVector x, NumberVector y, NumberVector weights) {
+    final int xdim = x.getDimensionality();
+    final int ydim = y.getDimensionality();
+    if(xdim != ydim) {
+      throw new IllegalArgumentException("Invalid arguments: feature vectors differ in dimensionality.");
+    }
+    if(xdim != weights.getDimensionality()) {
+      throw new IllegalArgumentException("Dimensionality doesn't agree to weights.");
+    }
+    // Inlined computation of Pearson correlation, to avoid allocating objects!
+    // This is a numerically stabilized version, avoiding sum-of-squares.
+    double sumXX = 0., sumYY = 0., sumXY = 0., sumWe = weights.doubleValue(0);
+    double meanX = x.doubleValue(0), meanY = y.doubleValue(0);
+    for(int i = 1; i < xdim; ++i) {
+      final double xv = x.doubleValue(i), yv = y.doubleValue(i),
+          w = weights.doubleValue(i);
+      // Delta to previous mean
+      final double deltaX = xv - meanX;
+      final double deltaY = yv - meanY;
+      // Increment weight first
+      sumWe += w;
+      // Update means
+      meanX += deltaX * w / sumWe;
+      meanY += deltaY * w / sumWe;
+      // Delta to new mean
+      final double neltaX = xv - meanX;
+      final double neltaY = yv - meanY;
+      // Update
+      sumXX += w * deltaX * neltaX;
+      sumYY += w * deltaY * neltaY;
+      // should equal weight * deltaY * neltaX!
+      sumXY += w * deltaX * neltaY;
+    }
+    // One or both series were constant:
+    if(!(sumXX > 0. && sumYY > 0.)) {
+      return (sumXX == sumYY) ? 1. : 0.;
+    }
+    return sumXY / Math.sqrt(sumXX * sumYY);
   }
 }

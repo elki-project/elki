@@ -68,20 +68,14 @@ public class CosineDistanceFunction extends AbstractSpatialDistanceFunction {
    */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    double d = 1 - VectorUtil.cosAngle(v1, v2);
-    if (d < 0) {
-      d = 0;
-    }
-    return d;
+    double d = VectorUtil.cosAngle(v1, v2);
+    return (d <= 1) ? 1 - d : 0;
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    double d = 1 - VectorUtil.minCosAngle(mbr1, mbr2);
-    if (d < 0) {
-      d = 0;
-    }
-    return d;
+    double d = VectorUtil.minCosAngle(mbr1, mbr2);
+    return (d <= 1) ? 1 - d : 0;
   }
 
   @Override
@@ -91,10 +85,10 @@ public class CosineDistanceFunction extends AbstractSpatialDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if(obj == null) {
       return false;
     }
-    if (obj == this) {
+    if(obj == this) {
       return true;
     }
     return this.getClass().equals(obj.getClass());

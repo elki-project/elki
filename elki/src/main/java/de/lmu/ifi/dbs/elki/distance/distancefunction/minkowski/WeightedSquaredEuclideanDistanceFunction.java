@@ -60,7 +60,7 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNor
     final int dim = dimensionality(v1, v2, weights.length);
     double agg = 0.;
     for(int d = 0; d < dim; d++) {
-      final double delta = (v1.doubleValue(d) - v2.doubleValue(d));
+      final double delta = v1.doubleValue(d) - v2.doubleValue(d);
       agg += delta * delta * weights[d];
     }
     return agg;

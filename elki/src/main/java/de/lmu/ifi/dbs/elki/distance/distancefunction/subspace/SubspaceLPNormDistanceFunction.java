@@ -72,10 +72,6 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    if(v1.getDimensionality() != v2.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of FeatureVectors\n  " + "first argument: " + v1 + "\n  " + "second argument: " + v2);
-    }
-
     double sqrDist = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
@@ -85,10 +81,6 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
   }
 
   protected double minDistObject(SpatialComparable mbr, NumberVector v) {
-    if(mbr.getDimensionality() != v.getDimensionality()) {
-      throw new IllegalArgumentException("Different dimensionality of objects\n  " + "first argument: " + mbr.toString() + "\n  " + "second argument: " + v.toString());
-    }
-
     double sqrDist = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       final double delta;

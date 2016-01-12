@@ -41,7 +41,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "M.-M. Deza and E. Deza", title = "Dictionary of distances", booktitle = "Dictionary of distances")
+@Reference(authors = "M.-M. Deza and E. Deza", //
+title = "Dictionary of distances", //
+booktitle = "Dictionary of distances")
 public class ClarkDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance.
@@ -63,10 +65,10 @@ public class ClarkDistanceFunction extends AbstractSpatialDistanceFunction {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = 0.;
-    for (int d = 0; d < mindim; d++) {
+    for(int d = 0; d < mindim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double div = Math.abs(xd) + Math.abs(yd);
-      if (div > 0.) {
+      if(div > 0.) {
         final double v = (xd - yd) / div;
         agg += v * v;
       }
@@ -89,15 +91,17 @@ public class ClarkDistanceFunction extends AbstractSpatialDistanceFunction {
     final int dim1 = mbr1.getDimensionality(), dim2 = mbr2.getDimensionality();
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = 0.;
-    for (int d = 0; d < mindim; d++) {
+    for(int d = 0; d < mindim; d++) {
       final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
       final double diff;
-      if (max1 < min2) {
+      if(max1 < min2) {
         diff = min2 - max1;
-      } else if (min1 > max2) {
+      }
+      else if(min1 > max2) {
         diff = min1 - max2;
-      } else {
+      }
+      else {
         // Minimum difference is 0
         continue;
       }

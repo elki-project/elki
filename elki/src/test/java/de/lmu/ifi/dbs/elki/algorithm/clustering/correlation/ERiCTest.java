@@ -80,8 +80,8 @@ public class ERiCTest extends AbstractSimpleAlgorithmTest implements JUnit4Test 
     // run ERiC on database
     Clustering<CorrelationModel<DoubleVector>> result = eric.run(db);
 
-    testFMeasure(db, result, 0.714207); // Hierarchical pairs scored: 0.9204825
-    testClusterSizes(result, new int[] { 109, 184, 307 });
+    testFMeasure(db, result, 0.728074); // Hierarchical pairs scored: 0.9204825
+    testClusterSizes(result, new int[] { 109, 188, 303 });
   }
 
   /**

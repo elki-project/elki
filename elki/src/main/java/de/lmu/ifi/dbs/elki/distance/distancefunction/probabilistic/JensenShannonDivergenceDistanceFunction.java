@@ -58,7 +58,7 @@ public class JensenShannonDivergenceDistanceFunction extends JeffreyDivergenceDi
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     return .5 * super.minDist(mbr1, mbr2);
   }
-  
+
   @Override
   public String toString() {
     return "JensenShannonDivergenceDistance";

@@ -142,7 +142,7 @@ public class DerivativeDTWDistanceFunction extends DTWDistanceFunction {
    * 
    * @return Derivative as double
    */
-  public double derivative(int i, NumberVector v) {
+  protected double derivative(int i, NumberVector v) {
     final int dim = v.getDimensionality();
     if(dim == 1) {
       return 0.;

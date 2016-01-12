@@ -47,8 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * <p>
  * Erich Schubert, Arthur Zimek and Hans-Peter Kriegel<br />
  * Geodetic Distance Queries on R-Trees for Indexing Geographic Data<br />
- * Advances in Spatial and Temporal Databases - 13th International Symposium,
- * SSTD 2013, Munich, Germany
+ * 13th Int. Symposium on Advances in Spatial and Temporal Databases
  * </p>
  * 
  * @author Erich Schubert
@@ -75,7 +74,10 @@ public class LatLngDistanceFunction extends AbstractSpatialDistanceFunction {
   }
 
   @Override
-  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", booktitle = "Advances in Spatial and Temporal Databases - 13th International Symposium, SSTD 2013, Munich, Germany")
+  @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", //
+  title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
+  booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
+  url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(mbr1 instanceof NumberVector) {
       if(mbr2 instanceof NumberVector) {

@@ -39,7 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "M.-M. Deza and E. Deza", title = "Dictionary of distances", booktitle = "Dictionary of distances")
+@Reference(authors = "M.-M. Deza and E. Deza", //
+title = "Dictionary of distances", //
+booktitle = "Dictionary of distances")
 public class Kulczynski1DistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance.

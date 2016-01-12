@@ -39,30 +39,6 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  */
 public class MathUtilTest implements JUnit4Test {
   @Test
-  public void testPearsonCorrelation() {
-    final int size = 1000;
-    final long seed = 1;
-    double[] data1 = new double[size];
-    double[] data2 = new double[size];
-    double[] weight1 = new double[size];
-    double[] weight2 = new double[size];
-
-    Random r = new Random(seed);
-    for(int i = 0; i < size; i++) {
-      data1[i] = r.nextDouble();
-      data2[i] = r.nextDouble();
-      weight1[i] = 1.0;
-      weight2[i] = 0.1;
-    }
-
-    double pear = MathUtil.pearsonCorrelationCoefficient(data1, data2);
-    double wpear1 = MathUtil.weightedPearsonCorrelationCoefficient(data1, data2, weight1);
-    double wpear2 = MathUtil.weightedPearsonCorrelationCoefficient(data1, data2, weight2);
-    assertEquals("Pearson and weighted pearson should be the same with constant weights.", pear, wpear1, 1E-10);
-    assertEquals("Weighted pearsons should be the same with constant weights.", wpear1, wpear2, 1E-10);
-  }
-
-  @Test
   public void testBitMath() {
     assertEquals("Bit math issues", 1024, MathUtil.nextPow2Int(912));
     assertEquals("Bit math issues", 8, MathUtil.nextPow2Int(5));

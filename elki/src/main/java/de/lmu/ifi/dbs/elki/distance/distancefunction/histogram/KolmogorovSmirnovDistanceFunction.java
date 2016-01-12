@@ -59,9 +59,7 @@ public class KolmogorovSmirnovDistanceFunction extends AbstractNumberVectorDista
       xs += v1.doubleValue(i);
       ys += v2.doubleValue(i);
       double diff = Math.abs(xs - ys);
-      if (diff > agg) {
-        agg = diff;
-      }
+      agg = diff < agg ? agg : diff;
     }
     return agg;
   }

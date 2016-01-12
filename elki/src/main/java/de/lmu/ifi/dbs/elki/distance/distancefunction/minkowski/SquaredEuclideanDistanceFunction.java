@@ -56,7 +56,18 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
     super();
   }
 
-  private final double preDistance(NumberVector v1, NumberVector v2, int start, int end, double agg) {
+  private final double preDistance(double[] v1, double[] v2, int start, int end) {
+    double agg = 0.;
+    for(int d = start; d < end; d++) {
+      final double xd = v1[d], yd = v2[d];
+      final double delta = xd - yd;
+      agg += delta * delta;
+    }
+    return agg;
+  }
+
+  private final double preDistance(NumberVector v1, NumberVector v2, int start, int end) {
+    double agg = 0.;
     for(int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double delta = xd - yd;
@@ -65,7 +76,8 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
     return agg;
   }
 
-  private final double preDistanceVM(NumberVector v, SpatialComparable mbr, int start, int end, double agg) {
+  private final double preDistanceVM(NumberVector v, SpatialComparable mbr, int start, int end) {
+    double agg = 0.;
     for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
@@ -79,7 +91,8 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
     return agg;
   }
 
-  private final double preDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, int start, int end, double agg) {
+  private final double preDistanceMBR(SpatialComparable mbr1, SpatialComparable mbr2, int start, int end) {
+    double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
       if(delta < 0.) {
@@ -92,16 +105,8 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
     return agg;
   }
 
-  private final double preDistance(double[] v1, double[] v2, int start, int end, double agg) {
-    for(int d = start; d < end; d++) {
-      final double xd = v1[d], yd = v2[d];
-      final double delta = xd - yd;
-      agg += delta * delta;
-    }
-    return agg;
-  }
-
-  private final double preNorm(NumberVector v, int start, int end, double agg) {
+  private final double preNorm(NumberVector v, int start, int end) {
+    double agg = 0.;
     for(int d = start; d < end; d++) {
       final double xd = v.doubleValue(d);
       agg += xd * xd;
@@ -109,7 +114,17 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
     return agg;
   }
 
-  private final double preNormMBR(SpatialComparable mbr, int start, int end, double agg) {
+  private final double preNorm(double[] v, int start, int end) {
+    double agg = 0.;
+    for(int d = start; d < end; d++) {
+      final double xd = v[d];
+      agg += xd * xd;
+    }
+    return agg;
+  }
+
+  private final double preNormMBR(SpatialComparable mbr, int start, int end) {
+    double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
       if(delta < 0.) {
@@ -122,47 +137,39 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
     return agg;
   }
 
-  private final double preNorm(double[] v, int start, int end, double agg) {
-    for(int d = start; d < end; d++) {
-      final double xd = v[d];
-      agg += xd * xd;
-    }
-    return agg;
-  }
-
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
-    double agg = preDistance(v1, v2, 0, mindim, 0.);
+    double agg = preDistance(v1, v2, 0, mindim);
     if(dim1 > mindim) {
-      agg = preNorm(v1, mindim, dim1, agg);
+      agg += preNorm(v1, mindim, dim1);
     }
     else if(dim2 > mindim) {
-      agg = preNorm(v2, mindim, dim2, agg);
+      agg += preNorm(v2, mindim, dim2);
     }
     return agg;
   }
 
   /**
-   * Distance of raw arrays
+   * Special version for double arrays.
    */
   public double distance(double[] v1, double[] v2) {
     final int dim1 = v1.length, dim2 = v2.length;
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
-    double agg = preDistance(v1, v2, 0, mindim, 0.);
+    double agg = preDistance(v1, v2, 0, mindim);
     if(dim1 > mindim) {
-      agg = preNorm(v1, mindim, dim1, agg);
+      agg += preNorm(v1, mindim, dim1);
     }
     else if(dim2 > mindim) {
-      agg = preNorm(v2, mindim, dim2, agg);
+      agg += preNorm(v2, mindim, dim2);
     }
     return agg;
   }
 
   @Override
   public double norm(NumberVector v) {
-    return preNorm(v, 0, v.getDimensionality(), 0.);
+    return preNorm(v, 0, v.getDimensionality());
   }
 
   @Override
@@ -176,36 +183,36 @@ public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {
     double agg = 0.;
     if(v1 != null) {
       if(v2 != null) {
-        agg = preDistance(v1, v2, 0, mindim, agg);
+        agg += preDistance(v1, v2, 0, mindim);
       }
       else {
-        agg = preDistanceVM(v1, mbr2, 0, mindim, agg);
+        agg += preDistanceVM(v1, mbr2, 0, mindim);
       }
     }
     else {
       if(v2 != null) {
-        agg = preDistanceVM(v2, mbr1, 0, mindim, agg);
+        agg += preDistanceVM(v2, mbr1, 0, mindim);
       }
       else {
-        agg = preDistanceMBR(mbr1, mbr2, 0, mindim, agg);
+        agg += preDistanceMBR(mbr1, mbr2, 0, mindim);
       }
     }
     // first object has more dimensions.
     if(dim1 > mindim) {
       if(v1 != null) {
-        agg = preNorm(v1, mindim, dim1, agg);
+        agg += preNorm(v1, mindim, dim1);
       }
       else {
-        agg = preNormMBR(v1, mindim, dim1, agg);
+        agg += preNormMBR(v1, mindim, dim1);
       }
     }
     // second object has more dimensions.
     if(dim2 > mindim) {
       if(v2 != null) {
-        agg = preNorm(v2, mindim, dim2, agg);
+        agg += preNorm(v2, mindim, dim2);
       }
       else {
-        agg = preNormMBR(mbr2, mindim, dim2, agg);
+        agg += preNormMBR(mbr2, mindim, dim2);
       }
     }
     return agg;

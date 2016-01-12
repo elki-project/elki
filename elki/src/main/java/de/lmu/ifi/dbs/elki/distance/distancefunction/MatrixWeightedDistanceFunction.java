@@ -23,11 +23,11 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.mahalanobisDistance;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
  * Weighted distance for feature vectors.
@@ -55,7 +55,7 @@ public class MatrixWeightedDistanceFunction extends AbstractNumberVectorDistance
   @Override
   public double distance(NumberVector o1, NumberVector o2) {
     dimensionality(o1, o2, weightMatrix.getColumnDimensionality());
-    return VMath.mahalanobisDistance(weightMatrix.getArrayRef(), o1.toArray(), o2.toArray());
+    return mahalanobisDistance(weightMatrix.getArrayRef(), o1.toArray(), o2.toArray());
   }
 
   @Override

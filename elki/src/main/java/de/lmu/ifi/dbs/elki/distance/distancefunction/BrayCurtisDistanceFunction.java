@@ -69,7 +69,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  */
 @Alias({ "bray-curtis", "braycurtis", "sorensen", "dice", "sorensen-dice" })
-@Reference(authors = "J. R. Bray and J. T. Curtis", title = "An ordination of the upland forest communities of southern Wisconsin", booktitle = "Ecological monographs 27.4", url = "http://dx.doi.org/10.2307/1942268")
+@Reference(authors = "J. R. Bray and J. T. Curtis", //
+title = "An ordination of the upland forest communities of southern Wisconsin", //
+booktitle = "Ecological monographs 27.4", //
+url = "http://dx.doi.org/10.2307/1942268")
 public class BrayCurtisDistanceFunction extends AbstractSpatialDistanceFunction {
   /**
    * Static instance.
@@ -89,7 +92,9 @@ public class BrayCurtisDistanceFunction extends AbstractSpatialDistanceFunction 
   /**
    * Dummy method, just to attach a second reference.
    */
-  @Reference(authors = "T. Sørensen", title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)")
+  @Reference(authors = "T. Sørensen", //
+  title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", //
+  booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)")
   static void secondReference() {
     // Empty, just to attach a second reference
   };
@@ -97,7 +102,9 @@ public class BrayCurtisDistanceFunction extends AbstractSpatialDistanceFunction 
   /**
    * Dummy method, just to attach a third reference.
    */
-  @Reference(authors = "L. R. Dice", title = "Measures of the Amount of Ecologic Association Between Species", booktitle = "Ecology 26 (3)")
+  @Reference(authors = "L. R. Dice", //
+  title = "Measures of the Amount of Ecologic Association Between Species", //
+  booktitle = "Ecology 26 (3)")
   static void thirdReference() {
     // Empty, just to attach a second reference
   };
@@ -106,8 +113,8 @@ public class BrayCurtisDistanceFunction extends AbstractSpatialDistanceFunction 
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double sumdiff = 0., sumsum = 0.;
-    for (int d = 0; d < dim; d++) {
-      double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
+    for(int d = 0; d < dim; d++) {
+      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       sumdiff += Math.abs(xd - yd);
       sumsum += Math.abs(xd) + Math.abs(yd);
     }
@@ -118,14 +125,16 @@ public class BrayCurtisDistanceFunction extends AbstractSpatialDistanceFunction 
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2);
     double sumdiff = 0., sumsum = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
-      if (max1 < min2) {
+      if(max1 < min2) {
         sumdiff += min2 - max1;
-      } else if (min1 > max2) {
+      }
+      else if(min1 > max2) {
         sumdiff += min1 - max2;
-      } else {
+      }
+      else {
         // Minimum difference is 0
       }
       sumsum += Math.max(-min1, max1) + Math.max(-min2, max2);

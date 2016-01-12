@@ -28,7 +28,7 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedNumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.PearsonCorrelation;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
@@ -83,7 +83,7 @@ public class WeightedSquaredPearsonCorrelationDistanceFunction extends AbstractN
    */
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    final double pcc = MathUtil.weightedPearsonCorrelationCoefficient(v1, v2, weights);
+    final double pcc = PearsonCorrelation.weightedCoefficient(v1, v2, weights);
     return 1 - pcc * pcc;
   }
 

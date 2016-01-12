@@ -29,6 +29,8 @@ import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Arrays;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
@@ -59,10 +61,10 @@ public class AffineTransformationTest implements JUnit4Test {
       dv[i] = i * i + testdim;
     }
     double[] v3 = t.apply(dv);
-    assertEquals("identity transformation wasn't identical", dv, v3);
+    assertTrue("identity transformation wasn't identical", Arrays.equals(dv, v3));
 
     double[] v4 = t.applyInverse(dv);
-    assertEquals("inverse of identity wasn't identity", dv, v4);
+    assertTrue("inverse of identity wasn't identity", Arrays.equals(dv, v4));
   }
 
   /**
@@ -100,22 +102,22 @@ public class AffineTransformationTest implements JUnit4Test {
     }
 
     double[] v1t = t.apply(v1);
-    assertEquals("Vector wasn't translated properly forward.", v2t, v1t);
+    assertTrue("Vector wasn't translated properly forward.", Arrays.equals(v2t, v1t));
     double[] v2b = t.applyInverse(v2t);
-    assertEquals("Vector wasn't translated properly backwards.", v1, v2b);
+    assertTrue("Vector wasn't translated properly backwards.", Arrays.equals(v1, v2b));
     double[] v1b = t.applyInverse(v1t);
-    assertEquals("Vector wasn't translated properly back and forward.", v1, v1b);
+    assertTrue("Vector wasn't translated properly back and forward.", Arrays.equals(v1, v1b));
 
     // Translation
     double[] vd = minus(v1, v2b);
     double[] vtd = minus(v1t, v2t);
-    assertEquals("Translation changed vector difference.", vd, vtd);
+    assertTrue("Translation changed vector difference.", Arrays.equals(vd, vtd));
 
     // Translation shouldn't change relative vectors.
-    assertEquals("Relative vectors weren't left unchanged by translation!", v1, t.applyRelative(v1));
-    assertEquals("Relative vectors weren't left unchanged by translation!", v2t, t.applyRelative(v2t));
-    assertEquals("Relative vectors weren't left unchanged by translation!", v1t, t.applyRelative(v1t));
-    assertEquals("Relative vectors weren't left unchanged by translation!", v2b, t.applyRelative(v2b));
+    assertTrue("Relative vectors weren't left unchanged by translation!", Arrays.equals(v1, t.applyRelative(v1)));
+    assertTrue("Relative vectors weren't left unchanged by translation!", Arrays.equals(v2t, t.applyRelative(v2t)));
+    assertTrue("Relative vectors weren't left unchanged by translation!", Arrays.equals(v1t, t.applyRelative(v1t)));
+    assertTrue("Relative vectors weren't left unchanged by translation!", Arrays.equals(v2b, t.applyRelative(v2b)));
   }
 
   /**
@@ -173,7 +175,7 @@ public class AffineTransformationTest implements JUnit4Test {
 
     // Rotation shouldn't disagree for relative vectors.
     // (they just are not affected by translation!)
-    assertEquals("Relative vectors were affected differently by pure rotation!", v2, t.applyRelative(v1));
+    assertTrue("Relative vectors were affected differently by pure rotation!", Arrays.equals(v2, t.applyRelative(v1)));
 
     // should do the same as built-in rotation!
     AffineTransformation t2 = new AffineTransformation(testdim);

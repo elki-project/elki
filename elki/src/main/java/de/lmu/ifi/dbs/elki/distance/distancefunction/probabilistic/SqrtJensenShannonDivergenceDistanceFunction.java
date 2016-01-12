@@ -40,7 +40,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  */
-@Reference(authors = "D. M. Endres, J. E. Schindelin", title = "A new metric for probability distributions", booktitle = "IEEE Transactions on Information Theory, 49(7)", url = "http://dx.doi.org/10.1109/TIT.2003.813506")
+@Reference(authors = "D. M. Endres, J. E. Schindelin", //
+title = "A new metric for probability distributions", //
+booktitle = "IEEE Transactions on Information Theory, 49(7)", //
+url = "http://dx.doi.org/10.1109/TIT.2003.813506")
 public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * Static instance. Use this!
