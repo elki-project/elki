@@ -131,7 +131,7 @@ public class CTLuScatterplotOutlier<N> extends AbstractNeighborhoodOutlier<N> {
     // Finalize covariance matrix, compute linear regression
     final double slope, inter;
     {
-      double[] meanv = covm.getMeanVector().getArrayRef();
+      double[] meanv = covm.getMeanVector();
       Matrix fmat = covm.destroyToSampleMatrix();
       final double covxx = fmat.get(0, 0);
       final double covxy = fmat.get(0, 1);

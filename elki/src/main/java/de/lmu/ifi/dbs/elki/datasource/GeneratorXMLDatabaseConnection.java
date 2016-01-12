@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorStatic;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
@@ -595,7 +594,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    * @throws UnableToComplyException
    */
   private void processElementTranslate(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
-    Vector offset = null;
+    double[] offset = null;
     String vstr = ((Element) cur).getAttribute(ATTR_VECTOR);
     if(vstr != null && vstr.length() > 0) {
       offset = parseVector(vstr);
@@ -625,8 +624,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    * @throws UnableToComplyException
    */
   private void processElementClipping(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
-    Vector cmin = null;
-    Vector cmax = null;
+    double[] cmin = null, cmax = null;
 
     String minstr = ((Element) cur).getAttribute(ATTR_MIN);
     if(minstr != null && minstr.length() > 0) {
@@ -666,7 +664,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
       throw new UnableToComplyException("No cluster name given in specification file.");
     }
 
-    ArrayList<Vector> points = new ArrayList<>();
+    ArrayList<double[]> points = new ArrayList<>();
     // TODO: check for unknown attributes.
     XMLNodeIterator iter = new XMLNodeIterator(cur.getFirstChild());
     while(iter.hasNext()) {
@@ -694,8 +692,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    * @param cur Current document nod
    * @throws UnableToComplyException
    */
-  private void processElementPoint(List<Vector> points, Node cur) throws UnableToComplyException {
-    Vector point = null;
+  private void processElementPoint(List<double[]> points, Node cur) throws UnableToComplyException {
+    double[] point = null;
     String vstr = ((Element) cur).getAttribute(ATTR_VECTOR);
     if(vstr != null && vstr.length() > 0) {
       point = parseVector(vstr);
@@ -726,7 +724,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    * @return Vector
    * @throws UnableToComplyException
    */
-  private Vector parseVector(String s) throws UnableToComplyException {
+  private double[] parseVector(String s) throws UnableToComplyException {
     String[] entries = WHITESPACE_PATTERN.split(s);
     double[] d = new double[entries.length];
     for(int i = 0; i < entries.length; i++) {
@@ -737,7 +735,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
         throw new UnableToComplyException("Could not parse vector.");
       }
     }
-    return new Vector(d);
+    return d;
   }
 
   @Override

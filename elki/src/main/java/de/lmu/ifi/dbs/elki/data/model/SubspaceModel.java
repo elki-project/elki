@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.data.model;
  */
 
 import de.lmu.ifi.dbs.elki.data.Subspace;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
@@ -49,7 +48,7 @@ public class SubspaceModel extends MeanModel implements TextWriteable {
    * @param subspace the subspace of the cluster
    * @param mean the cluster mean
    */
-  public SubspaceModel(Subspace subspace, Vector mean) {
+  public SubspaceModel(Subspace subspace, double[] mean) {
     super(mean);
     this.subspace = subspace;
   }

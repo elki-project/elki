@@ -196,6 +196,6 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean, Matrix.diagonal(variances));
+    return new EMModel(mean.getArrayRef(), Matrix.diagonal(variances));
   }
 }

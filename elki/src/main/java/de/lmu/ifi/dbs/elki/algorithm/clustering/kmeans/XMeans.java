@@ -257,7 +257,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    * @return List of new centroids
    */
   protected List<? extends NumberVector> splitCentroid(Cluster<? extends MeanModel> parentCluster, Relation<V> relation) {
-    Vector parentCentroid = parentCluster.getModel().getMean();
+    Vector parentCentroid = new Vector(parentCluster.getModel().getMean());
 
     // Compute size of cluster/region
     double radius = 0.;

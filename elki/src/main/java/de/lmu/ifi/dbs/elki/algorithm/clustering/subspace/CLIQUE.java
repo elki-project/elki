@@ -214,7 +214,7 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
 
       for(Pair<Subspace, ModifiableDBIDs> modelAndCluster : modelsAndClusters) {
         Cluster<SubspaceModel> newCluster = new Cluster<>(modelAndCluster.second);
-        newCluster.setModel(new SubspaceModel(modelAndCluster.first, Centroid.make(relation, modelAndCluster.second)));
+        newCluster.setModel(new SubspaceModel(modelAndCluster.first, Centroid.make(relation, modelAndCluster.second).getArrayRef()));
         newCluster.setName("cluster_" + numClusters++);
         result.addToplevelCluster(newCluster);
       }

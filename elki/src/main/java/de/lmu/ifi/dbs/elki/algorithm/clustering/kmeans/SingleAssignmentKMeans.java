@@ -98,7 +98,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("Nearest Centroid Clustering", "nearest-center-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
+      KMeansModel model = new KMeansModel(means.get(i).getArrayRef(), varsum[i]);
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;

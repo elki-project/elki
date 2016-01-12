@@ -56,11 +56,8 @@ public final class ModelUtil {
   public static <V extends NumberVector> V getPrototype(Model model, Relation<? extends V> relation, NumberVector.Factory<V> factory) {
     // Mean model contains a numeric Vector
     if(model instanceof MeanModel) {
-      final Vector p = ((MeanModel) model).getMean();
-      if(factory.getRestrictionClass().isInstance(p)) {
-        return (V) p;
-      }
-      return factory.newNumberVector(p.getArrayRef());
+      final double[] p = ((MeanModel) model).getMean();
+      return factory.newNumberVector(p);
     }
     // Handle medoid models
     if(model instanceof MedoidModel) {
@@ -97,7 +94,7 @@ public final class ModelUtil {
   public static NumberVector getPrototype(Model model, Relation<? extends NumberVector> relation) {
     // Mean model contains a numeric Vector
     if(model instanceof MeanModel) {
-      return ((MeanModel) model).getMean();
+      return new Vector(((MeanModel) model).getMean());
     }
     // Handle medoid models
     if(model instanceof MedoidModel) {

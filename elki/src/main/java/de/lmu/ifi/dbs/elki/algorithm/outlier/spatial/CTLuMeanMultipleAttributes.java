@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.mahalanobisDistance;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.neighborhood.NeighborSetPredicate;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -40,12 +42,9 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -110,7 +109,7 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(database, spatial);
 
     CovarianceMatrix covmaker = new CovarianceMatrix(RelationUtil.dimensionality(attributes));
-    WritableDataStore<Vector> deltas = DataStoreUtil.makeStorage(attributes.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
+    WritableDataStore<double[]> deltas = DataStoreUtil.makeStorage(attributes.getDBIDs(), DataStoreFactory.HINT_TEMP, double[].class);
     for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final O obj = attributes.get(iditer);
       final DBIDs neighbors = npred.getNeighborDBIDs(iditer);
@@ -119,18 +118,18 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
       // Mean vector "g"
       double[] mean = Centroid.make(attributes, neighbors).getArrayRef();
       // Delta vector "h"
-      Vector delta = new Vector(VMath.minusEquals(obj.toArray(), mean));
+      double[] delta = minusEquals(obj.toArray(), mean);
       deltas.put(iditer, delta);
       covmaker.put(delta);
     }
     // Finalize covariance matrix:
-    Vector mean = covmaker.getMeanVector();
+    double[] mean = covmaker.getMeanVector();
     Matrix cmati = covmaker.destroyToSampleMatrix().inverse();
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(attributes.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final double score = MathUtil.mahalanobisDistance(cmati, deltas.get(iditer), mean);
+      final double score = mahalanobisDistance(cmati.getArrayRef(), deltas.get(iditer), mean);
       minmax.put(score);
       scores.putDouble(iditer, score);
     }

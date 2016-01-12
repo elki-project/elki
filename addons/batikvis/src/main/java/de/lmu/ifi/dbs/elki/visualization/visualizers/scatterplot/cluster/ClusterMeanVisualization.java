@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -163,7 +162,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
         double[] mean = null;
         try {
           if(model instanceof MeanModel) {
-            final Vector mmean = ((MeanModel) model).getMean();
+            final double[] mmean = ((MeanModel) model).getMean();
             if(mmean == null) {
               continue;
             }

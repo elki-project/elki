@@ -263,8 +263,8 @@ public class CovarianceMatrix {
    * 
    * @return Mean vector
    */
-  public Vector getMeanVector() {
-    return new Vector(mean);
+  public double[] getMeanVector() {
+    return mean;
   }
 
   /**

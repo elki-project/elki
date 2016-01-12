@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
@@ -56,7 +55,7 @@ public interface GeneratorInterface {
    * @return List of generated points
    * @throws UnableToComplyException when generation fails
    */
-  List<Vector> generate(int count) throws UnableToComplyException;
+  List<double[]> generate(int count) throws UnableToComplyException;
 
   /**
    * Get the density of the given vector
@@ -64,7 +63,7 @@ public interface GeneratorInterface {
    * @param p vector
    * @return density
    */
-  double getDensity(Vector p);
+  double getDensity(double[] p);
 
   /**
    * Get cluster name
@@ -85,5 +84,5 @@ public interface GeneratorInterface {
    *
    * @return Cluster mean, or {@code null}.
    */
-  Vector computeMean();
+  double[] computeMean();
 }

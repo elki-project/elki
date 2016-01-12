@@ -216,6 +216,6 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean, covariance);
+    return new EMModel(mean.getArrayRef(), covariance);
   }
 }

@@ -111,7 +111,7 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
       if (cids.size() == 0) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
+      KMeansModel model = new KMeansModel(means.get(i).getArrayRef(), varsum[i]);
       result.addToplevelCluster(new Cluster<>(cids, model));
     }
     return result;

@@ -186,6 +186,6 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean, Matrix.identity(nmea.length, nmea.length).timesEquals(variance));
+    return new EMModel(mean.getArrayRef(), Matrix.identity(nmea.length, nmea.length).timesEquals(variance));
   }
 }

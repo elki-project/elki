@@ -206,7 +206,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
       return 0;
     }
     CovarianceMatrix builder = CovarianceMatrix.make(relation, objids);
-    double[] mean = builder.getMeanVector().getArrayRef();
+    double[] mean = builder.getMeanVector();
     Matrix covarianceMatrix = builder.destroyToSampleMatrix();
 
     // test singulaere matrix

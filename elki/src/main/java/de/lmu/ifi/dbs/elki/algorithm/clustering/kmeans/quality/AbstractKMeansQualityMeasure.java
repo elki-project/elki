@@ -105,7 +105,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
     }
     // Re-compute:
     DBIDs ids = cluster.getIDs();
-    Vector mean = model.getMean();
+    Vector mean = new Vector(model.getMean());
 
     boolean squared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
     double variance = 0.;

@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -162,7 +163,8 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
       }
       else {
         DistanceQuery<V> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
-        KNNList queryResults = database.getKNNQuery(distanceQuery, this.sampleSize).getKNNForObject(centroidDV, this.sampleSize);
+        KNNList queryResults = database.getKNNQuery(distanceQuery, this.sampleSize)//
+            .getKNNForObject(centroidDV, this.sampleSize);
         ids = DBIDUtil.newHashSet(queryResults);
       }
     }
@@ -170,7 +172,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
       ids = relation.getDBIDs();
     }
 
-    return generateModel(relation, ids, centroid);
+    return generateModel(relation, ids, centroid.getArrayRef());
   }
 
   /**
@@ -182,7 +184,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
    * @return a matrix of equations describing the dependencies
    */
   public CorrelationAnalysisSolution<V> generateModel(Relation<V> db, DBIDs ids) {
-    return generateModel(db, ids, Centroid.make(db, ids));
+    return generateModel(db, ids, Centroid.make(db, ids).getArrayRef());
   }
 
   /**
@@ -193,7 +195,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
    * @param centroid the centroid
    * @return a matrix of equations describing the dependencies
    */
-  public CorrelationAnalysisSolution<V> generateModel(Relation<V> db, DBIDs ids, Vector centroid) {
+  public CorrelationAnalysisSolution<V> generateModel(Relation<V> db, DBIDs ids, double[] centroid) {
     CorrelationAnalysisSolution<V> sol;
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("PCA...");
@@ -223,19 +225,19 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
         log.append(FormatUtil.format(pcares.getEigenvalues(), ", ", nf));
         LOG.debugFine(log.toString());
       }
-      Vector b = transposedWeakEigenvectors.times(centroid);
+      double[] b = VMath.times(transposedWeakEigenvectors.getArrayRef(), centroid);
       if(LOG.isDebugging()) {
         StringBuilder log = new StringBuilder();
         log.append("Centroid:\n").append(centroid).append('\n');
         log.append("tEV * Centroid\n");
-        log.append(b);
+        log.append(FormatUtil.format(b));
         LOG.debugFine(log.toString());
       }
 
       // +1 == + B.getColumnDimensionality()
       Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(), transposedWeakEigenvectors.getColumnDimensionality() + 1);
       gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimensionality() - 1, 0, transposedWeakEigenvectors.getColumnDimensionality() - 1, transposedWeakEigenvectors);
-      gaussJordan.setCol(transposedWeakEigenvectors.getColumnDimensionality(), b);
+      gaussJordan.setCol(transposedWeakEigenvectors.getColumnDimensionality(), new Vector(b));
 
       if(LOG.isDebuggingFiner()) {
         LOG.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan, nf));
@@ -245,7 +247,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
       double[][] we = transposedWeakEigenvectors.getArrayRef();
       System.arraycopy(we, 0, a, 0, transposedWeakEigenvectors.getRowDimensionality());
 
-      LinearEquationSystem lq = new LinearEquationSystem(a, b.getArrayRef());
+      LinearEquationSystem lq = new LinearEquationSystem(a, b);
       lq.solveByTotalPivotSearch();
 
       sol = new CorrelationAnalysisSolution<>(lq, db, strongEigenvectors, pcares.getWeakEigenvectors(), pcares.similarityMatrix(), centroid);

@@ -125,7 +125,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
 
   @Override
   protected void prepareComplete() {
-    mean = covmat.getMeanVector().getArrayRef();
+    mean = covmat.getMeanVector();
     PCAResult pcares = (new PCARunner(null)).processCovarMatrix(covmat.destroyToSampleMatrix());
     SortedEigenPairs eps = pcares.getEigenPairs();
     covmat = null;

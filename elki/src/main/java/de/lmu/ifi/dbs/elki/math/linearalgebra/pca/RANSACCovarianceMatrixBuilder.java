@@ -113,7 +113,7 @@ public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuild
     for(int i = 0; i < iterations; i++) {
       DBIDs sample = DBIDUtil.randomSample(ids, dim + 1, random);
       CovarianceMatrix cv = CovarianceMatrix.make(relation, sample);
-      double[] centroid = cv.getMeanVector().getArrayRef();
+      double[] centroid = cv.getMeanVector();
       Matrix p = cv.destroyToSampleMatrix().inverse();
 
       ModifiableDBIDs support = DBIDUtil.newHashSet();

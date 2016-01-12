@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.data.model;
  */
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
@@ -45,7 +44,7 @@ public class EMModel extends MeanModel {
    * @param mean Mean vector
    * @param covarianceMatrix Covariance matrix
    */
-  public EMModel(Vector mean, Matrix covarianceMatrix) {
+  public EMModel(double[] mean, Matrix covarianceMatrix) {
     super(mean);
     this.covarianceMatrix = covarianceMatrix;
   }

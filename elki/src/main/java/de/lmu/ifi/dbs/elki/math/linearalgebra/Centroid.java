@@ -40,11 +40,16 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * 
  * @author Erich Schubert
  */
-public class Centroid extends Vector {
+public class Centroid implements NumberVector {
   /**
    * The current weight.
    */
   protected double wsum;
+
+  /**
+   * Vector elements.
+   */
+  protected double[] elements;
 
   /**
    * Constructor.
@@ -52,7 +57,8 @@ public class Centroid extends Vector {
    * @param dim Dimensionality
    */
   public Centroid(int dim) {
-    super(dim);
+    super();
+    this.elements = new double[dim];
     this.wsum = 0;
   }
 
@@ -143,6 +149,61 @@ public class Centroid extends Vector {
     wsum = nwsum;
   }
 
+  @Override
+  public double doubleValue(int dimension) {
+    return elements[dimension];
+  }
+
+  @Override
+  public float floatValue(int dimension) {
+    return (float) elements[dimension];
+  }
+
+  @Override
+  public byte byteValue(int dimension) {
+    return (byte) elements[dimension];
+  }
+
+  @Override
+  public int intValue(int dimension) {
+    return (int) elements[dimension];
+  }
+
+  @Override
+  public long longValue(int dimension) {
+    return (long) elements[dimension];
+  }
+
+  @Override
+  public short shortValue(int dimension) {
+    return (short) elements[dimension];
+  }
+
+  @Override
+  public int getDimensionality() {
+    return elements.length;
+  }
+
+  @Override
+  public double getMin(int dimension) {
+    return elements[dimension];
+  }
+
+  @Override
+  public double getMax(int dimension) {
+    return elements[dimension];
+  }
+
+  @Override
+  public Double getValue(int dimension) {
+    return elements[dimension];
+  }
+
+  @Override
+  public double[] toArray() {
+    return elements.clone();
+  }
+
   /**
    * Get the data as vector.
    * 
@@ -222,5 +283,14 @@ public class Centroid extends Vector {
     }
     c.wsum = count;
     return c;
+  }
+
+  /**
+   * Low-level access to the element array.
+   * 
+   * @return Array access
+   */
+  public double[] getArrayRef() {
+    return elements;
   }
 }

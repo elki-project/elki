@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
@@ -156,8 +155,8 @@ public class GeneratorMain {
       int kept = 0;
       while(kept < curclus.getSize()) {
         // generate the "missing" number of points
-        List<Vector> newp = curclus.generate(curclus.getSize() - kept);
-        for(Vector p : newp) {
+        List<double[]> newp = curclus.generate(curclus.getSize() - kept);
+        for(double[] p : newp) {
           int bestc = assignment.getAssignment(i, p);
           if(bestc < 0) {
             cursclus.incrementDiscarded();
@@ -185,7 +184,7 @@ public class GeneratorMain {
      * @param p Point
      * @return New cluster number.
      */
-    public int getAssignment(int i, Vector p) {
+    public int getAssignment(int i, double[] p) {
       return i;
     }
 
@@ -209,7 +208,7 @@ public class GeneratorMain {
    */
   private class TestModel extends AssignPoint {
     @Override
-    public int getAssignment(int i, Vector p) {
+    public int getAssignment(int i, double[] p) {
       int bestc = i;
       GeneratorInterface curclus = generators.get(i);
       double is = curclus.getDensity(p) * curclus.getSize();
@@ -262,7 +261,7 @@ public class GeneratorMain {
     }
 
     @Override
-    public int getAssignment(int i, Vector p) {
+    public int getAssignment(int i, double[] p) {
       double is = curclus.getDensity(p) * curclus.getSize();
       int bestc = i;
       boolean reassign = labels[i] == null;
@@ -301,7 +300,7 @@ public class GeneratorMain {
     /**
      * Cluster centers.
      */
-    private Vector[] centers;
+    private double[][] centers;
 
     /**
      * Constructor.
@@ -320,9 +319,9 @@ public class GeneratorMain {
      * @param labels Labels ({@code null} if not needed)
      * @return
      */
-    private Vector[] clusterCenters(ArrayList<GeneratorInterface> generators, ClassLabel[] labels) {
+    private double[][] clusterCenters(ArrayList<GeneratorInterface> generators, ClassLabel[] labels) {
       final int l = generators.size();
-      Vector[] vs = new Vector[l];
+      double[][] vs = new double[l][];
       for(int i = 0; i < l; i++) {
         if(labels[i] == null) {
           continue; // Will be reassigned
@@ -333,7 +332,7 @@ public class GeneratorMain {
     }
 
     @Override
-    public int getAssignment(int i, Vector p) {
+    public int getAssignment(int i, double[] p) {
       int bestc = i;
       boolean reassign = (centers[i] == null);
       double is = reassign ? 0. : SquaredEuclideanDistanceFunction.STATIC.distance(centers[i], p);

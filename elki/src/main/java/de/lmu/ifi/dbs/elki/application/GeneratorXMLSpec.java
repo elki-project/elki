@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.GeneratorXMLDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -174,11 +173,11 @@ public class GeneratorXMLSpec extends AbstractApplication {
         GeneratorSingleCluster cursclus = (GeneratorSingleCluster) model;
         outStream.append("########################################################").append(LINE_SEPARATOR);
         outStream.append("## Cluster: ").append(cursclus.getName()).append(LINE_SEPARATOR);
-        Vector cmin = cursclus.getClipmin();
-        Vector cmax = cursclus.getClipmax();
+        double[] cmin = cursclus.getClipmin();
+        double[] cmax = cursclus.getClipmax();
         if(cmin != null && cmax != null) {
-          outStream.append("## Clipping: ").append(cmin.toString())//
-          .append(" - ").append(cmax.toString()).append(LINE_SEPARATOR);
+          outStream.append("## Clipping: ").append(FormatUtil.format(cmin))//
+          .append(" - ").append(FormatUtil.format(cmax)).append(LINE_SEPARATOR);
         }
         outStream.append("## Density correction factor: " + cursclus.getDensityCorrection()).append(LINE_SEPARATOR);
         outStream.append("## Generators:").append(LINE_SEPARATOR);

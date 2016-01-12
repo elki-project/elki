@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.data.model;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Trivial subclass of the {@link MeanModel} that indicates the clustering to be
@@ -42,7 +41,7 @@ public class KMeansModel extends MeanModel {
    * @param mean Mean vector.
    * @param varsum Variance sum.
    */
-  public KMeansModel(Vector mean, double varsum) {
+  public KMeansModel(double[] mean, double varsum) {
     super(mean);
     this.varsum = varsum;
   }

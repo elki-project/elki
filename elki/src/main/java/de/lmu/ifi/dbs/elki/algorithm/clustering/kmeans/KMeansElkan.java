@@ -189,7 +189,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
         varsum += distanceFunction.distance(mean, relation.get(it));
       }
-      KMeansModel model = new KMeansModel(mean, varsum);
+      KMeansModel model = new KMeansModel(mean.getArrayRef(), varsum);
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
     return result;

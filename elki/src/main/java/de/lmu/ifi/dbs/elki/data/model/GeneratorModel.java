@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Cluster model for synthetically generated data.
@@ -42,7 +41,7 @@ public class GeneratorModel extends MeanModel {
    * @param generator Cluster generator.
    * @param mean Mean vector.
    */
-  public GeneratorModel(GeneratorInterface generator, Vector mean) {
+  public GeneratorModel(GeneratorInterface generator, double[] mean) {
     super(mean);
     this.generator = generator;
   }

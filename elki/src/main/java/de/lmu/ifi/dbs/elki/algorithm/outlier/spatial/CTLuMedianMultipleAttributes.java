@@ -40,11 +40,9 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -112,7 +110,7 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends Abs
     final NeighborSetPredicate npred = getNeighborSetPredicateFactory().instantiate(database, spatial);
 
     CovarianceMatrix covmaker = new CovarianceMatrix(dim);
-    WritableDataStore<Vector> deltas = DataStoreUtil.makeStorage(attributes.getDBIDs(), DataStoreFactory.HINT_TEMP, Vector.class);
+    WritableDataStore<double[]> deltas = DataStoreUtil.makeStorage(attributes.getDBIDs(), DataStoreFactory.HINT_TEMP, double[].class);
     for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final O obj = attributes.get(iditer);
       final DBIDs neighbors = npred.getNeighborDBIDs(iditer);
@@ -136,18 +134,18 @@ public class CTLuMedianMultipleAttributes<N, O extends NumberVector> extends Abs
       }
 
       // Delta vector "h"
-      Vector delta = new Vector(VMath.minusEquals(obj.toArray(), median));
+      double[] delta = minusEquals(obj.toArray(), median);
       deltas.put(iditer, delta);
       covmaker.put(delta);
     }
     // Finalize covariance matrix:
-    Vector mean = covmaker.getMeanVector();
+    double[] mean = covmaker.getMeanVector();
     Matrix cmati = covmaker.destroyToSampleMatrix().inverse();
 
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(attributes.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final double score = MathUtil.mahalanobisDistance(cmati, deltas.get(iditer), mean);
+      final double score = mahalanobisDistance(cmati.getArrayRef(), deltas.get(iditer), mean);
       minmax.put(score);
       scores.putDouble(iditer, score);
     }

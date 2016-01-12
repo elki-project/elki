@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -77,7 +76,7 @@ public class PCAFilteredAutotuningRunner extends PCAFilteredRunner {
   public PCAFilteredResult processIds(DBIDs ids, Relation<? extends NumberVector> database) {
     // Assume Euclidean distance. In the context of PCA, the neighborhood should
     // be L2-spherical to be unbiased.
-    Vector center = Centroid.make(database, ids);
+    Centroid center = Centroid.make(database, ids);
     ModifiableDoubleDBIDList dres = DBIDUtil.newDistanceDBIDList(ids.size());
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       final double dist = EuclideanDistanceFunction.STATIC.distance(center, database.get(iter));

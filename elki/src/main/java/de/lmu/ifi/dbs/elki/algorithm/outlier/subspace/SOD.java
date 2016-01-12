@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -155,11 +156,11 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
       LOG.incrementProcessed(progress);
       DBIDs neighborhood = getNearestNeighbors(relation, snnInstance, iter);
 
-      Vector center;
+      double[] center;
       long[] weightVector;
       double sod;
       if(neighborhood.size() > 0) {
-        center = Centroid.make(relation, neighborhood);
+        center = Centroid.make(relation, neighborhood).getArrayRef();
         // Note: per-dimension variances; no covariances.
         double[] variances = computePerDimensionVariances(relation, center, neighborhood);
         double expectationOfVariance = Mean.of(variances);
@@ -172,7 +173,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
         sod = subspaceOutlierDegree(relation.get(iter), center, weightVector);
       }
       else {
-        center = new Vector(relation.get(iter).toArray());
+        center = relation.get(iter).toArray();
         weightVector = null;
         sod = 0.;
       }
@@ -235,19 +236,17 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
    * @param neighborhood Neighbors
    * @return Per-dimension variances.
    */
-  private static double[] computePerDimensionVariances(Relation<? extends NumberVector> relation, Vector center, DBIDs neighborhood) {
-    double[] c = center.getArrayRef();
-    double[] variances = new double[c.length];
+  private static double[] computePerDimensionVariances(Relation<? extends NumberVector> relation, double[] center, DBIDs neighborhood) {
+    final int dim = center.length;
+    double[] variances = new double[dim];
     for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
       NumberVector databaseObject = relation.get(iter);
-      for(int d = 0; d < c.length; d++) {
-        final double deviation = databaseObject.doubleValue(d) - c[d];
+      for(int d = 0; d < dim; d++) {
+        final double deviation = databaseObject.doubleValue(d) - center[d];
         variances[d] += deviation * deviation;
       }
     }
-    for(int d = 0; d < variances.length; d++) {
-      variances[d] /= neighborhood.size();
-    }
+    VMath.times(variances, 1. / neighborhood.size());
     return variances;
   }
 
@@ -259,13 +258,13 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
    * @param weightVector Weight vector
    * @return sod score
    */
-  private double subspaceOutlierDegree(V queryObject, Vector center, long[] weightVector) {
+  private double subspaceOutlierDegree(V queryObject, double[] center, long[] weightVector) {
     final int card = BitsUtil.cardinality(weightVector);
     if(card == 0) {
       return 0;
     }
     final SubspaceEuclideanDistanceFunction df = new SubspaceEuclideanDistanceFunction(weightVector);
-    double distance = df.distance(queryObject, center);
+    double distance = df.distance(queryObject, new Vector(center));
     distance /= card; // FIXME: defined and published as card, should be
                       // sqrt(card), unfortunately
     return distance;
@@ -290,7 +289,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
     /**
      * Center vector
      */
-    private Vector center;
+    private double[] center;
 
     /**
      * Relevant dimensions.
@@ -303,7 +302,7 @@ public class SOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult
      * @param center Center vector
      * @param weightVector Selected dimensions
      */
-    public SODModel(Vector center, long[] weightVector) {
+    public SODModel(double[] center, long[] weightVector) {
       this.center = center;
       this.weightVector = weightVector;
     }

@@ -209,7 +209,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     // Add the remainder as noise.
     if(S.size() > 0) {
       long[] alldims = BitsUtil.ones(d);
-      result.addToplevelCluster(new Cluster<>(S, true, new SubspaceModel(new Subspace(alldims), Centroid.make(relation, S))));
+      result.addToplevelCluster(new Cluster<>(S, true, new SubspaceModel(new Subspace(alldims), Centroid.make(relation, S).getArrayRef())));
     }
     LOG.setCompleted(cprogress);
     return result;
@@ -421,7 +421,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
   private Cluster<SubspaceModel> makeCluster(Relation<V> relation, DBIDs C, long[] D) {
     DBIDs ids = DBIDUtil.newHashSet(C); // copy, also to lose distance values!
     Cluster<SubspaceModel> cluster = new Cluster<>(ids);
-    cluster.setModel(new SubspaceModel(new Subspace(D), Centroid.make(relation, ids)));
+    cluster.setModel(new SubspaceModel(new Subspace(D), Centroid.make(relation, ids).getArrayRef()));
     return cluster;
   }
 

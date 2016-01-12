@@ -178,7 +178,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
         varsum += distanceFunction.distance(mean, relation.get(it));
       }
-      KMeansModel model = new KMeansModel(mean, varsum);
+      KMeansModel model = new KMeansModel(mean.getArrayRef(), varsum);
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
     return result;

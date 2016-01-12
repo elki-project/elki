@@ -64,7 +64,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectedCentroid;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -268,7 +267,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       // look for the proper cluster
       ArrayModifiableDBIDs cluster = null;
       for(ArrayModifiableDBIDs c : parallelClusters) {
-        Vector c_centroid = ProjectedCentroid.make(preferenceVector, relation, c);
+        NumberVector c_centroid = ProjectedCentroid.make(preferenceVector, relation, c);
         long[] commonPreferenceVector = BitsUtil.andCMin(preferenceVector, preferenceVector);
         int subspaceDim = subspaceDimensionality(object, c_centroid, preferenceVector, preferenceVector, commonPreferenceVector);
         if(subspaceDim == clusterOrder.getCorrelationValue(iter)) {
@@ -350,7 +349,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       for(int i = 0; i < parallelClusters.size(); i++) {
         ArrayModifiableDBIDs c = parallelClusters.get(i);
         Cluster<SubspaceModel> cluster = new Cluster<>(c);
-        cluster.setModel(new SubspaceModel(new Subspace(pv), Centroid.make(relation, c)));
+        cluster.setModel(new SubspaceModel(new Subspace(pv), Centroid.make(relation, c).getArrayRef()));
         String subspace = BitsUtil.toStringLow(cluster.getModel().getSubspace().getDimensions(), db_dim);
         if(parallelClusters.size() > 1) {
           cluster.setName("Cluster_" + subspace + "_" + i);
@@ -440,7 +439,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @return the parent of the specified cluster
    */
   private Pair<long[], ArrayModifiableDBIDs> findParent(Relation<V> relation, Pair<long[], ArrayModifiableDBIDs> child, TCustomHashMap<long[], List<ArrayModifiableDBIDs>> clustersMap) {
-    Vector child_centroid = ProjectedCentroid.make(child.first, relation, child.second);
+    NumberVector child_centroid = ProjectedCentroid.make(child.first, relation, child.second);
 
     Pair<long[], ArrayModifiableDBIDs> result = null;
     int resultCardinality = -1;
@@ -460,7 +459,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       if(pv.equals(parentPV)) {
         List<ArrayModifiableDBIDs> parentList = clustersMap.get(parentPV);
         for(ArrayModifiableDBIDs parent : parentList) {
-          Vector parent_centroid = ProjectedCentroid.make(parentPV, relation, parent);
+          NumberVector parent_centroid = ProjectedCentroid.make(parentPV, relation, parent);
           double d = weightedDistance(child_centroid, parent_centroid, parentPV);
           if(d <= 2 * epsilon) {
             result = new Pair<>(parentPV, parent);
@@ -491,7 +490,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       Cluster<SubspaceModel> c_i = clusters.get(i);
       final Subspace s_i = c_i.getModel().getSubspace();
       int subspaceDim_i = dimensionality - s_i.dimensionality();
-      Vector ci_centroid = ProjectedCentroid.make(s_i.getDimensions(), database, c_i.getIDs());
+      NumberVector ci_centroid = ProjectedCentroid.make(s_i.getDimensions(), database, c_i.getIDs());
       long[] pv1 = s_i.getDimensions();
 
       for(int j = i + 1; j < clusters.size(); j++) {
@@ -518,7 +517,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
             }
           }
           else {
-            Vector cj_centroid = ProjectedCentroid.make(c_j.getModel().getDimensions(), database, c_j.getIDs());
+            NumberVector cj_centroid = ProjectedCentroid.make(c_j.getModel().getDimensions(), database, c_j.getIDs());
             long[] pv2 = s_j.getDimensions();
             long[] commonPreferenceVector = BitsUtil.andCMin(pv1, pv2);
             int subspaceDim = subspaceDimensionality(ci_centroid, cj_centroid, pv1, pv2, commonPreferenceVector);
@@ -571,13 +570,13 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    */
   private boolean isParent(Relation<V> relation, Cluster<SubspaceModel> parent, Iter<Cluster<SubspaceModel>> iter, int db_dim) {
     Subspace s_p = parent.getModel().getSubspace();
-    Vector parent_centroid = ProjectedCentroid.make(s_p.getDimensions(), relation, parent.getIDs());
+    NumberVector parent_centroid = ProjectedCentroid.make(s_p.getDimensions(), relation, parent.getIDs());
     int subspaceDim_parent = db_dim - s_p.dimensionality();
 
     for(; iter.valid(); iter.advance()) {
       Cluster<SubspaceModel> child = iter.get();
       Subspace s_c = child.getModel().getSubspace();
-      Vector child_centroid = ProjectedCentroid.make(s_c.getDimensions(), relation, child.getIDs());
+      NumberVector child_centroid = ProjectedCentroid.make(s_c.getDimensions(), relation, child.getIDs());
       long[] commonPreferenceVector = BitsUtil.andCMin(s_p.getDimensions(), s_c.getDimensions());
       int subspaceDim = subspaceDimensionality(parent_centroid, child_centroid, s_p.getDimensions(), s_c.getDimensions(), commonPreferenceVector);
       if(subspaceDim == subspaceDim_parent) {

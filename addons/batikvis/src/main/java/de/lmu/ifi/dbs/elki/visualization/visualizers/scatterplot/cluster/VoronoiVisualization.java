@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -252,12 +251,8 @@ public class VoronoiVisualization extends AbstractVisFactory {
           double[] mean;
           try {
             if(model instanceof KMeansModel) {
-              Vector mmean = ((KMeansModel) model).getMean();
-              if(mmean == null) {
-                continue;
-              }
-              mean = mmean.toArray();
-              if(mean.length != dim) {
+              mean = ((KMeansModel) model).getMean();
+              if(mean == null || mean.length != dim) {
                 continue;
               }
             }

@@ -109,7 +109,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @param centroid the centroid if the objects belonging to the hyperplane
    *        induced by the correlation
    */
-  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid) {
+  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, double[] centroid) {
     this(solution, db, strongEigenvectors, weakEigenvectors, similarityMatrix, centroid, NumberFormat.getInstance(Locale.US));
   }
 
@@ -130,13 +130,13 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    *        induced by the correlation
    * @param nf the number format for output accuracy
    */
-  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, Vector centroid, NumberFormat nf) {
+  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, double[] centroid, NumberFormat nf) {
     this.linearEquationSystem = solution;
     this.correlationDimensionality = strongEigenvectors.getColumnDimensionality();
     this.strongEigenvectors = strongEigenvectors;
     this.weakEigenvectors = weakEigenvectors;
     this.similarityMatrix = similarityMatrix;
-    this.centroid = centroid.getArrayRef();
+    this.centroid = centroid;
     this.nf = nf;
 
     // determine standard deviation

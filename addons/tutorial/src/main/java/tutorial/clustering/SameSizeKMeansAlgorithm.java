@@ -126,7 +126,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     // Wrap result
     Clustering<MeanModel> result = new Clustering<>("k-Means Samesize Clustering", "kmeans-samesize-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      Vector mean = new Vector(means.get(i).toArray());
+      double[] mean = means.get(i).toArray();
       result.addToplevelCluster(new Cluster<>(clusters.get(i), new MeanModel(mean)));
     }
     return result;

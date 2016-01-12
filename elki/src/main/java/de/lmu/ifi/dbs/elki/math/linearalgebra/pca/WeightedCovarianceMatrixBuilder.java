@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ConstantWeight;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -106,7 +105,7 @@ public class WeightedCovarianceMatrixBuilder extends AbstractCovarianceMatrixBui
   public Matrix processIds(DBIDs ids, Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final CovarianceMatrix cmat = new CovarianceMatrix(dim);
-    final Vector centroid = Centroid.make(relation, ids);
+    final Centroid centroid = Centroid.make(relation, ids);
 
     // find maximum distance
     double maxdist = 0.0;

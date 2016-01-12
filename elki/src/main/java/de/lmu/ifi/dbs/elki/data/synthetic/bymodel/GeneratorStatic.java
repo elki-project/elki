@@ -28,7 +28,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Class for static clusters, that is an implementation of GeneratorInterface
@@ -45,7 +44,7 @@ public class GeneratorStatic implements GeneratorInterface {
   /**
    * Cluster points
    */
-  public List<Vector> points;
+  public List<double[]> points;
 
   /**
    * Construct generator using given name and points
@@ -53,7 +52,7 @@ public class GeneratorStatic implements GeneratorInterface {
    * @param name Cluster name
    * @param points Cluster points
    */
-  public GeneratorStatic(String name, List<Vector> points) {
+  public GeneratorStatic(String name, List<double[]> points) {
     super();
     this.name = name;
     this.points = points;
@@ -66,13 +65,13 @@ public class GeneratorStatic implements GeneratorInterface {
    * @param count parameter is ignored.
    */
   @Override
-  public List<Vector> generate(int count) {
+  public List<double[]> generate(int count) {
     return Collections.unmodifiableList(points);
   }
 
   @Override
-  public double getDensity(Vector p) {
-    for(Vector my : points) {
+  public double getDensity(double[] p) {
+    for(double[] my : points) {
       if(my.equals(p)) {
         return Double.POSITIVE_INFINITY;
       }
@@ -82,7 +81,7 @@ public class GeneratorStatic implements GeneratorInterface {
 
   @Override
   public int getDim() {
-    return points.get(0).getDimensionality();
+    return points.get(0).length;
   }
 
   @Override
@@ -101,7 +100,7 @@ public class GeneratorStatic implements GeneratorInterface {
   }
 
   @Override
-  public Vector computeMean() {
+  public double[] computeMean() {
     // Not supported except for singletons.
     return points.size() == 1 ? points.get(1) : null;
   }

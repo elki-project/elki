@@ -206,7 +206,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
         }
 
         Matrix covmat = model.getCovarianceMatrix();
-        Vector centroid = model.getMean();
+        double[] centroid = model.getMean();
         double[] cent = proj.fastProjectDataToRenderSpace(centroid);
 
         // Compute the eigenvectors

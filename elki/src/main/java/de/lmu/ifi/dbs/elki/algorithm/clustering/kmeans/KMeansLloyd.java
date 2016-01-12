@@ -141,7 +141,7 @@ public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMean
       if(ids.size() == 0) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
+      KMeansModel model = new KMeansModel(means.get(i).getArrayRef(), varsum[i]);
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
     return result;

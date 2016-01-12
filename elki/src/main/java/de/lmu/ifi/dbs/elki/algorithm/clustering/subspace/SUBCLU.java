@@ -264,7 +264,7 @@ public class SUBCLU<V extends NumberVector> extends AbstractAlgorithm<Clustering
       List<Cluster<Model>> clusters = clusterMap.get(subspace);
       for(Cluster<Model> cluster : clusters) {
         Cluster<SubspaceModel> newCluster = new Cluster<>(cluster.getIDs());
-        newCluster.setModel(new SubspaceModel(subspace, Centroid.make(relation, cluster.getIDs())));
+        newCluster.setModel(new SubspaceModel(subspace, Centroid.make(relation, cluster.getIDs()).getArrayRef()));
         newCluster.setName("cluster_" + numClusters++);
         result.addToplevelCluster(newCluster);
       }

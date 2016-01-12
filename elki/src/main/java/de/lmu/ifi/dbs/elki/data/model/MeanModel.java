@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 
 /**
@@ -31,20 +30,22 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
  * 
  * @author Erich Schubert
  */
-public class MeanModel extends PrototypeModel<Vector> implements TextWriteable {
+public class MeanModel extends PrototypeModel<double[]> implements TextWriteable {
   /**
    * Constructor with mean
    * 
    * @param mean Cluster mean
    */
-  public MeanModel(Vector mean) {
+  public MeanModel(double[] mean) {
     super(mean);
   }
 
   /**
-   * @return mean
+   * Get the mean.
+   * 
+   * @return mean (do not modify!)
    */
-  public Vector getMean() {
+  public double[] getMean() {
     return prototype;
   }
 

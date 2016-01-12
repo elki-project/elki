@@ -92,7 +92,7 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
   public void setInitialClusters(List<? extends Cluster<? extends MeanModel>> initialMeans) {
     List<Vector> vecs = new ArrayList<>(initialMeans.size());
     for(Cluster<? extends MeanModel> cluster : initialMeans) {
-      vecs.add(cluster.getModel().getMean().copy());
+      vecs.add(new Vector(cluster.getModel().getMean()));
     }
     this.initialMeans = vecs;
   }
