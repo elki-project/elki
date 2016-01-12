@@ -85,7 +85,7 @@ public class DTWDistanceFunctionTest implements JUnit4Test {
   public void testDynamicTimeWarping() {
     DoubleVector[] vecs = new DoubleVector[DATA.length];
     for(int i = 0; i < DATA.length; i++) {
-      vecs[i] = new DoubleVector(DATA[i]);
+      vecs[i] = DoubleVector.wrap(DATA[i]);
     }
     DTWDistanceFunction f = new DTWDistanceFunction();
     for(int i = 0; i < vecs.length; i++) {
@@ -104,7 +104,7 @@ public class DTWDistanceFunctionTest implements JUnit4Test {
   public void testConstrainedDynamicTimeWarping() {
     DoubleVector[] vecs = new DoubleVector[DATA.length];
     for(int i = 0; i < DATA.length; i++) {
-      vecs[i] = new DoubleVector(DATA[i]);
+      vecs[i] = DoubleVector.wrap(DATA[i]);
     }
     // 4,4 -> 2; 4,8 -> 3; 8,8 -> 3
     DTWDistanceFunction f = new DTWDistanceFunction(.33);

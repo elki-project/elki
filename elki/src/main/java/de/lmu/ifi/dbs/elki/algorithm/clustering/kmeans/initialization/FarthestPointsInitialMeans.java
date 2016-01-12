@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,9 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -73,7 +71,7 @@ public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
     // Get a distance query
     DistanceQuery<T> distQ = database.getDistanceQuery(relation, distanceFunction);
 
@@ -81,11 +79,11 @@ public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Double.POSITIVE_INFINITY);
 
     // Chose first mean
-    List<V> means = new ArrayList<>(k);
+    double[][] means = new double[k][];
 
     DBIDRef first = DBIDUtil.randomSample(ids, rnd);
     T prevmean = relation.get(first);
-    means.add(factory.newNumberVector(prevmean));
+    means[0] = prevmean.toArray();
 
     // Find farthest object each.
     DBIDVar best = DBIDUtil.newVar(first);
@@ -107,12 +105,9 @@ public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<
         }
       }
       // Add new mean (and drop the initial mean when desired)
-      if(i == 0) {
-        means.clear(); // Remove temporary first element.
-      }
       store.putDouble(best, Double.NaN); // So it won't be chosen twice.
       prevmean = relation.get(best);
-      means.add(factory.newNumberVector(prevmean));
+      means[i] = prevmean.toArray();
     }
 
     // Explicitly destroy temporary data.

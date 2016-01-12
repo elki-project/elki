@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.SparseDoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -129,6 +130,13 @@ public class ArffParser implements Parser {
    * (Reused) buffer for building label lists.
    */
   ArrayList<String> labels = new ArrayList<>();
+
+  /**
+   * Factory for dense vectors.
+   * 
+   * TODO: Make parameterizable
+   */
+  NumberVector.Factory<?> denseFactory = DoubleVector.FACTORY;
 
   /**
    * Constructor.
@@ -344,7 +352,7 @@ public class ArffParser implements Parser {
           }
           nextToken(tokenizer);
         }
-        data[out] = new DoubleVector(cur);
+        data[out] = denseFactory.newNumberVector(cur);
       }
       else if(TypeUtil.LABELLIST.equals(etyp[out])) {
         // Build a label list out of successive labels
@@ -631,10 +639,10 @@ public class ArffParser implements Parser {
 
   @Override
   public void cleanup() {
-    if (magic_eid != null) {
+    if(magic_eid != null) {
       magic_eid.reset("");
     }
-    if (magic_class != null) {
+    if(magic_class != null) {
       magic_class.reset("");
     }
   }

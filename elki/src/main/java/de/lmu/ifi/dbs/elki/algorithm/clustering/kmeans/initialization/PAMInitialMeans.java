@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.ArrayList;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -77,7 +75,10 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
   }
 
   @Override
-  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
+    if (relation.size() < k) {
+      throw new AbortException("Database has less than k objects.");
+    }
     // Ugly cast; but better than code duplication.
     @SuppressWarnings("unchecked")
     Relation<O> rel = (Relation<O>) relation;
@@ -86,9 +87,10 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
     final PrimitiveDistanceFunction<? super O> distF = (PrimitiveDistanceFunction<? super O>) distanceFunction;
     final DistanceQuery<O> distQ = database.getDistanceQuery(rel, distF);
     DBIDs medids = chooseInitialMedoids(k, rel.getDBIDs(), distQ);
-    List<V> medoids = new ArrayList<>(k);
-    for(DBIDIter iter = medids.iter(); iter.valid(); iter.advance()) {
-      medoids.add(factory.newNumberVector(relation.get(iter)));
+    double[][] medoids = new double[k][];
+    DBIDIter iter = medids.iter();
+    for(int i = 0; i < k; i++) {
+      medoids[i] = relation.get(iter).toArray();
     }
     return medoids;
   }
@@ -131,7 +133,7 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
       }
       medids.add(bestid);
     }
-    assert(mindist != null);
+    assert (mindist != null);
 
     // Subsequent means optimize the full criterion.
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Choosing initial centers", k, LOG) : null;

@@ -129,7 +129,7 @@ public abstract class AbstractIndexStructureTest implements JUnit4Test {
 
     if(expectKNNQuery != null) {
       // get the 10 next neighbors
-      DoubleVector dv = new DoubleVector(querypoint);
+      DoubleVector dv = DoubleVector.wrap(querypoint);
       KNNQuery<DoubleVector> knnq = db.getKNNQuery(dist, k);
       assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
       KNNList ids = knnq.getKNNForObject(dv, k);
@@ -142,13 +142,13 @@ public abstract class AbstractIndexStructureTest implements JUnit4Test {
         assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
         // verify vector
         DoubleVector c = rep.get(res);
-        DoubleVector c2 = new DoubleVector(shouldc[i]);
+        DoubleVector c2 = DoubleVector.wrap(shouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
       }
     }
     if(expectRangeQuery != null) {
       // Do a range query
-      DoubleVector dv = new DoubleVector(querypoint);
+      DoubleVector dv = DoubleVector.wrap(querypoint);
       RangeQuery<DoubleVector> rangeq = db.getRangeQuery(dist, eps);
       assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
       DoubleDBIDList ids = rangeq.getRangeForObject(dv, eps);
@@ -161,7 +161,7 @@ public abstract class AbstractIndexStructureTest implements JUnit4Test {
         assertEquals("Expected distance doesn't match.", shouldd[i], res.doubleValue(), 1e-6);
         // verify vector
         DoubleVector c = rep.get(res);
-        DoubleVector c2 = new DoubleVector(shouldc[i]);
+        DoubleVector c2 = DoubleVector.wrap(shouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
       }
     }
@@ -186,7 +186,7 @@ public abstract class AbstractIndexStructureTest implements JUnit4Test {
 
     if(expectKNNQuery != null) {
       // get the 10 next neighbors
-      DoubleVector dv = new DoubleVector(querypoint);
+      DoubleVector dv = DoubleVector.wrap(querypoint);
       KNNQuery<DoubleVector> knnq = db.getKNNQuery(dist, k);
       assertTrue("Returned knn query is not of expected class: expected " + expectKNNQuery + " got " + knnq.getClass(), expectKNNQuery.isAssignableFrom(knnq.getClass()));
       KNNList ids = knnq.getKNNForObject(dv, k);
@@ -199,13 +199,13 @@ public abstract class AbstractIndexStructureTest implements JUnit4Test {
         assertEquals("Expected distance doesn't match.", cosshouldd[i], res.doubleValue(), 1e-15);
         // verify vector
         DoubleVector c = rep.get(res);
-        DoubleVector c2 = new DoubleVector(cosshouldc[i]);
+        DoubleVector c2 = DoubleVector.wrap(cosshouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
       }
     }
     if(expectRangeQuery != null) {
       // Do a range query
-      DoubleVector dv = new DoubleVector(querypoint);
+      DoubleVector dv = DoubleVector.wrap(querypoint);
       RangeQuery<DoubleVector> rangeq = db.getRangeQuery(dist, coseps);
       assertTrue("Returned range query is not of expected class: expected " + expectRangeQuery + " got " + rangeq.getClass(), expectRangeQuery.isAssignableFrom(rangeq.getClass()));
       DoubleDBIDList ids = rangeq.getRangeForObject(dv, coseps);
@@ -218,7 +218,7 @@ public abstract class AbstractIndexStructureTest implements JUnit4Test {
         assertEquals("Expected distance doesn't match.", cosshouldd[i], res.doubleValue(), 1e-15);
         // verify vector
         DoubleVector c = rep.get(res);
-        DoubleVector c2 = new DoubleVector(cosshouldc[i]);
+        DoubleVector c2 = DoubleVector.wrap(cosshouldc[i]);
         assertEquals("Expected vector doesn't match: " + c.toString(), 0.0, dist.distance(c, c2), 1e-15);
       }
     }

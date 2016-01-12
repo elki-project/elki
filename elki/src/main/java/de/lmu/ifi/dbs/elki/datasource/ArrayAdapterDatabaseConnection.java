@@ -39,6 +39,10 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Import an existing data matrix (<code>double[rows][cols]</code>) into an ELKI
  * database.
  * 
+ * For efficiency, the data is <em>not</em> copied. If you modify the array
+ * afterwards, you can break indexes and algorithm results. It is your
+ * responsbility to not do this!
+ * 
  * Note: this class is not parameterizable, but can only be used from Java.
  * 
  * @author Erich Schubert
@@ -105,7 +109,7 @@ public class ArrayAdapterDatabaseConnection implements DatabaseConnection {
     for(int i = 0; i < data.length; i++) {
       mind = Math.min(mind, data[i].length);
       maxd = Math.max(maxd, data[i].length);
-      vecs.add(new DoubleVector(data[i]));
+      vecs.add(DoubleVector.wrap(data[i]));
     }
     SimpleTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, mind, maxd, DoubleVector.FACTORY.getDefaultSerializer());
     b.appendColumn(type, vecs);

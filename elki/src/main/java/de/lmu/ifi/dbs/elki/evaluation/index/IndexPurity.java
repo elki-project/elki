@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -96,8 +95,8 @@ public class IndexPurity implements Evaluator {
         }
         mv.put(gini);
       }
-      Collection<DoubleVector> col = new ArrayList<>();
-      col.add(new DoubleVector(new double[] { mv.getMean(), mv.getSampleStddev() }));
+      Collection<double[]> col = new ArrayList<>();
+      col.add(new double[] { mv.getMean(), mv.getSampleStddev() });
       database.getHierarchy().add((Result) index, new CollectionResult<>("Gini coefficient of index", "index-gini", col));
     }
   }

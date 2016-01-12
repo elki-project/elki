@@ -38,10 +38,10 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 public class LinearKernelFunctionTest implements JUnit4Test {
   @Test
   public void testToyExamples() {
-    DoubleVector v1 = new DoubleVector(new double[] { 1, 0, 0 });
-    DoubleVector v2 = new DoubleVector(new double[] { 0, 1, 0 });
-    DoubleVector v3 = new DoubleVector(new double[] { 1, 1, 1 });
-    DoubleVector v4 = new DoubleVector(new double[] { .1, .2, .3 });
+    DoubleVector v1 = DoubleVector.wrap(new double[] { 1, 0, 0 });
+    DoubleVector v2 = DoubleVector.wrap(new double[] { 0, 1, 0 });
+    DoubleVector v3 = DoubleVector.wrap(new double[] { 1, 1, 1 });
+    DoubleVector v4 = DoubleVector.wrap(new double[] { .1, .2, .3 });
 
     LinearKernelFunction kernel = LinearKernelFunction.STATIC;
     assertEquals("Linear kernel not correct.", 0., kernel.similarity(v1, v2), 0.);

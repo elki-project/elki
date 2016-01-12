@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -32,8 +34,8 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.Predefined
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality.KMeansQualityMeasure;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -45,7 +47,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.MutableProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -160,7 +162,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     }
-    splitInitializer.setInitialMeans(initializer.chooseInitialMeans(database, relation, k_min, getDistanceFunction(), Vector.FACTORY));
+    splitInitializer.setInitialMeans(initializer.chooseInitialMeans(database, relation, k_min, getDistanceFunction()));
     Clustering<M> clustering = innerKMeans.run(database, relation);
 
     if(prog != null) {
@@ -256,26 +258,26 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    * @param relation Data relation
    * @return List of new centroids
    */
-  protected List<? extends NumberVector> splitCentroid(Cluster<? extends MeanModel> parentCluster, Relation<V> relation) {
-    Vector parentCentroid = new Vector(parentCluster.getModel().getMean());
+  protected double[][] splitCentroid(Cluster<? extends MeanModel> parentCluster, Relation<V> relation) {
+    double[] parentCentroid = parentCluster.getModel().getMean();
 
     // Compute size of cluster/region
     double radius = 0.;
     for(DBIDIter it = parentCluster.getIDs().iter(); it.valid(); it.advance()) {
-      double d = getDistanceFunction().distance(relation.get(it), parentCentroid);
+      double d = getDistanceFunction().distance(relation.get(it), DoubleVector.wrap(parentCentroid));
       radius = (d > radius) ? d : radius;
     }
 
     // Choose random vector
     Random random = rnd.getSingleThreadedRandom();
     final int dim = RelationUtil.dimensionality(relation);
-    Vector randomVector = VectorUtil.randomVector(Vector.FACTORY, dim, random).normalize();
-    randomVector.timesEquals((.4 + random.nextDouble() * .5) * radius);
+    double[] randomVector = normalize(MathUtil.randomDoubleArray(dim, random));
+    timesEquals(randomVector, (.4 + random.nextDouble() * .5) * radius);
 
     // Get the new centroids
-    ArrayList<Vector> vecs = new ArrayList<>(2);
-    vecs.add(parentCentroid.minus(randomVector));
-    vecs.add(randomVector.plusEquals(parentCentroid));
+    double[][] vecs = new double[2][];
+    vecs[0] = minus(parentCentroid, randomVector);
+    vecs[1] = plusEquals(randomVector, parentCentroid);
     return vecs;
   }
 
@@ -369,7 +371,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       if(config.grab(rndP)) {
         random = rndP.getValue();
       }
-      splitInitializer = new PredefinedInitialMeans((List<Vector>) null);
+      splitInitializer = new PredefinedInitialMeans((double[][]) null);
 
       ObjectParameter<KMeans<V, M>> innerKMeansP = new ObjectParameter<>(INNER_KMEANS_ID, KMeans.class, KMeansLloyd.class);
       if(config.grab(innerKMeansP)) {

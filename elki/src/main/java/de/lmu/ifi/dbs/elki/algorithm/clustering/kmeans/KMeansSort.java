@@ -30,6 +30,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -48,7 +49,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -109,7 +109,7 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     }
-    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
+    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -153,7 +153,7 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
       if(ids.size() == 0) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means.get(i).getArrayRef(), varsum[i]);
+      KMeansModel model = new KMeansModel(means[i], varsum[i]);
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
     return result;
@@ -167,12 +167,12 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
    * @param cnum Center numbers
    * @param diststat Distance counting statistic
    */
-  private void recomputeSeperation(List<Vector> means, double[][] cdist, int[][] cnum, LongStatistic diststat) {
-    final int k = means.size();
+  private void recomputeSeperation(double[][] means, double[][] cdist, int[][] cnum, LongStatistic diststat) {
+    final int k = means.length;
     for(int i = 1; i < k; i++) {
-      Vector mi = means.get(i);
+      DoubleVector mi = DoubleVector.wrap(means[i]);
       for(int j = 0; j < i; j++) {
-        double d = distanceFunction.distance(mi, means.get(j));
+        double d = distanceFunction.distance(mi, DoubleVector.wrap(means[j]));
         cdist[i][j] = d;
         cdist[j][i] = d;
       }
@@ -205,8 +205,8 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
    * @param diststat Distance statistics
    * @return true when the object was reassigned
    */
-  private boolean assignToNearestCluster(Relation<V> relation, List<Vector> means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum, double[][] cdist, int[][] cnum, LongStatistic diststat) {
-    assert (k == means.size());
+  private boolean assignToNearestCluster(Relation<V> relation, double[][] means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum, double[][] cdist, int[][] cnum, LongStatistic diststat) {
+    assert (k == means.length);
     long dists = 0;
     boolean changed = false;
     // Reset all clusters
@@ -220,7 +220,7 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
       final int cur = assignment.intValue(iditer), ini = cur >= 0 ? cur : 0;
       // Distance to current mean:
       V fv = relation.get(iditer);
-      double mindist = df.distance(fv, means.get(ini));
+      double mindist = df.distance(fv, DoubleVector.wrap(means[ini]));
       ++dists;
       final double threshold = mult * mindist;
       int minIndex = ini;
@@ -228,7 +228,7 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
         if(cdist[minIndex][i] >= threshold) { // Sort pruning
           break; // All following can only be worse.
         }
-        double dist = df.distance(fv, means.get(i));
+        double dist = df.distance(fv, DoubleVector.wrap(means[i]));
         ++dists;
         if(dist < mindist) {
           minIndex = i;

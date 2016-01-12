@@ -22,18 +22,18 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
+import java.util.Arrays;
+
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.parallel.Executor;
 import de.lmu.ifi.dbs.elki.parallel.processor.Processor;
 
@@ -63,7 +63,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
   /**
    * Mean vectors.
    */
-  List<Vector> means;
+  double[][] means;
 
   /**
    * Updated cluster centroids
@@ -115,11 +115,11 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
    *
    * @param means New means.
    */
-  public void nextIteration(List<Vector> means) {
+  public void nextIteration(double[][] means) {
     this.means = means;
     changed = false;
-    final int k = means.size();
-    final int dim = means.get(0).getDimensionality();
+    final int k = means.length;
+    final int dim = means[0].length;
     centroids = new double[k][dim];
     sizes = new int[k];
     Arrays.fill(varsum, 0.);
@@ -145,11 +145,11 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
         double sum = sizea + sizeb;
         double[] cent = centroids[i];
         if(sizea > 0) {
-          VMath.timesEquals(cent, sizea / sum);
+          timesEquals(cent, sizea / sum);
         }
-        VMath.plusTimesEquals(cent, instance.centroids[i], 1. / sum);
+        plusTimesEquals(cent, instance.centroids[i], 1. / sum);
         sizes[i] += sizeb;
-        VMath.plusEquals(varsum, instance.varsum);
+        plusEquals(varsum, instance.varsum);
       }
     }
   }
@@ -159,14 +159,14 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
    *
    * @return New means
    */
-  public List<Vector> getMeans() {
-    ArrayList<Vector> newmeans = new ArrayList<>(centroids.length);
+  public double[][] getMeans() {
+    double[][] newmeans = new double[centroids.length][];
     for(int i = 0; i < centroids.length; i++) {
       if(sizes[i] == 0) {
-        newmeans.add(means.get(i)); // Keep old mean.
+        newmeans[i] = means[i]; // Keep old mean.
         continue;
       }
-      newmeans.add(new Vector(centroids[i]));
+      newmeans[i] = centroids[i];
     }
     return newmeans;
   }
@@ -195,7 +195,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
     /**
      * Current mean vectors.
      */
-    private Vector[] means;
+    private double[][] means;
 
     /**
      * Updated cluster centroids
@@ -225,19 +225,18 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
      * @param assignment Current assignment
      * @param means Previous mean vectors
      */
-    public Instance(Relation<V> relation, NumberVectorDistanceFunction<? super V> distance, WritableIntegerDataStore assignment, List<? extends NumberVector> means) {
+    public Instance(Relation<V> relation, NumberVectorDistanceFunction<? super V> distance, WritableIntegerDataStore assignment, double[][] means) {
       super();
       this.relation = relation;
       this.distance = distance;
       this.assignment = assignment;
-      final int k = means.size();
-      this.means = new Vector[k];
-      Iterator<? extends NumberVector> iter = means.iterator();
+      final int k = means.length;
+      this.means = new double[k][];
       for(int i = 0; i < k; i++) {
-        this.means[i] = new Vector(iter.next().toArray()); // Make local copy!
+        this.means[i] = means[i].clone(); // Make local copy!
       }
       // Storage for updated means.
-      final int dim = this.means[0].getDimensionality();
+      final int dim = this.means[0].length;
       this.centroids = new double[k][dim];
       this.sizes = new int[k];
       this.varsum = new double[k];
@@ -250,7 +249,7 @@ public class KMeansProcessor<V extends NumberVector> implements Processor {
       double mindist = Double.POSITIVE_INFINITY;
       int minIndex = 0;
       for(int i = 0; i < means.length; i++) {
-        final double dist = distance.distance(fv, means[i]);
+        final double dist = distance.distance(fv, DoubleVector.wrap(means[i]));
         if(dist < mindist) {
           minIndex = i;
           mindist = dist;

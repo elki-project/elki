@@ -94,7 +94,7 @@ public final class ModelUtil {
   public static NumberVector getPrototype(Model model, Relation<? extends NumberVector> relation) {
     // Mean model contains a numeric Vector
     if(model instanceof MeanModel) {
-      return new DoubleVector(((MeanModel) model).getMean());
+      return DoubleVector.wrap(((MeanModel) model).getMean());
     }
     // Handle medoid models
     if(model instanceof MedoidModel) {

@@ -51,8 +51,8 @@ public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest im
     // test with {1,1,-1,1,-1}
     int numberOfProjections = 1;
     LocalitySensitiveHashFunction<? super NumberVector> hashFunction = createCosineHashFunction(numberOfProjections);
-    assertEquals(1, hashFunction.hashObject(new DoubleVector(new double[] { 1, 1, 1, 1, 1 })));
-    assertEquals(0, hashFunction.hashObject(new DoubleVector(new double[] { 1, 1, 3, 1, 1 })));
+    assertEquals(1, hashFunction.hashObject(DoubleVector.wrap(new double[] { 1, 1, 1, 1, 1 })));
+    assertEquals(0, hashFunction.hashObject(DoubleVector.wrap(new double[] { 1, 1, 3, 1, 1 })));
   }
 
   @Test
@@ -60,8 +60,8 @@ public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest im
     // test with {1,1,-1,1,-1}
     int numberOfProjections = 2;
     LocalitySensitiveHashFunction<? super NumberVector> hashFunction = createCosineHashFunction(numberOfProjections);
-    assertEquals(2, hashFunction.hashObject(new DoubleVector(new double[] { 1, 1, 1, 1, 1 })));
-    assertEquals(2, hashFunction.hashObject(new DoubleVector(new double[] { 1, 1, 1, 1, 3 })));
+    assertEquals(2, hashFunction.hashObject(DoubleVector.wrap(new double[] { 1, 1, 1, 1, 1 })));
+    assertEquals(2, hashFunction.hashObject(DoubleVector.wrap(new double[] { 1, 1, 1, 1, 3 })));
   }
 
   private LocalitySensitiveHashFunction<? super NumberVector> createCosineHashFunction(int numberOfProjections) {

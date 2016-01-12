@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,9 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -35,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Initialize K-means by randomly choosing k existing elements as cluster
@@ -68,11 +67,15 @@ public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
     DBIDs ids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
-    List<V> means = new ArrayList<>(k);
-    for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      means.add(factory.newNumberVector(relation.get(iter)));
+    if(ids.size() < k) {
+      throw new AbortException("Could not choose k means.");
+    }
+    double[][] means = new double[k][];
+    DBIDIter iter = ids.iter();
+    for(int i = 0; i < k; i++, iter.advance()) {
+      means[i] = relation.get(iter).toArray();
     }
     return means;
   }

@@ -158,7 +158,7 @@ public class WeightedDiscreteUncertainObject extends AbstractUncertainObject imp
     for(int d = 0; d < dim; d++) {
       meanVals[d] /= weightSum;
     }
-    return new DoubleVector(meanVals);
+    return DoubleVector.wrap(meanVals);
   }
 
   @Override

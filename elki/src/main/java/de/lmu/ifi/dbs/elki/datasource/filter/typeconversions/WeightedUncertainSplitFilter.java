@@ -103,7 +103,7 @@ public class WeightedUncertainSplitFilter extends AbstractConversionFilter<Numbe
         buf[j++] = vec.doubleValue(i);
       }
       if(l == mod) {
-        samples[k] = new DoubleVector(buf);
+        samples[k] = DoubleVector.copy(buf);
         j = 0;
         l = 0;
         k++;

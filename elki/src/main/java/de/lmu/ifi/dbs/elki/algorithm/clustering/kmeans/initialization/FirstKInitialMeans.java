@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.ArrayList;
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -52,11 +50,11 @@ public class FirstKInitialMeans<O> implements KMeansInitialization<NumberVector>
   }
 
   @Override
-  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
     DBIDIter iter = relation.iterDBIDs();
-    List<V> means = new ArrayList<>(k);
+    double[][] means = new double[k][];
     for(int i = 0; i < k && iter.valid(); i++, iter.advance()) {
-      means.add(factory.newNumberVector(relation.get(iter)));
+      means[i] = relation.get(iter).toArray();
     }
     return means;
   }

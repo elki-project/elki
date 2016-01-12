@@ -113,7 +113,7 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
    * @param lrelation Relation for class label comparison
    * @return Vectors containing mean and standard deviation.
    */
-  public CollectionResult<DoubleVector> run(Database database, Relation<O> relation, Relation<?> lrelation) {
+  public CollectionResult<double[]> run(Database database, Relation<O> relation, Relation<?> lrelation) {
     final DistanceQuery<O> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final int qk = k + (includeSelf ? 0 : 1);
     final KNNQuery<O> knnQuery = database.getKNNQuery(distQuery, qk);
@@ -144,12 +144,11 @@ public class AveragePrecisionAtK<O> extends AbstractDistanceBasedAlgorithm<O, Co
     LOG.ensureCompleted(objloop);
 
     // Transform Histogram into a Double Vector array.
-    Collection<DoubleVector> res = new ArrayList<>(k);
+    Collection<double[]> res = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
       final MeanVarianceMinMax mv = mvs[i];
       final double std = mv.getCount() > 1. ? mv.getSampleStddev() : 0.;
-      DoubleVector row = new DoubleVector(new double[] { i + 1, mv.getMean(), std, mv.getMin(), mv.getMax(), mv.getCount() });
-      res.add(row);
+      res.add(new double[] { i + 1, mv.getMean(), std, mv.getMin(), mv.getMax(), mv.getCount() });
     }
     return new CollectionResult<>("Average Precision", "average-precision", res);
   }

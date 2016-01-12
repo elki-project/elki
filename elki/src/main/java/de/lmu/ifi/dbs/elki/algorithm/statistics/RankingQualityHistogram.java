@@ -29,7 +29,6 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -69,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Ranking Quality Histogram")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<DoubleVector>> {
+public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<double[]>> {
   /**
    * The logger for this class.
    */
@@ -98,7 +97,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
    * @param relation Relation to process
    * @return Histogram of ranking qualities
    */
-  public HistogramResult<DoubleVector> run(Database database, Relation<O> relation) {
+  public HistogramResult<double[]> run(Database database, Relation<O> relation) {
     final DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<O> knnQuery = database.getKNNQuery(distanceQuery, relation.size());
 
@@ -131,12 +130,11 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
     LOG.ensureCompleted(progress);
 
     // Transform Histogram into a Double Vector array.
-    Collection<DoubleVector> res = new ArrayList<>(relation.size());
+    Collection<double[]> res = new ArrayList<>(relation.size());
     for(DoubleStaticHistogram.Iter iter = hist.iter(); iter.valid(); iter.advance()) {
-      DoubleVector row = new DoubleVector(new double[] { iter.getCenter(), iter.getValue() });
-      res.add(row);
+      res.add(new double[] { iter.getCenter(), iter.getValue() });
     }
-    HistogramResult<DoubleVector> result = new HistogramResult<>("Ranking Quality Histogram", "ranking-histogram", res);
+    HistogramResult<double[]> result = new HistogramResult<>("Ranking Quality Histogram", "ranking-histogram", res);
     result.addHeader("Mean: " + mv.getMean() + " Variance: " + mv.getSampleVariance());
     return result;
   }

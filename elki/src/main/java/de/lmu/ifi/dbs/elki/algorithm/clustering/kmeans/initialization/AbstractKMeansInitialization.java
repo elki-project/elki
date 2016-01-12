@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
@@ -49,6 +51,20 @@ public abstract class AbstractKMeansInitialization<V extends NumberVector> imple
    */
   public AbstractKMeansInitialization(RandomFactory rnd) {
     this.rnd = rnd;
+  }
+
+  /**
+   * Unbox database means to primitive means.
+   * 
+   * @param means Database means
+   * @return List of primitive {@code double[]} means
+   */
+  public static double[][] unboxVectors(List<? extends NumberVector> means) {
+    double[][] ret = new double[means.size()][];
+    for(int i = 0; i < ret.length; i++) {
+      ret[i] = means.get(i).toArray();
+    }
+    return ret;
   }
 
   /**

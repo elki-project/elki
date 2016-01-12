@@ -120,9 +120,9 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
   public void run() throws UnableToComplyException {
     // Format: Latitude, Longitude
     // München:
-    DoubleVector stap = new DoubleVector(new double[] { 48.133333, 11.566667 });
+    DoubleVector stap = DoubleVector.wrap(new double[] { 48.133333, 11.566667 });
     // New York:
-    DoubleVector endp = new DoubleVector(new double[] { 40.712778, -74.005833 });
+    DoubleVector endp = DoubleVector.wrap(new double[] { 40.712778, -74.005833 });
     // Bavaria:
     ModifiableHyperBoundingBox bb = new ModifiableHyperBoundingBox(new double[] { 47.27011150, 8.97634970 }, new double[] { 50.56471420, 13.83963710 });
     // Bavaria slice on lat

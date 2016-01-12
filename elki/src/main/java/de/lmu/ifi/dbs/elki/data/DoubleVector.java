@@ -132,6 +132,29 @@ public class DoubleVector extends AbstractNumberVector {
   }
 
   /**
+   * Copy a double array into a new vector.
+   * 
+   * @param vals Values
+   * @return Wrapped vector
+   */
+  public static DoubleVector copy(double[] vals) {
+    return new DoubleVector(vals);
+  }
+
+  /**
+   * Wrap a double array as vector (without copying).
+   * 
+   * Note: modifying the array afterwards can lead to problems if the data has
+   * e.g. been added to an index, which relies on them being immutable!
+   * 
+   * @param vals Values
+   * @return Wrapped vector
+   */
+  public static DoubleVector wrap(double[] vals) {
+    return new DoubleVector(vals, true);
+  }
+
+  /**
    * Factory for Double vectors.
    *
    * @author Erich Schubert
@@ -157,7 +180,7 @@ public class DoubleVector extends AbstractNumberVector {
     @Override
     public <A> DoubleVector newNumberVector(A array, NumberArrayAdapter<?, ? super A> adapter) {
       if(adapter.getClass() == DoubleArray.class) {
-        return new DoubleVector(((DoubleArray)array).toArray(), true);
+        return new DoubleVector(((DoubleArray) array).toArray(), true);
       }
       final int dim = adapter.size(array);
       double[] values = new double[dim];
@@ -204,7 +227,7 @@ public class DoubleVector extends AbstractNumberVector {
     @Override
     public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final byte dimensionality = buffer.get();
-      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
       ;
       final double[] values = new double[dimensionality];
       for(int i = 0; i < dimensionality; i++) {
@@ -215,8 +238,8 @@ public class DoubleVector extends AbstractNumberVector {
 
     @Override
     public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
-      assert(vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
-      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
+      assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
       buffer.put((byte) vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
         buffer.putDouble(vec.values[i]);
@@ -225,7 +248,7 @@ public class DoubleVector extends AbstractNumberVector {
 
     @Override
     public int getByteSize(DoubleVector vec) {
-      assert(vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
+      assert (vec.values.length < Byte.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Byte.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_BYTE + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
     }
   }
@@ -243,7 +266,7 @@ public class DoubleVector extends AbstractNumberVector {
     @Override
     public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final short dimensionality = buffer.getShort();
-      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
       ;
       final double[] values = new double[dimensionality];
       for(int i = 0; i < dimensionality; i++) {
@@ -254,8 +277,8 @@ public class DoubleVector extends AbstractNumberVector {
 
     @Override
     public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
-      assert(vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
-      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
+      assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
       buffer.putShort((short) vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
         buffer.putDouble(vec.values[i]);
@@ -264,7 +287,7 @@ public class DoubleVector extends AbstractNumberVector {
 
     @Override
     public int getByteSize(DoubleVector vec) {
-      assert(vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
+      assert (vec.values.length < Short.MAX_VALUE) : "This serializer only supports a maximum dimensionality of " + Short.MAX_VALUE + "!";
       return ByteArrayUtil.SIZE_SHORT + ByteArrayUtil.SIZE_DOUBLE * vec.getDimensionality();
     }
   }
@@ -280,7 +303,7 @@ public class DoubleVector extends AbstractNumberVector {
     @Override
     public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final int dimensionality = ByteArrayUtil.readUnsignedVarint(buffer);
-      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
       final double[] values = new double[dimensionality];
       for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getDouble();
@@ -290,7 +313,7 @@ public class DoubleVector extends AbstractNumberVector {
 
     @Override
     public void toByteBuffer(ByteBuffer buffer, DoubleVector vec) throws IOException {
-      assert(buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
+      assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * vec.values.length) : "Not enough space remaining in buffer to write " + vec.values.length + " doubles";
       ByteArrayUtil.writeUnsignedVarint(buffer, vec.values.length);
       for(int i = 0; i < vec.values.length; i++) {
         buffer.putDouble(vec.values[i]);

@@ -74,14 +74,14 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
     DistanceQuery<T> distQ = database.getDistanceQuery(relation, distanceFunction);
 
     DBIDs ids = relation.getDBIDs();
     WritableDoubleDataStore weights = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
 
     // Chose first mean
-    List<V> means = new ArrayList<>(k);
+    List<NumberVector> means = new ArrayList<>(k);
 
     if(ids.size() <= k) {
       throw new AbortException("Don't use k-means with k >= data set size.");
@@ -90,7 +90,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
     Random random = rnd.getSingleThreadedRandom();
     DBIDRef first = DBIDUtil.randomSample(ids, random);
     T firstvec = relation.get(first);
-    means.add(factory.newNumberVector(firstvec));
+    means.add(firstvec);
 
     // Initialize weights
     double weightsum = initialWeights(weights, ids, firstvec, distQ);
@@ -112,7 +112,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
       }
       // Add new mean:
       final T newmean = relation.get(it);
-      means.add(factory.newNumberVector(newmean));
+      means.add(newmean);
       if(means.size() >= k) {
         break;
       }
@@ -125,7 +125,7 @@ public class KMeansPlusPlusInitialMeans<O> extends AbstractKMeansInitialization<
     // Explicitly destroy temporary data.
     weights.destroy();
 
-    return means;
+    return unboxVectors(means);
   }
 
   @Override

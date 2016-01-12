@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -51,14 +49,14 @@ public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<
   }
 
   @Override
-  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
     final int dim = RelationUtil.dimensionality(relation);
     double[][] minmax = RelationUtil.computeMinMax(relation);
     double[] min = minmax[0], scale = minmax[1];
     for(int d = 0; d < dim; d++) {
       scale[d] = scale[d] - min[d];
     }
-    List<V> means = new ArrayList<>(k);
+    double[][] means = new double[k][];
     final Random random = rnd.getSingleThreadedRandom();
     for(int i = 0; i < k; i++) {
       double[] r = MathUtil.randomDoubleArray(dim, random);
@@ -66,7 +64,7 @@ public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<
       for(int d = 0; d < dim; d++) {
         r[d] = min[d] + scale[d] * r[d];
       }
-      means.add(factory.newNumberVector(r));
+      means[i] = r;
     }
     return means;
   }

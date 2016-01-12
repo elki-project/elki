@@ -499,7 +499,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     // Matrix m = new Matrix(new
     // double[][]{f.getPointCoordinates()}).times(basis);
     double[] m = VMath.transposeTimes(basis.getArrayRef(), f.getColumnVector());
-    return new ParameterizationFunction(new DoubleVector(m));
+    return new ParameterizationFunction(DoubleVector.wrap(m));
   }
 
   /**
@@ -671,14 +671,14 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     CorrelationAnalysisSolution<DoubleVector> model = derivator.run(derivatorDB);
 
     Matrix weightMatrix = model.getSimilarityMatrix();
-    DoubleVector centroid = new DoubleVector(model.getCentroid());
+    DoubleVector centroid = DoubleVector.wrap(model.getCentroid());
     DistanceQuery<DoubleVector> df = QueryUtil.getDistanceQuery(derivatorDB, new MatrixWeightedDistanceFunction(weightMatrix));
     double eps = .25;
 
     ids.addDBIDs(interval.getIDs());
     // Search for nearby vectors in original database
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      DoubleVector v = new DoubleVector(relation.get(iditer).getColumnVector());
+      DoubleVector v = DoubleVector.wrap(relation.get(iditer).getColumnVector());
       double d = df.distance(v, centroid);
       if(d <= eps) {
         ids.add(iditer);
@@ -707,7 +707,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
     // Project
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      prep.put(iter, new DoubleVector(relation.get(iter).getColumnVector()));
+      prep.put(iter, DoubleVector.wrap(relation.get(iter).getColumnVector()));
     }
 
     if(LOG.isDebugging()) {
@@ -768,7 +768,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
     // Project
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      DoubleVector v = new DoubleVector(relation.get(iter).getColumnVector());
+      DoubleVector v = DoubleVector.wrap(relation.get(iter).getColumnVector());
       prep.insert(iter, v);
     }
 

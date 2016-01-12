@@ -162,7 +162,7 @@ public class GeneratorMain {
             cursclus.incrementDiscarded();
             continue;
           }
-          bundle.appendSimple(new DoubleVector(p), labels[bestc], models[bestc]);
+          bundle.appendSimple(DoubleVector.wrap(p), labels[bestc], models[bestc]);
           ++kept;
         }
       }

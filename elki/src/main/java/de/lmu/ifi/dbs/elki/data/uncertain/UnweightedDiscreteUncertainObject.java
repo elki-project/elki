@@ -107,7 +107,7 @@ public class UnweightedDiscreteUncertainObject extends AbstractUncertainObject i
     for(int d = 0; d < dim; d++) {
       meanVals[d] /= samples.length;
     }
-    return new DoubleVector(meanVals);
+    return DoubleVector.wrap(meanVals);
   }
 
   @Override

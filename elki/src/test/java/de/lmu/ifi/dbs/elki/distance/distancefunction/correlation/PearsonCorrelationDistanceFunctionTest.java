@@ -39,12 +39,12 @@ public class PearsonCorrelationDistanceFunctionTest implements JUnit4Test {
    * Some test series.
    */
   static final DoubleVector[] TESTS = { //
-  new DoubleVector(new double[] { 0., 1., 2., 3., 4., 5. }), //
-  new DoubleVector(new double[] { 0., .1, .2, .3, .4, .5 }), //
-  new DoubleVector(new double[] { -0., -1., -2., -3., -4., -5. }), //
-  new DoubleVector(new double[] { -5., -4., -3., -2., -1., 0. }), //
-  new DoubleVector(new double[] { 0., 0., 0., 0., 0., 0. }), //
-  new DoubleVector(new double[] { 0., 2., 4., 5., 3., 1. }), //
+      DoubleVector.wrap(new double[] { 0., 1., 2., 3., 4., 5. }), //
+      DoubleVector.wrap(new double[] { 0., .1, .2, .3, .4, .5 }), //
+      DoubleVector.wrap(new double[] { -0., -1., -2., -3., -4., -5. }), //
+      DoubleVector.wrap(new double[] { -5., -4., -3., -2., -1., 0. }), //
+      DoubleVector.wrap(new double[] { 0., 0., 0., 0., 0., 0. }), //
+      DoubleVector.wrap(new double[] { 0., 2., 4., 5., 3., 1. }), //
   };
 
   /** Dissimilarity for even-up,odd-down case */
@@ -54,12 +54,12 @@ public class PearsonCorrelationDistanceFunctionTest implements JUnit4Test {
    * The associated scores.
    */
   static final double[][] SCORES = { //
-  { 0., 0., 2., 0., 1., C1 },//
-  { 0., 0., 2., 0., 1., C1 },//
-  { 2., 2., 0., 2., 1., 2. - C1 },//
-  { 0., 0., 2., 0., 1., C1 },//
-  { 1., 1., 1., 1., 0., 1. },//
-  { C1, C1, 2. - C1, C1, 1., 0. },//
+      { 0., 0., 2., 0., 1., C1 }, //
+      { 0., 0., 2., 0., 1., C1 }, //
+      { 2., 2., 0., 2., 1., 2. - C1 }, //
+      { 0., 0., 2., 0., 1., C1 }, //
+      { 1., 1., 1., 1., 0., 1. }, //
+      { C1, C1, 2. - C1, C1, 1., 0. },//
   };
 
   @Test

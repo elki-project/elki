@@ -1,16 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.reinsert;
 
-import java.util.Arrays;
-import java.util.Collections;
-
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -33,6 +22,17 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.Arrays;
+
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Reinsert objects on page overflow, starting with farther objects first (even
@@ -59,20 +59,16 @@ public class FarReinsert extends AbstractPartialReinsert {
 
   @Override
   public <A> int[] computeReinserts(A entries, ArrayAdapter<? extends SpatialComparable, ? super A> getter, SpatialComparable page) {
-    DoubleIntPair[] order = new DoubleIntPair[getter.size(entries)];
-    DoubleVector centroid = new DoubleVector(SpatialUtil.centroid(page));
-    for(int i = 0; i < order.length; i++) {
-      double distance = distanceFunction.minDist(new DoubleVector(SpatialUtil.centroid(getter.get(entries, i))), centroid);
-      order[i] = new DoubleIntPair(distance, i);
+    DoubleVector centroid = DoubleVector.wrap(SpatialUtil.centroid(page));
+    final int size = getter.size(entries);
+    double[] dist = new double[size];
+    int[] idx = MathUtil.sequence(0, size);
+    for(int i = 0; i < size; i++) {
+      dist[i] = distanceFunction.minDist(DoubleVector.wrap(SpatialUtil.centroid(getter.get(entries, i))), centroid);
     }
-    Arrays.sort(order, Collections.reverseOrder());
+    DoubleIntegerArrayQuickSort.sortReverse(dist, idx, size);
 
-    int num = (int) (reinsertAmount * order.length);
-    int[] re = new int[num];
-    for(int i = 0; i < num; i++) {
-      re[i] = order[i].second;
-    }
-    return re;
+    return Arrays.copyOf(idx, (int) (reinsertAmount * size));
   }
 
   /**

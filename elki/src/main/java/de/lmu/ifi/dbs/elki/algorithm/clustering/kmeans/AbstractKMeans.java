@@ -23,7 +23,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -32,6 +35,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.RandomlyChosenInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -52,8 +56,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -112,8 +114,8 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param varsum Variance sum output
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<? extends V> relation, List<? extends NumberVector> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
-    assert (k == means.size());
+  protected boolean assignToNearestCluster(Relation<? extends V> relation, double[][] means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
+    assert (k == means.length);
     boolean changed = false;
     // Reset all clusters
     Arrays.fill(varsum, 0.);
@@ -126,7 +128,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       V fv = relation.get(iditer);
       int minIndex = 0;
       for(int i = 0; i < k; i++) {
-        double dist = df.distance(fv, means.get(i));
+        double dist = df.distance(fv, DoubleVector.wrap(means[i]));
         if(dist < mindist) {
           minIndex = i;
           mindist = dist;
@@ -152,32 +154,29 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<Vector> means(List<? extends DBIDs> clusters, List<? extends NumberVector> means, Relation<V> database) {
+  protected double[][] means(List<? extends DBIDs> clusters, double[][] means, Relation<V> database) {
     // TODO: use Kahan summation for better numerical precision?
-    List<Vector> newMeans = new ArrayList<>(k);
+    double[][] newMeans = new double[k][];
     for(int i = 0; i < k; i++) {
       DBIDs list = clusters.get(i);
-      Vector mean = null;
-      if(list.size() > 0) {
-        DBIDIter iter = list.iter();
-        // Initialize with first.
-        mean = new Vector(database.get(iter).toArray());
-        double[] raw = mean.getArrayRef();
-        iter.advance();
-        // Update with remaining instances
-        for(; iter.valid(); iter.advance()) {
-          NumberVector vec = database.get(iter);
-          for(int j = 0; j < mean.getDimensionality(); j++) {
-            raw[j] += vec.doubleValue(j);
-          }
-        }
-        mean.timesEquals(1.0 / list.size());
-      }
-      else {
+      if(list.size() == 0) {
         // Keep degenerated means as-is for now.
-        mean = new Vector(means.get(i).toArray());
+        newMeans[i] = means[i];
+        continue;
       }
-      newMeans.add(mean);
+      DBIDIter iter = list.iter();
+      // Initialize with first.
+      double[] mean = database.get(iter).toArray();
+      iter.advance();
+      // Update with remaining instances
+      for(; iter.valid(); iter.advance()) {
+        NumberVector vec = database.get(iter);
+        for(int j = 0; j < mean.length; j++) {
+          mean[j] += vec.doubleValue(j);
+        }
+      }
+      timesEquals(mean, 1.0 / list.size());
+      newMeans[i] = mean;
     }
     return newMeans;
   }
@@ -190,25 +189,25 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<Vector> medians(List<? extends DBIDs> clusters, List<Vector> medians, Relation<V> database) {
-    final int dim = medians.get(0).getDimensionality();
+  protected double[][] medians(List<? extends DBIDs> clusters, double[][] medians, Relation<V> database) {
+    final int dim = medians[0].length;
     final SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(database);
-    List<Vector> newMedians = new ArrayList<>(k);
+    double[][] newMedians = new double[k][];
     for(int i = 0; i < k; i++) {
       DBIDs clu = clusters.get(i);
       if(clu.size() <= 0) {
-        newMedians.add(medians.get(i));
+        newMedians[i] = medians[i];
         continue;
       }
       ArrayModifiableDBIDs list = DBIDUtil.newArray(clu);
       DBIDArrayIter it = list.iter();
-      Vector mean = new Vector(dim);
+      double[] mean = new double[dim];
       for(int d = 0; d < dim; d++) {
         sorter.setDimension(d);
         it.seek(QuickSelect.median(list, sorter));
-        mean.set(d, database.get(it).doubleValue(d));
+        mean[d] = database.get(it).doubleValue(d);
       }
-      newMedians.add(mean);
+      newMedians[i] = mean;
     }
     return newMedians;
   }
@@ -221,12 +220,13 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param newsize (New) size of cluster
    * @param op Cluster size change / Weight change
    */
-  protected void incrementalUpdateMean(Vector mean, V vec, int newsize, double op) {
+  protected void incrementalUpdateMean(double[] mean, V vec, int newsize, double op) {
     if(newsize == 0) {
       return; // Keep old mean
     }
-    double[] delta = VMath.minusEquals(vec.toArray(), mean.getArrayRef());
-    mean.plusTimesEquals(new Vector(delta), op / newsize);
+    // Note: numerically stabilized version:
+    double[] delta = minusEquals(vec.toArray(), mean);
+    plusTimesEquals(mean, delta, op / newsize);
   }
 
   /**
@@ -239,7 +239,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param varsum Variance sum output
    * @return true when the means have changed
    */
-  protected boolean macQueenIterate(Relation<V> relation, List<Vector> means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
+  protected boolean macQueenIterate(Relation<V> relation, double[][] means, List<ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
     boolean changed = false;
     Arrays.fill(varsum, 0.);
 
@@ -252,7 +252,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
       V fv = relation.get(iditer);
       int minIndex = 0;
       for(int i = 0; i < k; i++) {
-        double dist = df.distance(fv, means.get(i));
+        double dist = df.distance(fv, DoubleVector.wrap(means[i]));
         if(dist < mindist) {
           minIndex = i;
           mindist = dist;
@@ -275,19 +275,19 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    * @param assignment Current cluster assignment
    * @return {@code true} when assignment changed
    */
-  private boolean updateMeanAndAssignment(List<ModifiableDBIDs> clusters, List<Vector> means, int minIndex, V fv, DBIDIter iditer, WritableIntegerDataStore assignment) {
+  private boolean updateMeanAndAssignment(List<ModifiableDBIDs> clusters, double[][] means, int minIndex, V fv, DBIDIter iditer, WritableIntegerDataStore assignment) {
     int cur = assignment.intValue(iditer);
     if(cur == minIndex) {
       return false;
     }
     final ModifiableDBIDs curclus = clusters.get(minIndex);
     curclus.add(iditer);
-    incrementalUpdateMean(means.get(minIndex), fv, curclus.size(), +1);
+    incrementalUpdateMean(means[minIndex], fv, curclus.size(), +1);
 
     if(cur >= 0) {
       ModifiableDBIDs ci = clusters.get(cur);
       ci.remove(iditer);
-      incrementalUpdateMean(means.get(cur), fv, ci.size() + 1, -1);
+      incrementalUpdateMean(means[cur], fv, ci.size() + 1, -1);
     }
 
     assignment.putInt(iditer, minIndex);

@@ -71,7 +71,7 @@ public class SimpleGaussianContinuousUncertainObject extends AbstractUncertainOb
     for(int d = 0; d < dim; d++) {
       mean[d] = (bounds.getMin(d) + bounds.getMax(d)) * .5;
     }
-    return new DoubleVector(mean);
+    return DoubleVector.wrap(mean);
   }
 
   @Override
@@ -92,7 +92,7 @@ public class SimpleGaussianContinuousUncertainObject extends AbstractUncertainOb
       }
       values[i++] = v; // Success.
     }
-    return new DoubleVector(values);
+    return DoubleVector.wrap(values);
   }
 
   /**

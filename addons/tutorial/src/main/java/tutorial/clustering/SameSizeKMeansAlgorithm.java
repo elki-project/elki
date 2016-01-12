@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInit
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansPlusPlusInitialMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -52,7 +53,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -107,7 +107,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     // Database objects to process
     final DBIDs ids = relation.getDBIDs();
     // Choose initial means
-    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
+    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -126,8 +126,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     // Wrap result
     Clustering<MeanModel> result = new Clustering<>("k-Means Samesize Clustering", "kmeans-samesize-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      double[] mean = means.get(i).toArray();
-      result.addToplevelCluster(new Cluster<>(clusters.get(i), new MeanModel(mean)));
+      result.addToplevelCluster(new Cluster<>(clusters.get(i), new MeanModel(means[i])));
     }
     return result;
   }
@@ -139,7 +138,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param means Mean vectors
    * @return Initialized storage
    */
-  protected WritableDataStore<Meta> initializeMeta(Relation<V> relation, List<? extends NumberVector> means) {
+  protected WritableDataStore<Meta> initializeMeta(Relation<V> relation, double[][] means) {
     NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
     // The actual storage
     final WritableDataStore<Meta> metas = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, Meta.class);
@@ -148,7 +147,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
       Meta c = new Meta(k);
       V fv = relation.get(id);
       for(int i = 0; i < k; i++) {
-        c.dists[i] = df.distance(fv, means.get(i));
+        c.dists[i] = df.distance(fv, DoubleVector.wrap(means[i]));
         if(i > 0) {
           if(c.dists[i] < c.dists[c.primary]) {
             c.primary = i;
@@ -227,14 +226,14 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param metas Metadata storage
    * @param df Distance function
    */
-  protected void updateDistances(Relation<V> relation, List<Vector> means, final WritableDataStore<Meta> metas, NumberVectorDistanceFunction<? super V> df) {
+  protected void updateDistances(Relation<V> relation, double[][] means, final WritableDataStore<Meta> metas, NumberVectorDistanceFunction<? super V> df) {
     for(DBIDIter id = relation.iterDBIDs(); id.valid(); id.advance()) {
       Meta c = metas.get(id);
       V fv = relation.get(id);
       // Update distances to means.
       c.secondary = -1;
       for(int i = 0; i < k; i++) {
-        c.dists[i] = df.distance(fv, means.get(i));
+        c.dists[i] = df.distance(fv, DoubleVector.wrap(means[i]));
         if(c.primary != i) {
           if(c.secondary < 0 || c.dists[i] < c.dists[c.secondary]) {
             c.secondary = i;
@@ -255,7 +254,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param tids DBIDs array
    * @return final means
    */
-  protected List<Vector> refineResult(Relation<V> relation, List<Vector> means, List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
+  protected double[][] refineResult(Relation<V> relation, double[][] means, List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
     // This is a safe cast - see constructor.
     NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
     // Our desired cluster size:

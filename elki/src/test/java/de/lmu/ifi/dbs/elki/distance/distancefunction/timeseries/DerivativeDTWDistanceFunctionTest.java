@@ -65,7 +65,7 @@ public class DerivativeDTWDistanceFunctionTest implements JUnit4Test {
   public void testDerivativeDynamicTimeWarping() {
     DoubleVector[] vecs = new DoubleVector[DATA.length];
     for(int i = 0; i < DATA.length; i++) {
-      vecs[i] = new DoubleVector(DATA[i]);
+      vecs[i] = DoubleVector.wrap(DATA[i]);
     }
     DerivativeDTWDistanceFunction f = new DerivativeDTWDistanceFunction();
     for(int i = 0; i < vecs.length; i++) {

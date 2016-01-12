@@ -76,7 +76,7 @@ public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector,
     for(int i = 0, j = 0, k = 0; i < dim; i++) {
       buf[j++] = vec.doubleValue(i);
       if(j == dims) {
-        samples[k++] = new DoubleVector(buf);
+        samples[k++] = DoubleVector.copy(buf);
         j = 0;
       }
     }

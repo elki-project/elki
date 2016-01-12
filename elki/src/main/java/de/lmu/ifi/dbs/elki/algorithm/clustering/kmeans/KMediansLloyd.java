@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -102,7 +101,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     }
-    List<Vector> medians = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
+    double[][] medians = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -130,7 +129,7 @@ public class KMediansLloyd<V extends NumberVector> extends AbstractKMeans<V, Mea
     // Wrap result
     Clustering<MeanModel> result = new Clustering<>("k-Medians Clustering", "kmedians-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      MeanModel model = new MeanModel(medians.get(i).getArrayRef());
+      MeanModel model = new MeanModel(medians[i]);
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;

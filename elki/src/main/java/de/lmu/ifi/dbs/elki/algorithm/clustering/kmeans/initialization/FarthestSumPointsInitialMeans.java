@@ -64,7 +64,7 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
   }
 
   @Override
-  public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+  public <T extends NumberVector> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
     // Get a distance query
     DistanceQuery<T> distQ = database.getDistanceQuery(relation, distanceFunction);
 
@@ -72,11 +72,11 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
     WritableDoubleDataStore store = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 0.);
 
     // Chose first mean
-    List<V> means = new ArrayList<>(k);
+    List<T> means = new ArrayList<>(k);
 
     DBIDRef first = DBIDUtil.randomSample(ids, rnd);
     T prevmean = relation.get(first);
-    means.add(factory.newNumberVector(prevmean));
+    means.add(prevmean);
 
     // Find farthest object each.
     DBIDVar best = DBIDUtil.newVar(first);
@@ -103,12 +103,12 @@ public class FarthestSumPointsInitialMeans<O> extends FarthestPointsInitialMeans
       }
       store.putDouble(best, Double.NaN); // So it won't be chosen twice.
       prevmean = relation.get(best);
-      means.add(factory.newNumberVector(prevmean));
+      means.add(prevmean);
     }
 
     // Explicitly destroy temporary data.
     store.destroy();
-    return means;
+    return unboxVectors(means);
   }
 
   @Override

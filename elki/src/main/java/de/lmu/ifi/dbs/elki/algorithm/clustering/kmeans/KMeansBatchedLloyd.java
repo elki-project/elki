@@ -22,6 +22,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,6 +33,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -50,7 +54,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -118,7 +121,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initializer", initializer.toString()));
     }
-    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
+    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
 
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
@@ -171,7 +174,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
       if(ids.size() == 0) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means.get(i).getArrayRef(), varsum[i]);
+      KMeansModel model = new KMeansModel(means[i], varsum[i]);
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
     return result;
@@ -191,7 +194,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
    * @param varsum Sum of variances
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<V> relation, DBIDs ids, List<? extends NumberVector> oldmeans, double[][] meanshift, int[] changesize, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
+  protected boolean assignToNearestCluster(Relation<V> relation, DBIDs ids, double[][] oldmeans, double[][] meanshift, int[] changesize, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
     boolean changed = false;
 
     final NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
@@ -200,7 +203,7 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
       V fv = relation.get(iditer);
       int minIndex = 0;
       for(int i = 0; i < k; i++) {
-        double dist = df.distance(fv, oldmeans.get(i));
+        double dist = df.distance(fv, DoubleVector.wrap(oldmeans[i]));
         if(dist < mindist) {
           minIndex = i;
           mindist = dist;
@@ -259,21 +262,21 @@ public class KMeansBatchedLloyd<V extends NumberVector> extends AbstractKMeans<V
    * @param clusters
    * @param changesize Size of change (for weighting!)
    */
-  protected void updateMeans(List<Vector> means, double[][] meanshift, List<ModifiableDBIDs> clusters, int[] changesize) {
+  protected void updateMeans(double[][] means, double[][] meanshift, List<ModifiableDBIDs> clusters, int[] changesize) {
     for(int i = 0; i < k; i++) {
       int newsize = clusters.get(i).size(), oldsize = newsize - changesize[i];
       if(newsize == 0) {
         continue; // Keep previous mean vector.
       }
       if(oldsize == 0) {
-        means.set(i, new Vector(meanshift[i]).times(1. / newsize));
+        means[i] = times(meanshift[i], 1. / newsize);
         continue; // Replace with new vector.
       }
       if(oldsize == newsize) {
-        means.get(i).plusTimesEquals(new Vector(meanshift[i]), 1. / (double) newsize);
+        plusTimesEquals(means[i], meanshift[i], 1. / (double) newsize);
         continue;
       }
-      means.get(i).timesEquals(oldsize / (double) newsize).plusTimesEquals(new Vector(meanshift[i]), 1. / (double) newsize);
+      plusTimesEquals(timesEquals(means[i], oldsize / (double) newsize), meanshift[i], 1. / (double) newsize);
     }
   }
 

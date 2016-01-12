@@ -28,6 +28,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
@@ -38,7 +39,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -105,7 +105,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
     }
     // Re-compute:
     DBIDs ids = cluster.getIDs();
-    Vector mean = new Vector(model.getMean());
+    DoubleVector mean = DoubleVector.wrap(model.getMean());
 
     boolean squared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
     double variance = 0.;

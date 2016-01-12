@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
@@ -84,7 +83,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     }
-    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
+    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
     // Setup cluster assignment store
     List<ModifiableDBIDs> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
@@ -98,7 +97,7 @@ public class SingleAssignmentKMeans<V extends NumberVector> extends AbstractKMea
     // Wrap result
     Clustering<KMeansModel> result = new Clustering<>("Nearest Centroid Clustering", "nearest-center-clustering");
     for(int i = 0; i < clusters.size(); i++) {
-      KMeansModel model = new KMeansModel(means.get(i).getArrayRef(), varsum[i]);
+      KMeansModel model = new KMeansModel(means[i], varsum[i]);
       result.addToplevelCluster(new Cluster<>(clusters.get(i), model));
     }
     return result;

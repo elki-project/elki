@@ -33,7 +33,6 @@ import java.util.TreeSet;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -78,7 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  */
 @Title("Distance Histogram")
 @Description("Computes a histogram over the distances occurring in the data set.")
-public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<DoubleVector>> {
+public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<double[]>> {
   /**
    * The logger for this class.
    */
@@ -115,7 +114,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
   }
 
   @Override
-  public HistogramResult<DoubleVector> run(Database database) {
+  public HistogramResult<double[]> run(Database database) {
     final Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
     final DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
 
@@ -257,17 +256,16 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     }
     long bnum = inum + onum;
 
-    Collection<DoubleVector> binstat = new ArrayList<>(numbin);
+    Collection<double[]> binstat = new ArrayList<>(numbin);
     for(ObjHistogram.Iter<long[]> iter = histogram.iter(); iter.valid(); iter.advance()) {
       final long[] value = iter.getValue();
       final double icof = (inum == 0) ? 0 : ((double) value[0]) / inum / histogram.getBinsize();
       final double icaf = ((double) value[0]) / bnum / histogram.getBinsize();
       final double ocof = (onum == 0) ? 0 : ((double) value[1]) / onum / histogram.getBinsize();
       final double ocaf = ((double) value[1]) / bnum / histogram.getBinsize();
-      DoubleVector row = new DoubleVector(new double[] { iter.getCenter(), icof, icaf, ocof, ocaf });
-      binstat.add(row);
+      binstat.add(new double[] { iter.getCenter(), icof, icaf, ocof, ocaf });
     }
-    HistogramResult<DoubleVector> result = new HistogramResult<>("Distance Histogram", "distance-histogram", binstat);
+    HistogramResult<double[]> result = new HistogramResult<>("Distance Histogram", "distance-histogram", binstat);
 
     result.addHeader("Absolute minimum distance (abs): " + gminmax.getMin());
     result.addHeader("Absolute maximum distance (abs): " + gminmax.getMax());

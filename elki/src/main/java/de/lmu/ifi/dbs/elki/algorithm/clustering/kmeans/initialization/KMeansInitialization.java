@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -46,10 +45,8 @@ public interface KMeansInitialization<V extends NumberVector> {
    * @param relation Relation
    * @param k Parameter k
    * @param distanceFunction Distance function
-   * @param factory Factory for output vectors.
    * @param <T> Input vector type
-   * @param <O> Output vector type
    * @return List of chosen means for k-means
    */
-  public abstract <T extends V, O extends NumberVector> List<O> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<O> factory);
+  public abstract <T extends V> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction);
 }

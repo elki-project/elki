@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -81,7 +78,7 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
   }
 
   @Override
-  public <T extends V, O extends NumberVector> List<O> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<O> factory) {
+  public <T extends V> double[][] chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction) {
     final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), rate, rnd);
 
     // Ugly cast, sorry
@@ -100,11 +97,11 @@ public class SampleKMeansInitialization<V extends NumberVector> extends Abstract
     innerkMeans.setDistanceFunction(pdf);
     Clustering<?> clusters = innerkMeans.run(proxydb, proxyv);
 
-    List<O> means = new ArrayList<>();
+    double[][] means = new double[clusters.getAllClusters().size()][];
+    int i = 0;
     for(Cluster<?> cluster : clusters.getAllClusters()) {
-      means.add(factory.newNumberVector(ModelUtil.getPrototype(cluster.getModel(), relation)));
+      means[i++] = ModelUtil.getPrototype(cluster.getModel(), relation).toArray();
     }
-
     return means;
   }
 

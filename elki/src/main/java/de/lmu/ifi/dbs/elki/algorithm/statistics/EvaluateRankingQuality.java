@@ -32,7 +32,6 @@ import java.util.HashMap;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
@@ -86,7 +85,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Evaluate Ranking Quality")
 @Description("Evaluates the effectiveness of a distance function via the obtained rankings.")
-public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, CollectionResult<DoubleVector>> {
+public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, CollectionResult<double[]>> {
   /**
    * The logger for this class.
    */
@@ -109,7 +108,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
   }
 
   @Override
-  public HistogramResult<DoubleVector> run(Database database) {
+  public HistogramResult<double[]> run(Database database) {
     final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
     final DistanceQuery<V> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<V> knnQuery = database.getKNNQuery(distQuery, relation.size());
@@ -161,10 +160,9 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
     // Collections.sort(results);
 
     // Transform Histogram into a Double Vector array.
-    Collection<DoubleVector> res = new ArrayList<>(relation.size());
+    Collection<double[]> res = new ArrayList<>(relation.size());
     for(ObjHistogram.Iter<MeanVariance> iter = hist.iter(); iter.valid(); iter.advance()) {
-      DoubleVector row = new DoubleVector(new double[] { iter.getCenter(), iter.getValue().getCount(), iter.getValue().getMean(), iter.getValue().getSampleVariance() });
-      res.add(row);
+      res.add(new double[] { iter.getCenter(), iter.getValue().getCount(), iter.getValue().getMean(), iter.getValue().getSampleVariance() });
     }
     return new HistogramResult<>("Ranking Quality Histogram", "ranking-histogram", res);
   }

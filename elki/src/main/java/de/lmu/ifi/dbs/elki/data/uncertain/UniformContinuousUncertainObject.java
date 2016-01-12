@@ -67,7 +67,7 @@ public class UniformContinuousUncertainObject extends AbstractUncertainObject {
     for(int d = 0; d < dim; d++) {
       mean[d] = (bounds.getMin(d) + bounds.getMax(d)) * .5;
     }
-    return new DoubleVector(mean);
+    return DoubleVector.wrap(mean);
   }
 
   @Override
@@ -80,7 +80,7 @@ public class UniformContinuousUncertainObject extends AbstractUncertainObject {
       assert(w < Double.POSITIVE_INFINITY);
       values[i] = rand.nextDouble() * w + bounds.getMin(i);
     }
-    return new DoubleVector(values);
+    return DoubleVector.wrap(values);
   }
 
   /**

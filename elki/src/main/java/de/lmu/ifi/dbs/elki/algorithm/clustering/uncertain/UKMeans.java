@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -50,7 +51,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -133,9 +134,9 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
     }
     // Choose initial means randomly
     DBIDs sampleids = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
-    List<Vector> means = new ArrayList<>(k);
+    List<double[]> means = new ArrayList<>(k);
     for(DBIDIter iter = sampleids.iter(); iter.valid(); iter.advance()) {
-      means.add(new Vector(ArrayLikeUtil.toPrimitiveDoubleArray(relation.get(iter).getCenterOfMass())));
+      means.add(ArrayLikeUtil.toPrimitiveDoubleArray(relation.get(iter).getCenterOfMass()));
     }
 
     // Setup cluster assignment store
@@ -172,7 +173,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
       if(ids.size() == 0) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means.get(i).getArrayRef(), varsum[i]);
+      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
     return result;
@@ -189,7 +190,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
    * @param varsum Variance sum output
    * @return true when the object was reassigned
    */
-  protected boolean assignToNearestCluster(Relation<DiscreteUncertainObject> relation, List<Vector> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
+  protected boolean assignToNearestCluster(Relation<DiscreteUncertainObject> relation, List<double[]> means, List<? extends ModifiableDBIDs> clusters, WritableIntegerDataStore assignment, double[] varsum) {
     assert(k == means.size());
     boolean changed = false;
     Arrays.fill(varsum, 0.);
@@ -198,7 +199,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
       DiscreteUncertainObject fv = relation.get(iditer);
       int minIndex = 0;
       for(int i = 0; i < k; i++) {
-        double dist = getExpectedRepDistance(means.get(i), fv);
+        double dist = getExpectedRepDistance(DoubleVector.wrap(means.get(i)), fv);
         if(dist < mindist) {
           minIndex = i;
           mindist = dist;
@@ -239,7 +240,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
    * @param uo A discrete uncertain object
    * @return The distance
    */
-  protected double getExpectedRepDistance(Vector rep, DiscreteUncertainObject uo) {
+  protected double getExpectedRepDistance(NumberVector rep, DiscreteUncertainObject uo) {
     SquaredEuclideanDistanceFunction euclidean = SquaredEuclideanDistanceFunction.STATIC;
     int counter = 0;
     double sum = 0.0;
@@ -258,30 +259,28 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
    * @param database the database containing the vectors
    * @return the mean vectors of the given clusters in the given database
    */
-  protected List<Vector> means(List<? extends ModifiableDBIDs> clusters, List<? extends NumberVector> means, Relation<DiscreteUncertainObject> database) {
-    List<Vector> newMeans = new ArrayList<>(k);
+  protected List<double[]> means(List<? extends ModifiableDBIDs> clusters, List<double[]> means, Relation<DiscreteUncertainObject> database) {
+    List<double[]> newMeans = new ArrayList<>(k);
     for(int i = 0; i < k; i++) {
       ModifiableDBIDs list = clusters.get(i);
-      Vector mean = null;
+      double[] mean = null;
       if(list.size() > 0) {
         DBIDIter iter = list.iter();
         // Initialize with first.
-        final double[] raw = ArrayLikeUtil.toPrimitiveDoubleArray(database.get(iter).getCenterOfMass());
-        mean = new Vector(raw);
-        assert(raw == mean.getArrayRef());
+        mean = ArrayLikeUtil.toPrimitiveDoubleArray(database.get(iter).getCenterOfMass());
         iter.advance();
         // Update with remaining instances
         for(; iter.valid(); iter.advance()) {
           NumberVector vec = database.get(iter).getCenterOfMass();
-          for(int j = 0; j < mean.getDimensionality(); j++) {
-            raw[j] += vec.doubleValue(j);
+          for(int j = 0; j < mean.length; j++) {
+            mean[j] += vec.doubleValue(j);
           }
         }
-        mean.timesEquals(1.0 / list.size());
+        VMath.timesEquals(mean, 1.0 / list.size());
       }
       else {
         // Keep degenerated means as-is for now.
-        mean = new Vector(means.get(i).toArray());
+        mean = means.get(i);
       }
       newMeans.add(mean);
     }
