@@ -65,7 +65,7 @@ public class DiagonalGaussianModelFactory<V extends NumberVector> extends Abstra
     final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
     List<DiagonalGaussianModel> models = new ArrayList<>(k);
     for(Vector nv : initialMeans) {
-      models.add(new DiagonalGaussianModel(1. / k, nv, norm));
+      models.add(new DiagonalGaussianModel(1. / k, nv.getArrayRef(), norm));
     }
     return models;
   }

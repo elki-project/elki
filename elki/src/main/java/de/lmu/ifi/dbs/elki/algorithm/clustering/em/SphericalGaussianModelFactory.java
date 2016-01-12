@@ -65,7 +65,7 @@ public class SphericalGaussianModelFactory<V extends NumberVector> extends Abstr
     final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
     List<SphericalGaussianModel> models = new ArrayList<>(k);
     for(Vector nv : initialMeans) {
-      models.add(new SphericalGaussianModel(1. / k, nv, norm));
+      models.add(new SphericalGaussianModel(1. / k, nv.getArrayRef(), norm));
     }
     return models;
   }

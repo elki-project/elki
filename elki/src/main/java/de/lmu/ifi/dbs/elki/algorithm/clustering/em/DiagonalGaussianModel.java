@@ -29,8 +29,6 @@ import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Simpler model for a single Gaussian cluster, without covariances.
@@ -46,7 +44,7 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
   /**
    * Mean vector.
    */
-  Vector mean;
+  double[] mean;
 
   /**
    * Per-dimension variances.
@@ -56,7 +54,7 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
   /**
    * Temporary storage, to avoid reallocations.
    */
-  double[] nmea, mref;
+  double[] nmea;
 
   /**
    * Normalization factor.
@@ -74,8 +72,8 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
    * @param weight Cluster weight
    * @param mean Initial mean
    */
-  public DiagonalGaussianModel(double weight, Vector mean) {
-    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.getDimensionality()));
+  public DiagonalGaussianModel(double weight, double[] mean) {
+    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length));
   }
 
   /**
@@ -85,13 +83,12 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
    * @param mean Initial mean
    * @param norm Normalization factor.
    */
-  public DiagonalGaussianModel(double weight, Vector mean, double norm) {
+  public DiagonalGaussianModel(double weight, double[] mean, double norm) {
     this.weight = weight;
-    final int dim = mean.getDimensionality();
+    final int dim = mean.length;
     this.mean = mean;
     this.norm = norm;
     this.normDistrFactor = 1. / Math.sqrt(norm); // assume det=1
-    this.mref = mean.getArrayRef();
     this.nmea = new double[dim];
     this.variances = new double[dim];
     Arrays.fill(variances, 1.);
@@ -105,23 +102,24 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public void updateE(NumberVector vec, double wei) {
-    assert (vec.getDimensionality() == mref.length);
+    assert (vec.getDimensionality() == mean.length);
     final double nwsum = wsum + wei;
     // Compute new means
-    for(int i = 0; i < mref.length; i++) {
-      final double delta = vec.doubleValue(i) - mref[i];
+    for(int i = 0; i < mean.length; i++) {
+      final double delta = vec.doubleValue(i) - mean[i];
       final double rval = delta * wei / nwsum;
-      nmea[i] = mref[i] + rval;
+      nmea[i] = mean[i] + rval;
     }
     // Update variances
-    for(int i = 0; i < mref.length; i++) {
+    for(int i = 0; i < mean.length; i++) {
       // We DO want to use the new mean once and the old mean once!
       // It does not matter which one is which.
-      variances[i] += (vec.doubleValue(i) - nmea[i]) * (vec.doubleValue(i) - mref[i]) * wei;
+      double vi = vec.doubleValue(i);
+      variances[i] += (vi - nmea[i]) * (vi - mean[i]) * wei;
     }
     // Use new values.
     wsum = nwsum;
-    System.arraycopy(nmea, 0, mref, 0, nmea.length);
+    System.arraycopy(nmea, 0, mean, 0, nmea.length);
   }
 
   @Override
@@ -149,11 +147,11 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
    * @param vec Vector
    * @return Mahalanobis distance
    */
-  public double mahalanobisDistance(Vector vec) {
-    double[] difference = vec.minus(mean).getArrayRef();
+  public double mahalanobisDistance(double[] vec) {
     double agg = 0.;
     for(int i = 0; i < variances.length; i++) {
-      agg += difference[i] / variances[i] * difference[i];
+      double diff = vec[i] - mean[i];
+      agg += diff / variances[i] * diff;
     }
     return agg;
   }
@@ -165,10 +163,10 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(NumberVector vec) {
-    double[] difference = VMath.minusEquals(vec.toArray(), mean.getArrayRef());
     double agg = 0.;
     for(int i = 0; i < variances.length; i++) {
-      agg += difference[i] / variances[i] * difference[i];
+      double diff = vec.doubleValue(i) - mean[i];
+      agg += diff / variances[i] * diff;
     }
     return agg;
   }
@@ -196,6 +194,6 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean.getArrayRef(), Matrix.diagonal(variances));
+    return new EMModel(mean, Matrix.diagonal(variances));
   }
 }

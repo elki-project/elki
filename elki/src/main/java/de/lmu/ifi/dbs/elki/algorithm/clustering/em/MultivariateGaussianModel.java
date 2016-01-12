@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Model for a single Gaussian cluster.
@@ -49,7 +48,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   /**
    * Mean vector.
    */
-  Vector mean;
+  double[] mean;
 
   /**
    * Covariance matrix, and inverse.
@@ -59,7 +58,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   /**
    * Temporary storage, to avoid reallocations.
    */
-  double[] nmea, mref;
+  double[] nmea;
 
   /**
    * Matrix element reference.
@@ -82,8 +81,8 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @param weight Cluster weight
    * @param mean Initial mean
    */
-  public MultivariateGaussianModel(double weight, Vector mean) {
-    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.getDimensionality()));
+  public MultivariateGaussianModel(double weight, double[] mean) {
+    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length));
   }
 
   /**
@@ -93,13 +92,12 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @param mean Initial mean
    * @param norm Normalization factor.
    */
-  public MultivariateGaussianModel(double weight, Vector mean, double norm) {
+  public MultivariateGaussianModel(double weight, double[] mean, double norm) {
     this.weight = weight;
-    final int dim = mean.getDimensionality();
+    final int dim = mean.length;
     this.mean = mean;
     this.norm = norm;
     this.normDistrFactor = 1. / Math.sqrt(norm); // assume det=1
-    this.mref = mean.getArrayRef();
     this.nmea = new double[dim];
     this.covariance = new Matrix(dim, dim);
     this.elements = this.covariance.getArrayRef();
@@ -109,7 +107,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   @Override
   public void beginEStep() {
     if(covariance == null) {
-      covariance = new Matrix(mean.getDimensionality(), mean.getDimensionality());
+      covariance = new Matrix(mean.length, mean.length);
       return;
     }
     wsum = 0.;
@@ -117,20 +115,21 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public void updateE(NumberVector vec, double wei) {
-    assert (vec.getDimensionality() == mref.length);
+    assert (vec.getDimensionality() == mean.length);
     final double nwsum = wsum + wei;
     // Compute new means
-    for(int i = 0; i < mref.length; i++) {
-      final double delta = vec.doubleValue(i) - mref[i];
+    for(int i = 0; i < mean.length; i++) {
+      final double delta = vec.doubleValue(i) - mean[i];
       final double rval = delta * wei / nwsum;
-      nmea[i] = mref[i] + rval;
+      nmea[i] = mean[i] + rval;
     }
     // Update covariance matrix
-    for(int i = 0; i < mref.length; i++) {
-      for(int j = i; j < mref.length; j++) {
+    for(int i = 0; i < mean.length; i++) {
+      for(int j = i; j < mean.length; j++) {
         // We DO want to use the new mean once and the old mean once!
         // It does not matter which one is which.
-        double delta = (vec.doubleValue(i) - nmea[i]) * (vec.doubleValue(j) - mref[j]) * wei;
+        double vi = vec.doubleValue(i);
+        double delta = (vi - nmea[i]) * (vec.doubleValue(j) - mean[j]) * wei;
         elements[i][j] = elements[i][j] + delta;
         // Optimize via symmetry
         if(i != j) {
@@ -140,12 +139,12 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
     }
     // Use new values.
     wsum = nwsum;
-    System.arraycopy(nmea, 0, mref, 0, nmea.length);
+    System.arraycopy(nmea, 0, mean, 0, nmea.length);
   }
 
   @Override
   public void finalizeEStep() {
-    final int dim = mean.getDimensionality();
+    final int dim = mean.length;
     // TODO: improve handling of degenerated cases?
     if(wsum > Double.MIN_NORMAL) {
       covariance.timesEquals(1. / wsum);
@@ -174,12 +173,16 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @param vec Vector
    * @return Mahalanobis distance
    */
-  public double mahalanobisDistance(Vector vec) {
+  public double mahalanobisDistance(double[] vec) {
     if(invCovMatr != null) {
-      return VMath.mahalanobisDistance(invCovMatr.getArrayRef(), vec.getArrayRef(), mref);
+      return VMath.mahalanobisDistance(invCovMatr.getArrayRef(), vec, mean);
     }
-    Vector difference = vec.minus(mean);
-    return difference.transposeTimes(difference);
+    double sqsum = 0.;
+    for (int i = 0; i < vec.length; i++) {
+      double d = vec[i] - mean[i];
+      sqsum += d * d;
+    }
+    return sqsum;
   }
 
   /**
@@ -189,7 +192,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(NumberVector vec) {
-    double[] difference = minusEquals(vec.toArray(), mref);
+    double[] difference = minusEquals(vec.toArray(), mean);
     return (invCovMatr != null) ? transposeTimesTimes(difference, invCovMatr.getArrayRef(), difference) : transposeTimes(difference, difference);
   }
 
@@ -216,6 +219,6 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean.getArrayRef(), covariance);
+    return new EMModel(mean, covariance);
   }
 }

@@ -66,7 +66,7 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
     final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
     List<MultivariateGaussianModel> models = new ArrayList<>(k);
     for(Vector nv : initialMeans) {
-      models.add(new MultivariateGaussianModel(1. / k, nv, norm));
+      models.add(new MultivariateGaussianModel(1. / k, nv.getArrayRef(), norm));
     }
     return models;
   }

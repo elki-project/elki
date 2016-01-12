@@ -27,8 +27,6 @@ import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Simple spherical Gaussian cluster.
@@ -44,7 +42,7 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
   /**
    * Mean vector.
    */
-  Vector mean;
+  double[] mean;
 
   /**
    * Variances.
@@ -54,7 +52,7 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
   /**
    * Temporary storage, to avoid reallocations.
    */
-  double[] nmea, mref;
+  double[] nmea;
 
   /**
    * Normalization factor.
@@ -72,8 +70,8 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
    * @param weight Cluster weight
    * @param mean Initial mean
    */
-  public SphericalGaussianModel(double weight, Vector mean) {
-    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.getDimensionality()));
+  public SphericalGaussianModel(double weight, double[] mean) {
+    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length));
   }
 
   /**
@@ -83,14 +81,12 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
    * @param mean Initial mean
    * @param norm Normalization factor.
    */
-  public SphericalGaussianModel(double weight, Vector mean, double norm) {
+  public SphericalGaussianModel(double weight, double[] mean, double norm) {
     this.weight = weight;
-    final int dim = mean.getDimensionality();
     this.mean = mean;
     this.norm = norm;
     this.normDistrFactor = 1. / Math.sqrt(norm); // assume det=1
-    this.mref = mean.getArrayRef();
-    this.nmea = new double[dim];
+    this.nmea = new double[mean.length];
     this.variance = 1.;
     this.wsum = 0.;
   }
@@ -102,29 +98,30 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public void updateE(NumberVector vec, double wei) {
-    assert (vec.getDimensionality() == mref.length);
+    assert (vec.getDimensionality() == mean.length);
     final double nwsum = wsum + wei;
     // Compute new means
-    for(int i = 0; i < mref.length; i++) {
-      final double delta = vec.doubleValue(i) - mref[i];
+    for(int i = 0; i < mean.length; i++) {
+      final double delta = vec.doubleValue(i) - mean[i];
       final double rval = delta * wei / nwsum;
-      nmea[i] = mref[i] + rval;
+      nmea[i] = mean[i] + rval;
     }
     // Update variances
-    for(int i = 0; i < mref.length; i++) {
+    for(int i = 0; i < mean.length; i++) {
       // We DO want to use the new mean once and the old mean once!
       // It does not matter which one is which.
-      variance += (vec.doubleValue(i) - nmea[i]) * (vec.doubleValue(i) - mref[i]) * wei;
+      double vi = vec.doubleValue(i);
+      variance += (vi - nmea[i]) * (vi - mean[i]) * wei;
     }
     // Use new values.
     wsum = nwsum;
-    System.arraycopy(nmea, 0, mref, 0, nmea.length);
+    System.arraycopy(nmea, 0, mean, 0, nmea.length);
   }
 
   @Override
   public void finalizeEStep() {
     if(wsum > 0.) {
-      variance = variance / (wsum * mref.length);
+      variance = variance / (wsum * mean.length);
       normDistrFactor = 1. / Math.sqrt(norm * variance);
     }
     else {
@@ -139,11 +136,11 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
    * @param vec Vector
    * @return Mahalanobis distance
    */
-  public double mahalanobisDistance(Vector vec) {
-    double[] difference = vec.minus(mean).getArrayRef();
+  public double mahalanobisDistance(double[] vec) {
     double agg = 0.;
-    for(int i = 0; i < difference.length; i++) {
-      agg += difference[i] / variance * difference[i];
+    for(int i = 0; i < vec.length; i++) {
+      double diff = vec[i] - mean[i];
+      agg += diff / variance * diff;
     }
     return agg;
   }
@@ -155,10 +152,10 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(NumberVector vec) {
-    double[] difference = VMath.minusEquals(vec.toArray(), mean.getArrayRef());
     double agg = 0.;
-    for(int i = 0; i < difference.length; i++) {
-      agg += difference[i] / variance * difference[i];
+    for(int i = 0; i < mean.length; i++) {
+      double diff = vec.doubleValue(i) - mean[i];
+      agg += diff / variance * diff;
     }
     return agg;
   }
@@ -186,6 +183,6 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean.getArrayRef(), Matrix.identity(nmea.length, nmea.length).timesEquals(variance));
+    return new EMModel(mean, Matrix.identity(nmea.length, nmea.length).timesEquals(variance));
   }
 }
