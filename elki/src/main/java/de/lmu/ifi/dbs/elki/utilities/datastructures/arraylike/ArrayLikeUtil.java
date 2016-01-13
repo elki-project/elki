@@ -27,7 +27,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Utility class that allows plug-in use of various "array-like" types such as
@@ -84,11 +83,6 @@ public final class ArrayLikeUtil {
    * Use ArrayDBIDs as array.
    */
   public static final ArrayDBIDsAdapter ARRAYDBIDADAPTER = new ArrayDBIDsAdapter();
-
-  /**
-   * Adapter for vectors.
-   */
-  public static final NumberArrayAdapter<Double, Vector> VECTORADAPTER = new VectorAdapter();
 
   /**
    * Fake constructor. Do not instantiate!
