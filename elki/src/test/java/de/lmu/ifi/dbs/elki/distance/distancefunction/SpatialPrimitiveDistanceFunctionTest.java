@@ -76,9 +76,9 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
     double[] d2 = new double[dim];
     double[] d3 = new double[dim];
     double[] d4 = new double[dim];
-    DoubleVector v1 = DoubleVector.copy(d1);
+    DoubleVector v1 = DoubleVector.wrap(d1);
     ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(d2, d3);
-    DoubleVector v2 = DoubleVector.copy(d4);
+    DoubleVector v2 = DoubleVector.wrap(d4);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = (rnd.nextDouble() - .5) * 2E4;
@@ -121,9 +121,9 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
     double[] d2 = new double[dim];
     double[] d3 = new double[dim];
     double[] d4 = new double[dim];
-    DoubleVector v1 = DoubleVector.copy(d1);
+    DoubleVector v1 = DoubleVector.wrap(d1);
     ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(d2, d3);
-    DoubleVector v2 = DoubleVector.copy(d4);
+    DoubleVector v2 = DoubleVector.wrap(d4);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = rnd.nextDouble() * 2E4;
