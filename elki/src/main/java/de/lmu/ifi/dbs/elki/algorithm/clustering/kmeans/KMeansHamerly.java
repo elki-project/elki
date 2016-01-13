@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -165,6 +166,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     lower.destroy();
 
     // Wrap result
+    double totalvariance = 0.;
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
     for(int i = 0; i < clusters.size(); i++) {
       DBIDs ids = clusters.get(i);
@@ -173,11 +175,16 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
       double varsum = 0;
       double[] mean = means[i];
+      DoubleVector mvec = DoubleVector.wrap(mean);
       for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-        varsum += distanceFunction.distance(DoubleVector.wrap(mean), relation.get(it));
+        varsum += distanceFunction.distance(mvec, relation.get(it));
       }
+      totalvariance += varsum;
       KMeansModel model = new KMeansModel(mean, varsum);
       result.addToplevelCluster(new Cluster<>(ids, model));
+    }
+    if(LOG.isStatistics()) {
+      LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".variance-sum", totalvariance));
     }
     return result;
   }
