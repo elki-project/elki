@@ -22,8 +22,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -53,7 +53,9 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
  * Elkan's fast k-means by exploiting the triangle inequality.
@@ -92,15 +94,22 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
   private static final String KEY = KMeansElkan.class.getName();
 
   /**
+   * Flag whether to compute the final variance statistic.
+   */
+  private boolean varstat = false;
+
+  /**
    * Constructor.
    *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
+   * @param varstat Compute the variance statistic
    */
-  public KMeansElkan(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer) {
+  public KMeansElkan(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, boolean varstat) {
     super(distanceFunction, k, maxiter, initializer);
+    this.varstat = varstat;
   }
 
   @Override
@@ -184,17 +193,19 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
       if(ids.size() == 0) {
         continue;
       }
-      double varsum = 0;
       double[] mean = means[i];
-      DoubleVector mvec = DoubleVector.wrap(mean);
-      for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
-        varsum += distanceFunction.distance(mvec, relation.get(it));
+      double varsum = 0.;
+      if(varstat) {
+        DoubleVector mvec = DoubleVector.wrap(mean);
+        for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+          varsum += distanceFunction.distance(mvec, relation.get(it));
+        }
+        totalvariance += varsum;
       }
-      totalvariance += varsum;
       KMeansModel model = new KMeansModel(mean, varsum);
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
-    if(LOG.isStatistics()) {
+    if(LOG.isStatistics() && varstat) {
       LOG.statistics(new DoubleStatistic(this.getClass().getName() + ".variance-sum", totalvariance));
     }
     return result;
@@ -400,6 +411,16 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
+    /**
+     * Flag to compute the final clustering variance statistic.
+     */
+    public static final OptionID VARSTAT_ID = new OptionID("kmeans.varstat", "Compute the final clustering variance statistic. Needs an additional full pass over the data set.");
+
+    /**
+     * Compute the final variance statisic.
+     */
+    protected boolean varstat = false;
+
     @Override
     protected Logging getLogger() {
       return LOG;
@@ -417,8 +438,17 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
     }
 
     @Override
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      Flag varF = new Flag(VARSTAT_ID);
+      if(config.grab(varF)) {
+        varstat = varF.isTrue();
+      }
+    }
+
+    @Override
     protected KMeansElkan<V> makeInstance() {
-      return new KMeansElkan<>(distanceFunction, k, maxiter, initializer);
+      return new KMeansElkan<>(distanceFunction, k, maxiter, initializer, varstat);
     }
   }
 }
