@@ -709,7 +709,7 @@ public final class VMath {
    * @return the projection of p into the subspace formed by v
    */
   public static final double[] project(final double[] v1, final Matrix m2) {
-    return project(v1, m2);
+    return project(v1, m2.getArrayRef());
   }
 
   /**
