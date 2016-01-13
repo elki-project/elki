@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractNumberVectorDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -45,7 +46,6 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -224,8 +224,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
     final Random rand = random.getSingleThreadedRandom();
     final int dim = min.length;
 
-    Vector vec = new Vector(dim);
-    double[] buf = vec.getArrayRef(); // Reference!
+    double[] buf = new double[dim];
 
     double u = 0.;
     for(int i = 0; i < sampleSize; i++) {
@@ -233,7 +232,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
       for(int d = 0; d < buf.length; d++) {
         buf[d] = min[d] + (rand.nextDouble() * extend[d]);
       }
-      final double kdist = knnQuery.getKNNForObject(vec, k).getKNNDistance();
+      double kdist = knnQuery.getKNNForObject(DoubleVector.wrap(buf), k).getKNNDistance();
       u += MathUtil.powi(kdist, dim);
     }
     return u;
@@ -248,7 +247,7 @@ public class HopkinsStatisticClusteringTendency extends AbstractNumberVectorDist
    * @param extend Data extend output array (preallocated!)
    */
   protected void initializeDataExtends(Relation<NumberVector> relation, int dim, double[] min, double[] extend) {
-    assert(min.length == dim && extend.length == dim);
+    assert (min.length == dim && extend.length == dim);
     // if no parameter for min max compute min max values for each dimension
     // from dataset
     if(minima == null || maxima == null || minima.length == 0 || maxima.length == 0) {

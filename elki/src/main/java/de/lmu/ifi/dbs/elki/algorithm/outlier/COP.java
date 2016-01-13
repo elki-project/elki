@@ -52,7 +52,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
@@ -237,10 +236,10 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     }
 
     WritableDoubleDataStore cop_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDataStore<Vector> cop_err_v = null;
+    WritableDataStore<double[]> cop_err_v = null;
     WritableIntegerDataStore cop_dim = null;
     if(models) {
-      cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Vector.class);
+      cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, double[].class);
       cop_dim = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, -1);
     }
     // compute neighbors of each db object
@@ -281,16 +280,17 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       case GAMMA: {
         double[][] dists = new double[dim][nids.size()];
         int j = 0;
-        Vector srel = new Vector(dim);
+        double[] srel = new double[dim];
         for(DBIDIter s = nids.iter(); s.valid() && j < nids.size(); s.advance()) {
           V vec = relation.get(s);
           for(int d = 0; d < dim; d++) {
-            srel.set(d, vec.doubleValue(d) - centroid[d]);
+            srel[d] = vec.doubleValue(d) - centroid[d];
           }
-          Vector serr = evecs.transposeTimes(srel);
+          double[] serr = VMath.transposeTimes(evecs.getArrayRef(), srel);
           double sqdist = 0.0;
           for(int d = 0; d < dim; d++) {
-            sqdist += serr.get(d) * serr.get(d) / evs[d];
+            double serrd = serr[d];
+            sqdist += serrd * serrd / evs[d];
             dists[d][j] = sqdist;
           }
           j++;
@@ -323,7 +323,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
 
       cop_score.putDouble(id, prob);
       if(models) {
-        cop_err_v.put(id, new Vector(ev));
+        cop_err_v.put(id, ev);
         cop_dim.putInt(id, dim + 1 - vdim);
       }
 
@@ -337,7 +337,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     if(models) {
       result.addChildResult(new MaterializedRelation<>("Local Dimensionality", COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
-      result.addChildResult(new MaterializedRelation<>("Error vectors", COP_ERRORVEC, TypeUtil.VECTOR, cop_err_v, ids));
+      result.addChildResult(new MaterializedRelation<>("Error vectors", COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, cop_err_v, ids));
     }
     return result;
   }

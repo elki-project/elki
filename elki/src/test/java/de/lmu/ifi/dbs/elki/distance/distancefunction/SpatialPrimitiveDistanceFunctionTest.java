@@ -33,6 +33,7 @@ import java.util.Random;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersectionDistanceFunction;
@@ -42,7 +43,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistance
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MaximumDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MinimumDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Validate spatial distance functions by ensuring that mindist <= distance for
@@ -76,9 +76,9 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
     double[] d2 = new double[dim];
     double[] d3 = new double[dim];
     double[] d4 = new double[dim];
-    Vector v1 = new Vector(d1);
+    DoubleVector v1 = DoubleVector.copy(d1);
     ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(d2, d3);
-    Vector v2 = new Vector(d4);
+    DoubleVector v2 = DoubleVector.copy(d4);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = (rnd.nextDouble() - .5) * 2E4;
@@ -121,9 +121,9 @@ public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
     double[] d2 = new double[dim];
     double[] d3 = new double[dim];
     double[] d4 = new double[dim];
-    Vector v1 = new Vector(d1);
+    DoubleVector v1 = DoubleVector.copy(d1);
     ModifiableHyperBoundingBox mbr = new ModifiableHyperBoundingBox(d2, d3);
-    Vector v2 = new Vector(d4);
+    DoubleVector v2 = DoubleVector.copy(d4);
     for(int i = 0; i < iters; i++) {
       for(int d = 0; d < dim; d++) {
         d1[d] = rnd.nextDouble() * 2E4;

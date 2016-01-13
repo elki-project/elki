@@ -40,10 +40,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -57,11 +55,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Compute a quantile of a distance sample, useful for choosing parameters for
  * algorithms.
  *
- * @author Erich Schubert
+ * TODO: allow specifying multiple quantiles.
  *
+ * @author Erich Schubert
+ * 
  * @param <O> Object type
  */
-public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<Vector>> {
+public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<double[]>> {
   /**
    * Class logger.
    */
@@ -110,7 +110,14 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O
     this.rand = rand;
   }
 
-  public Result run(Database database, Relation<O> rel) {
+  /**
+   * Run the distance quantile sampler.
+   * 
+   * @param database
+   * @param rel
+   * @return
+   */
+  public CollectionResult<double[]> run(Database database, Relation<O> rel) {
     DistanceQuery<O> dq = rel.getDistanceQuery(getDistanceFunction());
     int size = rel.size();
     long pairs = (size * (long) size) >> 1;
@@ -144,8 +151,8 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O
     LOG.statistics(new DoubleStatistic(PREFIX + ".distance", heap.peek()));
     LOG.ensureCompleted(prog);
     Collection<String> header = Arrays.asList(new String[] { "Distance" });
-    Collection<Vector> data = Arrays.asList(new Vector[] { new Vector(heap.peek()) });
-    return new CollectionResult<Vector>("Distances sample", "distance-sample", data, header);
+    Collection<double[]> data = Arrays.asList(new double[][] { new double[] { heap.peek() } });
+    return new CollectionResult<double[]>("Distances sample", "distance-sample", data, header);
   }
 
   @Override

@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -55,7 +56,6 @@ import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
@@ -283,10 +283,10 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       upperVals[i] = val + epsilon;
     }
 
-    Vector lowerEpsilon = new Vector(lowerVals);
+    DoubleVector lowerEpsilon = DoubleVector.wrap(lowerVals);
     VectorApproximation lowerEpsilonPartitions = calculatePartialApproximation(null, lowerEpsilon, daFiles);
 
-    Vector upperEpsilon = new Vector(upperVals);
+    DoubleVector upperEpsilon = DoubleVector.wrap(upperVals);
     VectorApproximation upperEpsilonPartitions = calculatePartialApproximation(null, upperEpsilon, daFiles);
 
     for(int i = 0; i < daFiles.size(); i++) {

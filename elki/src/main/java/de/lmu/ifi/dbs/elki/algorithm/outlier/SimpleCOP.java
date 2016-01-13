@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -117,7 +117,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     DBIDs ids = data.getDBIDs();
 
     WritableDoubleDataStore cop_score = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDataStore<Vector> cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Vector.class);
+    WritableDataStore<double[]> cop_err_v = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, double[].class);
     WritableDataStore<Matrix> cop_datav = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Matrix.class);
     WritableIntegerDataStore cop_dim = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, -1);
     WritableDataStore<CorrelationAnalysisSolution<?>> cop_sol = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, CorrelationAnalysisSolution.class);
@@ -138,8 +138,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
         cop_score.putDouble(id, prob);
 
-        Vector errv = new Vector(depsol.errorVector(data.get(id))).timesEquals(-1);
-        cop_err_v.put(id, errv);
+        cop_err_v.put(id, VMath.times(depsol.errorVector(data.get(id)), -1));
 
         Matrix datav = depsol.dataProjections(data.get(id));
         cop_datav.put(id, datav);
@@ -158,7 +157,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // extra results
     result.addChildResult(new MaterializedRelation<>("Local Dimensionality", COP.COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
-    result.addChildResult(new MaterializedRelation<>("Error vectors", COP.COP_ERRORVEC, TypeUtil.VECTOR, cop_err_v, ids));
+    result.addChildResult(new MaterializedRelation<>("Error vectors", COP.COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, cop_err_v, ids));
     result.addChildResult(new MaterializedRelation<>("Data vectors", "cop-datavec", TypeUtil.MATRIX, cop_datav, ids));
     result.addChildResult(new MaterializedRelation<>("Correlation analysis", "cop-sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), cop_sol, ids));
     return result;
