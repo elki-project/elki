@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,6 +29,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
+import de.lmu.ifi.dbs.elki.data.AbstractNumberVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -50,7 +51,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -203,7 +203,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
             continue;
           }
           // TODO: always use manhattan?
-          if(ci == null || distFunc.distance(ci.getCenter(), obj) > distFunc.distance(ci2.getCenter(), obj)) {
+          if(ci == null || distFunc.distance(ci, obj) > distFunc.distance(ci2, obj)) {
             ci = ci2;
           }
         }
@@ -215,13 +215,13 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
         // Find the closest C_j
         Node cj = null;
         for(int i = 0; i < g; i++) {
-          Node cj2 = qts.get(i).findClosestNode(ci.getCenter(), l - alpha);
+          Node cj2 = qts.get(i).findClosestNode(ci, l - alpha);
           // TODO: allow higher levels or not?
           if(cj != null && cj2.getLevel() < cj.getLevel()) {
             continue;
           }
           // TODO: always use manhattan?
-          if(cj == null || distFunc.distance(cj.getCenter(), ci.getCenter()) > distFunc.distance(cj2.getCenter(), ci.getCenter())) {
+          if(cj == null || distFunc.distance(cj, ci) > distFunc.distance(cj2, ci)) {
             cj = cj2;
           }
         }
@@ -361,7 +361,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
       ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
       List<Node> children = new ArrayList<>();
       bulkLoad(min.clone(), max.clone(), children, ids, 0, ids.size(), 0, 0, 0);
-      this.root = new Node(0, new Vector(center), ids.size(), -1, children);
+      this.root = new Node(0, center, ids.size(), -1, children);
     }
 
     /**
@@ -378,7 +378,8 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
      * @param code Bit code of node position
      */
     private void bulkLoad(double[] lmin, double[] lmax, List<Node> children, ArrayModifiableDBIDs ids, int start, int end, int dim, int level, int code) {
-      // logger.warning(FormatUtil.format(lmin)+" "+FormatUtil.format(lmax)+" "+start+"->"+end+" "+(end-start));
+      // logger.warning(FormatUtil.format(lmin)+" "+FormatUtil.format(lmax)+"
+      // "+start+"->"+end+" "+(end-start));
       // Hack: Check degenerate cases that won't split
       if(dim == 0) {
         DBIDArrayIter iter = ids.iter();
@@ -403,7 +404,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
               center[d] -= width[d];
             }
           }
-          children.add(new Node(code, new Vector(center), end - start, level, null));
+          children.add(new Node(code, center, end - start, level, null));
           return;
         }
       }
@@ -417,13 +418,13 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
           }
         }
         if(end - start < nmin) {
-          children.add(new Node(code, new Vector(center), end - start, level, null));
+          children.add(new Node(code, center, end - start, level, null));
           return;
         }
         else {
           List<Node> newchildren = new ArrayList<>();
           bulkLoad(lmin, lmax, newchildren, ids, start, end, 0, level + 1, 0);
-          children.add(new Node(code, new Vector(center), end - start, level, newchildren));
+          children.add(new Node(code, center, end - start, level, newchildren));
           return;
         }
       }
@@ -466,7 +467,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
      *
      * @param obj Object
      * @param dim Dimension
-     * @param level Level (controls scaling/wraping!)
+     * @param level Level (controls scaling/wrapping!)
      * @return Shifted position
      */
     private double getShiftedDim(NumberVector obj, int dim, int level) {
@@ -476,8 +477,8 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     }
 
     /**
-     * Find the closest node (of depth tlevel or above, if there is no node at
-     * this depth) for the given vector.
+     * Find the closest node (of depth {@code tlevel} or above, if there is no
+     * node at this depth) for the given vector.
      *
      * @param vec Query vector
      * @param tlevel Target level
@@ -516,7 +517,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
    *
    * @author Erich Schubert
    */
-  static class Node {
+  static class Node extends AbstractNumberVector {
     /**
      * Position code
      */
@@ -545,7 +546,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     /**
      * Center vector
      */
-    Vector center;
+    double[] center;
 
     /**
      * Constructor.
@@ -556,7 +557,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
      * @param level Node level
      * @param children Children list
      */
-    protected Node(int code, Vector center, int count, int level, List<Node> children) {
+    protected Node(int code, double[] center, int count, int level, List<Node> children) {
       this.code = code;
       this.center = center;
       this.count = count;
@@ -585,15 +586,6 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
      */
     public int getCount() {
       return count;
-    }
-
-    /**
-     * Return center vector
-     *
-     * @return center vector
-     */
-    public Vector getCenter() {
-      return center;
     }
 
     /**
@@ -628,6 +620,41 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
         agg += child.getCubicSum(levels - 1);
       }
       return agg;
+    }
+
+    @Override
+    public int getDimensionality() {
+      return center.length;
+    }
+
+    @Override
+    public double doubleValue(int dimension) {
+      return center[dimension];
+    }
+
+    @Override
+    public long longValue(int dimension) {
+      return (long) center[dimension];
+    }
+
+    @Override
+    public double[] toArray() {
+      return center.clone();
+    }
+
+    @Override
+    public Double getValue(int dimension) {
+      return center[dimension];
+    }
+
+    @Override
+    public double getMin(int dimension) {
+      return center[dimension];
+    }
+
+    @Override
+    public double getMax(int dimension) {
+      return center[dimension];
     }
   }
 
