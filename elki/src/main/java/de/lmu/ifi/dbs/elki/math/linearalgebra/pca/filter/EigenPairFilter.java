@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
+package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
 
 /*
  This file is part of ELKI:
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  */
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 
 /**
  * The eigenpair filter is used to filter eigenpairs (i.e. eigenvectors

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
+package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
 
 /*
  This file is part of ELKI:
@@ -29,6 +29,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;

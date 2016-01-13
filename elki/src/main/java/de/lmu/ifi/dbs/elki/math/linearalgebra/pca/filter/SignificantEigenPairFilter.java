@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
+package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
 
 /*
  This file is part of ELKI:
@@ -28,55 +28,55 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
 /**
- * The RelativeEigenPairFilter sorts the eigenpairs in descending order of their
- * eigenvalues and marks the first eigenpairs who are a certain factor above the
- * average of the remaining eigenvalues.
- * 
- * It is closely related to the WeakEigenPairFilter, and differs mostly by
- * comparing to the remaining Eigenvalues, not to the total sum.
- * 
+ * The SignificantEigenPairFilter sorts the eigenpairs in descending order of
+ * their eigenvalues and chooses the contrast of an Eigenvalue to the remaining
+ * Eigenvalues is maximal.
+ *
+ * It is closely related to the WeakEigenPairFilter and RelativeEigenPairFilter.
+ * But while the RelativeEigenPairFilter chooses the highest dimensionality that
+ * satisfies the relative alpha levels, the SignificantEigenPairFilter will
+ * chose the local dimensionality such that the 'contrast' is maximal.
+ *
  * There are some situations where one or the other is superior, especially when
  * it comes to handling nested clusters and strong global correlations that are
  * not too interesting. These benefits usually only make a difference at higher
  * dimensionalities.
- * 
+ *
  * @author Erich Schubert
  */
-@Title("Relative EigenPair Filter")
-@Description("Sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is " + "above the average ('expected') eigenvalue of the remaining eigenvectors.")
-public class RelativeEigenPairFilter implements EigenPairFilter {
+@Title("Significant EigenPair Filter")
+@Description("Sorts the eigenpairs in decending order of their eigenvalues and looks for the maxmimum contrast of current Eigenvalue / average of remaining Eigenvalues.")
+public class SignificantEigenPairFilter implements EigenPairFilter {
   /**
-   * The default value for ralpha.
+   * The default value for walpha. Not used by default, we're going for maximum
+   * contrast only.
    */
-  public static final double DEFAULT_RALPHA = 1.1;
+  public static final double DEFAULT_WALPHA = 0.0;
 
   /**
    * The noise tolerance level for weak eigenvectors
    */
-  private double ralpha;
+  private double walpha;
 
   /**
    * Constructor.
-   * 
-   * @param ralpha
+   *
+   * @param walpha
    */
-  public RelativeEigenPairFilter(double ralpha) {
+  public SignificantEigenPairFilter(double walpha) {
     super();
-    this.ralpha = ralpha;
+    this.walpha = walpha;
   }
 
-  /**
-   * Filter eigenpairs
-   */
   @Override
   public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
     // init strong and weak eigenpairs
@@ -84,25 +84,36 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
     List<EigenPair> weakEigenPairs = new ArrayList<>();
 
     // default value is "all strong".
-    int contrastAtMax = eigenPairs.size() - 1;
-    // find the last eigenvector that is considered 'strong' by the weak rule
-    // applied to the remaining vectors only
-    double eigenValueSum = eigenPairs.getEigenPair(eigenPairs.size() - 1).getEigenvalue();
-    for(int i = eigenPairs.size() - 2; i >= 0; i--) {
+    int contrastMaximum = eigenPairs.size() - 1;
+    double maxContrast = 0.0;
+    // calc the eigenvalue sum.
+    double eigenValueSum = 0.0;
+    for(int i = 0; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       eigenValueSum += eigenPair.getEigenvalue();
-      double needEigenvalue = eigenValueSum / (eigenPairs.size() - i) * ralpha;
-      if(eigenPair.getEigenvalue() >= needEigenvalue) {
-        contrastAtMax = i;
-        break;
+    }
+    double weakEigenvalue = eigenValueSum / eigenPairs.size() * walpha;
+    // now find the maximum contrast.
+    double currSum = eigenPairs.getEigenPair(eigenPairs.size() - 1).getEigenvalue();
+    for(int i = eigenPairs.size() - 2; i >= 0; i--) {
+      EigenPair eigenPair = eigenPairs.getEigenPair(i);
+      currSum += eigenPair.getEigenvalue();
+      // weak?
+      if(eigenPair.getEigenvalue() < weakEigenvalue) {
+        continue;
+      }
+      double contrast = eigenPair.getEigenvalue() / (currSum / (eigenPairs.size() - i));
+      if(contrast > maxContrast) {
+        maxContrast = contrast;
+        contrastMaximum = i;
       }
     }
 
-    for(int i = 0; i <= contrastAtMax /* && i < eigenPairs.size() */; i++) {
+    for(int i = 0; i <= contrastMaximum /* && i < eigenPairs.size() */; i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       strongEigenPairs.add(eigenPair);
     }
-    for(int i = contrastAtMax + 1; i < eigenPairs.size(); i++) {
+    for(int i = contrastMaximum + 1; i < eigenPairs.size(); i++) {
       EigenPair eigenPair = eigenPairs.getEigenPair(i);
       weakEigenPairs.add(eigenPair);
     }
@@ -112,31 +123,27 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    /**
-     * Parameter relative alpha.
-     */
-    public static final OptionID EIGENPAIR_FILTER_RALPHA = new OptionID("pca.filter.relativealpha", "The sensitivity niveau for weak eigenvectors: An eigenvector which is at less than " + "the given share of the statistical average variance is considered weak.");
-    protected double ralpha;
+    private double walpha;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter ralphaP = new DoubleParameter(EIGENPAIR_FILTER_RALPHA, DEFAULT_RALPHA);
-      ralphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(ralphaP)) {
-        ralpha = ralphaP.getValue();
+      DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
+      walphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(walphaP)) {
+        walpha = walphaP.getValue();
       }
     }
 
     @Override
-    protected RelativeEigenPairFilter makeInstance() {
-      return new RelativeEigenPairFilter(ralpha);
+    protected SignificantEigenPairFilter makeInstance() {
+      return new SignificantEigenPairFilter(walpha);
     }
   }
 }

@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
+package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
 
 /*
  This file is part of ELKI:
@@ -28,6 +28,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -112,9 +113,9 @@ public class WeakEigenPairFilter implements EigenPairFilter {
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * OptionID for the weak alpha value of {@link WeakEigenPairFilter},
-     * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.ProgressiveEigenPairFilter}
+     * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.ProgressiveEigenPairFilter}
      * and
-     * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SignificantEigenPairFilter}
+     * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.SignificantEigenPairFilter}
      */
     public static final OptionID EIGENPAIR_FILTER_WALPHA = new OptionID("pca.filter.weakalpha", "The minimum strength of the statistically expected variance (1/n) share an eigenvector " + "needs to have to be considered 'strong'.");
     /**
