@@ -26,12 +26,12 @@ package de.lmu.ifi.dbs.elki.utilities.referencepoints;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -86,8 +86,8 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
 
     if(gridres <= 0) {
       LOG.warning("Grid of resolution " + gridres + " will have a single point only.");
-      ArrayList<Vector> result = new ArrayList<>(1);
-      result.add(new Vector(mean));
+      ArrayList<DoubleVector> result = new ArrayList<>(1);
+      result.add(DoubleVector.wrap(mean));
       return result;
     }
     final int grids = gridres + 1;
@@ -98,7 +98,7 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
     if(gridpoints < 0 || gridpoints > db.size()) {
       LOG.warning("Grid has " + gridpoints + " points, but you only have " + db.size() + " observations.");
     }
-    ArrayList<Vector> result = new ArrayList<>(gridpoints);
+    ArrayList<DoubleVector> result = new ArrayList<>(gridpoints);
     double[] delta = new double[dim];
     for(int d = 0; d < dim; d++) {
       delta[d] = (minmax[1][d] - minmax[0][d]) / gridres;
@@ -106,14 +106,14 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
 
     double halfgrid = gridres * .5;
     for(int i = 0; i < gridpoints; i++) {
-      double[] vec = new double[dim]; // Will be returned!
+      double[] vec = new double[dim];
       int acc = i;
       for(int d = 0; d < dim; d++) {
         int coord = acc % grids;
         acc /= grids;
         vec[d] = mean[d] + (coord - halfgrid) * delta[d] * gridscale;
       }
-      result.add(new Vector(vec));
+      result.add(DoubleVector.wrap(vec));
     }
     return result;
   }

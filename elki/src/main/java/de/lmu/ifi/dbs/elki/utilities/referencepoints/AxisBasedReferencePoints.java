@@ -26,10 +26,10 @@ package de.lmu.ifi.dbs.elki.utilities.referencepoints;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -72,18 +72,18 @@ public class AxisBasedReferencePoints implements ReferencePointsHeuristic {
       mean[d] -= delta[d] * .5;
     }
 
-    ArrayList<Vector> result = new ArrayList<>(2 + dim);
+    ArrayList<NumberVector> result = new ArrayList<>(2 + dim);
 
     double[] vec = new double[dim];
     // Use min and max
     for(int d = 0; d < dim; d++) {
       vec[d] = mean[d] - delta[d];
     }
-    result.add(new Vector(vec));
+    result.add(DoubleVector.copy(vec));
     for(int d = 0; d < dim; d++) {
       vec[d] = mean[d] + delta[d];
     }
-    result.add(new Vector(vec));
+    result.add(DoubleVector.copy(vec));
 
     // Plus axis end points:
     for(int i = 0; i < dim; i++) {
@@ -95,7 +95,7 @@ public class AxisBasedReferencePoints implements ReferencePointsHeuristic {
           vec[d] = mean[d] + delta[d];
         }
       }
-      result.add(new Vector(vec));
+      result.add(DoubleVector.copy(vec));
     }
 
     return result;

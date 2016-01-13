@@ -27,10 +27,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -88,14 +88,13 @@ public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic 
     }
 
     Random rand = rnd.getSingleThreadedRandom();
-    ArrayList<Vector> result = new ArrayList<>(samplesize);
-    double[] vec = new double[dim];
+    ArrayList<DoubleVector> result = new ArrayList<>(samplesize);
     for(int i = 0; i < samplesize; i++) {
+      double[] vec = new double[dim];
       for(int d = 0; d < dim; d++) {
         vec[d] = mean[d] + (rand.nextDouble() - 0.5) * scale * delta[d];
       }
-      Vector newp = new Vector(vec);
-      result.add(newp);
+      result.add(DoubleVector.wrap(vec));
     }
 
     return result;

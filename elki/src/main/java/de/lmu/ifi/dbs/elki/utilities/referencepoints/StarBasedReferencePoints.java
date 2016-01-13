@@ -26,11 +26,11 @@ package de.lmu.ifi.dbs.elki.utilities.referencepoints;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -95,18 +95,18 @@ public class StarBasedReferencePoints implements ReferencePointsHeuristic {
       max[d] = (max[d] - centroid[d]) * scale + centroid[d];
     }
 
-    ArrayList<Vector> result = new ArrayList<>(2 * dim + 1);
+    ArrayList<DoubleVector> result = new ArrayList<>(2 * dim + 1);
     if(!nocenter) {
-      result.add(new Vector(centroid));
+      result.add(DoubleVector.wrap(centroid));
     }
     // Plus axis end points through centroid
     for(int i = 0; i < dim; i++) {
       double[] vec = centroid.clone();
       vec[i] = min[i];
-      result.add(new Vector(vec));
+      result.add(DoubleVector.wrap(vec));
       vec = centroid.clone();
       vec[i] = max[i];
-      result.add(new Vector(vec));
+      result.add(DoubleVector.wrap(vec));
     }
 
     return result;
