@@ -22,8 +22,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.PreDeConNeighborPredicate.PreDeConModel;
@@ -46,9 +46,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -93,7 +95,12 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
   /**
    * The Filtered PCA Runner
    */
-  private PCAFilteredRunner pca;
+  private PCARunner pca;
+
+  /**
+   * Filter for selecting eigenvectors.
+   */
+  private EigenPairFilter filter;
 
   /**
    * Constructor.
@@ -103,7 +110,8 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
   public FourCNeighborPredicate(FourC.Settings settings) {
     super(settings.epsilon, EuclideanDistanceFunction.STATIC);
     this.settings = settings;
-    this.pca = new PCAFilteredRunner(new StandardCovarianceMatrixBuilder(), new LimitEigenPairFilter(settings.delta, settings.absolute), settings.kappa, 1);
+    this.pca = new PCARunner(new StandardCovarianceMatrixBuilder());
+    this.filter = new LimitEigenPairFilter(settings.delta, settings.absolute);
   }
 
   @SuppressWarnings("unchecked")
@@ -144,8 +152,9 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
   @Override
   protected PreDeConModel computeLocalModel(DBIDRef id, DoubleDBIDList neighbors, Relation<V> relation) {
     mvSize.put(neighbors.size());
-    PCAFilteredResult pcares = pca.processIds(neighbors, relation);
-    int cordim = pcares.getCorrelationDimension();
+    SortedEigenPairs epairs = pca.processIds(neighbors, relation).getEigenPairs();
+    int cordim = filter.filter(epairs.eigenValues());
+    PCAFilteredResult pcares = new PCAFilteredResult(epairs, cordim, settings.kappa, 1.);
     Matrix m_hat = pcares.similarityMatrix();
 
     double[] obj = relation.get(id).toArray();

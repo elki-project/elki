@@ -296,12 +296,17 @@ public final class ClassGenericsUtil {
       return ret;
     }
     catch(Exception e) {
-      if (config.hasErrors()) {
-        for (ParameterException err : config.getErrors()) {
+      if(config.hasErrors()) {
+        for(ParameterException err : config.getErrors()) {
           LOG.warning(err.toString());
         }
       }
-      throw new AbortException("Instantiation failed", e);
+      if(e instanceof AbortException) {
+        throw (AbortException) e;
+      }
+      else {
+        throw new AbortException("Instantiation failed", e);
+      }
     }
   }
 

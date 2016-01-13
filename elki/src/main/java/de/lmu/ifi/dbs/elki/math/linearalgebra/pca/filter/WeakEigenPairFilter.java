@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,12 +23,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -67,40 +61,25 @@ public class WeakEigenPairFilter implements EigenPairFilter {
     this.walpha = walpha;
   }
 
-  /**
-   * Filter eigenpairs
-   */
   @Override
-  public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
-    // init strong and weak eigenpairs
-    List<EigenPair> strongEigenPairs = new ArrayList<>();
-    List<EigenPair> weakEigenPairs = new ArrayList<>();
-
+  public int filter(double[] eigenValues) {
     // determine sum of eigenvalues
     double totalSum = 0;
-    for(int i = 0; i < eigenPairs.size(); i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      totalSum += eigenPair.getEigenvalue();
+    for(int i = 0; i < eigenValues.length; i++) {
+      totalSum += eigenValues[i];
     }
-    double expectEigenvalue = totalSum / eigenPairs.size() * walpha;
+    double expectEigenvalue = totalSum / eigenValues.length * walpha;
 
     // determine strong and weak eigenpairs
-    for(int i = 0; i < eigenPairs.size(); i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      if(eigenPair.getEigenvalue() > expectEigenvalue) {
-        strongEigenPairs.add(eigenPair);
-      }
-      else {
-        weakEigenPairs.add(eigenPair);
+    for(int i = 0; i < eigenValues.length; i++) {
+      if(eigenValues[i] <= expectEigenvalue) {
+        return i;
       }
     }
 
     // the code using this method doesn't expect an empty strong set,
     // if we didn't find any strong ones, we make all vectors strong
-    if(strongEigenPairs.size() == 0) {
-      return new FilteredEigenPairs(new ArrayList<EigenPair>(), weakEigenPairs);
-    }
-    return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+    return eigenValues.length;
   }
 
   /**
@@ -118,6 +97,7 @@ public class WeakEigenPairFilter implements EigenPairFilter {
      * {@link de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.SignificantEigenPairFilter}
      */
     public static final OptionID EIGENPAIR_FILTER_WALPHA = new OptionID("pca.filter.weakalpha", "The minimum strength of the statistically expected variance (1/n) share an eigenvector " + "needs to have to be considered 'strong'.");
+
     /**
      * The threshold for strong eigenvectors: the strong eigenvectors explain a
      * portion of at least alpha of the total variance.

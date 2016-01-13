@@ -52,7 +52,9 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -103,12 +105,13 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
    * 
    * @param distanceFunction Distance function
    * @param k k Parameter
-   * @param pca PCA runner-
+   * @param pca PCA runner
+   * @param filter Filter for selecting eigenvectors
    */
-  public SimpleCOP(DistanceFunction<? super V> distanceFunction, int k, PCAFilteredRunner pca) {
+  public SimpleCOP(DistanceFunction<? super V> distanceFunction, int k, PCARunner pca, EigenPairFilter filter) {
     super(distanceFunction);
     this.k = k;
-    this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF, pca, 0, false);
+    this.dependencyDerivator = new DependencyDerivator<>(null, FormatUtil.NF, pca, filter, 0, false);
   }
 
   public OutlierResult run(Database database, Relation<V> data) throws IllegalStateException {
@@ -208,7 +211,12 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     /**
      * Holds the object performing the dependency derivation
      */
-    protected PCAFilteredRunner pca;
+    protected PCARunner pca;
+
+    /**
+     * Filter for selecting eigenvectors.
+     */
+    private EigenPairFilter filter;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -218,15 +226,19 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
       if(config.grab(kP)) {
         k = kP.intValue();
       }
-      ObjectParameter<PCAFilteredRunner> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCAFilteredRunner.class, PCAFilteredRunner.class);
+      ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARUNNER_ID, PCARunner.class, PCARunner.class);
       if(config.grab(pcaP)) {
         pca = pcaP.instantiateClass(config);
+      }
+      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
+      if(config.grab(filterP)) {
+        filter = filterP.instantiateClass(config);
       }
     }
 
     @Override
     protected SimpleCOP<V> makeInstance() {
-      return new SimpleCOP<>(distanceFunction, k, pca);
+      return new SimpleCOP<>(distanceFunction, k, pca, filter);
     }
   }
 }

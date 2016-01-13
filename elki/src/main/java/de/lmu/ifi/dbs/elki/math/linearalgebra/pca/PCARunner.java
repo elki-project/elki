@@ -68,16 +68,6 @@ public class PCARunner {
   }
 
   /**
-   * Run PCA on the complete database.
-   * 
-   * @param database the database used
-   * @return PCA result
-   */
-  public PCAResult processDatabase(Relation<? extends NumberVector> database) {
-    return processCovarMatrix(covarianceMatrixBuilder.processDatabase(database));
-  }
-
-  /**
    * Run PCA on a collection of database IDs.
    * 
    * @param ids a collection of ids
@@ -149,8 +139,17 @@ public class PCARunner {
    */
   public static class Parameterizer extends AbstractParameterizer {
     /**
-     * Parameter to specify the class to compute the covariance matrix, must be a
-     * subclass of {@link CovarianceMatrixBuilder}.
+     * Parameter for the PCA variant to use.
+     * 
+     * <p>
+     * Key: {@code -pca.variant}
+     * </p>
+     */
+    public static final OptionID PCARUNNER_ID = new OptionID("pca.variant", "The class to compute (filtered) PCA.");
+
+    /**
+     * Parameter to specify the class to compute the covariance matrix, must be
+     * a subclass of {@link CovarianceMatrixBuilder}.
      * <p>
      * Default value: {@link CovarianceMatrixBuilder}
      * </p>
@@ -159,6 +158,7 @@ public class PCARunner {
      * </p>
      */
     public static final OptionID PCA_COVARIANCE_MATRIX = new OptionID("pca.covariance", "Class used to compute the covariance matrix.");
+
     /**
      * The covariance computation class.
      */

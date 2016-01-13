@@ -22,8 +22,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,7 +57,6 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -64,6 +64,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 
 /**
@@ -579,30 +581,34 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      configK(config);
-      configKI(config);
-      configL(config);
-      configAlpha(config);
-      configSeed(config);
-
-      // TODO: make configurable, to allow using stabilized PCA
-      Class<PCARunner> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCARunner.class);
-      pca = config.tryInstantiate(cls);
-    }
-
-    protected void configAlpha(Parameterization config) {
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.5);
-      alphaP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      alphaP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      IntParameter kP = new IntParameter(K_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+      IntParameter k_iP = new IntParameter(K_I_ID, 30) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(k_iP)) {
+        k_i = k_iP.getValue();
+      }
+      IntParameter lP = new IntParameter(L_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(lP)) {
+        l = lP.getValue();
+      }
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 0.5) //
+      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
-    }
-
-    protected void configSeed(Parameterization config) {
       RandomParameter rndP = new RandomParameter(SEED_ID);
       if(config.grab(rndP)) {
         rnd = rndP.getValue();
+      }
+      ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class);
+      if(config.grab(pcaP)) {
+        pca = pcaP.instantiateClass(config);
       }
     }
 

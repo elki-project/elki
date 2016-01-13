@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,12 +23,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -79,36 +74,18 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
    * Filter eigenpairs
    */
   @Override
-  public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
-    // init strong and weak eigenpairs
-    List<EigenPair> strongEigenPairs = new ArrayList<>();
-    List<EigenPair> weakEigenPairs = new ArrayList<>();
-
-    // default value is "all strong".
-    int contrastAtMax = eigenPairs.size() - 1;
+  public int filter(double[] eigenValues) {
     // find the last eigenvector that is considered 'strong' by the weak rule
     // applied to the remaining vectors only
-    double eigenValueSum = eigenPairs.getEigenPair(eigenPairs.size() - 1).getEigenvalue();
-    for(int i = eigenPairs.size() - 2; i >= 0; i--) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      eigenValueSum += eigenPair.getEigenvalue();
-      double needEigenvalue = eigenValueSum / (eigenPairs.size() - i) * ralpha;
-      if(eigenPair.getEigenvalue() >= needEigenvalue) {
-        contrastAtMax = i;
-        break;
+    double eigenValueSum = eigenValues[eigenValues.length - 1];
+    for(int i = eigenValues.length - 2; i >= 0; i--) {
+      eigenValueSum += eigenValues[i];
+      double needEigenvalue = eigenValueSum / (eigenValues.length - i) * ralpha;
+      if(eigenValues[i] >= needEigenvalue) {
+        return i + 1;
       }
     }
-
-    for(int i = 0; i <= contrastAtMax /* && i < eigenPairs.size() */; i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      strongEigenPairs.add(eigenPair);
-    }
-    for(int i = contrastAtMax + 1; i < eigenPairs.size(); i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      weakEigenPairs.add(eigenPair);
-    }
-
-    return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+    return eigenValues.length;
   }
 
   /**
@@ -128,8 +105,8 @@ public class RelativeEigenPairFilter implements EigenPairFilter {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter ralphaP = new DoubleParameter(EIGENPAIR_FILTER_RALPHA, DEFAULT_RALPHA);
-      ralphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      DoubleParameter ralphaP = new DoubleParameter(EIGENPAIR_FILTER_RALPHA, DEFAULT_RALPHA) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(ralphaP)) {
         ralpha = ralphaP.getValue();
       }

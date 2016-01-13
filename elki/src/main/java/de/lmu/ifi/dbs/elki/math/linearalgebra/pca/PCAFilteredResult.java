@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,12 +23,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Iterator;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 
 /**
@@ -41,7 +37,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
  * 
  * @apiviz.landmark
  */
-public class PCAFilteredResult extends PCAResult implements ProjectionResult {
+public class PCAFilteredResult extends PCAResult {
   /**
    * The strong eigenvalues.
    */
@@ -96,12 +92,12 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
    * Construct a result object for the filtered PCA result.
    * 
    * @param eigenPairs All EigenPairs
-   * @param filteredEigenPairs filtered EigenPairs
+   * @param numstrong Number of strong eigenvalues
    * @param big large value in selection matrix
    * @param small small value in selection matrix
    */
 
-  public PCAFilteredResult(SortedEigenPairs eigenPairs, FilteredEigenPairs filteredEigenPairs, double big, double small) {
+  public PCAFilteredResult(SortedEigenPairs eigenPairs, int numstrong, double big, double small) {
     super(eigenPairs);
 
     int dim = eigenPairs.getEigenPair(0).getEigenvector().length;
@@ -109,12 +105,10 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
     double sumStrongEigenvalues = 0;
     double sumWeakEigenvalues = 0;
     {// strong eigenpairs
-      List<EigenPair> strongEigenPairs = filteredEigenPairs.getStrongEigenPairs();
-      strongEigenvalues = new double[strongEigenPairs.size()];
-      strongEigenvectors = new Matrix(dim, strongEigenPairs.size());
-      int i = 0;
-      for(Iterator<EigenPair> it = strongEigenPairs.iterator(); it.hasNext(); i++) {
-        EigenPair eigenPair = it.next();
+      strongEigenvalues = new double[numstrong];
+      strongEigenvectors = new Matrix(dim, numstrong);
+      for (int i = 0; i < numstrong; i++) {
+        EigenPair eigenPair = eigenPairs.getEigenPair(i);
         strongEigenvalues[i] = eigenPair.getEigenvalue();
         strongEigenvectors.setCol(i, eigenPair.getEigenvector());
         sumStrongEigenvalues += strongEigenvalues[i];
@@ -122,15 +116,13 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
     }
 
     {// weak eigenpairs
-      List<EigenPair> weakEigenPairs = filteredEigenPairs.getWeakEigenPairs();
-      weakEigenvalues = new double[weakEigenPairs.size()];
-      weakEigenvectors = new Matrix(dim, weakEigenPairs.size());
-      int i = 0;
-      for(Iterator<EigenPair> it = weakEigenPairs.iterator(); it.hasNext(); i++) {
-        EigenPair eigenPair = it.next();
-        weakEigenvalues[i] = eigenPair.getEigenvalue();
-        weakEigenvectors.setCol(i, eigenPair.getEigenvector());
-        sumWeakEigenvalues += weakEigenvalues[i];
+      weakEigenvalues = new double[dim - numstrong];
+      weakEigenvectors = new Matrix(dim, dim - numstrong);
+      for (int i = numstrong, j = 0; i < dim; i++, j++) {
+        EigenPair eigenPair = eigenPairs.getEigenPair(i);
+        weakEigenvalues[j] = eigenPair.getEigenvalue();
+        weakEigenvectors.setCol(j, eigenPair.getEigenvector());
+        sumWeakEigenvalues += weakEigenvalues[j];
       }
     }
     explainedVariance = sumStrongEigenvalues / (sumStrongEigenvalues + sumWeakEigenvalues);
@@ -200,7 +192,6 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
    * 
    * @return length of strong eigenvalues
    */
-  @Override
   public final int getCorrelationDimension() {
     return strongEigenvalues.length;
   }
@@ -215,8 +206,8 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
   }
 
   /**
-   * Returns the selection matrix of the weak eigenvectors (E_hat) of
-   * the object to which this PCA belongs to.
+   * Returns the selection matrix of the weak eigenvectors (E_hat) of the object
+   * to which this PCA belongs to.
    * 
    * @return the selection matrix of the weak eigenvectors E_hat
    */
@@ -225,8 +216,8 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
   }
 
   /**
-   * Returns the selection matrix of the strong eigenvectors (E_czech)
-   * of this LocalPCA.
+   * Returns the selection matrix of the strong eigenvectors (E_czech) of this
+   * LocalPCA.
    * 
    * @return the selection matrix of the weak eigenvectors E_czech
    */
@@ -239,7 +230,6 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
    * 
    * @return the similarity matrix M_hat
    */
-  @Override
   public Matrix similarityMatrix() {
     return m_hat;
   }
@@ -259,7 +249,7 @@ public class PCAFilteredResult extends PCAResult implements ProjectionResult {
    * @return the adapted strong eigenvectors
    */
   public Matrix adapatedStrongEigenvectors() {
-    if (adapatedStrongEigenvectors == null) {
+    if(adapatedStrongEigenvectors == null) {
       final Matrix ev = getEigenvectors();
       adapatedStrongEigenvectors = ev.times(e_czech).times(Matrix.identity(ev.getRowDimensionality(), strongEigenvalues.length));
     }

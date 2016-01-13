@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,12 +23,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -120,55 +115,32 @@ public class ProgressiveEigenPairFilter implements EigenPairFilter {
    * Filter eigenpairs.
    */
   @Override
-  public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
-    // init strong and weak eigenpairs
-    List<EigenPair> strongEigenPairs = new ArrayList<>();
-    List<EigenPair> weakEigenPairs = new ArrayList<>();
-
+  public int filter(double[] eigenValues) {
     // determine sum of eigenvalues
     double totalSum = 0;
-    for(int i = 0; i < eigenPairs.size(); i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      totalSum += eigenPair.getEigenvalue();
+    for(int i = 0; i < eigenValues.length; i++) {
+      totalSum += eigenValues[i];
     }
-    double expectedVariance = totalSum / eigenPairs.size() * walpha;
+    double expectedVariance = totalSum / eigenValues.length * walpha;
 
     // determine strong and weak eigenpairs
     double currSum = 0;
-    boolean found = false;
-    int i;
-    for(i = 0; i < eigenPairs.size(); i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
+    for(int i = 0; i < eigenValues.length - 1; i++) {
       // weak Eigenvector?
-      if(eigenPair.getEigenvalue() < expectedVariance) {
+      if(eigenValues[i] < expectedVariance) {
         break;
       }
-      currSum += eigenPair.getEigenvalue();
+      currSum += eigenValues[i];
       // calculate progressive alpha level
-      double alpha = 1.0 - (1.0 - palpha) * (1.0 - (i + 1) / eigenPairs.size());
-      if(currSum / totalSum >= alpha || i == eigenPairs.size() - 1) {
-        found = true;
-        strongEigenPairs.add(eigenPair);
-        break;
+      double alpha = 1.0 - (1.0 - palpha) * (1.0 - (i + 1) / (double) eigenValues.length);
+      if(currSum / totalSum >= alpha) {
+        return i + 1;
       }
-    }
-    // if we didn't hit our alpha level, we consider all vectors to be weak!
-    if(!found) {
-      assert (weakEigenPairs.size() == 0);
-      weakEigenPairs = strongEigenPairs;
-      strongEigenPairs = new ArrayList<>();
-    }
-    for(; i < eigenPairs.size(); i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      weakEigenPairs.add(eigenPair);
     }
 
     // the code using this method doesn't expect an empty strong set,
     // if we didn't find any strong ones, we make all vectors strong
-    if(strongEigenPairs.size() == 0) {
-      return new FilteredEigenPairs(new ArrayList<EigenPair>(), weakEigenPairs);
-    }
-    return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+    return eigenValues.length;
   }
 
   /**

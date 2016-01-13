@@ -41,7 +41,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -52,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * COPAC is an algorithm to partition a database according to the correlation
@@ -75,7 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("COPAC: COrrelation PArtition Clustering")
 @Description("Partitions a database according to the correlation dimension of its objects and performs " //
-    + "a clustering algorithm over the partitions.")
++ "a clustering algorithm over the partitions.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", //
 title = "Robust, Complete, and Efficient Correlation Clustering", //
 booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", //
@@ -152,7 +155,12 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
     /**
      * Class to compute PCA.
      */
-    public PCAFilteredRunner pca;
+    public PCARunner pca;
+    
+    /**
+     * Eigenpair filter.
+     */
+    public EigenPairFilter filter;
 
     /**
      * Epsilon value for GDBSCAN.
@@ -163,79 +171,6 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
      * MinPts parameter.
      */
     public int minpts;
-
-    /**
-     * Parameterization class.
-     * 
-     * @author Erich Schubert
-     * 
-     * @apiviz.exclude
-     */
-    public static class Parameterizer extends AbstractParameterizer {
-      /**
-       * Size for the kNN neighborhood used in the PCA step of COPAC.
-       */
-      public static final OptionID K_ID = new OptionID("copac.knn", "Number of neighbors to use for PCA.");
-
-      /**
-       * Settings to build.
-       */
-      Settings settings;
-
-      @Override
-      public void makeOptions(Parameterization config) {
-        settings = new Settings();
-        configK(config);
-        // TODO: allow using other PCA runners?
-        settings.pca = config.tryInstantiate(PCAFilteredRunner.class);
-        configEpsilon(config);
-        configMinPts(config);
-      }
-
-      /**
-       * Configure the kNN parameter.
-       * 
-       * @param config Parameter source
-       */
-      protected void configK(Parameterization config) {
-        IntParameter kP = new IntParameter(K_ID) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(kP)) {
-          settings.k = kP.intValue();
-        }
-      }
-
-      /**
-       * Configure the epsilon radius parameter.
-       * 
-       * @param config Parameter source
-       */
-      protected void configEpsilon(Parameterization config) {
-        DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-        if(config.grab(epsilonP)) {
-          settings.epsilon = epsilonP.doubleValue();
-        }
-      }
-
-      /**
-       * Configure the minPts aka "mu" parameter.
-       * 
-       * @param config Parameter source
-       */
-      protected void configMinPts(Parameterization config) {
-        IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-        if(config.grab(minptsP)) {
-          settings.minpts = minptsP.intValue();
-        }
-      }
-
-      @Override
-      public Settings makeInstance() {
-        return settings;
-      }
-    }
   }
 
   /**
@@ -247,13 +182,41 @@ public class COPAC<V extends NumberVector> extends AbstractAlgorithm<Clustering<
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
     /**
+     * Size for the kNN neighborhood used in the PCA step of COPAC.
+     */
+    public static final OptionID K_ID = new OptionID("copac.knn", "Number of neighbors to use for PCA.");
+
+    /**
      * COPAC settings.
      */
     protected COPAC.Settings settings;
 
     @Override
     protected void makeOptions(Parameterization config) {
-      settings = config.tryInstantiate(COPAC.Settings.class);
+      settings = new Settings();
+      IntParameter kP = new IntParameter(K_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kP)) {
+        settings.k = kP.intValue();
+      }
+      ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class);
+      if(config.grab(pcaP)) {
+        settings.pca = pcaP.instantiateClass(config);
+      }
+      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
+      if(config.grab(filterP)) {
+        settings.filter = filterP.instantiateClass(config);
+      }
+      DoubleParameter epsilonP = new DoubleParameter(DBSCAN.Parameterizer.EPSILON_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(epsilonP)) {
+        settings.epsilon = epsilonP.doubleValue();
+      }
+      IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(minptsP)) {
+        settings.minpts = minptsP.intValue();
+      }
     }
 
     @Override

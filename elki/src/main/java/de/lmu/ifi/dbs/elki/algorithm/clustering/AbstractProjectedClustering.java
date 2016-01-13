@@ -34,9 +34,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Abstract superclass for projected clustering algorithms, like {@link PROCLUS}
@@ -143,44 +140,5 @@ public abstract class AbstractProjectedClustering<R extends Clustering<?>, V ext
     protected int k_i;
 
     protected int l;
-
-    /**
-     * Get the parameter k, see {@link #K_ID}
-     * 
-     * @param config Parameterization
-     */
-    protected void configK(Parameterization config) {
-      IntParameter kP = new IntParameter(K_ID);
-      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(kP)) {
-        k = kP.getValue();
-      }
-    }
-
-    /**
-     * Get the parameter k_i, see {@link #K_I_ID}
-     * 
-     * @param config Parameterization
-     */
-    protected void configKI(Parameterization config) {
-      IntParameter k_iP = new IntParameter(K_I_ID, 30);
-      k_iP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(k_iP)) {
-        k_i = k_iP.getValue();
-      }
-    }
-
-    /**
-     * Get the parameter l, see {@link #L_ID}
-     * 
-     * @param config Parameterization
-     */
-    protected void configL(Parameterization config) {
-      IntParameter lP = new IntParameter(L_ID);
-      lP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(lP)) {
-        l = lP.getValue();
-      }
-    }
   }
 }

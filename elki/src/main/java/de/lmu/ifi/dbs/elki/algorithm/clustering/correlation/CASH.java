@@ -22,8 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,9 +66,11 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.FirstNEigenPairFilter;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.IntegerPriorityObject;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ObjectHeap;
@@ -79,7 +80,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -658,16 +658,11 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @return a basis of the found subspace
    */
   private Matrix runDerivator(Relation<ParameterizationFunction> relation, int dim, CASHInterval interval, ModifiableDBIDs ids) {
-    // build database for derivator
     Database derivatorDB = buildDerivatorDB(relation, interval);
 
-    // set the parameters
-    ListParameterization parameters = new ListParameterization();
-    parameters.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
-    parameters.addParameter(FirstNEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_N, Integer.toString(dim - 1));
-    DependencyDerivator<DoubleVector> derivator = null;
-    Class<DependencyDerivator<DoubleVector>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
-    derivator = parameters.tryInstantiate(cls);
+    PCARunner pca = new PCARunner(new StandardCovarianceMatrixBuilder());
+    EigenPairFilter filter = new FirstNEigenPairFilter(dim - 1);
+    DependencyDerivator<DoubleVector> derivator = new DependencyDerivator<>(null, FormatUtil.NF4, pca, filter, 0, false);
 
     CorrelationAnalysisSolution<DoubleVector> model = derivator.run(derivatorDB);
 
@@ -735,12 +730,9 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       // build database for derivator
       Database derivatorDB = buildDerivatorDB(relation, ids);
 
-      ListParameterization parameters = new ListParameterization();
-      parameters.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, FirstNEigenPairFilter.class.getName());
-      parameters.addParameter(FirstNEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_N, Integer.toString(dimensionality));
-      DependencyDerivator<DoubleVector> derivator = null;
-      Class<DependencyDerivator<DoubleVector>> cls = ClassGenericsUtil.uglyCastIntoSubclass(DependencyDerivator.class);
-      derivator = parameters.tryInstantiate(cls);
+      PCARunner pca = new PCARunner(new StandardCovarianceMatrixBuilder());
+      EigenPairFilter filter = new FirstNEigenPairFilter(dimensionality);
+      DependencyDerivator<DoubleVector> derivator = new DependencyDerivator<>(null, FormatUtil.NF4, pca, filter, 0, false);
 
       CorrelationAnalysisSolution<DoubleVector> model = derivator.run(derivatorDB);
       LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);

@@ -1,3 +1,2 @@
 de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner
-# de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner
-de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredAutotuningRunner
+de.lmu.ifi.dbs.elki.math.linearalgebra.pca.AutotuningPCA

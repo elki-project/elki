@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -124,7 +125,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
     KNNQuery<V> knnq = database.getKNNQuery(dq, settings.k);
 
     WritableDataStore<COPACModel> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, COPACModel.class);
-
+    
     Duration time = LOG.newDuration(this.getClass().getName() + ".preprocessing-time").begin();
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -146,9 +147,10 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
    * @return COPAC object model
    */
   protected COPACModel computeLocalModel(DBIDRef id, DoubleDBIDList knnneighbors, Relation<V> relation) {
-    PCAFilteredResult pcares = settings.pca.processQueryResult(knnneighbors, relation);
+    SortedEigenPairs epairs = settings.pca.processIds(knnneighbors, relation).getEigenPairs();
+    int pdim = settings.filter.filter(epairs.eigenValues());
+    PCAFilteredResult pcares = new PCAFilteredResult(epairs, pdim, 1., 0.);
 
-    int pdim = pcares.getCorrelationDimension();
     Matrix mat = pcares.similarityMatrix();
 
     double[] vecP = relation.get(id).toArray();

@@ -39,42 +39,49 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.SignificantEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Performs a self-tuning local PCA based on the covariance matrices of given
  * objects. At most the closest 'k' points are used in the calculation and a
  * weight function is applied.
- * 
- * The number of points actually used depends on when the strong eigenvectors
- * exhibit the clearest correlation.
- * 
+ *
+ * The number of points used depends on when the strong eigenvectors exhibit the
+ * clearest correlation.
+ *
  * @author Erich Schubert
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
-title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms",//
-booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008",//
+title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms", //
+booktitle = "Proceedings of the 20th International Conference on Scientific and Statistical Database Management (SSDBM), Hong Kong, China, 2008", //
 url = "http://dx.doi.org/10.1007/978-3-540-69497-7_27")
-public class PCAFilteredAutotuningRunner extends PCAFilteredRunner {
+public class AutotuningPCA extends PCARunner {
+  /**
+   * Filter to select eigenvectors.
+   */
+  private EigenPairFilter filter;
+
   /**
    * Constructor.
    * 
    * @param covarianceMatrixBuilder Covariance matrix builder
-   * @param eigenPairFilter Eigen pair filter
-   * @param big Replacement for large values
-   * @param small Replacement for small values
+   * @param filter Filter to select eigenvectors
    */
-  public PCAFilteredAutotuningRunner(CovarianceMatrixBuilder covarianceMatrixBuilder, EigenPairFilter eigenPairFilter, double big, double small) {
-    super(covarianceMatrixBuilder, eigenPairFilter, big, small);
+  public AutotuningPCA(CovarianceMatrixBuilder covarianceMatrixBuilder, EigenPairFilter filter) {
+    super(covarianceMatrixBuilder);
+    this.filter = filter;
   }
 
   @Override
-  public PCAFilteredResult processIds(DBIDs ids, Relation<? extends NumberVector> database) {
+  public PCAResult processIds(DBIDs ids, Relation<? extends NumberVector> database) {
     // Assume Euclidean distance. In the context of PCA, the neighborhood should
     // be L2-spherical to be unbiased.
     Centroid center = Centroid.make(database, ids);
@@ -94,7 +101,7 @@ public class PCAFilteredAutotuningRunner extends PCAFilteredRunner {
    * 
    * @apiviz.exclude
    */
-  static class Cand {
+  private static class Cand {
     /** Candidate matrix */
     Matrix m;
 
@@ -119,7 +126,7 @@ public class PCAFilteredAutotuningRunner extends PCAFilteredRunner {
   }
 
   @Override
-  public PCAFilteredResult processQueryResult(DoubleDBIDList results, Relation<? extends NumberVector> database) {
+  public PCAResult processQueryResult(DoubleDBIDList results, Relation<? extends NumberVector> database) {
     assertSortedByDistance(results);
     final int dim = RelationUtil.dimensionality(database);
 
@@ -146,14 +153,14 @@ public class PCAFilteredAutotuningRunner extends PCAFilteredRunner {
       Matrix covMat = covarianceMatrixBuilder.processQueryResults(results, database);
       EigenvalueDecomposition evd = new EigenvalueDecomposition(covMat);
       SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
-      FilteredEigenPairs filteredEigenPairs = getEigenPairFilter().filter(eigenPairs);
+      int filteredEigenPairs = filter.filter(eigenPairs.eigenValues());
 
       // correlationDimension = #strong EV
-      int thisdim = filteredEigenPairs.countStrongEigenPairs();
+      int thisdim = filteredEigenPairs;
 
       // FIXME: handle the case of no strong EVs.
       assert ((thisdim > 0) && (thisdim <= dim));
-      double thisexplain = computeExplainedVariance(filteredEigenPairs);
+      double thisexplain = computeExplainedVariance(eigenPairs, filteredEigenPairs);
 
       prev.add(new Cand(covMat, thisexplain, thisdim));
 
@@ -206,19 +213,21 @@ public class PCAFilteredAutotuningRunner extends PCAFilteredRunner {
   }
 
   /**
-   * Compute the explained variance for a FilteredEigenPairs.
+   * Compute the explained variance for a filtered EigenPairs.
    * 
+   * @param eigenPairs Eigenpairs
    * @param filteredEigenPairs Filtered eigenpairs
    * @return explained variance by the strong eigenvectors.
    */
-  private double computeExplainedVariance(FilteredEigenPairs filteredEigenPairs) {
+  private double computeExplainedVariance(SortedEigenPairs eigenPairs, int filteredEigenPairs) {
     double strongsum = 0.0;
     double weaksum = 0.0;
-    for(EigenPair ep : filteredEigenPairs.getStrongEigenPairs()) {
-      strongsum += ep.getEigenvalue();
-    }
-    for(EigenPair ep : filteredEigenPairs.getWeakEigenPairs()) {
-      weaksum += ep.getEigenvalue();
+    for (int i = 0; i < eigenPairs.size(); i++) {
+      if (i <= filteredEigenPairs) {
+        strongsum += eigenPairs.eigenValue(i);
+      } else {
+        weaksum += eigenPairs.eigenValue(i);
+      }
     }
     return strongsum / (strongsum / weaksum);
   }
@@ -259,10 +268,29 @@ public class PCAFilteredAutotuningRunner extends PCAFilteredRunner {
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer extends PCAFilteredRunner.Parameterizer {
+  public static class Parameterizer extends PCARunner.Parameterizer {
+    /**
+     * Parameter for filtering eigenvectors.
+     */
+    public static final OptionID PCA_EIGENPAIR_FILTER = new OptionID("autopca.filter", "Filter for selecting eigenvectors during autotuning PCA.");
+
+    /**
+     * Filter to select eigenvectors.
+     */
+    private EigenPairFilter filter;
+
     @Override
-    protected PCAFilteredAutotuningRunner makeInstance() {
-      return new PCAFilteredAutotuningRunner(covarianceMatrixBuilder, eigenPairFilter, big, small);
+    protected void makeOptions(Parameterization config) {
+      super.makeOptions(config);
+      ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(PCA_EIGENPAIR_FILTER, EigenPairFilter.class, SignificantEigenPairFilter.class);
+      if(config.grab(filterP)) {
+        filter = filterP.instantiateClass(config);
+      }
+    }
+
+    @Override
+    protected AutotuningPCA makeInstance() {
+      return new AutotuningPCA(covarianceMatrixBuilder, filter);
     }
   }
 }

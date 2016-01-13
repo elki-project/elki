@@ -904,9 +904,21 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      configK(config);
-      configKI(config);
-      configL(config);
+      IntParameter kP = new IntParameter(K_ID);
+      kP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(kP)) {
+        k = kP.getValue();
+      }
+      IntParameter k_iP = new IntParameter(K_I_ID, 30);
+      k_iP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(k_iP)) {
+        k_i = k_iP.getValue();
+      }
+      IntParameter lP = new IntParameter(L_ID);
+      lP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      if(config.grab(lP)) {
+        l = lP.getValue();
+      }
 
       IntParameter m_iP = new IntParameter(M_I_ID, 10) //
       .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);

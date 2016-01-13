@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,10 +26,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -51,13 +47,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @author Elke Achtert
  */
 @Title("Limit-based Eigenpair Filter")
-@Description("Filters all eigenpairs, which are lower than a given value.")
+@Description("Filters all eigenvalues, which are lower than a given value.")
 public class LimitEigenPairFilter implements EigenPairFilter {
-  /**
-   * The logger for this class.
-   */
-  private static final Logging LOG = Logging.getLogger(LimitEigenPairFilter.class);
-
   /**
    * The default value for delta.
    */
@@ -86,54 +77,19 @@ public class LimitEigenPairFilter implements EigenPairFilter {
   }
 
   @Override
-  public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
-    StringBuilder msg = new StringBuilder();
-    if(LOG.isDebugging()) {
-      msg.append("delta = ").append(delta);
-    }
-
+  public int filter(double[] eigenValues) {
     // determine limit
-    double limit;
-    if(absolute) {
-      limit = delta;
-    }
-    else {
-      double max = Double.NEGATIVE_INFINITY;
-      for(int i = 0; i < eigenPairs.size(); i++) {
-        EigenPair eigenPair = eigenPairs.getEigenPair(i);
-        double eigenValue = Math.abs(eigenPair.getEigenvalue());
-        if(max < eigenValue) {
-          max = eigenValue;
-        }
-      }
-      limit = max * delta;
-    }
-    if(LOG.isDebugging()) {
-      msg.append("\nlimit = ").append(limit);
-    }
-
-    // init strong and weak eigenpairs
-    List<EigenPair> strongEigenPairs = new ArrayList<>();
-    List<EigenPair> weakEigenPairs = new ArrayList<>();
+    double limit = absolute ? delta : eigenValues[0] * delta;
 
     // determine strong and weak eigenpairs
-    for(int i = 0; i < eigenPairs.size(); i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      double eigenValue = Math.abs(eigenPair.getEigenvalue());
-      if(eigenValue >= limit) {
-        strongEigenPairs.add(eigenPair);
-      }
-      else {
-        weakEigenPairs.add(eigenPair);
+    for(int i = 0; i < eigenValues.length; i++) {
+      double eigenValue = Math.abs(eigenValues[i]);
+      if(eigenValue < limit) {
+        return i;
       }
     }
-    if(LOG.isDebugging()) {
-      msg.append("\nstrong EigenPairs = ").append(strongEigenPairs);
-      msg.append("\nweak EigenPairs = ").append(weakEigenPairs);
-      LOG.debugFine(msg.toString());
-    }
-
-    return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+    // By default, keep all.
+    return eigenValues.length;
   }
 
   /**
@@ -172,8 +128,8 @@ public class LimitEigenPairFilter implements EigenPairFilter {
         absolute = absoluteF.isTrue();
       }
 
-      DoubleParameter deltaP = new DoubleParameter(EIGENPAIR_FILTER_DELTA, DEFAULT_DELTA);
-      deltaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      DoubleParameter deltaP = new DoubleParameter(EIGENPAIR_FILTER_DELTA, DEFAULT_DELTA) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(deltaP)) {
         delta = deltaP.doubleValue();
         // TODO: make this a global constraint?

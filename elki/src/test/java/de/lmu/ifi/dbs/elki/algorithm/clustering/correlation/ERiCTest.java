@@ -32,9 +32,9 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.CorrelationModel;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.RelativeEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
@@ -65,13 +65,13 @@ public class ERiCTest extends AbstractSimpleAlgorithmTest implements JUnit4Test 
     ListParameterization params = new ListParameterization();
     params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 30);
     // ERiC Distance function in DBSCAN:
-    params.addParameter(ERiC.Settings.Parameterizer.DELTA_ID, 0.20);
-    params.addParameter(ERiC.Settings.Parameterizer.TAU_ID, 0.04);
-    params.addParameter(ERiC.Settings.Parameterizer.K_ID, 50);
+    params.addParameter(ERiC.Parameterizer.DELTA_ID, 0.20);
+    params.addParameter(ERiC.Parameterizer.TAU_ID, 0.04);
+    params.addParameter(ERiC.Parameterizer.K_ID, 50);
     // PCA
     params.addParameter(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
     params.addParameter(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class);
-    params.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class);
+    params.addParameter(EigenPairFilter.PCA_EIGENPAIR_FILTER, RelativeEigenPairFilter.class);
     params.addParameter(RelativeEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_RALPHA, 1.60);
 
     ERiC<DoubleVector> eric = ClassGenericsUtil.parameterizeOrAbort(ERiC.class, params);
@@ -98,13 +98,13 @@ public class ERiCTest extends AbstractSimpleAlgorithmTest implements JUnit4Test 
     // ERiC
     params.addParameter(DBSCAN.Parameterizer.MINPTS_ID, 15);
     // ERiC Distance function in DBSCAN:
-    params.addParameter(ERiC.Settings.Parameterizer.DELTA_ID, 1.0);
-    params.addParameter(ERiC.Settings.Parameterizer.TAU_ID, 1.0);
-    params.addParameter(ERiC.Settings.Parameterizer.K_ID, 45);
+    params.addParameter(ERiC.Parameterizer.DELTA_ID, 1.0);
+    params.addParameter(ERiC.Parameterizer.TAU_ID, 1.0);
+    params.addParameter(ERiC.Parameterizer.K_ID, 45);
     // PCA
     params.addParameter(PCARunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
     params.addParameter(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class);
-    params.addParameter(PCAFilteredRunner.Parameterizer.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
+    params.addParameter(EigenPairFilter.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
     params.addParameter(PercentageEigenPairFilter.Parameterizer.ALPHA_ID, 0.6);
 
     ERiC<DoubleVector> eric = ClassGenericsUtil.parameterizeOrAbort(ERiC.class, params);

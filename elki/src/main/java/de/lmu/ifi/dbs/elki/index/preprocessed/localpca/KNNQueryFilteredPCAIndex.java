@@ -32,7 +32,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -75,11 +76,12 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
    * 
    * @param relation Database to use
    * @param pca PCA Runner to use
+   * @param filter Filter for Eigenvectors
    * @param knnQuery KNN Query to use
    * @param k k value
    */
-  public KNNQueryFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner pca, KNNQuery<NV> knnQuery, int k) {
-    super(relation, pca);
+  public KNNQueryFilteredPCAIndex(Relation<NV> relation, PCARunner pca, EigenPairFilter filter, KNNQuery<NV> knnQuery, int k) {
+    super(relation, pca, filter);
     this.knnQuery = knnQuery;
     this.k = k;
     // Sanity check:
@@ -134,10 +136,11 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
      * 
      * @param pcaDistanceFunction distance
      * @param pca PCA class
+     * @param filter Eigenvector filter
      * @param k k
      */
-    public Factory(DistanceFunction<V> pcaDistanceFunction, PCAFilteredRunner pca, int k) {
-      super(pcaDistanceFunction, pca);
+    public Factory(DistanceFunction<V> pcaDistanceFunction, PCARunner pca, EigenPairFilter filter, int k) {
+      super(pcaDistanceFunction, pca, filter);
       this.k = k;
     }
 
@@ -145,7 +148,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
     public KNNQueryFilteredPCAIndex<V> instantiate(Relation<V> relation) {
       // TODO: set bulk flag, once the parent class supports bulk.
       KNNQuery<V> knnquery = QueryUtil.getKNNQuery(relation, pcaDistanceFunction, k);
-      return new KNNQueryFilteredPCAIndex<>(relation, pca, knnquery, k);
+      return new KNNQueryFilteredPCAIndex<>(relation, pca, filter, knnquery, k);
     }
 
     /**
@@ -188,7 +191,7 @@ public class KNNQueryFilteredPCAIndex<NV extends NumberVector> extends AbstractF
 
       @Override
       protected Factory<NV> makeInstance() {
-        return new Factory<>(pcaDistanceFunction, pca, k);
+        return new Factory<>(pcaDistanceFunction, pca, filter, k);
       }
     }
   }

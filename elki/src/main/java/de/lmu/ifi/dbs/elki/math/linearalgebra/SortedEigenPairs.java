@@ -109,10 +109,19 @@ public class SortedEigenPairs {
   public double[] eigenValues() {
     double[] eigenValues = new double[eigenPairs.length];
     for(int i = 0; i < eigenPairs.length; i++) {
-      EigenPair eigenPair = eigenPairs[i];
-      eigenValues[i] = eigenPair.getEigenvalue();
+      eigenValues[i] = eigenPairs[i].getEigenvalue();
     }
     return eigenValues;
+  }
+
+  /**
+   * Get the ith eigenvalue.
+   * 
+   * @param i Index
+   * @return Eigenvalue
+   */
+  public double eigenValue(int i) {
+    return eigenPairs[i].getEigenvalue();
   }
 
   /**

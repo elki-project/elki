@@ -52,6 +52,9 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -126,11 +129,14 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
 
     WritableDataStore<PCAFilteredResult> storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, PCAFilteredResult.class);
 
+    PCARunner pca = settings.pca;
+    EigenPairFilter filter = settings.filter;
     Duration time = LOG.newDuration(this.getClass().getName() + ".preprocessing-time").begin();
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress(this.getClass().getName(), relation.size(), LOG) : null;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DoubleDBIDList ref = knnq.getKNNForDBID(iditer, settings.k);
-      storage.put(iditer, settings.pca.processQueryResult(ref, relation));
+      PCAResult pcares = pca.processQueryResult(ref, relation);
+      storage.put(iditer, new PCAFilteredResult(pcares.getEigenPairs(), filter.filter(pcares.getEigenvalues()), 1., 0.));
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);

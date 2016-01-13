@@ -1,10 +1,11 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
 
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,12 +24,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -78,47 +73,31 @@ public class SignificantEigenPairFilter implements EigenPairFilter {
   }
 
   @Override
-  public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
-    // init strong and weak eigenpairs
-    List<EigenPair> strongEigenPairs = new ArrayList<>();
-    List<EigenPair> weakEigenPairs = new ArrayList<>();
-
+  public int filter(double[] eigenPairs) {
     // default value is "all strong".
-    int contrastMaximum = eigenPairs.size() - 1;
+    int contrastMaximum = eigenPairs.length;
     double maxContrast = 0.0;
     // calc the eigenvalue sum.
     double eigenValueSum = 0.0;
-    for(int i = 0; i < eigenPairs.size(); i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      eigenValueSum += eigenPair.getEigenvalue();
+    for(int i = 0; i < eigenPairs.length; i++) {
+      eigenValueSum += eigenPairs[i];
     }
-    double weakEigenvalue = eigenValueSum / eigenPairs.size() * walpha;
+    double weakEigenvalue = eigenValueSum / eigenPairs.length * walpha;
     // now find the maximum contrast.
-    double currSum = eigenPairs.getEigenPair(eigenPairs.size() - 1).getEigenvalue();
-    for(int i = eigenPairs.size() - 2; i >= 0; i--) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      currSum += eigenPair.getEigenvalue();
+    double currSum = eigenPairs[eigenPairs.length - 1];
+    for(int i = eigenPairs.length - 2; i >= 0; i--) {
+      currSum += eigenPairs[i];
       // weak?
-      if(eigenPair.getEigenvalue() < weakEigenvalue) {
-        continue;
+      if(eigenPairs[i] < weakEigenvalue) {
+        break;
       }
-      double contrast = eigenPair.getEigenvalue() / (currSum / (eigenPairs.size() - i));
+      double contrast = eigenPairs[i] / (currSum / (eigenPairs.length - i));
       if(contrast > maxContrast) {
         maxContrast = contrast;
-        contrastMaximum = i;
+        contrastMaximum = i + 1;
       }
     }
-
-    for(int i = 0; i <= contrastMaximum /* && i < eigenPairs.size() */; i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      strongEigenPairs.add(eigenPair);
-    }
-    for(int i = contrastMaximum + 1; i < eigenPairs.size(); i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      weakEigenPairs.add(eigenPair);
-    }
-
-    return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+    return contrastMaximum;
   }
 
   /**

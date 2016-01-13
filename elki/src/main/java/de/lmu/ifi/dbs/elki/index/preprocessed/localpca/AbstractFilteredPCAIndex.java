@@ -35,9 +35,11 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
@@ -56,24 +58,30 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <NV> Vector type
  */
-// TODO: loosen DoubleDistance restriction.
 @Title("Local PCA Preprocessor")
 @Description("Materializes the local PCA and the locally weighted matrix of objects of a database.")
 public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends AbstractPreprocessorIndex<NV, PCAFilteredResult> implements FilteredLocalPCAIndex<NV> {
   /**
    * PCA utility object.
    */
-  protected final PCAFilteredRunner pca;
+  protected final PCARunner pca;
+
+  /**
+   * Filter for selecting eigenvectors
+   */
+  protected EigenPairFilter filter;
 
   /**
    * Constructor.
    * 
    * @param relation Relation to use
    * @param pca PCA runner to use
+   * @param filter Filter for Eigenvectors
    */
-  public AbstractFilteredPCAIndex(Relation<NV> relation, PCAFilteredRunner pca) {
+  public AbstractFilteredPCAIndex(Relation<NV> relation, PCARunner pca, EigenPairFilter filter) {
     super(relation);
     this.pca = pca;
+    this.filter = filter;
   }
 
   @Override
@@ -97,7 +105,9 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DoubleDBIDList objects = objectsForPCA(iditer);
 
-      PCAFilteredResult pcares = pca.processQueryResult(objects, relation);
+      SortedEigenPairs epairs = pca.processIds(objects, relation).getEigenPairs();
+      int numstrong = filter.filter(epairs.eigenValues());
+      PCAFilteredResult pcares = new PCAFilteredResult(epairs, numstrong, 1., 0.);
 
       storage.put(iditer, pcares);
 
@@ -140,33 +150,33 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
    */
   public abstract static class Factory<NV extends NumberVector, I extends AbstractFilteredPCAIndex<NV>> implements FilteredLocalPCAIndex.Factory<NV, I> {
     /**
-     * Parameter to specify the distance function used for running PCA.
-     * 
-     * Key: {@code -localpca.distancefunction}
-     */
-    public static final OptionID PCA_DISTANCE_ID = new OptionID("localpca.distancefunction", "The distance function used to select objects for running PCA.");
-
-    /**
      * Holds the instance of the distance function specified by
-     * {@link #PCA_DISTANCE_ID}.
+     * {@link Parameterizer#PCA_DISTANCE_ID}.
      */
     protected DistanceFunction<NV> pcaDistanceFunction;
 
     /**
      * PCA utility object.
      */
-    protected PCAFilteredRunner pca;
+    protected PCARunner pca;
+
+    /**
+     * Filter for selecting eigenvectors
+     */
+    protected EigenPairFilter filter;
 
     /**
      * Constructor.
      * 
      * @param pcaDistanceFunction distance Function
      * @param pca PCA runner
+     * @param filter Eigenvector filter
      */
-    public Factory(DistanceFunction<NV> pcaDistanceFunction, PCAFilteredRunner pca) {
+    public Factory(DistanceFunction<NV> pcaDistanceFunction, PCARunner pca, EigenPairFilter filter) {
       super();
       this.pcaDistanceFunction = pcaDistanceFunction;
       this.pca = pca;
+      this.filter = filter;
     }
 
     @Override
@@ -186,6 +196,13 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
      */
     public abstract static class Parameterizer<NV extends NumberVector, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
       /**
+       * Parameter to specify the distance function used for running PCA.
+       * 
+       * Key: {@code -localpca.distancefunction}
+       */
+      public static final OptionID PCA_DISTANCE_ID = new OptionID("localpca.distancefunction", "The distance function used to select objects for running PCA.");
+
+      /**
        * Holds the instance of the distance function specified by
        * {@link #PCA_DISTANCE_ID}.
        */
@@ -194,7 +211,12 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
       /**
        * PCA utility object.
        */
-      protected PCAFilteredRunner pca;
+      protected PCARunner pca;
+
+      /**
+       * Filter for selecting eigenvectors
+       */
+      protected EigenPairFilter filter;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -205,8 +227,15 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
           pcaDistanceFunction = pcaDistanceFunctionP.instantiateClass(config);
         }
 
-        Class<PCAFilteredRunner> cls = ClassGenericsUtil.uglyCastIntoSubclass(PCAFilteredRunner.class);
-        pca = config.tryInstantiate(cls);
+        ObjectParameter<PCARunner> pcaP = new ObjectParameter<>(PCARunner.Parameterizer.PCARUNNER_ID, PCARunner.class, PCARunner.class);
+        if(config.grab(pcaP)) {
+          pca = pcaP.instantiateClass(config);
+        }
+
+        ObjectParameter<EigenPairFilter> filterP = new ObjectParameter<>(EigenPairFilter.PCA_EIGENPAIR_FILTER, EigenPairFilter.class, PercentageEigenPairFilter.class);
+        if(config.grab(filterP)) {
+          filter = filterP.instantiateClass(config);
+        }
       }
     }
   }

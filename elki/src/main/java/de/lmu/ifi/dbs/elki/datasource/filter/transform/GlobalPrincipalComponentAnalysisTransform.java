@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -143,14 +141,13 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
       }
     }
     else {
-      List<EigenPair> axes = filter.filter(eps).getStrongEigenPairs();
-      final int pdim = axes.size(); // Projection dimensionality
+      final int pdim = filter.filter(eps.eigenValues());
       if(LOG.isVerbose()) {
         LOG.verbose("Reducing dimensionality from " + dim + " to " + pdim + " via PCA.");
       }
       proj = new double[pdim][dim];
       for(int d = 0; d < pdim; d++) {
-        EigenPair ep = axes.get(d);
+        EigenPair ep = eps.getEigenPair(d);
         double[] ev = ep.getEigenvector();
         double mult = 1. / Math.sqrt(ep.getEigenvalue());
         // Fill weighted and transposed:

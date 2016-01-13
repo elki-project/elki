@@ -1,34 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import java.util.ArrayList;
-import java.util.List;
-
-import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FilteredEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -73,51 +44,35 @@ public class DropEigenPairFilter implements EigenPairFilter {
   }
 
   @Override
-  public FilteredEigenPairs filter(SortedEigenPairs eigenPairs) {
-    // init strong and weak eigenpairs
-    List<EigenPair> strongEigenPairs = new ArrayList<>();
-    List<EigenPair> weakEigenPairs = new ArrayList<>();
-
-    // default value is "all strong".
-    int contrastMaximum = eigenPairs.size() - 1;
+  public int filter(double[] eigenValues) {
+    int contrastMaximum = eigenValues.length;
     double maxContrast = 0.0;
 
-    double[] ev = eigenPairs.eigenValues();
     // calc the eigenvalue sum.
     double eigenValueSum = 0.0;
-    for (int i = 0; i < ev.length; i++) {
-      eigenValueSum += ev[i];
+    for(int i = 0; i < eigenValues.length; i++) {
+      eigenValueSum += eigenValues[i];
     }
     // Minimum value
-    final double weakEigenvalue = walpha * eigenValueSum / ev.length;
+    final double weakEigenvalue = walpha * eigenValueSum / eigenValues.length;
     // Now find the maximum contrast, scanning backwards.
-    double prev_sum = ev[ev.length - 1];
+    double prev_sum = eigenValues[eigenValues.length - 1];
     double prev_rel = 1.0;
-    for (int i = 2; i <= ev.length; i++) {
-      double curr_sum = prev_sum + ev[ev.length - i];
-      double curr_rel = ev[ev.length - i] / curr_sum * i;
+    for(int i = eigenValues.length - 2; i >= 0; i++) {
+      double curr_sum = prev_sum + eigenValues[i];
+      double curr_rel = eigenValues[i] / curr_sum * i;
       // not too weak?
-      if (ev[ev.length - i] >= weakEigenvalue) {
+      if(eigenValues[i] >= weakEigenvalue) {
         double contrast = curr_rel - prev_rel;
-        if (contrast > maxContrast) {
+        if(contrast > maxContrast) {
           maxContrast = contrast;
-          contrastMaximum = ev.length - i;
+          contrastMaximum = i + 1;
         }
       }
       prev_sum = curr_sum;
       prev_rel = curr_rel;
     }
-
-    for (int i = 0; i <= contrastMaximum; i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      strongEigenPairs.add(eigenPair);
-    }
-    for (int i = contrastMaximum + 1; i < eigenPairs.size(); i++) {
-      EigenPair eigenPair = eigenPairs.getEigenPair(i);
-      weakEigenPairs.add(eigenPair);
-    }
-
-    return new FilteredEigenPairs(weakEigenPairs, strongEigenPairs);
+    return contrastMaximum;
   }
 
   /**
@@ -135,7 +90,7 @@ public class DropEigenPairFilter implements EigenPairFilter {
       super.makeOptions(config);
       DoubleParameter walphaP = new DoubleParameter(WeakEigenPairFilter.Parameterizer.EIGENPAIR_FILTER_WALPHA, DEFAULT_WALPHA);
       walphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if (config.grab(walphaP)) {
+      if(config.grab(walphaP)) {
         walpha = walphaP.getValue();
       }
     }

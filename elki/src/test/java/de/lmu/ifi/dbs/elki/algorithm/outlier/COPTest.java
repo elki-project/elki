@@ -29,9 +29,10 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredAutotuningRunner;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.AutotuningPCA;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.RANSACCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.WeightedCovarianceMatrixBuilder;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -68,8 +69,8 @@ public class COPTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
     // Parameterization
     ListParameterization params = new ListParameterization();
     params.addParameter(COP.Parameterizer.K_ID, 30);
-    params.addParameter(COP.Parameterizer.PCARUNNER_ID, PCAFilteredAutotuningRunner.class);
-    params.addParameter(PCAFilteredAutotuningRunner.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
+    params.addParameter(COP.Parameterizer.PCARUNNER_ID, AutotuningPCA.class);
+    params.addParameter(AutotuningPCA.Parameterizer.PCA_COVARIANCE_MATRIX, WeightedCovarianceMatrixBuilder.class);
     params.addParameter(WeightedCovarianceMatrixBuilder.Parameterizer.WEIGHT_ID, ErfcWeight.class);
 
     // setup Algorithm
@@ -82,7 +83,6 @@ public class COPTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
     testSingleScore(result, 416, 0.25705955);
   }
 
-
   @Test
   public void testCOPRANSAC() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);
@@ -90,8 +90,9 @@ public class COPTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
     // Parameterization
     ListParameterization params = new ListParameterization();
     params.addParameter(COP.Parameterizer.K_ID, 30);
-    params.addParameter(COP.Parameterizer.PCARUNNER_ID, PCAFilteredAutotuningRunner.class);
-    params.addParameter(PCAFilteredAutotuningRunner.Parameterizer.PCA_COVARIANCE_MATRIX, RANSACCovarianceMatrixBuilder.class);
+    params.addParameter(COP.Parameterizer.PCARUNNER_ID, AutotuningPCA.class);
+    params.addParameter(AutotuningPCA.Parameterizer.PCA_EIGENPAIR_FILTER, PercentageEigenPairFilter.class);
+    params.addParameter(AutotuningPCA.Parameterizer.PCA_COVARIANCE_MATRIX, RANSACCovarianceMatrixBuilder.class);
     params.addParameter(RANSACCovarianceMatrixBuilder.Parameterizer.ITER_ID, 25);
     params.addParameter(RANSACCovarianceMatrixBuilder.Parameterizer.SEED_ID, 0);
 
@@ -101,7 +102,7 @@ public class COPTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
 
     OutlierResult result = cop.run(db);
 
-    testAUC(db, "Noise", result, 0.89269999);
-    testSingleScore(result, 416, 0.38287932);
+    testAUC(db, "Noise", result, 0.89383333);
+    testSingleScore(result, 416, 0.37358079);
   }
 }
