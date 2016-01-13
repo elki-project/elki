@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * Note: this class abstracts the efficient and numerical stable computation of
  * centroids.
  * 
- * See {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil DatabaseUtil} for
+ * See {@link de.lmu.ifi.dbs.elki.database.DatabaseUtil DatabaseUtil} for
  * easier to use APIs.
  * 
  * @author Erich Schubert

@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
  * This class abstracts the mathematics of efficient and numerically stable
  * computation of projected centroids.
  * 
- * See {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil DatabaseUtil} for
+ * See {@link de.lmu.ifi.dbs.elki.database.DatabaseUtil DatabaseUtil} for
  * easier to use APIs.
  * 
  * @author Erich Schubert

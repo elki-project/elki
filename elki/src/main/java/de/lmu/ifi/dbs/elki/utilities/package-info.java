@@ -21,7 +21,7 @@
  * <li>{@link de.lmu.ifi.dbs.elki.database.QueryUtil}: Database Query API simplifications.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil}: Database ID DBID handling.</li>
  * <li>{@link de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil}: Data storage layer (like Maps).</li>
- * <li>{@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil}: database utility functions (centroid etc.).</li>
+ * <li>{@link de.lmu.ifi.dbs.elki.database.DatabaseUtil}: database utility functions (centroid etc.).</li>
  * <li>{@link de.lmu.ifi.dbs.elki.result.ResultUtil}: result processing functions (e.g. extracting sub-results).</li>
  * </ul></li>
  * <li>Output-related:<ul>

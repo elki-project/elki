@@ -112,7 +112,7 @@ public final class TypeUtil {
   /**
    * Either class label, object labels or a string - anything that will be
    * accepted by
-   * {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil#guessObjectLabelRepresentation}
+   * {@link de.lmu.ifi.dbs.elki.database.DatabaseUtil#guessObjectLabelRepresentation}
    * .
    */
   public static final TypeInformation GUESSED_LABEL = new AlternativeTypeInformation(LABELLIST, CLASSLABEL, STRING);

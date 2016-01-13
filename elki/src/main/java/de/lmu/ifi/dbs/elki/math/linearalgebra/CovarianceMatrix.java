@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * 
  * This class encapsulates the mathematical aspects of computing this matrix.
  * 
- * See {@link de.lmu.ifi.dbs.elki.utilities.DatabaseUtil DatabaseUtil} for
+ * See {@link de.lmu.ifi.dbs.elki.database.DatabaseUtil DatabaseUtil} for
  * easier to use APIs.
  * 
  * For use in algorithms, it is more appropriate to use
