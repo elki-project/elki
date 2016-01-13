@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.data;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.map.hash.TIntDoubleHashMap;
-
 import java.util.Comparator;
 import java.util.Random;
 
@@ -38,9 +36,9 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
 /**
  * Utility functions for use with vectors.
@@ -322,16 +320,16 @@ public final class VectorUtil {
    * @param sample Sample set
    * @return Medoid vector
    */
-  public static Vector computeMedoid(Relation<? extends NumberVector> relation, DBIDs sample) {
+  public static double[] computeMedoid(Relation<? extends NumberVector> relation, DBIDs sample) {
     final int dim = RelationUtil.dimensionality(relation);
     ArrayModifiableDBIDs mids = DBIDUtil.newArray(sample);
     SortDBIDsBySingleDimension s = new SortDBIDsBySingleDimension(relation);
-    Vector medoid = new Vector(dim);
+    double[] medoid = new double[dim];
     DBIDArrayIter it = mids.iter();
     for(int d = 0; d < dim; d++) {
       s.setDimension(d);
       it.seek(QuickSelect.median(mids, s));
-      medoid.set(d, relation.get(it).doubleValue(d));
+      medoid[d] = relation.get(it).doubleValue(d);
     }
     return medoid;
   }

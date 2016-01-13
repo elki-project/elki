@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
  * @author Elke Achtert
  * @author Erich Schubert
  *
- * @apiviz.uses Vector
  * @apiviz.landmark
  */
 public class Matrix {
@@ -854,19 +853,19 @@ public class Matrix {
    * @return Matrix product, A * B
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
-  public final Vector times(final Vector B) {
-    if(B.elements.length != this.columndimension) {
+  public final double[] times(final double[] B) {
+    if(B.length != this.columndimension) {
       throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
-    final Vector X = new Vector(this.elements.length);
+    final double[] X = new double[this.elements.length];
     // multiply it with each row from A
     for(int i = 0; i < this.elements.length; i++) {
       final double[] Arowi = this.elements[i];
       double s = 0;
       for(int k = 0; k < this.columndimension; k++) {
-        s += Arowi[k] * B.elements[k];
+        s += Arowi[k] * B[k];
       }
-      X.elements[i] = s;
+      X[i] = s;
     }
     return X;
   }
@@ -878,18 +877,18 @@ public class Matrix {
    * @return Matrix product, A<sup>T</sup> * B
    * @throws IllegalArgumentException Matrix inner dimensions must agree.
    */
-  public final Vector transposeTimes(final Vector B) {
-    if(B.elements.length != elements.length) {
+  public final double[] transposeTimes(final double[] B) {
+    if(B.length != elements.length) {
       throw new IllegalArgumentException(ERR_MATRIX_INNERDIM);
     }
-    final Vector X = new Vector(this.columndimension);
+    final double[] X = new double[this.columndimension];
     // multiply it with each row from A
     for(int i = 0; i < this.columndimension; i++) {
       double s = 0;
       for(int k = 0; k < elements.length; k++) {
-        s += elements[k][i] * B.elements[k];
+        s += elements[k][i] * B[k];
       }
-      X.elements[i] = s;
+      X[i] = s;
     }
     return X;
   }

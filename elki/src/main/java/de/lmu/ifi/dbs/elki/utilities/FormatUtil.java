@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Locale;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Utility methods for output formatting of various number objects
@@ -625,51 +624,6 @@ public final class FormatUtil {
    */
   public static String format(Matrix m) {
     return format(m, FormatUtil.NF);
-  }
-
-  /**
-   * returns String-representation of Vector.
-   * 
-   * @param nf NumberFormat to specify output precision
-   * @return String representation of this Matrix in precision as specified by
-   *         given NumberFormat
-   */
-  public static String format(Vector m, NumberFormat nf) {
-    StringBuilder buf = new StringBuilder();
-    buf.append('[');
-    formatTo(buf, m.getArrayRef(), ", ", nf);
-    buf.append(']');
-    return buf.toString();
-  }
-
-  /**
-   * Returns String-representation of Vector.
-   * 
-   * @return String representation of this Vector
-   */
-  public static String format(Vector m) {
-    return format(m.getArrayRef());
-  }
-
-  /**
-   * Returns a string representation of this matrix. In each line the specified
-   * String <code>pre</code> is prefixed.
-   * 
-   * @param pre the prefix of each line
-   * @return a string representation of this matrix
-   */
-  public static String format(Vector v, String pre) {
-    StringBuilder output = new StringBuilder();
-    output.append(pre).append("[\n").append(pre);
-    for(int j = 0; j < v.getDimensionality(); j++) {
-      output.append(' ').append(v.get(j));
-      if(j < v.getDimensionality() - 1) {
-        output.append(',');
-      }
-    }
-    output.append("]\n").append(pre);
-
-    return (output.toString());
   }
 
   /**

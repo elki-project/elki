@@ -46,7 +46,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
 /**
@@ -220,11 +219,6 @@ public final class TypeUtil {
    * Integer array objects.
    */
   public static final SimpleTypeInformation<int[]> INTEGER_ARRAY = new SimpleTypeInformation<>(int[].class);
-
-  /**
-   * Vector type.
-   */
-  public static final SimpleTypeInformation<Vector> VECTOR = new SimpleTypeInformation<>(Vector.class);
 
   /**
    * Matrix type.
