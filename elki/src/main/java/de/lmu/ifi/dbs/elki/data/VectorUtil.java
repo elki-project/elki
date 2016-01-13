@@ -146,52 +146,6 @@ public final class VectorUtil {
    * @param o Origin
    * @return Angle
    */
-  public static double angle(NumberVector v1, NumberVector v2, Vector o) {
-    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality(),
-        dimo = o.getDimensionality();
-    final int mindim = (dim1 <= dim2) ? dim1 : dim2;
-    // Essentially, we want to compute this:
-    // v1' = v1 - o, v2' = v2 - o
-    // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());
-    // We can just compute all three in parallel.
-    double[] oe = o.getArrayRef();
-    double cross = 0., l1 = 0., l2 = 0.;
-    for(int k = 0; k < mindim; k++) {
-      final double dk = k < dimo ? oe[k] : 0.;
-      final double r1 = v1.doubleValue(k) - dk;
-      final double r2 = v2.doubleValue(k) - dk;
-      cross += r1 * r2;
-      l1 += r1 * r1;
-      l2 += r2 * r2;
-    }
-    for(int k = mindim; k < dim1; k++) {
-      final double dk = k < dimo ? oe[k] : 0.;
-      final double r1 = v1.doubleValue(k) - dk;
-      l1 += r1 * r1;
-    }
-    for(int k = mindim; k < dim2; k++) {
-      final double dk = k < dimo ? oe[k] : 0.;
-      final double r2 = v2.doubleValue(k) - dk;
-      l2 += r2 * r2;
-    }
-    if(cross == 0.) {
-      return 0.;
-    }
-    if(l1 == 0. || l2 == 0.) {
-      return 1.;
-    }
-    final double a = Math.sqrt((cross / l1) * (cross / l2));
-    return (a < 1.) ? a : 1.;
-  }
-
-  /**
-   * Compute the angle between two vectors.
-   *
-   * @param v1 first vector
-   * @param v2 second vector
-   * @param o Origin
-   * @return Angle
-   */
   public static double angle(NumberVector v1, NumberVector v2, NumberVector o) {
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality(),
         dimo = o.getDimensionality();

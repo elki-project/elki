@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 import org.apache.batik.util.SVGConstants;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -46,7 +47,6 @@ import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixIm
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -188,7 +188,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
             buf[1] = vecb.doubleValue(d);
             combined[d] = voting.combine(buf);
           }
-          double auc = ROCEvaluation.computeROCAUC(pos, new DecreasingVectorIter(new Vector(combined)));
+          double auc = ROCEvaluation.computeROCAUC(pos, new DecreasingVectorIter(DoubleVector.wrap(combined)));
           // logger.verbose(auc + " " + labels.get(ids.get(a)) + " " +
           // labels.get(ids.get(b)));
           data[a][b] = auc;

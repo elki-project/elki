@@ -212,6 +212,16 @@ public final class TypeUtil {
   public static final SimpleTypeInformation<Integer> INTEGER = new SimpleTypeInformation<>(Integer.class, ByteArrayUtil.INT_SERIALIZER);
 
   /**
+   * Double array objects (do <b>not</b> use for input data points).
+   */
+  public static final SimpleTypeInformation<double[]> DOUBLE_ARRAY = new SimpleTypeInformation<>(double[].class);
+
+  /**
+   * Integer array objects.
+   */
+  public static final SimpleTypeInformation<int[]> INTEGER_ARRAY = new SimpleTypeInformation<>(int[].class);
+
+  /**
    * Vector type.
    */
   public static final SimpleTypeInformation<Vector> VECTOR = new SimpleTypeInformation<>(Vector.class);

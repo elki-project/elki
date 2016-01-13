@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -124,7 +123,7 @@ public class COPVectorVisualization extends AbstractVisFactory {
     /**
      * The outlier result to visualize
      */
-    protected Relation<Vector> result;
+    protected Relation<double[]> result;
 
     /**
      * Constructor.
@@ -146,7 +145,7 @@ public class COPVectorVisualization extends AbstractVisFactory {
       setupCanvas();
       setupCSS(svgp);
       for(DBIDIter objId = sample.getSample().iter(); objId.valid(); objId.advance()) {
-        Vector evec = result.get(objId);
+        double[] evec = result.get(objId);
         if(evec == null) {
           continue;
         }
