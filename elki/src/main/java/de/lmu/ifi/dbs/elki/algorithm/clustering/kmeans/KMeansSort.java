@@ -58,10 +58,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Sort-Means: Accelerated k-means by exploiting the triangle inequality and
  * pairwise distances of means to prune candidate means (with sorting).
  *
+ * Reference:
  * <p>
- * Reference:<br />
- * S. J. Phillips<br/>
- * Acceleration of k-means and related clustering algorithms<br/>
+ * S. J. Phillips<br />
+ * Acceleration of k-means and related clustering algorithms<br />
  * Proc. 4th Int. Workshop on Algorithm Engineering and Experiments (ALENEX
  * 2002)
  * </p>
@@ -238,7 +238,6 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
       varsum[minIndex] += mindist;
       clusters.get(minIndex).add(iditer);
       changed |= assignment.putInt(iditer, minIndex) != minIndex;
-      varsum[minIndex] += mindist;
     }
     // Increment distance computations counter.
     if(diststat != null) {
