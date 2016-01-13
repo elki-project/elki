@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
@@ -51,7 +53,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
@@ -251,11 +252,11 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       nids.remove(id); // Do not use query object
 
       double[] centroid = Centroid.make(relation, nids).getArrayRef();
-      double[] relative = VMath.minusEquals(relation.get(id).toArray(), centroid);
+      double[] relative = minusEquals(relation.get(id).toArray(), centroid);
 
       PCAResult pcares = pca.processIds(nids, relation);
       Matrix evecs = pcares.getEigenvectors();
-      double[] projected = VMath.transposeTimes(evecs.getArrayRef(), relative);
+      double[] projected = transposeTimes(evecs, relative);
       double[] evs = pcares.getEigenvalues();
 
       double min = Double.POSITIVE_INFINITY;
@@ -286,7 +287,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
           for(int d = 0; d < dim; d++) {
             srel[d] = vec.doubleValue(d) - centroid[d];
           }
-          double[] serr = VMath.transposeTimes(evecs.getArrayRef(), srel);
+          double[] serr = transposeTimes(evecs, srel);
           double sqdist = 0.0;
           for(int d = 0; d < dim; d++) {
             double serrd = serr[d];
@@ -319,7 +320,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       for(int d = vdim; d < dim; d++) {
         projected[d] = 0.;
       }
-      double[] ev = VMath.timesEquals(VMath.times(evecs.getArrayRef(), projected), -1 * prob);
+      double[] ev = timesEquals(times(evecs, projected), -1 * prob);
 
       cop_score.putDouble(id, prob);
       if(models) {

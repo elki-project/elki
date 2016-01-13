@@ -245,7 +245,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    */
   private double deviation(double[] delta, Matrix beta) {
     final double a = squareSum(delta);
-    final double b = squareSum(transposeTimes(beta.getArrayRef(), delta));
+    final double b = squareSum(transposeTimes(beta, delta));
 
     return (a > b) ? Math.sqrt(a - b) : 0.;
   }

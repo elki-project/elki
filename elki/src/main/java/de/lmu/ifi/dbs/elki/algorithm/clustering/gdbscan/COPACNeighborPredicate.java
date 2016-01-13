@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
@@ -48,7 +50,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -160,8 +161,8 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
     // Check which neighbors survive
     HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet();
     for(DBIDIter neighbor = relation.iterDBIDs(); neighbor.valid(); neighbor.advance()) {
-      double[] diff = VMath.minusEquals(relation.get(neighbor).toArray(), vecP);
-      double cdistP = VMath.transposeTimesTimes(diff, mat.getArrayRef(), diff);
+      double[] diff = minusEquals(relation.get(neighbor).toArray(), vecP);
+      double cdistP = transposeTimesTimes(diff, mat, diff);
 
       if(cdistP <= epsilonsq) {
         survivors.add(neighbor);

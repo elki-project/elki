@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.math.statistics;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesTranspose;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
@@ -113,9 +112,9 @@ public class MultipleLinearRegression {
 
     // estimate b, e
     xx_inverse = x.transposeTimes(x).inverse();
-    b = times(timesTranspose(xx_inverse.getArrayRef(), x.getArrayRef()), y);
+    b = times(xx_inverse.timesTranspose(x), y);
     // b = new double[](x.solve(y).getColumnPackedCopy());
-    e = minus(y, times(x.getArrayRef(), b));
+    e = minus(y, times(x, b));
 
     // sum of square residuals: ssr
     sum = 0;
@@ -204,7 +203,7 @@ public class MultipleLinearRegression {
    * @return the estimation of y
    */
   public double estimateY(Matrix x) {
-    return times(x.getArrayRef(), b)[0];
+    return times(x, b)[0];
   }
 
   /**

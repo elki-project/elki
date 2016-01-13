@@ -213,8 +213,8 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      return mahalanobisDistance(pca1.similarityMatrix().getArrayRef(), v1.toArray(), v2.toArray()) <= settings.tau //
-      && mahalanobisDistance(pca2.similarityMatrix().getArrayRef(), v1.toArray(), v2.toArray()) <= settings.tau;
+      return mahalanobisDistance(pca1.similarityMatrix(), v1.toArray(), v2.toArray()) <= settings.tau //
+      && mahalanobisDistance(pca2.similarityMatrix(), v1.toArray(), v2.toArray()) <= settings.tau;
     }
 
     /**
@@ -240,11 +240,11 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      if(mahalanobisDistance(pca1.similarityMatrix().getArrayRef(), v1.toArray(), v2.toArray()) > settings.tau) {
+      if(mahalanobisDistance(pca1.similarityMatrix(), v1.toArray(), v2.toArray()) > settings.tau) {
         return false;
       }
       if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
-        return mahalanobisDistance(pca2.similarityMatrix().getArrayRef(), v1.toArray(), v2.toArray()) <= settings.tau;
+        return mahalanobisDistance(pca2.similarityMatrix(), v1.toArray(), v2.toArray()) <= settings.tau;
       }
       return true;
     }
@@ -266,7 +266,7 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         double[] v2_i = v2_strong.getCol(i);
         // check, if distance of v2_i to the space of pca_1 > delta
         // (i.e., if v2_i spans up a new dimension)
-        double distsq = squareSum(v2_i) - transposeTimesTimes(v2_i, m1_czech.getArrayRef(), v2_i);
+        double distsq = squareSum(v2_i) - transposeTimesTimes(v2_i, m1_czech, v2_i);
 
         // if so, return false
         if(distsq > deltasq) {

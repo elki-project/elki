@@ -208,7 +208,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
     // V_affin = V + a
     // dist(p, V_affin) = d(p-a, V) = ||p - a - proj_V(p-a) ||
     double[] p_minus_a = minus(p, centroid);
-    double[] proj = project(p_minus_a, strongEigenvectors.getArrayRef());
+    double[] proj = project(p_minus_a, strongEigenvectors);
     return euclideanLength(minusEquals(p_minus_a, proj));
   }
 
@@ -219,7 +219,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public double[] errorVector(V p) {
-    return project(minusEquals(p.toArray(), centroid), weakEigenvectors.getArrayRef());
+    return project(minusEquals(p.toArray(), centroid), weakEigenvectors);
   }
 
   /**
@@ -246,7 +246,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @return the error vectors
    */
   public double[] dataVector(V p) {
-    return project(minusEquals(p.toArray(), centroid), strongEigenvectors.getArrayRef());
+    return project(minusEquals(p.toArray(), centroid), strongEigenvectors);
   }
 
   /**

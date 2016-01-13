@@ -22,6 +22,8 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -39,7 +41,6 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -117,9 +118,9 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
 
     // for each object compute Mahalanobis distance
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      double[] x = VMath.minusEquals(relation.get(iditer).toArray(), mean);
+      double[] x = minusEquals(relation.get(iditer).toArray(), mean);
       // Gaussian PDF
-      final double mDist = VMath.transposeTimesTimes(x, covarianceTransposed.getArrayRef(), x);
+      final double mDist = transposeTimesTimes(x, covarianceTransposed, x);
       final double prob = fakt * Math.exp(-mDist * .5);
 
       mm.put(prob);

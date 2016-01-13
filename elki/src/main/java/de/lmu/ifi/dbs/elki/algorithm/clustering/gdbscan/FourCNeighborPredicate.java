@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.PreDeConNeighborPredicate.PreDeConModel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -44,7 +46,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.LimitEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
@@ -155,8 +156,8 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
     HashSetModifiableDBIDs survivors = DBIDUtil.newHashSet(neighbors.size());
     for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
       // Compute weighted / projected distance:
-      double[] diff = VMath.minusEquals(relation.get(iter).toArray(), obj);
-      double dist = VMath.transposeTimesTimes(diff, m_hat.getArrayRef(), diff);
+      double[] diff = minusEquals(relation.get(iter).toArray(), obj);
+      double dist = transposeTimesTimes(diff, m_hat, diff);
       if(dist <= sqeps) {
         survivors.add(iter);
       }

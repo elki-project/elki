@@ -142,7 +142,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
       Matrix covm = covmats.get(clus);
 
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
-        double d = mahalanobisDistance(covm.getArrayRef(), relation.get(iter).toArray(), av);
+        double d = mahalanobisDistance(covm, relation.get(iter).toArray(), av);
         cmem.add(d, iter);
       }
       cmem.sort();

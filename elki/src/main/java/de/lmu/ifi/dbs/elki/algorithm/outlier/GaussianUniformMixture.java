@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -44,7 +46,6 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -217,8 +218,8 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     // for each object compute probability and sum
     double prob = 0;
     for(DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
-      double[] x = VMath.minusEquals(relation.get(iter).toArray(), mean);
-      double mDist = VMath.transposeTimesTimes(x, covInv.getArrayRef(), x);
+      double[] x = minusEquals(relation.get(iter).toArray(), mean);
+      double mDist = transposeTimesTimes(x, covInv, x);
       prob += Math.log(fakt * Math.exp(-mDist * .5));
     }
     return prob;

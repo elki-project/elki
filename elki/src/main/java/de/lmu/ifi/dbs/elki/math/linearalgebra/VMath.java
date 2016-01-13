@@ -494,6 +494,17 @@ public final class VMath {
   }
 
   /**
+   * Matrix multiplication: v1 * m2
+   * 
+   * @param v1 vector
+   * @param m2 other matrix
+   * @return Matrix product, v1 * m2
+   */
+  public static final double[][] times(final double[] v1, final Matrix m2) {
+    return times(v1, m2.getArrayRef());
+  }
+
+  /**
    * Linear algebraic matrix multiplication, v1<sup>T</sup> * m2
    * 
    * @param v1 vector
@@ -512,6 +523,17 @@ public final class VMath {
       re[0][j] = s;
     }
     return re;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, v1<sup>T</sup> * m2
+   * 
+   * @param v1 vector
+   * @param m2 other matrix
+   * @return Matrix product, v1<sup>T</sup> * m2
+   */
+  public static final double[][] transposeTimes(final double[] v1, final Matrix m2) {
+    return transposeTimes(v1, m2.getArrayRef());
   }
 
   /**
@@ -547,6 +569,17 @@ public final class VMath {
       }
     }
     return re;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, v1 * m2^T
+   * 
+   * @param v1 vector
+   * @param m2 other matrix
+   * @return Matrix product, v1 * m2^T
+   */
+  public static final double[][] timesTranspose(final double[] v1, final Matrix m2) {
+    return timesTranspose(v1, m2.getArrayRef());
   }
 
   /**
@@ -666,6 +699,17 @@ public final class VMath {
       plusTimesEquals(sum, v_i, scalarProduct(v1, v_i));
     }
     return sum;
+  }
+
+  /**
+   * Projects this row vector into the subspace formed by the specified matrix
+   * v.
+   * 
+   * @param m2 the subspace matrix
+   * @return the projection of p into the subspace formed by v
+   */
+  public static final double[] project(final double[] v1, final Matrix m2) {
+    return project(v1, m2);
   }
 
   /**
@@ -1245,6 +1289,17 @@ public final class VMath {
   }
 
   /**
+   * Linear algebraic matrix multiplication, m1 * v2
+   * 
+   * @param m1 Input matrix
+   * @param v2 a vector
+   * @return Matrix product, m1 * v2
+   */
+  public static final double[] times(final Matrix m1, final double[] v2) {
+    return times(m1.getArrayRef(), v2);
+  }
+
+  /**
    * Linear algebraic matrix multiplication, m1<sup>T</sup> * v2
    * 
    * @param m1 Input matrix
@@ -1264,6 +1319,17 @@ public final class VMath {
       re[i] = s;
     }
     return re;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, m1<sup>T</sup> * v2
+   * 
+   * @param m1 Input matrix
+   * @param v2 another matrix
+   * @return Matrix product, m1<sup>T</sup> * v2
+   */
+  public static final double[] transposeTimes(final Matrix m1, final double[] v2) {
+    return transposeTimes(m1.getArrayRef(), v2);
   }
 
   /**
@@ -1316,6 +1382,18 @@ public final class VMath {
       sum += s * c[j];
     }
     return sum;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, a<sup>T</sup> * B * c
+   * 
+   * @param a vector on the left
+   * @param B matrix
+   * @param c vector on the right
+   * @return Matrix product, a<sup>T</sup> * B * c
+   */
+  public static double transposeTimesTimes(final double[] a, final Matrix B, final double[] c) {
+    return transposeTimesTimes(a, B.getArrayRef(), c);
   }
 
   /**
@@ -1395,6 +1473,18 @@ public final class VMath {
       sum += s * (a[j] - c[j]);
     }
     return sum;
+  }
+
+  /**
+   * Linear algebraic matrix multiplication, (a-c)<sup>T</sup> * B * (a-c)
+   * 
+   * @param B matrix
+   * @param a First vector
+   * @param c Center vector
+   * @return Matrix product, (a-c)<sup>T</sup> * B * (a-c)
+   */
+  public static double mahalanobisDistance(final Matrix B, final double[] a, final double[] c) {
+    return mahalanobisDistance(B.getArrayRef(), a, c);
   }
 
   /**

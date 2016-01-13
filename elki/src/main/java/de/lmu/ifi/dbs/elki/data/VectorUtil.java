@@ -27,17 +27,10 @@ import java.util.Comparator;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 
 /**
@@ -293,70 +286,6 @@ public final class VectorUtil {
     }
     final double a = Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
-  }
-
-  /**
-   * Compute the scalar product (inner product) of this and the given
-   * DoubleVector.
-   *
-   * @param d1 the first vector to compute the scalar product for
-   * @param d2 the second vector to compute the scalar product for
-   * @return the scalar product (inner product) of this and the given
-   *         DoubleVector
-   */
-  public static double scalarProduct(NumberVector d1, NumberVector d2) {
-    final int dim = d1.getDimensionality();
-    double result = 0.;
-    for(int i = 0; i < dim; i++) {
-      result += d1.doubleValue(i) * d2.doubleValue(i);
-    }
-    return result;
-  }
-
-  /**
-   * Compute medoid for a given subset.
-   *
-   * @param relation Relation to process
-   * @param sample Sample set
-   * @return Medoid vector
-   */
-  public static double[] computeMedoid(Relation<? extends NumberVector> relation, DBIDs sample) {
-    final int dim = RelationUtil.dimensionality(relation);
-    ArrayModifiableDBIDs mids = DBIDUtil.newArray(sample);
-    SortDBIDsBySingleDimension s = new SortDBIDsBySingleDimension(relation);
-    double[] medoid = new double[dim];
-    DBIDArrayIter it = mids.iter();
-    for(int d = 0; d < dim; d++) {
-      s.setDimension(d);
-      it.seek(QuickSelect.median(mids, s));
-      medoid[d] = relation.get(it).doubleValue(d);
-    }
-    return medoid;
-  }
-
-  /**
-   * This is an ugly hack, but we don't want to have the {@link Matrix} class
-   * depend on {@link NumberVector}. Maybe a future version will no longer need
-   * this.
-   *
-   * @param mat Matrix
-   * @param v Vector
-   * @return {@code mat * v}, as double array.
-   */
-  public static double[] fastTimes(Matrix mat, NumberVector v) {
-    final double[][] elements = mat.getArrayRef();
-    final int cdim = mat.getColumnDimensionality();
-    final double[] X = new double[elements.length];
-    // multiply it with each row from A
-    for(int i = 0; i < elements.length; i++) {
-      final double[] Arowi = elements[i];
-      double s = 0;
-      for(int k = 0; k < cdim; k++) {
-        s += Arowi[k] * v.doubleValue(k);
-      }
-      X[i] = s;
-    }
-    return X;
   }
 
   /**

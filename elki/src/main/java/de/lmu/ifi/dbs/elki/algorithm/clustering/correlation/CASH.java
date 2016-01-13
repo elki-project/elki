@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -65,7 +67,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -498,7 +499,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   private ParameterizationFunction project(Matrix basis, ParameterizationFunction f) {
     // Matrix m = new Matrix(new
     // double[][]{f.getPointCoordinates()}).times(basis);
-    double[] m = VMath.transposeTimes(basis.getArrayRef(), f.getColumnVector());
+    double[] m = transposeTimes(basis, f.getColumnVector());
     return new ParameterizationFunction(DoubleVector.wrap(m));
   }
 

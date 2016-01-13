@@ -1,27 +1,4 @@
 package de.lmu.ifi.dbs.elki.datasource.filter.transform;
-
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
-import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -44,6 +21,29 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import de.lmu.ifi.dbs.elki.data.ClassLabel;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -112,7 +112,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
       List<V> vectorcolumn = (List<V>) column;
       final VectorFieldTypeInformation<?> vtype = (VectorFieldTypeInformation<?>) type;
       @SuppressWarnings("unchecked")
-      NumberVector.Factory<V>  factory = (NumberVector.Factory<V> ) vtype.getFactory();
+      NumberVector.Factory<V> factory = (NumberVector.Factory<V>) vtype.getFactory();
       int dim = vtype.getDimensionality();
 
       if(tdim > dim) {
@@ -125,7 +125,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
       try {
         Matrix proj = computeProjectionMatrix(vectorcolumn, classcolumn, dim);
         for(int i = 0; i < dataLength; i++) {
-          double[] pv = VMath.times(proj.getArrayRef(), vectorcolumn.get(i).toArray());
+          double[] pv = times(proj, vectorcolumn.get(i).toArray());
           vectorcolumn.set(i, factory.newNumberVector(pv));
         }
         bundle.appendColumn(convertedType(type, factory), column);

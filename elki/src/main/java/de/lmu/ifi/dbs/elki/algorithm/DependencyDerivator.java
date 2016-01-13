@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -41,7 +43,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredRunner;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
@@ -163,7 +164,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
       else {
         DistanceQuery<V> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
         KNNList queryResults = database.getKNNQuery(distanceQuery, this.sampleSize)//
-            .getKNNForObject(centroidDV, this.sampleSize);
+        .getKNNForObject(centroidDV, this.sampleSize);
         ids = DBIDUtil.newHashSet(queryResults);
       }
     }
@@ -224,7 +225,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
         log.append(FormatUtil.format(pcares.getEigenvalues(), ", ", nf));
         LOG.debugFine(log.toString());
       }
-      double[] b = VMath.times(transposedWeakEigenvectors.getArrayRef(), centroid);
+      double[] b = times(transposedWeakEigenvectors, centroid);
       if(LOG.isDebugging()) {
         StringBuilder log = new StringBuilder();
         log.append("Centroid:\n").append(centroid).append('\n');

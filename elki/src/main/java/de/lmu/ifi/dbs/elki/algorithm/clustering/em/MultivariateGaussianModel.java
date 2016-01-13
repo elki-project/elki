@@ -61,11 +61,6 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   double[] nmea;
 
   /**
-   * Matrix element reference.
-   */
-  double[][] elements;
-
-  /**
    * Normalization factor.
    */
   double norm, normDistrFactor;
@@ -100,7 +95,6 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
     this.normDistrFactor = 1. / Math.sqrt(norm); // assume det=1
     this.nmea = new double[dim];
     this.covariance = new Matrix(dim, dim);
-    this.elements = this.covariance.getArrayRef();
     this.wsum = 0.;
   }
 
@@ -124,6 +118,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
       nmea[i] = mean[i] + rval;
     }
     // Update covariance matrix
+    final double[][] elements = covariance.getArrayRef();
     for(int i = 0; i < mean.length; i++) {
       for(int j = i; j < mean.length; j++) {
         // We DO want to use the new mean once and the old mean once!
@@ -175,7 +170,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    */
   public double mahalanobisDistance(double[] vec) {
     if(invCovMatr != null) {
-      return VMath.mahalanobisDistance(invCovMatr.getArrayRef(), vec, mean);
+      return VMath.mahalanobisDistance(invCovMatr, vec, mean);
     }
     double sqsum = 0.;
     for (int i = 0; i < vec.length; i++) {
@@ -193,7 +188,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    */
   public double mahalanobisDistance(NumberVector vec) {
     double[] difference = minusEquals(vec.toArray(), mean);
-    return (invCovMatr != null) ? transposeTimesTimes(difference, invCovMatr.getArrayRef(), difference) : transposeTimes(difference, difference);
+    return (invCovMatr != null) ? transposeTimesTimes(difference, invCovMatr, difference) : transposeTimes(difference, difference);
   }
 
   @Override

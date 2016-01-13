@@ -129,7 +129,7 @@ public class CTLuMeanMultipleAttributes<N, O extends NumberVector> extends Abstr
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(attributes.getDBIDs(), DataStoreFactory.HINT_STATIC);
     for(DBIDIter iditer = attributes.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      final double score = mahalanobisDistance(cmati.getArrayRef(), deltas.get(iditer), mean);
+      final double score = mahalanobisDistance(cmati, deltas.get(iditer), mean);
       minmax.put(score);
       scores.putDouble(iditer, score);
     }

@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -34,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -118,8 +119,8 @@ public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuild
 
       ModifiableDBIDs support = DBIDUtil.newHashSet();
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {
-        double[] vec = VMath.minusEquals(relation.get(id).toArray(), centroid);
-        double sqlen = VMath.transposeTimesTimes(vec, p.getArrayRef(), vec);
+        double[] vec = minusEquals(relation.get(id).toArray(), centroid);
+        double sqlen = transposeTimesTimes(vec, p, vec);
         if(sqlen < tresh) {
           support.add(id);
         }
