@@ -29,7 +29,6 @@ import java.net.URL;
 import java.util.Enumeration;
 
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.io.BufferedLineReader;
 
 /**
  * Class that emulates the behavior of an java ServiceLoader, except that the
@@ -79,11 +78,34 @@ public class ELKIServiceLoader {
       Enumeration<URL> configfiles = cl.getResources(fullName);
       while(configfiles.hasMoreElements()) {
         URL nextElement = configfiles.nextElement();
+        char[] buf = new char[0x4000];
         try (
-            InputStreamReader is = new InputStreamReader(nextElement.openStream(), "utf-8");
-            BufferedLineReader r = new BufferedLineReader(is)) {
-          while(r.nextLine()) {
-            parseLine(parent, r.getBuffer(), nextElement);
+            InputStreamReader is = new InputStreamReader(nextElement.openStream(), "UTF-8");) {
+          int start = 0, cur = 0, valid = is.read(buf, 0, buf.length);
+          char c;
+          while(cur < valid) {
+            // Find newline or end
+            while(cur < valid && (c = buf[cur]) != '\n' && c != '\r') {
+              cur++;
+            }
+            if(cur == valid && is.ready()) {
+              // Move consumed buffer contents:
+              if(start > 0) {
+                System.arraycopy(buf, start, buf, 0, valid - start);
+                valid -= start;
+                cur -= start;
+                start = 0;
+              } else if(valid == buf.length) {
+                throw new IOException("Buffer size exceeded. Maximum line length in service files is: " + buf.length + " in file: " + fullName);
+              }
+              valid = is.read(buf, valid, buf.length - valid);
+              continue;
+            }
+            parseLine(parent, buf, start, cur, nextElement);
+            while(cur < valid && ((c = buf[cur]) == '\n' || c == '\r')) {
+              cur++;
+            }
+            start = cur;
           }
         }
         catch(IOException x) {
@@ -94,6 +116,7 @@ public class ELKIServiceLoader {
     catch(IOException x) {
       throw new AbortException("Could not load service configuration files.", x);
     }
+
   }
 
   /**
@@ -103,38 +126,34 @@ public class ELKIServiceLoader {
    * @param line Line to read
    * @param nam File name for error reporting
    */
-  private static void parseLine(Class<?> parent, CharSequence line, URL nam) {
-    if(line == null) {
-      return;
-    }
-    int begin = 0, end = line.length();
-    while(begin < end && line.charAt(begin) == ' ') {
+  private static void parseLine(Class<?> parent, char[] line, int begin, int end, URL nam) {
+    while(begin < end && line[begin] == ' ') {
       begin++;
     }
-    if(begin >= end || line.charAt(begin) == '#') {
+    if(begin >= end || line[begin] == '#') {
       return; // Empty/comment lines are okay, continue
     }
-    assert(begin == 0 || line.charAt(begin - 1) == ' ');
+    assert (begin == 0 || line[begin - 1] == ' ');
     // Find end of class name:
     int cend = begin + 1;
-    while(cend < end && line.charAt(cend) != ' ') {
+    while(cend < end && line[cend] != ' ') {
       cend++;
     }
     // Class name:
-    String cname = line.subSequence(begin, cend).toString();
+    String cname = new String(line, begin, cend - begin);
     ELKIServiceRegistry.register(parent, cname);
     for(int abegin = cend + 1, aend = -1; abegin < end; abegin = aend + 1) {
       // Skip whitespace:
-      while(abegin < end && line.charAt(abegin) == ' ') {
+      while(abegin < end && line[abegin] == ' ') {
         abegin++;
       }
       // Find next whitespace:
       aend = abegin + 1;
-      while(aend < end && line.charAt(aend) != ' ') {
+      while(aend < end && line[aend] != ' ') {
         aend++;
       }
       if(abegin < aend) {
-        ELKIServiceRegistry.registerAlias(parent, line.subSequence(abegin, aend).toString(), cname);
+        ELKIServiceRegistry.registerAlias(parent, new String(line, abegin, aend - abegin), cname);
       }
     }
     return;
