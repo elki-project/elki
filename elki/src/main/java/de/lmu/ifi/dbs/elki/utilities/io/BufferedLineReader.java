@@ -28,11 +28,11 @@ import java.io.InputStreamReader;
 
 /**
  * Class for buffered IO, avoiding some of the overheads of the Java API.
- * 
+ *
  * The main difference to the standard Java API is that this implementation will
  * reuse the buffer. <b>After a call to {@code nextLine()}, the buffer will be
  * overwitten!</b>
- * 
+ *
  * @author Erich Schubert
  */
 public class BufferedLineReader implements AutoCloseable {
@@ -44,7 +44,7 @@ public class BufferedLineReader implements AutoCloseable {
   /**
    * The buffer we read the data into.
    */
-  protected StringBuilder buf = new StringBuilder();
+  protected StringBuilder buf = new StringBuilder(1024);
 
   /**
    * Current line number.
@@ -98,9 +98,9 @@ public class BufferedLineReader implements AutoCloseable {
 
   /**
    * Reset to a new line reader.
-   * 
+   *
    * <b>A previous reader will not be closed automatically!</b>
-   * 
+   *
    * @param r New reader
    */
   public void reset(LineReader r) {
@@ -110,9 +110,9 @@ public class BufferedLineReader implements AutoCloseable {
 
   /**
    * Reset to a new line reader.
-   * 
+   *
    * <b>A previous stream will not be closed automatically!</b>
-   * 
+   *
    * @param in New input stream reader
    */
   public void reset(InputStream in) {
@@ -122,9 +122,9 @@ public class BufferedLineReader implements AutoCloseable {
 
   /**
    * Reset to a new line reader.
-   * 
+   *
    * <b>A previous stream will not be closed automatically!</b>
-   * 
+   *
    * @param in New input stream reader
    */
   public void reset(InputStreamReader in) {
@@ -134,9 +134,9 @@ public class BufferedLineReader implements AutoCloseable {
 
   /**
    * Get the reader buffer.
-   * 
+   *
    * <b>After a call to {@code nextLine()}, the buffer will be overwitten!</b>
-   * 
+   *
    * @return Buffer.
    */
   public CharSequence getBuffer() {
@@ -145,7 +145,7 @@ public class BufferedLineReader implements AutoCloseable {
 
   /**
    * Get the current line number.
-   * 
+   *
    * @return Current line number
    */
   public int getLineNumber() {
@@ -154,7 +154,7 @@ public class BufferedLineReader implements AutoCloseable {
 
   /**
    * Read the next line.
-   * 
+   *
    * @return {@code true} if another line was read successfully.
    * @throws IOException on IO errors.
    */
@@ -179,7 +179,7 @@ public class BufferedLineReader implements AutoCloseable {
 
   /**
    * Get the length of the string, not taking trailing linefeeds into account.
-   * 
+   *
    * @param line Input line
    * @return Length
    */

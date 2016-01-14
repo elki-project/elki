@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.io;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,43 +30,51 @@ import java.io.Reader;
 
 /**
  * Fast class to read a file, line per line.
- * 
+ *
  * Lines must be split using Unix newlines <code>\n</code>, linefeeds
  * <code>\r</code> are ignored.
- * 
+ *
  * This is a rather minimal implementation, which supposedly pays off in
  * performance. In particular, this class allows recycling the buffer, which
  * will yield less object allocations and thus less garbage collection.
- * 
+ *
  * Usage example:
- * 
+ *
  * <pre>
  * StringBuilder buf = new StringBuilder();
  * LineReader reader = new LineReader(inputStream);
  * // Clear buffer, and append next line.
- * while(reader.readLine(buf.delete(0, buf.length()))) {
+ * while(reader.readLine(buf.setLength(0))) {
  *   // process string in buffer.
  * }
  * </pre>
- * 
+ *
  * @author Erich Schubert
  */
 public class LineReader implements AutoCloseable {
-  /** Buffer size to use */
+  /**
+   * Default buffer size to use
+   */
   final static int BUFFER_SIZE = 4096;
 
-  /** Input stream to read from */
+  /**
+   * Input stream to read from
+   */
   Reader in;
 
-  /** Character buffer */
-  char[] buffer = new char[BUFFER_SIZE];
+  /**
+   * Character buffer
+   */
+  char[] buffer;
 
-  /** Current position, and length of buffer */
+  /**
+   * Current position, and length of buffer
+   */
   int pos = 0, end = 0;
 
   /**
    * Constructor
-   * 
+   *
    * @param in Stream
    */
   public LineReader(InputStream in) {
@@ -75,16 +83,37 @@ public class LineReader implements AutoCloseable {
 
   /**
    * Constructor
-   * 
+   *
    * @param in Reader
    */
   public LineReader(Reader in) {
+    this(in, BUFFER_SIZE);
+  }
+
+  /**
+   * Constructor
+   *
+   * @param in Reader
+   * @param buffersize Buffer size
+   */
+  public LineReader(InputStream in, int buffersize) {
+    this(new InputStreamReader(in), buffersize);
+  }
+
+  /**
+   * Constructor
+   *
+   * @param in Reader
+   * @param buffersize Buffer size
+   */
+  public LineReader(Reader in, int buffersize) {
     this.in = in;
+    this.buffer = new char[buffersize];
   }
 
   /**
    * Read a line into the given buffer.
-   * 
+   *
    * @param buf Buffer.
    * @return {@code true} if some characters have been read.
    */
