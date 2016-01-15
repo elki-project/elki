@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
@@ -35,19 +34,12 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * @author Erich Schubert
  * 
  * @apiviz.composedOf PCAFilteredResult
- * 
- * @param <V> Vector type
  */
-public class CorrelationModel<V extends FeatureVector<?>> extends AbstractModel implements TextWriteable {
+public class CorrelationModel extends PrototypeModel<double[]> implements TextWriteable {
   /**
    * The computed PCA result of this cluster.
    */
   private PCAFilteredResult pcaresult;
-
-  /**
-   * The centroid of this cluster.
-   */
-  private V centroid;
 
   /**
    * Constructor
@@ -55,10 +47,9 @@ public class CorrelationModel<V extends FeatureVector<?>> extends AbstractModel 
    * @param pcaresult PCA result
    * @param centroid Centroid
    */
-  public CorrelationModel(PCAFilteredResult pcaresult, V centroid) {
-    super();
+  public CorrelationModel(PCAFilteredResult pcaresult, double[] centroid) {
+    super(centroid);
     this.pcaresult = pcaresult;
-    this.centroid = centroid;
   }
 
   /**
@@ -80,24 +71,6 @@ public class CorrelationModel<V extends FeatureVector<?>> extends AbstractModel 
   }
 
   /**
-   * Get assigned for Centroid
-   * 
-   * @return centroid
-   */
-  public V getCentroid() {
-    return centroid;
-  }
-
-  /**
-   * Assign new Centroid
-   * 
-   * @param centroid Centroid
-   */
-  public void setCentroid(V centroid) {
-    this.centroid = centroid;
-  }
-
-  /**
    * Implementation of {@link TextWriteable} interface
    * 
    * @param label unused parameter
@@ -105,7 +78,7 @@ public class CorrelationModel<V extends FeatureVector<?>> extends AbstractModel 
   @Override
   public void writeToText(TextWriterStream out, String label) {
     super.writeToText(out, label);
-    out.commentPrintLn("Centroid: " + out.normalizationRestore(getCentroid()).toString());
+    out.commentPrintLn("Centroid: " + out.normalizationRestore(getPrototype()).toString());
     out.commentPrintLn("Strong Eigenvectors:");
     String strong = getPCAResult().getStrongEigenvectors().toString();
     while(strong.endsWith("\n")) {

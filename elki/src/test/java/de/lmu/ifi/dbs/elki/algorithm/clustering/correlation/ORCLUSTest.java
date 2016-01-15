@@ -67,8 +67,8 @@ public class ORCLUSTest extends AbstractSimpleAlgorithmTest implements JUnit4Tes
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
 
-    testFMeasure(db, result, 0.6319449087);
-    testClusterSizes(result, new int[] { 26, 30, 394 });
+    testFMeasure(db, result, 0.6355307);
+    testClusterSizes(result, new int[] { 22, 25, 403 });
   }
 
   /**

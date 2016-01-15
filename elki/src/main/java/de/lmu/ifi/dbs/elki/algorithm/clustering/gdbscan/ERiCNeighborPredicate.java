@@ -234,7 +234,7 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
      * @param pca2 second PCA
      * @return {@code true} when the two vectors are close enough.
      */
-    public boolean weakNeighbors(NumberVector v1, NumberVector v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
+    public boolean weakNeighbors(double[] v1, double[] v2, PCAFilteredResult pca1, PCAFilteredResult pca2) {
       if(pca1.getCorrelationDimension() < pca2.getCorrelationDimension()) {
         return false;
       }
@@ -246,11 +246,11 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
         return false;
       }
 
-      if(mahalanobisDistance(pca1.similarityMatrix(), v1.toArray(), v2.toArray()) > settings.tau) {
+      if(mahalanobisDistance(pca1.similarityMatrix(), v1, v2) > settings.tau) {
         return false;
       }
       if(pca1.getCorrelationDimension() == pca2.getCorrelationDimension()) {
-        return mahalanobisDistance(pca2.similarityMatrix(), v1.toArray(), v2.toArray()) <= settings.tau;
+        return mahalanobisDistance(pca2.similarityMatrix(), v1, v2) <= settings.tau;
       }
       return true;
     }

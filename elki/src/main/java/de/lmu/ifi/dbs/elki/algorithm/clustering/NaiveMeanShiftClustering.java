@@ -125,6 +125,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
   public Clustering<MeanModel> run(Database database, Relation<V> relation) {
     final DistanceQuery<V> distq = database.getDistanceQuery(relation, getDistanceFunction());
     final RangeQuery<V> rangeq = database.getRangeQuery(distq);
+    final NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
     final int dim = RelationUtil.dimensionality(relation);
 
     // Stopping threshold
@@ -152,7 +153,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
               final double weight = kernel.density(niter.doubleValue() / bandwidth);
               newpos.put(relation.get(niter), weight);
             }
-            newvec = newpos.toVector(relation);
+            newvec = factory.newNumberVector(newpos.getArrayRef());
             // TODO: detect 0 weight!
           }
           if(!okay) {

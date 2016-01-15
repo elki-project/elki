@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
@@ -145,8 +146,9 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
     if(LOG.isVerbose()) {
       LOG.verbose("retrieving database objects...");
     }
-    Centroid centroid = Centroid.make(relation);
-    V centroidDV = centroid.toVector(relation);
+    Centroid centroid = Centroid.make(relation, relation.getDBIDs());
+    NumberVector.Factory<V> factory = RelationUtil.getNumberVectorFactory(relation);
+    V centroidDV = factory.newNumberVector(centroid.getArrayRef());
     DBIDs ids;
     if(this.sampleSize > 0) {
       if(randomsample) {

@@ -99,7 +99,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 title = "On Exploring Complex Relationships of Correlation Clusters", //
 booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", //
 url = "http://dx.doi.org/10.1109/SSDBM.2007.21")
-public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<CorrelationModel<V>>> implements ClusteringAlgorithm<Clustering<CorrelationModel<V>>> {
+public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<CorrelationModel>> implements ClusteringAlgorithm<Clustering<CorrelationModel>> {
   /**
    * The logger for this class.
    */
@@ -126,7 +126,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * @param relation Relation to process
    * @return Clustering result
    */
-  public Clustering<CorrelationModel<V>> run(Database database, Relation<V> relation) {
+  public Clustering<CorrelationModel> run(Database database, Relation<V> relation) {
     final int dimensionality = RelationUtil.dimensionality(relation);
 
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress(3) : null;
@@ -140,13 +140,13 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
 
     // extract correlation clusters
     LOG.beginStep(stepprog, 2, "Extract correlation clusters");
-    List<List<Cluster<CorrelationModel<V>>>> clusterMap = extractCorrelationClusters(copacResult, relation, dimensionality, npred);
+    List<List<Cluster<CorrelationModel>>> clusterMap = extractCorrelationClusters(copacResult, relation, dimensionality, npred);
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder("Step 2: Extract correlation clusters...");
       for(int corrDim = 0; corrDim < clusterMap.size(); corrDim++) {
-        List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
+        List<Cluster<CorrelationModel>> correlationClusters = clusterMap.get(corrDim);
         msg.append("\n\ncorrDim ").append(corrDim);
-        for(Cluster<CorrelationModel<V>> cluster : correlationClusters) {
+        for(Cluster<CorrelationModel> cluster : correlationClusters) {
           msg.append("\n  cluster ").append(cluster).append(", ids: ").append(cluster.getIDs().size());
           // .append(", level: ").append(cluster.getLevel()).append(", index:
           // ").append(cluster.getLevelIndex());
@@ -159,7 +159,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     }
     if(LOG.isVerbose()) {
       int clusters = 0;
-      for(List<Cluster<CorrelationModel<V>>> correlationClusters : clusterMap) {
+      for(List<Cluster<CorrelationModel>> correlationClusters : clusterMap) {
         clusters += correlationClusters.size();
       }
       LOG.verbose(clusters + " clusters extracted.");
@@ -167,20 +167,20 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
 
     // build hierarchy
     LOG.beginStep(stepprog, 3, "Building hierarchy");
-    Clustering<CorrelationModel<V>> clustering = new Clustering<>("ERiC clustering", "eric-clustering");
+    Clustering<CorrelationModel> clustering = new Clustering<>("ERiC clustering", "eric-clustering");
     buildHierarchy(clustering, clusterMap, npred);
     if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder("Step 3: Build hierarchy");
       for(int corrDim = 0; corrDim < clusterMap.size(); corrDim++) {
-        List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(corrDim);
-        for(Cluster<CorrelationModel<V>> cluster : correlationClusters) {
+        List<Cluster<CorrelationModel>> correlationClusters = clusterMap.get(corrDim);
+        for(Cluster<CorrelationModel> cluster : correlationClusters) {
           msg.append("\n  cluster ").append(cluster).append(", ids: ").append(cluster.getIDs().size());
           // .append(", level: ").append(cluster.getLevel()).append(", index:
           // ").append(cluster.getLevelIndex());
-          for(Iter<Cluster<CorrelationModel<V>>> iter = clustering.getClusterHierarchy().iterParents(cluster); iter.valid(); iter.advance()) {
+          for(Iter<Cluster<CorrelationModel>> iter = clustering.getClusterHierarchy().iterParents(cluster); iter.valid(); iter.advance()) {
             msg.append("\n   parent ").append(iter.get());
           }
-          for(Iter<Cluster<CorrelationModel<V>>> iter = clustering.getClusterHierarchy().iterChildren(cluster); iter.valid(); iter.advance()) {
+          for(Iter<Cluster<CorrelationModel>> iter = clustering.getClusterHierarchy().iterChildren(cluster); iter.valid(); iter.advance()) {
             msg.append("\n   child ").append(iter.get());
           }
         }
@@ -189,7 +189,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     }
     LOG.setCompleted(stepprog);
 
-    for(Cluster<CorrelationModel<V>> rc : clusterMap.get(clusterMap.size() - 1)) {
+    for(Cluster<CorrelationModel> rc : clusterMap.get(clusterMap.size() - 1)) {
       clustering.addToplevelCluster(rc);
     }
     return clustering;
@@ -208,11 +208,11 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * @param npred ERiC predicate
    * @return a list of clusters for each dimensionality
    */
-  private List<List<Cluster<CorrelationModel<V>>>> extractCorrelationClusters(Clustering<Model> dbscanResult, Relation<V> relation, int dimensionality, ERiCNeighborPredicate<V>.Instance npred) {
+  private List<List<Cluster<CorrelationModel>>> extractCorrelationClusters(Clustering<Model> dbscanResult, Relation<V> relation, int dimensionality, ERiCNeighborPredicate<V>.Instance npred) {
     // result
-    List<List<Cluster<CorrelationModel<V>>>> clusterMap = new ArrayList<>();
+    List<List<Cluster<CorrelationModel>>> clusterMap = new ArrayList<>();
     for(int i = 0; i <= dimensionality; i++) {
-      clusterMap.add(new ArrayList<Cluster<CorrelationModel<V>>>());
+      clusterMap.add(new ArrayList<Cluster<CorrelationModel>>());
     }
 
     // noise cluster containing all noise objects over all partitions
@@ -227,13 +227,13 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
         EigenPairFilter filter = new FirstNEigenPairFilter(dim);
 
         // get cluster list for this dimension.
-        List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(dim);
+        List<Cluster<CorrelationModel>> correlationClusters = clusterMap.get(dim);
         SortedEigenPairs epairs = settings.pca.processIds(group, relation).getEigenPairs();
         int numstrong = filter.filter(epairs.eigenValues());
         PCAFilteredResult pcares = new PCAFilteredResult(epairs, numstrong, 1., 0.);
 
-        V centroid = Centroid.make(relation, group).toVector(relation);
-        Cluster<CorrelationModel<V>> correlationCluster = new Cluster<>("[" + dim + "_" + correlationClusters.size() + "]", group, new CorrelationModel<>(pcares, centroid));
+        double[] centroid = Centroid.make(relation, group).getArrayRef();
+        Cluster<CorrelationModel> correlationCluster = new Cluster<>("[" + dim + "_" + correlationClusters.size() + "]", group, new CorrelationModel(pcares, centroid));
         correlationClusters.add(correlationCluster);
       }
       // partition containing noise
@@ -251,14 +251,14 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
 
     if(noise != null && noise.size() > 0) {
       // get cluster list for this dimension.
-      List<Cluster<CorrelationModel<V>>> correlationClusters = clusterMap.get(dimensionality);
+      List<Cluster<CorrelationModel>> correlationClusters = clusterMap.get(dimensionality);
       EigenPairFilter filter = new FirstNEigenPairFilter(dimensionality);
       SortedEigenPairs epairs = settings.pca.processIds(noise.getIDs(), relation).getEigenPairs();
       int numstrong  = filter.filter(epairs.eigenValues());
       PCAFilteredResult pcares = new PCAFilteredResult(epairs, numstrong, 1., 0.);
 
-      V centroid = Centroid.make(relation, noise.getIDs()).toVector(relation);
-      Cluster<CorrelationModel<V>> correlationCluster = new Cluster<>("[noise]", noise.getIDs(), new CorrelationModel<>(pcares, centroid));
+      double[] centroid = Centroid.make(relation, noise.getIDs()).getArrayRef();
+      Cluster<CorrelationModel> correlationCluster = new Cluster<>("[noise]", noise.getIDs(), new CorrelationModel(pcares, centroid));
       correlationClusters.add(correlationCluster);
     }
 
@@ -273,23 +273,23 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     return clusterMap;
   }
 
-  private void buildHierarchy(Clustering<CorrelationModel<V>> clustering, List<List<Cluster<CorrelationModel<V>>>> clusterMap, ERiCNeighborPredicate<V>.Instance npred) {
+  private void buildHierarchy(Clustering<CorrelationModel> clustering, List<List<Cluster<CorrelationModel>>> clusterMap, ERiCNeighborPredicate<V>.Instance npred) {
     StringBuilder msg = LOG.isDebuggingFine() ? new StringBuilder() : null;
-    Hierarchy<Cluster<CorrelationModel<V>>> hier = clustering.getClusterHierarchy();
+    Hierarchy<Cluster<CorrelationModel>> hier = clustering.getClusterHierarchy();
 
     // Find maximum dimensionality found:
     int lambda_max = clusterMap.size() - 1;
 
     for(int childCorrDim = 0; childCorrDim < lambda_max; childCorrDim++) {
-      List<Cluster<CorrelationModel<V>>> children = clusterMap.get(childCorrDim);
+      List<Cluster<CorrelationModel>> children = clusterMap.get(childCorrDim);
       if(msg != null) {
         msg.append("\ncorrdim ").append(childCorrDim);
       }
 
-      for(Cluster<CorrelationModel<V>> child : children) {
+      for(Cluster<CorrelationModel> child : children) {
         for(int parentCorrDim = childCorrDim + 1; parentCorrDim <= lambda_max; parentCorrDim++) {
-          List<Cluster<CorrelationModel<V>>> parents = clusterMap.get(parentCorrDim);
-          for(Cluster<CorrelationModel<V>> parent : parents) {
+          List<Cluster<CorrelationModel>> parents = clusterMap.get(parentCorrDim);
+          for(Cluster<CorrelationModel> parent : parents) {
             int subspaceDim_parent = parent.getModel().getPCAResult().getCorrelationDimension();
             if(subspaceDim_parent == lambda_max && hier.numParents(child) == 0) {
               clustering.addChildCluster(parent, child);
@@ -298,7 +298,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
               }
             }
             else {
-              boolean dist = npred.weakNeighbors(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
+              boolean dist = npred.weakNeighbors(parent.getModel().getPrototype(), child.getModel().getPrototype(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
               if(!dist && (hier.numParents(child) == 0 || !isParent(npred, parent, hier.iterParents(child)))) {
                 clustering.addChildCluster(parent, child);
                 if(msg != null) {
@@ -325,16 +325,16 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(ERiCNeighborPredicate<V>.Instance npred, Cluster<CorrelationModel<V>> parent, Iter<Cluster<CorrelationModel<V>>> iter) {
+  private boolean isParent(ERiCNeighborPredicate<V>.Instance npred, Cluster<CorrelationModel> parent, Iter<Cluster<CorrelationModel>> iter) {
     StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
 
     for(; iter.valid(); iter.advance()) {
-      Cluster<CorrelationModel<V>> child = iter.get();
+      Cluster<CorrelationModel> child = iter.get();
       if(parent.getModel().getPCAResult().getCorrelationDimension() == child.getModel().getPCAResult().getCorrelationDimension()) {
         return false;
       }
 
-      boolean dist = npred.weakNeighbors(parent.getModel().getCentroid(), child.getModel().getCentroid(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
+      boolean dist = npred.weakNeighbors(parent.getModel().getPrototype(), child.getModel().getPrototype(), parent.getModel().getPCAResult(), child.getModel().getPCAResult());
       if(msg != null) {
         msg.append("\ndist(").append(child).append(" - ").append(parent).append(") = ").append(dist);
       }

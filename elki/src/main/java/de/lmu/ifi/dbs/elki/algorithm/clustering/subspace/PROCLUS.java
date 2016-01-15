@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -52,12 +52,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.Mean;
@@ -136,7 +136,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * @param relation Relation to process
    */
   public Clustering<SubspaceModel> run(Database database, Relation<V> relation) {
-    DistanceQuery<V> distFunc = this.getDistanceQuery(database);
+    DistanceQuery<V> distFunc = database.getDistanceQuery(relation, SquaredEuclideanDistanceFunction.STATIC);
     RangeQuery<V> rangeQuery = database.getRangeQuery(distFunc);
     final Random random = rnd.getSingleThreadedRandom();
 
@@ -245,16 +245,12 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     DBIDVar m_i = DBIDUtil.newVar();
     int size = s.size();
 
-    // m_1 is random point of S
-    final int r = random.nextInt(size);
-    s.assignVar(r, m_i);
-    medoids.add(m_i);
+    // Move a random element to the end, then pop()
+    s.swap(random.nextInt(size), --size);
+    medoids.add(s.pop(m_i));
     if(LOG.isDebugging()) {
       LOG.debugFiner("medoids " + medoids.toString());
     }
-    // Remove m_i from candidates, by moving to the end.
-    s.swap(r, size - 1);
-    --size;
 
     // To track the current worst element:
     int worst = -1;
@@ -273,11 +269,8 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
     for(int i = 1; i < m; i++) {
       // choose medoid m_i to be far from previous medoids
-      s.assignVar(worst, m_i);
-      medoids.add(m_i);
-      // Remove m_i from candidates, by moving to the end.
-      s.swap(worst, size - 1);
-      --size;
+      s.swap(worst, --size);
+      medoids.add(s.pop(m_i));
 
       // compute distances of each point to closest medoid; track worst.
       worst = -1;
@@ -355,8 +348,8 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    * @param distFunc the distance function
    * @return a mapping of the medoid's id to its locality
    */
-  private DataStore<DoubleDBIDList> getLocalities(DBIDs medoids, Relation<V> database, DistanceQuery<V> distFunc, RangeQuery<V> rangeQuery) {
-    WritableDataStore<DoubleDBIDList> result = DataStoreUtil.makeStorage(medoids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, DoubleDBIDList.class);
+  private DataStore<DBIDs> getLocalities(DBIDs medoids, Relation<V> database, DistanceQuery<V> distFunc, RangeQuery<V> rangeQuery) {
+    WritableDataStore<DBIDs> result = DataStoreUtil.makeStorage(medoids, DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, DBIDs.class);
 
     for(DBIDIter iter = medoids.iter(); iter.valid(); iter.advance()) {
       // determine minimum distance between current medoid m and any other
@@ -374,8 +367,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
 
       // determine points in sphere centered at m with radius minDist
       assert minDist != Double.POSITIVE_INFINITY;
-      DoubleDBIDList qr = rangeQuery.getRangeForDBID(iter, minDist);
-      result.put(iter, qr);
+      result.put(iter, rangeQuery.getRangeForDBID(iter, minDist));
     }
 
     return result;
@@ -393,7 +385,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
    */
   private long[][] findDimensions(ArrayDBIDs medoids, Relation<V> database, DistanceQuery<V> distFunc, RangeQuery<V> rangeQuery) {
     // get localities
-    DataStore<DoubleDBIDList> localities = getLocalities(medoids, database, distFunc, rangeQuery);
+    DataStore<DBIDs> localities = getLocalities(medoids, database, distFunc, rangeQuery);
 
     // compute x_ij = avg distance from points in l_i to medoid m_i
     final int dim = RelationUtil.dimensionality(database);
@@ -402,7 +394,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
     int i = 0;
     for(DBIDArrayIter iter = medoids.iter(); iter.valid(); iter.advance(), i++) {
       V medoid_i = database.get(iter);
-      DoubleDBIDList l_i = localities.get(iter);
+      DBIDs l_i = localities.get(iter);
       double[] x_i = new double[dim];
       for(DBIDIter qr = l_i.iter(); qr.valid(); qr.advance()) {
         V o = database.get(qr);

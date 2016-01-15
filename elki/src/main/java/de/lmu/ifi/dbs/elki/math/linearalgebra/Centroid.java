@@ -35,8 +35,8 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * Note: this class abstracts the efficient and numerical stable computation of
  * centroids.
  * 
- * See {@link de.lmu.ifi.dbs.elki.database.DatabaseUtil DatabaseUtil} for
- * easier to use APIs.
+ * See {@link de.lmu.ifi.dbs.elki.database.DatabaseUtil DatabaseUtil} for easier
+ * to use APIs.
  * 
  * @author Erich Schubert
  */
@@ -183,58 +183,6 @@ public class Centroid implements NumberVector {
   @Override
   public double[] toArray() {
     return elements.clone();
-  }
-
-  /**
-   * Get the data as vector.
-   * 
-   * @param relation Data relation
-   * @param <F> vector type
-   * @return the data
-   */
-  public <F extends NumberVector> F toVector(Relation<? extends F> relation) {
-    return RelationUtil.getNumberVectorFactory(relation).newNumberVector(elements);
-  }
-
-  /**
-   * Static Constructor from an existing matrix columns.
-   * 
-   * @param mat Matrix to use the columns from.
-   * @return Centroid vector
-   */
-  public static Centroid make(Matrix mat) {
-    Centroid c = new Centroid(mat.getRowDimensionality());
-    int n = mat.getColumnDimensionality();
-    for(int i = 0; i < n; i++) {
-      // TODO: avoid constructing the vector objects?
-      c.put(mat.getCol(i));
-    }
-    return c;
-  }
-
-  /**
-   * Static constructor from an existing relation.
-   * 
-   * @param relation Relation to use
-   * @return Centroid of relation
-   */
-  public static Centroid make(Relation<? extends NumberVector> relation) {
-    final int dim = RelationUtil.dimensionality(relation);
-    Centroid c = new Centroid(dim);
-    double[] elems = c.elements;
-    int count = 0;
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      NumberVector v = relation.get(iditer);
-      for(int i = 0; i < dim; i++) {
-        elems[i] += v.doubleValue(i);
-      }
-      count += 1;
-    }
-    for(int i = 0; i < dim; i++) {
-      elems[i] /= count;
-    }
-    c.wsum = count;
-    return c;
   }
 
   /**
