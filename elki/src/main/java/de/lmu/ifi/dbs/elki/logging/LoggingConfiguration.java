@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.logging;
  */
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -32,7 +33,6 @@ import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
-import de.lmu.ifi.dbs.elki.utilities.FileUtil;
 
 /**
  * Facility for configuration of logging.
@@ -107,32 +107,58 @@ public final class LoggingConfiguration {
     LogManager logManager = LogManager.getLogManager();
     Logger logger = Logger.getLogger(LoggingConfiguration.class.getName());
     // allow null as package name.
-    if (pkg == null) {
+    if(pkg == null) {
       pkg = "";
     }
     // Load logging configuration from current directory
     String cfgfile = name;
-    if (new File(name).exists()) {
+    if(new File(name).exists()) {
       cfgfile = name;
-    } else {
+    }
+    else {
       // Fall back to full path / resources.
       cfgfile = pkg.replace('.', File.separatorChar) + File.separatorChar + name;
     }
     try {
-      InputStream cfgdata = FileUtil.openSystemFile(cfgfile);
+      InputStream cfgdata = openSystemFile(cfgfile);
       logManager.readConfiguration(cfgdata);
 
       // also load as properties for us, to get debug flag.
-      InputStream cfgdata2 = FileUtil.openSystemFile(cfgfile);
+      InputStream cfgdata2 = openSystemFile(cfgfile);
       Properties cfgprop = new Properties();
       cfgprop.load(cfgdata2);
       DEBUG = Boolean.parseBoolean(cfgprop.getProperty("debug"));
 
       logger.info("Logging configuration read.");
-    } catch (FileNotFoundException e) {
+    }
+    catch(FileNotFoundException e) {
       logger.log(Level.SEVERE, "Could not find logging configuration file: " + cfgfile, e);
-    } catch (Exception e) {
+    }
+    catch(Exception e) {
       logger.log(Level.SEVERE, "Failed to configure logging from file: " + cfgfile, e);
+    }
+  }
+
+  /**
+   * Private copy from FileUtil, to avoid cross-dependencies. Try to open a
+   * file, first trying the file system, then falling back to the classpath.
+   * 
+   * @param filename File name in system notation
+   * @return Input stream
+   * @throws FileNotFoundException When no file was found.
+   */
+  private static InputStream openSystemFile(String filename) throws FileNotFoundException {
+    try {
+      return new FileInputStream(filename);
+    }
+    catch(FileNotFoundException e) {
+      // try with classloader
+      String resname = filename.replace(File.separatorChar, '/');
+      InputStream result = ClassLoader.getSystemResourceAsStream(resname);
+      if(result == null) {
+        throw e;
+      }
+      return result;
     }
   }
 
@@ -149,23 +175,24 @@ public final class LoggingConfiguration {
    * @param verbose verbosity level.
    */
   public static void setVerbose(java.util.logging.Level verbose) {
-    if (verbose.intValue() <= Level.VERBOSE.intValue()) {
+    if(verbose.intValue() <= Level.VERBOSE.intValue()) {
       // decrease to VERBOSE if it was higher, otherwise further to VERYVERBOSE
-      if (LOGGER_GLOBAL_TOP.getLevel() == null || LOGGER_GLOBAL_TOP.getLevel().intValue() > verbose.intValue()) {
+      if(LOGGER_GLOBAL_TOP.getLevel() == null || LOGGER_GLOBAL_TOP.getLevel().intValue() > verbose.intValue()) {
         LOGGER_GLOBAL_TOP.setLevel(verbose);
       }
-      if (LOGGER_ELKI_TOP.getLevel() == null || LOGGER_ELKI_TOP.getLevel().intValue() > verbose.intValue()) {
+      if(LOGGER_ELKI_TOP.getLevel() == null || LOGGER_ELKI_TOP.getLevel().intValue() > verbose.intValue()) {
         LOGGER_ELKI_TOP.setLevel(verbose);
       }
-    } else {
+    }
+    else {
       // re-increase to given level if it was verbose or "very verbose".
-      if (LOGGER_GLOBAL_TOP.getLevel() != null && (//
+      if(LOGGER_GLOBAL_TOP.getLevel() != null && (//
       Level.VERBOSE.equals(LOGGER_GLOBAL_TOP.getLevel()) || //
       Level.VERYVERBOSE.equals(LOGGER_GLOBAL_TOP.getLevel()) //
       )) {
         LOGGER_GLOBAL_TOP.setLevel(verbose);
       }
-      if (LOGGER_ELKI_TOP.getLevel() != null && (//
+      if(LOGGER_ELKI_TOP.getLevel() != null && (//
       Level.VERBOSE.equals(LOGGER_ELKI_TOP.getLevel()) || //
       Level.VERYVERBOSE.equals(LOGGER_ELKI_TOP.getLevel()) //
       )) {
@@ -179,13 +206,13 @@ public final class LoggingConfiguration {
    */
   public static void setStatistics() {
     // decrease to INFO if it was higher
-    if (LOGGER_GLOBAL_TOP.getLevel() == null || LOGGER_GLOBAL_TOP.getLevel().intValue() > Level.STATISTICS.intValue()) {
+    if(LOGGER_GLOBAL_TOP.getLevel() == null || LOGGER_GLOBAL_TOP.getLevel().intValue() > Level.STATISTICS.intValue()) {
       LOGGER_GLOBAL_TOP.setLevel(Level.STATISTICS);
     }
-    if (LOGGER_ELKI_TOP.getLevel() == null || LOGGER_ELKI_TOP.getLevel().intValue() > Level.STATISTICS.intValue()) {
+    if(LOGGER_ELKI_TOP.getLevel() == null || LOGGER_ELKI_TOP.getLevel().intValue() > Level.STATISTICS.intValue()) {
       LOGGER_ELKI_TOP.setLevel(Level.STATISTICS);
     }
-    if (LOGGER_TIME_TOP.getLevel() == null || LOGGER_TIME_TOP.getLevel().intValue() > Level.STATISTICS.intValue()) {
+    if(LOGGER_TIME_TOP.getLevel() == null || LOGGER_TIME_TOP.getLevel().intValue() > Level.STATISTICS.intValue()) {
       LOGGER_TIME_TOP.setLevel(Level.STATISTICS);
     }
   }
@@ -209,8 +236,8 @@ public final class LoggingConfiguration {
    */
   public static void replaceDefaultHandler(Handler handler) {
     Logger rootlogger = LogManager.getLogManager().getLogger("");
-    for (Handler h : rootlogger.getHandlers()) {
-      if (h instanceof CLISmartHandler) {
+    for(Handler h : rootlogger.getHandlers()) {
+      if(h instanceof CLISmartHandler) {
         rootlogger.removeHandler(h);
       }
     }
@@ -226,7 +253,7 @@ public final class LoggingConfiguration {
    */
   public static void setLevelFor(String pkg, String level) throws IllegalArgumentException {
     Logger logr = Logger.getLogger(pkg);
-    if (logr == null) {
+    if(logr == null) {
       throw new IllegalArgumentException("Logger not found.");
     }
     // Can also throw an IllegalArgumentException
