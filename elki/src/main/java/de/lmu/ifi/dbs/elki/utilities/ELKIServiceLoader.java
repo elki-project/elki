@@ -95,7 +95,8 @@ public class ELKIServiceLoader {
                 valid -= start;
                 cur -= start;
                 start = 0;
-              } else if(valid == buf.length) {
+              }
+              else if(valid == buf.length) {
                 throw new IOException("Buffer size exceeded. Maximum line length in service files is: " + buf.length + " in file: " + fullName);
               }
               valid = is.read(buf, valid, buf.length - valid);
@@ -116,7 +117,6 @@ public class ELKIServiceLoader {
     catch(IOException x) {
       throw new AbortException("Could not load service configuration files.", x);
     }
-
   }
 
   /**
@@ -133,7 +133,6 @@ public class ELKIServiceLoader {
     if(begin >= end || line[begin] == '#') {
       return; // Empty/comment lines are okay, continue
     }
-    assert (begin == 0 || line[begin - 1] == ' ');
     // Find end of class name:
     int cend = begin + 1;
     while(cend < end && line[cend] != ' ') {
