@@ -78,6 +78,9 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
 
   @Override
   public <T extends NumberVector, V extends NumberVector> List<V> chooseInitialMeans(Database database, Relation<T> relation, int k, NumberVectorDistanceFunction<? super T> distanceFunction, NumberVector.Factory<V> factory) {
+    if(relation.size() < k) {
+      throw new AbortException("Database has less than k objects.");
+    }
     // Ugly cast; but better than code duplication.
     @SuppressWarnings("unchecked")
     Relation<O> rel = (Relation<O>) relation;
@@ -97,38 +100,33 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
   public DBIDs chooseInitialMedoids(int k, DBIDs ids, DistanceQuery<? super O> distQ) {
     ArrayModifiableDBIDs medids = DBIDUtil.newArray(k);
     DBIDVar bestid = DBIDUtil.newVar();
-    WritableDoubleDataStore mindist = null;
+    // We need three temporary storage arrays:
+    WritableDoubleDataStore mindist, bestd, tempd;
+    mindist = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+    bestd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
+    tempd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
 
     // First mean is chosen by having the smallest distance sum to all others.
     {
       double best = Double.POSITIVE_INFINITY;
-      WritableDoubleDataStore newd = null;
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Choosing initial mean", ids.size(), LOG) : null;
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        if(newd == null) {
-          newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-        }
-        double sum = 0;
+        double sum = 0, d;
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-          double d = distQ.distance(iter, iter2);
-          sum += d;
-          newd.putDouble(iter2, d);
+          sum += d = distQ.distance(iter, iter2);
+          tempd.putDouble(iter2, d);
         }
         if(sum < best) {
           best = sum;
           bestid.set(iter);
-          if(mindist != null) {
-            mindist.destroy();
-          }
-          mindist = newd;
-          newd = null;
+          // Swap mindist and newd:
+          WritableDoubleDataStore temp = mindist;
+          mindist = tempd;
+          tempd = temp;
         }
         LOG.incrementProcessed(prog);
       }
       LOG.ensureCompleted(prog);
-      if(newd != null) {
-        newd.destroy();
-      }
       medids.add(bestid);
     }
     assert(mindist != null);
@@ -138,44 +136,40 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
     LOG.incrementProcessed(prog); // First one was just chosen.
     for(int i = 1; i < k; i++) {
       double best = Double.POSITIVE_INFINITY;
-      WritableDoubleDataStore bestd = null, newd = null;
+      bestid.unset();
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         if(medids.contains(iter)) {
           continue;
         }
-        if(newd == null) {
-          newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
-        }
-        double sum = 0.;
+        double sum = 0., v;
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
-          double v = MathUtil.min(distQ.distance(iter, iter2), mindist.doubleValue(iter2));
-          sum += v;
-          newd.put(iter2, v);
+          sum += v = MathUtil.min(distQ.distance(iter, iter2), mindist.doubleValue(iter2));
+          tempd.put(iter2, v);
         }
         if(sum < best) {
           best = sum;
           bestid.set(iter);
-          if(bestd != null) {
-            bestd.destroy();
-          }
-          bestd = newd;
-          newd = null;
+          // Swap bestd and newd:
+          WritableDoubleDataStore temp = bestd;
+          bestd = tempd;
+          tempd = temp;
         }
       }
-      if(bestd == null) {
+      if(!bestid.isSet()) {
         throw new AbortException("No median found that improves the criterion function?!? Too many infinite distances.");
       }
       medids.add(bestid);
-      if(newd != null) {
-        newd.destroy();
-      }
-      mindist.destroy();
-      mindist = bestd;
+      // Swap bestd and mindist:
+      WritableDoubleDataStore temp = bestd;
+      bestd = mindist;
+      mindist = temp;
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
 
     mindist.destroy();
+    bestd.destroy();
+    tempd.destroy();
     return medids;
   }
 
