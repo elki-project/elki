@@ -203,5 +203,10 @@ public class ListParameterization extends AbstractParameterization {
       this.option = key;
       this.value = value;
     }
+
+    @Override
+    public String toString() {
+      return "-" + option.getName() + " " + value;
+    }
   }
 }
