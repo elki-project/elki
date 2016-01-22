@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  *
  * @author Erich Schubert
  */
-public class FarthestSumPointsInitialMeansTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class FirstKInitialMeansTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.
@@ -50,20 +50,19 @@ public class FarthestSumPointsInitialMeansTest extends AbstractSimpleAlgorithmTe
    * @throws ParameterException
    */
   @Test
-  public void testFarthestSumPointsInitialMeans() {
+  public void testFirstKInitialMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 3);
-    params.addParameter(KMeans.INIT_ID, FarthestSumPointsInitialMeans.class);
+    params.addParameter(KMeans.INIT_ID, FirstKInitialMeans.class);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(SingleAssignmentKMeans.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);
-    testFMeasure(db, result, 0.80399668933);
-    testClusterSizes(result, new int[] { 32, 169, 199, 201, 399 });
+    testFMeasure(db, result, 0.62025907);
+    testClusterSizes(result, new int[] { 23, 38, 226, 258, 455 });
   }
 }
