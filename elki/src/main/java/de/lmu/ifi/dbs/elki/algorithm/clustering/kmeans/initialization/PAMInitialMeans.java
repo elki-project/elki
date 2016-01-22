@@ -108,7 +108,7 @@ public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, K
         if(newd == null) {
           newd = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
         }
-        int sum = 0;
+        double sum = 0;
         for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
           double d = distQ.distance(iter, iter2);
           sum += d;
