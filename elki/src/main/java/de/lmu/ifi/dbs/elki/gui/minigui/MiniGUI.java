@@ -46,6 +46,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
@@ -493,6 +494,33 @@ public class MiniGUI extends AbstractApplication {
    * @param args command line parameters
    */
   public static void main(final String[] args) {
+    // Detect the common problem of an incomplete class path:
+    try {
+      Class<?> clz = ClassLoader.getSystemClassLoader().loadClass("de.lmu.ifi.dbs.elki.database.ids.DBIDUtil");
+      clz.getMethod("newHashSet").invoke(null);
+    }
+    catch(ReflectiveOperationException e) {
+      StringBuilder msg = new StringBuilder();
+      msg.append("Your Java class path is incomplete.\n");
+      if (e.getCause() != null) {
+        msg.append(e.getCause().toString()).append("\n");
+      } else {
+        msg.append(e.toString()).append("\n");
+      }
+      msg.append("Make sure you have all the required jars on the classpath.\n");
+      msg.append("On the home page, you can find a 'elki-bundle' which should include everything.");
+      JOptionPane.showMessageDialog(null, msg, "ClassPath incomplete", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
+    // Detect the broken Ubuntu jAyatana hack;
+    String toolopt = System.getenv("JAVA_TOOL_OPTION");
+    if(toolopt != null && toolopt.indexOf("jayatana") >= 0) {
+      StringBuilder msg = new StringBuilder();
+      msg.append("The Ubuntu JAyatana 'global menu support' hack is known to cause problems with many Java applications.\n");
+      msg.append("Please unset JAVA_TOOL_OPTION.");
+      JOptionPane.showMessageDialog(null, msg, "Incompatible with JAyatana", JOptionPane.ERROR_MESSAGE);
+      return;
+    }
     GUIUtil.logUncaughtExceptions(LOG);
     GUIUtil.setLookAndFeel();
     OutputStep.setDefaultHandlerVisualizer();
@@ -549,7 +577,7 @@ public class MiniGUI extends AbstractApplication {
    *
    * @apiviz.composedOf de.lmu.ifi.dbs.elki.gui.util.SavedSettingsFile
    */
-  class SettingsComboboxModel extends AbstractListModel<String>implements ComboBoxModel<String> {
+  class SettingsComboboxModel extends AbstractListModel<String> implements ComboBoxModel<String> {
     /**
      * Serial version.
      */
