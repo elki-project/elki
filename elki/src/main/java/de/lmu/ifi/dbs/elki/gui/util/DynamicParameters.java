@@ -207,10 +207,9 @@ public class DynamicParameters {
   /**
    * Serialize parameters into an array list to pass to setParameters()
    * 
-   * @return Array list of String parameters.
+   * @param p Output list (will not be emptied)
    */
-  public synchronized ArrayList<String> serializeParameters() {
-    ArrayList<String> p = new ArrayList<>(2 * parameters.size());
+  public synchronized void serializeParameters(ArrayList<String> p) {
     for(Node t : parameters) {
       if(t.param != null) {
         if(t.param instanceof RemainingOptions) {
@@ -233,7 +232,6 @@ public class DynamicParameters {
         }
       }
     }
-    return p;
   }
 
   /**

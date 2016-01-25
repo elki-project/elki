@@ -1,10 +1,10 @@
-package de.lmu.ifi.dbs.elki.visualization.gui;
+package de.lmu.ifi.dbs.elki.result;
 
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
+import de.lmu.ifi.dbs.elki.visualization.gui.ResultWindow;
 
 /**
  * Handler to process and visualize a Result.
@@ -50,12 +51,12 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
  * @apiviz.composedOf VisualizerParameterizer
  * @apiviz.uses ResultWindow oneway
  */
-@Alias({ "visualizer", "vis", "ResultVisualizer" })
-public class ResultVisualizer implements ResultHandler {
+@Alias({ "visualizer", "vis", "ResultVisualizer", "de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer" })
+public class AutomaticVisualization implements ResultHandler {
   /**
    * Get a logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(ResultVisualizer.class);
+  private static final Logging LOG = Logging.getLogger(AutomaticVisualization.class);
 
   /**
    * Stores the set title.
@@ -89,7 +90,7 @@ public class ResultVisualizer implements ResultHandler {
    * @param manager Parameterization manager for visualizers
    * @param single Flag to indicat single-view mode.
    */
-  public ResultVisualizer(String title, VisualizerParameterizer manager, boolean single) {
+  public AutomaticVisualization(String title, VisualizerParameterizer manager, boolean single) {
     super();
     this.title = title;
     this.manager = manager;
@@ -184,8 +185,8 @@ public class ResultVisualizer implements ResultHandler {
     }
 
     @Override
-    protected ResultVisualizer makeInstance() {
-      return new ResultVisualizer(title, manager, single);
+    protected AutomaticVisualization makeInstance() {
+      return new AutomaticVisualization(title, manager, single);
     }
   }
 }

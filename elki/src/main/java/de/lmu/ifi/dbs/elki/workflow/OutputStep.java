@@ -91,7 +91,7 @@ public class OutputStep implements WorkflowStep {
     Class<? extends ResultHandler> clz;
     try {
       clz = (Class<? extends ResultHandler>) ClassLoader.getSystemClassLoader().loadClass(//
-      "de.lmu.ifi.dbs.elki.visualization.gui.ResultVisualizer");
+      "de.lmu.ifi.dbs.elki.result.AutomaticVisualization");
     }
     catch(ClassNotFoundException e) {
       clz = ResultWriter.class;

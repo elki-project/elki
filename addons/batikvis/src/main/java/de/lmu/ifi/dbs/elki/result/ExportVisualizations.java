@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.visualization;
+package de.lmu.ifi.dbs.elki.result;
 
 /*
  This file is part of ELKI:
@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -44,6 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter.FileType;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
@@ -60,6 +64,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  *
  * @apiviz.composedOf VisualizerParameterizer
  */
+@Alias("de.lmu.ifi.dbs.elki.visualization.ExportVisualizations")
 public class ExportVisualizations implements ResultHandler {
   /**
    * Get a logger for this class.
@@ -213,7 +218,7 @@ public class ExportVisualizations implements ResultHandler {
 
     String prefix = null;
     prefix = (prefix == null && item.proj != null) ? item.proj.getMenuName() : prefix;
-    prefix = (prefix == null && item.tasks.size() > 0) ? item.tasks.get(0).name : prefix;
+    prefix = (prefix == null && item.tasks.size() > 0) ? item.tasks.get(0).getMenuName() : prefix;
     prefix = (prefix != null ? prefix : "plot");
     // TODO: generate names...
     Integer count = counter.get(prefix);

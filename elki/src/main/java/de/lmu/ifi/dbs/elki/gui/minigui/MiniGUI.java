@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.gui.minigui;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -49,6 +48,7 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingWorker;
 import javax.swing.event.TableModelEvent;
@@ -142,6 +142,11 @@ public class MiniGUI extends AbstractApplication {
   protected SavedSettingsFile store = new SavedSettingsFile(SAVED_SETTINGS_FILENAME);
 
   /**
+   * Combo box for choosing the application to run.
+   */
+  protected JComboBox<String> appCombo;
+
+  /**
    * Combo box for saved settings.
    */
   protected JComboBox<String> savedCombo;
@@ -162,12 +167,17 @@ public class MiniGUI extends AbstractApplication {
   private Class<? extends AbstractApplication> maincls = KDDCLIApplication.class;
 
   /**
+   * Command line output field.
+   */
+  private JTextField commandLine;
+
+  /**
    * Constructor.
    */
   public MiniGUI() {
     super();
     // Create and set up the window.
-    frame = new JFrame("ELKI MiniGUI");
+    frame = new JFrame("ELKI MiniGUI Command Line Builder");
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     try {
       frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
@@ -180,138 +190,11 @@ public class MiniGUI extends AbstractApplication {
     panel.setOpaque(true); // content panes must be opaque
     panel.setLayout(new GridBagLayout());
 
-    {
-      // Button panel
-      JPanel buttonPanel = new JPanel();
-      buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-
-      // Combo box for saved settings
-      savedSettingsModel = new SettingsComboboxModel(store);
-      savedCombo = new JComboBox<>(savedSettingsModel);
-      savedCombo.setEditable(true);
-      savedCombo.setSelectedItem("[Saved Settings]");
-      buttonPanel.add(savedCombo);
-
-      // button to load settings
-      JButton loadButton = new JButton("Load");
-      loadButton.setMnemonic(KeyEvent.VK_L);
-      loadButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          String key = savedSettingsModel.getSelectedItem();
-          ArrayList<String> settings = store.get(key);
-          if(settings != null) {
-            outputArea.clear();
-            outputArea.publish("Parameters: " + FormatUtil.format(settings, " ") + NEWLINE, Level.INFO);
-            doSetParameters(settings);
-          }
-        }
-      });
-      buttonPanel.add(loadButton);
-      // button to save settings
-      JButton saveButton = new JButton("Save");
-      saveButton.setMnemonic(KeyEvent.VK_S);
-      saveButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          String key = savedSettingsModel.getSelectedItem();
-          // Stop editing the table.
-          parameterTable.editCellAt(-1, -1);
-          store.put(key, parameters.serializeParameters());
-          try {
-            store.save();
-          }
-          catch(IOException e1) {
-            LOG.exception(e1);
-          }
-          savedSettingsModel.update();
-        }
-      });
-      buttonPanel.add(saveButton);
-      // button to remove saved settings
-      JButton removeButton = new JButton("Remove");
-      removeButton.setMnemonic(KeyEvent.VK_E);
-      removeButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          String key = savedSettingsModel.getSelectedItem();
-          store.remove(key);
-          try {
-            store.save();
-          }
-          catch(IOException e1) {
-            LOG.exception(e1);
-          }
-          savedCombo.setSelectedItem("[Saved Settings]");
-          savedSettingsModel.update();
-        }
-      });
-      buttonPanel.add(removeButton);
-
-      // button to launch the task
-      runButton = new JButton("Run Task");
-      runButton.setMnemonic(KeyEvent.VK_R);
-      runButton.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          startTask();
-        }
-      });
-      buttonPanel.add(runButton);
-
-      GridBagConstraints constraints = new GridBagConstraints();
-      constraints.fill = GridBagConstraints.HORIZONTAL;
-      constraints.gridx = 0;
-      constraints.gridy = 1;
-      constraints.weightx = 1.0;
-      constraints.weighty = 0.01;
-      panel.add(buttonPanel, constraints);
-    }
-
-    {
-      // Setup parameter storage and table model
-      this.parameters = new DynamicParameters();
-      ParametersModel parameterModel = new ParametersModel(parameters);
-      parameterModel.addTableModelListener(new TableModelListener() {
-        @Override
-        public void tableChanged(TableModelEvent e) {
-          // logger.debug("Change event.");
-          updateParameterTable();
-        }
-      });
-
-      // Create parameter table
-      parameterTable = new ParameterTable(frame, parameterModel, parameters);
-      // Create the scroll pane and add the table to it.
-      JScrollPane scrollPane = new JScrollPane(parameterTable);
-
-      // Add the scroll pane to this panel.
-      GridBagConstraints constraints = new GridBagConstraints();
-      constraints.fill = GridBagConstraints.BOTH;
-      constraints.gridx = 0;
-      constraints.gridy = 0;
-      constraints.weightx = 1;
-      constraints.weighty = 1;
-      panel.add(scrollPane, constraints);
-    }
-
-    {
-      // setup text output area
-      outputArea = new LogPanel();
-
-      // Create the scroll pane and add the table to it.
-      JScrollPane outputPane = new JScrollPane(outputArea);
-      outputPane.setPreferredSize(new Dimension(800, 400));
-
-      // Add the output pane to the bottom
-      GridBagConstraints constraints = new GridBagConstraints();
-      constraints.fill = GridBagConstraints.BOTH;
-      constraints.gridx = 0;
-      constraints.gridy = 2;
-      constraints.weightx = 1;
-      constraints.weighty = 1;
-      panel.add(outputPane, constraints);
-    }
+    setupAppChooser();
+    setupParameterTable();
+    setupLoadSaveButtons();
+    setupCommandLine();
+    setupLoggingArea();
 
     // load saved settings (we wanted to have the logger first!)
     try {
@@ -351,14 +234,215 @@ public class MiniGUI extends AbstractApplication {
   }
 
   /**
+   * Setup the application chooser.
+   */
+  private void setupAppChooser() {
+    // Configurator to choose the main application
+    appCombo = new JComboBox<>();
+    for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(AbstractApplication.class)) {
+      String nam = clz.getCanonicalName();
+      if(nam == null || clz.getCanonicalName().contains("GUI")) {
+        continue;
+      }
+      appCombo.addItem(nam);
+    }
+    appCombo.setEditable(true);
+    appCombo.setSelectedItem(maincls.getCanonicalName());
+    appCombo.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if("comboBoxChanged".equals(e.getActionCommand())) {
+          Class<? extends AbstractApplication> clz = ELKIServiceRegistry.findImplementation(AbstractApplication.class, (String) appCombo.getSelectedItem());
+          if(clz != null) {
+            maincls = clz;
+            updateParameterTable();
+          }
+          else {
+            LOG.warning("Main class name not found.");
+          }
+        }
+      }
+    });
+
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.BOTH;
+    constraints.gridx = 0;
+    constraints.gridy = 0;
+    constraints.weightx = 1;
+    constraints.weighty = .01;
+    panel.add(appCombo, constraints);
+  }
+
+  /**
+   * Setup the parameter table
+   */
+  private void setupParameterTable() {
+    // Setup parameter storage and table model
+    this.parameters = new DynamicParameters();
+    ParametersModel parameterModel = new ParametersModel(parameters);
+    parameterModel.addTableModelListener(new TableModelListener() {
+      @Override
+      public void tableChanged(TableModelEvent e) {
+        // logger.debug("Change event.");
+        updateParameterTable();
+      }
+    });
+
+    // Create parameter table
+    parameterTable = new ParameterTable(frame, parameterModel, parameters);
+    // Create the scroll pane and add the table to it.
+    JScrollPane scrollPane = new JScrollPane(parameterTable);
+
+    // Add the scroll pane to this panel.
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.BOTH;
+    constraints.gridx = 0;
+    constraints.gridy = 1;
+    constraints.weightx = 1;
+    constraints.weighty = 1;
+    panel.add(scrollPane, constraints);
+  }
+
+  /**
+   * Create the load and save buttons.
+   */
+  private void setupLoadSaveButtons() {
+    // Button panel
+    JPanel buttonPanel = new JPanel();
+    buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
+
+    // Combo box for saved settings
+    savedSettingsModel = new SettingsComboboxModel(store);
+    savedCombo = new JComboBox<>(savedSettingsModel);
+    savedCombo.setEditable(true);
+    savedCombo.setSelectedItem("[Saved Settings]");
+    buttonPanel.add(savedCombo);
+
+    // button to load settings
+    JButton loadButton = new JButton("Load");
+    loadButton.setMnemonic(KeyEvent.VK_L);
+    loadButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        String key = savedSettingsModel.getSelectedItem();
+        ArrayList<String> settings = store.get(key);
+        if(settings != null) {
+          doSetParameters(settings);
+        }
+      }
+    });
+    buttonPanel.add(loadButton);
+    // button to save settings
+    JButton saveButton = new JButton("Save");
+    saveButton.setMnemonic(KeyEvent.VK_S);
+    saveButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        String key = savedSettingsModel.getSelectedItem();
+        // Stop editing the table.
+        parameterTable.editCellAt(-1, -1);
+        ArrayList<String> list = new ArrayList<>(parameters.size() * 2 + 1);
+        list.add(maincls.getCanonicalName());
+        parameters.serializeParameters(list);
+        store.put(key, list);
+        try {
+          store.save();
+        }
+        catch(IOException e1) {
+          LOG.exception(e1);
+        }
+        savedSettingsModel.update();
+      }
+    });
+    buttonPanel.add(saveButton);
+    // button to remove saved settings
+    JButton removeButton = new JButton("Remove");
+    removeButton.setMnemonic(KeyEvent.VK_E);
+    removeButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        String key = savedSettingsModel.getSelectedItem();
+        store.remove(key);
+        try {
+          store.save();
+        }
+        catch(IOException e1) {
+          LOG.exception(e1);
+        }
+        savedCombo.setSelectedItem("[Saved Settings]");
+        savedSettingsModel.update();
+      }
+    });
+    buttonPanel.add(removeButton);
+
+    // button to launch the task
+    runButton = new JButton("Run Task");
+    runButton.setMnemonic(KeyEvent.VK_R);
+    runButton.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        startTask();
+      }
+    });
+    buttonPanel.add(runButton);
+
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.HORIZONTAL;
+    constraints.gridx = 0;
+    constraints.gridy = 2;
+    constraints.weightx = 1.0;
+    constraints.weighty = 0.01;
+    panel.add(buttonPanel, constraints);
+  }
+
+  /**
+   * Setup command line field
+   */
+  private void setupCommandLine() {
+    // setup text output area
+    commandLine = new JTextField();
+    commandLine.setEditable(false); // FIXME: Make editable!
+
+    // Add the output pane to the bottom
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.BOTH;
+    constraints.gridx = 0;
+    constraints.gridy = 3;
+    constraints.weightx = 1;
+    constraints.weighty = .01;
+    panel.add(commandLine, constraints);
+  }
+
+  /**
+   * Setup logging area
+   */
+  private void setupLoggingArea() {
+    // setup text output area
+    outputArea = new LogPanel();
+
+    // Create the scroll pane and add the table to it.
+    JScrollPane outputPane = new JScrollPane(outputArea);
+    outputPane.setPreferredSize(new Dimension(800, 400));
+
+    // Add the output pane to the bottom
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.BOTH;
+    constraints.gridx = 0;
+    constraints.gridy = 4;
+    constraints.weightx = 1;
+    constraints.weighty = 1;
+    panel.add(outputPane, constraints);
+  }
+
+  /**
    * Serialize the parameter table and run setParameters().
    */
   protected void updateParameterTable() {
     parameterTable.setEnabled(false);
-    ArrayList<String> params = parameters.serializeParameters();
-    outputArea.clear();
-    outputArea.publish("Parameters: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
-    doSetParameters(params);
+    ArrayList<String> list = new ArrayList<String>(parameters.size() * 2 + 1);
+    list.add(maincls.getCanonicalName());
+    parameters.serializeParameters(list);
+    doSetParameters(list);
     parameterTable.setEnabled(true);
   }
 
@@ -368,6 +452,16 @@ public class MiniGUI extends AbstractApplication {
    * @param params Parameters
    */
   protected void doSetParameters(List<String> params) {
+    if(params.size() > 0) {
+      String first = params.get(0);
+      if(!first.startsWith("-")) {
+        Class<? extends AbstractApplication> c = ELKIServiceRegistry.findImplementation(AbstractApplication.class, first);
+        if(c != null) {
+          maincls = c;
+          params.remove(0);
+        }
+      }
+    }
     SerializedParameterization config = new SerializedParameterization(params);
     TrackParameters track = new TrackParameters(config);
     track.tryInstantiate(LoggingStep.class);
@@ -381,6 +475,9 @@ public class MiniGUI extends AbstractApplication {
     runButton.setEnabled(!hasErrors);
 
     List<String> remainingParameters = config.getRemainingParameters();
+
+    outputArea.clear();
+    commandLine.setText(format(maincls.getCanonicalName(), params));
 
     // update table:
     parameterTable.removeEditor();
@@ -405,6 +502,97 @@ public class MiniGUI extends AbstractApplication {
   }
 
   /**
+   * Format objects to a command line.
+   * 
+   * @param params Parameters to format (Strings, or list of strings)
+   * @return Formatted string
+   */
+  private String format(Object... params) {
+    StringBuilder buf = new StringBuilder();
+    for(Object p : params) {
+      if(p instanceof String) {
+        formatTo(buf, (String) p);
+      }
+      else if(p instanceof List) {
+        formatTo(buf, (List<?>) p);
+      }
+      else {
+        LOG.warning("Incorrect object type: " + p.getClass());
+      }
+    }
+    return buf.toString();
+  }
+
+  /**
+   * Format a list of strings to a buffer.
+   * 
+   * @param buf Output buffer
+   * @param params List of strings
+   */
+  private void formatTo(StringBuilder buf, List<?> params) {
+    for(Object p : params) {
+      if(p instanceof String) {
+        formatTo(buf, (String) p);
+      }
+      else {
+        LOG.warning("Incorrect object type: " + p.getClass());
+      }
+    }
+  }
+
+  /**
+   * Format a single string for the command line.
+   * 
+   * @param buf Output buffer
+   * @param s String
+   */
+  private void formatTo(StringBuilder buf, String s) {
+    if(s == null || s.length() == 0) {
+      return;
+    }
+    if(buf.length() > 0) {
+      buf.append(' ');
+    }
+    // Test for escaping necessary
+    int escape = 0;
+    for(int i = 0, l = s.length(); i < l; i++) {
+      char c = s.charAt(i);
+      if(c == '\\') {
+        escape |= 8;
+      }
+      else if(c <= ' ' || c >= 128 || c == '<' || c == '>' || c == '|' || c == '$') {
+        escape |= 1;
+      }
+      else if(c == '"') {
+        escape |= 2;
+      }
+      else if(c == '\'') {
+        escape |= 4;
+      }
+    }
+    if(escape == 0) {
+      buf.append(s); // No escaping.
+    }
+    else if((escape & 10) == 0) {
+      buf.append('"').append(s).append('"');
+    }
+    else if((escape & 12) == 0) {
+      buf.append('\'').append(s).append('\'');
+    }
+    else { // Full escaping.
+      buf.append('"');
+      for(int i = 0, l = s.length(); i < l; i++) {
+        char c = s.charAt(i);
+        if(c == '"' || c == '\\' || c == '$') {
+          buf.append('\\');
+        }
+        buf.append(c);
+      }
+      buf.append('"');
+    }
+  }
+
+  /**
    * Auto-load the last task from the history file.
    */
   protected void loadLatest() {
@@ -422,14 +610,13 @@ public class MiniGUI extends AbstractApplication {
   protected void startTask() {
     parameterTable.editCellAt(-1, -1);
     parameterTable.setEnabled(false);
-    final ArrayList<String> params = parameters.serializeParameters();
+    final ArrayList<String> params = new ArrayList<>(parameters.size() * 2);
+    parameters.serializeParameters(params);
     parameterTable.setEnabled(true);
 
     runButton.setEnabled(false);
 
     outputArea.clear();
-    outputArea.publish("Running: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
-
     SwingWorker<Void, Void> r = new SwingWorker<Void, Void>() {
       @Override
       public Void doInBackground() {
@@ -503,9 +690,10 @@ public class MiniGUI extends AbstractApplication {
     catch(ReflectiveOperationException e) {
       StringBuilder msg = new StringBuilder();
       msg.append("Your Java class path is incomplete.\n");
-      if (e.getCause() != null) {
+      if(e.getCause() != null) {
         msg.append(e.getCause().toString()).append("\n");
-      } else {
+      }
+      else {
         msg.append(e.toString()).append("\n");
       }
       msg.append("Make sure you have all the required jars on the classpath.\n");
