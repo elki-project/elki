@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * parameters ({@link NumberParameter}) are not allowed to have the same value.
  * 
  * @author Steffi Wanka
+ * @since 0.2
  */
 public class NoDuplicateValueGlobalConstraint implements GlobalParameterConstraint {
   /**

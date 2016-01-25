@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Pseudo database that is empty.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 @Title("Empty Database")
 @Description("Dummy data source that does not provide any objects.")

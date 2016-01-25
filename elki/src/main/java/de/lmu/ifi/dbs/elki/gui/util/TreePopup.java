@@ -62,6 +62,7 @@ import javax.swing.tree.TreeModel;
  * Popup menu that contains a JTree.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class TreePopup extends JPopupMenu {
   /**

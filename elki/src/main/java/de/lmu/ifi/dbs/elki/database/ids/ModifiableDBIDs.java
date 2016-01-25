@@ -31,6 +31,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * <em>deliberately</em>.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has DBIDMIter
  */

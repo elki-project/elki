@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * LP-Norm, optimized for {@link SparseNumberVector}s.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 // TODO: implement SpatialDistanceFunction
 public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<SparseNumberVector> implements Norm<SparseNumberVector> {

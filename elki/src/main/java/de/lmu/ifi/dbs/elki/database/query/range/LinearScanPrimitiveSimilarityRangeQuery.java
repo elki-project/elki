@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * only once from the relation.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.uses PrimitiveSimilarityQuery
  *

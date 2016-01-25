@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
  * distribution.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  */
 public class LevenbergMarquardtGaussianFittingTest implements JUnit4Test {

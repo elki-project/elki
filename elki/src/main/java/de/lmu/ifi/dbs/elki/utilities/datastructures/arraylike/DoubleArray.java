@@ -28,6 +28,7 @@ import java.util.Arrays;
  * Array of double values.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class DoubleArray implements NumberArrayAdapter<Double, DoubleArray> {
   /**

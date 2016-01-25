@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Z), such that Euclidean distance is line-of-sight.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.uses NumberVector
  * @apiviz.composedOf EarthModel

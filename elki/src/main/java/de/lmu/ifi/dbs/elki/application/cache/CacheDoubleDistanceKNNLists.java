@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * Precompute the k nearest neighbors in a disk cache.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.has DistanceFunction
  * 

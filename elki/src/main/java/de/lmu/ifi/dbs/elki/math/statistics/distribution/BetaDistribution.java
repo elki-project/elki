@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Jan Brusis
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class BetaDistribution extends AbstractDistribution {
   /**

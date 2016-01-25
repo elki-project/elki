@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * <em>probability density</em> of the assumed distribution.
  * 
  * @author Lisa Reichert
+ * @since 0.3
  * 
  * @param <V> Vector type
  */

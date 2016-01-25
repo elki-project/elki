@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * of classes.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  * 
  * @apiviz.composedOf Comparable
  */

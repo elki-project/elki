@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  *
  * @author Robert Rödler
  * @author Erich Schubert
+ * @since 0.5.5
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

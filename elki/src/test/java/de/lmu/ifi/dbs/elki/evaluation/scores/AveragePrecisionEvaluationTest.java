@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
  * Test to validate ROC curve computation.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class AveragePrecisionEvaluationTest implements JUnit4Test {
   /**

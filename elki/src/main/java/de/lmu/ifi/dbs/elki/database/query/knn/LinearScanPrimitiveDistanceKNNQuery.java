@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
  * retrieve the query object from the relation only once!
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses PrimitiveDistanceQuery
  * @apiviz.uses PrimitiveDistanceFunction

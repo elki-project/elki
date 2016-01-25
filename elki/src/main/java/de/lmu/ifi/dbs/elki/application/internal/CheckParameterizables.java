@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * interface.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.landmark
  * @apiviz.uses AbstractParameterizer

@@ -79,6 +79,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
  * considered noise clusters.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.composedOf CSVReaderFormat
  * @apiviz.has Clustering

@@ -33,6 +33,7 @@ import java.lang.annotation.Target;
  * Class/algorithm description
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

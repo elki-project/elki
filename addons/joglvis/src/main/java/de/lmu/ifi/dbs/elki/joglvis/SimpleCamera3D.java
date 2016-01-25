@@ -29,6 +29,7 @@ import javax.media.opengl.glu.GLU;
  * Very simple (rotating) camera.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class SimpleCamera3D {
   /**

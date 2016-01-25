@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Abstract superclass for nodes in an tree based index structure.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * @param <E> the type of Entry used in the index
  */
 public abstract class AbstractNode<E extends Entry> extends AbstractExternalizablePage implements Node<E> {

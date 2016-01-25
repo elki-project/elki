@@ -105,6 +105,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @param <O> Vector type
  */

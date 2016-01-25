@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  * Class to extend an array with a single element virtually.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @param <T> Object type
  */

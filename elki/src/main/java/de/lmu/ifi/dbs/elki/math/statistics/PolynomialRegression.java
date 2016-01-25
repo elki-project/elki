@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * + b1*x1 + b2*x2 + ... + bp*xp + e
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class PolynomialRegression extends MultipleLinearRegression {
   /**

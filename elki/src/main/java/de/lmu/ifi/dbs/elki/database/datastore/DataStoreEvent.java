@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * {@link DataStoreListener} of the change.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @see DataStore
  * @see DataStoreListener

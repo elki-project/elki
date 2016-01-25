@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Access images via an internal image registry.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URLRegistryEntry, ParsedURLProtocolHandler {
   /**

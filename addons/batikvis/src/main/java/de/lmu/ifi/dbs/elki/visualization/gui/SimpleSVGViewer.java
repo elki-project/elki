@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * A minimalistic SVG viewer with export dialog.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class SimpleSVGViewer extends JFrame {
   /**

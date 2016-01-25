@@ -71,6 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Title("OutRank: ranking outliers in high dimensional data")
 @Description("Ranking outliers in high dimensional data - score 1")

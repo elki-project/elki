@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * Simple adapter class to iterate over a DOM tree nodes children.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class XMLNodeListIterator implements Iterator<Node> {
   /**

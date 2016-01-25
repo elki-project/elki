@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Tests the EM outlier detection algorithm.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class EMOutlierTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

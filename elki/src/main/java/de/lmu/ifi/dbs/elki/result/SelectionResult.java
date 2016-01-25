@@ -30,6 +30,7 @@ package de.lmu.ifi.dbs.elki.result;
  * DBIDSelection object should be seen as static contents of this result.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf DBIDSelection
  */

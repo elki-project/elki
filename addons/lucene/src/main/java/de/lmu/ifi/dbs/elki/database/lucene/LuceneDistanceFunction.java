@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Distance function, interfacing back into Lucene.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class LuceneDistanceFunction extends AbstractDBIDRangeDistanceFunction {
   /**

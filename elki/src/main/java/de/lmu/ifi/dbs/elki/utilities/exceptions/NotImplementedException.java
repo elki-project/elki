@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * See {@link ExceptionMessages} for common explanations.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class NotImplementedException extends AbortException {
   /**

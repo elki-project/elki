@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
  * Container class, with ugly casts to reduce generics crazyness.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.landmark
  * @apiviz.has VisualizerContext

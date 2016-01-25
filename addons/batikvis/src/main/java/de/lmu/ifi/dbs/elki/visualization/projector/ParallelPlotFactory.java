@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
  * Produce parallel axes projections.
  *
  * @author Robert Rödler
+ * @since 0.5.0
  *
  * @apiviz.has ParallelPlotProjector
  */

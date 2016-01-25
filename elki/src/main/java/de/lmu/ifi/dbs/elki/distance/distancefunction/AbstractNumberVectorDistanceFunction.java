@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
  * on number vectors and returning double values.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.excludeSubtypes

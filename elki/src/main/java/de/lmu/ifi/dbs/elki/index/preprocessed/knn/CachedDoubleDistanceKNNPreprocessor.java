@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * Preprocessor that loads an existing cached kNN result.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @param <O> Object type
  */

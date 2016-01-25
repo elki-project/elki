@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Class to help building a pointer hierarchy.
  *
  * @author Erich Schubert
+ * @since 0.7.1
  */
 public class PointerHierarchyRepresentationBuilder {
   /**

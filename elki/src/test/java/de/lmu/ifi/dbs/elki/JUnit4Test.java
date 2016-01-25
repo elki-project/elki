@@ -30,6 +30,7 @@ import org.junit.runners.JUnit4;
  * This interface is used for test-discovery by the {@link AllTestsTestSuite} TestSuite.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 @RunWith(JUnit4.class)
 public interface JUnit4Test {

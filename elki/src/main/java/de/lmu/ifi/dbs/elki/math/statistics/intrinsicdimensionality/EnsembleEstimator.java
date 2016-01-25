@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * This is an experimental estimator. Please cite ELKI when using.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class EnsembleEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**

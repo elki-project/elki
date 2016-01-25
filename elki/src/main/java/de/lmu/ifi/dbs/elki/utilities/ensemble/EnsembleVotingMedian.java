@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Note: median is very similar to a <em>majority voting</em>!
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class EnsembleVotingMedian implements EnsembleVoting {
   /**

@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * A simple web server to serve data base contents to a JavaScript client.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * TODO: use Jetty or something similar on the long run.
  *

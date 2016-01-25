@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * View on an ArrayDBIDs masked using a BitMask for efficient mask changing.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses DBIDs
  */

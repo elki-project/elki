@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * TODO: is this semantic sane?
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <O> Data type
  */

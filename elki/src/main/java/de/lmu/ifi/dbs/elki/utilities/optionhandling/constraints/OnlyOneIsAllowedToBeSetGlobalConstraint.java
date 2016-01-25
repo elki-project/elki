@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * parameters ({@link Parameter}) is allowed to be set.
  * 
  * @author Steffi Wanka
+ * @since 0.2
  */
 public class OnlyOneIsAllowedToBeSetGlobalConstraint implements GlobalParameterConstraint {
   /**

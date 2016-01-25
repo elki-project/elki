@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * TODO: make actual weighting parameterizable?
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class LinearWeightedExtendedNeighborhood implements WeightedNeighborSetPredicate {
   /**

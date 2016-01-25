@@ -79,6 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.composedOf ALOCIQuadTree
  *

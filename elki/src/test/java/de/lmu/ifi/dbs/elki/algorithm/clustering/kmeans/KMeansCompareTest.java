@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Regression test for Compare k-means.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class KMeansCompareTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

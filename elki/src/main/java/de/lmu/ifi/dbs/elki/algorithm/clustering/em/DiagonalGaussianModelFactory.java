@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * corresponds to the {@code 'VVI'} model in Mclust (R).
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has DiagonalGaussianModel
  *

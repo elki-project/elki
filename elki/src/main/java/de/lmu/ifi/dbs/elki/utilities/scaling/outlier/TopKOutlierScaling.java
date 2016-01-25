@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Outlier scaling function that only keeps the top k outliers.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class TopKOutlierScaling implements OutlierScalingFunction {
   /**

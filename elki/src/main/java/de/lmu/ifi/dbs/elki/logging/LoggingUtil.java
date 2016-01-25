@@ -35,6 +35,7 @@ import java.util.logging.Logger;
  * loop constructs.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.uses ELKILogRecord oneway - - «create»
  */

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Unit test for the Halton pseudo-Uniform distribution in ELKI.
  *
  * @author Erich Schubert
+ * @since 0.7.1
  */
 public class HaltonUniformDistributionTest extends AbstractDistributionTest implements JUnit4Test {
   public static final double[] P_CDFPDF = { //

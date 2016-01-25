@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * Interface for OPTICS type algorithms, that can be analyzed by OPTICS Xi etc.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has ClusterOrder
  */

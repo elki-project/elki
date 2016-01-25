@@ -78,6 +78,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
+ * @since 0.3
  *
  * @apiviz.composedOf JSVGSynchronizedCanvas
  * @apiviz.composedOf OverviewPlot

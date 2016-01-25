@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  * Subset array adapter (allows reordering and projection).
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <T> Entry type
  * @param <A> Array type

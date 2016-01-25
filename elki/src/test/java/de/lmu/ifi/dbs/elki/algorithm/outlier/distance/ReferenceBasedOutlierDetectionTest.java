@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.StarBasedReferencePoints;
  *
  * @author Lucia Cichella
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class ReferenceBasedOutlierDetectionTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

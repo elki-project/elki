@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.UnsynchronizedLongCounter;
  * {@link ELKILogRecord}!
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.uses LoggingConfiguration
  * @apiviz.uses ELKILogRecord oneway - - «create»

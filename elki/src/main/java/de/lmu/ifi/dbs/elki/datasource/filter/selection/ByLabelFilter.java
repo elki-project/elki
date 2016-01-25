@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * A filter to select data set by their label.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses LabelList oneway - - «reads»
  */

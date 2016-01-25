@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Gaussian distribution aka normal distribution
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Alias({ "GaussianDistribution", "normal", "gauss" })
 public class NormalDistribution extends AbstractDistribution {

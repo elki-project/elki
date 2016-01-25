@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * DBSCAN implementation when the {@code -gdbscan.core-model} flag is set.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class CoreObjectsModel extends AbstractModel implements TextWriteable {
   /**

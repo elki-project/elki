@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
  * times will be more likely to return the same local minima.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @param <O> Object type for kmedoids and kmedians
  */

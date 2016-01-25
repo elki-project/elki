@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * parameters k <= k_max of the underlying data object or MkTab-Tree node.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 interface MkTabEntry extends MTreeEntry {
   /**

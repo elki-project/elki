@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
  * These can implicitely (obviously) also handle full statistical moments.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @param <D> Distribution type
  */

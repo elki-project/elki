@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * from the same clustering, this can be useful.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class SimplifiedHierarchyExtractionEvaluator implements Evaluator {
   /**

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * HyperBoundingBox represents a hyperrectangle in the multidimensional space.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class HyperBoundingBox implements SpatialComparable, Externalizable {
   /**

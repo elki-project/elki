@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * Weighted version of the Minkowski L_p norm distance for {@link NumberVector}.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction implements WeightedNumberVectorDistanceFunction<NumberVector> {
   /**

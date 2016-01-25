@@ -29,6 +29,7 @@ import java.util.Collection;
  * Exception thrown when no supported data type was found.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses TypeInformation oneway - -
  */

@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * {@code 1-product(1-s_i)}
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class EnsembleVotingInverseMultiplicative implements EnsembleVoting {
   /**

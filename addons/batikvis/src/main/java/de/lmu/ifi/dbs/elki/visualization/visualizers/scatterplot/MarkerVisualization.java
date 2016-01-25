@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * kind of result we have a style source for.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

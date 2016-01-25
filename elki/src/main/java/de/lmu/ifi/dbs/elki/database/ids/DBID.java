@@ -34,6 +34,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * consistent across multiple results/databases.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  */

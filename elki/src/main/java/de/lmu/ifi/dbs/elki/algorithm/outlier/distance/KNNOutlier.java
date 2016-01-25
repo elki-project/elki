@@ -73,6 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  *
  * @author Lisa Reichert
+ * @since 0.3
  *
  * @apiviz.has KNNQuery
  *

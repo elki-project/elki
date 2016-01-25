@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Sascha Goldhofer
+ * @since 0.5.0
  */
 @Reference(authors = "Meilă, M.", //
 title = "Comparing clusterings by the variation of information", //

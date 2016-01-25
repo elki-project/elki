@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * indexes.
  *
  * @author Erich Schubert
+ * @since 0.5.5
  *
  * @apiviz.composedOf BundleReader
  */

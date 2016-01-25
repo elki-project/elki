@@ -77,6 +77,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  *
  * @author Erich Schubert
  * @author Guilherme Oliveira Campos
+ * @since 0.7.0
  */
 public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
   /**

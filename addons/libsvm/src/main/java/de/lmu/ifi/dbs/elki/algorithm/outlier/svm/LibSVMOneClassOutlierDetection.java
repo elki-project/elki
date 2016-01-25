@@ -70,6 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @param V vector type
  */

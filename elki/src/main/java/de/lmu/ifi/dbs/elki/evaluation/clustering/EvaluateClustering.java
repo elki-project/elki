@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Evaluate a clustering result by comparing it to an existing cluster label.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.landmark
  * @apiviz.uses ClusterContingencyTable

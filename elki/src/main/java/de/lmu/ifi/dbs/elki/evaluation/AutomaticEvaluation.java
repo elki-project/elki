@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling;
  * Evaluator that tries to auto-run a number of evaluation methods.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.landmark
  *

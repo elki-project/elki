@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
  * 
  * @author Robert Rödler
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public interface ProjectionParallel extends Projection {
   /**

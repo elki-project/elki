@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Estimate parameter of the Wald distribution.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.has WaldDistribution
  */

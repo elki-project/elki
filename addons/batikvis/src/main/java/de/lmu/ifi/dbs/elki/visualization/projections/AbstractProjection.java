@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
  * Abstract base projection class.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public abstract class AbstractProjection implements Projection {
   /**

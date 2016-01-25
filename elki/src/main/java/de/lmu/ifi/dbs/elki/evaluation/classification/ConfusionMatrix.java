@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.ClassLabel;
  * can be derived from a confusion matrix.
  * 
  * @author Arthur Zimek
+ * @since 0.7.0
  */
 public class ConfusionMatrix {
   /**

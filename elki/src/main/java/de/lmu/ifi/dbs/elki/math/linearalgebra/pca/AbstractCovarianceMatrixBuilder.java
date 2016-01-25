@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * Mostly the specification of an interface.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public abstract class AbstractCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   @Override

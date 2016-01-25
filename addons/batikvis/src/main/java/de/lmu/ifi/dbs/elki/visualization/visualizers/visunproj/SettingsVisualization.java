@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Pseudo-Visualizer, that lists the settings of the algorithm-
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»

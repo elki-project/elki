@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
  * i.e. that only need the statistical moments of a data set after logarithms.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @param <D> Distribution estimated.
  */

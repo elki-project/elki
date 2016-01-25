@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.parallel.variables;
  * Variable to share between different processors (within one thread only!)
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.has SharedObject.Instance
  * 

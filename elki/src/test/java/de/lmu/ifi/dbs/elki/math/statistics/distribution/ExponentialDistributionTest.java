@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public class ExponentialDistributionTest extends AbstractDistributionTest implements JUnit4Test {
   public static final double[] P_CDFPDF = { //

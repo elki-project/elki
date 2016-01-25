@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.Index;
  * Interface for preprocessor/index based similarity functions.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has Instance oneway - - «create»
  * @apiviz.landmark

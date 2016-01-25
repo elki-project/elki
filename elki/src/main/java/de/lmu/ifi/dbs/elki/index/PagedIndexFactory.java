@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract base class for tree-based indexes.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.stereotype factory,interface
  * @apiviz.excludeSubtypes

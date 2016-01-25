@@ -34,6 +34,12 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
+/**
+ * Test bit manipulation code.
+ * 
+ * @author Erich Schubert
+ * @since 0.5.0
+ */
 public class BitsUtilTest implements JUnit4Test {
   @Test
   public void testAgainstBigInteger() {

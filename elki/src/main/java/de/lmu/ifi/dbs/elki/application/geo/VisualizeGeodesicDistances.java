@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Niels Dörre
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public class VisualizeGeodesicDistances extends AbstractApplication {
   /**

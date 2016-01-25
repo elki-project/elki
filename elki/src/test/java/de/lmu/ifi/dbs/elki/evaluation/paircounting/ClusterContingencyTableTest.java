@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * data clusterings.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class ClusterContingencyTableTest implements JUnit4Test {
   // the following values depend on the data set used!

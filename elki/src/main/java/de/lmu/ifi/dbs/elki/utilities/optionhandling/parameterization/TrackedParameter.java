@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Class containing an object, and the associated value.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class TrackedParameter {
   /**

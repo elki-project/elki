@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Visualizer to render a simple 2D curve such as a ROC curve.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»

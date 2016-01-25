@@ -49,6 +49,7 @@ import javax.swing.event.ChangeListener;
  * additional options when saving as JPEG or PNG.
  * 
  * @author Simon Mittermüller
+ * @since 0.2
  */
 public class SaveOptionsPanel extends JPanel {
   // TODO: externalize strings

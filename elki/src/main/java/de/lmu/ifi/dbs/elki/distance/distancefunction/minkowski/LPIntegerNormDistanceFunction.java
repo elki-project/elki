@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * machine version.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.landmark
  */

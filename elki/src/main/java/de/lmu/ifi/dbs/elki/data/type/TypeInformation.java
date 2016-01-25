@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.data.type;
  * Class wrapping a particular data type.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface TypeInformation {
   /**

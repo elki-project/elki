@@ -31,6 +31,7 @@ import java.util.Random;
  *
  * @author Arthur Zimek
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.landmark
  */

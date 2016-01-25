@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * weighted neighborhoods.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class UnweightedNeighborhoodAdapter implements WeightedNeighborSetPredicate {
   /**

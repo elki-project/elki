@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Result class providing an ordering backed by a hashmap.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @param <T> Data type in hash map
  */

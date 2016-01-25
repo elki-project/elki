@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Regression tests the ParallelLOF algorithm.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class ParallelLOFTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

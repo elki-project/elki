@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * This is useful when using e.g. a distance matrix to access external data.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Description("This class generates a sequence of DBIDs to 'load' into a database. This is useful when using an external data matrix, and not requiring access to the actual vectors.")
 public class DBIDRangeDatabaseConnection implements DatabaseConnection {

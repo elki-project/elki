@@ -58,7 +58,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * TODO: allow specifying multiple quantiles.
  *
  * @author Erich Schubert
- * 
+ * @since 0.7.0
+ *
  * @param <O> Object type
  */
 public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O, CollectionResult<double[]>> {

@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * {@link de.lmu.ifi.dbs.elki.datasource.DatabaseConnection DatabaseConnection}.
  * 
  * @author Arthur Zimek
+ * @since 0.3
  * 
  * @apiviz.composedOf KDDTask
  */

@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * analyzes it using another estimator.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.uses DistributionEstimator
  * 

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * A holdout providing a seed for randomized operations.
  * 
  * @author Arthur Zimek
+ * @since 0.3
  */
 public abstract class RandomizedHoldout extends AbstractHoldout {
   /**

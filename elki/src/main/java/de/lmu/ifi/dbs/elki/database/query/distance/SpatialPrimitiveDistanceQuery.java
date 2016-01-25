@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFun
 /**
  * Distance query for spatial distance functions
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.uses SpatialPrimitiveDistanceFunction
  * 

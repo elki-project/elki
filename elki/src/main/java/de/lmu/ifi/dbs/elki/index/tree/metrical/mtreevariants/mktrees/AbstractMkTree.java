@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * k is less than or equal to the given parameter.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * @param <O> the type of DatabaseObject to be stored in the metrical index
  * @param <N> the type of MetricalNode used in the metrical index
  * @param <E> the type of MetricalEntry used in the metrical index

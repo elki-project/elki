@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * 
  * @author Thomas Bernecker
+ * @since 0.2
  */
 @Title("Longest Common Subsequence distance function")
 @Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", //

@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * estimators.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplication {
   /**

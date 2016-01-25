@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  *
  * @author Alexander Koos
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public abstract class AbstractUncertainObject implements UncertainObject {
   /**

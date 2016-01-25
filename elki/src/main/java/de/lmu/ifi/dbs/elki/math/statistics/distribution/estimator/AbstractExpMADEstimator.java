@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * Abstract base class for estimators based on the median and MAD.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @param <D> Distribution to generate.
  */

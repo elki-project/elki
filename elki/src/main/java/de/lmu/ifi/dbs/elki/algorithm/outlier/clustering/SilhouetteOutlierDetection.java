@@ -74,6 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * for citation information and BibTeX templates).
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.has ClusteringAlgorithm
  * 

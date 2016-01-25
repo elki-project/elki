@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
  * Abstract super class for all exceptions thrown during parameterization.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 @SuppressWarnings("serial")
 public abstract class ParameterException extends Exception {

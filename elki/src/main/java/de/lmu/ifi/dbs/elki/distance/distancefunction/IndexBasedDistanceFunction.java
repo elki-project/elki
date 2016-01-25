@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * Distance function relying on an index (such as preprocessed neighborhoods).
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.stereotype factory

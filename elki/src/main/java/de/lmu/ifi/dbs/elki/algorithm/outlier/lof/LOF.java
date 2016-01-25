@@ -87,6 +87,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Erich Schubert
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.has KNNQuery
  * 

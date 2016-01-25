@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.Entry;
  * belonging to this entry.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.uses Entry
  * 

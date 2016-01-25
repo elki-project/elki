@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
  * the routing object of the entry to its parent's routing object in the M-Tree.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class MTreeDirectoryEntry extends AbstractDirectoryEntry implements MTreeEntry {
   private static final long serialVersionUID = 2;

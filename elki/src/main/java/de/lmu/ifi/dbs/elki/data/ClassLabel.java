@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * other classes by a classifier.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 public abstract class ClassLabel implements Comparable<ClassLabel> {
   /**

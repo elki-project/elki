@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Unit test for pearson correlation.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class PearsonCorrelationTest implements JUnit4Test {
   @Test

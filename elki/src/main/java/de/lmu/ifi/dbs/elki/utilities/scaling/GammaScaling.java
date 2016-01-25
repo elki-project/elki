@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @author Erich Schubert
  * @author Remigius Wojdanowski
+ * @since 0.3
  */
 public class GammaScaling implements StaticScalingFunction {
   /**

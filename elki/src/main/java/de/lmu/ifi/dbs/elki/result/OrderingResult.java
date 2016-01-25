@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Interface for a result providing an object ordering.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public interface OrderingResult extends Result {
   /**

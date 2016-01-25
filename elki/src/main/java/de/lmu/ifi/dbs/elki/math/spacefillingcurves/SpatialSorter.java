@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  * Interface for spatial sorting - ZCurves, Peano curves, Hilbert curves, ...
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public interface SpatialSorter {
   /**

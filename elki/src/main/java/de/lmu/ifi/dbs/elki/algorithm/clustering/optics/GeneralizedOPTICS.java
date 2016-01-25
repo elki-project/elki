@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
  * distances, and serves as a base for several other algorithms (HiCO, HiSC).
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.composedOf Instance
  *

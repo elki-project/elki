@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * for example by adding scrambling.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 @Reference(title = "Randomized halton sequences", authors = "Wang, X. and Hickernell, F.J.", booktitle = "Mathematical and Computer Modelling Vol. 32 (7)", url = "http://dx.doi.org/10.1016/S0895-7177(00)00178-3")
 public class HaltonUniformDistribution implements Distribution {

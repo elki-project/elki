@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * </p>
  * 
  * @author Florian Nuecke
+ * @since 0.4.0
  * 
  * @param <E> Enum type
  */

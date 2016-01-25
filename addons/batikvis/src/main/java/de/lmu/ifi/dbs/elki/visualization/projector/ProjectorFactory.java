@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
  * detecting appropriate relations in the database.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.has Projector
  */

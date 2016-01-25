@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * progress suitable as a message for printing to the command line interface.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 public class FiniteProgress extends AbstractProgress {
   /**

@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 3.1.
  *
  * @author Lisa Reichert
+ * @since 0.3
  *
  * @apiviz.has KNNQuery
  *

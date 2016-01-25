@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.ensemble;
  * Interface for ensemble voting rules
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface EnsembleVoting {
   /**

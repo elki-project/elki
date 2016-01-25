@@ -33,6 +33,7 @@ package de.lmu.ifi.dbs.elki.math;
  * TODO: add caching
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public abstract class SinCosTable {
   /**

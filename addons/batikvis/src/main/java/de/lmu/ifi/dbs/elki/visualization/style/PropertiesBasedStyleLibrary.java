@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.marker.PrettyMarkers;
  * Style library loading the parameters from a properties file.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 // TODO: also use Caching for String values?
 public class PropertiesBasedStyleLibrary implements StyleLibrary {

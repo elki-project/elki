@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * TODO: Offer normalized and non-normalized variants?
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class JensenShannonEquiwidthDependenceMeasure extends AbstractDependenceMeasure {
   /**

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
  * parameters (default constructor) to be used for parameterization.
  *
  * @author Remigius Wojdanowski
+ * @since 0.3
  *
  * @apiviz.landmark
  * @apiviz.stereotype factory

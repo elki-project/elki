@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * of the {@link NumberVector}s.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  * @param <V> a certain subtype of NumberVector - the data matrix is supposed to
  *        consist of rows where each row relates to an object of type V and the
  *        columns relate to the attribute values of these objects

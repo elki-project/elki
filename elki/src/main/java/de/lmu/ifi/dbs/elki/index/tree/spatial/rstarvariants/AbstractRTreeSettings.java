@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.Top
  * Class to wrap common Rtree settings.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.composedOf BulkSplit
  * @apiviz.composedOf SplitStrategy

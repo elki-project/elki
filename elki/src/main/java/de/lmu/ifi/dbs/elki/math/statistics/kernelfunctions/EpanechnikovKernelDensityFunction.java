@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Epanechnikov kernel density estimator.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Alias({ "epanechnikov" })
 public final class EpanechnikovKernelDensityFunction implements KernelDensityFunction {

@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * robust towards outliers, and only slightly more expensive to compute.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * @param <V> vector type
  * 
  * @apiviz.uses NumberVector

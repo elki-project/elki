@@ -35,6 +35,7 @@ import org.w3c.dom.svg.SVGPoint;
  * Batik helper class with static methods.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public final class BatikUtil {
   /**

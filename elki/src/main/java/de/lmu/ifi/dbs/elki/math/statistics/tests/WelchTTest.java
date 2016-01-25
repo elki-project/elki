@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Jan Brusis
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.uses StudentsTDistribution
  */

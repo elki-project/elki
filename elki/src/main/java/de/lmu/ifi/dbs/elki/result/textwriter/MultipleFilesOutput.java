@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Manage output to multiple files.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class MultipleFilesOutput implements StreamFactory {
   /**

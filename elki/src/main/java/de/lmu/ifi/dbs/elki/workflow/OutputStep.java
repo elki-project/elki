@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * The "output" step, where data is analyzed.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.uses ResultHierarchy
  * @apiviz.has ResultHandler

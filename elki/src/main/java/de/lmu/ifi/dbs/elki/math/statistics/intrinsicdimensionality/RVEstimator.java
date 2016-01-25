@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  *
  * @author Oussama Chelly
+ * @since 0.7.0
  */
 @Reference(authors = "L. Amsaleg and O. Chelly and T. Furon and S. Girard and M. E. Houle and K. Kawarabayashi and M. Nett", //
 title = "Estimating Local Intrinsic Dimensionality", //

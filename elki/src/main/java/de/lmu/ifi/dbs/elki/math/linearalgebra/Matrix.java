@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
  *
  * @author Elke Achtert
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.landmark
  */

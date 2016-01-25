@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Class to manage saved settings in a text file.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String>>> {
   /**

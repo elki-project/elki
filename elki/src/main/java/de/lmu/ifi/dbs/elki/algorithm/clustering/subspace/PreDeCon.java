@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  * 
  * @author Peer Kröger
+ * @since 0.2
  * 
  * @apiviz.has PreDeCon.Settings
  * @apiviz.composedOf PreDeConNeighborPredicate

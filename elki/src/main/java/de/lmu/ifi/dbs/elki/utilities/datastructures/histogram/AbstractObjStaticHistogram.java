@@ -30,6 +30,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
  * left and right.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @param <T> Data type
  */

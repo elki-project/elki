@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Distance based initialization.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @param <O> Object type
  */

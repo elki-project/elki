@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * Leaf entry
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.excludeSubtypes
  */

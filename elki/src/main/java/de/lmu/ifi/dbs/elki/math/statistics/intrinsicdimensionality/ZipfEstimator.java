@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * TODO: possible to improve numerical precision via log1p?
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "M. Kratz and S. I. Resnick", //
 title = "On Least Squares Estimates of an Exponential Tail Coefficient", //

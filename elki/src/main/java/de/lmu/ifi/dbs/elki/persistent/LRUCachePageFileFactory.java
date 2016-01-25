@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Page file factory for memory page files.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.has LRUCache
  * @apiviz.composedOf PageFileFactory

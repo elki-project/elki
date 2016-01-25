@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * By default b=1, and thus the transformation is log2(1+|x|).
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @param <V> vector type
  */

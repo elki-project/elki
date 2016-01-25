@@ -40,7 +40,8 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * according to the same model)
  *
  * @author Erich Schubert
- *
+ * @since 0.2
+ * 
  * @apiviz.composedOf Distribution
  * @apiviz.composedOf AffineTransformation
  */

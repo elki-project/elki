@@ -30,6 +30,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * object reference.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public interface DoubleDBIDPair extends DBIDRef, Comparable<DoubleDBIDPair> {
   /**

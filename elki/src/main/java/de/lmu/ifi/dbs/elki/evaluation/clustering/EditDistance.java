@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Sascha Goldhofer
+ * @since 0.5.0
  */
 @Reference(authors = "Pantel, P. and Lin, D.", title = "Document clustering with committees", booktitle = "Proc. 25th ACM SIGIR conference on Research and development in information retrieval", url = "http://dx.doi.org/10.1145/564376.564412")
 public class EditDistance {

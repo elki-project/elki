@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Alias({ "centroid", "upgmc" })
 @Reference(authors = "A. K. Jain and R. C. Dubes", //

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * Type information for multi-variate time series.
  *
  * @author Sebastian Hollizeck
+ * @since 0.7.0
  *
  * @param <V> Vector type
  */

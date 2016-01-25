@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * Type information to specify that a type has a fixed dimensionality.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <V> Vector type
  */

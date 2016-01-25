@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Class representing a single CSS class.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class CSSClass {
   /**

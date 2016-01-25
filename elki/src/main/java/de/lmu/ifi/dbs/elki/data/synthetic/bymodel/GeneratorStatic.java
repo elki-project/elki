@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
  * that will return only a given set of points.
  *
  * @author Erich Schubert
+ * @since 0.2
  */
 public class GeneratorStatic implements GeneratorInterface {
   /**

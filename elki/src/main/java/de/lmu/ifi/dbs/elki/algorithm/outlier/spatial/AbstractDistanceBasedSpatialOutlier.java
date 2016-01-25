@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract base class for distance-based spatial outlier detection methods.
  * 
  * @author Ahmed Hettab
+ * @since 0.4.0
  * 
  * @param <N> Object type for neighborhood
  * @param <O> Non-spatial object type

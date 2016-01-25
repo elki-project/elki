@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * Represents a node in an M-Tree.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * @param <O> Object type
  */
 public class MTreeNode<O> extends AbstractMTreeNode<O, MTreeNode<O>, MTreeEntry> {

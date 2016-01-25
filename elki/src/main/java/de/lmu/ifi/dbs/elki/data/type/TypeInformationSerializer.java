@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * possible.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.composedOf SimpleTypeSerializer
  * @apiviz.composedOf VectorTypeSerializer

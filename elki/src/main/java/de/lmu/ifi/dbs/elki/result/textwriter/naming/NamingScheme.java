@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
  * Naming scheme implementation for clusterings.
  * 
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.uses Cluster
  */

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Parameter that represents a list of objects (in contrast to a class list parameter, they will be instanced at most once.)
  * 
  * @author Erich Schubert
+ * @since 0.3
  *
  * @param <C> Class type
  */

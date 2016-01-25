@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Unit test for external distances.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class FileBasedDoubleDistanceFunctionTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   final static String FILENAME = "data/testdata/unittests/distance/AsciiDistanceMatrix.ascii";

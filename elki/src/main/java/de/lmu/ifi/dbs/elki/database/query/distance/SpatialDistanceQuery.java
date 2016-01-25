@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFun
  * Query interface for spatial distance queries.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <V> Vector type
  */

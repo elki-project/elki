@@ -80,6 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * which has then been refined to the method published as {@link COP}
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("Simple COP: Correlation Outlier Probability")

@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * The "algorithms" step, where data is analyzed.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has Algorithm
  * @apiviz.has Result

@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Unit test for the M-tree.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class MTreeTest extends AbstractIndexStructureTest {
   /**

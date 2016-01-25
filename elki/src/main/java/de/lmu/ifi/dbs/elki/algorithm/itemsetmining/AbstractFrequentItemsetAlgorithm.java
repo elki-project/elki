@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Abstract base class for frequent itemset mining.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public abstract class AbstractFrequentItemsetAlgorithm extends AbstractAlgorithm<FrequentItemsetsResult> {
   /**

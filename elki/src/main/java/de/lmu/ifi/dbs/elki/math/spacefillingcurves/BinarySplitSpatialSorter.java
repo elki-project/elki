@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Reference(authors = "J. L. Bentley", title = "Multidimensional binary search trees used for associative searching", booktitle = "Communications of the ACM, Vol. 18 Issue 9, Sept. 1975", url = "http://dx.doi.org/10.1145/361002.361007")
 public class BinarySplitSpatialSorter extends AbstractSpatialSorter {

@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  * object, i.e. {@code hierarchy.iterChildren(object);}.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has Iter
  *

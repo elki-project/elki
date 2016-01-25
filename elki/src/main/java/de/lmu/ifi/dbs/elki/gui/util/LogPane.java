@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
  * {@link #becomeDefaultLogger()} to register as default logger in ELKI.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.uses LoggingConfiguration
  * @apiviz.uses de.lmu.ifi.dbs.elki.logging.ELKILogRecord

@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * The common use of the DeLiClu tree: indexing number vectors.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> Object type
  */

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * function.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  * 

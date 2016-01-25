@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
  * RTree insertion strategy interface.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public interface InsertionStrategy {
   /**

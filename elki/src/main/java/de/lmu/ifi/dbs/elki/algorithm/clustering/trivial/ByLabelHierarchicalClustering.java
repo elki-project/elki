@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * TODO: Noise handling (e.g. allow the user to specify a noise label pattern?)
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.data.ClassLabel
  */

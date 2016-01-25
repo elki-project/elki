@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * 
  * @author Ahmed Hettab
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <V> Vector type
  */

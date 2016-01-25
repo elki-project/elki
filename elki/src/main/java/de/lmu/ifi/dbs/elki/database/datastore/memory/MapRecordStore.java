@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
  * record.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has MapRecordStore.StorageAccessor oneway - - projectsTo
  */

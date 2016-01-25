@@ -29,6 +29,7 @@ import java.util.List;
  * Layout class.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class Layout {
   /**

@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * But from visual inspection, this might be a true positive.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class P3CTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

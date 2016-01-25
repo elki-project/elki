@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVi
  * Tool-Visualization for the tool to select axis ranges
  *
  * @author Robert Rödler
+ * @since 0.5.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

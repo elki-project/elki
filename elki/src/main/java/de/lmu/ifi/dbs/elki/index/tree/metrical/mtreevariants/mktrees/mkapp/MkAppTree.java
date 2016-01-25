@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * parameter k < kmax.
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.composedOf MkAppTreeSettings
  * @apiviz.has MkAppTreeNode oneway - - contains

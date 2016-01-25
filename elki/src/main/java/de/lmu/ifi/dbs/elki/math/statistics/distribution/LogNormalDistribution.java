@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * <tt>scipy.stats.lognorm(logstddev, shift, math.exp(logmean))</tt>
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Alias({ "lognormal" })
 public class LogNormalDistribution extends AbstractDistribution {

@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * instance
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> Database object type
  */

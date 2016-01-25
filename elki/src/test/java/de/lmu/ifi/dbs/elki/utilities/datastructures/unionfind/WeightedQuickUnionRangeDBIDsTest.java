@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
  *
  * @author Evgeniy Faerman
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class WeightedQuickUnionRangeDBIDsTest {
   @Test

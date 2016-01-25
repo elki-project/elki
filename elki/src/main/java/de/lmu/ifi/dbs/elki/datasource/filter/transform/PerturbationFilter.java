@@ -67,6 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.LongParameter;
  * </p>
  * 
  * @author Arthur Zimek
+ * @since 0.7.0
  */
 @Title("Data Perturbation for Outlier Detection Ensembles")
 @Description("A filter to perturb a datasset on read by an additive noise component, implemented for use in an outlier ensemble (this reference).")

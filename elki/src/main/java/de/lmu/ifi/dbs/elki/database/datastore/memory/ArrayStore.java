@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
  * A class to answer representation queries using the stored Array.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
  *

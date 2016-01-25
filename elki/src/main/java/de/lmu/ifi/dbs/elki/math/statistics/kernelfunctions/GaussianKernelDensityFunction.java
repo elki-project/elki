@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Gaussian kernel density estimator.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public final class GaussianKernelDensityFunction implements KernelDensityFunction {
   /**

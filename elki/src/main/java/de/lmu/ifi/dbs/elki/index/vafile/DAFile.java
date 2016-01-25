@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * 
  * @author Thomas Bernecker
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu", title = "Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations", booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06), Wien, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.23")
 public class DAFile {

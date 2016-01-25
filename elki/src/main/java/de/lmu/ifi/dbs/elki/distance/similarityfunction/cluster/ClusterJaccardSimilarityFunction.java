@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "P. Jaccard", //
 title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //

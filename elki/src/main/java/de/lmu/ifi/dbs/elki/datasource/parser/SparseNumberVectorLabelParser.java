@@ -70,6 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Arthur Zimek
+ * @since 0.2
  * 
  * @apiviz.has SparseNumberVector
  * 

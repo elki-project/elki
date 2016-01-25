@@ -31,6 +31,7 @@ package de.lmu.ifi.dbs.elki.result;
  * delegate is to keep the APIs simpler, and thus make ELKI development easier.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf ResultHierarchy
  */

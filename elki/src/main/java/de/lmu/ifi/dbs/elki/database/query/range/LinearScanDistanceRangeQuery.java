@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
  * Default linear scan range query class.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.has DistanceQuery

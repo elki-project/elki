@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * Binary heap for primitive types.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has UnsortedIter
  * @param <K> Key type

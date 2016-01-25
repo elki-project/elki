@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * Manager class to track CSS classes used in a particular SVG document.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.has de.lmu.ifi.dbs.elki.visualization.css.CSSClass
  */

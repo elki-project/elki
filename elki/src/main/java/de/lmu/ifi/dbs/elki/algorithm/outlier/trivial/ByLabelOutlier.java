@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * reference algorithm in comparisons.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class ByLabelOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

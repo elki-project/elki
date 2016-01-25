@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * General Exception to state inability to execute an operation.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 @SuppressWarnings("serial")
 public class UnableToComplyException extends Exception {

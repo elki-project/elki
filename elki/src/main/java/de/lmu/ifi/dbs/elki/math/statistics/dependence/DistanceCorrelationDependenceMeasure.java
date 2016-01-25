@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Marie Kiermeier
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "Székely, G. J., Rizzo, M. L., & Bakirov, N. K.", //
 title = "Measuring and testing dependence by correlation of distances", //

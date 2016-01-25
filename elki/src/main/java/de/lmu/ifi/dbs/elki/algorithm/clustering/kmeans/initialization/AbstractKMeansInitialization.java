@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Abstract base class for common k-means initializations.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @param <V> Vector type
  */

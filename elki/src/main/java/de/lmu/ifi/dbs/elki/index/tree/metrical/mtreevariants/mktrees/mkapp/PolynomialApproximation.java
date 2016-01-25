@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * for knn-distances consisting of parameters b0, ..., bp.
  *
  * @author Elke Achtert
+ * @since 0.2
  */
 public class PolynomialApproximation implements Externalizable {
   private static final long serialVersionUID = 1;

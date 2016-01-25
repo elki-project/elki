@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
  * Interface for an index providing preference vectors.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <NV> Vector type
  */

@@ -30,6 +30,12 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 
+/**
+ * Test parser functionality.
+ * 
+ * @author Erich Schubert
+ * @since 0.7.1
+ */
 public class ParseUtilTest implements JUnit4Test {
   @Test
   public void testParseDouble() {

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
  * Test class to test rounding of the linear scale.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  */
 public class LinearScaleTest implements JUnit4Test {

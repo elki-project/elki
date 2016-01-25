@@ -73,6 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has KMeansModel
  *

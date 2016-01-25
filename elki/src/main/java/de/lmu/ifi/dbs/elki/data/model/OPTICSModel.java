@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  * Model for an OPTICS cluster
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class OPTICSModel extends AbstractModel {
   /**

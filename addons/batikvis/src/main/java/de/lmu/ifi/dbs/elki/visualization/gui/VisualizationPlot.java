@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * SVG plot that allows visualization to schedule updates.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class VisualizationPlot extends SVGPlot {
   /**

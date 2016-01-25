@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
  * consistency in the visualizer API.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class OPTICSProjection implements Projection {
   /**

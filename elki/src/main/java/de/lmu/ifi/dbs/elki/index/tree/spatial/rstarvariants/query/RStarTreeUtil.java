@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
  * Utility class for RStar trees
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * 

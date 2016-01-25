@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  * Base interface for Model classes.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  */

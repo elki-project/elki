@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Regression test for Elkan k-means.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class KMeansElkanTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

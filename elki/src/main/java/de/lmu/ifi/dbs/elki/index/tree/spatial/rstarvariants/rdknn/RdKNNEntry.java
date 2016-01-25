@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
  * data object or RdKNN-Tree node.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 interface RdKNNEntry extends SpatialEntry {
   /**

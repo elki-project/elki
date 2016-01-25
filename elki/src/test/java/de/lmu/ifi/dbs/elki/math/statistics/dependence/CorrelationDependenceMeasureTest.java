@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * Validate correlation by comparing to the results of R.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class CorrelationDependenceMeasureTest implements JUnit4Test {
   double[][] data = { //

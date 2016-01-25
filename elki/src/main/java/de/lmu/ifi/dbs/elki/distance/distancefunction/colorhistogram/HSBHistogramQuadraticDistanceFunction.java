@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.3
  */
 @Reference(authors = "J. R. Smith, S. F. Chang", title = "VisualSEEk: a fully automated content-based image query system", booktitle = "Proceedings of the fourth ACM international conference on Multimedia 1997", url = "http://dx.doi.org/10.1145/244130.244151")
 public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanceFunction {

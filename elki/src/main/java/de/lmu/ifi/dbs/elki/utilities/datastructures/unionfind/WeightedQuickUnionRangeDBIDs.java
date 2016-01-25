@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @author Evgeniy Faerman
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "R. Sedgewick", //
 title = "1.3 Union-Find Algorithms", //

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * Unit test for dynamic time warping distance.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class DerivativeDTWDistanceFunctionTest implements JUnit4Test {
   /**

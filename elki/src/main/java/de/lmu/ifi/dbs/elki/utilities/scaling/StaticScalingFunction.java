@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
  * But will always map x to the same f(x) (given the same parameters).
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  */
 public interface StaticScalingFunction extends ScalingFunction {

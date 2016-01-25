@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
  * DBID pair using two ints for storage.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 class IntegerDBIDPair implements DBIDPair, IntegerDBIDs {
   /**

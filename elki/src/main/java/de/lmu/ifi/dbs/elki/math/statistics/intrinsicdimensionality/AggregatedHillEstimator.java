@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "R. Huisman and K. G. Koedijk and C. J. M. Kool and F. Palm", //
 title = "Tail-Index Estimates in Small Samples", //

@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
  * A boolean number type.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 public class Bit extends Number {
   /**

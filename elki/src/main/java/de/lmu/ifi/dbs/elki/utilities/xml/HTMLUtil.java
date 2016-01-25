@@ -40,6 +40,7 @@ import org.w3c.dom.Element;
  * Class with HTML related utility functions, in particular HTML generation.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class HTMLUtil {
   /**

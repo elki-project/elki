@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * TODO: add an optimized version for binary data.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Reference(authors = "M.-M. Deza and E. Deza", title = "Dictionary of distances", booktitle = "Dictionary of distances")
 public class Kulczynski2SimilarityFunction extends AbstractVectorSimilarityFunction {

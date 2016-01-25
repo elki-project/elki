@@ -35,6 +35,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * classes.
  * 
  * @see de.lmu.ifi.dbs.elki.utilities
+ * 
+ * @author Arthur Zimek
+ * @author Erich Schubert
+ * @since 0.2
  */
 public final class Util {
   /**

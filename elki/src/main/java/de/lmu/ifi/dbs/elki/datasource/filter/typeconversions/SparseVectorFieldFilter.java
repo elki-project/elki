@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * the maximum dimensionality for each vector.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @param <V> Vector type
  */

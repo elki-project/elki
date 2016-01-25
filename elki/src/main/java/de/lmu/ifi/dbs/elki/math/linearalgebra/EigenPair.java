@@ -7,6 +7,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * eigenvalue. This class is used to sort eigenpairs.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.composedOf Matrix
  */

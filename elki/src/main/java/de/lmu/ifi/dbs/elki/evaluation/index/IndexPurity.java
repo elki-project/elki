@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
  * capabilities using the Gini index.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class IndexPurity implements Evaluator {
   /**

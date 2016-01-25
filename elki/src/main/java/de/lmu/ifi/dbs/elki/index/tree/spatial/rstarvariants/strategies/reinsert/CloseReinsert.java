@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * The strategy preferred by the R*-Tree
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", //
 title = "The R*-tree: an efficient and robust access method for points and rectangles", //

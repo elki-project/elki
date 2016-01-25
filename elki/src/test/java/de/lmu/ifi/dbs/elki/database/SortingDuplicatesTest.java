@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
  * Test a corner case when sorting: duplicate keys.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class SortingDuplicatesTest implements JUnit4Test {
   @Test(timeout = 100)

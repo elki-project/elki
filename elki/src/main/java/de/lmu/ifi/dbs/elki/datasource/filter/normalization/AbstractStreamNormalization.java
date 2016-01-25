@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  * Abstract super class for all normalizations.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <V> Object type processed
  */

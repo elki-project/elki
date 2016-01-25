@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
  * Index with support for similarity range queries.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.landmark
  * @apiviz.excludeSubtypes

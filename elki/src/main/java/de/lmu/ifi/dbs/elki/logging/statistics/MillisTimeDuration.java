@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.logging.statistics;
  * Class that tracks the runtime of a task with {@code System.nanoTime()}
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class MillisTimeDuration extends AbstractStatistic implements Duration {
   /**

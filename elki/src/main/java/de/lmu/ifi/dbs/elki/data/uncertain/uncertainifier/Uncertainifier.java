@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * Class to derive uncertain object from exact vectors.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @param <UO> Object type
  *

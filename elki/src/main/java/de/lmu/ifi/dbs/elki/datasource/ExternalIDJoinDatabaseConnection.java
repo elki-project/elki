@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * Joins multiple data sources by their label
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses ExternalID
  */

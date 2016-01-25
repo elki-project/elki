@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
  * cluster sizes and the number of clusters.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class LogClusterSizes implements Evaluator {
   /**

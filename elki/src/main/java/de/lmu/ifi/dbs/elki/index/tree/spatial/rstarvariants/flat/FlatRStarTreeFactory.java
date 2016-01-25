@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
  * Factory for flat R*-Trees.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.stereotype factory
  * @apiviz.uses FlatRStarTreeIndex oneway - - «create»

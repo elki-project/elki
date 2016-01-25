@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * largest is 1, but using log_2(1+x).
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <V> vector type
  */

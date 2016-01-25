@@ -81,6 +81,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.ReferencePointsHeuristic;
  *
  * @author Lisa Reichert
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.composedOf ReferencePointsHeuristic
  */

@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * generator model information is still available.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

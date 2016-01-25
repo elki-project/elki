@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Visualize a similarity matrix with object labels
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

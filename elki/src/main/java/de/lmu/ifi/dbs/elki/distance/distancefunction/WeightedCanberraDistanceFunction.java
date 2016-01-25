@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * Weighted Canberra distance function, a variation of Manhattan distance.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class WeightedCanberraDistanceFunction extends AbstractSpatialDistanceFunction implements WeightedNumberVectorDistanceFunction<NumberVector> {
   /**

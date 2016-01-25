@@ -67,6 +67,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.Cluster
  * Generates a SVG-Element that visualizes the area covered by a cluster.
  *
  * @author Robert Rödler
+ * @since 0.5.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  * static {@link #CLUSTER} object.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  */

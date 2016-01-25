@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  * Use a double array as, well, double array in the ArrayAdapter API.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.exclude
  */

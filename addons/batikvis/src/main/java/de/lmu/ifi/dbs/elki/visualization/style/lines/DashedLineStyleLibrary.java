@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * patterns.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.composedOf ColorLibrary
  */

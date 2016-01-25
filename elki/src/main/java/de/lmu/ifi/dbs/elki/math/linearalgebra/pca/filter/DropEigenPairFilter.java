@@ -19,6 +19,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * The drop filter searches for argmax_k r_k / r_{k+1}
  *
  * @author Erich Schubert
+ * @since 0.2
  */
 @Title("Drop EigenPair Filter")
 public class DropEigenPairFilter implements EigenPairFilter {

@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Actions to use clusterings for styling.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class ClusterStyleAction extends AbstractVisFactory {
   /**

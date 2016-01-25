@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedPara
  * particular result.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class SettingsResult extends BasicResult {
   /**

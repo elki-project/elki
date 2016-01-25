@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Abstract base class for random projection families.
  *
  * @author Erich Schubert
+ * @since 0.3
  */
 public abstract class AbstractRandomProjectionFamily implements RandomProjectionFamily {
   /**

@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * API for handling different earth models.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.uses SphereUtil
  */

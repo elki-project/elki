@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * algorithm.
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.has DeLiCluNode oneway - - contains
  */

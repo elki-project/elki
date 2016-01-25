@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * before.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class FileOrderBulkSplit extends AbstractBulkSplit {
   /**

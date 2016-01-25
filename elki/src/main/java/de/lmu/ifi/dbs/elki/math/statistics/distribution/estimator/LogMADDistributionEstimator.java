@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
  * Distribuition estimators that use the method of moments (MOM) in logspace.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @param <D> Distribution estimated.
  */

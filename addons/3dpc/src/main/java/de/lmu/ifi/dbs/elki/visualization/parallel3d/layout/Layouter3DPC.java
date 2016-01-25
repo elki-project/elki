@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * Arrange parallel coordinates on a 2D plane, for 3D parallel coordinates.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @param <V> Object type
  */

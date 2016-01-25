@@ -71,6 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  *
  * @author Arthur Zimek
+ * @since 0.3
  *
  * @apiviz.has KNNQuery
  *

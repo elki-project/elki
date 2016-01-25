@@ -35,6 +35,7 @@ import java.util.zip.GZIPInputStream;
  * Various static helper methods to deal with files and file names.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class FileUtil {
   /**

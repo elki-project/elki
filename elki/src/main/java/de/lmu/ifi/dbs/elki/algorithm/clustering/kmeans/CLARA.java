@@ -66,6 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @param <V> Vector type
  */

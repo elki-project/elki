@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
  * called "range queries".
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.landmark
  * @apiviz.uses DoubleDBIDList oneway - - «create»

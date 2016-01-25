@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * in each entry of a node.
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.has MkMaxTreeNode oneway - - contains
  *

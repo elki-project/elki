@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * But it serves the purpose.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

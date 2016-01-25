@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Simple regression test for FastOPTICS.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class FastOPTICSTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

@@ -73,6 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  *
  * @author Alexander Koos
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "O. Benjelloun, A. D. Sarma, A. Halevy, J. Widom", //
 title = "ULDBs: Databases with uncertainty and lineage", //

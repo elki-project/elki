@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  * String tokenizer.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class Tokenizer implements Iter {
   /**

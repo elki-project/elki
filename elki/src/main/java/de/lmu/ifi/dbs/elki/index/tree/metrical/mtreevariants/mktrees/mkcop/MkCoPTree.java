@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * parameter k < kmax.
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.has MkCoPTreeNode oneway - - contains
  * @apiviz.has ConvexHull

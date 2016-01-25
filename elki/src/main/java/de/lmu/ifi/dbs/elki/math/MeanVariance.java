@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 @Reference(authors = "B. P. Welford", //
 title = "Note on a method for calculating corrected sums of squares and products", //

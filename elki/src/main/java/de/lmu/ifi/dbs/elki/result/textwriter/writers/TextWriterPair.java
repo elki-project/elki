@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Write a pair
  * 
  * @author Erich Schubert
+ * @since 0.2
  *
  */
 public class TextWriterPair extends TextWriterWriterInterface<Pair<?,?>> {

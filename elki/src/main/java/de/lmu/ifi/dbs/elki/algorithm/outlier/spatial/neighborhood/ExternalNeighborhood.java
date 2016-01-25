@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * A precomputed neighborhood, loaded from an external file.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
   /**

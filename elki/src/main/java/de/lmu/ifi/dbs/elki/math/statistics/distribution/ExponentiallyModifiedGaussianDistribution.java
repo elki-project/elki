@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * is a combination of a normal distribution and an exponential distribution.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Alias({ "exgaussian" })
 public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribution {

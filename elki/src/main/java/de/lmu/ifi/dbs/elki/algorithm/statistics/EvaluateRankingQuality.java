@@ -81,6 +81,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * TODO: Add sampling
  *
  * @author Erich Schubert
+ * @since 0.2
  * @param <V> Vector type
  */
 @Title("Evaluate Ranking Quality")

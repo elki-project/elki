@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileListParameter
  * Database that will loading multiple files, concatenating the results.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnection {
   /**

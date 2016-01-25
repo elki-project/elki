@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * dimensions.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFunction {
   /**

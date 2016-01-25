@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * TODO: currently, only a 3 sigma bounding box is supported.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class SimpleGaussianContinuousUncertainObject extends AbstractUncertainObject {
   /**

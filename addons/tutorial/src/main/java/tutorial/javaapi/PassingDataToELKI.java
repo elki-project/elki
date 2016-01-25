@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
  * Example program to generate a random data set, and run k-means on it.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class PassingDataToELKI {
   /**

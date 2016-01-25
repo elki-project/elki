@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
  * Interface for an index providing local PCA results.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <NV> Vector type
  */

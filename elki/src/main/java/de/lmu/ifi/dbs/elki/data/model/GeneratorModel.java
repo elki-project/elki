@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface;
  * Cluster model for synthetically generated data.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class GeneratorModel extends MeanModel {
   /**

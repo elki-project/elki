@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Performs a single assignment with different k-means initializations.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class KMeansPlusPlusInitialMeansTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

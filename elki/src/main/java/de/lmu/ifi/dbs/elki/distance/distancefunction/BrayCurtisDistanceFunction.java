@@ -67,6 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * TODO: add a version optimized for sparse vectors / binary data.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 @Alias({ "bray-curtis", "braycurtis", "sorensen", "dice", "sorensen-dice" })
 @Reference(authors = "J. R. Bray and J. T. Curtis", //

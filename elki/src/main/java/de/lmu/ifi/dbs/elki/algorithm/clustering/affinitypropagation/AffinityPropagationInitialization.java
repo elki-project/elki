@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * Initialization methods for affinity propagation.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public interface AffinityPropagationInitialization<O> {
   /**

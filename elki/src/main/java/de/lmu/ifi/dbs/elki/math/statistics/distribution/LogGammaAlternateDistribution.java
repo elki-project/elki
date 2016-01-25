@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Note: this matches the loggamma of SciPy.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class LogGammaAlternateDistribution extends AbstractDistribution {
   /**

@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Test the QuickSelect math class.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class QuickSelectTest implements JUnit4Test {
   /**

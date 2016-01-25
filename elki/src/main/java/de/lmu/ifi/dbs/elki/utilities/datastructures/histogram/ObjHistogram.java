@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
  * Basic interface for object based histograms (static and flexible).
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.has Iter
  * 

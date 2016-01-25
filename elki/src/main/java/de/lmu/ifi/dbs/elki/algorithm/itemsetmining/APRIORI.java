@@ -72,6 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @author Arthur Zimek
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.has Itemset
  * @apiviz.uses BitVector

@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  * produce values in the range of [0:1].
  * 
  * @author Erich Schubert
+ * @since 0.2
  * @param <O> object type
  */
 public interface NormalizedSimilarityFunction<O> extends SimilarityFunction<O> {

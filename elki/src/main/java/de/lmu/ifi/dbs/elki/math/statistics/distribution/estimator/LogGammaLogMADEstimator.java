@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * A modified algorithm for LogGamma distributions.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.has LogGammaDistribution - - estimates
  */

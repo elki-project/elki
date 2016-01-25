@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * object is an outlier.
  * 
  * @author Lisa Reichert
+ * @since 0.3
  * 
  * @apiviz.has EM
  * 

@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.visualization.colors;
  * Color scheme interface
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public interface ColorLibrary {
   /**

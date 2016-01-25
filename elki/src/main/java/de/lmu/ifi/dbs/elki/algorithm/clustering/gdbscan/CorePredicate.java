@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * Note the Factory/Instance split of this interface.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.has Instance
  */

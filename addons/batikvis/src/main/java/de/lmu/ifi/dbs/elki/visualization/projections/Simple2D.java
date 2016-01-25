@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
  * Dimension-selecting 2D projection.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class Simple2D extends AbstractSimpleProjection implements Projection2D {
   /**

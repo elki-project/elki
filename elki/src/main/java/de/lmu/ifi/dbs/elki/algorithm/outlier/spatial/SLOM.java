@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * still not be too useful then), which will result in divisions by zero.
  * 
  * @author Ahmed Hettab
+ * @since 0.4.0
  * 
  * @param <N> the type the spatial neighborhood is defined over
  * @param <O> the type of objects handled by the algorithm

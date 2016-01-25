@@ -74,6 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * TODO: noch nicht fertig!!!
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.has RdKNNNode
  * @apiviz.has RdKNNTreeHeader

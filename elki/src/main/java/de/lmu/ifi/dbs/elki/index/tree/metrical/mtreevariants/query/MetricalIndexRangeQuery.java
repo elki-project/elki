@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * Instance of a range query for a particular spatial index.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses AbstractMTree
  * 

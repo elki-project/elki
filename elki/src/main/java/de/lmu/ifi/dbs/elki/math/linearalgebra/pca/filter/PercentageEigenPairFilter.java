@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * eigenpairs.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 @Title("Percentage based Eigenpair filter")
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns the first eigenpairs, whose sum of eigenvalues is higher than the given percentage of the sum of all eigenvalues.")

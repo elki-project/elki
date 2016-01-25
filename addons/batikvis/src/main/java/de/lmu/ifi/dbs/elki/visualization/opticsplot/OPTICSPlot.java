@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  * Class to produce an OPTICS plot image.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.composedOf LinearScale
  * @apiviz.has ClusterOrder oneway - - renders

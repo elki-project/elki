@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Convert an input file to the more efficient ELKI bundle format.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public class ConvertToBundleApplication extends AbstractApplication {
   /**

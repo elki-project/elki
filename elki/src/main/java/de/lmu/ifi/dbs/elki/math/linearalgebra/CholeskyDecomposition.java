@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Cholesky Decomposition.
  * <P>
@@ -33,6 +32,9 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * If the matrix is not symmetric or positive definite, the constructor returns
  * a partial decomposition and sets an internal flag that may be queried by the
  * isSPD() method.
+ * 
+ * @author Arthur Zimek
+ * @since 0.2
  * 
  * @apiviz.uses Matrix - - transforms
  */

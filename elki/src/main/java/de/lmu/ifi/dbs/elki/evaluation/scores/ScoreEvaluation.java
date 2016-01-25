@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  * Compute ranking/scoring based evaluation measures.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has ScoreIter
  * @apiviz.uses Predicate

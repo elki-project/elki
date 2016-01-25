@@ -29,6 +29,7 @@ import java.util.Comparator;
  * dimension.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses SpatialComparable
  */

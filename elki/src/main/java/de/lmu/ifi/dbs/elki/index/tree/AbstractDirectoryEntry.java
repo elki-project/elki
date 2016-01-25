@@ -31,6 +31,7 @@ import java.io.ObjectOutput;
  * Abstract superclass for entries in an tree based index structure.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public abstract class AbstractDirectoryEntry implements DirectoryEntry {
   /**

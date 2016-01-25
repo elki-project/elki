@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Normalization used by HeDES
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 @Reference(authors = "H. V. Nguyen, H. H. Ang, V. Gopalkrishnan", title = "Mining Outliers with Ensemble of Heterogeneous Detectors on Random Subspaces", booktitle = "Proc. 15th International Conference on Database Systems for Advanced Applications (DASFAA 2010)", url = "http://dx.doi.org/10.1007/978-3-642-12026-8_29")
 public class HeDESNormalizationOutlierScaling implements OutlierScalingFunction {

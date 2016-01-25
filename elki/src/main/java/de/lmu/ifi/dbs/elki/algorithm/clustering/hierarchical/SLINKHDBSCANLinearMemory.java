@@ -75,6 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Title("HDBSCAN: Hierarchical Density-Based Spatial Clustering of Applications with Noise")
 @Description("Density-Based Clustering Based on Hierarchical Density Estimates")

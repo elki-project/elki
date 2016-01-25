@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * API for a spatial primitive distance function.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <V> Vector type
  */

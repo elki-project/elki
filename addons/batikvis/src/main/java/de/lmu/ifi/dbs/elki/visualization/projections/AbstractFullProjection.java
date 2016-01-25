@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
  * clear use case that cannot be done by the low level fast projections.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public abstract class AbstractFullProjection extends AbstractProjection implements FullProjection {
   /**

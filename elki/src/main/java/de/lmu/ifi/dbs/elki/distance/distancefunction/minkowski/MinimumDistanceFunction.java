@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Maximum distance for {@link NumberVector}s.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 @Alias({ "minimum", "min", "de.lmu.ifi.dbs.elki.distance.distancefunction.MinimumDistanceFunction" })
 public class MinimumDistanceFunction extends AbstractSpatialNorm {

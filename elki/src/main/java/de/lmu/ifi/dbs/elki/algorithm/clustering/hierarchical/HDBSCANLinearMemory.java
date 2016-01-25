@@ -74,6 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @param <O> Object type
  */

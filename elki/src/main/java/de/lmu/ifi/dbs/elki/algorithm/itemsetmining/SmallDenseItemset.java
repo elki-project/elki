@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * APRIORI itemset.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class SmallDenseItemset extends Itemset {
   /**

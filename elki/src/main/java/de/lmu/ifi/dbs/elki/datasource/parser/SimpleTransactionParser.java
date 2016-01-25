@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * of tokens.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.has BitVector
  */

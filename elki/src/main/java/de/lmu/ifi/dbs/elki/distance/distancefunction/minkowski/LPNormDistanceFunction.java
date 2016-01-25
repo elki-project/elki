@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * LP-Norm for {@link NumberVector}s.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  * 
  * @apiviz.landmark
  */

@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * also we need to do the instantiations our way with the parameterizable API.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class ELKIServiceLoader {
   /**

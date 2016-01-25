@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.database.datastore;
  * {@link DataStore}.
  *
  * @author Elke Achtert
+ * @since 0.4.0
  *
  * @apiviz.uses DataStoreEvent oneway - - listens
  * @apiviz.excludeSubtypes

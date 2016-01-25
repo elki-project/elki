@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * to use APIs.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class Centroid implements NumberVector {
   /**

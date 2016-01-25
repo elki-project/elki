@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * TODO: support acceleration for sparse vectors
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "E. Hellinger", //
 title = "Neue Begründung der Theorie quadratischer Formen von unendlichvielen Veränderlichen", //

@@ -71,6 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleObjectMinHeap;
  * TODO: allow insertions and removals, as in the original publication.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has CoverTreeRangeQuery
  * @apiviz.has CoverTreeKNNQuery

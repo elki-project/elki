@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * faster but less accurate than the Haversince or Vincenty's formula.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class SphericalCosineEarthModel extends AbstractEarthModel {
   /**

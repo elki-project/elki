@@ -30,6 +30,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  * normalized according to the maximum or standard deviation.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public interface WeightFunction {
   /**

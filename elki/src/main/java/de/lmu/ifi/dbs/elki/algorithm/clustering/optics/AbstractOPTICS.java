@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @author Elke Achtert
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @param <O> the type of DatabaseObjects handled by the algorithm
  */

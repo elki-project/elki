@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * Interface for a collection of database references (IDs).
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.composedOf DBID

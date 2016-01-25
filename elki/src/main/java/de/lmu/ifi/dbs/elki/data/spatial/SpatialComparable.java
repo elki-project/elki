@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.data.spatial;
  * Defines the required methods needed for comparison of spatial objects.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.excludeSubtypes

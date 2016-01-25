@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * Visualize the mean of a KMeans-Clustering
  *
  * @author Heidi Kolb
+ * @since 0.5.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

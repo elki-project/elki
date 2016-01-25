@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Utility functionality for writing clustering algorithms.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class ClusteringAlgorithmUtil {
   /**

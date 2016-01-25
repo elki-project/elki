@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressTracker;
  * Handler that handles output to the console with clever formatting.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.composedOf ProgressTracker
  * @apiviz.uses LogRecord oneway - - processes

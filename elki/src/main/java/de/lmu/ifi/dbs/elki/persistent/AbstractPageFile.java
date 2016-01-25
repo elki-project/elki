@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
  * (in-memory and on-disk).
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <P> page type
  */

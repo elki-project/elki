@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  *
  * @author Alexander Koos
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class UniformContinuousUncertainObject extends AbstractUncertainObject {
   /**

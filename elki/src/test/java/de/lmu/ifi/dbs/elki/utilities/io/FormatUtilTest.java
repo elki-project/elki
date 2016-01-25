@@ -29,6 +29,12 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 
+/**
+ * Test formatting code.
+ * 
+ * @author Erich Schubert
+ * @since 0.6.0
+ */
 public class FormatUtilTest implements JUnit4Test {
   @Test
   public void testStringSize() {

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * reorganizing the objects into a real array.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.landmark
  * @apiviz.composedOf ArrayAdapter

@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
  * combined implementations of both.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> Object type
  */

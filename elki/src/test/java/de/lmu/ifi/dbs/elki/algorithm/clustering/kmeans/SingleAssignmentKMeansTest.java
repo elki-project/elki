@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * work, as a side effect).
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class SingleAssignmentKMeansTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

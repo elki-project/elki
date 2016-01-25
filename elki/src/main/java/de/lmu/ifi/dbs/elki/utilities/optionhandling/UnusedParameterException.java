@@ -23,9 +23,11 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Thrown by OptionHandler in case of request of an unused parameter.
+ * 
+ * @author Arthur Zimek
+ * @since 0.2
  */
 @SuppressWarnings("serial")
 public class UnusedParameterException extends ParameterException {

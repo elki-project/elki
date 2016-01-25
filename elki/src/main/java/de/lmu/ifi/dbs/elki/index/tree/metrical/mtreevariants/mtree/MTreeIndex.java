@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * Class for using an m-tree as database index.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <O> Object type
  */

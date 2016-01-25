@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
  * Writable data store for double values.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class MapIntegerDBIDIntegerStore implements WritableIntegerDataStore {
   /**

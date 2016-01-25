@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * Bundle streams that add new columns are not supported.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.uses BundleStreamSource - - «reads»
  * @apiviz.uses WritableByteChannel - - «writes»

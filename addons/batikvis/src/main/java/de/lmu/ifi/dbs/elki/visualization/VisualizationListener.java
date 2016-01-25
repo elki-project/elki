@@ -29,6 +29,7 @@ import java.util.EventListener;
  * Listener for visualization events.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface VisualizationListener extends EventListener {
   /**

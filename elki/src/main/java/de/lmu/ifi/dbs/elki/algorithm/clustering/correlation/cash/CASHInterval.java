@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * and a set of objects ids associated with this interval.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.has de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash.CASHIntervalSplit
  */

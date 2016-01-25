@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * @author Robert Rödler
+ * @since 0.7.0
  */
 @Reference(authors = "Elke Achtert, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
 title = "Interactive Data Mining with 3D-Parallel-Coordinate-Trees", //

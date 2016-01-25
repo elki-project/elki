@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * single file. All pages are stored in a specified directory.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.composedOf PageHeader
  * @apiviz.composedOf RandomAccessFile

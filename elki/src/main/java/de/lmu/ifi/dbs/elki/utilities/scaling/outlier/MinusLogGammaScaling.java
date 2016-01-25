@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
 title = "Interpreting and Unifying Outlier Scores", //

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
  * objects that implement the <code>Page</code> interface.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  * 
  * @param <P> Page type
  */

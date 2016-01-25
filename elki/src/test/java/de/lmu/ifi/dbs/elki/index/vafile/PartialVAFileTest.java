@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Unit test for the partial VAfile index.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class PartialVAFileTest extends AbstractIndexStructureTest {
   /**

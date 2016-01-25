@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * Scale another outlier score using the given scaling function.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf OutlierAlgorithm
  */

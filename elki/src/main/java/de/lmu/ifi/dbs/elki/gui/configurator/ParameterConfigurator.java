@@ -29,12 +29,40 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParameters;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
+/**
+ * Interface for different configuration assistants for the multistep GUI.
+ * 
+ * @author Erich Schubert
+ * @since 0.4.0
+ */
 public interface ParameterConfigurator {
+  /**
+   * Add a parameter to the panel.
+   * 
+   * @param owner Owning ("parent") object
+   * @param param Parameter
+   * @param track Parameter tracker
+   */
   public void addParameter(Object owner, Parameter<?> param, TrackParameters track);
 
+  /**
+   * Add a change listener
+   * 
+   * @param listener Change listener
+   */
   public void addChangeListener(ChangeListener listener);
 
+  /**
+   * Remove a change listener
+   * 
+   * @param listener Change listener
+   */
   public void removeChangeListener(ChangeListener listener);
 
+  /**
+   * Append the parameters to a list.
+   * 
+   * @param params Parameter list (output)
+   */
   public void appendParameters(ListParameterization params);
 }

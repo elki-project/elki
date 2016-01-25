@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleArrayListPa
  * correspond to the value of a integer parameter ({@link IntParameter}) given.
  * 
  * @author Steffi Wanka
+ * @since 0.2
  */
 public class GlobalVectorListElementSizeConstraint implements GlobalParameterConstraint {
   /**

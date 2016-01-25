@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * a normal distribution.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class LogRankingPseudoOutlierScaling implements OutlierScalingFunction {
   /**

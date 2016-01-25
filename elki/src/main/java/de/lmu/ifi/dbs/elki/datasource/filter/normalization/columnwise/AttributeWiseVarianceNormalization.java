@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * given mean and standard deviation in each dimension.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * @param <V> vector type
  * 
  * @apiviz.uses NumberVector

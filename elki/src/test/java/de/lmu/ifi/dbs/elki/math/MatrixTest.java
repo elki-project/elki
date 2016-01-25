@@ -30,6 +30,12 @@ import org.junit.Test;
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
+/**
+ * Test some basic matrix operations.
+ *
+ * @author Erich Schubert
+ * @since 0.4.0
+ */
 public class MatrixTest implements JUnit4Test {
 
   @Test

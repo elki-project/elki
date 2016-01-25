@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Pseudo-representation that is the object ID itself.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class DBIDView extends AbstractRelation<DBID> {
   /**

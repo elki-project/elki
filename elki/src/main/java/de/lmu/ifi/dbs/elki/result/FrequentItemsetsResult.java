@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Result class for Apriori Algorithm.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class FrequentItemsetsResult extends BasicResult implements TextWriteable {
   /**

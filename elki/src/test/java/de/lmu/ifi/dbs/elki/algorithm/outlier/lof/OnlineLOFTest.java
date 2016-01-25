@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * BUG: This currently does not appear to work correctly!
  *
  * @author Elke Achtert
+ * @since 0.4.0
  */
 @Ignore
 public class OnlineLOFTest implements JUnit4Test {

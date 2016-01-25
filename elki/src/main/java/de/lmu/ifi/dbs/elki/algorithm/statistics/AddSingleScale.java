@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * FIXME: this should become part of relation metadata.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Description("Setup a scaling so that all dimensions are scaled equally in visualization.")
 public class AddSingleScale implements Algorithm {

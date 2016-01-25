@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.logging.statistics;
  * Abstract base interface for statistics tracking.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface Statistic {
   /**

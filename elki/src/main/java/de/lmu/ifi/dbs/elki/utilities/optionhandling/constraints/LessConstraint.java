@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
  * constraint value.
  * 
  * @author Steffi Wanka
+ * @since 0.2
  */
 public class LessConstraint extends AbstractNumberConstraint<Number> {
   /**

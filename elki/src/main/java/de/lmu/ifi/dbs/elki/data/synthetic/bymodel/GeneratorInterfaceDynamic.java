@@ -30,6 +30,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
  * and the generation of additional new points.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public interface GeneratorInterfaceDynamic extends GeneratorInterface {
   /**

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable;
  * Processor executor.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.parallel.processor.Processor
  * @apiviz.uses SharedVariable

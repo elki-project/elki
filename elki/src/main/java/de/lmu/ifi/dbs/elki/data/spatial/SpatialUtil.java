@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
  * Utility class with spatial functions.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * 

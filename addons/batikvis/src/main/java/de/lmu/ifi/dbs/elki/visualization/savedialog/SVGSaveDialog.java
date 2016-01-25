@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * </ul>
  * 
  * @author Simon Mittermüller
+ * @since 0.2
  * 
  * @apiviz.composedOf SaveOptionsPanel
  */

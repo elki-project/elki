@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
  * appropriately, the score is only used to detect ties.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class FilteredDistanceResultAdapter extends DistanceResultAdapter {
   /**

@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * Empty DBID collection.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.composedOf EmptyDBIDIterator
  */

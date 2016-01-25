@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Parameterization handler that only allows the use of default values.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class EmptyParameterization extends AbstractParameterization {  
   @Override

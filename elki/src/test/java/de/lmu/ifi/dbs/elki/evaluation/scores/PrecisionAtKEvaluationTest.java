@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
  * Test precision@k evaluation.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class PrecisionAtKEvaluationTest implements JUnit4Test {
   /**

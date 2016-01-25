@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * 
  * @author Lisa Reichert
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.landmark
  * @apiviz.uses OutlierResult

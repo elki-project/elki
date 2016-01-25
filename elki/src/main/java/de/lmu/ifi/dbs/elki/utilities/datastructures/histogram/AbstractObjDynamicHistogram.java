@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * into the histogram.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @param <T> Data type
  */

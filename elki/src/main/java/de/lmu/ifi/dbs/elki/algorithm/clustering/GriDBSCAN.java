@@ -86,6 +86,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.7.1
  * 
  * @apiviz.composedOf Instance
  * 

@@ -32,6 +32,12 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 
+/**
+ * Test the polygon class.
+ * 
+ * @author Erich Schubert
+ * @since 0.4.0
+ */
 public class PolygonTest implements JUnit4Test {
   @Test
   public void testPolygonContainment() {

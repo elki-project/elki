@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * not.
  * 
  * @author Steffi Wanka
+ * @since 0.2
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag
  * @apiviz.uses 

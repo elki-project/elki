@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  *
  * @author Evgeniy Faerman
+ * @since 0.3
  */
 @Reference(authors = "M.S. Charikar", //
 title = "Similarity estimation techniques from rounding algorithms", //

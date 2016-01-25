@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * Reasonable default choice for a {@link CovarianceMatrixBuilder}
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.uses CovarianceMatrix
  */

@@ -33,6 +33,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * 
  * As such, for each ring (= clustering), a cluster number (or the constant
  * {@link #UNCLUSTERED}) is stored.
+ *
+ * @author Sascha Goldhofer
+ * @author Erich Schubert
+ * @since 0.5.0
  */
 public class Segment implements Comparable<Segment> {
   /**

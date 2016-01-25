@@ -31,6 +31,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * {@link de.lmu.ifi.dbs.elki.database.ids.DBIDUtil#newHeap}!
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.landmark
  * 

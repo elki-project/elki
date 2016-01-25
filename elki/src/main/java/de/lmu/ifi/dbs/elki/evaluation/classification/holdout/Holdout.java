@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
  * pairs of training and test data sets.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.uses MultipleObjectsBundle
  * @apiviz.has TrainingAndTestSet

@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * correct.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.DynamicParameters.RemainingOptions
  */

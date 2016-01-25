@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.utilities.ensemble;
  * Simple combination rule, by taking the minimum.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class EnsembleVotingMin implements EnsembleVoting {
   /**

@@ -77,6 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @param <V> Vector type
  */

@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  *
  * @author Steffi Wanka
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.uses ELKIServiceRegistry
  *

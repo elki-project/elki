@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * A simple dragable area for Batik.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has DragListener
  * @apiviz.has Element

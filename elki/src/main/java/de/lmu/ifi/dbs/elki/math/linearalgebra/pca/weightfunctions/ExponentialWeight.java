@@ -36,6 +36,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  * -2.3025850929940455 is log(-.1) to achieve the intended range of 1.0 - 0.1
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class ExponentialWeight implements WeightFunction {
   /**

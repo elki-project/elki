@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * A filter to sort the data set by some label.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.data.LabelList oneway - - «reads»
  */

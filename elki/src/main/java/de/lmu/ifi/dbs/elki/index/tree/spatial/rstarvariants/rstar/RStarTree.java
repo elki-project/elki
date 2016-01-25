@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * for certain object in the structure and ensures persistence.
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.has RStarTreeNode oneway - - contains
  */

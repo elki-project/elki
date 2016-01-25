@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
  *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
+ * @since 0.3
  *
  * @apiviz.composedOf VisualizerParameterizer
  * @apiviz.uses ResultWindow oneway

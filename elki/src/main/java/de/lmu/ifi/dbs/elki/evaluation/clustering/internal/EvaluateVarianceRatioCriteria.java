@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  *
  * @author Stephan Baier
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.composedOf NoiseHandling
  */

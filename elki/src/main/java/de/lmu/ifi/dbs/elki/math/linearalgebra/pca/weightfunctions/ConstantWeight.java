@@ -30,6 +30,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  * The result is always 1.0
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class ConstantWeight implements WeightFunction {
   /**

@@ -66,6 +66,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Dendrogram visualizer.
  *
  * @author Erich Schubert
+ * @since 0.7.1
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

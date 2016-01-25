@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Class to help keeping track of the materialized layers of the different visualizations.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.has PlotItem
  * @apiviz.has VisualizationTask

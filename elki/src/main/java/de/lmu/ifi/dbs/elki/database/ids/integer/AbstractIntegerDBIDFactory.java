@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FixedSizeByteBufferSerializer;
  * Abstract base class for DBID factories.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses IntegerDBID oneway - - «create»
  * @apiviz.uses IntegerDBIDPair oneway - - «create»

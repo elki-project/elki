@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * Abstract super class for all spatial index tree classes.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.landmark
  * @apiviz.has SpatialNode oneway - - contains

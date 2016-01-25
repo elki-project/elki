@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf EarthModel
  */

@@ -44,6 +44,7 @@ import gnu.trove.map.TIntFloatMap;
  * value.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 public class SparseFloatVector extends AbstractNumberVector implements SparseNumberVector {
   /**

@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * <tt>#</tt>.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <V> Vector type
  */

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * AbstractNumberVector is an abstract implementation of FeatureVector.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 public abstract class AbstractNumberVector implements NumberVector {
   /**

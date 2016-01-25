@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * {@link NumberVector}s.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class WeightedMaximumDistanceFunction extends WeightedLPNormDistanceFunction {
   /**

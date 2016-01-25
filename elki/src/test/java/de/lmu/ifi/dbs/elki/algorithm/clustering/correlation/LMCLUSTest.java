@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Test the LMCLUS algorithm.
  *
  * @author Erich Schubert
+ * @since 0.3
  */
 public class LMCLUSTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
  * within this class.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public final class OptionID {
   /**

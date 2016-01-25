@@ -31,6 +31,7 @@ import javax.media.opengl.GL2;
  * TODO: make color configurable?
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public abstract class AbstractSimpleOverlay {
   /**

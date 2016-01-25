@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
  * processing and Lloyd-Style batch steps.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.has KMeansModel
  *

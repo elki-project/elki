@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
  * and the values of the underlying data object.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialEntry, NumberVector {
   /**

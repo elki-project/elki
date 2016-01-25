@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Apply a projection to the data.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.composedOf Projection
  * 

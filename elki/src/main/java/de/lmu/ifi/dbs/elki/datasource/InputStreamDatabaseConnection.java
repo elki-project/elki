@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Database connection expecting input from an input stream such as stdin.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  * 
  * @apiviz.uses Parser oneway - - runs
  */

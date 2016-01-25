@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * Parameter for random generators and/or random seeds.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public class RandomParameter extends AbstractParameter<RandomParameter, RandomFactory> {
   /**

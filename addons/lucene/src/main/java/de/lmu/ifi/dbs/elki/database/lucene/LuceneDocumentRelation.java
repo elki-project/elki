@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Relation representing the Lucene document.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class LuceneDocumentRelation extends AbstractRelation<Document> {
   /**

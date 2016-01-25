@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * This implementation is O(n^2), and uses O(n^2) memory.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @param <O> Data type
  */

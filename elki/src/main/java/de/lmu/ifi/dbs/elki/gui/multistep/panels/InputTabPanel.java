@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * Panel to handle data input.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class InputTabPanel extends ParameterTabPanel {
   /**

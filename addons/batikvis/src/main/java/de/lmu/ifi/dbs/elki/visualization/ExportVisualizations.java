@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * visualizers to run.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.composedOf VisualizerParameterizer
  */

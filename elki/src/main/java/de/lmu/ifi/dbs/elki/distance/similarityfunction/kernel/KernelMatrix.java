@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * Kernel matrix representation.
  * 
  * @author Simon Paradies
+ * @since 0.2
  * 
  * @apiviz.uses PrimitiveSimilarityFunction
  */

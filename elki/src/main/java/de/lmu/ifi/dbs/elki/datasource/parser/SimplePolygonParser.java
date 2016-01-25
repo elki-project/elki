@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
  * Unparseable parts will be treated as labels.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has PolygonsObject
  */

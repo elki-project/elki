@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
  * Run a database query in a database context.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.uses PrimitiveDistanceFunction

@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * algorithm.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class AnderbergHierarchicalClusteringTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   // TODO: add more data sets.

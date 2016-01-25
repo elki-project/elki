@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 @Reference(authors = "G. N. Lance, W. T. Williams", //
 title = "Computer programs for hierarchical polythetic classification (similarity analyses)", //

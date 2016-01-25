@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.StackedIter;
  * Tree - actually a forest - to manage visualizations.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has Handler1
  * @apiviz.has Handler2

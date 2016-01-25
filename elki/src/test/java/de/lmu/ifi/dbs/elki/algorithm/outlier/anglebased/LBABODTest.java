@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Note: we don't implement JUnit4Test, as this test is slow.
  *
  * @author Lucia Cichella
+ * @since 0.4.0
  */
 public class LBABODTest extends AbstractSimpleAlgorithmTest {
   @Test

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Class to compute the dimension similarity based on covariances.
  *
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public class CovarianceDimensionSimilarity implements DimensionSimilarity<NumberVector> {
   /**

@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.result.ResultListener;
  * Class to manage database events such as insertions and removals.
  *
  * @author Elke Achtert
+ * @since 0.4.0
  * @apiviz.has ResultListener
  */
 public class DatabaseEventManager {

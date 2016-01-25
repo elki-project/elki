@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
  * Compute a similarity matrix for a distance function.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has SimilarityMatrix oneway - - «create»
  * 

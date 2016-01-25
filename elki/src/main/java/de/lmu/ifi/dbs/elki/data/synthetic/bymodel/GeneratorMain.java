@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * be as expected.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.has GeneratorInterface
  */

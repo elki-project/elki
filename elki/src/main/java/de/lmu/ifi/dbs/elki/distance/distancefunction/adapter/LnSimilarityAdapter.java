@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunct
  * <code>-log(sim)</code>.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.has Instance
  * 

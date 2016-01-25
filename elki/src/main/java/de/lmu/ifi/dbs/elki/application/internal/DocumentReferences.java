@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * Build a reference documentation for all available parameters.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.uses Reference
  */

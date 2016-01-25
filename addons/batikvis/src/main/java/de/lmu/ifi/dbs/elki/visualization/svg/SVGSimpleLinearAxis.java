@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * Class to draw a simple axis with tick marks on the plot.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.uses CSSClass
  * @apiviz.uses CSSClassManager

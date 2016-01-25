@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  * Abstract super class for constraints dealing with a certain number value.
  *
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.uses 
  *              de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter

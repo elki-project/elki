@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
  * 
  * @author Erich Schubert
  * @author Robert Rödler
+ * @since 0.5.5
  * 
  * @apiviz.uses SVGPath
  */

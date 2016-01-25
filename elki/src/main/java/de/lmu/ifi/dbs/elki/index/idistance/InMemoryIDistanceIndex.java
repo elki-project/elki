@@ -87,6 +87,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <O> Object type
  */

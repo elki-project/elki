@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
  * Class to launch ELKI.
  *
  * @author Erich Schubert
+ * @since 0.5.5
  *
  * @apiviz.uses AbstractApplication
  */

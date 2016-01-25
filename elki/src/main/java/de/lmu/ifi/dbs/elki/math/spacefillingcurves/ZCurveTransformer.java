@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * Class to transform a relation to its Z coordinates.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class ZCurveTransformer {
   /**

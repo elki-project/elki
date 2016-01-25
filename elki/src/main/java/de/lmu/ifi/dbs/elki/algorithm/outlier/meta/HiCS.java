@@ -94,6 +94,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Jan Brusis
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.composedOf GoodnessOfFitTest
  * @apiviz.composedOf OutlierAlgorithm

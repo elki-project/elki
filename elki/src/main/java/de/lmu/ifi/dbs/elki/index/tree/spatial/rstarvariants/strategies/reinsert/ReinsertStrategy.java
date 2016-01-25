@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
  * Reinsertion strategy to resolve overflows in the RStarTree.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public interface ReinsertStrategy {
   /**

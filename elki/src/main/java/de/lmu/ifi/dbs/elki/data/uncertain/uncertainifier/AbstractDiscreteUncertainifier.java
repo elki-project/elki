@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Factory class for discrete uncertain objects.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @param <UO> Uncertain object type.
  */

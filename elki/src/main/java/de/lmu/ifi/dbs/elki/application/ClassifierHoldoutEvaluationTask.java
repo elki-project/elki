@@ -83,6 +83,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * TODO: add support for predefined test and training pairs!
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <O> Object type
  */

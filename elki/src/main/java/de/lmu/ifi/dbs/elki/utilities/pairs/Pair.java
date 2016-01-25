@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * meaningful field names and comparators.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @param <FIRST> first type
  * @param <SECOND> second type

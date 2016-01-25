@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * the original database.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @param <O> Object type
  * 

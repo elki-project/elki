@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * however, is constant.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "S. D. Lee, B. Kao, R. Cheng", //
 title = "Reducing UK-means to K-means", //

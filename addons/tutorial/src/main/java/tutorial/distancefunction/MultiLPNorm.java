@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * function tutorial</a>
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class MultiLPNorm extends AbstractNumberVectorDistanceFunction {
 	/**

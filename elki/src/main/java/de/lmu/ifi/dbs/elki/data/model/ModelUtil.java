@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * Utility classes for dealing with cluster models.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.uses Model
  * @apiviz.uses NumberVector

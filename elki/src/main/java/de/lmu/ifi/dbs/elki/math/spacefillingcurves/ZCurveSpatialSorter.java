@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  * materialization of the Z indexes.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class ZCurveSpatialSorter extends AbstractSpatialSorter {
   private static final double STOPVAL = 1E-10;

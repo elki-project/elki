@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * Default class to handle 2D projected visualizations.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.landmark
  * @apiviz.has Projection2D

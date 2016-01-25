@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * TODO: offer radio buttons when just a few choices are available?
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses EnumParameter
  */

@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
  * Use the static instance from {@link ArrayLikeUtil}!
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <F> Feature type
  */

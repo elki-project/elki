@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * sense when you have data that has been mean-variance normalized before.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <V> Object type
  * 

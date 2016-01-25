@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * k is less than or equal to the given parameter.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.has MkTreeHeader oneway
  * @apiviz.composedOf MkTreeSettings

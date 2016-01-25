@@ -41,6 +41,7 @@ import org.junit.Test;
  * regular PriorityQueue.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class HeapPerformanceTest {
   final private int queueSize = 200000;

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Estimate the uniform distribution by computing min and max.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.has UniformDistribution - - estimates
  */

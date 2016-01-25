@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Elke Achtert
  * @author Erich Schubert
  * @author Katharina Rausch
+ * @since 0.3
  */
 public class DBSCANTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

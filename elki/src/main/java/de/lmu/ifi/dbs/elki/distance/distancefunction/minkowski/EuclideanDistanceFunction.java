@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Euclidean distance for {@link NumberVector}s.
  *
  * @author Arthur Zimek
+ * @since 0.2
  */
 @Alias({ "euclidean", "euclid", "l2", "EuclideanDistanceFunction", "de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction" })
 public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {

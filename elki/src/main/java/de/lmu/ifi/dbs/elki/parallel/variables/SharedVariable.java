@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.parallel.variables;
  * Shared variables storing a particular type.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.has SharedVariable.Instance
  * 

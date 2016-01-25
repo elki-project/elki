@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * equation.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has Instance
  * 

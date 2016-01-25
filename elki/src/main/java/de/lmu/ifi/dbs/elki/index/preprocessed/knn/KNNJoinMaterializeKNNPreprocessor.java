@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Class to materialize the kNN using a spatial join on an R-tree.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @param <V> vector type
  */

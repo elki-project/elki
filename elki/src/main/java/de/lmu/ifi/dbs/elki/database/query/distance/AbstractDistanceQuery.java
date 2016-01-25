@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * distances.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param O Input object type
  */

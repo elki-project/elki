@@ -39,6 +39,7 @@ import gnu.trove.map.TIntDoubleMap;
  * Vector using a dense bit set encoding, based on {@code long[]} storage.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  * 
  * @apiviz.composedOf Bit
  */

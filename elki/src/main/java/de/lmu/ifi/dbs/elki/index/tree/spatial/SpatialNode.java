@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.Node;
  * leaf node.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.composedOf SpatialEntry
  * 

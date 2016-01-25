@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layout.Edge;
  * Abstract class for dimension similarity based layouters.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public abstract class AbstractLayout3DPC<N extends Layout.Node> implements SimilarityBasedLayouter3DPC<NumberVector> {
   /**

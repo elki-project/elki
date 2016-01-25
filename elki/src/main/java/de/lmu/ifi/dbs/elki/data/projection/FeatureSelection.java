@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * Projection class for number vectors.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.uses FeatureVector
  * 

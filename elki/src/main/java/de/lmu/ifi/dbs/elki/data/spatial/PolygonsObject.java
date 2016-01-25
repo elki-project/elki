@@ -31,6 +31,7 @@ import java.util.Iterator;
  * Object representation consisting of (multiple) polygons.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has Polygon
  */

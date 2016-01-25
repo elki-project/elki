@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * Panel to handle result output / visualization
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class OutputTabPanel extends ParameterTabPanel {
   /**

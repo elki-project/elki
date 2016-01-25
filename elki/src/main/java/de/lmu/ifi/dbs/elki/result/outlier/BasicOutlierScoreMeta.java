@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * {@link OutlierScoreMeta} interface.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class BasicOutlierScoreMeta implements OutlierScoreMeta {
   /**

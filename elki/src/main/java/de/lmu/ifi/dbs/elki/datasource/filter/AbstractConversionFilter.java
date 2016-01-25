@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Abstract base class for simple conversion filters such as normalizations and projections.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <I> Input object type
  * @param <O> Input object type

@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
  * Test to validate ROC curve computation.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class ROCEvaluationTest implements JUnit4Test {
   /**

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
  * this initialization will only return members of the original data set.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @param <V> Object type
  */

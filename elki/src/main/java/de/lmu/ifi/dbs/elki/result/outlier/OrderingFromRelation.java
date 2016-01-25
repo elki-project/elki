@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * Ordering obtained from an outlier score.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses DoubleRelation
  */

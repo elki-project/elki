@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * A filter to remove entries that have missing values.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.NoMissingValuesFilter" })
 public class NoMissingValuesFilter extends AbstractStreamFilter {

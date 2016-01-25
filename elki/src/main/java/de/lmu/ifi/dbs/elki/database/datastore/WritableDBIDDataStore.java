@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * Data store specialized for doubles. Avoids boxing/unboxing.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface WritableDBIDDataStore extends DBIDDataStore, WritableDataStore<DBID> {
   /**

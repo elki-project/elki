@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Normalize vectors such that they have zero mean and unit variance.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <V> vector type
  */

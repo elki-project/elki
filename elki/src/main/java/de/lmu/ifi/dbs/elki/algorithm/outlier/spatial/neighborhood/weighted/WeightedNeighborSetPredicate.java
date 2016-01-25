@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * Neighbor predicate with weight support.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface WeightedNeighborSetPredicate {
   /**

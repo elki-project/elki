@@ -43,6 +43,7 @@ import gnu.trove.list.array.TIntArrayList;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "R. Sedgewick", //
 title = "1.3 Union-Find Algorithms", //

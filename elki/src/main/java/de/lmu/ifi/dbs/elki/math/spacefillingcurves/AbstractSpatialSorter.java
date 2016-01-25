@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  * Abstract base class for spatial sorters, offering shared functionality.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public abstract class AbstractSpatialSorter implements SpatialSorter {
   /**

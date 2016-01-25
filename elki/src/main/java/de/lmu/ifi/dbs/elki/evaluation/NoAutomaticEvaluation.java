@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * evaluation to run.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class NoAutomaticEvaluation implements Evaluator {
   @Override

@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.uses GaussianRandomProjectionFamily
  */

@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * Perform agglomerative hierarchical clustering, using the naive algorithm.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class AGNESTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   // TODO: add more data sets.

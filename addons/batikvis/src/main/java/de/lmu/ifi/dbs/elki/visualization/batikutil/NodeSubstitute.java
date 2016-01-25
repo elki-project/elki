@@ -30,6 +30,7 @@ import org.w3c.dom.Element;
  * be put on the update queue.
  *
  * @author Erich Schubert
+ * @since 0.2
  */
 public class NodeSubstitute implements Runnable {
   /**

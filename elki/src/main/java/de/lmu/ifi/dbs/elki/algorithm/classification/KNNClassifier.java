@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * k nearest neighbors in a database.
  * 
  * @author Arthur Zimek
+ * @since 0.7.0
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */
 @Title("kNN-classifier")

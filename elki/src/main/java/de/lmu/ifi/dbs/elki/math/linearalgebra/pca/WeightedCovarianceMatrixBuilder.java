@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Computer Science 5069, Springer
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.has WeightFunction
  * @apiviz.has PrimitiveDistanceFunction

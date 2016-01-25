@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Abstract base class for algorithms.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <O> Input type
  * @param <R> Result type

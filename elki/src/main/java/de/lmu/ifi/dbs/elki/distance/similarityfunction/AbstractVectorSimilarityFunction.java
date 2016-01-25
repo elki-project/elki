@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
  * Abstract base class for double-valued primitive similarity functions.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public abstract class AbstractVectorSimilarityFunction extends AbstractPrimitiveSimilarityFunction<NumberVector> implements PrimitiveSimilarityFunction<NumberVector> {
   @Override

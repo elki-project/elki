@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  * Interface for a bulk split strategy.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface BulkSplit {
   /**

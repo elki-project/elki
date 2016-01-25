@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * uncertain observation.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class UncertainSplitFilter extends AbstractConversionFilter<NumberVector, UnweightedDiscreteUncertainObject> {
   /**

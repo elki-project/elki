@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * Base implementation of a similarity function.
  * 
  * @author Arthur Zimek
+ * @since 0.4.0
  * 
  * @apiviz.excludeSubtypes
  * 

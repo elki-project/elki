@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * </p>
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @param <O> the type of DatabaseObject to be stored in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree

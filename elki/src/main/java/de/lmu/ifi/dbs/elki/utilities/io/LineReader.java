@@ -50,6 +50,7 @@ import java.io.Reader;
  * </pre>
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class LineReader implements AutoCloseable {
   /**

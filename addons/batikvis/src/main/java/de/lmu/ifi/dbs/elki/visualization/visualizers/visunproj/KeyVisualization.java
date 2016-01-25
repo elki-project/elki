@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * TODO: also show in scatter plot detail view.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

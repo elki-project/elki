@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
  * Utilities for handling result objects
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.uses Result oneway - - filters
  */

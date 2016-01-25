@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
+ * @since 0.3
  *
  * @apiviz.landmark
  * @apiviz.has VisualizerContext

@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  *
  * @author Alexander Koos
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "N. Dalvi, C. Ré, D. Suciu", //
 title = "Probabilistic databases: diamonds in the dirt", //

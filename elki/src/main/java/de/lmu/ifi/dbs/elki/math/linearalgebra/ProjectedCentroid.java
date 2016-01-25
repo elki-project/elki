@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * easier to use APIs.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class ProjectedCentroid extends Centroid {
   /**

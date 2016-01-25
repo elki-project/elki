@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * TODO: maybe also run an example algorithm?
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class TermFrequencyParserTest implements JUnit4Test {
   /** Test data set to use. */

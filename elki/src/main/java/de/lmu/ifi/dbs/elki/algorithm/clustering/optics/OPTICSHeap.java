@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  *
  * @author Elke Achtert
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.composedOf Instance
  *

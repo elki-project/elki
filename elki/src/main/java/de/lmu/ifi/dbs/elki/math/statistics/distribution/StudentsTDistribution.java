@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * FIXME: add quantile and random function!
  * 
  * @author Jan Brusis
+ * @since 0.5.0
  */
 public class StudentsTDistribution extends AbstractDistribution {
   /**

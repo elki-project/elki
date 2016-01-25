@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * Cluster model using a filtered PCA result and an centroid.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.composedOf PCAFilteredResult
  */

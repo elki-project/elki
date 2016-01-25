@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * performing kernel density estimation.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class KNNKernelDensityMinimaClustering<V extends NumberVector> extends AbstractAlgorithm<Clustering<ClusterModel>> implements ClusteringAlgorithm<Clustering<ClusterModel>> {
   /**

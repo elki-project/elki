@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.KNNList;
  * Combination interface for KNNList and IntegerDBIDs.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public interface IntegerDBIDKNNList extends KNNList, DoubleDBIDList, IntegerDBIDs {
   @Override

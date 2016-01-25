@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Gamma Distribution, with random generation and density functions.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class GammaDistribution extends AbstractDistribution {
   /**

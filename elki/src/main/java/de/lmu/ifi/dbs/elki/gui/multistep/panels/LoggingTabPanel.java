@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * Panel to handle logging
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class LoggingTabPanel extends ParameterTabPanel {
   /**

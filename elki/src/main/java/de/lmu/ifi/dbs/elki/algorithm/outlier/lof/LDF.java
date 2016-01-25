@@ -77,6 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.5.5
  *
  * @apiviz.has KNNQuery
  * @apiviz.has KernelDensityFunction

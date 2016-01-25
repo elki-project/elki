@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Small experiment to assert the console output logger works as expected.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  */
 public class OutputStreamLoggerTest implements JUnit4Test {

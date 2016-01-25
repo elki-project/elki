@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
  * This information is needed for persistent storage.
  *
  * @author Elke Achtert
+ * @since 0.2
  */
 public class MkTreeHeader extends TreeIndexHeader {
 

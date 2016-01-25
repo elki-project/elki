@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
  * spatial node.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements SpatialEntry {
   private static final long serialVersionUID = 1;

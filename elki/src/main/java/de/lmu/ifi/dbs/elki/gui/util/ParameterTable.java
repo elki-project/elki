@@ -73,6 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Class showing a table of ELKI parameters.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.composedOf ParametersModel
  * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.ColorfulRenderer

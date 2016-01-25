@@ -32,6 +32,7 @@ import java.util.Arrays;
  * left and right.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public class LongStaticHistogram extends AbstractStaticHistogram implements LongHistogram {
   /**

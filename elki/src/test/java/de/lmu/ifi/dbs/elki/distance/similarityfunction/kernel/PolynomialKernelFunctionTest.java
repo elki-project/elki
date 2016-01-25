@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * Unit test for Kernel implementation.
  *
  * @author Erich Schubert
+ * @since 0.7.1
  */
 public class PolynomialKernelFunctionTest implements JUnit4Test {
   @Test

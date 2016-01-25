@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
  * Default linear scan RKNN query class.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.has KNNQuery

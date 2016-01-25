@@ -84,6 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.has SubspaceModel
  * @apiviz.has CLIQUESubspace

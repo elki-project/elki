@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
  * 
  * @author Robert Rödler
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle
  * @apiviz.uses Projection2D

@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * 
  * @author Felix Stahlberg
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Title("String Parser")
 @Description("Parses new line separated strings")

@@ -42,6 +42,7 @@ import gnu.trove.map.TIntDoubleMap;
  * integer value.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 public class SparseIntegerVector extends AbstractNumberVector implements SparseNumberVector {
   /**

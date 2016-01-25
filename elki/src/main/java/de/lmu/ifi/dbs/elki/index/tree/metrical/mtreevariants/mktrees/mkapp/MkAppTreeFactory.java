@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Factory for a MkApp-Tree
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.stereotype factory
  * @apiviz.uses MkAppTreeIndex oneway - - «create»

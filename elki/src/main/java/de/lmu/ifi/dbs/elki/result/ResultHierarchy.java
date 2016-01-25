@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarch
  * Class to store a hierarchy of result objects.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 // TODO: add listener merging!
 public class ResultHierarchy extends HashMapHierarchy<Result> {

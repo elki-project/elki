@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Abstract class to produce a configurator for a particular parameter.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has StockIcon
  * 

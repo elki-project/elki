@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * Abstract super class for nodes in M-Tree variants.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.has MTreeEntry oneway - - contains
  * @apiviz.excludeSubtypes

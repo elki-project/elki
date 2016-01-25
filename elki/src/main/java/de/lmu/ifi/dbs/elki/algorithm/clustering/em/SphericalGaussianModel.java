@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * Simple spherical Gaussian cluster.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class SphericalGaussianModel implements EMClusterModel<EMModel> {
   /**

@@ -51,6 +51,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
  * string) and Namespace handling
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.uses Element oneway - - «create»
  */

@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
  * Base class for a materialized Visualization.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.landmark
  * @apiviz.has Element oneway

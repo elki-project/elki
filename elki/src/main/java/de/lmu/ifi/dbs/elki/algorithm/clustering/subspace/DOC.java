@@ -77,6 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * </p>
  * 
  * @author Florian Nuecke
+ * @since 0.6.0
  * 
  * @apiviz.has SubspaceModel
  * 

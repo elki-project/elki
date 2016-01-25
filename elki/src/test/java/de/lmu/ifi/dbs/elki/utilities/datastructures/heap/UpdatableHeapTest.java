@@ -33,6 +33,12 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 
+/**
+ * Test the updateable heap used by OPTICS.
+ *
+ * @author Erich Schubert
+ * @since 0.5.0
+ */
 public class UpdatableHeapTest implements JUnit4Test {
   @Test
   public void testUpdatableHeap() {

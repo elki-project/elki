@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListMIter;
  * Combination interface for modifiable iterators.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 interface DoubleIntegerDBIDListMIter extends DoubleIntegerDBIDListIter, DoubleDBIDListMIter {
 

@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.has MeanModel
  *

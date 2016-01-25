@@ -35,6 +35,7 @@ import java.util.Locale;
  * values.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  */
 

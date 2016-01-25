@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * Add a CSS class to the event target.
  * 
  * @author Erich Schubert
+ * @since 0.2
  *
  */
 public class AddCSSClass implements EventListener {

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Pseudo distribution, that has a unique constant value.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class ConstantDistribution implements Distribution {
   /**

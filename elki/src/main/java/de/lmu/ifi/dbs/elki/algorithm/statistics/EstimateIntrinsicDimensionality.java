@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Note: this algorithm does not produce a result, but only logs statistics.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @param <O> Data type
  */

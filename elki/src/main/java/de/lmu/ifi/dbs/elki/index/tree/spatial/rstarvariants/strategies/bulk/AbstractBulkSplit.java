@@ -30,6 +30,7 @@ import java.util.List;
  * Encapsulates the required parameters for a bulk split of a spatial index.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  */
 public abstract class AbstractBulkSplit implements BulkSplit {
   /**

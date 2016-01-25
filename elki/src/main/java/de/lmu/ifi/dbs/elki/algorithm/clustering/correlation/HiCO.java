@@ -76,6 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  *
  * @author Elke Achtert
+ * @since 0.3
  *
  * @apiviz.composedOf HiCO.Instance
  *

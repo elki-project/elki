@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 @Alias({ "upgma", "average", "average-link", "average-linkage", "UPGMA" })
 @Reference(authors = "A. K. Jain and R. C. Dubes", //

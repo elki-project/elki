@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * the database and ID layers.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  */
 public class RelationSortingTest implements JUnit4Test {

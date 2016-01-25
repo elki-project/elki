@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * much memory as {@link DoubleVector}.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class FloatVector extends AbstractNumberVector {
   /**

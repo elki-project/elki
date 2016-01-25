@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
  * The trivial "identity" scaling function.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class IdentityScaling implements StaticScalingFunction {
   @Override

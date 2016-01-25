@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNod
  * Represents a node in a RDkNN-Tree.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.has RdKNNEntry oneway - - contains
  */

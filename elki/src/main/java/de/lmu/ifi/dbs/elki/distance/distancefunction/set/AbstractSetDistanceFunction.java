@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFu
  * Abstract base class for set distance functions.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <O> Vector type
  */

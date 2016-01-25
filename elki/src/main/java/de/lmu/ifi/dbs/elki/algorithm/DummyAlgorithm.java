@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * NullAlgorithm} instead.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * @param <O> Vector type
  * 
  * @apiviz.uses KNNQuery

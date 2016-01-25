@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * norms.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  */

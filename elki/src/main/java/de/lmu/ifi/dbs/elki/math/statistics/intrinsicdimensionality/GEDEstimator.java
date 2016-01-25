@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "M. E. Houle, H. Kashima, M. Nett", //
 title = "Generalized expansion dimension", //

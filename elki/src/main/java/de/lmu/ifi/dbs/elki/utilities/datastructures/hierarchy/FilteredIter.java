@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  * Filtered iterator.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.composedOf Hierarchy.Iter
  *

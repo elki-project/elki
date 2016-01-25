@@ -53,6 +53,7 @@ import gnu.trove.list.TIntList;
  * 
  * @author Angela Peng
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @param <V> Vector type
  */

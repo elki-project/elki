@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * A Swing TableModel that uses a {@link DynamicParameters} object as storage.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class ParametersModel extends AbstractTableModel {
   /**

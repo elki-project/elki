@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Use {@link #FACTORY} for a static instance.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.stereotype factory,interface
  * @apiviz.has WritableDataStore oneway - - «create»

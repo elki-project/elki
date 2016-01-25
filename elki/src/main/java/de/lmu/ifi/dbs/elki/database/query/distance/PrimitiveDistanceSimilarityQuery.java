@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * Combination query class, for convenience.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses PrimitiveSimilarityFunction
  * 

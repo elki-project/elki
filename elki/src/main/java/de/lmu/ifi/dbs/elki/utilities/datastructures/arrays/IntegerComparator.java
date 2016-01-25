@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arrays;
  * Interface for comparing two Integer.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface IntegerComparator {
   /**

@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * FIXME: Class naming in this package is inconsistent.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  */
 public class GenericMTreeDistanceSearchCandidate implements Comparable<GenericMTreeDistanceSearchCandidate> {
   /**

@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Utility functions for handling database relation.
  *
  * @author Erich Schubert
+ * @since 0.5.5
  *
  * @apiviz.uses Relation oneway
  * @apiviz.has CollectionFromRelation

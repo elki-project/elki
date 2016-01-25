@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.MT
  * Class to store the MTree settings.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> Object type
  * @param <N> Node type

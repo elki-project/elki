@@ -77,6 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //
 title = "Fast and Scalable Outlier Detection with Approximate Nearest Neighbor Ensembles", //

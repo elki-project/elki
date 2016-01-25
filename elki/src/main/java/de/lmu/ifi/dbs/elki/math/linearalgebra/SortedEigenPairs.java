@@ -33,6 +33,7 @@ import java.util.List;
  * eigenvectors (and -values).
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair
  */

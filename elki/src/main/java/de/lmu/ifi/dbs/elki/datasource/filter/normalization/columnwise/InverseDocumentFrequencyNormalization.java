@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * frequency (IDF). See also: TF-IDF for text analysis.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses SparseNumberVector
  * 

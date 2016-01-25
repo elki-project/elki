@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
  * erfc(1 / sqrt(2) * distance / stddev)
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class ErfcStddevWeight implements WeightFunction {
   /**

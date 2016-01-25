@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Additionally, the classes can in turn have additional parameters.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses ClassParameter
  */

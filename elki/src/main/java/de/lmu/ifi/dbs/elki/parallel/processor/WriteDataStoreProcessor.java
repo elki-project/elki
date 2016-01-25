@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
  * Output channel to store data in a {@link WritableDataStore}.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <T> data type
  *

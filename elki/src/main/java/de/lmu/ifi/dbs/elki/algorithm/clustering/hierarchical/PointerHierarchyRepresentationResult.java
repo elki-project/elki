@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
  * due to sorting, but using an additional temporary array.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class PointerHierarchyRepresentationResult extends BasicResult {
   /**

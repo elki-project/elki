@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
  * Reader that will tokenize the input data as desired.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.composedOf Tokenizer
  */

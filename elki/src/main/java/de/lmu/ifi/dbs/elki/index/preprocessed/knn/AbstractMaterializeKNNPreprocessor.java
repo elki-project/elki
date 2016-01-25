@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract base class for KNN Preprocessors.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <O> Object type
  */

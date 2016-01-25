@@ -82,6 +82,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * one-element clusters to reduce garbage collection overhead.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.uses HierarchicalClusteringAlgorithm
  * @apiviz.uses PointerHierarchyRepresentationResult

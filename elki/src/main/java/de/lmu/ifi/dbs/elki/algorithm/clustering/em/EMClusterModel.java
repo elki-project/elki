@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
  * Models useable in EM clustering.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public interface EMClusterModel<M extends MeanModel> {
   /**

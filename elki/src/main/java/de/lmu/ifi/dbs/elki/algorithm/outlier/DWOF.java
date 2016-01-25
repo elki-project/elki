@@ -90,6 +90,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  *
  * @author Omar Yousry
+ * @since 0.6.0
  *
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */

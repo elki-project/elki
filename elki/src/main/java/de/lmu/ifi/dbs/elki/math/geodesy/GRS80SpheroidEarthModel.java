@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Flattening: 1 / 298.257222101
  *
  * @author Erich Schubert
+ * @since 0.3
  */
 @Alias({ "GRS-80", "GRS80" })
 public class GRS80SpheroidEarthModel extends AbstractEarthModel {

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
  * The ROC values would be incorrect then anyway!
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.composedOf OutlierResult
  */

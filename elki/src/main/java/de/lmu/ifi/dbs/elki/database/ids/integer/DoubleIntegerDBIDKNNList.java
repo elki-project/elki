@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
  * the results to be sorted!
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class DoubleIntegerDBIDKNNList extends DoubleIntegerDBIDList implements IntegerDBIDKNNList {
   /**

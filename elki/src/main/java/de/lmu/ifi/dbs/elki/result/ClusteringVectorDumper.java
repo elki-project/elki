@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.meta.ExternalClustering}.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class ClusteringVectorDumper implements ResultHandler {
   /**

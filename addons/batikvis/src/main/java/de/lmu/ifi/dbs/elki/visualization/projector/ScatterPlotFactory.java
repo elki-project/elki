@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
  * Produce scatterplot projections.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has ScatterPlotProjector
  */

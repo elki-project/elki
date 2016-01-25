@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
  * Note: this is a {@code LinkedList<VisualizationTask>}!
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.composedOf Projection
  * @apiviz.composedOf VisualizationTask

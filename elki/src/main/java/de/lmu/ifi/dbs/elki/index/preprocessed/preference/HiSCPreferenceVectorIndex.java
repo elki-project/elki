@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * database.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  * 
  * @see HiSC
  * 

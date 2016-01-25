@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
  * Currently not used.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.has SingleThreadedRunner
  */

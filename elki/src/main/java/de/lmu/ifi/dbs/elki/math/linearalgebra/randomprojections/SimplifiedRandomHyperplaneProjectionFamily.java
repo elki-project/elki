@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @author Evgeniy Faerman
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "M. Henzinger", //
 title = "Finding near-duplicate web pages: a large-scale evaluation of algorithms", //

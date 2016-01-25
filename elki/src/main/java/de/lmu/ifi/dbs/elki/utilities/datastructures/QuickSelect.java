@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
  * Charles Antony Richard Hoare
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.uses ArrayModifiableDBIDs
  * @apiviz.uses List

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * covering radius.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  */
 public class DoubleMTreeDistanceSearchCandidate extends DoubleDistanceSearchCandidate {
   /**

@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * {@link LineStyleLibrary#FLAG_INTERPOLATED} will result in dashed lines.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.composedOf ColorLibrary
  */

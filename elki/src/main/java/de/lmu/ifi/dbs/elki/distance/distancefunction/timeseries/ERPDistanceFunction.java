@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * </p>
  * 
  * @author Thomas Bernecker
+ * @since 0.2
  */
 @Title("Edit Distance with Real Penalty")
 @Reference(authors = "L. Chen and R. Ng", //

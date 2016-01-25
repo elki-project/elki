@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction}
  * 
  * @author Simon Paradies
+ * @since 0.2
  */
 public class LinearKernelFunction extends PolynomialKernelFunction {
   /**

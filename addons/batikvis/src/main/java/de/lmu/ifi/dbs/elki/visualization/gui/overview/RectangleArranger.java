@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
  * a greedy placement strategy, extending the canvas as little as possible.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <T> Key type
  */

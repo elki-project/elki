@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Tests the KNNWeightOutlier algorithm.
  * 
  * @author Lucia Cichella
+ * @since 0.4.0
  */
 public class KNNWeightOutlierTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

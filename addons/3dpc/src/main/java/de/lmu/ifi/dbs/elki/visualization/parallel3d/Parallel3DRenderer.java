@@ -77,6 +77,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * TODO: generalize to non-numeric features and scales.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @param <O> Object type
  */

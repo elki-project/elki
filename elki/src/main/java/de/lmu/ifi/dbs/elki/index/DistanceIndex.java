@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
  * caches)
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.excludeSubtypes

@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * the bundle by adding a column of DBID type to the bundle.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has DBIDRange oneway - - «produces»
  */

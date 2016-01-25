@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.parallel.processor.Processor;
  * Parallel k-means implementation.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has Instance
  */

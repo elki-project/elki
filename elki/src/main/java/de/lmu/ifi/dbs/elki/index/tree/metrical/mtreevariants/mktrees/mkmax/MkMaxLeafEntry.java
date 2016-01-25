@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
  * the underlying data object.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 class MkMaxLeafEntry extends MTreeLeafEntry implements MkMaxEntry {
   /**

@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  *
  * @author Stephan Baier
+ * @since 0.7.0
  *
  * @apiviz.composedOf NoiseHandling
  */

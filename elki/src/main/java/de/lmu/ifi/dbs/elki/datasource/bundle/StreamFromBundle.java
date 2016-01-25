@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
  * To use this, invoke {@link MultipleObjectsBundle#asStream()}.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class StreamFromBundle implements BundleStreamSource {
   /**

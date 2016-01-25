@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayIter;
  * Array iterators that can also go backwards and seek.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface DBIDArrayIter extends DBIDIter, ArrayIter {
   @Override

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Log-Logistic distribution also known as Fisk distribution.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Alias({ "fisk", "loglog" })
 public class LogLogisticDistribution extends AbstractDistribution {

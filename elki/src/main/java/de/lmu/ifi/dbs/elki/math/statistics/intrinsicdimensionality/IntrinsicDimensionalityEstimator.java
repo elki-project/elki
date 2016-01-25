@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * Estimate the intrinsic dimensionality from a distance list.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public interface IntrinsicDimensionalityEstimator {
   /**

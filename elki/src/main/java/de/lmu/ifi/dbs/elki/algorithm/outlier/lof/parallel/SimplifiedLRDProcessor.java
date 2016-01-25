@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
  * Note: we compute 1/lrd, the local reachability distance.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has Instance
  */

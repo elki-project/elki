@@ -75,6 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.XMLNodeIterator;
  * supported) data sets that satisfy a given specification file.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.composedOf GeneratorMain
  */

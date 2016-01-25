@@ -11,6 +11,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * as we want to implement the interface.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class OneDimensionalDoubleVector extends AbstractNumberVector {
   /**

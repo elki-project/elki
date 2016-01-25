@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * Construct a type information for vector spaces with fixed dimensionality.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has FeatureVector
  * 

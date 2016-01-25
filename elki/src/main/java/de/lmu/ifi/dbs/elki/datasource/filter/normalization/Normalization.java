@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
  * dependencies quantitatively adapted to the original space.
  *
  * @author Arthur Zimek
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.has NonNumericFeaturesException

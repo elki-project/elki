@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
  * Static DBID range.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface DBIDRange extends ArrayStaticDBIDs, DataStoreIDMap {
   /**

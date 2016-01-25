@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Reference(authors = "P. Ciaccia, M. Patella, P. Zezula", //
 title = "M-tree: An Efficient Access Method for Similarity Search in Metric Spaces", //

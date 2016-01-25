@@ -34,6 +34,12 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
 
+/**
+ * Test the specialized heap structures.
+ * 
+ * @author Erich Schubert
+ * @since 0.5.0
+ */
 public class TiedTopBoundedUpdatableHeapTest implements JUnit4Test {
   @Test
   public void testTiedTopBoundedUpdatableHeap() {

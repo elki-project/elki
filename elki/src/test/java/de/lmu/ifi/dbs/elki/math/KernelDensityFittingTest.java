@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * JUnit test that does a complete Kernel and Levenberg-Marquadt fitting.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class KernelDensityFittingTest implements JUnit4Test {
   // the following values depend on the data set used!

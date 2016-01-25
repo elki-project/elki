@@ -31,6 +31,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  * exp(-2.3025850929940455 * (distance/max)^2)
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class GaussWeight implements WeightFunction {
   /**

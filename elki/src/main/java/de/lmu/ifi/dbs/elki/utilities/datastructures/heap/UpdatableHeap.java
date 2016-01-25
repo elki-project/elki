@@ -32,6 +32,7 @@ import java.util.Comparator;
  * A heap as used in OPTICS that allows updating entries.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> object type
  */

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
  * Write double values into a {@link WritableDoubleDataStore}.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has Instance
  * @apiviz.uses SharedDouble

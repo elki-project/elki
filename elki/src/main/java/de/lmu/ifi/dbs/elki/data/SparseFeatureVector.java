@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.data;
  * Extended interface for sparse feature vector types.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  */
 public interface SparseFeatureVector<D> extends FeatureVector<D> {

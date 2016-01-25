@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * Unmodifiable, indexed DBIDs.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface ArrayStaticDBIDs extends ArrayDBIDs, StaticDBIDs {
   // empty.

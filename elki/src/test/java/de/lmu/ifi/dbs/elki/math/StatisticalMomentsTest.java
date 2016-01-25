@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Unit test to check our statistical moments class for correctness.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class StatisticalMomentsTest implements JUnit4Test {
   @Test

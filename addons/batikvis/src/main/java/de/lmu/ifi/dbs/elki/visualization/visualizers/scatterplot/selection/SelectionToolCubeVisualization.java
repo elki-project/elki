@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * TODO: support non-point spatial data
  *
  * @author Heidi Kolb
+ * @since 0.4.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

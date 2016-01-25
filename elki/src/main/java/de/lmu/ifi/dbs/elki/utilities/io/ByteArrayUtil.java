@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * {@link java.io.ByteArrayOutputStream}
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * 

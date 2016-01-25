@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * </p>
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.has MTreeNode oneway - - contains
  * 

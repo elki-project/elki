@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.index.IndexFactory;
  * Interface for an index providing nearest neighbor sets.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface SharedNearestNeighborIndex<O> extends Index {
   /**

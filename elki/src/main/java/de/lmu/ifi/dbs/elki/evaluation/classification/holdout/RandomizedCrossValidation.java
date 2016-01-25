@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * to perform cross-validation. The test sets are not guaranteed to be disjoint.
  * 
  * @author Arthur Zimek
+ * @since 0.7.0
  */
 public class RandomizedCrossValidation extends RandomizedHoldout {
   /**

@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Evaluate using the maximum F1 score.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class MaximumF1Evaluation extends AbstractScoreEvaluation {
   /**

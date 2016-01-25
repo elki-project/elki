@@ -38,6 +38,7 @@ import javax.media.opengl.glu.GLU;
  * view will have the usual X/Y plane on the ground.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.uses CameraListener
  */

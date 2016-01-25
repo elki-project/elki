@@ -30,6 +30,7 @@ import java.util.Collection;
  * 
  * @author Erich Schubert
  * @author Arthur Zimek
+ * @since 0.2
  */
 public class IntegerMinMax {
   /**

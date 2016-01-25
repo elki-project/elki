@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * Streaming filter to derive an outlier class label.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ClassLabelFromPatternFilter" })
 public class ClassLabelFromPatternFilter extends AbstractStreamFilter {

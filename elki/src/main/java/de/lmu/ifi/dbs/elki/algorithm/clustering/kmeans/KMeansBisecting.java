@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  *
  * @author Stephan Baier
+ * @since 0.6.0
  *
  * @param <V> Vector type
  * @param <M> Model type

@@ -66,6 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract base class for k-means implementations.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.composedOf KMeansInitialization
  *

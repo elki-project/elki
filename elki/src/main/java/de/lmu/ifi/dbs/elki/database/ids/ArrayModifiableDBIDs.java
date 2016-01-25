@@ -28,6 +28,7 @@ import java.util.Comparator;
  * Array-oriented implementation of a modifiable DBID collection.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has DBIDArrayMIter
  */

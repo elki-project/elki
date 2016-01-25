@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * One-dimensional projected visualization.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.landmark
  * @apiviz.has Projection1D

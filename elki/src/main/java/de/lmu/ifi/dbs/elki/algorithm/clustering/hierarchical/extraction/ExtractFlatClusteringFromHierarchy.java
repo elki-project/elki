@@ -69,6 +69,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * TODO: add an hierarchy simplification step.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @apiviz.uses HierarchicalClusteringAlgorithm
  * @apiviz.uses PointerHierarchyRepresentationResult

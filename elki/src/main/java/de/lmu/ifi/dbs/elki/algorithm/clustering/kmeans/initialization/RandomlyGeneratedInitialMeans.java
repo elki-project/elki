@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
  * range).
  *
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<NumberVector> {
   /**

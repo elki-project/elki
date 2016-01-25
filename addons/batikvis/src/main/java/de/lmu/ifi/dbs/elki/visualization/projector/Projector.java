@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
  * A projector is responsible for adding projections to the visualization.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface Projector extends VisualizationItem {
   /**

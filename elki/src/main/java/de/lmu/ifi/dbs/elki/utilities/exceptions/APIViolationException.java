@@ -36,6 +36,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * the Java compiler).
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class APIViolationException extends AbortException {
   /**

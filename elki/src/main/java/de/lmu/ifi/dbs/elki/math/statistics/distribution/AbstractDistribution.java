@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Abstract base class for distributions.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public abstract class AbstractDistribution implements Distribution {
   /**

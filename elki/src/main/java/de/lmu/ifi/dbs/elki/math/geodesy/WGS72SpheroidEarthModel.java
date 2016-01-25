@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Flattening: 1 / 298.26
  *
  * @author Erich Schubert
+ * @since 0.3
  */
 @Alias({ "WGS72", "WGS-72" })
 public class WGS72SpheroidEarthModel extends AbstractEarthModel {

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * slightly more memory (by using arrays) but essentially does the same.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class PearsonCorrelation {
   /**

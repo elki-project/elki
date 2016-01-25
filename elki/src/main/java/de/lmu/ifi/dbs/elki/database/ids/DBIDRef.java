@@ -31,6 +31,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * are a good example how the DBIDRef may change.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.landmark
  * 

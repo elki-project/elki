@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Outliers.
  * 
  * @author Ahmed Hettab
+ * @since 0.4.0
  * 
  * @param <N> Neighborhood type
  */

@@ -29,17 +29,31 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Evaluate clustering results by building segments for their pairs: shared
  * pairs and differences.
  * 
+ * Reference:
+ * <p>
+ * Evaluation of Clusterings – Metrics and Visual Support<br />
+ * Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur
+ * Zimek<br />
+ * In: Proc. 28th International Conference on Data Engineering (ICDE) 2012
+ * </p>
+ *
  * @author Sascha Goldhofer
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.uses Clustering
  * @apiviz.uses Segments
  */
+@Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", //
+authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", //
+url = "http://dx.doi.org/10.1109/ICDE.2012.128")
 public class ClusterPairSegmentAnalysis implements Evaluator {
   /**
    * Constructor.
@@ -55,7 +69,7 @@ public class ClusterPairSegmentAnalysis implements Evaluator {
   public void processNewResult(ResultHierarchy hier, Result result) {
     // Get all new clusterings
     // TODO: handle clusterings added later, too. Can we update the result?
-    
+
     List<Clustering<?>> clusterings = ResultUtil.getClusteringResults(result);
     // Abort if not enough clusterings to compare
     if(clusterings.size() < 2) {

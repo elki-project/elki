@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * A simple spherical earth model using radius 6371009 m.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class SphericalVincentyEarthModel extends AbstractEarthModel {
   /**

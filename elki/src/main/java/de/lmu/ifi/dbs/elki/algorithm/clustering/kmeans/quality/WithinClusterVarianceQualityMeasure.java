@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
  *
  * @author Stephan Baier
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class WithinClusterVarianceQualityMeasure extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override

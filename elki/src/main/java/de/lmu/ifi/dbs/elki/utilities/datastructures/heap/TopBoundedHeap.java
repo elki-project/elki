@@ -30,6 +30,7 @@ import java.util.Comparator;
  * {@code k} Elements only.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <E> Element type. Should be {@link Comparable} or a {@link Comparator}
  *        needs to be given.

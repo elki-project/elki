@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
  *
  * @author Heidi Kolb
  * @author Erich Schubert
+ * @since 0.4.0
  */
 // FIXME: INCOMPLETE TRANSITION TO MULTI-REPRESENTED DATA
 public class SelectionTableWindow extends JFrame implements DataStoreListener, ResultListener {

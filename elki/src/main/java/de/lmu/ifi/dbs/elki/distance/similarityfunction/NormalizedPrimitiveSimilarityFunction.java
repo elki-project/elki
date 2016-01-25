@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction;
  * limited to the 0-1 value range.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> Object type
  */

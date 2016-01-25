@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  * that should to be shared among plots, such as line colors, styles etc.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.landmark
  * @apiviz.composedOf StyleLibrary

@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
  * Represents a node in a MkMax-Tree.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.has MkTabEntry oneway - - contains
  * 

@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.visualization.projections;
  * Size of a canvas. A 2D bounding rectangle.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class CanvasSize {
   /**

@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * Interface to collect exception messages that are used in several cases.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 public interface ExceptionMessages {
   /**

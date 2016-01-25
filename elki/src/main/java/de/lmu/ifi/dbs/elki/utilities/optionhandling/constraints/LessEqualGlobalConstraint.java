@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.NumberParameter;
  * the value of the second number parameter ({@link NumberParameter}).
  * 
  * @author Steffi Wanka
+ * @since 0.2
  * @param <T> Number type
  */
 public class LessEqualGlobalConstraint<T extends Number> implements GlobalParameterConstraint {

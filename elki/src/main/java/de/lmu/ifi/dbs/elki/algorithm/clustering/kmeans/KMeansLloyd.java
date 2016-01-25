@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * </p>
  *
  * @author Arthur Zimek
+ * @since 0.5.0
  *
  * @apiviz.landmark
  * @apiviz.has KMeansModel

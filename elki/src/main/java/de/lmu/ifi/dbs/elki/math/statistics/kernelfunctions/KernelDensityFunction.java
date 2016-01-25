@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Note: as of now, this API does not support asymmetric kernels.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public interface KernelDensityFunction {
   /**

@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * doesn't use "the" statistical moments.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.has WeibullDistribution - - estimates
  */

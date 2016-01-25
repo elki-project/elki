@@ -71,6 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.has LRDProcessor
  * @apiviz.has LOFProcessor

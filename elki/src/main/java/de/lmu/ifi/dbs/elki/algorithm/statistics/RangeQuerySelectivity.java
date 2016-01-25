@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * TODO: Add sampling
  *
  * @author Erich Schubert
+ * @since 0.7.0
  * @param <V> Vector type
  */
 public class RangeQuerySelectivity<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, Result> {

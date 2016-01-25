@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQui
  * Abstract super class for splitting a node in an M-Tree.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.composedOf Assignments
  * 

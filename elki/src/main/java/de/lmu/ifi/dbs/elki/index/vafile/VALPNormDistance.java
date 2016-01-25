@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * Lp-Norm distance function for partially computed objects.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class VALPNormDistance {
   /**

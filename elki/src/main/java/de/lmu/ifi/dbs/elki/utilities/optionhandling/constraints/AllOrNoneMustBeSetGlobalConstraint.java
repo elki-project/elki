@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * parameters ({@link Parameter}) must be set, or none of them.
  * 
  * @author Steffi Wanka
+ * @since 0.2
  */
 public class AllOrNoneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
   /**

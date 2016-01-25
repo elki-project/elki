@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * classic Grahams scan. Also computes a bounding box.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has Polygon
  */

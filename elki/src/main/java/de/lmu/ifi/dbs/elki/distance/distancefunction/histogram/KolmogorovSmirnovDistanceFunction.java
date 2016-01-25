@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * i.e. they should be some 1-dimensional histogram.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class KolmogorovSmirnovDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**

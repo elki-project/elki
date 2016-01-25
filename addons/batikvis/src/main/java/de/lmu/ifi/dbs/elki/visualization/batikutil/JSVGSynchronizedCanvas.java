@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * objects.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.composedOf JSVGUpdateSynchronizer
  * @apiviz.has SVGPlot oneway - - displays

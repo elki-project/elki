@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * distance.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.has RetrievalPerformanceResult
  * @apiviz.composedOf KNNEvaluator

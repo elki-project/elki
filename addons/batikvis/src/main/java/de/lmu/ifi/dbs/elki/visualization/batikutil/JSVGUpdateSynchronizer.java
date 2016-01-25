@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.UpdateSynchronizer;
  * This class is used to synchronize SVG updates with an JSVG canvas.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.uses UpdateRunner
  */

@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "T. W. Anderson, and D. A. Darling", //
 title = "Asymptotic theory of certain 'goodness of fit' criteria based on stochastic processes", //

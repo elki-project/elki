@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * passed on to the wrapped representation.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <O> Object type
  */

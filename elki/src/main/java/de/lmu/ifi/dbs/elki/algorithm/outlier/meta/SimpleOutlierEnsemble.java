@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * Simple outlier ensemble method.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.composedOf EnsembleVoting
  * @apiviz.uses OutlierResult oneway - - reads

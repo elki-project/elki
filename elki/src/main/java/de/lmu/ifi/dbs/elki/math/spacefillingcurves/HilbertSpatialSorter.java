@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.composedOf HilbertRef
  */

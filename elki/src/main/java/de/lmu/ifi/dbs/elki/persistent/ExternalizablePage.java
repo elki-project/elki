@@ -29,6 +29,7 @@ import java.io.Externalizable;
  * Base interface for externalizable pages.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 // TODO: replace with the newer ByteSerializers
 public interface ExternalizablePage extends Page, Externalizable {

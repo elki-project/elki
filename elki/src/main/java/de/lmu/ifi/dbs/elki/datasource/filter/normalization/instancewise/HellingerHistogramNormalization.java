@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.HellingerDistanceFunction}
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <V> vector type
  */

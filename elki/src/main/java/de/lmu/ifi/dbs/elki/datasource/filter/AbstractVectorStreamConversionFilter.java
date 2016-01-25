@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * Abstract base class for streaming filters that produce vectors.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <I> Input type
  * @param <O> Output vector type

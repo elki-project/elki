@@ -82,6 +82,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.composedOf COPAC
  * @apiviz.composedOf DBSCAN

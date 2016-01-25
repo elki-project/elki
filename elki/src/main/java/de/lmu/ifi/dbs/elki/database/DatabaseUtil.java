@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
  * covariances etc.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class DatabaseUtil {
   /**

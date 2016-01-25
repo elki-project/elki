@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * Note: This implementation does not check or handle duplicate points!
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.has Polygon
  */

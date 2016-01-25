@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * randomly selected subset of attributes.
  * 
  * @author Arthur Zimek
+ * @since 0.4.0
  * 
  * @apiviz.uses NumberVector
  * 

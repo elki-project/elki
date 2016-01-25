@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * give different values. But in the end, it's always just an approximation.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class EarthModelsTest implements JUnit4Test {
   // New York City

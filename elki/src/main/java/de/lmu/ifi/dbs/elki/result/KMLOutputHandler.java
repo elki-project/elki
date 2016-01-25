@@ -95,6 +95,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * different result types.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 // TODO: make configurable color scheme
 @Reference(authors = "E. Achtert, A. Hettab, H.-P. Kriegel, E. Schubert, A. Zimek", //

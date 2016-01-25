@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.parallel.variables;
  * Direct channel connecting two processors.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.has SharedInteger.Instance
  */

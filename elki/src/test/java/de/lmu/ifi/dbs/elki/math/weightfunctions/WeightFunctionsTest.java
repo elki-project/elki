@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction
  * JUnit test to assert consistency of a couple of Weight functions
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  */
 public class WeightFunctionsTest implements JUnit4Test {

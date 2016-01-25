@@ -96,6 +96,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", //
 title = "On Evaluation of Outlier Rankings and Outlier Scores", //

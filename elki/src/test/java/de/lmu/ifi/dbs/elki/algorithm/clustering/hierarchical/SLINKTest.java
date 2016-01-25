@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  *
  * @author Katharina Rausch
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class SLINKTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   // TODO: add a test for a non-single-link dataset?

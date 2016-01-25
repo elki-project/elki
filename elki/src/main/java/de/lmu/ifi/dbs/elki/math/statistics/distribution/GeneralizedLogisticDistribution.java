@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Where {@code shape=1} yields the regular logistic distribution.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class GeneralizedLogisticDistribution extends AbstractDistribution {
   /**

@@ -69,6 +69,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
  * TODO: allow optional class labels.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class ArffParser implements Parser {
   /**

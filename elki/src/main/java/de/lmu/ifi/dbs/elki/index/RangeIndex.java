@@ -30,7 +30,8 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
  * Index with support for range queries (<i>radius</i> queries).
  *
  * @author Erich Schubert
- *
+ * @since 0.4.0
+ * 
  * @apiviz.landmark
  * @apiviz.excludeSubtypes
  * @apiviz.has RangeQuery oneway - - «provides»

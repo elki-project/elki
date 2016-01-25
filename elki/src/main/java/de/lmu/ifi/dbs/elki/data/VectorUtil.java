@@ -39,6 +39,7 @@ import gnu.trove.map.hash.TIntDoubleHashMap;
  * Note: obviously, many functions are class methods or database related.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.uses NumberVector
  */

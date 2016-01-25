@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * Represents a node in an MkApp-Tree.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.has MkAppEntry oneway - - contains
  * 

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * function.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.excludeSubtypes

@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * To instantiate a class, use {@link Parameterization#tryInstantiate(Class)}!
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface Parameterizer {
   /**

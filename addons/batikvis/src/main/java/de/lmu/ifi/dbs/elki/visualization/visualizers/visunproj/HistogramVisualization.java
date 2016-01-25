@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Visualizer to draw histograms.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»

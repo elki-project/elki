@@ -37,6 +37,10 @@ import java.util.Locale;
  * Utility methods for output formatting of various number objects
  * 
  * FIXME: Handle formatting of infinity and NaN better.
+ * 
+ * @author Arthur Zimek
+ * @author Erich Schubert
+ * @since 0.2
  */
 public final class FormatUtil {
   /**

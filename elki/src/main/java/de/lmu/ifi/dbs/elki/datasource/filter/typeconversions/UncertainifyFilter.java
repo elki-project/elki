@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  *
  * @author Alexander Koos
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @param <UO> Uncertain object type
  */

@@ -104,6 +104,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  *
  * @author Alexander Koos
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has RepresentativenessEvaluation
  */

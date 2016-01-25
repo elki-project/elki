@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * Star-based strategy to pick reference points.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class StarBasedReferencePoints implements ReferencePointsHeuristic {
   /**

@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
  * Modifiable integer array iterator.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 interface IntegerDBIDArrayIter extends IntegerDBIDIter, DBIDArrayIter {
   // Empty

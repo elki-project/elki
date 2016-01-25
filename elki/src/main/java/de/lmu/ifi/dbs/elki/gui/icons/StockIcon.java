@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * Stock icon library for use in the GUI.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  */
