@@ -142,6 +142,11 @@ public class MiniGUI extends AbstractApplication {
   protected SavedSettingsFile store = new SavedSettingsFile(SAVED_SETTINGS_FILENAME);
 
   /**
+   * Combo box for choosing the application to run.
+   */
+  protected JComboBox<String> appCombo;
+
+  /**
    * Combo box for saved settings.
    */
   protected JComboBox<String> savedCombo;
@@ -167,7 +172,7 @@ public class MiniGUI extends AbstractApplication {
   public MiniGUI() {
     super();
     // Create and set up the window.
-    frame = new JFrame("ELKI MiniGUI");
+    frame = new JFrame("ELKI MiniGUI Command Line Builder");
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     try {
       frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());
@@ -179,6 +184,69 @@ public class MiniGUI extends AbstractApplication {
     panel = new JPanel();
     panel.setOpaque(true); // content panes must be opaque
     panel.setLayout(new GridBagLayout());
+
+    { // Configurator to choose the main application
+      appCombo = new JComboBox<>();
+      for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(AbstractApplication.class)) {
+        String nam = clz.getCanonicalName();
+        if(nam == null || clz.getCanonicalName().contains("GUI")) {
+          continue;
+        }
+        appCombo.addItem(nam);
+      }
+      appCombo.setEditable(true);
+      appCombo.setSelectedItem(maincls.getCanonicalName());
+      appCombo.addActionListener(new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+          if("comboBoxChanged".equals(e.getActionCommand())) {
+            Class<? extends AbstractApplication> clz = ELKIServiceRegistry.findImplementation(AbstractApplication.class, (String) appCombo.getSelectedItem());
+            if(clz != null) {
+              maincls = clz;
+              updateParameterTable();
+            }
+            else {
+              LOG.warning("Main class name not found.");
+            }
+          }
+        }
+      });
+
+      GridBagConstraints constraints = new GridBagConstraints();
+      constraints.fill = GridBagConstraints.BOTH;
+      constraints.gridx = 0;
+      constraints.gridy = 0;
+      constraints.weightx = 1;
+      constraints.weighty = .01;
+      panel.add(appCombo, constraints);
+    }
+
+    {
+      // Setup parameter storage and table model
+      this.parameters = new DynamicParameters();
+      ParametersModel parameterModel = new ParametersModel(parameters);
+      parameterModel.addTableModelListener(new TableModelListener() {
+        @Override
+        public void tableChanged(TableModelEvent e) {
+          // logger.debug("Change event.");
+          updateParameterTable();
+        }
+      });
+
+      // Create parameter table
+      parameterTable = new ParameterTable(frame, parameterModel, parameters);
+      // Create the scroll pane and add the table to it.
+      JScrollPane scrollPane = new JScrollPane(parameterTable);
+
+      // Add the scroll pane to this panel.
+      GridBagConstraints constraints = new GridBagConstraints();
+      constraints.fill = GridBagConstraints.BOTH;
+      constraints.gridx = 0;
+      constraints.gridy = 1;
+      constraints.weightx = 1;
+      constraints.weighty = 1;
+      panel.add(scrollPane, constraints);
+    }
 
     {
       // Button panel
@@ -262,37 +330,10 @@ public class MiniGUI extends AbstractApplication {
       GridBagConstraints constraints = new GridBagConstraints();
       constraints.fill = GridBagConstraints.HORIZONTAL;
       constraints.gridx = 0;
-      constraints.gridy = 1;
+      constraints.gridy = 2;
       constraints.weightx = 1.0;
       constraints.weighty = 0.01;
       panel.add(buttonPanel, constraints);
-    }
-
-    {
-      // Setup parameter storage and table model
-      this.parameters = new DynamicParameters();
-      ParametersModel parameterModel = new ParametersModel(parameters);
-      parameterModel.addTableModelListener(new TableModelListener() {
-        @Override
-        public void tableChanged(TableModelEvent e) {
-          // logger.debug("Change event.");
-          updateParameterTable();
-        }
-      });
-
-      // Create parameter table
-      parameterTable = new ParameterTable(frame, parameterModel, parameters);
-      // Create the scroll pane and add the table to it.
-      JScrollPane scrollPane = new JScrollPane(parameterTable);
-
-      // Add the scroll pane to this panel.
-      GridBagConstraints constraints = new GridBagConstraints();
-      constraints.fill = GridBagConstraints.BOTH;
-      constraints.gridx = 0;
-      constraints.gridy = 0;
-      constraints.weightx = 1;
-      constraints.weighty = 1;
-      panel.add(scrollPane, constraints);
     }
 
     {
@@ -307,7 +348,7 @@ public class MiniGUI extends AbstractApplication {
       GridBagConstraints constraints = new GridBagConstraints();
       constraints.fill = GridBagConstraints.BOTH;
       constraints.gridx = 0;
-      constraints.gridy = 2;
+      constraints.gridy = 3;
       constraints.weightx = 1;
       constraints.weighty = 1;
       panel.add(outputPane, constraints);
@@ -503,9 +544,10 @@ public class MiniGUI extends AbstractApplication {
     catch(ReflectiveOperationException e) {
       StringBuilder msg = new StringBuilder();
       msg.append("Your Java class path is incomplete.\n");
-      if (e.getCause() != null) {
+      if(e.getCause() != null) {
         msg.append(e.getCause().toString()).append("\n");
-      } else {
+      }
+      else {
         msg.append(e.toString()).append("\n");
       }
       msg.append("Make sure you have all the required jars on the classpath.\n");
