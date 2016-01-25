@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.logging.Level;
 
 import javax.swing.AbstractAction;
 import javax.swing.AbstractListModel;
@@ -235,44 +234,43 @@ public class MiniGUI extends AbstractApplication {
   }
 
   /**
-   * 
+   * Setup the application chooser.
    */
   private void setupAppChooser() {
-    { // Configurator to choose the main application
-      appCombo = new JComboBox<>();
-      for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(AbstractApplication.class)) {
-        String nam = clz.getCanonicalName();
-        if(nam == null || clz.getCanonicalName().contains("GUI")) {
-          continue;
-        }
-        appCombo.addItem(nam);
+    // Configurator to choose the main application
+    appCombo = new JComboBox<>();
+    for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(AbstractApplication.class)) {
+      String nam = clz.getCanonicalName();
+      if(nam == null || clz.getCanonicalName().contains("GUI")) {
+        continue;
       }
-      appCombo.setEditable(true);
-      appCombo.setSelectedItem(maincls.getCanonicalName());
-      appCombo.addActionListener(new ActionListener() {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-          if("comboBoxChanged".equals(e.getActionCommand())) {
-            Class<? extends AbstractApplication> clz = ELKIServiceRegistry.findImplementation(AbstractApplication.class, (String) appCombo.getSelectedItem());
-            if(clz != null) {
-              maincls = clz;
-              updateParameterTable();
-            }
-            else {
-              LOG.warning("Main class name not found.");
-            }
+      appCombo.addItem(nam);
+    }
+    appCombo.setEditable(true);
+    appCombo.setSelectedItem(maincls.getCanonicalName());
+    appCombo.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if("comboBoxChanged".equals(e.getActionCommand())) {
+          Class<? extends AbstractApplication> clz = ELKIServiceRegistry.findImplementation(AbstractApplication.class, (String) appCombo.getSelectedItem());
+          if(clz != null) {
+            maincls = clz;
+            updateParameterTable();
+          }
+          else {
+            LOG.warning("Main class name not found.");
           }
         }
-      });
+      }
+    });
 
-      GridBagConstraints constraints = new GridBagConstraints();
-      constraints.fill = GridBagConstraints.BOTH;
-      constraints.gridx = 0;
-      constraints.gridy = 0;
-      constraints.weightx = 1;
-      constraints.weighty = .01;
-      panel.add(appCombo, constraints);
-    }
+    GridBagConstraints constraints = new GridBagConstraints();
+    constraints.fill = GridBagConstraints.BOTH;
+    constraints.gridx = 0;
+    constraints.gridy = 0;
+    constraints.weightx = 1;
+    constraints.weighty = .01;
+    panel.add(appCombo, constraints);
   }
 
   /**
@@ -343,7 +341,10 @@ public class MiniGUI extends AbstractApplication {
         String key = savedSettingsModel.getSelectedItem();
         // Stop editing the table.
         parameterTable.editCellAt(-1, -1);
-        store.put(key, parameters.serializeParameters());
+        ArrayList<String> list = new ArrayList<>(parameters.size() * 2 + 1);
+        list.add(maincls.getCanonicalName());
+        parameters.serializeParameters(list);
+        store.put(key, list);
         try {
           store.save();
         }
@@ -438,7 +439,10 @@ public class MiniGUI extends AbstractApplication {
    */
   protected void updateParameterTable() {
     parameterTable.setEnabled(false);
-    doSetParameters(parameters.serializeParameters());
+    ArrayList<String> list = new ArrayList<String>(parameters.size() * 2 + 1);
+    list.add(maincls.getCanonicalName());
+    parameters.serializeParameters(list);
+    doSetParameters(list);
     parameterTable.setEnabled(true);
   }
 
@@ -473,7 +477,7 @@ public class MiniGUI extends AbstractApplication {
     List<String> remainingParameters = config.getRemainingParameters();
 
     outputArea.clear();
-    commandLine.setText(format(maincls.getCanonicalName(), params, remainingParameters));
+    commandLine.setText(format(maincls.getCanonicalName(), params));
 
     // update table:
     parameterTable.removeEditor();
@@ -606,14 +610,13 @@ public class MiniGUI extends AbstractApplication {
   protected void startTask() {
     parameterTable.editCellAt(-1, -1);
     parameterTable.setEnabled(false);
-    final ArrayList<String> params = parameters.serializeParameters();
+    final ArrayList<String> params = new ArrayList<>(parameters.size() * 2);
+    parameters.serializeParameters(params);
     parameterTable.setEnabled(true);
 
     runButton.setEnabled(false);
 
     outputArea.clear();
-    outputArea.publish("Running: " + FormatUtil.format(params, " ") + NEWLINE, Level.INFO);
-
     SwingWorker<Void, Void> r = new SwingWorker<Void, Void>() {
       @Override
       public Void doInBackground() {
