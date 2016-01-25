@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.2
  * @param <V> Vector type.
  */
 @Reference(authors = "Y. Cheng, G. M. Church", title = "Biclustering of expression data", booktitle = "Proc. 8th International Conference on Intelligent Systems for Molecular Biology (ISMB)")

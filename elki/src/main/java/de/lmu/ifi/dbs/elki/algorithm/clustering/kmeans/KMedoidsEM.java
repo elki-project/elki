@@ -72,6 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * (this variation is likely not worth publishing on its own).
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.has MedoidModel
  * @apiviz.composedOf KMedoidsInitialization

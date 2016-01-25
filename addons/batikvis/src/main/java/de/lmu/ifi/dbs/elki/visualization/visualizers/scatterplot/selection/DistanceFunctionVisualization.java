@@ -72,6 +72,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  *
  * @author Erich Schubert
  * @author Robert Rödler
+ * @since 0.5.5
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

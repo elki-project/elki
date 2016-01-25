@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Abstract base class for Cluster Models.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public abstract class AbstractModel implements Model {
   /**

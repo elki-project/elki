@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
  * Abstract base class for evaluating a scoring result.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public abstract class AbstractScoreEvaluation implements ScoreEvaluation {
   @Override

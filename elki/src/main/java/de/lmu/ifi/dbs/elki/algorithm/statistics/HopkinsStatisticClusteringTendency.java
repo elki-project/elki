@@ -78,6 +78,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  *
  * @author Lisa Reichert
  * @author Erich Schubert
+ * @since 0.7.0
  */
 // TODO: allow using more than one k
 @Reference(authors = "B. Hopkins and J. G. Skellam", //

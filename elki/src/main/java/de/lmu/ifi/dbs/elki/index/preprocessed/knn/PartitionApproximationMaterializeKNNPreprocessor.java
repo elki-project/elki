@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF}.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @param <O> the type of database objects the preprocessor can be applied to
  */

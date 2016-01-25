@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * within a consecutive range. This is beneficial for external distances.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public abstract class AbstractDBIDRangeDistanceFunction extends AbstractDatabaseDistanceFunction<DBID> implements DBIDRangeDistanceFunction {
   @Override

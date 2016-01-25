@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * Runnable wrapper for appending XML-Elements to existing Elements.
  * 
  * @author Remigius Wojdanowski
+ * @since 0.3
  */
 public class NodeAppendChild implements Runnable {
   /**

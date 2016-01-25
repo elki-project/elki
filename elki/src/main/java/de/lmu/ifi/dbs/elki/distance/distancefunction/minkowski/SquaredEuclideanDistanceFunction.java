@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * computing the square root.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 @Alias({ "squaredeuclidean", "de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction" })
 public class SquaredEuclideanDistanceFunction extends AbstractSpatialNorm {

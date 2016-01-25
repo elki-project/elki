@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 @Reference(authors = "J. C. Gower", //
 title = "A comparison of some methods of cluster analysis", //

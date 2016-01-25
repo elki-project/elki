@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction
  * Estimates a density using a variable width kernel density estimation.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.uses KernelDensityFunction
  */

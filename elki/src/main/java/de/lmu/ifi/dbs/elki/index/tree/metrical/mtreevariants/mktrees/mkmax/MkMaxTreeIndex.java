@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
  * MkMax tree
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  * 
  * @param <O> Object type
  */

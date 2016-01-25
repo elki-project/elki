@@ -30,6 +30,7 @@ import java.io.File;
  * Result encapsulating a single image.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface PixmapResult extends Result {
   /**

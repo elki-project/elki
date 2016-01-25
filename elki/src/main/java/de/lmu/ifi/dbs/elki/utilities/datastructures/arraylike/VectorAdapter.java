@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * Use the static instance from {@link ArrayLikeUtil}!
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class VectorAdapter implements NumberArrayAdapter<Double, Vector> {
   /**

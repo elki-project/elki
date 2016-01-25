@@ -33,6 +33,7 @@ import javax.swing.tree.TreeNode;
  * Build a tree of available classes for use in Swing UIs.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has TreeNode
  */

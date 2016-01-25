@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Perform standard unit tests on the double-indexed heap structures.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public class DoubleHeapTest implements JUnit4Test {
   @Test

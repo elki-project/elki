@@ -29,6 +29,7 @@ import java.util.Random;
  * seeds. This implementation is <em>no longer thread-safe</em> (but faster)!
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class FastNonThreadsafeRandom extends Random {
   /**

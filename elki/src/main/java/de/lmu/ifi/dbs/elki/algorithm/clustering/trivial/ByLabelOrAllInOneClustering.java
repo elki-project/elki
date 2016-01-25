@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * "all-in-one" clustering.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class ByLabelOrAllInOneClustering extends ByLabelClustering {
   /**

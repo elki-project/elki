@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * TODO: manage fragmentation of ranges?
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.stereotype factory
  */

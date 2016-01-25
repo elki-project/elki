@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * TODO: add references.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class KappaDistribution extends AbstractDistribution {
   /**

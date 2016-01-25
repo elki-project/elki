@@ -61,6 +61,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * developer should use {@link #instantiate} instead.
  * </p>
  * 
+ * @author Erich Schubert
+ * @since 0.2
  */
 public final class ClassGenericsUtil {
   /**

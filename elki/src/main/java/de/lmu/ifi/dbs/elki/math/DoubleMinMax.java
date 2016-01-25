@@ -29,6 +29,7 @@ import java.util.Collection;
  * Class to find the minimum and maximum double values in data.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class DoubleMinMax {
   /**

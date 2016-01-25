@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Unit test for Levenshtein distance.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class NormalizedLevenshteinDistanceFunctionTest implements JUnit4Test {
   /**

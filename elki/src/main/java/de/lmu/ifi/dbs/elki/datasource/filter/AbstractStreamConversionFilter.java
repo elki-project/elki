@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
  * projections.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @param <I> Input object type
  * @param <O> Input object type

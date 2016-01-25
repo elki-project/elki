@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
  * The interface of an actual instance.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.has KNNList oneway - - «create»

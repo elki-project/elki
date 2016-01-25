@@ -72,6 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * and Data Mining (PKDD), Prague, Czech Republic
  *
  * @author Ahmed Hettab
+ * @since 0.3
  *
  * @apiviz.has KNNQuery
  * @apiviz.has RangeQuery

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Thrown by a Parameterizable object in case of wrong parameter format.
  * 
  * @author Steffi Wanka
+ * @since 0.2
  */
 public class WrongParameterValueException extends ParameterException {
   /**

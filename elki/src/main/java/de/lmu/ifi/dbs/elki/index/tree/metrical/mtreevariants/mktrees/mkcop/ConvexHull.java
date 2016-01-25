@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
  * Holds the lower and upper hull for some values.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class ConvexHull {
   /**

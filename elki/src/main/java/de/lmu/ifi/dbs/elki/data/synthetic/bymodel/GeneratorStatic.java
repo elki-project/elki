@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * that will return only a given set of points.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class GeneratorStatic implements GeneratorInterface {
   /**

@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * MkTabTree used as database index.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> Object type
  */

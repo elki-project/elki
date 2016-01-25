@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Flattening: 1 / 294.26068
  *
  * @author Erich Schubert
+ * @since 0.3
  */
 @Alias({ "Clarke1858" })
 public class Clarke1858SpheroidEarthModel extends AbstractEarthModel {

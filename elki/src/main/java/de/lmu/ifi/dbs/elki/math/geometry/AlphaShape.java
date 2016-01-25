@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
  * Compute the alpha-Shape of a point set, using Delaunay triangulation.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.uses SweepHullDelaunay2D
  * @apiviz.has Polygon

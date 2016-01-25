@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
  *
  * @author Elke Achtert
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.uses Vector
  * @apiviz.landmark

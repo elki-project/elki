@@ -33,6 +33,7 @@ import java.util.Arrays;
  * allows retrieving existing values.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @param <E>
  */

@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
  * primitive in Java.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public final class LongArrayStaticHistogram extends AbstractObjStaticHistogram<long[]> {
   /**

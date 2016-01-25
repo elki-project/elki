@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Maximum distance for {@link NumberVector}s.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 @Alias({ "maximum", "max", "chebyshev", "de.lmu.ifi.dbs.elki.distance.distancefunction.MaximumDistanceFunction" })
 public class MaximumDistanceFunction extends LPNormDistanceFunction {

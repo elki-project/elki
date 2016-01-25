@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * 
  * @author Tibor Goldschwendt
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class XMeansTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

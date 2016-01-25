@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * A filter to shuffle the dataset.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.ShuffleObjectsFilter" })
 public class ShuffleObjectsFilter implements ObjectFilter {

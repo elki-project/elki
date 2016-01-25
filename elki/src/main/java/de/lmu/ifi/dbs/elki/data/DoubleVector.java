@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Vector type using {@code double[]} storage for real numbers.
  *
  * @author Arthur Zimek
+ * @since 0.2
  *
  * @apiviz.landmark
  */

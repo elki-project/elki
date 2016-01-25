@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * processing and Lloyd-Style batch steps.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.has KMeansModel
  *

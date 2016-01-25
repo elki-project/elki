@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * e.g. in visualization classes.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 // TODO: Can we merge MergedParameterization and TrackParameters into one?
 public class MergedParameterization implements Parameterization {

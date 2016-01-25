@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.workflow.EvaluationStep;
  * Panel to handle result evaluation
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class EvaluationTabPanel extends ParameterTabPanel {
   /**

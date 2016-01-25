@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  * Adapter for array-like things. For example, arrays and lists.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <T> Item type
  * @param <A> Array object type

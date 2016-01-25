@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Complete-linkage clustering method.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Alias({ "complete", "clink", "complete-link", "farthest-neighbor" })
 public class CompleteLinkageMethod implements LinkageMethod {

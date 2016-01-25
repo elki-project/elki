@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
  * Simple projections use the given scaling and dimension selection only.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public abstract class AbstractSimpleProjection extends AbstractFullProjection {
   /**

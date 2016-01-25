@@ -69,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Ahmed Hettab
+ * @since 0.4.0
  * 
  * @param <N> Spatial Vector
  * @param <O> Attribute Vector

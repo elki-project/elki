@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * information.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.has IndexMetaResult oneway - - «create»

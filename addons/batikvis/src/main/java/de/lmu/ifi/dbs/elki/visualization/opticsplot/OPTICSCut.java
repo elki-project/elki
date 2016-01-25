@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
  *
  * @author Heidi Kolb
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.uses ClusterOrder
  */

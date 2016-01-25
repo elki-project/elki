@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * Represents an interval in a certain dimension of the data space.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class CLIQUEInterval implements Comparable<CLIQUEInterval> {
   /**

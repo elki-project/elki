@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * Modifiable DBIDList iterator.
  *
  * @author Erich Schubert
+ * @since 0.2
  */
 public interface DoubleDBIDListMIter extends DoubleDBIDListIter, DBIDArrayMIter {
   /**

@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * representing the selected Database's objects.
  *
  * @author Heidi Kolb
+ * @since 0.4.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
  * Note: obviously, many functions are class methods or database related.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.uses NumberVector
  */

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Abstract evaluation result.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.composedOf EvaluationResult.MeasurementGroup
  */

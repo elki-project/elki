@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Reference(authors = "M. Datar and N. Immorlica and P. Indyk and V. S. Mirrokni", //
 title = "Locality-sensitive hashing scheme based on p-stable distributions", //

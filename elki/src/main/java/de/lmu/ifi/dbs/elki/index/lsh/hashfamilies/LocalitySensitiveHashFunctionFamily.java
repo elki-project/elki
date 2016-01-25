@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction
  * LSH family of hash functions.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @param <V> Object type
  */

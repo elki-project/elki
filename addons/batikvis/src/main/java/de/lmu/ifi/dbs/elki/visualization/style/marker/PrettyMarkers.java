@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * shapes with different colors. Uses object ID management by SVGPlot.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.composedOf ColorLibrary
  */

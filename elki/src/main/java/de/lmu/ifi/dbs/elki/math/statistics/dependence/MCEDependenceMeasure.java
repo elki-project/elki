@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "D. Guo", //
 title = "Coordinating computational and visual approaches for interactive feature selection and multivariate clustering", //

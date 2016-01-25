@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedObject;
  * Processor to compute the kNN of each object.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <O> Object type
  *

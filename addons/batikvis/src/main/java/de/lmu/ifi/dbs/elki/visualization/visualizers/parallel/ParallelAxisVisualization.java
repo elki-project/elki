@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Generates a SVG-Element containing axes, including labeling.
  *
  * @author Robert Rödler
+ * @since 0.5.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

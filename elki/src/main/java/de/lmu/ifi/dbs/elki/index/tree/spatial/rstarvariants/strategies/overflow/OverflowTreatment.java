@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNod
  * Reinsertion strategy to resolve overflows in the RStarTree.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public interface OverflowTreatment {
   /**

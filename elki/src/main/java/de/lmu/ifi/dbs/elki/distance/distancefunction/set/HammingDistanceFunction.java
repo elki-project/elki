@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * TODO: add a sparse (but not binary) optimized version?
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "R. W. Hamming", //
 title = "Error detecting and error correcting codes", //

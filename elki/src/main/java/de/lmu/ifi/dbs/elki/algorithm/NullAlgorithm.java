@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * set.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 @Title("Null Algorithm")
 @Description("Algorithm which does nothing, just return a null object.")

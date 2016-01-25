@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * {@code 'VVV'} model in Mclust (R).
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has MultivariateGaussianModel
  *

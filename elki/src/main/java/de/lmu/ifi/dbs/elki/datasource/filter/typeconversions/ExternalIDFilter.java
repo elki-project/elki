@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Class that turns a label column into an external ID column.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses LabelList oneway - - «reads»
  * @apiviz.has ExternalID oneway - - «produces»

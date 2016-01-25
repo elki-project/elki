@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * </p>
  * 
  * @author Lara Hirschbeck, Daniel Kolb
+ * @since 0.2
  */
 @Title("Derivative dynamic time warping")
 @Reference(authors = "E. J. Keogh and M. J. Pazzani", //

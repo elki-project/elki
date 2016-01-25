@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Handle the marker in an OPTICS plot.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

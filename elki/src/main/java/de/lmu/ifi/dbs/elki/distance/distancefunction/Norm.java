@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  * Abstract interface for a mathematical norm.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> Object type
  */

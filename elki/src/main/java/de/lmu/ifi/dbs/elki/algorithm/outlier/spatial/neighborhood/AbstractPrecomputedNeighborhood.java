@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Abstract base class for precomputed neighborhoods.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public abstract class AbstractPrecomputedNeighborhood implements NeighborSetPredicate {
   /**

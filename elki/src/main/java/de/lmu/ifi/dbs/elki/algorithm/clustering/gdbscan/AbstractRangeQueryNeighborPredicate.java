@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract local model neighborhood predicate.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.has Instance
  * 

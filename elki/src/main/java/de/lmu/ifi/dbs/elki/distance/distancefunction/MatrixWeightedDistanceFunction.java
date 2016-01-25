@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * Weighted distance for feature vectors.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 // TODO: Factory with parameterizable weight matrix?
 public class MatrixWeightedDistanceFunction extends AbstractNumberVectorDistanceFunction {

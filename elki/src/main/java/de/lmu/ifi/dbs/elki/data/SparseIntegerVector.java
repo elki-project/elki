@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * integer value.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 public class SparseIntegerVector extends AbstractNumberVector implements SparseNumberVector {
   /**

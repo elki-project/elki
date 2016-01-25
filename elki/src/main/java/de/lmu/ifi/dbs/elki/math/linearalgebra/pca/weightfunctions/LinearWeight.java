@@ -31,6 +31,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  * 1 - 0.9 * (distance/max)
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class LinearWeight implements WeightFunction {
   /**

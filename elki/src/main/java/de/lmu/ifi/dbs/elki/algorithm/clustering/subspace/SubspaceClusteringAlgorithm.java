@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.model.SubspaceModel;
  * {@link SubspaceModel}, that can then be post-processed for outlier detection.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <M> Model type
  */

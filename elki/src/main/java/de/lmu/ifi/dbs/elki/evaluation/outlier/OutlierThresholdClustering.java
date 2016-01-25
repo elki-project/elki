@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * dataset.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class OutlierThresholdClustering implements Evaluator {
   /**

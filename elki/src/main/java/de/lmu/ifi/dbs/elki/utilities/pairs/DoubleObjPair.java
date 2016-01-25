@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  * Pair storing a native double value and an arbitrary object.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> Object type
  */

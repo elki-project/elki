@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * TODO: make configurable how many threads are used.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class ParallelCore {
   /**

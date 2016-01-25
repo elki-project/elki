@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * sources are ordered appropriately!
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Description("Blindly joins multiple data sources, assuming they are ordered the same way.")
 public class PresortedBlindJoinDatabaseConnection extends AbstractDatabaseConnection {

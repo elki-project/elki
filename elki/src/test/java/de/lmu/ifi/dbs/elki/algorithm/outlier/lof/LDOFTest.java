@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Tests the LDOF algorithm.
  *
  * @author Lucia Cichella
+ * @since 0.4.0
  */
 public class LDOFTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

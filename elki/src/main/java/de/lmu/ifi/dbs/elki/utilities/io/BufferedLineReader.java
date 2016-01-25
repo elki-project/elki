@@ -34,6 +34,7 @@ import java.io.InputStreamReader;
  * overwitten!</b>
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class BufferedLineReader implements AutoCloseable {
   /**

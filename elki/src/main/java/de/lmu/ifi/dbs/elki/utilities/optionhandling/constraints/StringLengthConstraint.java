@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * .
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter
  */

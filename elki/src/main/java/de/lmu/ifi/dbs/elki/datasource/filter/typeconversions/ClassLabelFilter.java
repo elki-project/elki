@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Class that turns a label column into a class label column.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses LabelList oneway - - «reads»
  * @apiviz.has ClassLabel

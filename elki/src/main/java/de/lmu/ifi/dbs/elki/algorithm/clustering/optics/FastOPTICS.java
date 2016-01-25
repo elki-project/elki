@@ -73,6 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @author Johannes Schneider
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.composedOf RandomProjectedNeighborsAndDensities
  */

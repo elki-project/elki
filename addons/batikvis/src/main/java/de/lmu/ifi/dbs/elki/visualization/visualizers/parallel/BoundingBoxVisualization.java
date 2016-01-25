@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Draw spatial objects (except vectors!)
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

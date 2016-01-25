@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Cluster model just providing a cluster dimensionality.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class DimensionModel extends AbstractModel implements TextWriteable {
   /**

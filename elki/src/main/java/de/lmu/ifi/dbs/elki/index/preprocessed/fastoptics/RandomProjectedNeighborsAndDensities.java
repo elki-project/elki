@@ -85,6 +85,7 @@ import gnu.trove.list.array.TIntArrayList;
  *
  * @author Johannes Schneider
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "J. Schneider and M. Vlachos", //
 title = "Fast parameterless density-based clustering via random projections", //

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
  * the curve while adding points.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class XYCurve implements Result, TextWriteable {
   /**

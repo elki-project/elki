@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * to a weighted covariance matrix builder)
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  * @apiviz.uses PCAResult oneway - - «create»

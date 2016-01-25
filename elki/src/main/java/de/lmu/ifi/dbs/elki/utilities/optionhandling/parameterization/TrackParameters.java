@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * All actual Parameterization operations are forwarded to the inner class.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.composedOf TrackedParameter
  */

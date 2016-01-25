@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Chi-Squared distribution (a specialization of the Gamma distribution).
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class ChiSquaredDistribution extends GammaDistribution {
   /**

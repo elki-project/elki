@@ -30,6 +30,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * Thread to render thumbnails in the background.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses Listener oneway - - signals
  */

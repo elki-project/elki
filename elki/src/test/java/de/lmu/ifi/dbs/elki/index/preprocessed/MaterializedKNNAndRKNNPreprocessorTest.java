@@ -72,6 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * 
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  */
 public class MaterializedKNNAndRKNNPreprocessorTest implements JUnit4Test {
   // the following values depend on the data set used!

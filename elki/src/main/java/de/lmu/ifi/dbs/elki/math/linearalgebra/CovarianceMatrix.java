@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * stabilized covariance matrix builder!
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses Vector oneway
  * @apiviz.uses NumberVector oneway

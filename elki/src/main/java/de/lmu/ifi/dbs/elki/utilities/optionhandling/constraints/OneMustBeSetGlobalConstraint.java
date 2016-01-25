@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * set.
  * 
  * @author Steffi Wanka
+ * @since 0.2
  */
 public class OneMustBeSetGlobalConstraint implements GlobalParameterConstraint {
   /**

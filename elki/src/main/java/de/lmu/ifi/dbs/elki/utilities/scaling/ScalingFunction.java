@@ -36,6 +36,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
  * {@code prepare} statement.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public interface ScalingFunction {
   /**

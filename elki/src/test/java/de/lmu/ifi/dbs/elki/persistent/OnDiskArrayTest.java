@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Test to validate proper OnDiskArray operation.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 // TODO: also test with a static sample file.
 public class OnDiskArrayTest implements JUnit4Test {

@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Initialize k-means by running k-means on a sample of the data set only.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @param <V> Vector type
  */

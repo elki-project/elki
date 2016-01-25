@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * Evaluate outlier scores by their ranking
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.landmark
  *

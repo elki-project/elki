@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * Validate jensen shannon dependence.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class AbstractDependenceMeasureTest implements JUnit4Test {
   @Test

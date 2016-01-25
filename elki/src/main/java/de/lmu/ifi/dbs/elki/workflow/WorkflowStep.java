@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.workflow;
  * A logical grouping of classes with no real functionality.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface WorkflowStep {
   // Empty

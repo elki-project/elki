@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * 
  * @author Thomas Bernecker
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class VectorApproximation {
   /**

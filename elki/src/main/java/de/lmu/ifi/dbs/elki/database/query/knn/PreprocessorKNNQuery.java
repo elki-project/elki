@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Instance for a particular database, invoking the preprocessor.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <O> Data object type
  */

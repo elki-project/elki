@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * surrounding cube.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class AxisBasedReferencePoints implements ReferencePointsHeuristic {
   /**

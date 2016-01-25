@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  *
  * @author Elke Achtert
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.uses LoggingConfiguration oneway
  * @apiviz.excludeSubtypes

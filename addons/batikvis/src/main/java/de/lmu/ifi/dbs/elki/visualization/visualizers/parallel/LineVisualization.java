@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Generates data lines.
  *
  * @author Robert Rödler
+ * @since 0.5.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

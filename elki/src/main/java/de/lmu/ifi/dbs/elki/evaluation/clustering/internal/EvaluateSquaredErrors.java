@@ -87,6 +87,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * by k-means.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.composedOf NoiseHandling
  */

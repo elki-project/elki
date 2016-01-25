@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
  * left and right.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf MeanVariance
  */

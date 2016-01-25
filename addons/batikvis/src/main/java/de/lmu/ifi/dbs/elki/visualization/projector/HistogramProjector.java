@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj.LabelVisualizatio
  * visualizations.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.uses ScalesResult
  * @apiviz.uses Projection1D

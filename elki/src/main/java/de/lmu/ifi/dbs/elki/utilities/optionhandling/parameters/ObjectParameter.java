@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * 
  * @author Steffi Wanka
  * @author Erich Schubert
+ * @since 0.3
  * @param <C> Class type
  */
 public class ObjectParameter<C> extends ClassParameter<C> {

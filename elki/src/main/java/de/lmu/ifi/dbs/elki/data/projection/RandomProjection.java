@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * suggested for locality sensitive hashing (LSH).
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.uses NumberVector
  * 

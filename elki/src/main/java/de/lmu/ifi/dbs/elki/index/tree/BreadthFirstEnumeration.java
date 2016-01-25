@@ -32,6 +32,7 @@ import java.util.Queue;
  * Breadth first enumeration over the nodes of an index structure.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.uses IndexTree
  * @apiviz.has IndexTreePath

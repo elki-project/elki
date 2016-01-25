@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
  * Scaling function to invert values by computing -1 * Math.log(x)
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class MinusLogScaling implements StaticScalingFunction {
   @Override

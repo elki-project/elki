@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Initialize K-means by using the first k objects as initial means.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <O> Object type for KMedoids
  */

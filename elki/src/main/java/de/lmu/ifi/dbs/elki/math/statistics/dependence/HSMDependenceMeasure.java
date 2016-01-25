@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Erich Schubert
  * @author Robert Rödler
+ * @since 0.5.5
  */
 @Reference(authors = "A. Tatu, G. Albuquerque, M. Eisemann, P. Bak, H. Theisel, M. A. Magnor, and D. A. Keim", //
 title = "Automated Analytical Methods to Support Visual Exploration of High-Dimensional Data", //

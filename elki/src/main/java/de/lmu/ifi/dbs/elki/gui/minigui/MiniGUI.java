@@ -82,6 +82,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * Minimal GUI built around a table-based parameter editor.
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.composedOf SettingsComboboxModel
  * @apiviz.composedOf LoggingStep

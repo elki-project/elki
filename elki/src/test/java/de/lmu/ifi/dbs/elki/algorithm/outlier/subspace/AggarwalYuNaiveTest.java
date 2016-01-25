@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Tests the AggarwalYuNaive algorithm.
  * 
  * @author Lucia Cichella
+ * @since 0.4.0
  */
 public class AggarwalYuNaiveTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

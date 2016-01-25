@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
  * Combination interface of the DoubleDBIDListIter with IntegerDBIDIter.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public interface DoubleIntegerDBIDListIter extends DoubleDBIDListIter, IntegerDBIDIter {
   // No additional methods.

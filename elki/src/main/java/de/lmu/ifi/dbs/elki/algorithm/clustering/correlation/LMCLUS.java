@@ -79,6 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * 
  * @author Ernst Waas
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Reference(authors = "Robert Haralick, Rave Harpaz", title = "Linear manifold clustering in high dimensional spaces by stochastic search", booktitle = "Pattern Recognition volume 40, Issue 10", url = "http://dx.doi.org/10.1016/j.patcog.2007.01.020")
 public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {

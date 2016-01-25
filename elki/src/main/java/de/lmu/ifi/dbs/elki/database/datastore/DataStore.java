@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * Generic storage interface for objects indexed by {@link DBID}.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <T> Data type
  */

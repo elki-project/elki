@@ -75,6 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  *
  * @author Ahmed Hettab
+ * @since 0.4.0
  *
  * @param <P> Spatial Vector type
  */

@@ -33,6 +33,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  * max(0.0, 1.0 - (distance/(3*stddev))^2
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class QuadraticStddevWeight implements WeightFunction {
   /**

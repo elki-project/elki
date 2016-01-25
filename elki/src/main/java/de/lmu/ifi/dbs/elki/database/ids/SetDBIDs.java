@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * "contains" lookups.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface SetDBIDs extends DBIDs {
   // empty marker interface

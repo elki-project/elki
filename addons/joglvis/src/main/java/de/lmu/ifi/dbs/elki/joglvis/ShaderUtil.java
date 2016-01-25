@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.FileUtil;
  * Class to help dealing with shaders.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class ShaderUtil {
   /**

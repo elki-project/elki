@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 @Reference(authors = "J. Gao, P.-N. Tan", //
 title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", //

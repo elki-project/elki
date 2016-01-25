@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * eigenpairs, where n is a user specified number.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 // todo parameter comments
 @Title("First n Eigenpair filter")

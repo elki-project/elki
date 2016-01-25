@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * has been used the wrong way, and should be used backwards.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.has XYCurve
  */

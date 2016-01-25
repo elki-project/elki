@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
  * Dimension-selecting 1D projection.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class Simple1D extends AbstractSimpleProjection implements Projection1D {
   /**

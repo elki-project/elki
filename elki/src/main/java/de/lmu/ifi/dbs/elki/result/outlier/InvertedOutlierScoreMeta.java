@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.result.outlier;
  * Class to signal a value-inverted outlier score, i.e. low values are outliers.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class InvertedOutlierScoreMeta extends BasicOutlierScoreMeta {
   /**

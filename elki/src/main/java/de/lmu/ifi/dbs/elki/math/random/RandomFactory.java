@@ -36,6 +36,7 @@ import java.util.Random;
  * scientific experiments are not likely to be adversarial.
  *
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.has Random
  * @apiviz.has FastNonThreadsafeRandom

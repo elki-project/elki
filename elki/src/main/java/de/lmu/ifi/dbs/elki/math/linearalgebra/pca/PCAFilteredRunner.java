@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * regular runner, but afterwards, an {@link EigenPairFilter} is applied.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  * @apiviz.has PCAFilteredResult oneway - - «create»

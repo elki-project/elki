@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * TODO: resize buffer when necessary?
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.uses MappedByteBuffer - - «reads»
  * @apiviz.uses FileChannel - - «reads»

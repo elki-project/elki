@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * Modifiable array iterator.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface DBIDArrayMIter extends DBIDArrayIter, DBIDMIter {
   // Nothing new, see {@link DBIDArrayIter} and {@link DBIDMIter}

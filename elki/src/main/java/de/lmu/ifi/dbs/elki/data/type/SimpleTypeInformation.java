@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * Class wrapping a particular data type.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf ByteBufferSerializer
  * 

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * Utilities for implementing filters.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public final class FilterUtil {
   /**

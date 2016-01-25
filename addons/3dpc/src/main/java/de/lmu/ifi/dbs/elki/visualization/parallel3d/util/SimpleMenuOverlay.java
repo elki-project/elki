@@ -39,6 +39,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
  * TODO: Hover effects?
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public abstract class SimpleMenuOverlay extends AbstractSimpleOverlay implements MouseListener {
   /**

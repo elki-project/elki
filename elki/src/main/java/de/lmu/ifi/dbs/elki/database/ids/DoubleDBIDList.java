@@ -50,6 +50,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * </pre>
  *
  * @author Erich Schubert
+ * @since 0.5.5
  *
  * @apiviz.landmark
  *

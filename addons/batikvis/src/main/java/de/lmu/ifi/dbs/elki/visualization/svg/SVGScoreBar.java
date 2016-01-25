@@ -33,6 +33,7 @@ import org.w3c.dom.Element;
  * a relative score.
  * 
  * @author Sascha Goldhofer
+ * @since 0.5.0
  */
 // TODO: refactor to get a progress bar?
 public class SVGScoreBar {

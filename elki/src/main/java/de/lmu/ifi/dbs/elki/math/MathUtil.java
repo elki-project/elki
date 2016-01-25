@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  *
  * @author Arthur Zimek
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.landmark
  */

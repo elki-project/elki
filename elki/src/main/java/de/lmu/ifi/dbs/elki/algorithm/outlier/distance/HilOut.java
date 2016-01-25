@@ -85,6 +85,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @author Jonathan von Brünken
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.composedOf HilbertFeatures
  * @apiviz.uses HilFeature

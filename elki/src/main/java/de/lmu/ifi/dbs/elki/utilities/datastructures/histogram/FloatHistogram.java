@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
  * Histogram storing float values.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.has Iter
  */

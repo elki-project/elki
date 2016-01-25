@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
  * Runnable wrapper for modifying XML-Attributes.
  * 
  * @author Remigius Wojdanowski
+ * @since 0.3
  * 
  */
 // FIXME: Unused? Remove?

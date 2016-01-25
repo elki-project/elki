@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  * API to synchronize updates
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.has UpdateRunner
  */

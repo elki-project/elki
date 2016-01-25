@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
  * Static class with utilities related to querying a database.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.landmark
  *

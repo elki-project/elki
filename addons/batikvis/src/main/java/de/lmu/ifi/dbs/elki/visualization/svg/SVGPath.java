@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
  * Element used for building an SVG path using a string buffer.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.uses Element oneway - - «create»
  */

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * negative values.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.stereotype factory

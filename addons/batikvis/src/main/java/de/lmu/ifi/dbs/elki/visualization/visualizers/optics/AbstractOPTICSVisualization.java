@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  * Abstract base class for OPTICS visualizer
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.uses OPTICSProjection
  */

@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * Static (no modifications allowed) set of Database Object IDs.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 class ArrayStaticIntegerDBIDs implements IntegerArrayStaticDBIDs {
   /**

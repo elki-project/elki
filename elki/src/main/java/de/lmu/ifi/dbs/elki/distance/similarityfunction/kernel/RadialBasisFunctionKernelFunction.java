@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Gaussian radial basis function kernel (RBF Kernel).
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 @Alias({ "rbf" })
 public class RadialBasisFunctionKernelFunction extends AbstractVectorSimilarityFunction {

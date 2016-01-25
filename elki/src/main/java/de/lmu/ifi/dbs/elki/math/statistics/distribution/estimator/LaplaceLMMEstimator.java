@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Estimate Laplace distribution parameters using the method of L-Moments (LMM).
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.has LaplaceDistribution
  */

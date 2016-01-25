@@ -25,6 +25,9 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling;
 
 /**
  * Thrown by OptionHandler in case of incorrect parameter-array.
+ *
+ * @author Arthur Zimek
+ * @since 0.2
  */
 public class NoParameterValueException extends ParameterException {
   /**

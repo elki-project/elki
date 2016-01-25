@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @author Erich Schubert
  * @author Niels Dörre
+ * @since 0.5.5
  */
 @Reference(authors = "Ed Williams", title = "Aviation Formulary", booktitle = "", url = "http://williams.best.vwh.net/avform.htm")
 public final class SphereUtil {

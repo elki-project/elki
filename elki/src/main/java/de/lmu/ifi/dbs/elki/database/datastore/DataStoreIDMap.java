@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * Interface to map DBIDs to integer record ids for use in storage.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface DataStoreIDMap {
   /**

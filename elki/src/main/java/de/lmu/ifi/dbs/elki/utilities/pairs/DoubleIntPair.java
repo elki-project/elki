@@ -29,6 +29,7 @@ import java.util.Comparator;
  * Pair storing an integer and a double.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.has Comparator
  */

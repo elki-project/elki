@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.logging.statistics;
  * TODO: add support for different time units?
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public interface Duration extends Statistic {
   /**

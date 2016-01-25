@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * Run a database query in a database context.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> Database object type.
  */

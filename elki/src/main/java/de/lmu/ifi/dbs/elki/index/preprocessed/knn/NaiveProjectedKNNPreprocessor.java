@@ -79,6 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.7.0
  * @apiviz.has NaiveProjectedKNNQuery
  */
 @Reference(authors = "E. Schubert, A. Zimek, H.-P. Kriegel", //

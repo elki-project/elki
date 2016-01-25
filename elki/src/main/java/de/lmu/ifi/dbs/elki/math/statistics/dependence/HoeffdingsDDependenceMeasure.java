@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @author Yinchong Yang
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "W. Hoeffding", //
 title = "A non-parametric test of independence", //

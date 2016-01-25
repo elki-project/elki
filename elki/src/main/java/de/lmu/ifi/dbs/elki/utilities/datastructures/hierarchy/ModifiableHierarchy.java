@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  * Modifiable Hierarchy.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <O> Object type
  */

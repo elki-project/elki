@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation.ScoreIter;
  * The ROC values would be incorrect then anyway!
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.composedOf DBIDIter
  */

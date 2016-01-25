@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Cluster model containing a linear equation system for the cluster.
  * 
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.composedOf LinearEquationSystem
  */

@@ -106,6 +106,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
  * FIXME: proper depth-sorting of edges. It's not that simple, unfortunately.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @param <O> Object type
  */

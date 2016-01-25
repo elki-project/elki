@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * value, i.e., <code>arccos(&lt;v1,v2&gt;)</code>.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 @Alias({ "arccos" })
 public class ArcCosineDistanceFunction extends AbstractSpatialDistanceFunction {

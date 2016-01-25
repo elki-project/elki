@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.KNNList;
  * order.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 class DoubleIntegerDBIDListKNNHeap extends DoubleIntegerDBIDKNNList implements KNNHeap {
   /**

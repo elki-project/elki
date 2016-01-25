@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * attribute is scaled to have the same mean (but 0 is not changed).
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * @param <V> vector type
  * 
  * @apiviz.uses NumberVector

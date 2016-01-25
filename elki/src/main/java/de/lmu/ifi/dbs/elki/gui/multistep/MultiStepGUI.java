@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * Experimenter-style multi step GUI.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.composedOf AlgorithmTabPanel

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * JUnit Test for the class {@link AffineTransformation}
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  */
 public class AffineTransformationTest implements JUnit4Test {

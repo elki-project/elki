@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * matrix of an external binary matrix file.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 @Title("File based double distance for database objects.")
 @Description("Loads double distance values from an external matrix.")

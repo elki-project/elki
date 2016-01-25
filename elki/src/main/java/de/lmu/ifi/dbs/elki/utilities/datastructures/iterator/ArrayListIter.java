@@ -32,6 +32,7 @@ import java.util.List;
  * access and seeking (i.e. ArrayLists, but not Linked Lists!)
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.excludeSubtypes
  * 

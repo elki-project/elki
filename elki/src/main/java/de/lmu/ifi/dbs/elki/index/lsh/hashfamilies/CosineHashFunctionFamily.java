@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * </p>
  *
  * @author Evgeniy Faerman
+ * @since 0.6.0
  */
 @Reference(authors = "M.S. Charikar", //
 title = "Similarity estimation techniques from rounding algorithms", //

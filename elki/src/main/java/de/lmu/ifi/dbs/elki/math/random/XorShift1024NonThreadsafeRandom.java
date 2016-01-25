@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "S. Vigna", //
 title = "An experimental exploration of Marsaglia's xorshift generators, scrambled", //

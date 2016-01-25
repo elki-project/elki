@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "Fowlkes, E.B. and Mallows, C.L.", //
 title = "A method for comparing two hierarchical clusterings", //

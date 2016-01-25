@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Tests the COF algorithm.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class COFTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

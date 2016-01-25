@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Biweight (Quartic) kernel density estimator.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Alias({ "biweight", "quartic" })
 public final class BiweightKernelDensityFunction implements KernelDensityFunction {

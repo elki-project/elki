@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
  * Class storing the contingency table and related data on two clusterings.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.landmark
  * 

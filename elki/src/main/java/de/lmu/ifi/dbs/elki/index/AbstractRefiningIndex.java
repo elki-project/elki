@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.Counter;
  * The number of refinements will be counted as individual page accesses.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.excludeSubtypes
  * @apiviz.has AbstractRangeQuery

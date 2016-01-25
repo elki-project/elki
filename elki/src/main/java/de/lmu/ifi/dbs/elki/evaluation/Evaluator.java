@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.result.ResultProcessor;
  * evaluations, ...
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.excludeSubtypes
  */

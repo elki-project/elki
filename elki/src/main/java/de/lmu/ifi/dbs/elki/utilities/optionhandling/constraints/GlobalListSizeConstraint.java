@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
  * specified by the integer parameter ({@link IntParameter}) given.
  * 
  * @author Steffi Wanka
+ * @since 0.2
  */
 public class GlobalListSizeConstraint implements GlobalParameterConstraint {
   /**

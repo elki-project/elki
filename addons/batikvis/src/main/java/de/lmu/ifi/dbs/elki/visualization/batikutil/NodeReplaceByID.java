@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * be put on the update queue.
  *
  * @author Erich Schubert
+ * @since 0.2
  */
 public class NodeReplaceByID implements Runnable {
   /**

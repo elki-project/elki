@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * perceptron MLP kernel).
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class SigmoidKernelFunction extends AbstractVectorSimilarityFunction {
   /**

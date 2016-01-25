@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * easier to use APIs.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class Centroid extends Vector {
   /**

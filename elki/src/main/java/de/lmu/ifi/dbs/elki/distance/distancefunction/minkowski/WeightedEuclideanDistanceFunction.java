@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * Weighted Euclidean distance for {@link NumberVector}s.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFunction {
   /**

@@ -30,6 +30,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  * This can either come from a full PCA, or just from an axis-parallel subspace selection
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 // TODO: cleanup
 public interface ProjectionResult {

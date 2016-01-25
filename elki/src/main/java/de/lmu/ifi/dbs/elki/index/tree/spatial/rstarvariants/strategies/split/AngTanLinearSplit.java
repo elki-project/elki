@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Reference(authors = "C. H. Ang and T. C. Tan", title = "New linear node splitting algorithm for R-trees", booktitle = "Proceedings of the 5th International Symposium on Advances in Spatial Databases", url = "http://dx.doi.org/10.1007/3-540-63238-7_38")
 public class AngTanLinearSplit implements SplitStrategy {

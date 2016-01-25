@@ -32,6 +32,7 @@ import java.util.Collection;
  * This is meant for reporting re-parameterization errors.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class InternalParameterizationErrors extends ParameterException {
   /**

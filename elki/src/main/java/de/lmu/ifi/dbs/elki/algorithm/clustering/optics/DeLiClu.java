@@ -80,6 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  *
  * @author Elke Achtert
+ * @since 0.7.0
  * @param <NV> the type of NumberVector handled by this Algorithm
  */
 @Title("DeliClu: Density-Based Hierarchical Clustering")

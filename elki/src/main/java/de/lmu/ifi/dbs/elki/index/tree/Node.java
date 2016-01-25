@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.persistent.Page;
  * has to provide an enumeration over its children.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.composedOf Entry
  * @apiviz.excludeSubtypes

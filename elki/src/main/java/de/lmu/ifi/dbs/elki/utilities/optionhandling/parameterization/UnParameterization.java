@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * in a non-recursive way.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class UnParameterization implements Parameterization {  
   /**

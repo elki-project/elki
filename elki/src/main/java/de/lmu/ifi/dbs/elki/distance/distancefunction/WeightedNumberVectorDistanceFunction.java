@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * Distance functions where each dimension is assigned a weight.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <V> Vector type, usually NumberVector or above.
  */

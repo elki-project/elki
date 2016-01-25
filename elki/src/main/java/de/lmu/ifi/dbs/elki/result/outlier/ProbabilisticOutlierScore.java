@@ -30,6 +30,7 @@ package de.lmu.ifi.dbs.elki.result.outlier;
  * But the baseline may be different from 0.0!
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class ProbabilisticOutlierScore implements OutlierScoreMeta {
   /**

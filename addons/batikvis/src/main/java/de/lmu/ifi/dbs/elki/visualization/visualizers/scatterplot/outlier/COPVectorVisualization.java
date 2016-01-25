@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * Visualize error vectors as produced by COP.
  *
  * @author Erich Schubert
+ * @since 0.5.5
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

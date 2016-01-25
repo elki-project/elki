@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
  * database.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class MultipleObjectsBundleDatabaseConnection implements DatabaseConnection {
   /**

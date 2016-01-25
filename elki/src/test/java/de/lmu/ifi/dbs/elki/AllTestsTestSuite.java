@@ -34,6 +34,7 @@ import junit.framework.TestSuite;
  * Build a test suite with all tests included with ELKI
  *
  * @author Erich Schubert
+ * @since 0.2
  */
 public class AllTestsTestSuite extends TestSuite {
   /**

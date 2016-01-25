@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.AbstractPreprocessorIndex;
  * Abstract base class for preference vector based algorithms.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <NV> Number vector
  */

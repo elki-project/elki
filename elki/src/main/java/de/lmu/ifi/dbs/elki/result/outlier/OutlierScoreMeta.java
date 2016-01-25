@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * return {@link Double#NEGATIVE_INFINITY} or {@link Double#POSITIVE_INFINITY}.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public interface OutlierScoreMeta extends Result {
   /**

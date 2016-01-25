@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * coefficient, which is a proper distance metric.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses 
  *              de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex

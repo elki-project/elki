@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * Provide a configuration panel to modify a boolean via a checkbox.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses Flag
  */

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectionResult;
  * Abstract index interface for local projections
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has ProjectionResult
  * 

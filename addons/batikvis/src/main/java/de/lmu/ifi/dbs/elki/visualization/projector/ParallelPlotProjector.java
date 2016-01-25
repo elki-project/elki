@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.SimpleParallel;
  * visualization.
  *
  * @author Robert Rödler
+ * @since 0.5.0
  *
  * @param <V> Vector type
  */

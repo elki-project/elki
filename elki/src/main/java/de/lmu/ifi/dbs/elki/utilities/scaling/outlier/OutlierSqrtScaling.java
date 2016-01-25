@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * mapping onto 0:1 using the minimum values seen.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class OutlierSqrtScaling implements OutlierScalingFunction {
   /**

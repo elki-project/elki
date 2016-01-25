@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.logging.statistics;
  * Abstract base class for statistics tracking.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public abstract class AbstractStatistic implements Statistic {
   /**

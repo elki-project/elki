@@ -35,6 +35,7 @@ import java.util.zip.GZIPOutputStream;
  * Class to output all result data to a single stream (e.g. Stdout, single file)
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class SingleStreamOutput implements StreamFactory {
   /**

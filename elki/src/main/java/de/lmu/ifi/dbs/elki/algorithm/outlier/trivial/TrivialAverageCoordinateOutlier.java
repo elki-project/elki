@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
  * convert a 1d data set into a score, e.g. in geodata.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class TrivialAverageCoordinateOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

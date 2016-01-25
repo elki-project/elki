@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * Default implementation of a page header.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class DefaultPageHeader implements PageHeader {
   /**

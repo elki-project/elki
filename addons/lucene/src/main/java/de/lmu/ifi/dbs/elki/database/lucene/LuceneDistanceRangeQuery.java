@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Perform range similarity search using lucene.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class LuceneDistanceRangeQuery extends AbstractDistanceRangeQuery<DBID> {
   /**

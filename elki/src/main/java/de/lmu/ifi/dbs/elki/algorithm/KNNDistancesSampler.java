@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * and look for a bend or knee in this plot.
  *
  * @author Arthur Zimek
+ * @since 0.7.0
  *
  * @param <O> the type of objects handled by this Algorithm
  */

@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.io;
  * Serializers with a fixed length serialization.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * @apiviz.excludeSubtypes
  * 
  * @param <T> Type

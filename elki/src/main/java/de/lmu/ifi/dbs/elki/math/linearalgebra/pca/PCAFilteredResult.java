@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
  * subspace and an "error" subspace.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  */

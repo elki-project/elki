@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleArrayListPa
  * Run k-means with prespecified initial means.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberVector> {
   /**

@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * clustering obtained via the given class label.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.landmark
  *

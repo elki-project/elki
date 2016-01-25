@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Projected relation view (non-materialized)
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <IN> Vector type
  * @param <OUT> Vector type

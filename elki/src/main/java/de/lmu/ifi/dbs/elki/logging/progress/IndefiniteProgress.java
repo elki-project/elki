@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Progress class without a fixed destination value.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class IndefiniteProgress extends AbstractProgress {
   /**

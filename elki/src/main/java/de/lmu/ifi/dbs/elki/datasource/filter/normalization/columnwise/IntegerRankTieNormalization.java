@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
  * then, followed by the next on "4")
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.IntegerRankTieNormalization"})
 public class IntegerRankTieNormalization implements ObjectFilter {

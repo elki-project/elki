@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
  * APRIORI itemset.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public abstract class Itemset implements Comparable<Itemset> {
   /**

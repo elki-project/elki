@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  * projections in the required dimensions!
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.landmark
  *

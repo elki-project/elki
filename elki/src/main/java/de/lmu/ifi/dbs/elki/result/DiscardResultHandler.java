@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.result;
  * benchmarks.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class DiscardResultHandler implements ResultHandler {
   /**

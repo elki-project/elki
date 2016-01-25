@@ -71,6 +71,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  *
  * @author Arthur Zimek
+ * @since 0.2
  * @param <V> the type of FeatureVector handled by this Algorithm
  */
 @Title("Dependency Derivator: Deriving numerical inter-dependencies on data")

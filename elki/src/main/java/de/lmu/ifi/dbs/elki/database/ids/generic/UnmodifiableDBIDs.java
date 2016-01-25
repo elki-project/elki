@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
  * Unmodifiable wrapper for DBIDs.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses DBIDs
  * @apiviz.has UnmodifiableDBIDIter

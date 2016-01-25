@@ -60,6 +60,7 @@ import gnu.trove.map.hash.TLongFloatHashMap;
  *
  * @author Elke Achtert
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.composedOf DistanceCacheWriter
  */

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * Use a matrix as array, by flattening it into a sequence.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.exclude
  */

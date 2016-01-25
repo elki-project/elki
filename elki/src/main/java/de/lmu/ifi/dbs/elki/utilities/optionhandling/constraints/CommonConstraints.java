@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  * Class storing a number of very common constraints.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.landmark
  * @apiviz.composedOf ParameterConstraint

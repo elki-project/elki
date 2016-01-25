@@ -83,6 +83,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * Note: these classes need to be rewritten. Contributions welcome!
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  * @apiviz.uses TextWriterStream oneway - - writesTo

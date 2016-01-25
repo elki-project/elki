@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
  * Interface for initializing K-Means
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.landmark
  *

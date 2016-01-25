@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
  * </dl>
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.uses CSSClass oneway
  */

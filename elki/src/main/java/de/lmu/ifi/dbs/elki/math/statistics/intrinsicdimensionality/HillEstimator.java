@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "B. M. Hill", //
 title = "A simple general approach to inference about the tail of a distribution", //

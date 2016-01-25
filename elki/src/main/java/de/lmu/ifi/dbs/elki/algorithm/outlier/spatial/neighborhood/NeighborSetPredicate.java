@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * Predicate to obtain the neighbors of a reference object as set.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface NeighborSetPredicate extends Result {
   /**

@@ -87,6 +87,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * choose whichever works best.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.uses MOMDistributionEstimator
  * @apiviz.uses MADDistributionEstimator

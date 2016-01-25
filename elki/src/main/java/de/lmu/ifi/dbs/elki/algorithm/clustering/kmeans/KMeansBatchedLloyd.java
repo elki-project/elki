@@ -69,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * blocks.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @apiviz.has KMeansModel
  *

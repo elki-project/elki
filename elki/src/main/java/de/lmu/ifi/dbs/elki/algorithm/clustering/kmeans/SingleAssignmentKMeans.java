@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Pseudo-k-Means variations, that assigns each object to the nearest center.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.has KMeansModel
  *

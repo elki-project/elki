@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * further, by also varying the fan-out degree.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class MaxExtensionSortTileRecursiveBulkSplit extends AbstractBulkSplit {
   /**

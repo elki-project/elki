@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf SpatialSorter 
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Reference(title = "On packing R-trees", authors = "Kamel, I. and Faloutsos, C.", booktitle = "Proc. of the second international conference on Information and knowledge management", url = "http://dx.doi.org/10.1145/170088.170403")
 public class SpatialSortBulkSplit extends AbstractBulkSplit {

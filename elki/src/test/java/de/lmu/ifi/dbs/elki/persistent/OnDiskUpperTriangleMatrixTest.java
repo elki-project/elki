@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Test the on-disk OnDiskUpperTriangleMatrix class.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  */
 // TODO: also test with a static sample file.

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * The reference values were computed using SciPy.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class GeneralizedParetoDistributionTest extends AbstractDistributionTest implements JUnit4Test {
   public static final double[] P_CDFPDF = { //

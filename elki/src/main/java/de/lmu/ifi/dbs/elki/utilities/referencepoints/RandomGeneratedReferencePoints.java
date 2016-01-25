@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Reference points generated randomly within the used data space.
  *
  * @author Erich Schubert
+ * @since 0.3
  */
 public class RandomGeneratedReferencePoints implements ReferencePointsHeuristic {
   /**

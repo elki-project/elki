@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Note: this class is not parameterizable, but can only be used from Java.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class ArrayAdapterDatabaseConnection implements DatabaseConnection {
   /**

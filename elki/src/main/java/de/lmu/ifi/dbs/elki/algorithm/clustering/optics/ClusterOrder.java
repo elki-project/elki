@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * Class to store the result of an ordering clustering algorithm such as OPTICS.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.landmark
  */

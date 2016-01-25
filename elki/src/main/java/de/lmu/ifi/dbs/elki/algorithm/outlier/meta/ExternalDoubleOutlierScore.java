@@ -73,6 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * score specified with an algorithm-specific prefix.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has ScalingFunction
  * @apiviz.has File

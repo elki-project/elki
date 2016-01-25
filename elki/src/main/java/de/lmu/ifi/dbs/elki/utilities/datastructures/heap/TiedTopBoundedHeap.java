@@ -33,6 +33,7 @@ import java.util.List;
  * elements.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <E> Object type
  */

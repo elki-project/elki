@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Union-find implementations in ELKI, for DBID objects.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public interface UnionFind {
   /**

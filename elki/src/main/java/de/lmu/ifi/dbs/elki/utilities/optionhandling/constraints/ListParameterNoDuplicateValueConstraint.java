@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * is not allowed to have duplicate values.
  * 
  * @author Arthur Zimek
+ * @since 0.5.5
  */
 public class ListParameterNoDuplicateValueConstraint<T extends Object> implements ParameterConstraint<List<T>> {
 

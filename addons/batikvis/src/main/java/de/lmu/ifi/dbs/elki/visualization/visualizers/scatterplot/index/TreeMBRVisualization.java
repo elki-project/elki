@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * Visualize the bounding rectangles of an R-Tree based index.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

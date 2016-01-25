@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * 
  * @author Katharina Rausch
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class CLARATest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

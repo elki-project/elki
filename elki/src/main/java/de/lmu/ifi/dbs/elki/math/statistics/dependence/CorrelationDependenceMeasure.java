@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Pearson product-moment correlation coefficient.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class CorrelationDependenceMeasure extends AbstractDependenceMeasure {
   /**

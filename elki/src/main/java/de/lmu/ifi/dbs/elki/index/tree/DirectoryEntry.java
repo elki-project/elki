@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.index.tree;
  * Directory Entry
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.excludeSubtypes
  */

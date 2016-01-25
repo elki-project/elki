@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.ProgressLogRecord;
  * Format a log record for error output, including a stack trace if available.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 // TODO: make more configurable and handle suppressed exceptions
 public class ErrorFormatter extends Formatter {

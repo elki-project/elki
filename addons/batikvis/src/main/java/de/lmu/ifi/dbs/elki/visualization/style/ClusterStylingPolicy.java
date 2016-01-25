@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * Styling policy based on cluster membership.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  */
 // TODO: fast enough? Some other kind of mapping we can use?

@@ -89,6 +89,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * TODO: alternatively, allow using a fixed radius?
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @param <O> Vector type
  * 

@@ -30,6 +30,7 @@ import java.util.EventListener;
  * objects have been changed due to insertion or removals of objects.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  * 
  * @apiviz.uses KNNChangeEvent oneway - -
  */

@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Grid-based strategy to pick reference points.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class GridBasedReferencePoints implements ReferencePointsHeuristic {
   /**

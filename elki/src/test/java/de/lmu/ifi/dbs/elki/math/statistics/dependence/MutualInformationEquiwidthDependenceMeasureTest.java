@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * Validate correlation by comparing to manual computation.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class MutualInformationEquiwidthDependenceMeasureTest implements JUnit4Test {
   double[][] data = { //

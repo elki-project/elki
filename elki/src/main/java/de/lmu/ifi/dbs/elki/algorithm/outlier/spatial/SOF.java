@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * A LOF variation simplified with reachDist(o,p) == dist(o,p).
  * 
  * @author Ahmed Hettab
+ * @since 0.4.0
  * 
  * @param <N> Neighborhood object type
  * @param <O> Attribute object type

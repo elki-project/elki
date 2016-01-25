@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Unit test {@link MeanVariance} with negative weights.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class MeanVarianceTest implements JUnit4Test {
   /**

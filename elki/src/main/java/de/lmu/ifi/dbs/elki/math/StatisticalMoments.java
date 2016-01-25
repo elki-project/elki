@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Reference(authors = "T. B. Terriberry", title = "Computing Higher-Order Moments Online", booktitle = "Online - Technical Note", url = "http://people.xiph.org/~tterribe/notes/homs.html")
 public class StatisticalMoments extends MeanVarianceMinMax {

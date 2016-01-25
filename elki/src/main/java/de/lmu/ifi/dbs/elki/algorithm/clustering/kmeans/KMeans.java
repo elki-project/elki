@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * Some constants and options shared among kmeans family algorithms.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @param <V> Number vector type
  * @param <M> Actual model type

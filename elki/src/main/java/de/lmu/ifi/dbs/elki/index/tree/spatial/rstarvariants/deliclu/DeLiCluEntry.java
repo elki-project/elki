@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
  * contains handled or unhandled data objects.
  *
  * @author Elke Achtert
+ * @since 0.2
  */
 public interface DeLiCluEntry extends SpatialEntry {
   /**

@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * On the first set, its an all-or-nothing depending on the parameters.
  *
  * @author Erich Schubert
+ * @since 0.3
  */
 public class DOCTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

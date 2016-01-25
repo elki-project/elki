@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * is defined to be y = b0 + b1*x1 + b2*x2 + ... + bp*xp + e.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class MultipleLinearRegression {
   /**

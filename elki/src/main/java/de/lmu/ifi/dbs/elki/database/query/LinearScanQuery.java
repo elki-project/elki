@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.database.query;
  * Marker interface for linear scan (slow, non-accelerated) queries.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.database.Database
  */

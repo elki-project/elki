@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualizati
  * Abstract superclass for Visualizers (aka: Visualization Factories).
  *
  * @author Remigius Wojdanowski
+ * @since 0.4.0
  *
  * @apiviz.uses ThumbnailVisualization oneway - - «create»
  * @apiviz.excludeSubtypes

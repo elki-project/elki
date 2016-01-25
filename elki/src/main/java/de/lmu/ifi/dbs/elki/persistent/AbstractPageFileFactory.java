@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Abstract page file factory.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @param <P> Page type
  */

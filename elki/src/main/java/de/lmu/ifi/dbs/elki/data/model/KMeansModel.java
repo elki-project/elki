@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * produced by k-means (so the Voronoi cell visualization is sensible).
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class KMeansModel extends MeanModel {
   /**

@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Unit test for random hyperplane / cosine distance.
  *
  * @author Evgeniy Faerman
+ * @since 0.7.0
  */
 public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

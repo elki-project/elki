@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Base class for MiniGUI input helpers
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <T> Parameter type
  */

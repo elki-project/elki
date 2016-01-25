@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * subscribed {@link KNNListener} of the change.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  * 
  * @apiviz.has DBIDs
  * 

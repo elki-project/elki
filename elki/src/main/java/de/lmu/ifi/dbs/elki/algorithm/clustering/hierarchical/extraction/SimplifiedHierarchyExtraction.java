@@ -74,6 +74,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.uses HierarchicalClusteringAlgorithm
  * @apiviz.uses PointerHierarchyRepresentationResult

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Uniform / Rectangular kernel density estimator.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public final class UniformKernelDensityFunction implements KernelDensityFunction {
   /**

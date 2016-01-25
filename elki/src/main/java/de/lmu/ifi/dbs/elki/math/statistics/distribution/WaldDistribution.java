@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Inverse Gaussian distribution aka Wald distribution
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Alias({ "InverseGaussianDistribution", "invgauss" })
 public class WaldDistribution extends AbstractDistribution {

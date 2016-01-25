@@ -34,6 +34,7 @@ import com.jogamp.opengl.util.awt.TextRenderer;
  * Simple menu overlay.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class SimpleMessageOverlay extends AbstractSimpleOverlay {
   /**

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.DOMCloner;
  * Clone visible parts of an SVG document.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class SVGCloneVisible extends DOMCloner {
   @Override

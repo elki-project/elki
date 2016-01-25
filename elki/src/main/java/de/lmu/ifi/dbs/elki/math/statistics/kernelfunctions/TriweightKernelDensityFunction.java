@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Triweight kernel density estimator.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Alias({ "triweight" })
 public final class TriweightKernelDensityFunction implements KernelDensityFunction {

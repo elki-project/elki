@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * Abstract super class for all metrical index classes.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @param <O> the type of objects stored in the index
  * @param <N> the type of nodes used in the metrical index

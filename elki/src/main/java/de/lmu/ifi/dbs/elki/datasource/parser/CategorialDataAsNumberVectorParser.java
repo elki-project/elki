@@ -40,6 +40,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
  * TODO: specify handling for numerical values.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @apiviz.landmark
  * @apiviz.has NumberVector

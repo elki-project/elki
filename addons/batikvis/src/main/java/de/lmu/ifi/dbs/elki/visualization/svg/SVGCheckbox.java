@@ -37,6 +37,7 @@ import org.w3c.dom.events.EventTarget;
  * SVG checkbox.
  * 
  * @author Sascha Goldhofer
+ * @since 0.5.0
  */
 public class SVGCheckbox {
   /**

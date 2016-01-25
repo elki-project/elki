@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 @Reference(authors = "L.N. Vaserstein", //
 title = "Markov processes over denumerable products of spaces describing large systems of automata", //

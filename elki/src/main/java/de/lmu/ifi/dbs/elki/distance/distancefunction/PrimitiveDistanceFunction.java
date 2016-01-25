@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * Primitive distance function that is defined on some kind of object.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * 

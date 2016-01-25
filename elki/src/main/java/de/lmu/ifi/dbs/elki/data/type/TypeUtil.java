@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * Utility package containing various common types.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has TypeInformation oneway - -
  * @apiviz.landmark

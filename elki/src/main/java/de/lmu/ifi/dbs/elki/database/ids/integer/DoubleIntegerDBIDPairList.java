@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
  * Currently unused. Needs benchmarking.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, IntegerDBIDs {
   /**

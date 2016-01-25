@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
  * The average of all average pairwise distances in a cluster.
  *
  * @author Stephan Baier
+ * @since 0.6.0
  */
 public class WithinClusterMeanDistanceQualityMeasure implements KMeansQualityMeasure<NumberVector> {
   @Override

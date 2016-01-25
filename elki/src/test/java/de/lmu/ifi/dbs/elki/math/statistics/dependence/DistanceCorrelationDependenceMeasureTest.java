@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * Validate dCor by comparing to output of the official R version.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class DistanceCorrelationDependenceMeasureTest implements JUnit4Test {
   double[][] data = { //

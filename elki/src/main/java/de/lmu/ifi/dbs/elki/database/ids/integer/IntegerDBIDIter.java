@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
  * Iterator for integer DBIDs.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  */

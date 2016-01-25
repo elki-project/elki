@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FixedSizeByteBufferSerializer;
  * instance to use.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.stereotype factory
  * @apiviz.uses DBID oneway - - «create»

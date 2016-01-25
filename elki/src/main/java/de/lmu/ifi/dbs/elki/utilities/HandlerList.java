@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * query object can be cast to the handlers restriction class.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @param <H> Parent class/interface for all handlers
  */

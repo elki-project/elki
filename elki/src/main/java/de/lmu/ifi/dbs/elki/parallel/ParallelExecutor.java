@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
  * TODO: add progress
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.has BlockArrayRunner
  * @apiviz.uses ParallelCore

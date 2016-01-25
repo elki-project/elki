@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * ) to be tested is equal to the specified constraint-strings.
  * 
  * @author Steffi Wanka
+ * @since 0.2
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter
  */

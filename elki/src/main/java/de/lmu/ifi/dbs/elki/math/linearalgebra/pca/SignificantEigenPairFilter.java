@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * dimensionalities.
  *
  * @author Erich Schubert
+ * @since 0.2
  */
 @Title("Significant EigenPair Filter")
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and looks for the maxmimum contrast of current Eigenvalue / average of remaining Eigenvalues.")

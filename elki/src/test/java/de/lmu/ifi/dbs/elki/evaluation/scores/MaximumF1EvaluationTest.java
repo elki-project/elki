@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
  * Validate evaluation based on F1 scores.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class MaximumF1EvaluationTest implements JUnit4Test {
   /**

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ListParameter;
  * ) must have equal list sizes.
  * 
  * @author Steffi Wanka
+ * @since 0.2
  */
 public class EqualSizeGlobalConstraint implements GlobalParameterConstraint {
   /**

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * able to automatically choose log scales when appropriate.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.has LinearScale oneway - - computes
  */

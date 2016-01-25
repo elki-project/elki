@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
  * Wrap an existing ByteBuffer as OutputStream.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has ByteBuffer
  */

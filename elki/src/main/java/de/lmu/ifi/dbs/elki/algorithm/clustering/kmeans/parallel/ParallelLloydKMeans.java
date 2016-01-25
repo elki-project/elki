@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.parallel.ParallelExecutor;
  * Parallel implementation of k-Means clustering.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has KMeansProcessor
  *

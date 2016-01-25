@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  * Exception for aborting some process and transporting a message.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 public class AbortException extends RuntimeException {
   /**

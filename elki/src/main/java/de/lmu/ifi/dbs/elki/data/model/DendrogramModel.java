@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Model for dendrograms, provides the distance to the child cluster.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  */
 // TODO: comments
 public class DendrogramModel extends AbstractModel {

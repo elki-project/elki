@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
  * Pair containing a double value and an integer DBID.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 class DoubleIntegerDBIDPair implements DoubleDBIDPair, IntegerDBIDRef {
   /**

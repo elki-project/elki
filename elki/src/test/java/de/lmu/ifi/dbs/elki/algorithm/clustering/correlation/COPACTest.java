@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  *
  * @author Erich Schubert
  * @author Katharina Rausch
+ * @since 0.3
  */
 public class COPACTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

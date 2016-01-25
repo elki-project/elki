@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * (BEP).
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class PrecisionAtKEvaluation extends AbstractScoreEvaluation {
   /**

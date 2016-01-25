@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "D. Pelleg, A. Moore", //
 booktitle = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //

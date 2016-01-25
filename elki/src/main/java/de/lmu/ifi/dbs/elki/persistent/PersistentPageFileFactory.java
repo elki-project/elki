@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * Page file factory for disk-based page files.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.has PersistentPageFile
  * 

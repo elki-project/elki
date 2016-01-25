@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * A proxy database to use e.g. for projections and partitions.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class ProxyDatabase extends AbstractDatabase {
   /**

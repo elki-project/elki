@@ -33,6 +33,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  * This function has increasing weight, from 0.1 to 1.0 at distance == max.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class InverseLinearWeight implements WeightFunction {
   /**

@@ -39,6 +39,9 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * fail. The matrix condition number and the effective numerical rank can be
  * computed from this decomposition.
  * 
+ * @author Arthur Zimek
+ * @since 0.2
+ *
  * @apiviz.uses Matrix - - transforms
  */
 public class SingularValueDecomposition {
@@ -326,7 +329,7 @@ public class SingularValueDecomposition {
       // Perform the task indicated by kase.
 
       switch(kase){
-      
+
       // Deflate negligible s(p).
       case 1: {
         double f = e[p - 2];

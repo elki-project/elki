@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Registry of available implementations in ELKI.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class ELKIServiceRegistry {
   /**

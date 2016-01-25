@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * implementations.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.uses ELKIServiceLoader
  */

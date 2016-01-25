@@ -37,6 +37,7 @@ import java.util.Arrays;
  * <code>I</code> modify in-place.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public final class BitsUtil {
   /**

@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * Supports the splitting of CASH intervals.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class CASHIntervalSplit {
   /**

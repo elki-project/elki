@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  *
  * @author Erich Schubert
  * @author Katharina Rausch
+ * @since 0.3
  */
 public class FourCTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * in-memory.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.stereotype factory
  * @apiviz.has ArrayStore oneway - - «create»

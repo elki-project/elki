@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Implemented as a Map with keys representing the ids of the saved pages.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @param <P> Page type
  */

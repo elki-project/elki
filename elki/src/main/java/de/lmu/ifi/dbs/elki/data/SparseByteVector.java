@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * value (limited to -128..+127).
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 public class SparseByteVector extends AbstractNumberVector implements SparseNumberVector {
   /**

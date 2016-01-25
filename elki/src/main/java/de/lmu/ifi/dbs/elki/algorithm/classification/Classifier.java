@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * classify a new instance of the same type.
  * 
  * @author Arthur Zimek
+ * @since 0.7.0
  *
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */

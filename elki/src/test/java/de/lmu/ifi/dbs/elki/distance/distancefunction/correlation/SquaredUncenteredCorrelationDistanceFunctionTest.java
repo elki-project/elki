@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * Unit test for Squared Pearson correlation distance.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class SquaredUncenteredCorrelationDistanceFunctionTest implements JUnit4Test {
   /** Inherited test data */

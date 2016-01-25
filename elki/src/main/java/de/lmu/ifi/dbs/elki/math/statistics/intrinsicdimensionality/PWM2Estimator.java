@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * this. This hack causes this estimator to have a bias to underestimate the ID.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class PWM2Estimator extends AbstractIntrinsicDimensionalityEstimator {
   /**

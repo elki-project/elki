@@ -31,6 +31,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
  * adapted for multiple use cases.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public abstract class AbstractStaticHistogram implements Histogram {
   /**

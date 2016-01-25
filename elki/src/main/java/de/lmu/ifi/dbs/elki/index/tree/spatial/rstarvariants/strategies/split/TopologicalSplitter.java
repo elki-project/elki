@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * Encapsulates the required parameters for a topological split of a R*-Tree.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  * 
  * @apiviz.has Split
  */

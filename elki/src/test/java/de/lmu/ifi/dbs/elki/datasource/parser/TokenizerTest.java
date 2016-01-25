@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
  * TODO: add more test cases, refactor into input, expected-output pattern.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class TokenizerTest implements JUnit4Test {
   Tokenizer t = new Tokenizer(Pattern.compile("\\s"), "\"'");

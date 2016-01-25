@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * TODO: faster implementation exploiting sparsity.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Reference(title = "Database-friendly random projections: Johnson-Lindenstrauss with binary coins", //
 authors = "D. Achlioptas", //

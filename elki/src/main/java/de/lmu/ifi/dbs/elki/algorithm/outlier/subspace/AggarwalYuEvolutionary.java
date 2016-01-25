@@ -75,6 +75,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * 
  * @author Ahmed Hettab
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has EvolutionarySearch oneway - - runs
  * @apiviz.has Individuum oneway - - obtains

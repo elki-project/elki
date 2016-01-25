@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * at k, when ranking the objects by distance.
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @param <O> Object type
  */

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayIter;
  * to be shared for primitive types, too!
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.has Iter
  */

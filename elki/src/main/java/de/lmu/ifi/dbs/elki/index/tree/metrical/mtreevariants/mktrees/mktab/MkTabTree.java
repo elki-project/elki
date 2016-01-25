@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * of a node.
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.has MkTabTreeNode oneway - - contains
  *

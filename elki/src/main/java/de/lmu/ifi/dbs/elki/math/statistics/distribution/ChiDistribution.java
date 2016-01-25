@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Chi distribution.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.composedOf ChiSquaredDistribution
  */

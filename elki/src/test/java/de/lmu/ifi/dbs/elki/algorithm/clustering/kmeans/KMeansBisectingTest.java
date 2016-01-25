@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Tests the KMeansBisecting
  * 
  * @author Stephan Baier
+ * @since 0.6.0
  */
 public class KMeansBisectingTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

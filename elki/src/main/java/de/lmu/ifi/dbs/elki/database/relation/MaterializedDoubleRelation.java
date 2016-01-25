@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * set(), remove the DBID, then delete().
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class MaterializedDoubleRelation extends AbstractRelation<Double>implements DoubleRelation {
   /**

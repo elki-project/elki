@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
  * scaling function.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public interface OutlierScalingFunction extends ScalingFunction {
   /**

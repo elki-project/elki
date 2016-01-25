@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Validate the two-sample anderson darling test.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class StandardizedTwoSampleAndersonDarlingTestTest implements JUnit4Test {
   // Table 4, Scholz and Stephens (1987, p.922)

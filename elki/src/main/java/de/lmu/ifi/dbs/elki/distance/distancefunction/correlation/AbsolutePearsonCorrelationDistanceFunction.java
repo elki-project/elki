@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * uncorrelated.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class AbsolutePearsonCorrelationDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**

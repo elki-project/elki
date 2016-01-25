@@ -77,6 +77,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * weak.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  */
 @Title("Progressive Eigenpair Filter")

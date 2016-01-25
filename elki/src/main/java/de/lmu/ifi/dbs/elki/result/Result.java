@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.result;
  * Interface for arbitrary result objects.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  * @apiviz.excludeSubtypes

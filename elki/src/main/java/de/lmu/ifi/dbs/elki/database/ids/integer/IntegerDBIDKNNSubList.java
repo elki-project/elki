@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
  * Sublist of an existing result to contain only the first k elements.
  *
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
   /**

@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Parameterization handler using a List and OptionIDs, for programmatic use.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class ListParameterization extends AbstractParameterization {
   /**

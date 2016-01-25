@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
  * dimensions.
  * 
  * @author Elke Achtert
+ * @since 0.5.0
  */
 public class SubspaceMaximumDistanceFunction extends SubspaceLPNormDistanceFunction {
   /**

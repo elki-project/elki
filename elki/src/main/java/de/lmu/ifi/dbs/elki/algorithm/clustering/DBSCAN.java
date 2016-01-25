@@ -72,6 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @author Arthur Zimek
  * @author Erich Schubert
+ * @since 0.2
  * @param <O> the type of Object the algorithm is applied to
  */
 @Title("DBSCAN: Density-Based Clustering of Applications with Noise")

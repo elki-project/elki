@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * Abstract base class for FiniteProgress objects.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public abstract class AbstractProgress implements Progress {
   /**

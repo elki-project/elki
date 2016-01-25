@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * Abstract base class for earth models with shared glue code.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public abstract class AbstractEarthModel implements EarthModel {
   /**

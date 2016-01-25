@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
  * Abstract superclass for entries in an tree based index structure.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public abstract class AbstractLeafEntry implements LeafEntry {
   /**

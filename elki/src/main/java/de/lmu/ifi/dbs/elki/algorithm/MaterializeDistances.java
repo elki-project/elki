@@ -49,6 +49,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * MultipleFileInput to use cached distances.
  *
  * Symmetry is assumed.
+ * 
+ * @author Erich Schubert
+ * @since 0.2
  *
  * @param <O> Object type
  */

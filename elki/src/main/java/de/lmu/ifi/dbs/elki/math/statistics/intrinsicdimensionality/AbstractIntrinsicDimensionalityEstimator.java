@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * Abstract base class for ID estimators.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public abstract class AbstractIntrinsicDimensionalityEstimator implements IntrinsicDimensionalityEstimator {
   @Override

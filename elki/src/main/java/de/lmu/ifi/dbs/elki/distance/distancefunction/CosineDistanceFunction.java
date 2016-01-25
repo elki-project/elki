@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * <code>1-(cosine similarity)</code>.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 @Alias({ "cosine" })
 public class CosineDistanceFunction extends AbstractSpatialDistanceFunction {

@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * Split an existing column into two types.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses NumberVector
  * 

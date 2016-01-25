@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * The "evaluation" step, where data is analyzed.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has Evaluator
  * @apiviz.uses Result

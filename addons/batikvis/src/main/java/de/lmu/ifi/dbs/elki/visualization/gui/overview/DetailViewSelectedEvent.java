@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
  * by their coordinates on the screen.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class DetailViewSelectedEvent extends ActionEvent {
   /**

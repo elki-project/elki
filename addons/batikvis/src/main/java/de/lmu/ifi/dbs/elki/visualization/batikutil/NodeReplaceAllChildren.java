@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * Runnable wrapper to replace all children of a given node.
  *
  * @author Erich Schubert
+ * @since 0.3
  */
 public class NodeReplaceAllChildren extends NodeAppendChild {
   /**

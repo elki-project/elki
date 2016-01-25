@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * extreme values.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.has NormalDistribution - - estimates
  */

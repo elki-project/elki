@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * number of parameters (which obviously needs to be a multiple of 3)
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class GaussianFittingFunction implements FittingFunction {
   /**

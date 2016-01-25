@@ -67,6 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * of the nearest neighbors!
  *
  * @author Elke Achtert
+ * @since 0.4.0
  *
  * @param <O> the type of database objects the preprocessor can be applied to
  * @param the type of distance the used distance function will return

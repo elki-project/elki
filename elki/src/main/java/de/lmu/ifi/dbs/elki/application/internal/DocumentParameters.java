@@ -80,6 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * {@link Parameter}s. Used in documentation generation only.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.uses Parameter
  */

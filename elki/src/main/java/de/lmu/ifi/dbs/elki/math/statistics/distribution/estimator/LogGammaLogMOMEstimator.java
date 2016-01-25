@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * transformed values.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.has LogGammaDistribution - - estimates
  */

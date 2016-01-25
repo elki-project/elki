@@ -29,6 +29,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * primitive in Java.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public final class IntArrayStaticHistogram extends AbstractObjStaticHistogram<int[]> {
   /**

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * Writable data store.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * 

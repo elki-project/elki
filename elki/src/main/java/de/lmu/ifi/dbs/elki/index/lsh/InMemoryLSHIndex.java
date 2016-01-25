@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Locality Sensitive Hashing.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @apiviz.has LocalitySensitiveHashFunctionFamily
  * @apiviz.has Instance

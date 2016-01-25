@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * Strategy to use the complete database as reference points.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class FullDatabaseReferencePoints implements ReferencePointsHeuristic {
   /**

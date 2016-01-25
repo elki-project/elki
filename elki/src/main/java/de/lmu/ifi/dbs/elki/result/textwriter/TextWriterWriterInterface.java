@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * Base class for object writers.
  * 
  * @author Erich Schubert
+ * @since 0.2
  *
  * @param <O> Object type (usually the class itself)
  */

@@ -90,6 +90,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </ul>
  *
  * @author Erich Schubert
+ * @since 0.3
  *
  * @apiviz.has KNNQuery
  *

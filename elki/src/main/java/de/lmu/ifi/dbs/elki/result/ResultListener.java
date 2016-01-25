@@ -29,6 +29,7 @@ import java.util.EventListener;
  * Listener interface invoked when new results are added to the result tree.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has Result
  */

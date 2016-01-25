@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * Simple Interface for an heuristic to pick reference points.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public interface ReferencePointsHeuristic {
   /**

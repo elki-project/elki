@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * deterministic.
  * 
  * @author Arthur Zimek
+ * @since 0.7.0
  */
 public class StratifiedCrossValidation extends AbstractHoldout {
   /**

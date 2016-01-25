@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * dependencies.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  * 
  * @apiviz.composedOf LinearEquationSystem
  * 

@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
  * scaling.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class ErfcWeight implements WeightFunction {
   /**

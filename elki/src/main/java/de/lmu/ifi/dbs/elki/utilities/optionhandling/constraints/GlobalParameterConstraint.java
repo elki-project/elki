@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * The proper constraint test should be implemented in the method {@link #test()}. 
  * </p>
  * @author Steffi Wanka
+ * @since 0.2
  *
  */
 public interface GlobalParameterConstraint {

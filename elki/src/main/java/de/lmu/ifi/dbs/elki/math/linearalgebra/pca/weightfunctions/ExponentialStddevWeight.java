@@ -34,6 +34,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  * not squared.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class ExponentialStddevWeight implements WeightFunction {
   /**

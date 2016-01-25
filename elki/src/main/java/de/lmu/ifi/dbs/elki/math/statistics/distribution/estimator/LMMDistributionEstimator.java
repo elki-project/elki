@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
  * (LMM).
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @param <D> Distribution class.
  */

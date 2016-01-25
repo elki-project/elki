@@ -33,6 +33,7 @@ import java.lang.annotation.Target;
  * Simple interface to provide a nicer title for the class.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

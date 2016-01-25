@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Random-Sampling strategy for picking reference points.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class RandomSampleReferencePoints implements ReferencePointsHeuristic {
   /**

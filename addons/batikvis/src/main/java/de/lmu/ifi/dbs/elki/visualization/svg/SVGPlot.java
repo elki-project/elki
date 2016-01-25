@@ -73,6 +73,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
  * creation, axis plotting, markers and number formatting for SVG.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.landmark
  * @apiviz.composedOf CSSClassManager

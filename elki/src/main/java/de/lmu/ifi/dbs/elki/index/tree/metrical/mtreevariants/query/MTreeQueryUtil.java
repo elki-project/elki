@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
  * Query utility classes for MTrees.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public final class MTreeQueryUtil {
   /**

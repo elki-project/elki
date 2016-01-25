@@ -33,6 +33,7 @@ import java.util.List;
  * Class to keep track of "alive" progresses.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.uses Progress oneway - - tracks
  */

@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Test cluster quality measure computations.
  *
  * @author Stephan Baier
+ * @since 0.6.0
  */
 public class WithinClusterMeanDistanceQualityMeasureTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

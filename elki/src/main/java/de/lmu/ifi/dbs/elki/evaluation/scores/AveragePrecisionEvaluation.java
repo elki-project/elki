@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Evaluate using average precision.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class AveragePrecisionEvaluation extends AbstractScoreEvaluation {
   /**

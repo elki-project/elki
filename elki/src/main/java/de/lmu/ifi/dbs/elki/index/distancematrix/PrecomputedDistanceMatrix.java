@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * (precisely, 65536 objects) in a single array, which needs about 16 GB of RAM.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has PrecomputedDistanceQuery
  *

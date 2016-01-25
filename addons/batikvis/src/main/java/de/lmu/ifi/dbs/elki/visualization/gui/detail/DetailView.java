@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * Manages a detail view.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has Visualization
  * @apiviz.has PlotItem

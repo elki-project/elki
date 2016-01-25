@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  *
  * @author Sascha Goldhofer
+ * @since 0.5.0
  */
 @Reference(authors = "A. Bagga and B. Baldwin", //
 title = "Entity-based cross-document coreferencing using the Vector Space Model", //

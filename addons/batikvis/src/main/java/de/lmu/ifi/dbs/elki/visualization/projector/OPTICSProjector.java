@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.OPTICSProjection;
  * Projection for OPTICS plots.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class OPTICSProjector implements Projector {
   /**

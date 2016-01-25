@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * object storage for preprocessing results.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf WritableDataStore
  * 

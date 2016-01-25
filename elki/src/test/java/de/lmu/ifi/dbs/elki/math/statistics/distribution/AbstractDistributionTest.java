@@ -29,6 +29,7 @@ import static org.junit.Assert.assertTrue;
  * Abstract base class for distribution unit testing.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class AbstractDistributionTest {
   public void checkPDF(Distribution d, double[] x, double[] expected, double err) {

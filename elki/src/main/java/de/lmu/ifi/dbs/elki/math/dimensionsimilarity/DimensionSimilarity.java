@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * dimensions in parallel coordinate plots.
  *
  * @author Erich Schubert
+ * @since 0.5.5
  *
  * @apiviz.uses DimensionSimilarityMatrix - - «writes»
  *

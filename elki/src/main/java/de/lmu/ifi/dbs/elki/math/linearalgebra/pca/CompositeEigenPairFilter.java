@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * eigenpair filters.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 // todo parameter comments
 public class CompositeEigenPairFilter implements EigenPairFilter {

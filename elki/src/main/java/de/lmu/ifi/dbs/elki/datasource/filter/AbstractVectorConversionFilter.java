@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * Abstract class for filters that produce number vectors.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <I> Input vector type
  * @param <O> Output vector type

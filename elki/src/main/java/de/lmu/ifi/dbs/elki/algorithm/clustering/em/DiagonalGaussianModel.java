@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * Simpler model for a single Gaussian cluster, without covariances.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
   /**

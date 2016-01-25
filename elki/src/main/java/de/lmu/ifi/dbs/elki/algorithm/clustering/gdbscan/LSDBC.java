@@ -75,6 +75,7 @@ import gnu.trove.list.array.TIntArrayList;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @param <O> Object type
  */

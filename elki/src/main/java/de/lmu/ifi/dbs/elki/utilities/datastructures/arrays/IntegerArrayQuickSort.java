@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * objects.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.uses IntegerComparator
  */

@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * results.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public abstract class AbstractIndexStructureTest implements JUnit4Test {
   // the following values depend on the data set used!

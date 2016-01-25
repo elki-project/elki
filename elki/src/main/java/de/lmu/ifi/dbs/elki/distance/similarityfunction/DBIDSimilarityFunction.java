@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * function defined over object IDs.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  * 
  * @apiviz.landmark
  * @apiviz.uses DBID oneway - - defined on

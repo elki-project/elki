@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * Validate the Anderson Darling test.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class AndersonDarlingTestTest implements JUnit4Test {
   double[][] noncentral = { //

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
  * M-Tree.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class MTreeLeafEntry extends AbstractLeafEntry implements MTreeEntry {
   /**

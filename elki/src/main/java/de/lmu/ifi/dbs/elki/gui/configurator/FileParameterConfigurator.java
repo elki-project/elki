@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * Provide a configuration panel to choose a file with a file selector button.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses FileParameter
  */

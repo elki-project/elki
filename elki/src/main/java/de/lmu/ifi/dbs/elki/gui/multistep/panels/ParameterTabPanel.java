@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackParame
  * Abstract panel, showing particular options.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public abstract class ParameterTabPanel extends JPanel implements ChangeListener {
   /**

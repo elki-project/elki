@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
  * Generic interface for split strategies.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface SplitStrategy {
   /**

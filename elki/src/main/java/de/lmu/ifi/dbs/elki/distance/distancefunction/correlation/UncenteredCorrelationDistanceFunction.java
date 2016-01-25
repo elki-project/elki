@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * uses a fixed mean of 0 instead of the sample mean.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class UncenteredCorrelationDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**

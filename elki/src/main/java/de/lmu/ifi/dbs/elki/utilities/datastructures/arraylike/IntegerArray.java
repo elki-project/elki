@@ -28,6 +28,7 @@ import java.util.Arrays;
  * Array of int values.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class IntegerArray implements NumberArrayAdapter<Integer, IntegerArray> {
   /**

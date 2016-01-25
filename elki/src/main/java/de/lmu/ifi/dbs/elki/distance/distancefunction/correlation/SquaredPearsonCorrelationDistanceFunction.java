@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 1).
  * 
  * @author Arthur Zimek
+ * @since 0.3
  */
 public class SquaredPearsonCorrelationDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**

@@ -30,6 +30,7 @@ import java.io.InputStream;
  * InputStream.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  * 
  * @apiviz.uses DistanceCacheWriter oneway - - «create»
  */

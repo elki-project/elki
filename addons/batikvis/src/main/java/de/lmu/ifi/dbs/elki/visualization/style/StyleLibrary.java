@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
  * having to change program code.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.composedOf ColorLibrary
  * @apiviz.composedOf LineStyleLibrary

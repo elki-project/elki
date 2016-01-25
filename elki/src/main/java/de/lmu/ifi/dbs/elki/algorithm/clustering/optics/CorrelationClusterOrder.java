@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * 
  * @author Elke Achtert
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class CorrelationClusterOrder extends ClusterOrder {
   /**

@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Elke Achtert
  * @author Katharina Rausch
  * @author Erich Schubert
+ * @since 0.3
  */
 public class SUBCLUTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

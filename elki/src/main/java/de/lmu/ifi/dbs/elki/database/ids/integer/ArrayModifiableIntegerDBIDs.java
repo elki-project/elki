@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * Class using a primitive int[] array as storage.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayDBIDs {
   /**

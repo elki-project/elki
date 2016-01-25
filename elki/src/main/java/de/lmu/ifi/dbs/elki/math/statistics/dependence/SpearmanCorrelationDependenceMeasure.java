@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Spearman rank-correlation coefficient, also known as Spearmans Rho.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class SpearmanCorrelationDependenceMeasure extends AbstractDependenceMeasure {
   /**

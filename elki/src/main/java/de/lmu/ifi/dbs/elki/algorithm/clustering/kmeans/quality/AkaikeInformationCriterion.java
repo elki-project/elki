@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
+ * @since 0.2
  */
 @Reference(authors = "H. Akaike", //
 title = "On entropy maximization principle", //

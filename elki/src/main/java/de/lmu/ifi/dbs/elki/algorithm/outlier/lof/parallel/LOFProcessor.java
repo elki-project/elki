@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
  * Processor for computing the LOF.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has Instance
  */

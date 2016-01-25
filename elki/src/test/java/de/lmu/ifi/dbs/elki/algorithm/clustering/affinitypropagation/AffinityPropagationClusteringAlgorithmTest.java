@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Test Affinity Propagation
  *
  * @author Erich Schubert
+ * @since 0.7.1
  */
 public class AffinityPropagationClusteringAlgorithmTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

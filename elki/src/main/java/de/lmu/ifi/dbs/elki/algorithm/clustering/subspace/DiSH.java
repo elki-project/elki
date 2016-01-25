@@ -95,6 +95,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * </p>
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.uses DiSHPreferenceVectorIndex
  * @apiviz.has SubspaceModel

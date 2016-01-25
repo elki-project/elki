@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * Interface for computing covariance matrixes on a data set.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public interface CovarianceMatrixBuilder {
   /**

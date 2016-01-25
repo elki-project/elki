@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Useful for evaluation and testing.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 @Title("Trivial all-in-one clustering")
 @Description("Returns a 'tivial' clustering which just considers all points to be one big cluster.")

@@ -29,6 +29,7 @@ import java.util.Collection;
  * Histogram result.
  * 
  * @author Erich Schubert
+ * @since 0.3
  *
  * @param <O> Object class (e.g. {@link de.lmu.ifi.dbs.elki.data.DoubleVector})
  */

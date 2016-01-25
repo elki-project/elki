@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Laplace distribution also known as double exponential distribution
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 @Alias("DoubleExponentialDistribution")
 public class LaplaceDistribution extends AbstractDistribution {

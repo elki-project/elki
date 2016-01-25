@@ -107,6 +107,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Peer Kröger
  * @author Erich Schubert
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.has LOFResult oneway - - computes
  * @apiviz.has KNNQuery

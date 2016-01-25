@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
  * TODO: transform this into an evaluator, then visualize, too?
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 @Description("Development result handler that merely logs the structure of the result tree.")
 public class LogResultStructureResultHandler implements ResultHandler {

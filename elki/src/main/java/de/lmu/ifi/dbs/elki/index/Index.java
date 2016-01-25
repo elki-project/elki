@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
  * See also: {@link IndexFactory}, {@link DynamicIndex}
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.excludeSubtypes
  */

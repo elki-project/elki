@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
  * polygons are simple.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf Vector
  */

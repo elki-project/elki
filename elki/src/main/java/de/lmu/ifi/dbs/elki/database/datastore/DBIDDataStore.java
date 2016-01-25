@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
  * DBID-valued data store (avoids boxing/unboxing).
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface DBIDDataStore extends DataStore<DBID> {
   /**

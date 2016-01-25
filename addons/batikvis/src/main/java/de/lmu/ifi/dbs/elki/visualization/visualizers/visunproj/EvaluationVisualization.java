@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  *
  * @author Erich Schubert
  * @author Sascha Goldhofer
+ * @since 0.4.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses StaticVisualizationInstance oneway - - «create»

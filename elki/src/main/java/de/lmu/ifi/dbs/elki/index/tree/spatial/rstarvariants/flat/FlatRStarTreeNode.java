@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
  * Represents a node in a flat R*-Tree.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class FlatRStarTreeNode extends AbstractRStarTreeNode<FlatRStarTreeNode, SpatialEntry> {
   /**

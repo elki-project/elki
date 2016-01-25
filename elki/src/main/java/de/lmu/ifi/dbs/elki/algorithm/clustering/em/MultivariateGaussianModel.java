@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
  * Model for a single Gaussian cluster.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   /**

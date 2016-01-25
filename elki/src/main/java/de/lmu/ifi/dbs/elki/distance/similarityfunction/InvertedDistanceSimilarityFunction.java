@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * 1/distance.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @param <O> Object type
  */

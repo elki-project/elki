@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * same rankings as Euclidean distance, but saves computing the square root.
  * 
  * @author Arthur Zimek
+ * @since 0.4.0
  */
 public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNorm implements WeightedNumberVectorDistanceFunction<NumberVector> {
   /**

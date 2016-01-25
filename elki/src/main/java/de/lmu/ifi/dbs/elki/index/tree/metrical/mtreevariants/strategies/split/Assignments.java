@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
  * Encapsulates the attributes of an assignment during a split.
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.composedOf DistanceEntry
  * 

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Class collecting mean, variance, minimum and maximum statistics.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class MeanVarianceMinMax extends MeanVariance {
   /**

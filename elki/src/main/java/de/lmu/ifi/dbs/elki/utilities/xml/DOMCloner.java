@@ -33,6 +33,7 @@ import org.w3c.dom.Node;
  * Class for cloning XML document, with filter capabilites
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class DOMCloner {
   /**

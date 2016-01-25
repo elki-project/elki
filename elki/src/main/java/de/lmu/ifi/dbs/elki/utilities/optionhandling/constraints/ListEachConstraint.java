@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
  * Applies constraints to all elements of a list.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.composedOf ParameterConstraint oneway 1 n
  */

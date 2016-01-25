@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Regression test for Sort-means.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class KMeansSortTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

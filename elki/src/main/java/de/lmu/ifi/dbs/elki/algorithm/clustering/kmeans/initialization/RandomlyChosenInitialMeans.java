@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * available in Biometrics).
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @param <O> Vector type
  */

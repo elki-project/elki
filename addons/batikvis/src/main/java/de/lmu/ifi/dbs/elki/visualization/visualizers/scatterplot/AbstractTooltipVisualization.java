@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * General base class for a tooltip visualizer.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 // TODO: can we improve performance by not adding as many hovers?
 public abstract class AbstractTooltipVisualization extends AbstractScatterplotVisualization implements DataStoreListener {

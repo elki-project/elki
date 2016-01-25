@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
  * case for them as opposed to always using the low-level fast projections.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface FullProjection extends Projection {
   /**

@@ -1,11 +1,4 @@
 package de.lmu.ifi.dbs.elki.math;
-
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -29,8 +22,19 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-public class SinCosTableTest implements JUnit4Test {
+import static org.junit.Assert.assertEquals;
 
+import org.junit.Test;
+
+import de.lmu.ifi.dbs.elki.JUnit4Test;
+
+/**
+ * Test the sin-cos lookup table.
+ *
+ * @author Erich Schubert
+ * @since 0.4.0
+ */
+public class SinCosTableTest implements JUnit4Test {
   @Test
   public void testSinCosTable() {
     doSinCosTableTest(360);
@@ -41,7 +45,7 @@ public class SinCosTableTest implements JUnit4Test {
 
   protected void doSinCosTableTest(int steps) {
     SinCosTable table = SinCosTable.make(steps);
-    for (int i = -steps; i < 2 * steps; i++) {
+    for(int i = -steps; i < 2 * steps; i++) {
       double angle = Math.toRadians(360. * i / steps);
       assertEquals("Cosine does not match at i=" + i + " a=" + angle, Math.cos(angle), table.cos(i), 1E-10);
       assertEquals("Sine does not match at i=" + i + " a=" + angle, Math.sin(angle), table.sin(i), 1E-10);

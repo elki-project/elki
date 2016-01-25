@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * Precompute an on-disk distance matrix, using float precision.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.has OnDiskUpperTriangleMatrix
  * @apiviz.has DistanceFunction

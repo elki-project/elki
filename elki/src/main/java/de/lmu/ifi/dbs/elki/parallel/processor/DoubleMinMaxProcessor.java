@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedDouble;
  * Sink collecting minimum and maximum values.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has Instance
  * @apiviz.uses SharedDouble

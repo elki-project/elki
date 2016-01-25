@@ -66,6 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * This removes a popular type of artifacts.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.composedOf OPTICSTypeAlgorithm oneway - «runs»
  * @apiviz.uses ClusterOrder oneway - «reads»

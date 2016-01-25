@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * @author Tibor Goldschwendt
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Reference(authors = "G. Schwarz", //
 title = "Estimating the dimension of a model", //

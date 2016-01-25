@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
  * MBR class allowing modifications (as opposed to {@link HyperBoundingBox}).
  *
  * @author Marisa Thoma
+ * @since 0.3
  */
 public class ModifiableHyperBoundingBox extends HyperBoundingBox {
   /**

@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @param <O> Vector type
  */

@@ -67,6 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @param <O> Object type
  */

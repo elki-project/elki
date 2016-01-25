@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.parallel.Executor;
  * Class to represent a processor factory.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.has Instance
  */

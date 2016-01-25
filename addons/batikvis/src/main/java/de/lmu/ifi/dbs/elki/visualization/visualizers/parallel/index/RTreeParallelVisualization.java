@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index.TreeMBRVi
  * Visualize the of an R-Tree based index.
  *
  * @author Robert Rödler
+ * @since 0.5.0
  *
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»

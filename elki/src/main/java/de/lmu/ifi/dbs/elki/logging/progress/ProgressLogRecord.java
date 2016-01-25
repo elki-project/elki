@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.logging.ELKILogRecord;
  * Log record for progress messages.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.has Progress
  */

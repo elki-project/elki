@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * This is a maximum-likelihood-estimator (MLE).
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.has LogNormalDistribution - - estimates
  */

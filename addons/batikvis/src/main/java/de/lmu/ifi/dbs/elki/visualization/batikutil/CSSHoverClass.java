@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
  * Do a hover effect using a CSS class.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  */
 public class CSSHoverClass implements EventListener {

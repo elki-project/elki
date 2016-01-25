@@ -32,6 +32,7 @@ import java.io.PrintStream;
  * Note: these classes need to be rewritten. Contributions welcome!
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public interface StreamFactory {
   /**

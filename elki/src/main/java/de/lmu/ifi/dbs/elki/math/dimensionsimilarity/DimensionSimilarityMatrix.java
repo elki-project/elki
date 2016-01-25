@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * Class representing a similarity matrix between dimensions.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.uses PrimsMinimumSpanningTree
  */

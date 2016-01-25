@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * Filter to remove all vectors that do not have the desired dimensionality.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <V> Vector type
  */

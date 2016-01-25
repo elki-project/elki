@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * but they do not detail how to obtain an appropriate function `F`.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * @param <V> vector type
  * 
  * @apiviz.uses NumberVector

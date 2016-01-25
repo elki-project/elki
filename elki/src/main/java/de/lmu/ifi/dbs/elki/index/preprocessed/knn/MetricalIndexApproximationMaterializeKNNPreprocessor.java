@@ -59,6 +59,7 @@ import gnu.trove.map.hash.TObjectDoubleHashMap;
  * TODO correct handling of datastore events
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.uses MetricalIndexTree
  *

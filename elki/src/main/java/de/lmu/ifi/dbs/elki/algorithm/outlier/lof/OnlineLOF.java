@@ -63,6 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * BUG: this currently does not appear to work.
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.has FlexibleLOF.LOFResult oneway - - updates
  */

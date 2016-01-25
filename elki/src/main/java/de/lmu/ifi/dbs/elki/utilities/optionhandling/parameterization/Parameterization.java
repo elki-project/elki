@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * @apiviz.uses ParameterException
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public interface Parameterization {
   /**

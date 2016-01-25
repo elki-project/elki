@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.result;
  * Interface for any class that can handle results
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.uses Result oneway - - processes
  */

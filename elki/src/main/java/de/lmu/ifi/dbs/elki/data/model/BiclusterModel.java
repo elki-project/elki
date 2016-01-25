@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  * Wrapper class to provide the basic properties of a Bicluster.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  */
 public class BiclusterModel implements Model {
   /**

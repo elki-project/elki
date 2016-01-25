@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Logistic distribution.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Alias({ "log" })
 public class LogisticDistribution extends AbstractDistribution {

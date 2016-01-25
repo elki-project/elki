@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.index.lsh.hashfunctions;
  * Hash functions as used by locality sensitive hashing.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @param <V> Data type to hash.
  */

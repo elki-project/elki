@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * This progress class is used for multi-step processing.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class StepProgress extends FiniteProgress {
   /**

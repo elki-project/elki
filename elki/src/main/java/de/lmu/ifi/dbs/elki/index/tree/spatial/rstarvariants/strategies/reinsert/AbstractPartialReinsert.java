@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * parameter to partially reinsert entries.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public abstract class AbstractPartialReinsert implements ReinsertStrategy {
   /**

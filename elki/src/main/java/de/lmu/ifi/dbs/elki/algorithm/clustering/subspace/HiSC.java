@@ -69,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * </p>
  * 
  * @author Elke Achtert
+ * @since 0.3
  * 
  * @apiviz.uses HiSCPreferenceVectorIndex
  * 

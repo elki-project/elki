@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
  *
  * @author Robert Rödler
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class SimpleParallel implements ProjectionParallel {
   /**

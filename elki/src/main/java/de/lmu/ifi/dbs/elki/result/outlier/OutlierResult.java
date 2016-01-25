@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.result.OrderingResult;
  * parts.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @apiviz.landmark
  * @apiviz.composedOf OutlierScoreMeta

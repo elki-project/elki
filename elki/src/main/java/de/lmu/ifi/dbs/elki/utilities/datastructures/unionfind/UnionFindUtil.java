@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
  * Union-find algorithm factory, to choose the best implementation.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class UnionFindUtil {
   /**

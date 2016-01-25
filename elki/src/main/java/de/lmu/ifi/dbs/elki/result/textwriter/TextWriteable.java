@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
  * human reading and storage in CSV files.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 //TODO: split TextWriteable interface into data writing and metadata writing?
 public interface TextWriteable {

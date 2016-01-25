@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * When building parameter lists, use {@link ListParameterization} where possible.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class SerializedParameterization extends AbstractParameterization {
   /**

@@ -29,6 +29,7 @@ import gnu.trove.map.TIntDoubleMap;
  * Combines the SparseFeatureVector and NumberVector.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Number> {
   /**

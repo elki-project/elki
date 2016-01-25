@@ -79,6 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * that make the optimization problem convex.
  *
  * @author Ahmed Hettab
+ * @since 0.4.0
  *
  * @param <V> Vector type to use for distances
  */

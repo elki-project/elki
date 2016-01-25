@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @author Erich Schubert
  * @author Arthur Zimek
+ * @since 0.5.0
  *
  * @apiviz.landmark
  *

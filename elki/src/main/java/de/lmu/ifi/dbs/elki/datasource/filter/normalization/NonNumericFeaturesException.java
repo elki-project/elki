@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
  * features have been expected.
  * 
  * @author Arthur Zimek
+ * @since 0.4.0
  */
 public class NonNumericFeaturesException extends Exception {
   /**

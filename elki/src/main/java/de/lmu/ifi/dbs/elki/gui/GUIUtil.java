@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  * GUI utilities.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public final class GUIUtil {
   /**

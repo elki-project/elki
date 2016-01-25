@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Tricube kernel density estimator.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public final class TricubeKernelDensityFunction implements KernelDensityFunction {
   /**

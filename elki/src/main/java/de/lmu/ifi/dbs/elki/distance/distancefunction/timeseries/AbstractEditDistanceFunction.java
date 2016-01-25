@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Edit Distance for FeatureVectors.
  * 
  * @author Thomas Bernecker
+ * @since 0.2
  */
 public abstract class AbstractEditDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**

@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
  * discovery task.
  *
  * @author Arthur Zimek
+ * @since 0.2
  *
  * @apiviz.composedOf InputStep
  * @apiviz.composedOf AlgorithmStep

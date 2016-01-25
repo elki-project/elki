@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  * </ul>
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  * 
  * @apiviz.landmark
  */

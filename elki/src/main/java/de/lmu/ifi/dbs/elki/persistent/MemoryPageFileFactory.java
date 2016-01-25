@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  * Page file factory for memory page files.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has MemoryPageFile
  * 

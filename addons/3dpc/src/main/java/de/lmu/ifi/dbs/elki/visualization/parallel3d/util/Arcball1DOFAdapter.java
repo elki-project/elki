@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
  * Arcball style helper.
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.uses Simple1DOFCamera
  */

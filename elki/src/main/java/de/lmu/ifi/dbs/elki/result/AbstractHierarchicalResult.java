@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.result;
  * Abstract class for a result object with hierarchy
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public abstract class AbstractHierarchicalResult implements HierarchicalResult {
   /**

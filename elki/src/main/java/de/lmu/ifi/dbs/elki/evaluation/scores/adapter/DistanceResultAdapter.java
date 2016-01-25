@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation.ScoreIter;
  * ties.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.composedOf DoubleDBIDListIter
  */

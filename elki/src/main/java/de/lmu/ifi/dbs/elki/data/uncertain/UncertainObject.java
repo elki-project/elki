@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  * TODO: Eventually allow float precision, too.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has DoubleVector oneway - «contains/produces»
  */

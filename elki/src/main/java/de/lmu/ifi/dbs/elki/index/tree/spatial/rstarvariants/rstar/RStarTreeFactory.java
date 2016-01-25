@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * Factory for regular R*-Trees.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.landmark factory
  * @apiviz.uses RStarTreeIndex oneway - - «create»

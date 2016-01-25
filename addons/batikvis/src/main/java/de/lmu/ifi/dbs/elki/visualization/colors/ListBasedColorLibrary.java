@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.visualization.colors;
  * Color library using the color names from a list.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class ListBasedColorLibrary implements ColorLibrary {
   /**

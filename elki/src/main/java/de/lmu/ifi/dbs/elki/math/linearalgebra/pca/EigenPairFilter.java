@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
  * and weak eigenpairs having small variances.
  *
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.uses SortedEigenPairs oneway - - reads
  * @apiviz.uses FilteredEigenPairs oneway - - «create»

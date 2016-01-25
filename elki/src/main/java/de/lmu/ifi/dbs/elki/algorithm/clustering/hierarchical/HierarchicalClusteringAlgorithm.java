@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
  * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy}.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has PointerHierarchyRepresentationResult
  */

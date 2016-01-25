@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
  * 
  * @author Stephan Baier
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public enum NoiseHandling {
   /** Merge all noise into a cluster */

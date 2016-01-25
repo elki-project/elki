@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * the database, without using the actual data values.
  * 
  * @author Arthur Zimek
+ * @since 0.7.0
  */
 @Title("Prior Probability Classifier")
 @Description("Classifier to predict simply prior probabilities for all classes as defined by their relative abundance in a given database.")

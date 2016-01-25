@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Abstract super class for distance functions needing a preprocessor.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  * 
  * @apiviz.uses IndexFactory
  * @apiviz.has Instance oneway - - «create»

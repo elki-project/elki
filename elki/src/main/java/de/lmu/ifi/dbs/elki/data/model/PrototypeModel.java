@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Cluster model that stores a prototype for each cluster.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class PrototypeModel<V> extends AbstractModel implements TextWriteable {
   /**

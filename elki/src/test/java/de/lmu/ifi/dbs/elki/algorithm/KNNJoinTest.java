@@ -57,6 +57,12 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
+/**
+ * Unit test for kNN joins.
+ * 
+ * @author Erich Schubert
+ * @since 0.4.0
+ */
 public class KNNJoinTest implements JUnit4Test {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/uebungsblatt-2d-mini.csv";

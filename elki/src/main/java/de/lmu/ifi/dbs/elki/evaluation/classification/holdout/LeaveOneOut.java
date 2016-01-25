@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
  * remaining instances are training instances.
  * 
  * @author Arthur Zimek
+ * @since 0.7.0
  */
 public class LeaveOneOut extends AbstractHoldout {
   /**

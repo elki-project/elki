@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
  * Class to convert from and to byte arrays (in index structures).
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.has ByteBuffer - - oneway «serializes to/from»
  * @apiviz.excludeSubtypes

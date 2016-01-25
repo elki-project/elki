@@ -73,6 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * TODO: support noise, via negative cluster numbers?
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.has Clustering
  */

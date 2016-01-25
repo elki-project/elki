@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
  * 
  * @author Elke Achtert
  * @author Erich Schubert
+ * @since 0.2
  */
 public class IntListParameter extends ListParameter<IntListParameter, int[]> {
   /**

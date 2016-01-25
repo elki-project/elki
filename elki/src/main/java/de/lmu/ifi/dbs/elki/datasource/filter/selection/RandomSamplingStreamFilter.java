@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Subsampling stream filter.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.RandomSamplingStreamFilter" })
 public class RandomSamplingStreamFilter extends AbstractStreamFilter {

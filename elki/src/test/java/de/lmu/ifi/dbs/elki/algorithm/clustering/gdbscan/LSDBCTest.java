@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Regression test for LSDBC.
  *
  * @author Erich Schubert
+ * @since 0.3
  */
 public class LSDBCTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

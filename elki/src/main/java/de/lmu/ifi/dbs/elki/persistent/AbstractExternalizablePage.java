@@ -31,6 +31,7 @@ import java.io.ObjectOutput;
  * Abstract superclass for pages.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 // todo elke revise comments
 public abstract class AbstractExternalizablePage implements ExternalizablePage {

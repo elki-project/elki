@@ -74,6 +74,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
 title = "Outlier Detection in Arbitrarily Oriented Subspaces", //

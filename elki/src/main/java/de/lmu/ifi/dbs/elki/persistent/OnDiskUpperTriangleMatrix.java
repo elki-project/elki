@@ -34,6 +34,7 @@ import java.nio.ByteBuffer;
  * @apiviz.composedOf OnDiskArray
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class OnDiskUpperTriangleMatrix {
   /**

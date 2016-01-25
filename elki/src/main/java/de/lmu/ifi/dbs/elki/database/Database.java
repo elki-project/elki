@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  * parameters for dynamic instantiation.
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.landmark
  * @apiviz.has DistanceQuery oneway - - provides

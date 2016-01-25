@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.index.tree.query;
  * implementation).
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class DoubleDistanceSearchCandidate implements Comparable<DoubleDistanceSearchCandidate> {
   /**

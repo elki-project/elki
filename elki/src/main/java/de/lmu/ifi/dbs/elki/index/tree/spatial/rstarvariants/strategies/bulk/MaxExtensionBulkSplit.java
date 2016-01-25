@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * dimensions with maximum extension.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf SpatialSingleMinComparator
  */

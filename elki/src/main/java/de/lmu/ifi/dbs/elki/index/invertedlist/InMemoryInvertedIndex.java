@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Simple index using inverted lists.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @param <V> Vector type
  */

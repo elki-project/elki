@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.data.type;
  * TODO: implement polygon and rectangle types!
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public interface FieldTypeInformation extends TypeInformation {
   /**

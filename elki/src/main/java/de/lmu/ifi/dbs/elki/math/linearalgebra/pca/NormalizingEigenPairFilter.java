@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * eigenvector> * eigenvalue = 1, where <,> is the standard dot product
  * 
  * @author Simon Paradies
+ * @since 0.2
  */
 @Title("Perecentage based Eigenpair filter")
 @Description("Normalizes all eigenpairs, consisting of eigenvalue e and eigenvector v such that <v,v> * e = 1, where <,> is the standard dot product.")

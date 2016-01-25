@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * Exception when a required parameter was not given.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class UnspecifiedParameterException extends WrongParameterValueException {
   /**

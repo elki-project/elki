@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
  *
  * @author Robert Rödler
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @param <NV> Data type in relation
  */

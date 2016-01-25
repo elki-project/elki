@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * JUnit test to test the {@link ReplacingHistogram} class.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class DoubleHistogramTest implements JUnit4Test {
   /**

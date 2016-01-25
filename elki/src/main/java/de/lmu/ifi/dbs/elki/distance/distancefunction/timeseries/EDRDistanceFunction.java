@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * </p>
  * 
  * @author Thomas Bernecker
+ * @since 0.2
  */
 @Title("Edit Distance on Real Sequence")
 @Reference(authors = "L. Chen and M. T. Özsu and V. Oria", //

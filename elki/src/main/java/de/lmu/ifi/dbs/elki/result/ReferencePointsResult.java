@@ -29,6 +29,7 @@ import java.util.Collection;
  * Result used in passing the reference points to the visualizers.
  * 
  * @author Erich Schubert
+ * @since 0.3
  * 
  * @param <O> data type
  */

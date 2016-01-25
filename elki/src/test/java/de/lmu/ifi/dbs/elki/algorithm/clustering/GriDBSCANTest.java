@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Test GriDBSCAN.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class GriDBSCANTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   /**

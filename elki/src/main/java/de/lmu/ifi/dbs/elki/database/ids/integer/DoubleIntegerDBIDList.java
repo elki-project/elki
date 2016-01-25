@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQui
  * Class to store double distance, integer DBID results.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @apiviz.uses DoubleIntegerArrayQuickSort
  */

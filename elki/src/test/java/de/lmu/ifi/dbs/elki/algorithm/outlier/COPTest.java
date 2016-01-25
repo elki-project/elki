@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Tests the COP algorithm.
  *
  * @author Erich Schubert
+ * @since 0.7.1
  */
 public class COPTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
   @Test

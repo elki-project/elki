@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * (possibly weighted) number of samples.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public interface DiscreteUncertainObject extends UncertainObject {
   /**

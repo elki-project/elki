@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Note: this API is non-final, and will be refactored soon.
  *
  * @author Arthur Zimek
+ * @since 0.7.0
  */
 public class ConfusionMatrixEvaluationResult implements Result, TextWriteable {
   /**

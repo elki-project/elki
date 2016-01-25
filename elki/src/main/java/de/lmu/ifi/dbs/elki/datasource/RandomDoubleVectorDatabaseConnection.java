@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Produce a database of random double vectors with each dimension in [0:1].
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class RandomDoubleVectorDatabaseConnection extends AbstractDatabaseConnection {
   /**

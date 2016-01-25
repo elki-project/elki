@@ -38,6 +38,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
 
 /**
  * Utility methods for output formatting of various number objects
+ * 
+ * @author Arthur Zimek
+ * @author Erich Schubert
+ * @since 0.2
  */
 public final class FormatUtil {
   /**

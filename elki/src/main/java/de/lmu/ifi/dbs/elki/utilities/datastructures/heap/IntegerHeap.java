@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
  * Basic in-memory heap for int values.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @apiviz.has UnsortedIter
  */

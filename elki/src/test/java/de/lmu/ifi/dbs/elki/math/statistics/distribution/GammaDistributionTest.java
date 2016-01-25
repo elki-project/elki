@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * The reference values were computed using GNU R and SciPy.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class GammaDistributionTest extends AbstractDistributionTest implements JUnit4Test {
   public static final double[] P_CDFPDF = { //

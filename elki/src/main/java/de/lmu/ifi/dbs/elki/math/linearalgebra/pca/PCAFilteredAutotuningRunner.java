@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * exhibit the clearest correlation.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
 title = "A General Framework for Increasing the Robustness of PCA-based Correlation Clustering Algorithms",//

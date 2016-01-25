@@ -33,6 +33,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.tests;
  * 
  * @author Jan Brusis
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public interface GoodnessOfFitTest {
   /**

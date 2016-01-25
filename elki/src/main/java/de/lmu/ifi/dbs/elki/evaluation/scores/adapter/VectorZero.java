@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation.Predicate;
  * @apiviz.composedOf NumberVector
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class VectorZero implements Predicate<IncreasingVectorIter> {
   /**

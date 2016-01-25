@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  * Statistical distributions, with their common functions.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public interface Distribution {
   /**

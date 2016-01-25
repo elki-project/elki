@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * A list of string labels.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf String
  */

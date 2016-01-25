@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * distance functions easier.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public abstract class AbstractSpatialDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector> {
   @Override

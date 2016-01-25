@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
  * as name, and add an enumeration postfix
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.uses Clustering
  */

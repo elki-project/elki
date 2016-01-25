@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Strings that define a non-negative Integer.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  * 
  * @apiviz.has 
  *             de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborIndex

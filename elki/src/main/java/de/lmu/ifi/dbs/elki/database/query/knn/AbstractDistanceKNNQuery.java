@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * Instance for the query on a particular database.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public abstract class AbstractDistanceKNNQuery<O> implements KNNQuery<O> {
   /**

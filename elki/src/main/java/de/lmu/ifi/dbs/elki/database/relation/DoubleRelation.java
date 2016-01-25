@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * Interface for double-valued relations.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public interface DoubleRelation extends ModifiableRelation<Double> {
   /**

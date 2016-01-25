@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
  * needed for persistent storage.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 class RdKNNTreeHeader extends TreeIndexHeader {
   /**

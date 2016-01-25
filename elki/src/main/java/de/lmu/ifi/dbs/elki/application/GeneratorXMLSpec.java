@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * Generate a data set based on a specified model (using an XML specification)
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.composedOf GeneratorXMLDatabaseConnection
  */

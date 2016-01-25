@@ -34,6 +34,7 @@ import java.util.logging.Logger;
  * additional classes when determining the 'origin' of a log message.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class ELKILogRecord extends LogRecord {
   /**

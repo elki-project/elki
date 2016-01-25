@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * as "strong", the others as "weak".
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 @Title("Weak Eigenpair Filter")
 @Description("Sorts the eigenpairs in decending order of their eigenvalues and returns those eigenpairs, whose eigenvalue is above the average ('expected') eigenvalue.")

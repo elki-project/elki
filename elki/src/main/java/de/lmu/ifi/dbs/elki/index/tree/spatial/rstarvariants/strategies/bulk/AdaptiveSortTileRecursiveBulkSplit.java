@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * See {@link SortTileRecursiveBulkSplit} for the original STR bulk load.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class AdaptiveSortTileRecursiveBulkSplit extends AbstractBulkSplit {
   /**

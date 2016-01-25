@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Always split, as in the original R-Tree
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class SplitOnlyOverflowTreatment implements OverflowTreatment {
   /**

@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * The common use of the rstar tree: indexing number vectors.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <O> Object type
  */

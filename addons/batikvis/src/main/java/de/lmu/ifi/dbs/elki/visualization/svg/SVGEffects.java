@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
  * Class containing some popular SVG effects.
  * 
  * @author Erich Schubert
+ * @since 0.5.0
  */
 public class SVGEffects {
   /**

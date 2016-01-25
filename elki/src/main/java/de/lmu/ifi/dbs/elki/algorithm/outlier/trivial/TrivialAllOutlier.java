@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
  * reference algorithm in comparisons.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class TrivialAllOutlier extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**

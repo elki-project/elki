@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
  * Abstract reverse kNN Query interface.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses DoubleDBIDList oneway - - «create»
  * 

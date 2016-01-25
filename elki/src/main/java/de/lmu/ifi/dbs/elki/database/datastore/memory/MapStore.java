@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
  * wrapper around a regular map.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @param <T> Representation object type
  */

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * Exponential distribution.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public class ExponentialDistribution extends AbstractDistribution {
   /**

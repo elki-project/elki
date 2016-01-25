@@ -29,6 +29,7 @@ package de.lmu.ifi.dbs.elki.result;
  * stores the required short and long result names.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.landmark
  */

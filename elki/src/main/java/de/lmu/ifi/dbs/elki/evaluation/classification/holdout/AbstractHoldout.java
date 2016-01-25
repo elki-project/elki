@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * Split a data set for holdout evaluation.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public abstract class AbstractHoldout implements Holdout {
   /**

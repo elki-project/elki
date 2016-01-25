@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayIter;
  * Class to iterate over a number vector in decreasing order.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  * 
  * @apiviz.composedOf NumberVector
  */

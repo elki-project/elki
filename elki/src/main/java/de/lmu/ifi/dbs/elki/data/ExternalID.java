@@ -28,6 +28,7 @@ package de.lmu.ifi.dbs.elki.data;
  * External ID objects.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf String
  */

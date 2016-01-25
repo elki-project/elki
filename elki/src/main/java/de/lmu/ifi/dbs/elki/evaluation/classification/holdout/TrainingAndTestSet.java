@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
  * training and test set are provided in labels.
  * 
  * @author Arthur Zimek
+ * @since 0.7.0
  */
 public class TrainingAndTestSet {
   /**

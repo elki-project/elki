@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * Unit test for the Cover-tree.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class CoverTreeTest extends AbstractIndexStructureTest {
   /**

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Matrix.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class EMModel extends MeanModel {
   /**

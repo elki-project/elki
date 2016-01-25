@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarch
  * or getAllClusters().
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.composedOf Cluster oneway - n
  * 

@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * which are spatial nodes or data objects.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  */
 public class SpatialPair<K, V extends SpatialComparable> extends Pair<K, V> implements SpatialComparable {
   /**

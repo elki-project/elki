@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * AbstractDistanceFunction provides some methods valid for any extending class.
  * 
  * @author Arthur Zimek
+ * @since 0.4.0
  * 
  * @apiviz.excludeSubtypes
  * 

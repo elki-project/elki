@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * </p>
  * 
  * @author Lisa Reichert
+ * @since 0.3
  * 
  * @param <O> the type of DatabaseObjects handled by this Algorithm
  */

@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenPair;
  * by an eigenpair filter.
  *
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @apiviz.has EigenPair
  */

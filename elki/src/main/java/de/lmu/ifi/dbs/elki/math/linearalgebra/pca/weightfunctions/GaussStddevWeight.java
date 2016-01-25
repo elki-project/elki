@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * with factor being 1 / sqrt(2 * PI)
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public final class GaussStddevWeight implements WeightFunction {
   /**

@@ -76,6 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * </p>
  *
  * @author Klaus Arthur Schmidt
+ * @since 0.7.0
  */
 @Reference(authors = "M. Chau, R. Cheng, B. Kao, J. Ng", //
 title = "Uncertain data mining: An example in clustering location data", //

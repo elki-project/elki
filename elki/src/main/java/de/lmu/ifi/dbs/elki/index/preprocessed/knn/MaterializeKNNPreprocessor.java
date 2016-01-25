@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Used for example by {@link de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF}.
  *
  * @author Erich Schubert
+ * @since 0.2
  *
  * @apiviz.has DistanceFunction
  * @apiviz.has KNNQuery

@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * A mathematical vector object, along with mathematical operations.
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.landmark
  */

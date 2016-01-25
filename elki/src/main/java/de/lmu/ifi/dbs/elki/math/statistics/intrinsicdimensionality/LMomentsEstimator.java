@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * @author Jonathan von Brünken
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**

@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.visualization.style;
  * Styling policy based on assigning objects individual colors.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public interface SingleObjectsStylingPolicy extends StylingPolicy {
   // TODO: finish and use, e.g. for outliers and density visualization

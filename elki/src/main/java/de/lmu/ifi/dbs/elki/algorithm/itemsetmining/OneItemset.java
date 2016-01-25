@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * APRIORI itemset.
  * 
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class OneItemset extends Itemset {
   /**

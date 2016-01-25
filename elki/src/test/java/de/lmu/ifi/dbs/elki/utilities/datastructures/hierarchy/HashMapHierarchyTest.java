@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
  * Test the main hierarchy implementation.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  */
 public class HashMapHierarchyTest implements JUnit4Test {
   @Test

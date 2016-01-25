@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.BitsUtil;
  * Represents a subspace of the original data space.
  *
  * @author Elke Achtert
+ * @since 0.2
  *
  * @apiviz.owns de.lmu.ifi.dbs.elki.data.Subspace.DimensionComparator
  */

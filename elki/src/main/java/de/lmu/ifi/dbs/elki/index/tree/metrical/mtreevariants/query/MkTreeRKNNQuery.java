@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
  * Instance of a rKNN query for a particular spatial index.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses AbstractMkTree
  */

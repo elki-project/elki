@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
  * Instance of a KNN query for a particular spatial index.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses AbstractMTree
  * @apiviz.uses DoubleMTreeDistanceSearchCandidate

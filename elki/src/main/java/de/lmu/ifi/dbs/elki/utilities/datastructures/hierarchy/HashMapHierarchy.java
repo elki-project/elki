@@ -29,6 +29,7 @@ import java.util.HashMap;
  * Centralized hierarchy implementation, using a HashMap of Lists.
  *
  * @author Erich Schubert
+ * @since 0.6.0
  *
  * @param <O> Object type (arbitrary!)
  */

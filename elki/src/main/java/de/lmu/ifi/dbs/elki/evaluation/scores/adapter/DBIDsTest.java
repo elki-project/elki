@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation.Predicate;
  * @apiviz.composedOf DBIDs
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 public class DBIDsTest implements Predicate<DBIDRefIter> {
   /**

@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @param <M> Model object type
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  * 

@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * exact indexing (e.g. linear scanning).
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  * 
  * @param <O> Object type
  * 

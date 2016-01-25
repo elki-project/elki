@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  */
 @Reference(authors = "J. H. Ward Jr", //
 title = "Hierarchical grouping to optimize an objective function", //

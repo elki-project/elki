@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Elke Achtert
+ * @since 0.2
  * 
  * @param <O> the type of objects to be stored in the M-Tree
  * @param <N> the type of AbstractMTreeNode used in the M-Tree

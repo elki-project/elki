@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * Abstract super class for distance functions needing a preprocessor.
  * 
  * @author Elke Achtert
+ * @since 0.4.0
  */
 public abstract class AbstractDBIDSimilarityFunction extends AbstractPrimitiveSimilarityFunction<DBID> implements DBIDSimilarityFunction {
   /**

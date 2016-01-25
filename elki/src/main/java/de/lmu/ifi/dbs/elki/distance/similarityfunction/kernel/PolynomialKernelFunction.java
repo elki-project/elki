@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * vectors V1 and V2 defined by (V1^T*V2)^degree.
  * 
  * @author Simon Paradies
+ * @since 0.2
  */
 public class PolynomialKernelFunction extends AbstractVectorSimilarityFunction implements PrimitiveDistanceFunction<NumberVector> {
   /**

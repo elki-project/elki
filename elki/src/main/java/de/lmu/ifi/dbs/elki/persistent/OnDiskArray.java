@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * by the actual data.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.composedOf RandomAccessFile
  */

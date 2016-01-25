@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.7.0
  */
 @Reference(authors = "Rand, W. M.", //
 title = "Objective Criteria for the Evaluation of Clustering Methods", //

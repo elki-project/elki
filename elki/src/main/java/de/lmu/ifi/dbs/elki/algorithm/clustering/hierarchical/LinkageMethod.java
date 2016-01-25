@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 @Reference(authors = "G. N. Lance and W. T. Williams", //
 title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //

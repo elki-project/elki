@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * <tt>-enableDebug de.lmu.ifi.dbs.elki.database=FINEST</tt>
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf DatabaseEventManager
  * @apiviz.has IndexFactory

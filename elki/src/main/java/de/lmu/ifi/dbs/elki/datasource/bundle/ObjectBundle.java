@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
  * Shared API for both single-object and multi-object packages.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf BundleMeta
  */

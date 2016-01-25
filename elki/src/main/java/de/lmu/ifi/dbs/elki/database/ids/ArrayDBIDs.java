@@ -27,6 +27,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * Interface for array based DBIDs.
  *
  * @author Erich Schubert
+ * @since 0.4.0
  *
  * @apiviz.has DBIDArrayIter
  */

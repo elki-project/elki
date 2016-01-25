@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Vector using a dense bit set encoding, based on {@code long[]} storage.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  * 
  * @apiviz.composedOf Bit
  */

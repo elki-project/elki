@@ -29,6 +29,7 @@ import java.util.Stack;
  * Helper class to produce JSON output. Try hard to ensure validity of the output.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf StringBuilder
  * @apiviz.has JSONBuffer.JSONException

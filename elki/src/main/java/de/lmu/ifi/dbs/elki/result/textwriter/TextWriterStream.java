@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.HandlerList;
  * Representation of an output stream to a text file.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory oneway - -
  *              wraps

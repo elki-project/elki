@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.SortedEigenPairs;
  * Result class for Principal Component Analysis with some convenience methods
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  * @apiviz.has SortedEigenPairs

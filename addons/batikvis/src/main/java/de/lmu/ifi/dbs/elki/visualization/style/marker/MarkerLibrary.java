@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * screen, thumbnail, print)
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.uses Element oneway - - «create»
  */

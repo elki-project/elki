@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * it improves code readability and type safety.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  * 
  * @apiviz.composedOf SimpleTypeInformation
  */

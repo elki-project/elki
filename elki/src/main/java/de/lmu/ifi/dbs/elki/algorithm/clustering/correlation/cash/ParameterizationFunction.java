@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * belonging to the normal vector n.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class ParameterizationFunction {
   /**

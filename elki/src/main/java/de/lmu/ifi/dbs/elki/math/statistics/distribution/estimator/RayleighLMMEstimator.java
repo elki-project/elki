@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * the method of L-Moments (LMM).
  * 
  * @author Erich Schubert
+ * @since 0.6.0
  * 
  * @apiviz.has RayleighDistribution - - estimates
  */

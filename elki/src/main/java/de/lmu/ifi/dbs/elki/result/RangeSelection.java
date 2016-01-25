@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  *
  * @author Heidi Kolb
  * @author Erich Schubert
+ * @since 0.4.0
  */
 public class RangeSelection extends DBIDSelection {
   /**

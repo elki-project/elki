@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * TODO: add support for sparse vectors.
  * 
  * @author Erich Schubert
+ * @since 0.4.0
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.DropNaNFilter" })
 public class DropNaNFilter extends AbstractStreamFilter {

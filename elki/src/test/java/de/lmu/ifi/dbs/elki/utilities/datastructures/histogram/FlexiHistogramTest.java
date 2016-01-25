@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * JUnit test to test the {@link AbstractObjDynamicHistogram} class.
  * 
  * @author Erich Schubert
+ * @since 0.5.5
  */
 public class FlexiHistogramTest implements JUnit4Test {
   /**

@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
  * Class for systems of linear equations.
  * 
  * @author Elke Achtert
+ * @since 0.2
  */
 public class LinearEquationSystem {
   /**

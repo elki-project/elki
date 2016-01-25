@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Bit. Lines starting with &quot;#&quot; will be ignored.
  * 
  * @author Arthur Zimek
+ * @since 0.2
  * 
  * @apiviz.has BitVector
  */

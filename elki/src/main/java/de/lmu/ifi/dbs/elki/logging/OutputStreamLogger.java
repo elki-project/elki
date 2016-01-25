@@ -37,6 +37,7 @@ import java.nio.charset.CharsetEncoder;
  * This is meant to wrap logging output to the console.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 public class OutputStreamLogger extends OutputStreamWriter {
   /**

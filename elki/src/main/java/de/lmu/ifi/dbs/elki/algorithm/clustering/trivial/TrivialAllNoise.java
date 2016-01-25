@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Useful for evaluation and testing.
  * 
  * @author Erich Schubert
+ * @since 0.2
  */
 @Title("Trivial all-noise clustering")
 @Description("Returns a 'trivial' clustering which just considers all points as noise points.")

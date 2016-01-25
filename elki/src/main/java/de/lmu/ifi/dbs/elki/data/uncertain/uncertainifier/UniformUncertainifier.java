@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * Factory class.
  *
  * @author Erich Schubert
+ * @since 0.7.0
  *
  * @apiviz.has UniformContinuousUncertainObject
  */

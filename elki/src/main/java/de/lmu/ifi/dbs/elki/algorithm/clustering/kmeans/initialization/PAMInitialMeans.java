@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * </p>
  *
  * @author Erich Schubert
+ * @since 0.5.0
  *
  * @param <O> Object type for KMedoids initialization
  */

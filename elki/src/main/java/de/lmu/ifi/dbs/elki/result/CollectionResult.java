@@ -32,6 +32,7 @@ import java.util.Iterator;
  * For example, a list of NumberVectors.
  * 
  * @author Erich Schubert
+ * @since 0.2
  * 
  * @apiviz.landmark
  *

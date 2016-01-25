@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
  * for examples.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class ChainedParameterization extends AbstractParameterization {
   /**

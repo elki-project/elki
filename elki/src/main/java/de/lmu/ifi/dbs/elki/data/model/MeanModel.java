@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
  * Cluster model that stores a mean for the cluster.
  * 
  * @author Erich Schubert
+ * @since 0.3
  */
 public class MeanModel extends PrototypeModel<Vector> implements TextWriteable {
   /**
