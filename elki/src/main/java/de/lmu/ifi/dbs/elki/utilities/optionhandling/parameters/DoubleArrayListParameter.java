@@ -142,11 +142,8 @@ public class DoubleArrayListParameter extends ListParameter<DoubleArrayListParam
       List<?> l = List.class.cast(obj);
       // do extra validation:
       for(Object o : l) {
-        List<?> v = List.class.cast(o);
-        for(Object c : v) {
-          if(!(c instanceof Double)) {
-            throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getName() + "\". Given list contains objects of different type!");
-          }
+        if(!(o instanceof double[])) {
+          throw new WrongParameterValueException("Wrong parameter format for parameter \"" + getName() + "\". Given list contains objects of different type!");
         }
       }
       // TODO: can we use reflection to get extra checks?

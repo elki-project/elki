@@ -172,9 +172,7 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
     for(int i = 1; i < k; i++) {
       DoubleVector mi = DoubleVector.wrap(means[i]);
       for(int j = 0; j < i; j++) {
-        double d = distanceFunction.distance(mi, DoubleVector.wrap(means[j]));
-        cdist[i][j] = d;
-        cdist[j][i] = d;
+        cdist[i][j] = cdist[j][i] = distanceFunction.distance(mi, DoubleVector.wrap(means[j]));
       }
     }
     double[] buf = new double[k - 1];
