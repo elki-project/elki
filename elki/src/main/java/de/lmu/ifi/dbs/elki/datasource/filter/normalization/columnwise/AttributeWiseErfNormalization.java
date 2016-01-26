@@ -42,7 +42,8 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * 
  * @apiviz.uses NumberVector
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseErfNormalization"})
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseErfNormalization", //
+"de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseErfNormalization" })
 public class AttributeWiseErfNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.

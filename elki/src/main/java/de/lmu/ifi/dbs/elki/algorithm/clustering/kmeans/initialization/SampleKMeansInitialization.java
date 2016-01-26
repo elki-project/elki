@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -57,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <V> Vector type
  */
+@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SampleKMeansInitialization")
 public class SampleKMeansInitialization<V extends NumberVector> extends AbstractKMeansInitialization<V> {
   /**
    * Variant of kMeans to use for initialization.

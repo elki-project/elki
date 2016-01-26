@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -68,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @apiviz.has FlexibleLOF.LOFResult oneway - - updates
  */
 // TODO: related to publication?
+@Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.OnlineLOF")
 public class OnlineLOF<O> extends FlexibleLOF<O> {
   /**
    * The logger for this class.

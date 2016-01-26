@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -44,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * @param <O> Object type for KMedoids
  */
+@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.FirstKInitialMeans")
 public class FirstKInitialMeans<O> implements KMeansInitialization<NumberVector>, KMedoidsInitialization<O> {
   /**
    * Constructor.

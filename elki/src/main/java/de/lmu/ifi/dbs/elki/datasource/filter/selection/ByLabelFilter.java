@@ -46,7 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * 
  * @apiviz.uses LabelList oneway - - «reads»
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ByLabelFilter" })
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.ByLabelFilter", //
+"de.lmu.ifi.dbs.elki.datasource.filter.FilterByLabelFilter" })
 public class ByLabelFilter extends AbstractStreamFilter {
   /**
    * Class logger

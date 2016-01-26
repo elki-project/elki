@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
@@ -39,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
+@Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedLPNormDistanceFunction")
 public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction implements WeightedNumberVectorDistanceFunction<NumberVector> {
   /**
    * Weight array

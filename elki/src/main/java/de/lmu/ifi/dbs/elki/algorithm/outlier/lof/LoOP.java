@@ -102,7 +102,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 title = "LoOP: Local Outlier Probabilities", //
 booktitle = "Proceedings of the 18th International Conference on Information and Knowledge Management (CIKM), Hong Kong, China, 2009", //
 url = "http://dx.doi.org/10.1145/1645953.1646195")
-@Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP", "LoOP" })
+@Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.LoOP")
 public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

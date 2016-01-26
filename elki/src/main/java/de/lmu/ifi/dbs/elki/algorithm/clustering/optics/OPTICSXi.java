@@ -72,7 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @apiviz.uses ClusterOrder oneway - «reads»
  * @apiviz.has SteepAreaResult oneway - «produces»
  */
-@Alias({ "OPTICSXi", "de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi" })
+@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi")
 public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> implements ClusteringAlgorithm<Clustering<OPTICSModel>> {
   /**
    * The logger for this class.

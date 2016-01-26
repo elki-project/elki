@@ -58,10 +58,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * convergence, although MacQueen likely only meant to do a single pass over the
  * data.
  *
+ * Reference:
  * <p>
- * Reference:<br />
- * J. MacQueen: Some Methods for Classification and Analysis of Multivariate
- * Observations. <br />
+ * J. MacQueen:<br />
+ * Some Methods for Classification and Analysis of Multivariate Observations.
+ * <br />
  * In 5th Berkeley Symp. Math. Statist. Prob., Vol. 1, 1967, pp 281-297.
  * </p>
  *

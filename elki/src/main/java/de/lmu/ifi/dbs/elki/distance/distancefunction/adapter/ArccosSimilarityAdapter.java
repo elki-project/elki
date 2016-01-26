@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 
 /**
  * Adapter from a normalized similarity function to a distance function using
@@ -40,6 +41,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunct
  * 
  * @param <O> Object class to process.
  */
+@Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.adapter.SimilarityAdapterArccos")
 public class ArccosSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
   /**
    * Constructor.

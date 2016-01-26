@@ -85,7 +85,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 title = "Maximum Likelihood from Incomplete Data via the EM algorithm", //
 booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", //
 url = "http://www.jstor.org/stable/2984875")
-@Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.EM", "EM" })
+@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.EM")
 public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * The logger for this class.

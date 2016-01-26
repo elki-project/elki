@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @param <V> vector type
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.HellingerHistogramNormalization" })
 public class HellingerHistogramNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
   /**
    * Static instance.

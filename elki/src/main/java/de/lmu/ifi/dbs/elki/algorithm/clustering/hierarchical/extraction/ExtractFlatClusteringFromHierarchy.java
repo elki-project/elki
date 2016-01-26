@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -74,6 +75,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * @apiviz.uses HierarchicalClusteringAlgorithm
  * @apiviz.uses PointerHierarchyRepresentationResult
  */
+@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.ExtractFlatClusteringFromHierarchy")
 public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
   /**
    * Class logger.

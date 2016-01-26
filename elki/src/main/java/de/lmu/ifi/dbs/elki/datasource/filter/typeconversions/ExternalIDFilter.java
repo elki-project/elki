@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.uses LabelList oneway - - «reads»
  * @apiviz.has ExternalID oneway - - «produces»
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ExternalIDFilter" })
+@Alias("de.lmu.ifi.dbs.elki.datasource.filter.ExternalIDFilter")
 public class ExternalIDFilter implements ObjectFilter {
   /**
    * The index of the label to be used as external Id.

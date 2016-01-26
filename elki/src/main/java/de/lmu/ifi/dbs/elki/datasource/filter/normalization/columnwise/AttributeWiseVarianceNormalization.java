@@ -51,7 +51,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * 
  * @apiviz.uses NumberVector
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormalization", "z" })
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormalization", //
+"z", "de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseVarianceNormalization" })
 public class AttributeWiseVarianceNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.

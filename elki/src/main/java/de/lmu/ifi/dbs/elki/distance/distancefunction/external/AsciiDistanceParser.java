@@ -29,6 +29,7 @@ import java.io.InputStream;
 import de.lmu.ifi.dbs.elki.datasource.parser.CSVReaderFormat;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -57,6 +58,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 @Description("Parser for the following line format:\n" //
 + "id1 id2 distanceValue, where id1 and is2 are integers starting at 0 representing the two ids belonging to the distance value.\n" //
 + "The ids and the distance value are separated by whitespace. Empty lines and lines beginning with \"#\" will be ignored.")
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.parser.NumberDistanceParser", //
+"de.lmu.ifi.dbs.elki.distance.distancefunction.external.NumberDistanceParser", //
+"de.lmu.ifi.dbs.elki.parser.NumberDistanceParser" })
 public class AsciiDistanceParser implements DistanceParser {
   /**
    * The logger for this class.

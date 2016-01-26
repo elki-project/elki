@@ -34,7 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  * @since 0.2
  */
-@Alias({ "taxicab", "cityblock", "l1", "ManhattanDistanceFunction", "de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction" })
+@Alias({ "taxicab", "cityblock", "l1", //
+"de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction" })
 public class ManhattanDistanceFunction extends LPIntegerNormDistanceFunction {
   /**
    * The static instance to use.

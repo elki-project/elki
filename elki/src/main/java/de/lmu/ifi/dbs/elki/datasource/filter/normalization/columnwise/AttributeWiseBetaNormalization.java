@@ -66,7 +66,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * @apiviz.uses NumberVector
  * @apiviz.uses DistributionEstimator
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseBetaNormalization"})
 public class AttributeWiseBetaNormalization<V extends NumberVector> implements Normalization<V> {
   /**
    * Class logger.

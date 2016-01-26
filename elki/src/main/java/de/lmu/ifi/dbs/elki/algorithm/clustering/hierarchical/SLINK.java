@@ -75,7 +75,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 title = "SLINK: An optimally efficient algorithm for the single-link cluster method", //
 booktitle = "The Computer Journal 16 (1973), No. 1, p. 30-34.", //
 url = "http://dx.doi.org/10.1093/comjnl/16.1.30")
-@Alias(value = { "de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK", "clustering.SLINK", "SLINK", "single-link", "single-linkage" })
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK", "clustering.SLINK", //
+"single-link", "single-linkage" })
 public class SLINK<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult>implements HierarchicalClusteringAlgorithm {
   /**
    * The logger for this class.

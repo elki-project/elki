@@ -44,7 +44,8 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * 
  * @param <V> Vector type
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.InverseDocumentFrequencyNormalization" })
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.InverseDocumentFrequencyNormalization", //
+"de.lmu.ifi.dbs.elki.datasource.filter.InverseDocumentFrequencyNormalization" })
 public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.

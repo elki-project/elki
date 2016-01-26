@@ -43,7 +43,6 @@ import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
  * 
  * @apiviz.uses NumberVector
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMeanNormalization"})
 public class AttributeWiseMeanNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.

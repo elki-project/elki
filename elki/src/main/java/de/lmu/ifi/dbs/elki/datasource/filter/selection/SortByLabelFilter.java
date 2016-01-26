@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * 
  * @apiviz.uses de.lmu.ifi.dbs.elki.data.LabelList oneway - - «reads»
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.SortByLabelFilter" })
+@Alias("de.lmu.ifi.dbs.elki.datasource.filter.SortByLabelFilter")
 public class SortByLabelFilter implements ObjectFilter {
   /**
    * Class logger

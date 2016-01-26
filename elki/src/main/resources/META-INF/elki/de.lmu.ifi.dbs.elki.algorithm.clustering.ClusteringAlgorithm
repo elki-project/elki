@@ -4,15 +4,15 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.GeneralizedDBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.LSDBC
 de.lmu.ifi.dbs.elki.algorithm.clustering.GriDBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.affinitypropagation.AffinityPropagationClusteringAlgorithm
-de.lmu.ifi.dbs.elki.algorithm.clustering.em.EM de.lmu.ifi.dbs.elki.algorithm.clustering.EM EM
+de.lmu.ifi.dbs.elki.algorithm.clustering.em.EM de.lmu.ifi.dbs.elki.algorithm.clustering.EM
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.ExtractFlatClusteringFromHierarchy
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansSort
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansCompare
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansElkan
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd
+de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel.ParallelLloydKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMediansLloyd
@@ -26,7 +26,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHybridLloydMacQueen
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.XMeans
 de.lmu.ifi.dbs.elki.algorithm.clustering.NaiveMeanShiftClustering
-de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi OPTICSXi de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi
+de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICSXi
 de.lmu.ifi.dbs.elki.algorithm.clustering.SNNClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering.ChengAndChurch
 de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.CASH
@@ -43,11 +43,11 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PreDeCon
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.PROCLUS
 de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.SUBCLU
 de.lmu.ifi.dbs.elki.algorithm.clustering.meta.ExternalClustering
-de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering
-de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelHierarchicalClustering de.lmu.ifi.dbs.elki.algorithm.clustering.ByLabelHierarchicalClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByModelClustering
-de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne
-de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise
+de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllInOne
+de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise de.lmu.ifi.dbs.elki.algorithm.clustering.TrivialAllNoise
 de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.FDBSCAN
 de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain.CKMeans

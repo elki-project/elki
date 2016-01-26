@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractVectorSimilarityFunction;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -38,6 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Erich Schubert
  * @since 0.2
  */
+@Alias("sigmoid")
 public class SigmoidKernelFunction extends AbstractVectorSimilarityFunction {
   /**
    * Scaling factor c, bias theta
@@ -60,7 +62,7 @@ public class SigmoidKernelFunction extends AbstractVectorSimilarityFunction {
   public double similarity(NumberVector o1, NumberVector o2) {
     final int dim = AbstractNumberVectorDistanceFunction.dimensionality(o1, o2);
     double sim = 0.;
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       final double v = o1.doubleValue(i) * o2.doubleValue(i);
       sim += v;
     }
@@ -94,11 +96,11 @@ public class SigmoidKernelFunction extends AbstractVectorSimilarityFunction {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter cP = new DoubleParameter(C_ID, 1.);
-      if (config.grab(cP)) {
+      if(config.grab(cP)) {
         c = cP.doubleValue();
       }
       final DoubleParameter thetaP = new DoubleParameter(THETA_ID, 0.);
-      if (config.grab(thetaP)) {
+      if(config.grab(thetaP)) {
         theta = thetaP.doubleValue();
       }
     }

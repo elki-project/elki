@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -57,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @param <V> Vector type
  */
 @Description("Add uniform Jitter to a dataset, while preserving the total vector sum.")
+@Alias("de.lmu.ifi.dbs.elki.datasource.filter.HistogramJitterFilter")
 public class HistogramJitterFilter<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> {
   /**
    * Jitter amount.

@@ -31,6 +31,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialSingleMinComparator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -42,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.composedOf SpatialSingleMinComparator
  */
+@Alias("de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.bulk.MaxExtensionBulkSplit")
 public class MaxExtensionBulkSplit extends AbstractBulkSplit {
   /**
    * Logger.

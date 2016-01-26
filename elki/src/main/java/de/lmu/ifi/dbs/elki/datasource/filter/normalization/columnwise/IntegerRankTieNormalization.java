@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.IntegerRankTieNormalization"})
+@Alias("de.lmu.ifi.dbs.elki.datasource.filter.normalization.RankTieNormalization")
 public class IntegerRankTieNormalization implements ObjectFilter {
   /**
    * Constructor.

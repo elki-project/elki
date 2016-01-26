@@ -70,6 +70,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Algorithm to compute local correlation outlier probability.
  * 
  * This is the simpler, original version of COP, as published in
+ * 
+ * Reference:
  * <p>
  * Arthur Zimek<br />
  * Correlation Clustering.<br />
@@ -82,7 +84,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Title("Simple COP: Correlation Outlier Probability")
-@Reference(authors = "Arthur Zimek", title = "Correlation Clustering. PhD thesis, Chapter 18", booktitle = "")
+@Reference(authors = "Arthur Zimek", //
+title = "Correlation Clustering", //
+booktitle = "PhD thesis, Chapter 18")
 public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<V, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

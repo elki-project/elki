@@ -54,6 +54,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -88,6 +89,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 title = "Outlier Detection with Kernel Density Functions", //
 booktitle = "Machine Learning and Data Mining in Pattern Recognition", //
 url = "http://dx.doi.org/10.1007/978-3-540-73499-4_6")
+@Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.LDF")
 public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

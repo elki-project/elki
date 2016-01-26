@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -65,6 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  */
 @Title("KNN-Distance-Order")
 @Description("Assesses the knn distances for a specified k and orders them.")
+@Alias("de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder")
 public class KNNDistancesSampler<O> extends AbstractDistanceBasedAlgorithm<O, KNNDistanceOrderResult> {
   /**
    * The logger for this class.

@@ -1,6 +1,6 @@
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK clustering.SLINK SLINK single-link single-linkage
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK clustering.SLINK single-link single-linkage
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AnderbergHierarchicalClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AGNES HAC NaiveAgglomerativeHierarchicalClustering de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CLINK CLINK Defays
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CLINK Defays
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory

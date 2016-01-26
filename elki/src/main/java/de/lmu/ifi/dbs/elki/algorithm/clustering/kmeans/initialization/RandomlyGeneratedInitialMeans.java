@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 
 /**
  * Initialize k-means by generating random vectors (within the data sets value
@@ -41,6 +42,7 @@ import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.5.0
  */
+@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyGeneratedInitialMeans")
 public class RandomlyGeneratedInitialMeans extends AbstractKMeansInitialization<NumberVector> {
   /**
    * Constructor.

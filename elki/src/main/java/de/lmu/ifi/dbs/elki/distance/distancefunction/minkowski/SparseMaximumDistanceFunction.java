@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -31,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.5.0
  */
+@Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.SparseMaximumDistanceFunction")
 public class SparseMaximumDistanceFunction extends SparseLPNormDistanceFunction {
   /**
    * Static instance
