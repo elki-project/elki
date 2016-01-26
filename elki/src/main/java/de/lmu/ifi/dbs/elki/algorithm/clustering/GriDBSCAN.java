@@ -44,7 +44,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -56,6 +59,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -65,8 +69,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import gnu.trove.iterator.TIntObjectIterator;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.iterator.TLongObjectIterator;
+import gnu.trove.map.hash.TLongObjectHashMap;
 
 /**
  * Using Grid for Accelerating Density-Based Clustering.
@@ -214,7 +218,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     /**
      * Data grid partitioning.
      */
-    TIntObjectHashMap<ModifiableDBIDs> grid;
+    TLongObjectHashMap<ModifiableDBIDs> grid;
 
     /**
      * Core identifier objects (shared to conserve memory).
@@ -235,6 +239,11 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
      * Temporary assignments of a single run.
      */
     private WritableIntegerDataStore temporary;
+
+    /**
+     * Indicates that the number of grid cells has overflown.
+     */
+    private boolean overflown;
 
     /**
      * Constructor.
@@ -267,10 +276,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       this.cells = new int[dim];
       // Compute the grid start, and the number of cells in each dimension.
       long numcells = computeGridBaseOffsets();
-      if(numcells > Integer.MAX_VALUE - 5 /* Maximum array size */) {
-        throw new AbortException("The maximum number of grid cells allowed is: " + (Integer.MAX_VALUE - 5) + " Use a larger grid!");
-      }
-      else if(numcells > size) {
+      if(numcells > size) {
         LOG.warning("The generated grid has more cells than data points. This may need excessive amounts of memory.");
       }
       else if(numcells == 1) {
@@ -298,9 +304,11 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       this.cores = new Core[2];
       this.borders = new Border[2];
 
+      // Reused storage for neighbors:
+      ModifiableDoubleDBIDList neighbors = DBIDUtil.newDistanceDBIDList(minpts << 1);
       // Run DBSCAN on each cell that has enough objects.
       FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Processing grid cells", mincells, LOG) : null;
-      for(TIntObjectIterator<ModifiableDBIDs> it = grid.iterator(); it.hasNext();) {
+      for(TLongObjectIterator<ModifiableDBIDs> it = grid.iterator(); it.hasNext();) {
         it.advance();
         ModifiableDBIDs cellids = it.value();
         if(cellids.size() < minpts) {
@@ -315,7 +323,8 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
           if(temporary.intValue(id) != UNPROCESSED) {
             continue;
           }
-          DBIDs neighbors = rq.getRangeForDBID(id, epsilon);
+          neighbors.clear();
+          rq.getRangeForDBID(id, epsilon, neighbors);
           if(neighbors.size() >= minpts) {
             expandCluster(id, clusterid, temporary, neighbors, activeSet, rq, pprog);
             ++clusterid;
@@ -413,7 +422,11 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
         assert (offset[d] + c * gridwidth >= ma) : "Grid inconsistent.";
         total *= c;
         if(total < 0) {
-          throw new AbortException("Excessive amount of grid cells! Use larger grid cells.");
+          LOG.warning("Excessive amount of grid cells (long overflow)! Use larger grid cells.");
+          if (total < 0) {
+            overflown = true;
+            total &= 0x7FFF_FFFF_FFFF_FFFFL;
+          }
         }
         if(buf != null) {
           buf.append(d).append(": min=").append(mi).append(" max=").append(ma);
@@ -439,7 +452,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
      * @param offset Offset
      */
     protected void buildGrid(Relation<V> relation, int numcells, double[] offset) {
-      grid = new TIntObjectHashMap<ModifiableDBIDs>(numcells >>> 2);
+      grid = new TLongObjectHashMap<ModifiableDBIDs>(numcells >>> 2);
       for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
         V obj = relation.get(it);
         insertIntoGrid(it, obj, 0, 0);
@@ -487,7 +500,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       int tcount = 0;
       int hasmin = 0;
       double sqcount = 0;
-      for(TIntObjectIterator<ModifiableDBIDs> it = grid.iterator(); it.hasNext();) {
+      for(TLongObjectIterator<ModifiableDBIDs> it = grid.iterator(); it.hasNext();) {
         it.advance();
         final int s = it.value().size();
         if(s >= size >> 1) {
@@ -504,7 +517,11 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       if(savings >= 1) {
         LOG.warning("Pairwise distances within each cells are more expensive than a full DBSCAN run due to overlap!");
       }
-      LOG.statistics(new LongStatistic(GriDBSCAN.class.getName() + ".all-cells", numcell));
+      if (overflown) {
+        LOG.statistics(new StringStatistic(GriDBSCAN.class.getName() + ".all-cells", "overflow"));
+      } else {
+        LOG.statistics(new LongStatistic(GriDBSCAN.class.getName() + ".all-cells", numcell));
+      }
       LOG.statistics(new LongStatistic(GriDBSCAN.class.getName() + ".used-cells", grid.size()));
       LOG.statistics(new LongStatistic(GriDBSCAN.class.getName() + ".minpts-cells", hasmin));
       LOG.statistics(new DoubleStatistic(GriDBSCAN.class.getName() + ".redundancy", tcount / (double) size));
@@ -523,7 +540,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
      * @param pprog Object progress
      * @return cluster size
      */
-    protected int expandCluster(final DBIDRef seed, final int clusterid, final WritableIntegerDataStore clusterids, final DBIDs neighbors, ArrayModifiableDBIDs activeSet, RangeQuery<V> rq, FiniteProgress pprog) {
+    protected int expandCluster(final DBIDRef seed, final int clusterid, final WritableIntegerDataStore clusterids, final ModifiableDoubleDBIDList neighbors, ArrayModifiableDBIDs activeSet, RangeQuery<V> rq, FiniteProgress pprog) {
       assert (activeSet.size() == 0);
       int clustersize = 1 + processCorePoint(seed, neighbors, clusterid, clusterids, activeSet);
       LOG.incrementProcessed(pprog);
@@ -531,11 +548,12 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       final DBIDVar id = DBIDUtil.newVar();
       while(!activeSet.isEmpty()) {
         activeSet.pop(id);
+        neighbors.clear();
         // Evaluate Neighborhood predicate
-        DBIDs newneighbors = rq.getRangeForDBID(id, epsilon);
+        rq.getRangeForDBID(id, epsilon, neighbors);
         // Evaluate Core-Point predicate
-        if(newneighbors.size() >= minpts) {
-          clustersize += processCorePoint(id, newneighbors, clusterid, clusterids, activeSet);
+        if(neighbors.size() >= minpts) {
+          clustersize += processCorePoint(id, neighbors, clusterid, clusterids, activeSet);
         }
         LOG.incrementProcessed(pprog);
       }
@@ -552,14 +570,16 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
      * @param activeSet Active set of cluster seeds
      * @return Number of new points added to cluster
      */
-    protected int processCorePoint(final DBIDRef seed, DBIDs newneighbors, final int clusterid, final WritableIntegerDataStore clusterids, ArrayModifiableDBIDs activeSet) {
+    protected int processCorePoint(final DBIDRef seed, DoubleDBIDList newneighbors, final int clusterid, final WritableIntegerDataStore clusterids, ArrayModifiableDBIDs activeSet) {
       clusterids.putInt(seed, clusterid); // Core point now
       int clustersize = 0;
       // The recursion is unrolled into iteration over the active set.
-      for(DBIDIter it = newneighbors.iter(); it.valid(); it.advance()) {
+      for(DoubleDBIDListIter it = newneighbors.iter(); it.valid(); it.advance()) {
         final int oldassign = clusterids.intValue(it);
         if(oldassign == UNPROCESSED) {
-          activeSet.add(it);
+          if(it.doubleValue() > 0.) { // We can skip points at distance 0.
+            activeSet.add(it);
+          }
         }
         else if(oldassign != NOISE) {
           continue; // Member of some cluster.
