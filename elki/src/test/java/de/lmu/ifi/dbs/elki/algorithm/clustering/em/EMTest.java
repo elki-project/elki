@@ -61,8 +61,8 @@ public class EMTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
 
     // run EM on database
     Clustering<?> result = em.run(db);
-    testFMeasure(db, result, 0.781737);
-    testClusterSizes(result, new int[] { 2, 5, 17, 175, 200, 311 });
+    testFMeasure(db, result, 0.780036);
+    testClusterSizes(result, new int[] { 2, 5, 27, 171, 200, 305 });
   }
 
   /**
@@ -82,8 +82,8 @@ public class EMTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
 
     // run EM on database
     Clustering<?> result = em.run(db);
-    testFMeasure(db, result, 0.8155410);
-    testClusterSizes(result, new int[] { 7, 95, 99, 133, 176, 200 });
+    testFMeasure(db, result, 0.9302319);
+    testClusterSizes(result, new int[] { 7, 22, 93, 97, 200, 291 });
   }
 
   /**
