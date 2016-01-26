@@ -69,12 +69,7 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   private static final Logging LOG = Logging.getLogger(ByModelClustering.class);
 
   /**
-   * Pattern to recognize noise clusters with
-   */
-  public static final OptionID NOISE_ID = new OptionID("bymodel.noise", "Pattern to recognize noise models by their label.");
-
-  /**
-   * Holds the value of {@link #NOISE_ID}.
+   * Pattern to recognize noise clusters with.
    */
   private Pattern noisepattern = null;
 
@@ -145,6 +140,14 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter to specify the pattern to recognize noise clusters with.
+     */
+    public static final OptionID NOISE_ID = new OptionID("bymodel.noise", "Pattern to recognize noise models by their label.");
+
+    /**
+     * Pattern to recognize noise clusters with
+     */
     protected Pattern noisepat;
 
     @Override

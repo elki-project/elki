@@ -66,7 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * 
  * If an assignment of an object to multiple clusters is desired, the labels of
  * the object indicating the clusters need to be separated by blanks and the
- * flag {@link #MULTIPLE_ID} needs to be set.
+ * flag {@link Parameterizer#MULTIPLE_ID} needs to be set.
  * 
  * TODO: handling of data sets with no labels?
  * 
@@ -85,24 +85,12 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
   private static final Logging LOG = Logging.getLogger(ByLabelClustering.class);
 
   /**
-   * Flag to indicate that multiple cluster assignment is possible. If an
-   * assignment to multiple clusters is desired, the labels indicating the
-   * clusters need to be separated by blanks.
-   */
-  public static final OptionID MULTIPLE_ID = new OptionID("bylabelclustering.multiple", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
-
-  /**
-   * Pattern to recognize noise clusters by.
-   */
-  public static final OptionID NOISE_ID = new OptionID("bylabelclustering.noise", "Pattern to recognize noise classes by their label.");
-
-  /**
-   * Holds the value of {@link #MULTIPLE_ID}.
+   * Allow multiple cluster assignment.
    */
   private boolean multiple;
 
   /**
-   * Holds the value of {@link #NOISE_ID}.
+   * Pattern to recognize noise clusters by.
    */
   private Pattern noisepattern = null;
 
@@ -251,8 +239,26 @@ public class ByLabelClustering extends AbstractAlgorithm<Clustering<Model>> impl
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Flag to indicate that multiple cluster assignment is possible. If an
+     * assignment to multiple clusters is desired, the labels indicating the
+     * clusters need to be separated by blanks.
+     */
+    public static final OptionID MULTIPLE_ID = new OptionID("bylabelclustering.multiple", "Flag to indicate that only subspaces with large coverage " + "(i.e. the fraction of the database that is covered by the dense units) " + "are selected, the rest will be pruned.");
+
+    /**
+     * Parameter to specify the pattern to recognize noise clusters by.
+     */
+    public static final OptionID NOISE_ID = new OptionID("bylabelclustering.noise", "Pattern to recognize noise classes by their label.");
+
+    /**
+     * Allow multiple cluster assignment.
+     */
     protected boolean multiple;
 
+    /**
+     * Pattern to recognize noise clusters by.
+     */
     protected Pattern noisepat;
 
     @Override
