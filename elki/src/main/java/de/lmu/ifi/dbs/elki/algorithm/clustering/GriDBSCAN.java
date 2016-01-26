@@ -486,7 +486,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
     protected int checkGridCellSizes(int size, long numcell) {
       int tcount = 0;
       int hasmin = 0;
-      long sqcount = 0;
+      double sqcount = 0;
       for(TIntObjectIterator<ModifiableDBIDs> it = grid.iterator(); it.hasNext();) {
         it.advance();
         final int s = it.value().size();
@@ -495,12 +495,12 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
           + " objects). This will not scale very well.");
         }
         tcount += s;
-        sqcount += s * s;
+        sqcount += s * (long) s;
         if(s >= minpts) {
           hasmin++;
         }
       }
-      double savings = sqcount / (double) size / (double) size;
+      double savings = sqcount / size / size;
       if(savings >= 1) {
         LOG.warning("Pairwise distances within each cells are more expensive than a full DBSCAN run due to overlap!");
       }
