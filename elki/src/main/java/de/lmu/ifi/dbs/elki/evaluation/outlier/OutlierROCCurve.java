@@ -69,7 +69,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @apiviz.uses OutlierResult
  * @apiviz.has ROCResult oneway - - «create»
  */
-@Alias({ "ComputeROCCurve", "de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve" })
+@Alias({ "de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve", //
+"de.lmu.ifi.dbs.elki.evaluation.ComputeROCCurve" })
 public class OutlierROCCurve implements Evaluator {
   /**
    * The label we use for marking ROCAUC values.
@@ -143,7 +144,8 @@ public class OutlierROCCurve implements Evaluator {
 
     if(nonefound) {
       return;
-      // logger.warning("No results found to process with ROC curve analyzer. Got "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
+      // logger.warning("No results found to process with ROC curve analyzer.
+      // Got "+iterables.size()+" iterables, "+orderings.size()+" orderings.");
     }
   }
 
@@ -210,6 +212,7 @@ public class OutlierROCCurve implements Evaluator {
      * </p>
      */
     public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("rocauc.positive", "Class label for the 'positive' class.");
+
     /**
      * Pattern for positive class.
      */

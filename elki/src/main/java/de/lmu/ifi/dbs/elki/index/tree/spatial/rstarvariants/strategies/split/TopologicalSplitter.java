@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -44,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
  * @apiviz.has Split
  */
 @Reference(authors = "N. Beckmann, H.-P. Kriegel, R. Schneider, B. Seeger", title = "The R*-tree: an efficient and robust access method for points and rectangles", booktitle = "Proceedings of the 1990 ACM SIGMOD International Conference on Management of Data, Atlantic City, NJ, May 23-25, 1990", url = "http://dx.doi.org/10.1145/93597.98741")
+@Alias("de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.util.TopologicalSplitter")
 public class TopologicalSplitter implements SplitStrategy {
   /**
    * Static instance.

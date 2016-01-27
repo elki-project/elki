@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.iterator.TLongIntIterator;
-import gnu.trove.map.hash.TLongIntHashMap;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -46,11 +43,14 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import gnu.trove.iterator.TLongIntIterator;
+import gnu.trove.map.hash.TLongIntHashMap;
 
 /**
  * The APRIORI algorithm for Mining Association Rules.
@@ -83,6 +83,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 title = "Fast Algorithms for Mining Association Rules", //
 booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", //
 url = "http://www.vldb.org/conf/1994/P487.PDF")
+@Alias("de.lmu.ifi.dbs.elki.algorithm.APRIORI")
 public class APRIORI extends AbstractFrequentItemsetAlgorithm {
   /**
    * The logger for this class.

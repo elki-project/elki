@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -54,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  *
  * @param <O> Object type for kMedoids and kMedians
  */
+@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.FarthestPointsInitialMeans")
 public class FarthestPointsInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**
    * Discard the first vector.

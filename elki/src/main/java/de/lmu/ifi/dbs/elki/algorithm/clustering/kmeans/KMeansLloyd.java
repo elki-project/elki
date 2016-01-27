@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -52,9 +53,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 /**
  * The standard k-means algorithm, using Lloyd-style bulk iterations.
  *
+ * Reference:
  * <p>
- * Reference:<br />
- * S. Lloyd<br/>
+ * S. Lloyd:<br/>
  * Least squares quantization in PCM<br/>
  * IEEE Transactions on Information Theory 28 (2)<br/>
  * previously published as Bell Telephone Laboratories Paper
@@ -74,6 +75,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 title = "Least squares quantization in PCM", //
 booktitle = "IEEE Transactions on Information Theory 28 (2): 129–137.", //
 url = "http://dx.doi.org/10.1109/TIT.1982.1056489")
+@Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans", //
+"de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans" })
 public class KMeansLloyd<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.

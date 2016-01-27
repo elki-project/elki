@@ -48,7 +48,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * 
  * @param <V> Vector type
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.VectorDimensionalityFilter" })
 public class VectorDimensionalityFilter<V extends NumberVector> extends AbstractStreamFilter {
   /**
    * Class logger.

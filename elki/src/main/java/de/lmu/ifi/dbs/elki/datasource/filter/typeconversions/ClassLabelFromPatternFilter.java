@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ClassLabelFromPatternFilter" })
+@Alias("de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFromPatternFilter")
 public class ClassLabelFromPatternFilter extends AbstractStreamFilter {
   /**
    * Current meta data

@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.4.0
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.DropNaNFilter" })
+@Alias("de.lmu.ifi.dbs.elki.datasource.filter.DropNaNFilter")
 public class DropNaNFilter extends AbstractStreamFilter {
   /**
    * Class logger

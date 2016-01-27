@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.QuotientOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -91,6 +92,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 title = "LOCI: Fast Outlier Detection Using the Local Correlation Integral", //
 booktitle = "Proc. 19th IEEE Int. Conf. on Data Engineering (ICDE '03)", //
 url = "http://dx.doi.org/10.1109/ICDE.2003.1260802")
+@Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.ALOCI")
 public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.

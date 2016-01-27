@@ -23,8 +23,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.impl.Constants;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,9 +47,12 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import gnu.trove.impl.Constants;
+import gnu.trove.map.hash.TObjectDoubleHashMap;
 
 /**
  * A preprocessor for annotation of the k nearest neighbors (and their
@@ -71,6 +72,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  */
 @Title("Spatial Approximation Materialize kNN Preprocessor")
 @Description("Caterializes the (approximate) k nearest neighbors of objects of a database using a spatial approximation.")
+@Alias("de.lmu.ifi.dbs.elki.preprocessing.SpatialApproximationMaterializeKNNPreprocessor")
 public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Logger to use

@@ -45,7 +45,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @param <V> vector type
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.Log1PlusNormalization" })
 public class Log1PlusNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
   /**
    * Static instance.

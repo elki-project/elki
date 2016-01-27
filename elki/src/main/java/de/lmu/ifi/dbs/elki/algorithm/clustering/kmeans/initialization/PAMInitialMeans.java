@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -62,6 +63,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(title = "Clustering my means of Medoids", //
 authors = "Kaufman, L. and Rousseeuw, P.J.", //
 booktitle = "Statistical Data Analysis Based on the L_1–Norm and Related Methods")
+@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.PAMInitialMeans")
 public class PAMInitialMeans<O> implements KMeansInitialization<NumberVector>, KMedoidsInitialization<O> {
   /**
    * Class logger.

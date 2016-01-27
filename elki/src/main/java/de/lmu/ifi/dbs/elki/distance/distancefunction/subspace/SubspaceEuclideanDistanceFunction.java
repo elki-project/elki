@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
@@ -34,6 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * @author Elke Achtert
  * @since 0.2
  */
+@Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction")
 public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFunction {
   /**
    * Constructor.

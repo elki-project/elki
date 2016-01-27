@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
  */
 
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -32,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.5.0
  */
+@Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.SparseEuclideanDistanceFunction")
 public class SparseEuclideanDistanceFunction extends SparseLPNormDistanceFunction {
   /**
    * Static instance

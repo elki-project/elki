@@ -1,22 +1,22 @@
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction euclidean euclid l2 EuclideanDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction taxicab cityblock l1 ManhattanDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction euclidean euclid l2 de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction taxicab cityblock l1 de.lmu.ifi.dbs.elki.distance.distancefunction.ManhattanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MaximumDistanceFunction maximum max chebyshev de.lmu.ifi.dbs.elki.distance.distancefunction.MaximumDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.MinimumDistanceFunction minimum min de.lmu.ifi.dbs.elki.distance.distancefunction.MinimumDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction lp minkowski p de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction
 # de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPIntegerNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction squaredeuclidean de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedLPNormDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedManhattanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedMaximumDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedSquaredEuclideanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseEuclideanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseManhattanDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseLPNormDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseMaximumDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedSquaredEuclideanDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedSquaredEuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseEuclideanDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.SparseEuclideanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseManhattanDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.SparseManhattanDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseLPNormDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.SparseLPNormDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseMaximumDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.SparseMaximumDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceEuclideanDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionsSelectingEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceLPNormDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceManhattanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.SubspaceMaximumDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.OnedimensionalDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.OnedimensionalDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.LorentzianDistanceFunction

@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hash.Unique;
@@ -66,6 +67,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <V> the type of NumberVector used
  */
+@Alias({ "de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser", //
+"de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser" })
 public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStreamingParser {
   /**
    * Logging class.

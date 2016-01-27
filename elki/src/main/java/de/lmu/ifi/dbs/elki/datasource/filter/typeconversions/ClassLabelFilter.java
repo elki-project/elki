@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.uses LabelList oneway - - «reads»
  * @apiviz.has ClassLabel
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ClassLabelFilter" })
+@Alias("de.lmu.ifi.dbs.elki.datasource.filter.ClassLabelFilter")
 public class ClassLabelFilter implements ObjectFilter {
   /**
    * The index of the label to be used as class label, null if no class label is

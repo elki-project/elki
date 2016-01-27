@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @author Erich Schubert
  * @since 0.2
  */
-@Alias({ "rbf" })
+@Alias("rbf")
 public class RadialBasisFunctionKernelFunction extends AbstractVectorSimilarityFunction {
   /**
    * Scaling factor gamma. (= - 1/(2sigma^2))

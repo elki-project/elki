@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * 
  * @param <V> Vector type
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.SplitNumberVectorFilter" })
+@Alias("de.lmu.ifi.dbs.elki.datasource.filter.SplitNumberVectorFilter")
 public class SplitNumberVectorFilter<V extends NumberVector> implements ObjectFilter {
   /**
    * Selected dimensions.

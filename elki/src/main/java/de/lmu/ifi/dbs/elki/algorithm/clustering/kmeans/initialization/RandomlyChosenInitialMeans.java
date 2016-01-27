@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -57,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 @Reference(authors = "E. W. Forgy", //
 title = "Cluster analysis of multivariate data: efficiency versus interpretability of classifications", //
 booktitle = "Biometrics 21(3)")
+@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.RandomlyChosenInitialMeans")
 public class RandomlyChosenInitialMeans<O> extends AbstractKMeansInitialization<NumberVector> implements KMedoidsInitialization<O> {
   /**
    * Constructor.

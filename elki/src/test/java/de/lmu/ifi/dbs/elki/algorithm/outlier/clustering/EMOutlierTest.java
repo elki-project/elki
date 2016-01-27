@@ -57,7 +57,7 @@ public class EMOutlierTest extends AbstractSimpleAlgorithmTest implements JUnit4
 
     OutlierResult result = silout.run(db);
 
-    testAUC(db, "Noise", result, 0.5426);
+    testAUC(db, "Noise", result, 0.54073333);
     testSingleScore(result, 416, 0.00240242);
   }
 }

@@ -23,12 +23,14 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.list.array.TLongArrayList;
+
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import gnu.trove.list.array.TLongArrayList;
 
 /**
  * Parser for parsing one BitVector per line, bits separated by whitespace.
@@ -48,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 "If this fails, it will be appended to a label. " + //
 "(Thus, any label must not be parseable as Bit.) " + //
 "Empty lines and lines beginning with \"#\" will be ignored.")
+@Alias("de.lmu.ifi.dbs.elki.parser.BitVectorLabelParser")
 public class BitVectorLabelParser extends NumberVectorLabelParser<BitVector> implements Parser {
   /**
    * Class logger

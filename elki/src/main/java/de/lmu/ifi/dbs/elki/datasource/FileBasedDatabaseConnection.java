@@ -32,6 +32,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -46,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * 
  * @apiviz.landmark
  */
+@Alias("de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection")
 public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
   /**
    * Constructor.

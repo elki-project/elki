@@ -63,9 +63,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * Clustering by expectation maximization (EM-Algorithm), also known as Gaussian
  * Mixture Modeling (GMM).
  * 
+ * Reference:
  * <p>
- * Reference: A. P. Dempster, N. M. Laird, D. B. Rubin:<br />
- * Maximum Likelihood from Incomplete Data via the EM algorithm.<br>
+ * A. P. Dempster, N. M. Laird, D. B. Rubin:<br />
+ * Maximum Likelihood from Incomplete Data via the EM algorithm.<br />
  * In Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31
  * </p>
  * 
@@ -84,7 +85,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 title = "Maximum Likelihood from Incomplete Data via the EM algorithm", //
 booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", //
 url = "http://www.jstor.org/stable/2984875")
-@Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.EM", "EM" })
+@Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.EM")
 public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
   /**
    * The logger for this class.
@@ -393,7 +394,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
         initializer = initialP.instantiateClass(config);
       }
 
-      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 1e-5)//
+      DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 1e-7)//
       .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(deltaP)) {
         delta = deltaP.getValue();

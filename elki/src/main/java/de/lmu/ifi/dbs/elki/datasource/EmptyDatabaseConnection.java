@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.datasource;
 
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -36,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  */
 @Title("Empty Database")
 @Description("Dummy data source that does not provide any objects.")
+@Alias("de.lmu.ifi.dbs.elki.database.connection.EmptyDatabaseConnection")
 public class EmptyDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * Static logger

@@ -1,7 +1,7 @@
-de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.UniformDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution GaussianDistribution normal gauss
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentialDistribution
-de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution de.lmu.ifi.dbs.elki.data.synthetic.bymodel.distribution.GammaDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.BetaDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.CauchyDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiDistribution

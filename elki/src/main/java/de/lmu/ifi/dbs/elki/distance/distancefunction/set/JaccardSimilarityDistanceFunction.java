@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedPrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -63,6 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 @Reference(authors = "P. Jaccard", //
 title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
 booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles")
+@Alias("de.lmu.ifi.dbs.elki.distance.similarityfunction.JaccardPrimitiveSimilarityFunction")
 public class JaccardSimilarityDistanceFunction<O extends FeatureVector<?>> extends AbstractSetDistanceFunction<O> implements NormalizedPrimitiveSimilarityFunction<O>, NumberVectorDistanceFunction<O>, PrimitiveDistanceFunction<O> {
   /**
    * Constructor. No parameters.

@@ -50,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @author Erich Schubert
  * @since 0.4.0
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.ReplaceNaNWithRandomFilter" })
+@Alias("de.lmu.ifi.dbs.elki.datasource.filter.ReplaceNaNWithRandomFilter")
 public class ReplaceNaNWithRandomFilter extends AbstractStreamFilter {
   /**
    * Class logger

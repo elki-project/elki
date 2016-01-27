@@ -34,7 +34,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Arthur Zimek
  * @since 0.2
  */
-@Alias({ "euclidean", "euclid", "l2", "EuclideanDistanceFunction", "de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction" })
+@Alias({ "euclidean", "euclid", "l2", //
+"de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction" })
 public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
   /**
    * Static instance. Use this!

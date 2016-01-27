@@ -38,7 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.4.0
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.NoMissingValuesFilter" })
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.FilterNoMissingValuesFilter", //
+"de.lmu.ifi.dbs.elki.datasource.filter.NoMissingValuesFilter" })
 public class NoMissingValuesFilter extends AbstractStreamFilter {
   /**
    * Class logger

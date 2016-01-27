@@ -244,6 +244,7 @@ public class CheckELKIServices {
       if(parts.length > 1) {
         StringBuilder buf = new StringBuilder();
         buf.append("Class ").append(classname);
+        buf.append(" in ").append(parent.getCanonicalName());
         buf.append(" has the following extraneous aliases:");
         for(int i = 1; i < parts.length; i++) {
           buf.append(' ').append(parts[i]);
@@ -262,6 +263,7 @@ public class CheckELKIServices {
         if(buf == null) {
           buf = new StringBuilder();
           buf.append("Class ").append(classname);
+          buf.append(" in ").append(parent.getCanonicalName());
           buf.append(" is missing the following aliases:");
         }
         buf.append(' ').append(a);
@@ -275,6 +277,7 @@ public class CheckELKIServices {
         buf.append('\n');
       }
       buf.append("Class ").append(classname);
+      buf.append(" in ").append(parent.getCanonicalName());
       buf.append(" has the following extraneous aliases:");
       for(String a : aliases) {
         buf.append(' ').append(a);

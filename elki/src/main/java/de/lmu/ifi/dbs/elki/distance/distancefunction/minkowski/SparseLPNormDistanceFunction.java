@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -40,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @since 0.5.0
  */
 // TODO: implement SpatialDistanceFunction
+@Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.SparseLPNormDistanceFunction")
 public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<SparseNumberVector> implements Norm<SparseNumberVector> {
   /**
    * P parameter and its inverse.

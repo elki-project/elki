@@ -49,7 +49,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * 
  * @apiviz.uses NumberVector
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMinMaxNormalization" })
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMinMaxNormalization", //
+"de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseMinMaxNormalization" })
 public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.
