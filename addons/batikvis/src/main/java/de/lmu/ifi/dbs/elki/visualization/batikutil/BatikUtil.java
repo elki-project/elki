@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.batikutil;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -33,7 +33,7 @@ import org.w3c.dom.svg.SVGPoint;
 
 /**
  * Batik helper class with static methods.
- * 
+ *
  * @author Erich Schubert
  * @since 0.3
  */
@@ -41,7 +41,7 @@ public final class BatikUtil {
   /**
    * Get the relative coordinates of a point within the coordinate system of a
    * particular SVG Element.
-   * 
+   *
    * @param evt Event, needs to be a DOMMouseEvent
    * @param reference SVG Element the coordinate system is used of
    * @return Array containing the X and Y values
@@ -62,5 +62,22 @@ public final class BatikUtil {
       return new double[] { cPt.getX(), cPt.getY() };
     }
     return null;
+  }
+
+  /**
+   * Test whether FOP were installed (for PDF, PS and EPS output support).
+   *
+   * @return {@code true} when FOP is available.
+   */
+  public static boolean hasFOPInstalled() {
+    try {
+      Class<?> c1 = Class.forName("org.apache.fop.svg.PDFTranscoder");
+      Class<?> c2 = Class.forName("org.apache.fop.render.ps.PSTranscoder");
+      Class<?> c3 = Class.forName("org.apache.fop.render.ps.EPSTranscoder");
+      return (c1 != null) && (c2 != null) && (c3 != null);
+    }
+    catch(ClassNotFoundException e) {
+      return false;
+    }
   }
 }
