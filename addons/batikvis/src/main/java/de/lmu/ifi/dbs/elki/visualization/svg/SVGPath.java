@@ -32,10 +32,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 
 /**
  * Element used for building an SVG path using a string buffer.
- * 
+ *
  * @author Erich Schubert
  * @since 0.3
- * 
+ *
  * @apiviz.uses Element oneway - - «create»
  */
 public class SVGPath {
@@ -110,7 +110,7 @@ public class SVGPath {
 
   /**
    * Constructor with initial point.
-   * 
+   *
    * @param x initial coordinates
    * @param y initial coordinates
    */
@@ -121,7 +121,7 @@ public class SVGPath {
 
   /**
    * Constructor with initial point.
-   * 
+   *
    * @param xy initial coordinates
    */
   public SVGPath(double[] xy) {
@@ -131,7 +131,7 @@ public class SVGPath {
 
   /**
    * Constructor from a double[] collection (e.g. a polygon)
-   * 
+   *
    * @param vectors vectors
    */
   public SVGPath(Polygon vectors) {
@@ -144,10 +144,10 @@ public class SVGPath {
 
   /**
    * Draw a line given a series of coordinates.
-   * 
+   *
    * Helper function that will use "move" for the first point, "lineto" for the
    * remaining.
-   * 
+   *
    * @param x new coordinates
    * @param y new coordinates
    * @return path object, for compact syntax.
@@ -158,20 +158,20 @@ public class SVGPath {
 
   /**
    * Draw a line given a series of coordinates.
-   * 
+   *
    * Helper function that will use "move" for the first point, "lineto" for the
    * remaining.
-   * 
+   *
    * @param xy new coordinates
    * @return path object, for compact syntax.
    */
   public SVGPath drawTo(double[] xy) {
-    return !isStarted() ? moveTo(xy[0], xy[0]) : lineTo(xy[0], xy[1]);
+    return !isStarted() ? moveTo(xy[0], xy[1]) : lineTo(xy[0], xy[1]);
   }
 
   /**
    * Test whether the path drawing has already started.
-   * 
+   *
    * @return Path freshness
    */
   public boolean isStarted() {
@@ -180,7 +180,7 @@ public class SVGPath {
 
   /**
    * Draw a line to the given coordinates.
-   * 
+   *
    * @param x new coordinates
    * @param y new coordinates
    * @return path object, for compact syntax.
@@ -195,7 +195,7 @@ public class SVGPath {
 
   /**
    * Draw a line to the given coordinates.
-   * 
+   *
    * @param xy new coordinates
    * @return path object, for compact syntax.
    */
@@ -205,7 +205,7 @@ public class SVGPath {
 
   /**
    * Draw a line to the given relative coordinates.
-   * 
+   *
    * @param x relative coordinates
    * @param y relative coordinates
    * @return path object, for compact syntax.
@@ -220,7 +220,7 @@ public class SVGPath {
 
   /**
    * Draw a line to the given relative coordinates.
-   * 
+   *
    * @param xy new coordinates
    * @return path object, for compact syntax.
    */
@@ -230,7 +230,7 @@ public class SVGPath {
 
   /**
    * Draw a horizontal line to the given x coordinate.
-   * 
+   *
    * @param x new coordinates
    * @return path object, for compact syntax.
    */
@@ -243,7 +243,7 @@ public class SVGPath {
 
   /**
    * Draw a horizontal line to the given relative x coordinate.
-   * 
+   *
    * @param x new coordinates
    * @return path object, for compact syntax.
    */
@@ -256,7 +256,7 @@ public class SVGPath {
 
   /**
    * Draw a vertical line to the given y coordinate.
-   * 
+   *
    * @param y new coordinate
    * @return path object, for compact syntax.
    */
@@ -269,7 +269,7 @@ public class SVGPath {
 
   /**
    * Draw a vertical line to the given relative y coordinate.
-   * 
+   *
    * @param y new coordinate
    * @return path object, for compact syntax.
    */
@@ -282,7 +282,7 @@ public class SVGPath {
 
   /**
    * Move to the given coordinates.
-   * 
+   *
    * @param x new coordinates
    * @param y new coordinates
    * @return path object, for compact syntax.
@@ -297,7 +297,7 @@ public class SVGPath {
 
   /**
    * Move to the given coordinates.
-   * 
+   *
    * @param xy new coordinates
    * @return path object, for compact syntax.
    */
@@ -307,7 +307,7 @@ public class SVGPath {
 
   /**
    * Move to the given relative coordinates.
-   * 
+   *
    * @param x new coordinates
    * @param y new coordinates
    * @return path object, for compact syntax.
@@ -322,7 +322,7 @@ public class SVGPath {
 
   /**
    * Move to the given relative coordinates.
-   * 
+   *
    * @param xy new coordinates
    * @return path object, for compact syntax.
    */
@@ -332,7 +332,7 @@ public class SVGPath {
 
   /**
    * Cubic Bezier line to the given coordinates.
-   * 
+   *
    * @param c1x first control point x
    * @param c1y first control point y
    * @param c2x second control point x
@@ -348,7 +348,7 @@ public class SVGPath {
 
   /**
    * Cubic Bezier line to the given coordinates.
-   * 
+   *
    * @param c1xy first control point
    * @param c2xy second control point
    * @param xy new coordinates
@@ -361,7 +361,7 @@ public class SVGPath {
 
   /**
    * Cubic Bezier line to the given relative coordinates.
-   * 
+   *
    * @param c1x first control point x
    * @param c1y first control point y
    * @param c2x second control point x
@@ -377,7 +377,7 @@ public class SVGPath {
 
   /**
    * Cubic Bezier line to the given relative coordinates.
-   * 
+   *
    * @param c1xy first control point
    * @param c2xy second control point
    * @param xy new coordinates
@@ -390,7 +390,7 @@ public class SVGPath {
 
   /**
    * Smooth Cubic Bezier line to the given coordinates.
-   * 
+   *
    * @param c2x second control point x
    * @param c2y second control point y
    * @param x new coordinates
@@ -404,7 +404,7 @@ public class SVGPath {
 
   /**
    * Smooth Cubic Bezier line to the given coordinates.
-   * 
+   *
    * @param c2xy second control point
    * @param xy new coordinates
    * @return path object, for compact syntax.
@@ -416,7 +416,7 @@ public class SVGPath {
 
   /**
    * Smooth Cubic Bezier line to the given relative coordinates.
-   * 
+   *
    * @param c2x second control point x
    * @param c2y second control point y
    * @param x new coordinates
@@ -430,7 +430,7 @@ public class SVGPath {
 
   /**
    * Smooth Cubic Bezier line to the given relative coordinates.
-   * 
+   *
    * @param c2xy second control point
    * @param xy new coordinates
    * @return path object, for compact syntax.
@@ -442,7 +442,7 @@ public class SVGPath {
 
   /**
    * Quadratic Bezier line to the given coordinates.
-   * 
+   *
    * @param c1x first control point x
    * @param c1y first control point y
    * @param x new coordinates
@@ -456,7 +456,7 @@ public class SVGPath {
 
   /**
    * Quadratic Bezier line to the given coordinates.
-   * 
+   *
    * @param c1xy first control point
    * @param xy new coordinates
    * @return path object, for compact syntax.
@@ -468,7 +468,7 @@ public class SVGPath {
 
   /**
    * Quadratic Bezier line to the given relative coordinates.
-   * 
+   *
    * @param c1x first control point x
    * @param c1y first control point y
    * @param x new coordinates
@@ -482,7 +482,7 @@ public class SVGPath {
 
   /**
    * Quadratic Bezier line to the given relative coordinates.
-   * 
+   *
    * @param c1xy first control point
    * @param xy new coordinates
    * @return path object, for compact syntax.
@@ -494,7 +494,7 @@ public class SVGPath {
 
   /**
    * Smooth quadratic Bezier line to the given coordinates.
-   * 
+   *
    * @param x new coordinates
    * @param y new coordinates
    * @return path object, for compact syntax.
@@ -506,7 +506,7 @@ public class SVGPath {
 
   /**
    * Smooth quadratic Bezier line to the given coordinates.
-   * 
+   *
    * @param xy new coordinates
    * @return path object, for compact syntax.
    */
@@ -517,7 +517,7 @@ public class SVGPath {
 
   /**
    * Smooth quadratic Bezier line to the given relative coordinates.
-   * 
+   *
    * @param x new coordinates
    * @param y new coordinates
    * @return path object, for compact syntax.
@@ -529,7 +529,7 @@ public class SVGPath {
 
   /**
    * Smooth quadratic Bezier line to the given relative coordinates.
-   * 
+   *
    * @param xy new coordinates
    * @return path object, for compact syntax.
    */
@@ -540,7 +540,7 @@ public class SVGPath {
 
   /**
    * Elliptical arc curve to the given coordinates.
-   * 
+   *
    * @param rx x radius
    * @param ry y radius
    * @param ar x-axis-rotation
@@ -556,7 +556,7 @@ public class SVGPath {
 
   /**
    * Elliptical arc curve to the given coordinates.
-   * 
+   *
    * @param rx x radius
    * @param ry y radius
    * @param ar x-axis-rotation
@@ -571,7 +571,7 @@ public class SVGPath {
 
   /**
    * Elliptical arc curve to the given coordinates.
-   * 
+   *
    * @param rxy radius
    * @param ar x-axis-rotation
    * @param la large arc flag, if angle >= 180 deg
@@ -585,7 +585,7 @@ public class SVGPath {
 
   /**
    * Elliptical arc curve to the given relative coordinates.
-   * 
+   *
    * @param rx x radius
    * @param ry y radius
    * @param ar x-axis-rotation
@@ -601,7 +601,7 @@ public class SVGPath {
 
   /**
    * Elliptical arc curve to the given relative coordinates.
-   * 
+   *
    * @param rx x radius
    * @param ry y radius
    * @param ar x-axis-rotation
@@ -616,7 +616,7 @@ public class SVGPath {
 
   /**
    * Elliptical arc curve to the given relative coordinates.
-   * 
+   *
    * @param rxy radius
    * @param ar x-axis-rotation
    * @param la large arc flag, if angle >= 180 deg
@@ -630,7 +630,7 @@ public class SVGPath {
 
   /**
    * Append an action to the current path.
-   * 
+   *
    * @param action Current action
    * @param ds coordinates.
    */
@@ -647,7 +647,7 @@ public class SVGPath {
 
   /**
    * Close the path.
-   * 
+   *
    * @return path object, for compact syntax.
    */
   public SVGPath close() {
@@ -660,7 +660,7 @@ public class SVGPath {
 
   /**
    * Turn the path buffer into an SVG element.
-   * 
+   *
    * @param document Document context (= element factory)
    * @return SVG Element
    */
@@ -672,7 +672,7 @@ public class SVGPath {
 
   /**
    * Turn the path buffer into an SVG element.
-   * 
+   *
    * @param plot Plot context (= element factory)
    * @return SVG Element
    */
