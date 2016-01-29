@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -119,29 +119,29 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
   private static final Logging LOG = Logging.getLogger(CASH.class);
 
   /**
-   * Holds the value of {@link #MINPTS_ID}.
+   * Threshold for minimum number of points in a cluster
    */
-  private int minPts;
+  protected int minPts;
 
   /**
-   * Holds the value of {@link #MAXLEVEL_ID}.
+   * Maximum level for splitting the hypercube.
    */
-  private int maxLevel;
+  protected int maxLevel;
 
   /**
-   * Holds the value of {@link #MINDIM_ID}.
+   * Minimum dimensionality of the subspaces to be found
    */
-  private int minDim;
+  protected int minDim;
 
   /**
-   * Holds the value of {@link #JITTER_ID}.
+   * Maximum jitter for distance values.
    */
-  private double jitter;
+  protected double jitter;
 
   /**
-   * Holds the value of {@link #ADJUST_ID}.
+   * Apply adjustment heuristic for interval choosing.
    */
-  private boolean adjust;
+  protected boolean adjust;
 
   /**
    * Holds the dimensionality for noise.
@@ -835,14 +835,29 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
      */
     public static final OptionID ADJUST_ID = new OptionID("cash.adjust", "Flag to indicate that an adjustment of the applied heuristic for choosing an interval " + "is performed after an interval is selected.");
 
-    protected int minpts;
+    /**
+     * Threshold for minimum number of points in a cluster
+     */
+    protected int minPts;
 
-    protected int maxlevel;
+    /**
+     * Maximum level for splitting the hypercube.
+     */
+    protected int maxLevel;
 
-    protected int mindim;
+    /**
+     * Minimum dimensionality of the subspaces to be found
+     */
+    protected int minDim;
 
+    /**
+     * Maximum jitter for distance values.
+     */
     protected double jitter;
 
+    /**
+     * Apply adjustment heuristic for interval choosing.
+     */
     protected boolean adjust;
 
     @Override
@@ -851,17 +866,17 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       IntParameter minptsP = new IntParameter(MINPTS_ID);
       minptsP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
-        minpts = minptsP.getValue();
+        minPts = minptsP.getValue();
       }
       IntParameter maxlevelP = new IntParameter(MAXLEVEL_ID);
       maxlevelP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(maxlevelP)) {
-        maxlevel = maxlevelP.getValue();
+        maxLevel = maxlevelP.getValue();
       }
       IntParameter mindimP = new IntParameter(MINDIM_ID, 1);
       mindimP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(mindimP)) {
-        mindim = mindimP.getValue();
+        minDim = mindimP.getValue();
       }
       DoubleParameter jitterP = new DoubleParameter(JITTER_ID);
       jitterP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
@@ -876,7 +891,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
     @Override
     protected CASH<NumberVector> makeInstance() {
-      return new CASH<>(minpts, maxlevel, mindim, jitter, adjust);
+      return new CASH<>(minPts, maxLevel, minDim, jitter, adjust);
     }
   }
 }

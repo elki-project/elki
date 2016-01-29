@@ -1,0 +1,2 @@
+# BUG FIX for Batik 1.8
+org.apache.batik.ext.awt.image.codec.png.PNGImageWriter

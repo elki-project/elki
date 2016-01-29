@@ -172,6 +172,11 @@ public class MiniGUI extends AbstractApplication {
   private JTextField commandLine;
 
   /**
+   * Prefix for application package.
+   */
+  private String APP_PREFIX = AbstractApplication.class.getPackage().getName() + ".";
+
+  /**
    * Constructor.
    */
   public MiniGUI() {
@@ -244,10 +249,17 @@ public class MiniGUI extends AbstractApplication {
       if(nam == null || clz.getCanonicalName().contains("GUI")) {
         continue;
       }
+      if(nam.startsWith(APP_PREFIX)) {
+        nam = nam.substring(APP_PREFIX.length());
+      }
       appCombo.addItem(nam);
     }
     appCombo.setEditable(true);
-    appCombo.setSelectedItem(maincls.getCanonicalName());
+    String sel = maincls.getCanonicalName();
+    if(sel.startsWith(APP_PREFIX)) {
+      sel = sel.substring(APP_PREFIX.length());
+    }
+    appCombo.setSelectedItem(sel);
     appCombo.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
@@ -477,7 +489,11 @@ public class MiniGUI extends AbstractApplication {
     List<String> remainingParameters = config.getRemainingParameters();
 
     outputArea.clear();
-    commandLine.setText(format(maincls.getCanonicalName(), params));
+    String mainnam = maincls.getCanonicalName();
+    if(mainnam.startsWith(APP_PREFIX)) {
+      mainnam = mainnam.substring(APP_PREFIX.length());
+    }
+    commandLine.setText(format(mainnam, params));
 
     // update table:
     parameterTable.removeEditor();
@@ -503,7 +519,7 @@ public class MiniGUI extends AbstractApplication {
 
   /**
    * Format objects to a command line.
-   * 
+   *
    * @param params Parameters to format (Strings, or list of strings)
    * @return Formatted string
    */
@@ -525,7 +541,7 @@ public class MiniGUI extends AbstractApplication {
 
   /**
    * Format a list of strings to a buffer.
-   * 
+   *
    * @param buf Output buffer
    * @param params List of strings
    */
@@ -542,7 +558,7 @@ public class MiniGUI extends AbstractApplication {
 
   /**
    * Format a single string for the command line.
-   * 
+   *
    * @param buf Output buffer
    * @param s String
    */

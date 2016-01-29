@@ -489,23 +489,6 @@ public class SVGPlot {
   }
 
   /**
-   * Test whether FOP were installed (for PDF, PS and EPS output support).
-   *
-   * @return true when FOP is available.
-   */
-  public static boolean hasFOPInstalled() {
-    try {
-      Class<?> c1 = Class.forName("org.apache.fop.svg.PDFTranscoder");
-      Class<?> c2 = Class.forName("org.apache.fop.render.ps.PSTranscoder");
-      Class<?> c3 = Class.forName("org.apache.fop.render.ps.EPSTranscoder");
-      return (c1 != null) && (c2 != null) && (c3 != null);
-    }
-    catch(ClassNotFoundException e) {
-      return false;
-    }
-  }
-
-  /**
    * Transcode file to PNG.
    *
    * @param file Output filename
