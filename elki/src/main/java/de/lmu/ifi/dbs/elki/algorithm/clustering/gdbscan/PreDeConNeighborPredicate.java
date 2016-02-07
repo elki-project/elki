@@ -67,7 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 title = "Density Connected Clustering with Local Subspace Preferences",//
 booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004",//
 url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
-public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel> {
+public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel, PreDeConNeighborPredicate.PreDeConModel> {
   /**
    * The logger for this class.
    */
@@ -96,7 +96,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
+  public Instance instantiate(Database database) {
     DistanceQuery<V> dq = QueryUtil.getDistanceQuery(database, distFunc);
     Relation<V> relation = (Relation<V>) dq.getRelation();
     RangeQuery<V> rq = database.getRangeQuery(dq);
@@ -119,7 +119,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
             ", but you will need to experiment with these parameters and epsilon.");
       }
     }
-    return (NeighborPredicate.Instance<T>) new Instance(dq.getRelation().getDBIDs(), storage);
+    return new Instance(dq.getRelation().getDBIDs(), storage);
   }
 
   @Override

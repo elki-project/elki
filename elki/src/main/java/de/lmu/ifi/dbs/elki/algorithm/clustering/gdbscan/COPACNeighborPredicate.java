@@ -80,7 +80,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 title = "Robust, Complete, and Efficient Correlation Clustering", //
 booktitle = "Proc. 7th SIAM International Conference on Data Mining (SDM'07), Minneapolis, MN, 2007", //
 url = "http://www.siam.org/proceedings/datamining/2007/dm07_037achtert.pdf")
-public class COPACNeighborPredicate<V extends NumberVector> implements NeighborPredicate {
+public class COPACNeighborPredicate<V extends NumberVector> implements NeighborPredicate<COPACNeighborPredicate.COPACModel> {
   /**
    * The logger for this class.
    */
@@ -107,11 +107,9 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
     this.epsilonsq = settings.epsilon * settings.epsilon;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
-    Relation<V> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    return (NeighborPredicate.Instance<T>) instantiate(database, relation);
+  public NeighborPredicate.Instance<COPACModel> instantiate(Database database) {
+    return instantiate(database, database.<V>getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**

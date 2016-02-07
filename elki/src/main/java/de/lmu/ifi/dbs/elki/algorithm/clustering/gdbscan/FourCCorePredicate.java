@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 title = "Computing Clusters of Correlation Connected Objects", //
 booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", //
 url = "http://dx.doi.org/10.1145/1007568.1007620")
-public class FourCCorePredicate implements CorePredicate {
+public class FourCCorePredicate implements CorePredicate<PreDeConModel> {
   /**
    * The PreDeCon settings class.
    */
@@ -69,14 +69,13 @@ public class FourCCorePredicate implements CorePredicate {
     this.settings = settings;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> CorePredicate.Instance<T> instantiate(Database database) {
-    return (CorePredicate.Instance<T>) new Instance(settings);
+  public Instance instantiate(Database database) {
+    return new Instance(settings);
   }
 
   @Override
-  public boolean acceptsType(SimpleTypeInformation<?> type) {
+  public boolean acceptsType(SimpleTypeInformation<? extends PreDeConModel> type) {
     return (type.getRestrictionClass().isAssignableFrom(PreDeConModel.class));
   }
 

@@ -37,15 +37,17 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
  * @since 0.5.0
  * 
  * @apiviz.has Instance
+ * 
+ * @param <T> Data type of neighborhoods
  */
-public interface CorePredicate {
+public interface CorePredicate<T> {
   /**
    * Instantiate for a database.
    * 
    * @param database Database to instantiate for
    * @return Instance
    */
-  public <T> Instance<T> instantiate(Database database);
+  Instance<? super T> instantiate(Database database);
 
   /**
    * Test whether the neighborhood type T is accepted by this predicate.
@@ -53,7 +55,7 @@ public interface CorePredicate {
    * @param type Type information
    * @return true when the type is accepted
    */
-  public boolean acceptsType(SimpleTypeInformation<?> type);
+  boolean acceptsType(SimpleTypeInformation<? extends T> type);
   
   /**
    * Instance for a particular data set.
@@ -70,6 +72,6 @@ public interface CorePredicate {
      * @param neighbors Neighbors
      * @return core point property
      */
-    public boolean isCorePoint(DBIDRef point, T neighbors);
+    boolean isCorePoint(DBIDRef point, T neighbors);
   }
 }

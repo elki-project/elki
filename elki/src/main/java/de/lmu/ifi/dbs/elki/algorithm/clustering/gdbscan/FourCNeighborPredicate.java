@@ -76,7 +76,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 title = "Computing Clusters of Correlation Connected Objects", //
 booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", //
 url = "http://dx.doi.org/10.1145/1007568.1007620")
-public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConNeighborPredicate.PreDeConModel> {
+public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConModel, PreDeConModel> {
   /**
    * The logger for this class.
    */
@@ -117,7 +117,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
+  public Instance instantiate(Database database) {
     DistanceQuery<V> dq = QueryUtil.getDistanceQuery(database, distFunc);
     Relation<V> relation = (Relation<V>) dq.getRelation();
     RangeQuery<V> rq = database.getRangeQuery(dq);
@@ -147,7 +147,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
             + ", but you will need to experiment with these parameters and epsilon.");
       }
     }
-    return (NeighborPredicate.Instance<T>) new Instance(dq.getRelation().getDBIDs(), storage);
+    return new Instance(dq.getRelation().getDBIDs(), storage);
   }
 
   @Override

@@ -39,29 +39,31 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * @since 0.5.0
  * 
  * @apiviz.has Instance
+ * 
+ * @param <T> Data type of neighborhoods
  */
-public interface NeighborPredicate {
+public interface NeighborPredicate<T> {
   /**
    * Instantiate for a database.
    * 
    * @param database Database to instantiate for
    * @return Instance
    */
-  public <T> Instance<T> instantiate(Database database);
+  Instance<T> instantiate(Database database);
 
   /**
    * Input data type restriction.
    * 
    * @return Type restriction
    */
-  public TypeInformation getInputTypeRestriction();
+  TypeInformation getInputTypeRestriction();
 
   /**
    * Output data type information.
    * 
    * @return Type information
    */
-  public SimpleTypeInformation<?> getOutputType();
+  SimpleTypeInformation<? extends T> getOutputType();
 
   /**
    * Instance for a particular data set.
@@ -75,14 +77,14 @@ public interface NeighborPredicate {
      * @param reference Reference object
      * @return Neighborhood
      */
-    public T getNeighbors(DBIDRef reference);
+    T getNeighbors(DBIDRef reference);
 
     /**
      * Get the IDs the predicate is defined for.
      * 
      * @return Database ids
      */
-    public DBIDs getIDs();
+    DBIDs getIDs();
 
     /**
      * Add the neighbors to a DBID set
@@ -90,6 +92,6 @@ public interface NeighborPredicate {
      * @param neighbors Neighbors to iterate over
      * @return iterator
      */
-    public DBIDIter iterDBIDs(T neighbors);
+    DBIDIter iterDBIDs(T neighbors);
   }
 }

@@ -52,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 title = "Density Connected Clustering with Local Subspace Preferences", //
 booktitle = "Proc. 4th IEEE Int. Conf. on Data Mining (ICDM'04), Brighton, UK, 2004", //
 url = "http://dx.doi.org/10.1109/ICDM.2004.10087")
-public class PreDeConCorePredicate implements CorePredicate {
+public class PreDeConCorePredicate implements CorePredicate<PreDeConModel> {
   /**
    * The PreDeCon settings class.
    */
@@ -68,14 +68,13 @@ public class PreDeConCorePredicate implements CorePredicate {
     this.settings = settings;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> CorePredicate.Instance<T> instantiate(Database database) {
-    return (CorePredicate.Instance<T>) new Instance(settings);
+  public Instance instantiate(Database database) {
+    return new Instance(settings);
   }
 
   @Override
-  public boolean acceptsType(SimpleTypeInformation<?> type) {
+  public boolean acceptsType(SimpleTypeInformation<? extends PreDeConModel> type) {
     return (type.getRestrictionClass().isAssignableFrom(PreDeConModel.class));
   }
 

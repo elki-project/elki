@@ -1,29 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import gnu.trove.list.array.TIntArrayList;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
@@ -50,9 +26,35 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2015
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import gnu.trove.list.array.TIntArrayList;
 
 /**
  * Generalized DBSCAN, density-based clustering with noise.
@@ -88,12 +90,12 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
   /**
    * The neighborhood predicate factory.
    */
-  protected NeighborPredicate npred;
+  protected NeighborPredicate<?> npred;
 
   /**
    * The core predicate factory.
    */
-  protected CorePredicate corepred;
+  protected CorePredicate<?> corepred;
 
   /**
    * Track which objects are "core" objects.
@@ -107,19 +109,28 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
    * @param corepred Core point predicate.
    * @param coremodel Keep track of core points.
    */
-  public GeneralizedDBSCAN(NeighborPredicate npred, CorePredicate corepred, boolean coremodel) {
+  public GeneralizedDBSCAN(NeighborPredicate<?> npred, CorePredicate<?> corepred, boolean coremodel) {
     super();
     this.npred = npred;
     this.corepred = corepred;
     this.coremodel = coremodel;
-  }
-
-  @Override
-  public Clustering<Model> run(Database database) {
-    if(!corepred.acceptsType(npred.getOutputType())) {
+    // Ignore the generic, we do a run-time test below:
+    @SuppressWarnings("unchecked")
+    CorePredicate<Object> cp = (CorePredicate<Object>) corepred;
+    if(!cp.acceptsType(npred.getOutputType())) {
       throw new AbortException("Core predicate and neighbor predicate are not compatible.");
     }
-    return new Instance<>(npred.instantiate(database), corepred.instantiate(database), coremodel).run();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Clustering<Model> run(Database database) {
+    // Ignore the generic, we do a run-time test below:
+    CorePredicate<Object> cp = (CorePredicate<Object>) corepred;
+    if(!cp.acceptsType(npred.getOutputType())) {
+      throw new AbortException("Core predicate and neighbor predicate are not compatible.");
+    }
+    return new Instance<>(npred.instantiate(database), cp.instantiate(database), coremodel).run();
   }
 
   @Override
@@ -345,12 +356,12 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     /**
      * Neighborhood predicate.
      */
-    protected NeighborPredicate npred = null;
+    protected NeighborPredicate<?> npred = null;
 
     /**
      * Core point predicate.
      */
-    protected CorePredicate corepred = null;
+    protected CorePredicate<?> corepred = null;
 
     /**
      * Track which objects are "core" objects.
@@ -360,15 +371,23 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> impl
     @Override
     protected void makeOptions(Parameterization config) {
       // Neighborhood predicate
-      ObjectParameter<NeighborPredicate> npredOpt = new ObjectParameter<>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class);
+      ObjectParameter<NeighborPredicate<?>> npredOpt = new ObjectParameter<>(NEIGHBORHOODPRED_ID, NeighborPredicate.class, EpsilonNeighborPredicate.class);
       if(config.grab(npredOpt)) {
         npred = npredOpt.instantiateClass(config);
       }
 
       // Core point predicate
-      ObjectParameter<CorePredicate> corepredOpt = new ObjectParameter<>(COREPRED_ID, CorePredicate.class, MinPtsCorePredicate.class);
+      ObjectParameter<CorePredicate<?>> corepredOpt = new ObjectParameter<>(COREPRED_ID, CorePredicate.class, MinPtsCorePredicate.class);
       if(config.grab(corepredOpt)) {
         corepred = corepredOpt.instantiateClass(config);
+      }
+      if(npred != null && corepred != null) {
+        // Ignore the generic, we do a run-time test below:
+        @SuppressWarnings("unchecked")
+        CorePredicate<Object> cp = (CorePredicate<Object>) corepred;
+        if(!cp.acceptsType(npred.getOutputType())) {
+          config.reportError(new WrongParameterValueException(corepredOpt, corepredOpt.getValueAsString(), "Neighbor predicate and core predicate are not compatible."));
+        }
       }
 
       Flag coremodelOpt = new Flag(COREMODEL_ID);

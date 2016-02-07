@@ -83,7 +83,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 title = "On Exploring Complex Relationships of Correlation Clusters", //
 booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", //
 url = "http://dx.doi.org/10.1109/SSDBM.2007.21")
-public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPredicate {
+public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPredicate<DBIDs> {
   /**
    * The logger for this class.
    */
@@ -110,11 +110,9 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
     this.deltasq = settings.delta * settings.delta;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
-    Relation<V> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    return (NeighborPredicate.Instance<T>) instantiate(database, relation);
+  public Instance instantiate(Database database) {
+    return instantiate(database, database.<V>getRelation(TypeUtil.NUMBER_VECTOR_FIELD));
   }
 
   /**
@@ -151,8 +149,8 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
   }
 
   @Override
-  public SimpleTypeInformation<PCAFilteredResult> getOutputType() {
-    return new SimpleTypeInformation<>(PCAFilteredResult.class);
+  public SimpleTypeInformation<DBIDs> getOutputType() {
+    return new SimpleTypeInformation<>(DBIDs.class);
   }
 
   /**

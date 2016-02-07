@@ -87,7 +87,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 title = "Density-based clustering of uncertain data", //
 booktitle = "Proc. 11th ACM Int. Conf. on Knowledge Discovery and Data Mining (KDD'05)", //
 url = "http://dx.doi.org/10.1145/1081870.1081955")
-public class FDBSCANNeighborPredicate implements NeighborPredicate {
+public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
   /**
    * Epsilon radius
    */
@@ -125,11 +125,10 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate {
     this.rand = seed;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
+  public Instance instantiate(Database database) {
     Relation<? extends UncertainObject> relation = database.getRelation(TypeUtil.UNCERTAIN_OBJECT_FIELD);
-    return (NeighborPredicate.Instance<T>) new Instance(epsilon, sampleSize, threshold, relation, rand);
+    return new Instance(epsilon, sampleSize, threshold, relation, rand);
   }
 
   @Override

@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
 booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
 url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
-public class MinPtsCorePredicate implements CorePredicate {
+public class MinPtsCorePredicate implements CorePredicate<DBIDs> {
   /**
    * Class logger.
    */
@@ -79,14 +79,13 @@ public class MinPtsCorePredicate implements CorePredicate {
     this.minpts = minpts;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> CorePredicate.Instance<T> instantiate(Database database) {
-    return (CorePredicate.Instance<T>) new Instance(minpts);
+  public Instance instantiate(Database database) {
+    return new Instance(minpts);
   }
 
   @Override
-  public boolean acceptsType(SimpleTypeInformation<?> type) {
+  public boolean acceptsType(SimpleTypeInformation<? extends DBIDs> type) {
     if(TypeUtil.DBIDS.isAssignableFromType(type)) {
       return true;
     }

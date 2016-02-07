@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 title = "A Density-Based Algorithm for Discovering Clusters in Large Spatial Databases with Noise", //
 booktitle = "Proc. 2nd Int. Conf. on Knowledge Discovery and Data Mining (KDD '96), Portland, OR, 1996", //
 url = "http://www.aaai.org/Papers/KDD/1996/KDD96-037")
-public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
+public class EpsilonNeighborPredicate<O> implements NeighborPredicate<DoubleDBIDList> {
   /**
    * Range to query with
    */
@@ -92,12 +92,11 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
     this.distFunc = distFunc;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
+  public Instance instantiate(Database database) {
     DistanceQuery<O> dq = QueryUtil.getDistanceQuery(database, distFunc);
     RangeQuery<O> rq = database.getRangeQuery(dq);
-    return (NeighborPredicate.Instance<T>) new Instance(epsilon, rq, dq.getRelation().getDBIDs());
+    return new Instance(epsilon, rq, dq.getRelation().getDBIDs());
   }
 
   @Override
