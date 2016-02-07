@@ -26,6 +26,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.util.Assignment;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.util.Border;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.util.Core;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.util.MultiBorder;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -360,12 +364,12 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
           }
           assert (cids instanceof Core);
           Core co = (Core) cids;
-          while(cores[co.parent].parent != co.parent) {
-            co = cores[co.parent = cores[co.parent].parent];
+          while(cores[co.num].num != co.num) {
+            co = cores[co.num = cores[co.num].num];
           }
-          ModifiableDBIDs clu = clusters[co.parent];
+          ModifiableDBIDs clu = clusters[co.num];
           if(clu == null) {
-            clu = clusters[co.parent] = DBIDUtil.newArray();
+            clu = clusters[co.num] = DBIDUtil.newArray();
           }
           clu.add(it);
         }
@@ -603,7 +607,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
         int nclus = temporary.intValue(id);
         if(nclus > NOISE) { // Core point
           Core core = cores[nclus];
-          assert (core.parent > NOISE);
+          assert (core.num > NOISE);
           Assignment oclus = clusterids.get(id);
           if(oclus == null) { // No assignment yet (= NOISE)
             clusterids.put(id, core);
@@ -621,14 +625,14 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
               LOG.debugFinest("Multi-Merge: " + nclus + " - " + oclus + " -> " + core);
             }
             // Find minimum:
-            int m = core.parent, m2 = ((MultiBorder) oclus).getCore().parent;
+            int m = core.num, m2 = ((MultiBorder) oclus).getCore().num;
             m = m < m2 ? m : m2;
             assert (m > NOISE);
             // Execute all merges:
             for(Border b : ((MultiBorder) oclus).cs) {
-              cores[b.core.parent].parent = m;
+              cores[b.core.num].num = m;
             }
-            core.parent = m;
+            core.num = m;
             clusterids.put(id, core);
           }
         }
@@ -642,7 +646,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
             ((Core) oclus).mergeWith(border.core);
           }
           else if(oclus instanceof Border) { // Border and border
-            if(((Border) oclus).core.parent != border.core.parent) {
+            if(((Border) oclus).core.num != border.core.num) {
               clusterids.put(id, new MultiBorder((Border) oclus, border));
             }
           }
@@ -657,172 +661,6 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
         LOG.incrementProcessed(mprog);
       }
       LOG.ensureCompleted(mprog);
-    }
-  }
-
-  /**
-   * Point assignment.
-   * 
-   * @author Erich Schubert
-   *
-   * @apiviz.exclude
-   */
-  protected static interface Assignment {
-    // Empty
-  }
-
-  /**
-   * Core point assignment.
-   * 
-   * @author Erich Schubert
-   *
-   * @apiviz.exclude
-   */
-  protected static class Core implements Assignment {
-    /**
-     * Cluster number
-     */
-    protected int parent;
-
-    /**
-     * Constructor.
-     *
-     * @param parent Cluster number
-     */
-    protected Core(int parent) {
-      assert (parent > GriDBSCAN.Instance.NOISE);
-      this.parent = parent;
-    }
-
-    /**
-     * Merge two cores.
-     * 
-     * @param o Other core
-     */
-    public void mergeWith(Core o) {
-      o.parent = this.parent = (parent < o.parent ? parent : o.parent);
-    }
-
-    @Override
-    public String toString() {
-      return "Core[" + parent + "]";
-    }
-  }
-
-  /**
-   * Border point assignment.
-   * 
-   * @author Erich Schubert
-   *
-   * @apiviz.exclude
-   */
-  protected static class Border implements Assignment, Comparable<Border> {
-    /**
-     * Cluster number
-     */
-    protected Core core;
-
-    /**
-     * Constructor.
-     *
-     * @param core Cluster number
-     */
-    protected Border(Core core) {
-      this.core = core;
-    }
-
-    @Override
-    public String toString() {
-      return "Border[" + core.parent + "]";
-    }
-
-    @Override
-    public int compareTo(Border o) {
-      return Integer.compare(o.core.parent, this.core.parent);
-    }
-  }
-
-  /**
-   * Multiple border point assignment.
-   * 
-   * @author Erich Schubert
-   *
-   * @apiviz.exclude
-   */
-  protected static class MultiBorder implements Assignment {
-    /**
-     * Cluster numbers
-     */
-    protected Border[] cs;
-
-    /**
-     * Constructor.
-     *
-     * @param i First cluster border
-     * @param j Second cluster border
-     */
-    protected MultiBorder(Border i, Border j) {
-      assert (i.core != j.core);
-      this.cs = new Border[] { i, j };
-    }
-
-    /**
-     * Add a new border to the existing borders.
-     * 
-     * @param border New border.
-     */
-    public Assignment update(Border border) {
-      Arrays.sort(cs);
-      int j = 1;
-      boolean found = (cs[0].core == border.core);
-      for(int i = 1; i < cs.length; i++) {
-        if(cs[i].core != cs[i - 1].core) {
-          cs[j++] = cs[i];
-        }
-        found |= (cs[i].core == border.core);
-      }
-      if(found) {
-        if(j == 1) {
-          Border r = cs[0];
-          cs = null; // Prevent further use
-          return r;
-        }
-        if(j < cs.length) {
-          cs = Arrays.copyOf(cs, j);
-        }
-        return this;
-      }
-      if(j + 1 != cs.length) {
-        cs = Arrays.copyOf(cs, j + 1);
-      }
-      cs[j] = border;
-      return this;
-    }
-
-    /**
-     * Get the core this is assigned to.
-     * 
-     * @return Core
-     */
-    public Core getCore() {
-      Core a = cs[0].core;
-      for(int i = 1; i < cs.length; i++) {
-        Core v = cs[i].core;
-        a = a.parent > v.parent ? a : v; // max, of negative values
-      }
-      assert (a.parent > GriDBSCAN.Instance.NOISE);
-      return a;
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder buf = new StringBuilder();
-      buf.append("MultiBorder[");
-      for(Border b : cs) {
-        buf.append(b.core.parent).append(',');
-      }
-      buf.append(']');
-      return buf.toString();
     }
   }
 
