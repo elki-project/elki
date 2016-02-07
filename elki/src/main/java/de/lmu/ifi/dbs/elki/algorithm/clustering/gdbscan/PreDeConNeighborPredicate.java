@@ -96,7 +96,7 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
+  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
     DistanceQuery<V> dq = QueryUtil.getDistanceQuery(database, distFunc);
     Relation<V> relation = (Relation<V>) dq.getRelation();
     RangeQuery<V> rq = database.getRangeQuery(dq);
@@ -220,8 +220,8 @@ public class PreDeConNeighborPredicate<V extends NumberVector> extends AbstractR
   }
 
   @Override
-  public SimpleTypeInformation<?>[] getOutputType() {
-    return new SimpleTypeInformation[] { new SimpleTypeInformation<>(PreDeConModel.class) };
+  public SimpleTypeInformation<PreDeConModel> getOutputType() {
+    return new SimpleTypeInformation<>(PreDeConModel.class);
   }
 
   /**

@@ -47,7 +47,7 @@ public interface NeighborPredicate {
    * @param database Database to instantiate for
    * @return Instance
    */
-  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<?> type);
+  public <T> Instance<T> instantiate(Database database);
 
   /**
    * Input data type restriction.
@@ -61,7 +61,7 @@ public interface NeighborPredicate {
    * 
    * @return Type information
    */
-  public SimpleTypeInformation<?>[] getOutputType();
+  public SimpleTypeInformation<?> getOutputType();
 
   /**
    * Instance for a particular data set.

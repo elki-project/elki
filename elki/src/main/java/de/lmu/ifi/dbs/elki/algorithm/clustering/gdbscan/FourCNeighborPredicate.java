@@ -117,7 +117,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
+  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
     DistanceQuery<V> dq = QueryUtil.getDistanceQuery(database, distFunc);
     Relation<V> relation = (Relation<V>) dq.getRelation();
     RangeQuery<V> rq = database.getRangeQuery(dq);
@@ -186,8 +186,8 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
   }
 
   @Override
-  public SimpleTypeInformation<?>[] getOutputType() {
-    return new SimpleTypeInformation[] { new SimpleTypeInformation<>(PreDeConModel.class) };
+  public SimpleTypeInformation<PreDeConModel> getOutputType() {
+    return new SimpleTypeInformation<>(PreDeConModel.class);
   }
 
   /**

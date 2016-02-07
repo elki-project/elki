@@ -81,7 +81,7 @@ public class MinPtsCorePredicate implements CorePredicate {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> CorePredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
+  public <T> CorePredicate.Instance<T> instantiate(Database database) {
     return (CorePredicate.Instance<T>) new Instance(minpts);
   }
 

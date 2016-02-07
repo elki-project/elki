@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.ClusterModel;
 import de.lmu.ifi.dbs.elki.data.model.CoreObjectsModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -80,7 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 title = "Density-Based Clustering in Spatial Databases: The Algorithm GDBSCAN and Its Applications", //
 booktitle = "Data Mining and Knowledge Discovery", //
 url = "http://dx.doi.org/10.1023/A:1009745219419")
-public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>>implements ClusteringAlgorithm<Clustering<Model>> {
+public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Get a logger for this algorithm
    */
@@ -117,12 +116,10 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>>imple
 
   @Override
   public Clustering<Model> run(Database database) {
-    for(SimpleTypeInformation<?> t : npred.getOutputType()) {
-      if(corepred.acceptsType(t)) {
-        return new Instance<>(npred.instantiate(database, t), corepred.instantiate(database, t), coremodel).run();
-      }
+    if(!corepred.acceptsType(npred.getOutputType())) {
+      throw new AbortException("Core predicate and neighbor predicate are not compatible.");
     }
-    throw new AbortException("No compatible types found.");
+    return new Instance<>(npred.instantiate(database), corepred.instantiate(database), coremodel).run();
   }
 
   @Override
@@ -273,7 +270,7 @@ public class GeneralizedDBSCAN extends AbstractAlgorithm<Clustering<Model>>imple
      * @return cluster size
      */
     protected int expandCluster(final DBIDRef seed, final int clusterid, final WritableIntegerDataStore clusterids, final T neighbors, ArrayModifiableDBIDs activeSet, final FiniteProgress progress) {
-      assert(activeSet.size() == 0);
+      assert (activeSet.size() == 0);
       int clustersize = 1 + processCorePoint(seed, neighbors, clusterid, clusterids, activeSet);
       // run expandCluster as long as there is another seed
       final DBIDVar id = DBIDUtil.newVar();

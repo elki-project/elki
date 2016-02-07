@@ -112,7 +112,7 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
+  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
     Relation<V> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     return (NeighborPredicate.Instance<T>) instantiate(database, relation);
   }
@@ -151,8 +151,8 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
   }
 
   @Override
-  public SimpleTypeInformation<?>[] getOutputType() {
-    return new SimpleTypeInformation[] { new SimpleTypeInformation<>(PCAFilteredResult.class) };
+  public SimpleTypeInformation<PCAFilteredResult> getOutputType() {
+    return new SimpleTypeInformation<>(PCAFilteredResult.class);
   }
 
   /**

@@ -94,15 +94,15 @@ public class EpsilonNeighborPredicate<O> implements NeighborPredicate {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
+  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
     DistanceQuery<O> dq = QueryUtil.getDistanceQuery(database, distFunc);
     RangeQuery<O> rq = database.getRangeQuery(dq);
     return (NeighborPredicate.Instance<T>) new Instance(epsilon, rq, dq.getRelation().getDBIDs());
   }
 
   @Override
-  public SimpleTypeInformation<?>[] getOutputType() {
-    return new SimpleTypeInformation<?>[] { TypeUtil.DBIDS, TypeUtil.NEIGHBORLIST };
+  public SimpleTypeInformation<DoubleDBIDList> getOutputType() {
+    return TypeUtil.NEIGHBORLIST;
   }
 
   @Override

@@ -92,15 +92,15 @@ public class SimilarityNeighborPredicate<O> implements NeighborPredicate {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
+  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
     SimilarityQuery<O> dq = QueryUtil.getSimilarityQuery(database, distFunc);
     RangeQuery<O> rq = database.getSimilarityRangeQuery(dq);
     return (NeighborPredicate.Instance<T>) new Instance(epsilon, rq, dq.getRelation().getDBIDs());
   }
 
   @Override
-  public SimpleTypeInformation<?>[] getOutputType() {
-    return new SimpleTypeInformation<?>[] { TypeUtil.DBIDS, TypeUtil.NEIGHBORLIST };
+  public SimpleTypeInformation<DoubleDBIDList> getOutputType() {
+    return TypeUtil.NEIGHBORLIST;
   }
 
   @Override

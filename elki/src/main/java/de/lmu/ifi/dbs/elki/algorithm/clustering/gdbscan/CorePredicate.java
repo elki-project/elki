@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -43,10 +43,9 @@ public interface CorePredicate {
    * Instantiate for a database.
    * 
    * @param database Database to instantiate for
-   * @param type Type to instantiate for
    * @return Instance
    */
-  public <T> Instance<T> instantiate(Database database, SimpleTypeInformation<?> type);
+  public <T> Instance<T> instantiate(Database database);
 
   /**
    * Test whether the neighborhood type T is accepted by this predicate.

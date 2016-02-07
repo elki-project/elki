@@ -109,7 +109,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
+  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
     Relation<V> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     return (NeighborPredicate.Instance<T>) instantiate(database, relation);
   }
@@ -232,8 +232,8 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
   }
 
   @Override
-  public SimpleTypeInformation<?>[] getOutputType() {
-    return new SimpleTypeInformation[] { new SimpleTypeInformation<>(COPACModel.class) };
+  public SimpleTypeInformation<COPACModel> getOutputType() {
+    return new SimpleTypeInformation<>(COPACModel.class);
   }
 
   /**

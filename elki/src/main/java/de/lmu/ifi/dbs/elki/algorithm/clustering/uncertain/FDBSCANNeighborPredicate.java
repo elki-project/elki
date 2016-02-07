@@ -127,7 +127,7 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> NeighborPredicate.Instance<T> instantiate(Database database, SimpleTypeInformation<?> type) {
+  public <T> NeighborPredicate.Instance<T> instantiate(Database database) {
     Relation<? extends UncertainObject> relation = database.getRelation(TypeUtil.UNCERTAIN_OBJECT_FIELD);
     return (NeighborPredicate.Instance<T>) new Instance(epsilon, sampleSize, threshold, relation, rand);
   }
@@ -138,8 +138,8 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate {
   }
 
   @Override
-  public SimpleTypeInformation<?>[] getOutputType() {
-    return new SimpleTypeInformation<?>[] { TypeUtil.DBIDS };
+  public SimpleTypeInformation<DBIDs> getOutputType() {
+    return TypeUtil.DBIDS;
   }
 
   /**
