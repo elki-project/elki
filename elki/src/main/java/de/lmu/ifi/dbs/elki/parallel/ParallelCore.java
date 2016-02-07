@@ -87,7 +87,7 @@ public class ParallelCore {
    * @return Number of threads to run in parallel
    */
   public int getParallelism() {
-    return executor.getMaximumPoolSize();
+    return executor != null ? executor.getMaximumPoolSize() : processors;
   }
 
   /**

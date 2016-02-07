@@ -57,12 +57,12 @@ public class ParallelExecutor {
    * @param procs Processors to run
    */
   public static final void run(DBIDs ids, Processor... procs) {
-    // TODO: try different strategies anyway!
-    ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
     ParallelCore core = ParallelCore.getCore();
+    core.connect();
     try {
+      // TODO: try different strategies anyway!
+      ArrayDBIDs aids = DBIDUtil.ensureArray(ids);
       final int size = aids.size();
-      core.connect();
       int numparts = core.getParallelism();
       // TODO: are there better heuristics for choosing this?
       numparts = (size > numparts * numparts * 16) ? numparts * numparts - 1 : numparts;
