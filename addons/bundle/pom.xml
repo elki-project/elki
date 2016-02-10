@@ -58,15 +58,32 @@
 				<executions>
 					<execution>
 						<id>createJavadocDir</id>
-						<phase>prepare-package</phase>
+						<phase>compile</phase><!-- abuse compile to run before prepare-package -->
 						<configuration>
-							<tasks>
+						<target>
 								<mkdir dir="${project.build.directory}/apidocs" />
-							</tasks>
+						</target>
 						</configuration>
 						<goals>
 							<goal>run</goal>
 						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Copy dependencies earlier: -->
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>compile</phase> <!-- abuse compile to run before prepare-package -->
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${outputDir}</outputDirectory>
+							<excludeArtifactIds>junit:*,org.hamcrest:*</excludeArtifactIds>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
