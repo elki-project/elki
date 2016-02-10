@@ -133,7 +133,6 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
   public static class Parameterizer extends AbstractDatabaseConnection.Parameterizer {
     @Override
     protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
       configParser(config, Parser.class, NumberVectorLabelParser.class);
       configFilters(config);
     }

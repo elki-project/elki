@@ -31,6 +31,8 @@ import java.io.InputStream;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
+import de.lmu.ifi.dbs.elki.datasource.parser.ArffParser;
+import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.datasource.parser.Parser;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.FileUtil;
@@ -118,12 +120,18 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
 
     @Override
     protected void makeOptions(Parameterization config) {
+      Class<? extends Parser> defaultParser = NumberVectorLabelParser.class;
       // Add the input file first, for usability reasons.
       final FileParameter inputParam = new FileParameter(INPUT_ID, FileParameter.FileType.INPUT_FILE);
       if(config.grab(inputParam)) {
         infile = inputParam.getValue();
+        String nam = infile.getName();
+        if(nam != null && (nam.endsWith(".arff") || nam.endsWith(".arff.gz"))) {
+          defaultParser = ArffParser.class;
+        }
       }
-      super.makeOptions(config);
+      configParser(config, Parser.class, defaultParser);
+      configFilters(config);
     }
 
     @Override
