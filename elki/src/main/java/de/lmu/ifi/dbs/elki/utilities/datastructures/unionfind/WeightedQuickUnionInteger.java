@@ -114,8 +114,8 @@ public class WeightedQuickUnionInteger {
   /**
    * Join the components of elements p and q.
    *
-   * @param p First element
-   * @param q Second element
+   * @param first First element
+   * @param second Second element
    * @return Component id.
    */
   public int union(int first, int second) {
@@ -139,8 +139,8 @@ public class WeightedQuickUnionInteger {
   /**
    * Test if two components are connected.
    *
-   * @param p First element
-   * @param q Second element
+   * @param first First element
+   * @param second Second element
    * @return {@code true} if they are in the same component.
    */
   public boolean isConnected(int first, int second) {
