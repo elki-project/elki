@@ -89,6 +89,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.6.0
  *
  * @apiviz.composedOf LinkageMethod
+ * @apiviz.composedOf PointerHierarchyRepresentationBuilder
  *
  * @param <O> Object type
  */

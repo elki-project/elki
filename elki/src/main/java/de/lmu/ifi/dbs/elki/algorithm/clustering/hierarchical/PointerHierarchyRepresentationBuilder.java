@@ -37,6 +37,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
  *
  * @author Erich Schubert
  * @since 0.7.1
+ *
+ * @apiviz.has PointerHierarchyRepresentationResult
  */
 public class PointerHierarchyRepresentationBuilder {
   /**

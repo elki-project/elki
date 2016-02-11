@@ -77,6 +77,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * @since 0.7.0
  *
  * @param <O> Object type
+ *
+ * @apiviz.has PointerDensityHierarchyRepresentationResult
  */
 @Title("HDBSCAN: Hierarchical Density-Based Spatial Clustering of Applications with Noise")
 @Description("Density-Based Clustering Based on Hierarchical Density Estimates")
