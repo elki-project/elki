@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>de.lmu.ifi.dbs.elki</groupId>
-	<version>0.7.1-SNAPSHOT</version>
+	<version>0.7.1</version>
 	<artifactId>elki-project</artifactId>
 	<packaging>pom</packaging>
 
@@ -342,6 +342,13 @@
 							<autoReleaseAfterClose>true</autoReleaseAfterClose>
 							<useReleaseProfile>false</useReleaseProfile>
 							<releaseProfiles>release</releaseProfiles>
+						</configuration>
+					</plugin>
+					<plugin>
+						<artifactId>maven-release-plugin</artifactId>
+						<version>2.3.2</version>
+						<configuration>
+							<mavenExecutorId>forked-path</mavenExecutorId>
 						</configuration>
 					</plugin>
 					<plugin>

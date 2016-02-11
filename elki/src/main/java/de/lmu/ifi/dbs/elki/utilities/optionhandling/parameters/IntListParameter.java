@@ -123,7 +123,7 @@ public class IntListParameter extends ListParameter<IntListParameter, int[]> {
   /**
    * Get the values as a bitmask.
    *
-   * {@see de.lmu.ifi.dbs.elki.utilities.BitsUtil}
+   * See also: {@link de.lmu.ifi.dbs.elki.utilities.BitsUtil}
    *
    * @return Bitmask
    */

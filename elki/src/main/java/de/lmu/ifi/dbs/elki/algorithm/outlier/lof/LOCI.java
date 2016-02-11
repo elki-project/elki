@@ -98,19 +98,19 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
   private static final Logging LOG = Logging.getLogger(LOCI.class);
 
   /**
-   * Holds the value of {@link #RMAX_ID}.
+   * Maximum radius.
    */
   private double rmax;
 
   /**
-   * Holds the value of {@link #NMIN_ID}.
+   * Minimum neighborhood size.
    */
-  private int nmin;
+  private int nmin = 0;
 
   /**
-   * Holds the value of {@link #ALPHA_ID}.
+   * Scaling of averaging neighborhood.
    */
-  private double alpha;
+  private double alpha = 0.5;
 
   /**
    * Constructor.
@@ -427,10 +427,19 @@ public class LOCI<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
      */
     public static final OptionID ALPHA_ID = new OptionID("loci.alpha", "Scaling factor for averaging neighborhood");
 
+    /**
+     * Maximum radius.
+     */
     protected double rmax;
 
+    /**
+     * Minimum neighborhood size.
+     */
     protected int nmin = 0;
 
+    /**
+     * Scaling of averaging neighborhood.
+     */
     protected double alpha = 0.5;
 
     @Override

@@ -71,6 +71,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @since 0.7.0
  *
  * @apiviz.has PrecomputedDistanceQuery
+ * @apiviz.has PrecomputedKNNQuery
+ * @apiviz.has PrecomputedRangeQuery
  *
  * @param <O> Object type
  */

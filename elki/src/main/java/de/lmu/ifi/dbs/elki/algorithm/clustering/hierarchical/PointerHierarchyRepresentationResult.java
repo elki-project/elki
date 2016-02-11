@@ -168,7 +168,7 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
   /**
    * Perform topological sorting based on the successor order.
    *
-   * @param ids IDs to sort
+   * @param oids IDs to sort
    * @param parent Parent relationship.
    * @param parentDistance Distance to parent.
    * @return Sorted order

@@ -50,22 +50,22 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
 /**
  * Linear memory implementation of HDBSCAN clustering based on SLINK.
- * 
+ *
  * By not building a distance matrix, we can reduce memory usage to linear
  * memory only; but at the cost of roughly double the runtime (unless using
  * indexes) as we first need to compute all kNN distances (for core sizes), then
  * recompute distances when building the spanning tree.
- * 
+ *
  * This version uses the SLINK algorithm to directly produce the pointer
  * representation expected by the extraction methods. The SLINK algorithm is
  * closely related to Prim's minimum spanning tree, but produces the more
  * compact pointer representation instead of an edges list.
- * 
+ *
  * This implementation does <em>not</em> include the cluster extraction
  * discussed as Step 4. This functionality should however already be provided by
  * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction}
  * . For this reason, we also do <em>not include self-edges</em>.
- * 
+ *
  * Reference:
  * <p>
  * R. J. G. B. Campello, D. Moulavi, and J. Sander<br />
@@ -73,9 +73,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
  * Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining,
  * PAKDD
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
+ *
+ * @apiviz.has PointerDensityHierarchyRepresentationResult
  */
 @Title("HDBSCAN: Hierarchical Density-Based Spatial Clustering of Applications with Noise")
 @Description("Density-Based Clustering Based on Hierarchical Density Estimates")
@@ -91,7 +93,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function
    * @param minPts Minimum number of points for density
    */
@@ -101,7 +103,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
 
   /**
    * Run the algorithm
-   * 
+   *
    * @param db Database
    * @param relation Relation
    * @return Clustering hierarchy
@@ -144,7 +146,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
 
   /**
    * First step: Initialize P(id) = id, L(id) = infinity.
-   * 
+   *
    * @param id the id of the object to be inserted into the pointer
    *        representation
    * @param pi Pi data store
@@ -161,7 +163,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
   /**
    * Second step: Determine the pairwise distances from all objects in the
    * pointer representation to the new object with the specified id.
-   * 
+   *
    * @param id the id of the object to be inserted into the pointer
    *        representation
    * @param processedIDs the already processed ids
@@ -180,7 +182,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
 
   /**
    * Third step: Determine the values for P and L
-   * 
+   *
    * @param id the id of the object to be inserted into the pointer
    *        representation
    * @param pi Pi data store
@@ -221,7 +223,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
 
   /**
    * Fourth step: Actualize the clusters if necessary
-   * 
+   *
    * @param id the id of the current object
    * @param pi Pi data store
    * @param lambda Lambda data store
@@ -255,11 +257,11 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractHDBSCAN.Parameterizer<O> {

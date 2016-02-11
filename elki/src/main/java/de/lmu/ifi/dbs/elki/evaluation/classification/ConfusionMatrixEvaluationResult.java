@@ -30,11 +30,13 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 /**
  * Provides the prediction performance measures for a classifier based on the
  * confusion matrix.
- * 
+ *
  * Note: this API is non-final, and will be refactored soon.
  *
  * @author Arthur Zimek
  * @since 0.7.0
+ *
+ * @apiviz.composedOf ConfusionMatrix
  */
 public class ConfusionMatrixEvaluationResult implements Result, TextWriteable {
   /**
