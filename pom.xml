@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>de.lmu.ifi.dbs.elki</groupId>
-	<version>0.7.1</version>
+	<version>0.7.2-SNAPSHOT</version>
 	<artifactId>elki-project</artifactId>
 	<packaging>pom</packaging>
 
