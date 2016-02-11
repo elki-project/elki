@@ -135,6 +135,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
       final boolean ismetric = getDistanceQuery().getDistanceFunction().isMetric();
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         if(ismetric && storage.get(iter) != null) {
+          log.incrementProcessed(progress);
           continue; // Previously computed (duplicate point?)
         }
         KNNList knn = knnQuery.getKNNForDBID(iter, k);
