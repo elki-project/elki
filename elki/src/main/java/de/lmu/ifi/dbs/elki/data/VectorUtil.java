@@ -131,6 +131,43 @@ public final class VectorUtil {
   }
 
   /**
+   * Compute the angle for vectors, one of which is sparse.
+   *
+   * @param v1 The sparse vector
+   * @param v2 Second vector
+   * @return angle
+   */
+  public static double angleOneSparse(SparseNumberVector v1, NumberVector v2) {
+    double l1 = 0., l2 = 0., cross = 0.;
+    int i1 = v1.iter();
+    int dim2 = v2.getDimensionality();
+    while(v1.iterValid(i1) && v1.iterDim(i1) < dim2) {
+      final double val1 = v1.iterDoubleValue(i1);
+      final double val2 = v2.doubleValue(v1.iterDim(i1));
+      l1 += val1 * val1;
+      cross += val1 * val2;
+      i1 = v1.iterAdvance(i1);
+    }
+    while(v1.iterValid(i1)) {
+      final double val = v1.iterDoubleValue(i1);
+      l1 += val * val;
+      i1 = v1.iterAdvance(i1);
+    }
+    for(int k = 0; k < dim2; k++) {
+      final double r2 = v2.doubleValue(k);
+      l2 += r2 * r2;
+    }
+    if(cross == 0.) {
+      return 0.;
+    }
+    if(l1 == 0. || l2 == 0.) {
+      return 1.;
+    }
+    final double a = Math.sqrt((cross / l1) * (cross / l2));
+    return (a < 1.) ? a : 1.;
+  }
+
+  /**
    * Compute the angle between two vectors.
    *
    * @param v1 first vector
@@ -187,6 +224,12 @@ public final class VectorUtil {
   public static double cosAngle(NumberVector v1, NumberVector v2) {
     if(v1 instanceof SparseNumberVector && v2 instanceof SparseNumberVector) {
       return angleSparse((SparseNumberVector) v1, (SparseNumberVector) v2);
+    }
+    if(v1 instanceof SparseNumberVector) {
+      return angleOneSparse((SparseNumberVector) v1, v2);
+    }
+    if(v2 instanceof SparseNumberVector) {
+      return angleOneSparse((SparseNumberVector) v2, v1);
     }
     final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
     final int mindim = (dim1 <= dim2) ? dim1 : dim2;
