@@ -312,7 +312,7 @@ public final class VectorUtil {
     for(int k = 0; k < mindim; k++) {
       final double ok = k < dimo ? o.doubleValue(k) : 0.;
       final double r1 = v1.doubleValue(k) - ok;
-      final double r2 = v2.doubleValue(k) - o.doubleValue(k);
+      final double r2 = v2.doubleValue(k) - ok;
       cross += r1 * r2;
       l1 += r1 * r1;
       l2 += r2 * r2;

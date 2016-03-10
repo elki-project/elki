@@ -42,13 +42,30 @@ public class VectorUtilTest implements JUnit4Test {
   public void denseAngle() {
     NumberVector v1 = new DoubleVector(new double[] { 1.0, 2.0, 3.0 });
     NumberVector v2 = new FloatVector(new float[] { 3.f, 2.f, 1.f });
+    NumberVector v3 = new ByteVector(new byte[] { 1, 2, 3, 0 });
+    NumberVector v4 = new IntegerVector(new int[] { 3, 2, 1, 0 });
     // Exact: (3+4+3)/(1+4+9) = 0.7142857142857143
     assertEquals("Angle not exact.", 1., VectorUtil.cosAngle(v1, v1), 0.);
     assertEquals("Angle not exact.", 1., VectorUtil.cosAngle(v2, v2), 0.);
+    assertEquals("Angle not exact.", 1., VectorUtil.cosAngle(v1, v3), 0.);
+    assertEquals("Angle not exact.", 1., VectorUtil.cosAngle(v2, v4), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.cosAngle(v1, v2), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.angleDense(v1, v2), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.cosAngle(v2, v1), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.angleDense(v2, v1), 0.);
+  }
+
+  @Test
+  public void denseAngleOffset() {
+    NumberVector v1 = new DoubleVector(new double[] { 1.0, 2.0, 3.0 });
+    NumberVector v2 = new FloatVector(new float[] { 3.f, 2.f, 1.f });
+
+    NumberVector o = new DoubleVector(new double[] { 0. });
+    assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.angle(v2, v1, o), 0.);
+
+    // Exact: (0+1+0)/(0+1+4) = 0.2
+    NumberVector one = new DoubleVector(new double[] { 1., 1., 1. });
+    assertEquals("Angle not exact.", 0.2, VectorUtil.angle(v2, v1, one), 0.);
   }
 
   @Test
@@ -84,8 +101,8 @@ public class VectorUtilTest implements JUnit4Test {
 
   @Test
   public void sparseDenseAngle() {
-    NumberVector d1 = new DoubleVector(new double[] { 1.0, 2.0, 3.0 });
-    NumberVector d2 = new FloatVector(new float[] { 3.f, 2.f, 1.f });
+    NumberVector d1 = new DoubleVector(new double[] { 1.0, 2.0, 3.0, 0.0 });
+    NumberVector d2 = new FloatVector(new float[] { 3.f, 2.f, 1.f, 0.f });
     SparseNumberVector s1 = new SparseDoubleVector(new double[] { 1.0, 2.0, 3.0 });
     SparseNumberVector s2 = new SparseFloatVector(new float[] { 3.f, 2.f, 1.f });
     // Exact: (3+4+3)/(1+4+9) = 0.7142857142857143
