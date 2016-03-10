@@ -77,6 +77,43 @@ public final class VectorUtil {
   }
 
   /**
+   * Compute the absolute cosine of the angle between two dense vectors.
+   *
+   * To convert it to radians, use <code>Math.acos(angle)</code>!
+   *
+   * @param v1 first vector
+   * @param v2 second vector
+   * @return Angle
+   */
+  public static double angleDense(NumberVector v1, NumberVector v2) {
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
+    final int mindim = (dim1 <= dim2) ? dim1 : dim2;
+    // Essentially, we want to compute this:
+    // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
+    // We can just compute all three in parallel.
+    double cross = 0, l1 = 0, l2 = 0;
+    for(int k = 0; k < mindim; k++) {
+      final double r1 = v1.doubleValue(k);
+      final double r2 = v2.doubleValue(k);
+      cross += r1 * r2;
+      l1 += r1 * r1;
+      l2 += r2 * r2;
+    }
+    for(int k = mindim; k < dim1; k++) {
+      final double r1 = v1.doubleValue(k);
+      l1 += r1 * r1;
+    }
+    for(int k = mindim; k < dim2; k++) {
+      final double r2 = v2.doubleValue(k);
+      l2 += r2 * r2;
+    }
+    final double a = (cross == 0.) ? 0. : //
+        (l1 == 0. || l2 == 0.) ? 1. : //
+            Math.sqrt((cross / l1) * (cross / l2));
+    return (a < 1.) ? a : 1.;
+  }
+
+  /**
    * Compute the angle for sparse vectors.
    *
    * @param v1 First vector
@@ -85,7 +122,6 @@ public final class VectorUtil {
    */
   public static double angleSparse(SparseNumberVector v1, SparseNumberVector v2) {
     // TODO: exploit precomputed length, when available?
-    // Length of first vector
     double l1 = 0., l2 = 0., cross = 0.;
     int i1 = v1.iter(), i2 = v2.iter();
     while(v1.iterValid(i1) && v2.iterValid(i2)) {
@@ -120,58 +156,53 @@ public final class VectorUtil {
       l2 += val * val;
       i2 = v2.iterAdvance(i2);
     }
-    if(cross == 0.) {
-      return 0.;
-    }
-    if(l1 == 0. || l2 == 0.) {
-      return 1.;
-    }
-    final double a = Math.sqrt((cross / l1) * (cross / l2));
+    final double a = (cross == 0.) ? 0. : //
+        (l1 == 0. || l2 == 0.) ? 1. : //
+            Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
   /**
-   * Compute the angle between two vectors.
+   * Compute the angle for a sparse and a dense vector.
    *
-   * @param v1 first vector
-   * @param v2 second vector
-   * @param o Origin
-   * @return Angle
+   * @param v1 Sparse first vector
+   * @param v2 Dense second vector
+   * @return angle
    */
-  public static double angle(NumberVector v1, NumberVector v2, NumberVector o) {
-    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality(),
-        dimo = o.getDimensionality();
-    final int mindim = (dim1 <= dim2) ? dim1 : dim2;
-    // Essentially, we want to compute this:
-    // v1' = v1 - o, v2' = v2 - o
-    // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());
-    // We can just compute all three in parallel.
-    double cross = 0, l1 = 0, l2 = 0;
-    for(int k = 0; k < mindim; k++) {
-      final double ok = k < dimo ? o.doubleValue(k) : 0.;
-      final double r1 = v1.doubleValue(k) - ok;
-      final double r2 = v2.doubleValue(k) - o.doubleValue(k);
-      cross += r1 * r2;
-      l1 += r1 * r1;
-      l2 += r2 * r2;
+  public static double angleSparseDense(SparseNumberVector v1, NumberVector v2) {
+    // TODO: exploit precomputed length, when available.
+    final int dim2 = v2.getDimensionality();
+    double l1 = 0., l2 = 0., cross = 0.;
+    int i1 = v1.iter(), d2 = 0;
+    while(v1.iterValid(i1)) {
+      final int d1 = v1.iterDim(i1);
+      while(d2 < d1 && d2 < dim2) {
+        final double val = v2.doubleValue(d2);
+        l2 += val;
+      }
+      if(d2 < dim2) {
+        final double val1 = v1.iterDoubleValue(i1);
+        final double val2 = v2.doubleValue(d2);
+        l1 += val1 * val1;
+        l2 += val2 * val2;
+        cross += val1 * val2;
+        i1 = v1.iterAdvance(i1);
+        ++d2;
+      }
     }
-    for(int k = mindim; k < dim1; k++) {
-      final double ok = k < dimo ? o.doubleValue(k) : 0.;
-      final double r1 = v1.doubleValue(k) - ok;
-      l1 += r1 * r1;
+    while(v1.iterValid(i1)) {
+      final double val = v1.iterDoubleValue(i1);
+      l1 += val * val;
+      i1 = v1.iterAdvance(i1);
     }
-    for(int k = mindim; k < dim2; k++) {
-      final double ok = k < dimo ? o.doubleValue(k) : 0.;
-      final double r2 = v2.doubleValue(k) - ok;
-      l2 += r2 * r2;
+    while(d2 < dim2) {
+      final double val = v2.doubleValue(d2);
+      l2 += val * val;
+      ++d2;
     }
-    if(cross == 0.) {
-      return 0.;
-    }
-    if(l1 == 0. || l2 == 0.) {
-      return 1.;
-    }
-    final double a = Math.sqrt((cross / l1) * (cross / l2));
+    final double a = (cross == 0.) ? 0. : //
+        (l1 == 0. || l2 == 0.) ? 1. : //
+            Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -185,38 +216,14 @@ public final class VectorUtil {
    * @return Angle
    */
   public static double cosAngle(NumberVector v1, NumberVector v2) {
-    if(v1 instanceof SparseNumberVector && v2 instanceof SparseNumberVector) {
-      return angleSparse((SparseNumberVector) v1, (SparseNumberVector) v2);
-    }
-    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality();
-    final int mindim = (dim1 <= dim2) ? dim1 : dim2;
-    // Essentially, we want to compute this:
-    // v1.transposeTimes(v2) / (v1.euclideanLength() * v2.euclideanLength());
-    // We can just compute all three in parallel.
-    double cross = 0, l1 = 0, l2 = 0;
-    for(int k = 0; k < mindim; k++) {
-      final double r1 = v1.doubleValue(k);
-      final double r2 = v2.doubleValue(k);
-      cross += r1 * r2;
-      l1 += r1 * r1;
-      l2 += r2 * r2;
-    }
-    for(int k = mindim; k < dim1; k++) {
-      final double r1 = v1.doubleValue(k);
-      l1 += r1 * r1;
-    }
-    for(int k = mindim; k < dim2; k++) {
-      final double r2 = v2.doubleValue(k);
-      l2 += r2 * r2;
-    }
-    if(cross == 0.) {
-      return 0.;
-    }
-    if(l1 == 0. || l2 == 0.) {
-      return 1.;
-    }
-    final double a = Math.sqrt((cross / l1) * (cross / l2));
-    return (a < 1.) ? a : 1.;
+    // Java Hotspot appears to optimize these better than if-then-else:
+    return v1 instanceof SparseNumberVector ? //
+        v2 instanceof SparseNumberVector ? //
+            angleSparse((SparseNumberVector) v1, (SparseNumberVector) v2) : //
+            angleSparseDense((SparseNumberVector) v1, v2) : //
+        v2 instanceof SparseNumberVector ? //
+            angleSparseDense((SparseNumberVector) v2, v1) : //
+            angleDense(v1, v2);
   }
 
   // TODO: add more precise but slower O(n^2) angle computation according to:
@@ -279,13 +286,50 @@ public final class VectorUtil {
       } // else: 0
     }
     final double cross = MathUtil.max(s1, Math.abs(s2));
-    if(cross == 0.) {
-      return 0.;
+    final double a = (cross == 0.) ? 0. : //
+        (l1 == 0. || l2 == 0.) ? 1. : //
+            Math.sqrt((cross / l1) * (cross / l2));
+    return (a < 1.) ? a : 1.;
+  }
+
+  /**
+   * Compute the angle between two vectors with respect to a reference point.
+   *
+   * @param v1 first vector
+   * @param v2 second vector
+   * @param o Origin
+   * @return Angle
+   */
+  public static double angle(NumberVector v1, NumberVector v2, NumberVector o) {
+    final int dim1 = v1.getDimensionality(), dim2 = v2.getDimensionality(),
+        dimo = o.getDimensionality();
+    final int mindim = (dim1 <= dim2) ? dim1 : dim2;
+    // Essentially, we want to compute this:
+    // v1' = v1 - o, v2' = v2 - o
+    // v1'.transposeTimes(v2') / (v1'.euclideanLength()*v2'.euclideanLength());
+    // We can just compute all three in parallel.
+    double cross = 0, l1 = 0, l2 = 0;
+    for(int k = 0; k < mindim; k++) {
+      final double ok = k < dimo ? o.doubleValue(k) : 0.;
+      final double r1 = v1.doubleValue(k) - ok;
+      final double r2 = v2.doubleValue(k) - o.doubleValue(k);
+      cross += r1 * r2;
+      l1 += r1 * r1;
+      l2 += r2 * r2;
     }
-    if(l1 == 0. || l2 == 0.) {
-      return 1.;
+    for(int k = mindim; k < dim1; k++) {
+      final double ok = k < dimo ? o.doubleValue(k) : 0.;
+      final double r1 = v1.doubleValue(k) - ok;
+      l1 += r1 * r1;
     }
-    final double a = Math.sqrt((cross / l1) * (cross / l2));
+    for(int k = mindim; k < dim2; k++) {
+      final double ok = k < dimo ? o.doubleValue(k) : 0.;
+      final double r2 = v2.doubleValue(k) - ok;
+      l2 += r2 * r2;
+    }
+    final double a = (cross == 0.) ? 0. : //
+        (l1 == 0. || l2 == 0.) ? 1. : //
+            Math.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
