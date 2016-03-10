@@ -27,6 +27,8 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.JUnit4Test;
+import gnu.trove.map.TIntDoubleMap;
+import gnu.trove.map.hash.TIntDoubleHashMap;
 
 /**
  * Unit test for angle computations in ELKI.
@@ -49,10 +51,23 @@ public class VectorUtilTest implements JUnit4Test {
     assertEquals("Angle not exact.", 1., VectorUtil.cosAngle(v2, v2), 0.);
     assertEquals("Angle not exact.", 1., VectorUtil.cosAngle(v1, v3), 0.);
     assertEquals("Angle not exact.", 1., VectorUtil.cosAngle(v2, v4), 0.);
+    assertEquals("Angle not exact.", 1., VectorUtil.cosAngle(v3, v1), 0.);
+    assertEquals("Angle not exact.", 1., VectorUtil.cosAngle(v4, v2), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.cosAngle(v1, v2), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.angleDense(v1, v2), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.cosAngle(v2, v1), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.angleDense(v2, v1), 0.);
+  }
+
+  @Test
+  public void angleDegenerate() {
+    NumberVector o1 = new DoubleVector(new double[] { 0. });
+    NumberVector o2 = new DoubleVector(new double[] {});
+    NumberVector v1 = new DoubleVector(new double[] { 1.0 });
+    assertEquals("Angle not exact.", 0., VectorUtil.cosAngle(o1, o1), 0.);
+    assertEquals("Angle not exact.", 0., VectorUtil.cosAngle(o1, o2), 0.);
+    assertEquals("Angle not exact.", 0., VectorUtil.cosAngle(o2, o2), 0.);
+    assertEquals("Angle not exact.", 0., VectorUtil.cosAngle(o2, v1), 0.);
   }
 
   @Test
@@ -97,6 +112,9 @@ public class VectorUtilTest implements JUnit4Test {
     assertEquals("Angle not exact.", 0.35714285714285715, VectorUtil.angleDense(s3, s4), 0.);
     assertEquals("Angle not exact.", 0.35714285714285715, VectorUtil.cosAngle(s3, s4), 0.);
     assertEquals("Angle not exact.", 0.35714285714285715, VectorUtil.angleSparse(s3, s4), 0.);
+    assertEquals("Angle not exact.", 0.35714285714285715, VectorUtil.angleDense(s4, s3), 0.);
+    assertEquals("Angle not exact.", 0.35714285714285715, VectorUtil.cosAngle(s4, s3), 0.);
+    assertEquals("Angle not exact.", 0.35714285714285715, VectorUtil.angleSparse(s4, s3), 0.);
   }
 
   @Test
@@ -105,11 +123,13 @@ public class VectorUtilTest implements JUnit4Test {
     NumberVector d2 = new FloatVector(new float[] { 3.f, 2.f, 1.f, 0.f });
     SparseNumberVector s1 = new SparseDoubleVector(new double[] { 1.0, 2.0, 3.0 });
     SparseNumberVector s2 = new SparseFloatVector(new float[] { 3.f, 2.f, 1.f });
-    // Exact: (3+4+3)/(1+4+9) = 0.7142857142857143
+    SparseNumberVector s3 = new SparseDoubleVector(new double[] { 1.0, 2.0, 3.0, 4.0 });
+    SparseNumberVector s4 = new SparseFloatVector(new float[] { 3.f, 2.f, 1.f, 4.f });
     assertEquals("Angle not exact.", 1., VectorUtil.angleDense(s2, d2), 0.);
     assertEquals("Angle not exact.", 1., VectorUtil.angleSparseDense(s2, d2), 0.);
     assertEquals("Angle not exact.", 1., VectorUtil.angleDense(s1, d1), 0.);
     assertEquals("Angle not exact.", 1., VectorUtil.angleSparseDense(s1, d1), 0.);
+    // Exact: (3+4+3)/(1+4+9) = 0.7142857142857143
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.cosAngle(s1, s2), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.angleSparse(s1, s2), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.angleDense(s1, s2), 0.);
@@ -119,5 +139,36 @@ public class VectorUtilTest implements JUnit4Test {
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.cosAngle(s1, d2), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.angleDense(s1, d2), 0.);
     assertEquals("Angle not exact.", 0.7142857142857143, VectorUtil.angleSparseDense(s1, d2), 0.);
+    // Exact: (3+4+3+16)/(1+4+9+16) = 0.8666666666666667
+    assertEquals("Angle not exact.", 0.8666666666666667, VectorUtil.cosAngle(s3, s4), 0.);
+    assertEquals("Angle not exact.", 0.8666666666666667, VectorUtil.angleSparse(s3, s4), 0.);
+    assertEquals("Angle not exact.", 0.8666666666666667, VectorUtil.angleDense(s3, s4), 0.);
+    // Exact: (3+4+3)/sqrt((1+4+9)*(1+4+9+16)) = 0.4879500364742666
+    assertEquals("Angle not exact.", 0.4879500364742666, VectorUtil.cosAngle(d1, s4), 0.);
+    assertEquals("Angle not exact.", 0.4879500364742666, VectorUtil.angleDense(s4, d1), 0.);
+    assertEquals("Angle not exact.", 0.4879500364742666, VectorUtil.angleSparseDense(s4, d1), 0.);
+    assertEquals("Angle not exact.", 0.4879500364742666, VectorUtil.cosAngle(s3, d2), 0.);
+    assertEquals("Angle not exact.", 0.4879500364742666, VectorUtil.angleDense(s3, d2), 0.);
+    assertEquals("Angle not exact.", 0.4879500364742666, VectorUtil.angleSparseDense(s3, d2), 0.);
+  }
+
+  @Test
+  public void sparseAngleDegenerate() {
+    NumberVector o1 = new SparseDoubleVector(new double[] {});
+    TIntDoubleMap v2 = new TIntDoubleHashMap();
+    v2.put(3, 0.);
+    v2.put(4, 0.);
+    v2.put(42, 0.);
+    NumberVector o2 = new SparseDoubleVector(v2, 100);
+    TIntDoubleMap v3 = new TIntDoubleHashMap();
+    v3.put(15, 0.);
+    v3.put(5, 1.);
+    NumberVector v1 = new SparseDoubleVector(v3, 100);
+    assertEquals("Angle not exact.", 0., VectorUtil.cosAngle(o1, o1), 0.);
+    assertEquals("Angle not exact.", 0., VectorUtil.cosAngle(o1, o2), 0.);
+    assertEquals("Angle not exact.", 0., VectorUtil.cosAngle(o2, o2), 0.);
+    assertEquals("Angle not exact.", 0., VectorUtil.cosAngle(o1, v1), 0.);
+    assertEquals("Angle not exact.", 0., VectorUtil.cosAngle(o2, v1), 0.);
+    assertEquals("Angle not exact.", 1., VectorUtil.cosAngle(v1, v1), 0.);
   }
 }
