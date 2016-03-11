@@ -85,8 +85,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * @param <M> Model type
  */
 @Reference(authors = "D. Pelleg, A. Moore", //
-booktitle = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
-title = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
+title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
+booktitle = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
 url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
 public class XMeans<V extends NumberVector, M extends MeanModel> extends AbstractKMeans<V, M> {
   /**

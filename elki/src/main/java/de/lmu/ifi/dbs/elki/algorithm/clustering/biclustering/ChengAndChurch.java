@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -52,19 +52,23 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Perform Cheng and Church biclustering.
- * 
+ *
+ * Reference:
  * <p>
- * Reference: <br>
- * Y. Cheng and G. M. Church. Biclustering of expression data. In Proceedings of
- * the 8th International Conference on Intelligent Systems for Molecular Biology
- * (ISMB), San Diego, CA, 2000.
+ * Y. Cheng and G. M. Church.<br />
+ * Biclustering of expression data.<br />
+ * In Proceedings of the 8th International Conference on Intelligent Systems for
+ * Molecular Biology (ISMB), San Diego, CA, 2000.
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
  * @param <V> Vector type.
  */
-@Reference(authors = "Y. Cheng, G. M. Church", title = "Biclustering of expression data", booktitle = "Proc. 8th International Conference on Intelligent Systems for Molecular Biology (ISMB)")
+@Reference(authors = "Y. Cheng, G. M. Church", //
+    title = "Biclustering of expression data", //
+    booktitle = "Proc. 8th International Conference on Intelligent Systems for Molecular Biology (ISMB)", //
+    url = "https://www.ncbi.nlm.nih.gov/pubmed/10977070")
 public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering<V, BiclusterWithInversionsModel> {
   /**
    * The logger for this class.
@@ -73,7 +77,8 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
   /**
    * The minimum number of columns that the database must have so that a removal
-   * of columns is performed in {@link #multipleNodeDeletion}.</p>
+   * of columns is performed in {@link #multipleNodeDeletion}.
+   * </p>
    * <p>
    * Just start deleting multiple columns when more than 100 columns are in the
    * data matrix.
@@ -102,7 +107,8 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
   private double delta;
 
   /**
-   * The parameter for multiple node deletion.</p>
+   * The parameter for multiple node deletion.
+   * </p>
    * <p>
    * It is used to magnify the {@link #delta} value in the
    * {@link #multipleNodeDeletion} method.
@@ -127,7 +133,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
   /**
    * Constructor.
-   * 
+   *
    * @param delta Delta parameter: desired quality
    * @param alpha Alpha parameter: controls switching to single node deletion
    *        approach
@@ -144,9 +150,9 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
   /**
    * Visitor pattern for processing cells.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static interface CellVisitor {
@@ -155,7 +161,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     /**
      * Visit a cell.
-     * 
+     *
      * @param val Value
      * @param row Row Number
      * @param col Column number
@@ -168,9 +174,9 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
   /**
    * Bicluster candidate.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   protected static class BiclusterCandidate {
@@ -201,7 +207,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     /**
      * Constructor.
-     * 
+     *
      * @param rows Row dimensionality.
      * @param cols Column dimensionality.
      */
@@ -229,7 +235,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     /**
      * Visit all selected cells in the data matrix.
-     * 
+     *
      * @param mat Data matrix
      * @param mode Operation mode
      * @param visitor Visitor function
@@ -272,7 +278,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     /**
      * Visit a column of the matrix.
-     * 
+     *
      * @param mat Data matrix
      * @param col Column to visit
      * @param mode Operation mode
@@ -311,7 +317,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     /**
      * Visit a row of the data matrix.
-     * 
+     *
      * @param mat Data matrix
      * @param row Row to visit
      * @param visitor Visitor function
@@ -365,7 +371,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     /**
      * Update the row means and column means.
-     * 
+     *
      * @param mat Data matrix
      * @param all Flag, to update all
      * @return overall mean
@@ -396,7 +402,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     /**
      * Compute the mean square residue.
-     * 
+     *
      * @param mat Data matrix
      * @return mean squared residue
      */
@@ -417,7 +423,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     /**
      * Computes the <b>mean row residue</b> of the given <code>row</code>.
-     * 
+     *
      * @param mat Data matrix
      * @param row The row who's residue should be computed.
      * @param rowinverted Indicates if the row should be considered inverted.
@@ -440,9 +446,9 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     }
 
     /**
-     * 
+     *
      * Computes the <b>mean column residue</b> of the given <code>col</code>.
-     * 
+     *
      * @param col The column who's residue should be computed.
      * @return The row residue of the given <code>col</code>um.
      */
@@ -465,7 +471,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     /**
      * Updates the mask with replacement values for all data in the given rows
      * and columns.
-     * 
+     *
      * @param mat Mask to update.
      * @param replacement Distribution to sample replacement values from.
      */
@@ -482,7 +488,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     /**
      * Select or deselect a column.
-     * 
+     *
      * @param cnum Column to select
      * @param set Value to set
      */
@@ -499,7 +505,7 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
     /**
      * Select or deselect a row.
-     * 
+     *
      * @param rnum Row to select
      * @param set Value to set
      */
@@ -570,11 +576,11 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
   /**
    * Algorithm 1 of Cheng and Church:
-   * 
+   *
    * Remove single rows or columns.
-   * 
+   *
    * Inverted rows are not supported in this method.
-   * 
+   *
    * @param mat Data matrix
    * @param cand Bicluster candidate
    */
@@ -636,11 +642,11 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
   //
   /**
    * Algorithm 2 of Cheng and Church.
-   * 
+   *
    * Remove all rows and columns that reduce the residue by alpha.
-   * 
+   *
    * Inverted rows are not supported in this method.
-   * 
+   *
    * @param mat Data matrix
    * @param cand Bicluster candidate
    */
@@ -708,11 +714,11 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
   /**
    * Algorithm 3 of Cheng and Church.
-   * 
+   *
    * Try to re-add rows or columns that decrease the overall score.
-   * 
+   *
    * Also try adding inverted rows.
-   * 
+   *
    * @param mat Data matrix
    * @param cand Bicluster candidate
    */
@@ -795,11 +801,11 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <V> Vector type
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {
@@ -844,7 +850,8 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     private double delta;
 
     /**
-     * The parameter for multiple node deletion.</p>
+     * The parameter for multiple node deletion.
+     * </p>
      * <p>
      * It is used to magnify the {@link #delta} value in the
      * {@link ChengAndChurch#multipleNodeDeletion} method.
@@ -865,20 +872,20 @@ public class ChengAndChurch<V extends NumberVector> extends AbstractBiclustering
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter deltaP = new DoubleParameter(DELTA_ID);
+      DoubleParameter deltaP = new DoubleParameter(DELTA_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(deltaP)) {
         delta = deltaP.doubleValue();
       }
-      deltaP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
 
-      IntParameter nP = new IntParameter(N_ID, 1);
-      nP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter nP = new IntParameter(N_ID, 1) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(nP)) {
         n = nP.intValue();
       }
 
-      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 1.);
-      alphaP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
+      DoubleParameter alphaP = new DoubleParameter(ALPHA_ID, 1.) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
       if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }

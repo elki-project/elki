@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  *
  * A different version of logLikelihood is derived in:
  * <p>
- * Q. Zhao, M. Xu, P. Fränti:<br />
+ * Q. Zhao, M. Xu, P. Fränti:<br />
  * Knee Point Detection on Bayesian Information Criterion<br />
  * 20th IEEE International Conference on Tools with Artificial Intelligence
  * </p>
@@ -68,8 +68,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.7.0
  */
 @Reference(authors = "D. Pelleg, A. Moore", //
-booktitle = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
-title = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
+title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
+booktitle = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
 url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
 public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> implements KMeansQualityMeasure<O> {
   /**
@@ -184,7 +184,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
    * @param <V> Vector type
    * @return Log Likelihood.
    */
-  @Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
+  @Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
   title = "Knee Point Detection on Bayesian Information Criterion", //
   booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
   url = "http://dx.doi.org/10.1109/ICTAI.2008.154")

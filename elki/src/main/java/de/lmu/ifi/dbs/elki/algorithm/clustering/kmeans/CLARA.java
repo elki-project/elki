@@ -1,13 +1,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-import java.util.Random;
-
-import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithmUtil;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +22,9 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithmUtil;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithmUtil;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMedoidsInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -57,22 +57,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
  * Clustering Large Applications (CLARA) is a clustering method for large data
  * sets based on PAM, partitioning around medoids ({@link KMedoidsPAM}) based on
  * sampling.
- * 
+ *
  * Reference:
  * <p>
  * L. Kaufman, P. J. Rousseeuw<br />
- * Clustering Large Data Sets (with discussion)<br />
- * in: Pattern Recognition in Practice II
+ * Clustering Large Applications (Program CLARA)<br />
+ * Finding Groups in Data: An Introduction to Cluster Analysis
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
  *
  * @param <V> Vector type
  */
 @Reference(authors = "L. Kaufman, P. J. Rousseeuw", //
-title = "Clustering Large Data Sets (with discussion)", //
-booktitle = "Pattern Recognition in Practice II")
+    title = "Clustering Large Applications (Program CLARA)", //
+    booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis")
 public class CLARA<V> extends KMedoidsPAM<V> {
   /**
    * Class logger.
@@ -157,7 +157,7 @@ public class CLARA<V> extends KMedoidsPAM<V> {
   /**
    * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
    * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
-   * 
+   *
    * @param means Object centroids
    * @param ids Object ids
    * @param rids Sample that was already assigned
@@ -191,9 +191,9 @@ public class CLARA<V> extends KMedoidsPAM<V> {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V> extends KMedoidsPAM.Parameterizer<V> {
@@ -231,13 +231,13 @@ public class CLARA<V> extends KMedoidsPAM<V> {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter numsamplesP = new IntParameter(NUMSAMPLES_ID, 5) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(numsamplesP)) {
         numsamples = numsamplesP.intValue();
       }
 
       DoubleParameter samplingP = new DoubleParameter(SAMPLESIZE_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(samplingP)) {
         sampling = samplingP.doubleValue();
       }
