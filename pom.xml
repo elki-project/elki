@@ -25,6 +25,8 @@
 	<modules>
 		<module>elki-logging</module>
 		<module>elki</module>
+		<!-- this will eventually become non-default compile time only -->
+		<module>elki-docutil</module>
 		<!-- Use PROFILES to enable further modules! -->
 	</modules>
 
