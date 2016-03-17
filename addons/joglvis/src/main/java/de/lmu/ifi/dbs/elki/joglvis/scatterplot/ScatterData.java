@@ -42,11 +42,11 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.utilities.FormatUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
  * Class to manage the vector data in the GPU.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
@@ -108,7 +108,7 @@ public class ScatterData {
 
   /**
    * Get the data size.
-   * 
+   *
    * @return Number of vertexes.
    */
   public int size() {
@@ -212,7 +212,7 @@ public class ScatterData {
 
   /**
    * Free all memory allocations.
-   * 
+   *
    * @param gl GL context
    */
   public void free(GL2 gl) {
@@ -224,7 +224,7 @@ public class ScatterData {
 
   /**
    * Get the OpenGL buffer ID.
-   * 
+   *
    * @return OpenGL buffer ID.
    */
   public int getBufferID() {
@@ -233,7 +233,7 @@ public class ScatterData {
 
   /**
    * Get the offset for the current X coordinate.
-   * 
+   *
    * @return Buffer offset in bytes.
    */
   public int getOffsetX() {
@@ -242,7 +242,7 @@ public class ScatterData {
 
   /**
    * Get the offset for the current Y coordinate.
-   * 
+   *
    * @return Buffer offset in bytes.
    */
   public int getOffsetY() {
@@ -251,7 +251,7 @@ public class ScatterData {
 
   /**
    * Get the offset for the current Z coordinate.
-   * 
+   *
    * @return Buffer offset in bytes.
    */
   public int getOffsetZ() {
@@ -260,7 +260,7 @@ public class ScatterData {
 
   /**
    * Get the offset for the current shape source.
-   * 
+   *
    * @return Buffer offset in bytes.
    */
   public int getOffsetShapeNum() {
@@ -269,7 +269,7 @@ public class ScatterData {
 
   /**
    * Get the offset for the current integer color source.
-   * 
+   *
    * @return Buffer offset in bytes.
    */
   public int getOffsetColorNum() {

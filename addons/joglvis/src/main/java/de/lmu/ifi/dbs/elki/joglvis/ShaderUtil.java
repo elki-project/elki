@@ -27,18 +27,18 @@ import java.io.InputStream;
 
 import javax.media.opengl.GL2;
 
-import de.lmu.ifi.dbs.elki.utilities.FileUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
 
 /**
  * Class to help dealing with shaders.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
 public class ShaderUtil {
   /**
    * Compile a shader from a file.
-   * 
+   *
    * @param context Class context for loading the resource file.
    * @param gl GL context
    * @param type
@@ -77,7 +77,7 @@ public class ShaderUtil {
 
   /**
    * Link multiple (compiled) shaders into one program.
-   * 
+   *
    * @param gl GL context
    * @param shaders Shaders to link
    * @return Program id
@@ -106,7 +106,7 @@ public class ShaderUtil {
 
   /**
    * Exceptions when compiling shaders.
-   * 
+   *
    * @author Erich Schubert
    */
   public static class ShaderCompilationException extends Exception {
@@ -117,7 +117,7 @@ public class ShaderUtil {
 
     /**
      * Constructor.
-     * 
+     *
      * @param message Error message
      * @param cause Cause (e.g. file not found)
      */
@@ -127,7 +127,7 @@ public class ShaderUtil {
 
     /**
      * Constructor.
-     * 
+     *
      * @param message Error message
      */
     public ShaderCompilationException(String message) {
