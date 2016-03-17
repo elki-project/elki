@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
@@ -38,7 +39,6 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleArrayStaticHistogram;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;

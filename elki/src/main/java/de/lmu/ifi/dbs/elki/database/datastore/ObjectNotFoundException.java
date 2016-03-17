@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.utilities.exceptions;
+package de.lmu.ifi.dbs.elki.database.datastore;
 
 /*
  This file is part of ELKI:

@@ -26,10 +26,10 @@ import java.util.Arrays;
  */
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
+import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 
 /**
  * A class to answer representation queries using the stored Array.

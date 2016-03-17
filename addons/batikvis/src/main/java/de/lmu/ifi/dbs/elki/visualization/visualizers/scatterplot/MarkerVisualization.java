@@ -28,10 +28,10 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
