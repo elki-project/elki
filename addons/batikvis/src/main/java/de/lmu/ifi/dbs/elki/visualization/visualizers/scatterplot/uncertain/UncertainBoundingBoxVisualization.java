@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.uncertain;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -87,7 +86,7 @@ public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
     for(; it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
       Relation<?> r = p.getRelation();
-      if(TypeUtil.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r.getDataTypeInformation())) {
+      if(UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r.getDataTypeInformation())) {
         final VisualizationTask task = new VisualizationTask(NAME, context, p, r, this);
         task.level = VisualizationTask.LEVEL_DATA;
         // task.initDefaultVisibility(false);

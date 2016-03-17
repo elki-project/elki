@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.uncertain;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,6 +28,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 
 /**
  * Interface for uncertain objects.
@@ -43,6 +44,16 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
  * @apiviz.has DoubleVector oneway - «contains/produces»
  */
 public interface UncertainObject extends SpatialComparable, FeatureVector<Double> {
+  /**
+   * Uncertain objects.
+   */
+  public static final VectorFieldTypeInformation<UncertainObject> UNCERTAIN_OBJECT_FIELD = VectorFieldTypeInformation.typeRequest(UncertainObject.class);
+
+  /**
+   * Uncertain objects.
+   */
+  public static final VectorFieldTypeInformation<DiscreteUncertainObject> DISCRETE_UNCERTAIN_OBJECT = VectorFieldTypeInformation.typeRequest(DiscreteUncertainObject.class);
+
   /**
    * Draw a random sampled instance.
    *

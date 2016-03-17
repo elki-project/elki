@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.type;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -39,8 +39,6 @@ import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.uncertain.DiscreteUncertainObject;
-import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -240,16 +238,6 @@ public final class TypeUtil {
    * Clustering.
    */
   public static final SimpleTypeInformation<Clustering<?>> CLUSTERING = new SimpleTypeInformation<>(Clustering.class);
-
-  /**
-   * Uncertain objects.
-   */
-  public static final VectorFieldTypeInformation<UncertainObject> UNCERTAIN_OBJECT_FIELD = VectorFieldTypeInformation.typeRequest(UncertainObject.class);
-
-  /**
-   * Uncertain objects.
-   */
-  public static final VectorFieldTypeInformation<DiscreteUncertainObject> DISCRETE_UNCERTAIN_OBJECT = VectorFieldTypeInformation.typeRequest(DiscreteUncertainObject.class);
 
   /**
    * Spatial objects.

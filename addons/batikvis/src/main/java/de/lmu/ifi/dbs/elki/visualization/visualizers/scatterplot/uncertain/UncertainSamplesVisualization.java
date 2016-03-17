@@ -29,7 +29,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.uncertain.DiscreteUncertainObject;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -96,7 +95,7 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
     for(; it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
       Relation<?> r = p.getRelation();
-      if(TypeUtil.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r.getDataTypeInformation())) {
+      if(UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r.getDataTypeInformation())) {
         final VisualizationTask task = new VisualizationTask(NAME, context, p, r, this);
         task.level = VisualizationTask.LEVEL_DATA;
         task.initDefaultVisibility(false);
@@ -107,7 +106,7 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
       Hierarchy.Iter<Relation<?>> it2 = new FilteredIter<Relation<?>>(context.getHierarchy().iterParents(r), Relation.class);
       for(; it2.valid(); it2.advance()) {
         Relation<?> r2 = it2.get();
-        if(TypeUtil.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r2.getDataTypeInformation())) {
+        if(UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r2.getDataTypeInformation())) {
           final VisualizationTask task = new VisualizationTask(NAME, context, p, r2, this);
           task.level = VisualizationTask.LEVEL_DATA;
           task.initDefaultVisibility(false);

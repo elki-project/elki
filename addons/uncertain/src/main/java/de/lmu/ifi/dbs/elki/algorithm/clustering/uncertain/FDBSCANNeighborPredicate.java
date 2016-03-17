@@ -127,13 +127,13 @@ public class FDBSCANNeighborPredicate implements NeighborPredicate<DBIDs> {
 
   @Override
   public Instance instantiate(Database database) {
-    Relation<? extends UncertainObject> relation = database.getRelation(TypeUtil.UNCERTAIN_OBJECT_FIELD);
+    Relation<? extends UncertainObject> relation = database.getRelation(UncertainObject.UNCERTAIN_OBJECT_FIELD);
     return new Instance(epsilon, sampleSize, threshold, relation, rand);
   }
 
   @Override
   public TypeInformation getInputTypeRestriction() {
-    return TypeUtil.UNCERTAIN_OBJECT_FIELD;
+    return UncertainObject.UNCERTAIN_OBJECT_FIELD;
   }
 
   @Override

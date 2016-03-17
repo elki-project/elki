@@ -84,7 +84,7 @@ public class ParallelPlotFactory implements ProjectorFactory {
       Relation<NumberVector> vrel = (Relation<NumberVector>) rel;
       return RelationUtil.dimensionality(vrel);
     }
-    if(TypeUtil.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+    if(UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
       @SuppressWarnings("unchecked")
       Relation<UncertainObject> vrel = (Relation<UncertainObject>) rel;
       return RelationUtil.dimensionality(vrel);

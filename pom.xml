@@ -277,6 +277,18 @@
 			<id>svg</id>
 			<modules>
 				<module>addons/batikvis</module>
+				<!-- batikvis currently depends on uncertain: -->
+				<module>addons/uncertain</module>
+			</modules>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<!-- Uncertain data mining -->
+		<profile>
+			<id>uncertain</id>
+			<modules>
+				<module>addons/uncertain</module>
 			</modules>
 			<activation>
 				<activeByDefault>true</activeByDefault>

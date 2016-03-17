@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
@@ -86,7 +87,7 @@ public class UncertainInstancesVisualization extends AbstractVisFactory {
       // Find a scatter plot visualizing uncertain objects:
       ScatterPlotProjector<?> p = it.get();
       Relation<?> r = p.getRelation();
-      if(!TypeUtil.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r.getDataTypeInformation())) {
+      if(!UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r.getDataTypeInformation())) {
         continue;
       }
       final VisualizationTask task = new VisualizationTask(NAME, context, p, r, this);

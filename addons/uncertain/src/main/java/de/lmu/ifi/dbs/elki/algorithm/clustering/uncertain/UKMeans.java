@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.uncertain.DiscreteUncertainObject;
+import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
@@ -290,7 +291,7 @@ public class UKMeans extends AbstractAlgorithm<Clustering<KMeansModel>>implement
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.UNCERTAIN_OBJECT_FIELD);
+    return TypeUtil.array(UncertainObject.UNCERTAIN_OBJECT_FIELD);
   }
 
   @Override

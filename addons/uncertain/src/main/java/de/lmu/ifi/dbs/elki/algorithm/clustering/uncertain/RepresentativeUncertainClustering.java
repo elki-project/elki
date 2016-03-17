@@ -325,7 +325,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.UNCERTAIN_OBJECT_FIELD);
+    return TypeUtil.array(UncertainObject.UNCERTAIN_OBJECT_FIELD);
   }
 
   @Override
