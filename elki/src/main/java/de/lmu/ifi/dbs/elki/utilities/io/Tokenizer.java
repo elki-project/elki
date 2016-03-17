@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.io;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 
 /**
  * String tokenizer.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
@@ -53,7 +53,7 @@ public class Tokenizer implements Iter {
 
   /**
    * Constructor.
-   * 
+   *
    * @param colSep Column separator pattern.
    * @param quoteChars Quotation character.
    */
@@ -91,7 +91,7 @@ public class Tokenizer implements Iter {
 
   /**
    * Initialize parser with a new string.
-   * 
+   *
    * @param input New string to parse.
    * @param begin Begin
    * @param end End
@@ -154,7 +154,7 @@ public class Tokenizer implements Iter {
 
   /**
    * Get the current part as substring
-   * 
+   *
    * @return Current value as substring.
    */
   public String getSubstring() {
@@ -165,7 +165,7 @@ public class Tokenizer implements Iter {
 
   /**
    * Get the current part as substring
-   * 
+   *
    * @return Current value as substring.
    */
   public String getStrippedSubstring() {
@@ -191,7 +191,7 @@ public class Tokenizer implements Iter {
 
   /**
    * Get current value as double.
-   * 
+   *
    * @return double value
    * @throws NumberFormatException when current value cannot be parsed as double
    *         value.
@@ -202,7 +202,7 @@ public class Tokenizer implements Iter {
 
   /**
    * Get current value as long.
-   * 
+   *
    * @return double value
    * @throws NumberFormatException when current value cannot be parsed as long
    *         value.
@@ -213,7 +213,7 @@ public class Tokenizer implements Iter {
 
   /**
    * Test for empty tokens; usually at end of line.
-   * 
+   *
    * @return Empty
    */
   public boolean isEmpty() {
@@ -222,10 +222,10 @@ public class Tokenizer implements Iter {
 
   /**
    * Detect quote characters.
-   * 
+   *
    * TODO: support more than one quote character, make sure opening and closing
    * quotes match then.
-   * 
+   *
    * @param index Position
    * @return {@code 1} when a quote character, {@code 0} otherwise.
    */
@@ -244,7 +244,7 @@ public class Tokenizer implements Iter {
 
   /**
    * Test if the current string was quoted.
-   * 
+   *
    * @return {@code true} when quoted.
    */
   public boolean isQuoted() {
@@ -253,7 +253,7 @@ public class Tokenizer implements Iter {
 
   /**
    * Get start of token.
-   * 
+   *
    * @return Start
    */
   public int getStart() {
@@ -262,7 +262,7 @@ public class Tokenizer implements Iter {
 
   /**
    * Get end of token.
-   * 
+   *
    * @return End
    */
   public int getEnd() {

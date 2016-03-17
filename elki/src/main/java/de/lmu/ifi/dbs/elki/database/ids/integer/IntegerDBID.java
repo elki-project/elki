@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
@@ -260,17 +261,17 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     }
 
     @Override
-    public DBID fromByteBuffer(ByteBuffer buffer) throws UnsupportedOperationException {
+    public DBID fromByteBuffer(ByteBuffer buffer) throws IOException {
       return new IntegerDBID(ByteArrayUtil.readSignedVarint(buffer));
     }
 
     @Override
-    public void toByteBuffer(ByteBuffer buffer, DBID object) throws UnsupportedOperationException {
+    public void toByteBuffer(ByteBuffer buffer, DBID object) throws IOException {
       ByteArrayUtil.writeSignedVarint(buffer, ((IntegerDBID) object).id);
     }
 
     @Override
-    public int getByteSize(DBID object) throws UnsupportedOperationException {
+    public int getByteSize(DBID object) throws IOException {
       return ByteArrayUtil.getSignedVarintSize(((IntegerDBID) object).id);
     }
   }
@@ -289,17 +290,17 @@ final class IntegerDBID implements DBID, IntegerDBIDRef {
     }
 
     @Override
-    public DBID fromByteBuffer(ByteBuffer buffer) throws UnsupportedOperationException {
+    public DBID fromByteBuffer(ByteBuffer buffer) throws IOException {
       return new IntegerDBID(buffer.getInt());
     }
 
     @Override
-    public void toByteBuffer(ByteBuffer buffer, DBID object) throws UnsupportedOperationException {
+    public void toByteBuffer(ByteBuffer buffer, DBID object) throws IOException {
       buffer.putInt(((IntegerDBID) object).id);
     }
 
     @Override
-    public int getByteSize(DBID object) throws UnsupportedOperationException {
+    public int getByteSize(DBID object) throws IOException {
       return getFixedByteSize();
     }
 

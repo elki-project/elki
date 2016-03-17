@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.junit.Assert;
@@ -33,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
 /**
  * Test some of the varint functions.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
@@ -42,7 +43,7 @@ public class ByteArrayUtilTest implements JUnit4Test {
    * Test the Varint functions
    */
   @Test
-  public void dotestUnsignedVarint32() {
+  public void dotestUnsignedVarint32() throws IOException {
     int[] testvals = { 0, 1, 127, 128, 16383, 16384, 2097151, 2097152, 268435455, 268435456, Integer.MAX_VALUE, 0xFFFFFFFF };
     int[] elen = { 1, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 5 };
     ByteBuffer buffer = ByteBuffer.allocate(100);
@@ -70,7 +71,7 @@ public class ByteArrayUtilTest implements JUnit4Test {
    * Test the Varint functions
    */
   @Test
-  public void dotestSignedVarint32() {
+  public void dotestSignedVarint32() throws IOException {
     int[] testvals = { 0, 1, -1, 63, -64, 64, -65, 8191, -8192, 8192, -8193, 1048575, -1048576, 1048576, -1048577, 134217727, -134217728, 134217728, -134217729, Integer.MAX_VALUE, Integer.MIN_VALUE };
     int[] elen = { 1, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5 };
     ByteBuffer buffer = ByteBuffer.allocate(100);
@@ -98,7 +99,7 @@ public class ByteArrayUtilTest implements JUnit4Test {
    * Official examples
    */
   @Test
-  public void dotestVarintExamples() {
+  public void dotestVarintExamples() throws IOException {
     byte[] test = { 0x03, (byte) 0x8E, 0x02, (byte) 0x9E, (byte) 0xA7, 0x05, (byte) 0x96, 0x01 };
     int[] expect = { 3, 270, 86942, 150 };
     ByteBuffer buffer = ByteBuffer.wrap(test);

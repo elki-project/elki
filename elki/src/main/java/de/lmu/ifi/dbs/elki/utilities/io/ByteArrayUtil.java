@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.io;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,11 +23,11 @@ package de.lmu.ifi.dbs.elki.utilities.io;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
-import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CharsetEncoder;
@@ -35,23 +35,22 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Class with various utilities for manipulating byte arrays.
- * 
+ *
  * If you find a reusable copy of this in the Java API, please tell me. Using a
  * {@link java.io.ByteArrayOutputStream} and {@link java.io.DataInputStream}
  * doesn't seem appropriate.
- * 
+ *
  * C.f. {@link java.io.DataOutputStream} and
  * {@link java.io.ByteArrayOutputStream}
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.composedOf ByteSerializer
  * @apiviz.composedOf ShortSerializer
  * @apiviz.composedOf IntegerSerializer
@@ -101,7 +100,7 @@ public final class ByteArrayUtil {
 
   /**
    * Write a short to the byte array at the given offset.
-   * 
+   *
    * @param array Array to write to
    * @param offset Offset to write to
    * @param v data
@@ -115,7 +114,7 @@ public final class ByteArrayUtil {
 
   /**
    * Write an integer to the byte array at the given offset.
-   * 
+   *
    * @param array Array to write to
    * @param offset Offset to write to
    * @param v data
@@ -131,7 +130,7 @@ public final class ByteArrayUtil {
 
   /**
    * Write a long to the byte array at the given offset.
-   * 
+   *
    * @param array Array to write to
    * @param offset Offset to write to
    * @param v data
@@ -151,7 +150,7 @@ public final class ByteArrayUtil {
 
   /**
    * Write a float to the byte array at the given offset.
-   * 
+   *
    * @param array Array to write to
    * @param offset Offset to write to
    * @param v data
@@ -163,7 +162,7 @@ public final class ByteArrayUtil {
 
   /**
    * Write a double to the byte array at the given offset.
-   * 
+   *
    * @param array Array to write to
    * @param offset Offset to write to
    * @param v data
@@ -175,7 +174,7 @@ public final class ByteArrayUtil {
 
   /**
    * Read a short from the byte array at the given offset.
-   * 
+   *
    * @param array Array to read from
    * @param offset Offset to read at
    * @return (signed) short
@@ -189,7 +188,7 @@ public final class ByteArrayUtil {
 
   /**
    * Read an unsigned short from the byte array at the given offset.
-   * 
+   *
    * @param array Array to read from
    * @param offset Offset to read at
    * @return short
@@ -203,7 +202,7 @@ public final class ByteArrayUtil {
 
   /**
    * Read an integer from the byte array at the given offset.
-   * 
+   *
    * @param array Array to read from
    * @param offset Offset to read at
    * @return data
@@ -219,7 +218,7 @@ public final class ByteArrayUtil {
 
   /**
    * Read a long from the byte array at the given offset.
-   * 
+   *
    * @param array Array to read from
    * @param offset Offset to read at
    * @return data
@@ -239,7 +238,7 @@ public final class ByteArrayUtil {
 
   /**
    * Read a float from the byte array at the given offset.
-   * 
+   *
    * @param array Array to read from
    * @param offset Offset to read at
    * @return data
@@ -250,7 +249,7 @@ public final class ByteArrayUtil {
 
   /**
    * Read a double from the byte array at the given offset.
-   * 
+   *
    * @param array Array to read from
    * @param offset Offset to read at
    * @return data
@@ -261,7 +260,7 @@ public final class ByteArrayUtil {
 
   /**
    * Serializer for byte objects.
-   * 
+   *
    * @author Erich Schubert
    */
   public static final class ByteSerializer implements FixedSizeByteBufferSerializer<Byte> {
@@ -298,7 +297,7 @@ public final class ByteArrayUtil {
 
   /**
    * Serializer for short objects.
-   * 
+   *
    * @author Erich Schubert
    */
   public static final class ShortSerializer implements FixedSizeByteBufferSerializer<Short> {
@@ -335,7 +334,7 @@ public final class ByteArrayUtil {
 
   /**
    * Serializer for integer objects.
-   * 
+   *
    * @author Erich Schubert
    */
   public static final class IntegerSerializer implements FixedSizeByteBufferSerializer<Integer> {
@@ -372,7 +371,7 @@ public final class ByteArrayUtil {
 
   /**
    * Serializer for long objects.
-   * 
+   *
    * @author Erich Schubert
    */
   public static final class LongSerializer implements FixedSizeByteBufferSerializer<Long> {
@@ -409,7 +408,7 @@ public final class ByteArrayUtil {
 
   /**
    * Serializer for float objects.
-   * 
+   *
    * @author Erich Schubert
    */
   public static final class FloatSerializer implements FixedSizeByteBufferSerializer<Float> {
@@ -446,7 +445,7 @@ public final class ByteArrayUtil {
 
   /**
    * Serializer for double objects.
-   * 
+   *
    * @author Erich Schubert
    */
   public static final class DoubleSerializer implements FixedSizeByteBufferSerializer<Double> {
@@ -483,7 +482,7 @@ public final class ByteArrayUtil {
 
   /**
    * Serializer for String objects.
-   * 
+   *
    * @author Erich Schubert
    */
   public static final class StringSerializer implements ByteBufferSerializer<String> {
@@ -510,48 +509,34 @@ public final class ByteArrayUtil {
     }
 
     @Override
-    public String fromByteBuffer(ByteBuffer buffer) {
+    public String fromByteBuffer(ByteBuffer buffer) throws IOException {
       int len = readUnsignedVarint(buffer);
       // Create and limit a view
       ByteBuffer subbuffer = buffer.slice();
       subbuffer.limit(len);
-      CharBuffer res;
-      try {
-        res = decoder.decode(subbuffer);
-      } catch (CharacterCodingException e) {
-        throw new AbortException("String not representable as UTF-8.", e);
-      }
+      CharBuffer res = decoder.decode(subbuffer);
       // TODO: assert that the decoding did not yet advance the buffer!
       buffer.position(buffer.position() + len);
       return res.toString();
     }
 
     @Override
-    public void toByteBuffer(ByteBuffer buffer, String obj) {
-      ByteBuffer data;
-      try {
-        data = encoder.encode(CharBuffer.wrap(obj));
-      } catch (CharacterCodingException e) {
-        throw new AbortException("String not representable as UTF-8.", e);
-      }
+    public void toByteBuffer(ByteBuffer buffer, String obj) throws IOException {
+      ByteBuffer data = encoder.encode(CharBuffer.wrap(obj));
       writeUnsignedVarint(buffer, data.remaining());
       buffer.put(data);
     }
 
     @Override
-    public int getByteSize(String object) {
-      try {
-        final int len = encoder.encode(CharBuffer.wrap(object)).remaining();
-        return getUnsignedVarintSize(len) + len;
-      } catch (CharacterCodingException e) {
-        throw new AbortException("String not representable as UTF-8.", e);
-      }
+    public int getByteSize(String object) throws IOException {
+      final int len = encoder.encode(CharBuffer.wrap(object)).remaining();
+      return getUnsignedVarintSize(len) + len;
     }
   }
 
   /**
    * Serializer for Integer objects using a variable size encoding.
-   * 
+   *
    * @author Erich Schubert
    */
   public static final class VarintSerializer implements ByteBufferSerializer<Integer> {
@@ -564,7 +549,7 @@ public final class ByteArrayUtil {
 
     @Deprecated
     @Override
-    public Integer fromByteBuffer(ByteBuffer buffer) {
+    public Integer fromByteBuffer(ByteBuffer buffer) throws IOException {
       return readSignedVarint(buffer);
     }
 
@@ -623,12 +608,12 @@ public final class ByteArrayUtil {
 
   /**
    * Write an signed integer using a variable-length encoding.
-   * 
+   *
    * The sign bit is moved to bit 0.
-   * 
+   *
    * Data is always written in 7-bit little-endian, where the 8th bit is the
    * continuation flag.
-   * 
+   *
    * @param buffer Buffer to write to
    * @param val number to write
    */
@@ -639,12 +624,12 @@ public final class ByteArrayUtil {
 
   /**
    * Write a signed long using a variable-length encoding.
-   * 
+   *
    * The sign bit is moved to bit 0.
-   * 
+   *
    * Data is always written in 7-bit little-endian, where the 8th bit is the
    * continuation flag.
-   * 
+   *
    * @param buffer Buffer to write to
    * @param val number to write
    */
@@ -655,16 +640,16 @@ public final class ByteArrayUtil {
 
   /**
    * Write an unsigned integer using a variable-length encoding.
-   * 
+   *
    * Data is always written in 7-bit little-endian, where the 8th bit is the
    * continuation flag.
-   * 
+   *
    * @param buffer Buffer to write to
    * @param val number to write
    */
   public static void writeUnsignedVarint(ByteBuffer buffer, int val) {
     // Extra bytes have the high bit set
-    while ((val & 0x7F) != val) {
+    while((val & 0x7F) != val) {
       buffer.put((byte) ((val & 0x7F) | 0x80));
       val >>>= 7;
     }
@@ -674,19 +659,19 @@ public final class ByteArrayUtil {
 
   /**
    * Write an unsigned long using a variable-length encoding.
-   * 
+   *
    * Data is always written in 7-bit little-endian, where the 8th bit is the
    * continuation flag.
-   * 
+   *
    * Note that for integers, this will result in the same encoding as
    * {@link #writeUnsignedVarint}
-   * 
+   *
    * @param buffer Buffer to write to
    * @param val number to write
    */
   public static void writeUnsignedVarintLong(ByteBuffer buffer, long val) {
     // Extra bytes have the high bit set
-    while ((val & 0x7F) != val) {
+    while((val & 0x7F) != val) {
       buffer.put((byte) ((val & 0x7F) | 0x80));
       val >>>= 7;
     }
@@ -696,14 +681,14 @@ public final class ByteArrayUtil {
 
   /**
    * Write a string to the buffer.
-   * 
+   *
    * See {@link StringSerializer} for details.
-   * 
+   *
    * @param buffer Buffer to write to
    * @param s String to write
    */
-  public static void writeString(ByteBuffer buffer, String s) {
-    if (s == null) {
+  public static void writeString(ByteBuffer buffer, String s) throws IOException {
+    if(s == null) {
       s = ""; // Which will be written as Varint 0 = single byte 0.
     }
     ByteArrayUtil.STRING_SERIALIZER.toByteBuffer(buffer, s);
@@ -711,7 +696,7 @@ public final class ByteArrayUtil {
 
   /**
    * Compute the size of the varint encoding for this signed integer.
-   * 
+   *
    * @param val integer to write
    * @return Encoding size of this integer
    */
@@ -722,14 +707,14 @@ public final class ByteArrayUtil {
 
   /**
    * Compute the size of the varint encoding for this unsigned integer.
-   * 
+   *
    * @param obj integer to write
    * @return Encoding size of this integer
    */
   public static int getUnsignedVarintSize(int obj) {
     int bytes = 1;
     // Extra bytes have the high bit set
-    while ((obj & 0x7F) != obj) {
+    while((obj & 0x7F) != obj) {
       bytes++;
       obj >>>= 7;
     }
@@ -738,7 +723,7 @@ public final class ByteArrayUtil {
 
   /**
    * Compute the size of the varint encoding for this signed integer.
-   * 
+   *
    * @param val integer to write
    * @return Encoding size of this integer
    */
@@ -749,14 +734,14 @@ public final class ByteArrayUtil {
 
   /**
    * Compute the size of the varint encoding for this unsigned integer.
-   * 
+   *
    * @param obj integer to write
    * @return Encoding size of this integer
    */
   public static int getUnsignedVarintLongSize(long obj) {
     int bytes = 1;
     // Extra bytes have the high bit set
-    while ((obj & 0x7F) != obj) {
+    while((obj & 0x7F) != obj) {
       bytes++;
       obj >>>= 7;
     }
@@ -765,100 +750,100 @@ public final class ByteArrayUtil {
 
   /**
    * Compute the size of the string after encoding.
-   * 
+   *
    * @param s String to encode
    * @return Byte size
    */
-  public static int getStringSize(String s) {
+  public static int getStringSize(String s) throws IOException {
     return STRING_SERIALIZER.getByteSize(s);
   }
 
   /**
    * Read a signed integer.
-   * 
+   *
    * @param buffer Buffer to read from
    * @return Integer value
    */
-  public static int readSignedVarint(ByteBuffer buffer) {
+  public static int readSignedVarint(ByteBuffer buffer) throws IOException {
     final int raw = readUnsignedVarint(buffer);
     return (raw >>> 1) ^ -(raw & 1);
   }
 
   /**
    * Read an unsigned integer.
-   * 
+   *
    * @param buffer Buffer to read from
    * @return Integer value
    */
-  public static int readUnsignedVarint(ByteBuffer buffer) {
+  public static int readUnsignedVarint(ByteBuffer buffer) throws IOException {
     int val = 0;
     int bits = 0;
-    while (true) {
+    while(true) {
       final int data = buffer.get();
       val |= (data & 0x7F) << bits;
-      if ((data & 0x80) == 0) {
+      if((data & 0x80) == 0) {
         return val;
       }
       bits += 7;
-      if (bits > 35) {
-        throw new AbortException("Variable length quantity is too long for expected integer.");
+      if(bits > 35) {
+        throw new IOException("Variable length quantity is too long for expected integer.");
       }
     }
   }
 
   /**
    * Read a signed long.
-   * 
+   *
    * @param buffer Buffer to read from
    * @return long value
    */
-  public static long readSignedVarintLong(ByteBuffer buffer) {
+  public static long readSignedVarintLong(ByteBuffer buffer) throws IOException {
     final long raw = readUnsignedVarintLong(buffer);
     return (raw >>> 1) ^ -(raw & 1);
   }
 
   /**
    * Read an unsigned long.
-   * 
+   *
    * @param buffer Buffer to read from
    * @return long value
    */
-  public static long readUnsignedVarintLong(ByteBuffer buffer) {
+  public static long readUnsignedVarintLong(ByteBuffer buffer) throws IOException {
     long val = 0;
     int bits = 0;
-    while (true) {
+    while(true) {
       final int data = buffer.get();
       val |= (data & 0x7F) << bits;
-      if ((data & 0x80) == 0) {
+      if((data & 0x80) == 0) {
         return val;
       }
       bits += 7;
-      if (bits > 63) {
-        throw new AbortException("Variable length quantity is too long for expected integer.");
+      if(bits > 63) {
+        throw new IOException("Variable length quantity is too long for expected integer.");
       }
     }
   }
 
   /**
    * Read a string from the buffer.
-   * 
+   *
    * Note: this is not 100% symmetric to writeString, as a {@code null} value
    * and the empty string are encoded the same way.
-   * 
+   *
    * @param buffer Buffer to read from.
    * @return Deserialized string
    */
-  public static String readString(ByteBuffer buffer) {
+  public static String readString(ByteBuffer buffer) throws IOException {
     return STRING_SERIALIZER.fromByteBuffer(buffer);
   }
 
   /**
    * Unmap a byte buffer.
-   * 
+   *
    * @param map Byte buffer to unmap.
    */
   public static void unmapByteBuffer(final MappedByteBuffer map) {
-    if (map == null) {
+    if(map == null) {
       return;
     }
     map.force();
@@ -869,18 +854,19 @@ public final class ByteArrayUtil {
       public Object run() {
         try {
           Method getCleanerMethod = map.getClass().getMethod("cleaner", new Class[0]);
-          if (getCleanerMethod == null) {
+          if(getCleanerMethod == null) {
             return null;
           }
 
           getCleanerMethod.setAccessible(true);
           Object cleaner = getCleanerMethod.invoke(map, new Object[0]);
           Method cleanMethod = cleaner.getClass().getMethod("clean");
-          if (cleanMethod == null) {
+          if(cleanMethod == null) {
             return null;
           }
           cleanMethod.invoke(cleaner);
-        } catch (Exception e) {
+        }
+        catch(Exception e) {
           LoggingUtil.exception(e);
         }
         return null;
