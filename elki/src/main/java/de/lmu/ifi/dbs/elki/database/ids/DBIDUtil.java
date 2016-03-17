@@ -34,10 +34,10 @@ import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDKNNSubList;
 import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerDBIDs;
-import de.lmu.ifi.dbs.elki.math.random.FastNonThreadsafeRandom;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
+import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
+import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * DBID Utility functions.

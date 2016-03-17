@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.math.random;
+package de.lmu.ifi.dbs.elki.utilities.random;
 
 /*
  This file is part of ELKI:

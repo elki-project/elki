@@ -24,10 +24,10 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  */
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Log-Logistic distribution also known as Fisk distribution.
