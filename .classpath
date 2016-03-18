@@ -6,7 +6,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="src" path="/elki"/>
-	<classpathentry kind="src" path="/elki-batik-visualization"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/elki-batik-visualization"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/elki-core-dbids-int"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

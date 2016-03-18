@@ -143,6 +143,12 @@
 
 		<dependency>
 			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki-gui-minigui</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
 			<artifactId>elki-uncertain</artifactId>
 			<version>${project.version}</version>
 		</dependency>

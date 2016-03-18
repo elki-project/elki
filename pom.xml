@@ -27,6 +27,7 @@
 		<module>elki-core-util</module>
 		<module>elki-core-dbids</module>
 		<module>elki-core-dbids-int</module>
+		<module>elki-gui-minigui</module>
 		<module>elki</module>
 		<!-- this will eventually become non-default compile time only -->
 		<module>elki-docutil</module>
