@@ -1,11 +1,10 @@
 package de.lmu.ifi.dbs.elki.database.ids;
 
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,12 +23,11 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
  * Interface for kNN results.
- * 
+ *
  * To iterate over the results, use the following code:
- * 
+ *
  * <pre>
  * {@code
  * for (DistanceDBIDResultIter<D> iter = result.iter(); iter.valid(); iter.advance()) {
@@ -38,10 +36,10 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * }
  * }
  * </pre>
- * 
+ *
  * If you are only interested in the IDs of the objects, the following is also
  * sufficient:
- * 
+ *
  * <pre>
  * {@code
  * for (DBIDIter<D> iter = result.iter(); iter.valid(); iter.advance()) {
@@ -49,12 +47,12 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * }
  * }
  * </pre>
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.5
- * 
+ *
  * @apiviz.landmark
- * 
+ *
  * @apiviz.composedOf DoubleDBIDPair
  */
 public interface KNNList extends DoubleDBIDList {
@@ -62,27 +60,27 @@ public interface KNNList extends DoubleDBIDList {
    * Size
    */
   @Override
-  public int size();
+  int size();
 
   /**
    * Get the K parameter (note: this may be less than the size of the list!)
-   * 
+   *
    * @return K
    */
-  public int getK();
+  int getK();
 
   /**
    * Direct object access.
-   * 
+   *
    * @param index
    */
   @Override
-  public DoubleDBIDPair get(int index);
+  DoubleDBIDPair get(int index);
 
   /**
    * Get the distance to the k nearest neighbor, or maxdist otherwise.
-   * 
+   *
    * @return Maximum distance
    */
-  public double getKNNDistance();
+  double getKNNDistance();
 }

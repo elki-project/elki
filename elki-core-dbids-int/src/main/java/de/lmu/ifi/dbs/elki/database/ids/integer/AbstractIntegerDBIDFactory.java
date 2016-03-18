@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
@@ -34,15 +36,19 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.generic.KNNSubList;
+import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.io.FixedSizeByteBufferSerializer;
 
 /**
  * Abstract base class for DBID factories.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.uses IntegerDBID oneway - - «create»
  * @apiviz.uses IntegerDBIDPair oneway - - «create»
  * @apiviz.uses IntegerDBIDRange oneway - - «create»
@@ -85,7 +91,7 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   @Override
   public String toString(DBIDRef id) {
     return (id != null && id.internalGetIndex() != Integer.MIN_VALUE) //
-    ? Integer.toString(id.internalGetIndex()) : "null";
+        ? Integer.toString(id.internalGetIndex()) : "null";
   }
 
   @Override
@@ -156,6 +162,34 @@ abstract class AbstractIntegerDBIDFactory implements DBIDFactory {
   @Override
   public ModifiableDoubleDBIDList newDistanceDBIDList() {
     return new DoubleIntegerDBIDList();
+  }
+
+  @Override
+  public StaticDBIDs makeUnmodifiable(DBIDs existing) {
+    if(existing instanceof StaticDBIDs) {
+      return (StaticDBIDs) existing;
+    }
+    if(existing instanceof IntegerArrayDBIDs) {
+      return new UnmodifiableIntegerArrayDBIDs((IntegerArrayDBIDs) existing);
+    }
+    if(existing instanceof IntegerDBIDs) {
+      return new UnmodifiableIntegerDBIDs((IntegerDBIDs) existing);
+    }
+    if(existing instanceof ArrayDBIDs) {
+      return new UnmodifiableArrayDBIDs((ArrayDBIDs) existing);
+    }
+    return new UnmodifiableDBIDs(existing);
+  }
+
+  @Override
+  public KNNList subList(KNNList list, int k) {
+    if(k >= list.size()) {
+      return list;
+    }
+    if(list instanceof IntegerDBIDKNNList) {
+      return new IntegerDBIDKNNSubList((IntegerDBIDKNNList) list, k);
+    }
+    return new KNNSubList(list, k);
   }
 
   @Override

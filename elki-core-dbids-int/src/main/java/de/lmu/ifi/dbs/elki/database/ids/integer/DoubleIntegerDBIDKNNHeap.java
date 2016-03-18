@@ -32,10 +32,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
 
 /**
  * Class to efficiently manage a kNN heap.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @apiviz.has DoubleIntegerDBIDKNNList
  * @apiviz.composedOf DoubleIntegerMaxHeap
  */
@@ -72,7 +72,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
 
   /**
    * Constructor.
-   * 
+   *
    * @param k Size of knn.
    */
   protected DoubleIntegerDBIDKNNHeap(int k) {
@@ -138,7 +138,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
 
   /**
    * Do a full update for the heap.
-   * 
+   *
    * @param distance Distance
    * @param iid Object id
    */
@@ -158,7 +158,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
 
   /**
    * Ensure the ties array has capacity for at least one more element.
-   * 
+   *
    * @param id Id to add
    */
   private final void addToTies(int id) {
@@ -233,9 +233,28 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
     return ret;
   }
 
+  @Override
+  public DoubleIntegerDBIDKNNList toKNNListSqrt() {
+    final int hsize = heap.size();
+    DoubleIntegerDBIDKNNList ret = new DoubleIntegerDBIDKNNList(k, hsize + numties);
+    // Add ties:
+    double kdist = numties > 0 ? Math.sqrt(this.kdist) : 0.;
+    for(int i = 0; i < numties; i++) {
+      ret.dists[hsize + i] = kdist;
+      ret.ids[hsize + i] = ties[i];
+    }
+    for(int j = hsize - 1; j >= 0; j--) {
+      ret.dists[j] = Math.sqrt(heap.peekKey());
+      ret.ids[j] = heap.peekValue();
+      heap.poll();
+    }
+    ret.size = hsize + numties;
+    return ret;
+  }
+
   /**
    * Peek the topmost distance.
-   * 
+   *
    * @return distance
    */
   protected double peekDistance() {
@@ -244,7 +263,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
 
   /**
    * Peek the topmost internal ID.
-   * 
+   *
    * @return internal id
    */
   protected int peekInternalDBID() {

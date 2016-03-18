@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -42,13 +41,13 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
 
 /**
  * Instance of this query for a particular database.
- * 
+ *
  * This is a subtle optimization: for primitive queries, it is clearly faster to
  * retrieve the query object from the relation only once!
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.uses PrimitiveDistanceQuery
  * @apiviz.uses EuclideanDistanceFunction
  * @apiviz.uses SquaredEuclideanDistanceFunction
@@ -61,7 +60,7 @@ public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceQuery Distance function to use
    */
   public LinearScanEuclideanDistanceKNNQuery(PrimitiveDistanceQuery<O> distanceQuery) {
@@ -71,17 +70,17 @@ public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends
 
   @Override
   public KNNList getKNNForDBID(DBIDRef id, int k) {
-    return QueryUtil.applySqrt(linearScan(relation, relation.iterDBIDs(), relation.get(id), DBIDUtil.newHeap(k)).toKNNList());
+    return linearScan(relation, relation.iterDBIDs(), relation.get(id), DBIDUtil.newHeap(k)).toKNNListSqrt();
   }
 
   @Override
   public KNNList getKNNForObject(O obj, int k) {
-    return QueryUtil.applySqrt(linearScan(relation, relation.iterDBIDs(), obj, DBIDUtil.newHeap(k)).toKNNList());
+    return linearScan(relation, relation.iterDBIDs(), obj, DBIDUtil.newHeap(k)).toKNNListSqrt();
   }
 
   /**
    * Main loop of the linear scan.
-   * 
+   *
    * @param relation Data relation
    * @param iter ID iterator
    * @param obj Query object
@@ -113,14 +112,14 @@ public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends
 
     List<KNNList> result = new ArrayList<>(heaps.size());
     for(KNNHeap heap : heaps) {
-      result.add(QueryUtil.applySqrt(heap.toKNNList()));
+      result.add(heap.toKNNListSqrt());
     }
     return result;
   }
 
   /**
    * Perform a linear scan batch kNN for primitive distance functions.
-   * 
+   *
    * @param objs Objects list
    * @param heaps Heaps array
    */

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,17 +23,17 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.integer.TrivialDBIDFactory;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.io.FixedSizeByteBufferSerializer;
 
 /**
  * Factory interface for generating DBIDs. See {@link #FACTORY} for the static
  * instance to use.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.stereotype factory
  * @apiviz.uses DBID oneway - - «create»
  * @apiviz.uses DBIDs oneway - - «create»
@@ -48,11 +48,11 @@ public interface DBIDFactory {
   /**
    * Static DBID factory to use.
    */
-  final static DBIDFactory FACTORY = new TrivialDBIDFactory();
+  final static DBIDFactory FACTORY = ClassGenericsUtil.instantiateLowlevel(DBIDFactory.class);
 
   /**
    * Make a new DBID variable.
-   * 
+   *
    * @param val Initial value.
    * @return Variable
    */
@@ -60,9 +60,9 @@ public interface DBIDFactory {
 
   /**
    * Import and integer as DBID.
-   * 
+   *
    * Note: this may not be possible for some factories!
-   * 
+   *
    * @param id Integer ID to import
    * @return DBID
    */
@@ -70,9 +70,9 @@ public interface DBIDFactory {
 
   /**
    * Assign an integer value to a DBID variable.
-   * 
+   *
    * Note: this may not be possible for some factories!
-   * 
+   *
    * @param var Variable
    * @param val Integer value
    */
@@ -80,21 +80,21 @@ public interface DBIDFactory {
 
   /**
    * Generate a single DBID.
-   * 
+   *
    * @return A single DBID
    */
   DBID generateSingleDBID();
 
   /**
    * Return a single DBID for reuse.
-   * 
+   *
    * @param id DBID to deallocate
    */
   void deallocateSingleDBID(DBIDRef id);
 
   /**
    * Generate a static DBID range.
-   * 
+   *
    * @param size Requested size
    * @return DBID range
    */
@@ -102,7 +102,7 @@ public interface DBIDFactory {
 
   /**
    * Generate a static DBID range.
-   * 
+   *
    * @param begin Range begin
    * @param size Requested size
    * @return DBID range
@@ -111,24 +111,24 @@ public interface DBIDFactory {
 
   /**
    * Deallocate a static DBID range.
-   * 
+   *
    * @param range Range to deallocate
    */
   void deallocateDBIDRange(DBIDRange range);
 
   /**
    * Make a DBID pair from two existing DBIDs.
-   * 
+   *
    * @param id1 first DBID
    * @param id2 second DBID
-   * 
+   *
    * @return new pair.
    */
   DBIDPair newPair(DBIDRef id1, DBIDRef id2);
 
   /**
    * Make a double-DBID pair.
-   * 
+   *
    * @param val Double value
    * @param id DBID
    * @return New pair
@@ -137,21 +137,21 @@ public interface DBIDFactory {
 
   /**
    * Make a new (modifiable) array of DBIDs.
-   * 
+   *
    * @return New array
    */
   ArrayModifiableDBIDs newArray();
 
   /**
    * Make a new (modifiable) hash set of DBIDs.
-   * 
+   *
    * @return New hash set
    */
   HashSetModifiableDBIDs newHashSet();
 
   /**
    * Make a new (modifiable) array of DBIDs.
-   * 
+   *
    * @param size Size hint
    * @return New array
    */
@@ -159,7 +159,7 @@ public interface DBIDFactory {
 
   /**
    * Make a new (modifiable) hash set of DBIDs.
-   * 
+   *
    * @param size Size hint
    * @return New hash set
    */
@@ -167,7 +167,7 @@ public interface DBIDFactory {
 
   /**
    * Make a new (modifiable) array of DBIDs.
-   * 
+   *
    * @param existing existing DBIDs to use
    * @return New array
    */
@@ -175,7 +175,7 @@ public interface DBIDFactory {
 
   /**
    * Make a new (modifiable) hash set of DBIDs.
-   * 
+   *
    * @param existing existing DBIDs to use
    * @return New hash set
    */
@@ -183,7 +183,7 @@ public interface DBIDFactory {
 
   /**
    * Create an heap for kNN search.
-   * 
+   *
    * @param k K value
    * @return New heap of size k.
    */
@@ -191,7 +191,7 @@ public interface DBIDFactory {
 
   /**
    * Build a new heap from a given list.
-   * 
+   *
    * @param exist Existing result
    * @return New heap
    */
@@ -199,28 +199,28 @@ public interface DBIDFactory {
 
   /**
    * Get a serializer for DBIDs.
-   * 
+   *
    * @return DBID serializer
    */
   ByteBufferSerializer<DBID> getDBIDSerializer();
 
   /**
    * Get a serializer for DBIDs with static size.
-   * 
+   *
    * @return DBID serializer
    */
   FixedSizeByteBufferSerializer<DBID> getDBIDSerializerStatic();
 
   /**
    * Get type restriction.
-   * 
+   *
    * @return type restriction for DBIDs
    */
   Class<? extends DBID> getTypeRestriction();
 
   /**
    * Compare two DBIDs, for sorting.
-   * 
+   *
    * @param a First
    * @param b Second
    * @return Comparison result
@@ -229,7 +229,7 @@ public interface DBIDFactory {
 
   /**
    * Compare two DBIDs, for equality testing.
-   * 
+   *
    * @param a First
    * @param b Second
    * @return Comparison result
@@ -238,7 +238,7 @@ public interface DBIDFactory {
 
   /**
    * Print a DBID as string.
-   * 
+   *
    * @param id DBID reference
    * @return Formatted ID
    */
@@ -246,14 +246,14 @@ public interface DBIDFactory {
 
   /**
    * Get the invalid DBID value, usable as "undefined" placeholder.
-   * 
+   *
    * @return Invalid value
    */
   DBIDRef invalid();
 
   /**
    * Create a modifiable list to store distance-DBID pairs.
-   * 
+   *
    * @param size initial size estimate
    * @return New list of given initial size
    */
@@ -261,8 +261,25 @@ public interface DBIDFactory {
 
   /**
    * Create a modifiable list to store distance-DBID pairs.
-   * 
+   *
    * @return New list
    */
   ModifiableDoubleDBIDList newDistanceDBIDList();
+
+  /**
+   * Make DBIDs immutable.
+   *
+   * @param existing Existing DBIDs
+   * @return Immutable version
+   */
+  StaticDBIDs makeUnmodifiable(DBIDs existing);
+
+  /**
+   * Get a subset of the KNN result.
+   *
+   * @param list Existing list
+   * @param k k
+   * @return Subset
+   */
+  KNNList subList(KNNList list, int k);
 }

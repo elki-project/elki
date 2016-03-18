@@ -25,15 +25,6 @@ package de.lmu.ifi.dbs.elki.database.ids;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.database.ids.generic.KNNSubList;
-import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.generic.UnmodifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDKNNList;
-import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDKNNSubList;
-import de.lmu.ifi.dbs.elki.database.ids.integer.IntegerDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.integer.UnmodifiableIntegerDBIDs;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 import de.lmu.ifi.dbs.elki.utilities.random.FastNonThreadsafeRandom;
@@ -426,19 +417,7 @@ public final class DBIDUtil {
    * @return Unmodifiable collection
    */
   public static StaticDBIDs makeUnmodifiable(DBIDs existing) {
-    if(existing instanceof StaticDBIDs) {
-      return (StaticDBIDs) existing;
-    }
-    if(existing instanceof IntegerArrayDBIDs) {
-      return new UnmodifiableIntegerArrayDBIDs((IntegerArrayDBIDs) existing);
-    }
-    if(existing instanceof IntegerDBIDs) {
-      return new UnmodifiableIntegerDBIDs((IntegerDBIDs) existing);
-    }
-    if(existing instanceof ArrayDBIDs) {
-      return new UnmodifiableArrayDBIDs((ArrayDBIDs) existing);
-    }
-    return new UnmodifiableDBIDs(existing);
+    return DBIDFactory.FACTORY.makeUnmodifiable(existing);
   }
 
   /**
@@ -761,13 +740,7 @@ public final class DBIDUtil {
    * @return Subset
    */
   public static KNNList subList(KNNList list, int k) {
-    if(k >= list.size()) {
-      return list;
-    }
-    if(list instanceof IntegerDBIDKNNList) {
-      return new IntegerDBIDKNNSubList((IntegerDBIDKNNList) list, k);
-    }
-    return new KNNSubList(list, k);
+    return DBIDFactory.FACTORY.subList(list, k);
   }
 
   /**

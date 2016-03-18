@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,14 +31,14 @@ import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 /**
  * Track the k nearest neighbors, with insertion sort to ensure the correct
  * order.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
 class DoubleIntegerDBIDListKNNHeap extends DoubleIntegerDBIDKNNList implements KNNHeap {
   /**
    * Constructor.
-   * 
+   *
    * @param k K parameter
    */
   protected DoubleIntegerDBIDListKNNHeap(int k) {
@@ -47,7 +47,7 @@ class DoubleIntegerDBIDListKNNHeap extends DoubleIntegerDBIDKNNList implements K
 
   /**
    * Add a new element to the heap/list.
-   * 
+   *
    * @param dist Distance
    * @param id Object ID
    */
@@ -61,7 +61,7 @@ class DoubleIntegerDBIDListKNNHeap extends DoubleIntegerDBIDKNNList implements K
 
   /**
    * Insertion sort a single object.
-   * 
+   *
    * @param dist New distance
    * @param id New id
    */
@@ -125,6 +125,14 @@ class DoubleIntegerDBIDListKNNHeap extends DoubleIntegerDBIDKNNList implements K
 
   @Override
   public KNNList toKNNList() {
+    return this;
+  }
+
+  @Override
+  public KNNList toKNNListSqrt() {
+    for(int i = 0; i < size; i++) {
+      dists[i] = Math.sqrt(dists[i]);
+    }
     return this;
   }
 

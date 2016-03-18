@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,9 +24,6 @@ package de.lmu.ifi.dbs.elki.database;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.integer.DoubleIntegerDBIDKNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
@@ -274,19 +271,5 @@ public final class QueryUtil {
       return new LinearScanPrimitiveSimilarityRangeQuery<>(pdq);
     }
     return new LinearScanSimilarityRangeQuery<>(simQuery);
-  }
-
-  /**
-   * Apply the square root function to each value in the list.
-   *
-   * @param knnList kNN list
-   * @return new list, after taking the square root
-   */
-  public static KNNList applySqrt(KNNList knnList) {
-    DoubleIntegerDBIDKNNList ret = new DoubleIntegerDBIDKNNList(knnList.getK(), knnList.size());
-    for(DoubleDBIDListIter iter = knnList.iter(); iter.valid(); iter.advance()) {
-      ret.add(Math.sqrt(iter.doubleValue()), iter);
-    }
-    return ret;
   }
 }

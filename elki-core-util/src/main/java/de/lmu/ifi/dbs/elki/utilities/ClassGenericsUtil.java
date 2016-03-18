@@ -41,26 +41,26 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 /**
  * Utils for handling class instantiation especially with respect to Java
  * generics.
- * 
+ *
  * <p>
  * Due to the way generics are implemented - via erasure - type safety cannot be
  * guaranteed properly at compile time here. These classes collect such cases
  * using helper functions, so that we have to suppress these warnings only in
  * one place.
  * </p>
- * 
+ *
  * <p>
  * Note that many of these situations are still type safe, i.e. an <i>empty</i>
  * array of List<List<?>> can indeed be cast into a List<List<Whatever>>.
  * </p>
- * 
+ *
  * <p>
  * The only one potentially unsafe is {@link #instantiateGenerics}, since we
  * can't verify that the runtime type 'type' adhers to the compile time
  * restriction T. When T is not generic, such a check is possible, and then the
  * developer should use {@link #instantiate} instead.
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
  */
@@ -91,12 +91,12 @@ public final class ClassGenericsUtil {
    * <p>
    * Returns a new instance of the given type for the specified className.
    * </p>
-   * 
+   *
    * <p>
    * If the Class for className is not found, the instantiation is tried using
    * the package of the given type as package of the given className.
    * </p>
-   * 
+   *
    * @param <T> Class type for compile time type checking
    * @param type desired Class type of the Object to retrieve
    * @param className name of the class to instantiate
@@ -134,17 +134,17 @@ public final class ClassGenericsUtil {
    * <p>
    * Returns a new instance of the given type for the specified className.
    * </p>
-   * 
+   *
    * <p>
    * If the Class for className is not found, the instantiation is tried using
    * the package of the given type as package of the given className.
    * </p>
-   * 
+   *
    * <p>
    * This is a weaker type checked version of "{@link #instantiate}" for use
    * with Generics.
    * </p>
-   * 
+   *
    * @param <T> Class type for compile time type checking
    * @param type desired Class type of the Object to retrieve
    * @param className name of the class to instantiate
@@ -184,7 +184,7 @@ public final class ClassGenericsUtil {
   /**
    * Inspect the class for a static "parameterize" method that satisfies certain
    * constraints.
-   * 
+   *
    * @param <C> Return class type
    * @param c Class to inspect.
    * @param ret Expected return type
@@ -210,7 +210,7 @@ public final class ClassGenericsUtil {
 
   /**
    * Get a parameterizer for the given class.
-   * 
+   *
    * @param c Class
    * @return Parameterizer or null.
    */
@@ -231,7 +231,7 @@ public final class ClassGenericsUtil {
   /**
    * Instantiate a parameterizable class. When using this, consider using
    * {@link Parameterization#descend}!
-   * 
+   *
    * @param <C> base type
    * @param r Base (restriction) class
    * @param c Class to instantiate
@@ -279,10 +279,10 @@ public final class ClassGenericsUtil {
 
   /**
    * Force parameterization method.
-   * 
+   *
    * Please use this only in "runner" classes such as unit tests, since the
    * error handling is not very flexible.
-   * 
+   *
    * @param <C> Type
    * @param c Class to instantiate
    * @param config Parameters
@@ -314,10 +314,10 @@ public final class ClassGenericsUtil {
 
   /**
    * Create an array (of null values)
-   * 
+   *
    * This is a common unchecked cast we have to do due to Java Generics
    * limitations.
-   * 
+   *
    * @param <T> Type the array elements have
    * @param len array size
    * @param base template class for array creation.
@@ -330,7 +330,7 @@ public final class ClassGenericsUtil {
 
   /**
    * Convert a collection to an array.
-   * 
+   *
    * @param <B> Base type
    * @param <T> Type the array elements have
    * @param coll collection to convert.
@@ -344,10 +344,10 @@ public final class ClassGenericsUtil {
 
   /**
    * Create an array of <code>len</code> empty ArrayLists.
-   * 
+   *
    * This is a common unchecked cast we have to do due to Java Generics
    * limitations.
-   * 
+   *
    * @param <T> Type the list elements have
    * @param len array size
    * @return new array of ArrayLists
@@ -363,10 +363,10 @@ public final class ClassGenericsUtil {
 
   /**
    * Create an array of <code>len</code> empty HashSets.
-   * 
+   *
    * This is a common unchecked cast we have to do due to Java Generics
    * limitations.
-   * 
+   *
    * @param <T> Type the set elements have
    * @param len array size
    * @return new array of HashSets
@@ -382,18 +382,18 @@ public final class ClassGenericsUtil {
 
   /**
    * Cast the (erased) generics onto a class.
-   * 
+   *
    * Note: this function is a hack - notice that it would allow you to up-cast
    * any class! Still it is preferable to have this cast in one place than in
    * dozens without any explanation.
-   * 
+   *
    * The reason this is needed is the following: There is no
    * Class&lt;Set&lt;String&gt;&gt;.class. This method allows you to do <code>
    * Class&lt;Set&lt;String&gt;&gt; setclass = uglyCastIntoSubclass(Set.class);
    * </code>
-   * 
+   *
    * We can't type check at runtime, since we don't have T.
-   * 
+   *
    * @param cls Class type
    * @param <D> Base type
    * @param <T> Supertype
@@ -407,19 +407,19 @@ public final class ClassGenericsUtil {
   /**
    * This class performs an ugly cast, from <code>Class&lt;F&gt;</code> to
    * <code>Class&lt;T&gt;</code>, where both F and T need to extend B.
-   * 
+   *
    * The restrictions are there to avoid misuse of this cast helper.
-   * 
+   *
    * While this sounds really ugly, the common use case will be something like
-   * 
+   *
    * <pre>
    * BASE = Class&lt;Database&gt;
    * FROM = Class&lt;Database&gt;
    * TO = Class&lt;Database&lt;V&gt;&gt;
    * </pre>
-   * 
+   *
    * i.e. the main goal is to add missing Generics to the compile time type.
-   * 
+   *
    * @param <BASE> Base type
    * @param <TO> Destination type
    * @param <FROM> Source type
@@ -440,11 +440,11 @@ public final class ClassGenericsUtil {
 
   /**
    * Cast an object at a base class, but return a subclass (for Generics!).
-   * 
+   *
    * The main goal of this is to allow casting an object from e.g. "
    * <code>List</code>" to "<code>List&lt;Something&gt;</code>" without having
    * to add SuppressWarnings everywhere.
-   * 
+   *
    * @param <B> Base type to cast at
    * @param <T> Derived type returned
    * @param base Base class to cast at
@@ -463,7 +463,7 @@ public final class ClassGenericsUtil {
 
   /**
    * Generic newInstance that tries to clone an object.
-   * 
+   *
    * @param <T> Object type, generic
    * @param obj Master copy - must not be null.
    * @return New instance, if possible
@@ -485,7 +485,7 @@ public final class ClassGenericsUtil {
 
   /**
    * Retrieve the component type of a given array. For cloning.
-   * 
+   *
    * @param <T> Array type, generic
    * @param a Existing array
    * @return Component type of the given array.
@@ -498,7 +498,7 @@ public final class ClassGenericsUtil {
 
   /**
    * Make a new array of the given class and size.
-   * 
+   *
    * @param <T> Generic type
    * @param k Class
    * @param size Size
@@ -515,7 +515,7 @@ public final class ClassGenericsUtil {
 
   /**
    * Clone an array of the given type.
-   * 
+   *
    * @param <T> Generic type
    * @param a existing array
    * @param size array size
@@ -527,7 +527,7 @@ public final class ClassGenericsUtil {
 
   /**
    * Clone a collection. Collection must have an empty constructor!
-   * 
+   *
    * @param <T> Data type
    * @param <C> Collection type
    * @param coll Existing collection
@@ -555,7 +555,7 @@ public final class ClassGenericsUtil {
 
   /**
    * Transform a collection to an Array
-   * 
+   *
    * @param <T> object type
    * @param c Collection
    * @param a Array to write to or replace (i.e. sample array)
@@ -574,5 +574,26 @@ public final class ClassGenericsUtil {
       a[i] = null;
     }
     return a;
+  }
+
+  /**
+   * Instantiate the first available implementation of an interface.
+   *
+   * Only supports public and parameterless constructors.
+   *
+   * @param clz Class to instantiate.
+   * @return Instance
+   */
+  public static <T> T instantiateLowlevel(Class<? extends T> clz) {
+    Exception last = null;
+    for(Class<?> c : ELKIServiceRegistry.findAllImplementations(clz)) {
+      try {
+        return clz.cast(c.newInstance());
+      }
+      catch(Exception e) {
+        last = e;
+      }
+    }
+    throw new AbortException("Cannot find a usable implementation of " + clz.toString(), last);
   }
 }

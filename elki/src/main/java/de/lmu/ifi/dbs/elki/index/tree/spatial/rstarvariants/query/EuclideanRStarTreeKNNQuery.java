@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -49,17 +48,17 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Instance of a KNN query for a particular spatial index.
- * 
+ *
  * Reference:
  * <p>
  * G. R. Hjaltason, H. Samet<br />
  * Ranking in spatial databases<br />
  * In: 4th Symposium on Advances in Spatial Databases, SSD'95
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @apiviz.uses EuclideanDistanceFunction
  * @apiviz.uses SquaredEuclideanDistanceFunction
  */
@@ -75,7 +74,7 @@ public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTre
 
   /**
    * Constructor.
-   * 
+   *
    * @param tree Index to use
    * @param relation Data relation to query
    */
@@ -105,7 +104,7 @@ public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTre
       }
       maxDist = expandNode(obj, knnList, pq, maxDist, pqNode.nodeID);
     }
-    return QueryUtil.applySqrt(knnList.toKNNList());
+    return knnList.toKNNListSqrt();
   }
 
   private double expandNode(O object, KNNHeap knnList, final ComparableMinHeap<DoubleDistanceSearchCandidate> pq, double maxDist, final int nodeID) {
@@ -161,7 +160,7 @@ public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTre
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       tree.statistics.countKNNQuery();
-      result.add(QueryUtil.applySqrt(knnLists.get(id).toKNNList()));
+      result.add(knnLists.get(id).toKNNListSqrt());
     }
     return result;
   }

@@ -1,0 +1,3 @@
+de.lmu.ifi.dbs.elki.database.ids.integer.TrivialDBIDFactory
+de.lmu.ifi.dbs.elki.database.ids.integer.SimpleDBIDFactory
+de.lmu.ifi.dbs.elki.database.ids.integer.ReusingDBIDFactory

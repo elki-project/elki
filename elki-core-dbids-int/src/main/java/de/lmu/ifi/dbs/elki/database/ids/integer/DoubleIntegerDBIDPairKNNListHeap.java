@@ -33,12 +33,12 @@ import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 
 /**
  * KNN Heap implemented using a list of DoubleInt pair objects.
- * 
+ *
  * Currently unused, needs benchmarking.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @apiviz.composedOf DoubleIntegerDBIDPair
  */
 class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
@@ -59,7 +59,7 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
 
   /**
    * Constructor.
-   * 
+   *
    * @param k K parameter
    */
   protected DoubleIntegerDBIDPairKNNListHeap(int k) {
@@ -125,7 +125,7 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
 
   /**
    * Perform insertion sort.
-   * 
+   *
    * @param obj Object to insert
    */
   private void insertionSort(DoubleIntegerDBIDPair obj) {
@@ -165,6 +165,14 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
   @Override
   public KNNList toKNNList() {
     return this;
+  }
+
+  @Override
+  public KNNList toKNNListSqrt() {
+    for(int i = 0; i < size; i++) {
+      data[i].value = Math.sqrt(data[i].value);
+    }
+    return null;
   }
 
   @Override
@@ -224,9 +232,9 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
 
   /**
    * Iterator.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class Itr implements DoubleIntegerDBIDListIter, IntegerDBIDArrayIter {
