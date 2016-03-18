@@ -25,22 +25,20 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-
 /**
  * Binary heap for primitive types.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.has UnsortedIter
  * @param <K> Key type
  */
-public class ComparableMinHeap<K extends Comparable<? super K>> implements ObjectHeap<K> {
+public class ComparatorMinHeap<K> implements ObjectHeap<K> {
   /**
    * Base heap.
    */
-  protected Comparable<Object>[] twoheap;
+  protected Object[] twoheap;
 
   /**
    * Current size of heap.
@@ -52,28 +50,38 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
    */
   private final static int TWO_HEAP_INITIAL_SIZE = (1 << 5) - 1;
 
+
+  /**
+   * Comparator
+   */
+  protected java.util.Comparator<Object> comparator;
+
   /**
    * Constructor, with default size.
+   * @param comparator Comparator
    */
   @SuppressWarnings("unchecked")
-  public ComparableMinHeap() {
+  public ComparatorMinHeap(java.util.Comparator<? super K> comparator) {
     super();
-    Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, TWO_HEAP_INITIAL_SIZE);
+    this.comparator = (java.util.Comparator<Object>) java.util.Comparator.class.cast(comparator);
+    Object[] twoheap = new Object[TWO_HEAP_INITIAL_SIZE];
 
     this.twoheap = twoheap;
   }
 
   /**
    * Constructor, with given minimum size.
-   * 
+   *
    * @param minsize Minimum size
+   * @param comparator Comparator
    */
   @SuppressWarnings("unchecked")
-  public ComparableMinHeap(int minsize) {
+  public ComparatorMinHeap(int minsize, java.util.Comparator<? super K> comparator) {
     super();
-    final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
-    Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, size);
-      
+    this.comparator = (java.util.Comparator<Object>) java.util.Comparator.class.cast(comparator);
+    final int size = HeapUtil.nextPow2Int(minsize + 1) - 1;
+    Object[] twoheap = new Object[size];
+
     this.twoheap = twoheap;
   }
 
@@ -94,9 +102,8 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public void add(K o) {
-    final Comparable<Object> co = (Comparable<Object>)o;
+    final Object co = o;
     // System.err.println("Add: " + o);
     if (size >= twoheap.length) {
       // Grow by one layer.
@@ -112,7 +119,7 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
   public void add(K key, int max) {
     if (size < max) {
       add(key);
-    } else if (twoheap[0].compareTo(key) < 0) {
+    } else if (comparator.compare(twoheap[0], key) < 0) {
       replaceTopElement(key);
     }
   }
@@ -120,22 +127,22 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
   @Override
   @SuppressWarnings("unchecked")
   public K replaceTopElement(K reinsert) {
-    final Comparable<Object> ret = twoheap[0];
-    heapifyDown((Comparable<Object>) reinsert);
+    final Object ret = twoheap[0];
+    heapifyDown( reinsert);
     return (K)ret;
   }
 
   /**
    * Heapify-Up method for 2-ary heap.
-   * 
+   *
    * @param twopos Position in 2-ary heap.
    * @param cur Current object
    */
-  private void heapifyUp(int twopos, Comparable<Object> cur) {
+  private void heapifyUp(int twopos, Object cur) {
     while (twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
-      Comparable<Object> par = twoheap[parent];
-      if (cur.compareTo(par) >= 0) {
+      Object par = twoheap[parent];
+      if (comparator.compare(cur, par) >= 0) {
         break;
       }
       twoheap[twopos] = par;
@@ -147,11 +154,11 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
   @Override
   @SuppressWarnings("unchecked")
   public K poll() {
-    final Comparable<Object> ret = twoheap[0];
+    final Object ret = twoheap[0];
     --size;
     // Replacement object:
     if (size > 0) {
-      final Comparable<Object> reinsert = twoheap[size];
+      final Object reinsert = twoheap[size];
       twoheap[size] = null;
       heapifyDown(reinsert);
     } else {
@@ -162,21 +169,21 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
 
   /**
    * Invoke heapify-down for the root object.
-   * 
+   *
    * @param cur Object to insert.
    */
-  private void heapifyDown(Comparable<Object> cur) {
+  private void heapifyDown(Object cur) {
     final int stop = size >>> 1;
     int twopos = 0;
     while (twopos < stop) {
       int bestchild = (twopos << 1) + 1;
-      Comparable<Object> best = twoheap[bestchild];
+      Object best = twoheap[bestchild];
       final int right = bestchild + 1;
-      if (right < size && best.compareTo(twoheap[right]) > 0) {
+      if (right < size && comparator.compare(best, twoheap[right]) > 0) {
         bestchild = right;
         best = twoheap[right];
       }
-      if (cur.compareTo(best) <= 0) {
+      if (comparator.compare(cur, best) <= 0) {
         break;
       }
       twoheap[twopos] = best;
@@ -194,7 +201,7 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(ComparableMinHeap.class.getSimpleName()).append(" [");
+    buf.append(ComparatorMinHeap.class.getSimpleName()).append(" [");
     for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
       buf.append(iter.get()).append(',');
     }
@@ -209,9 +216,9 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
 
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
-   * 
+   *
    * Use this class as follows:
-   * 
+   *
    * <pre>
    * {@code
    * for (ObjectHeap.UnsortedIter<K> iter = heap.unsortedIter(); iter.valid(); iter.next()) {
@@ -219,7 +226,7 @@ public class ComparableMinHeap<K extends Comparable<? super K>> implements Objec
    * }
    * }
    * </pre>
-   * 
+   *
    * @author Erich Schubert
    */
   private class UnsortedIter implements ObjectHeap.UnsortedIter<K> {

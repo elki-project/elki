@@ -81,11 +81,6 @@ public final class ArrayLikeUtil {
   public static final NumberArrayAdapter<Float, float[]> FLOATARRAYADAPTER = new FloatArrayAdapter();
 
   /**
-   * Use ArrayDBIDs as array.
-   */
-  public static final ArrayDBIDsAdapter ARRAYDBIDADAPTER = new ArrayDBIDsAdapter();
-
-  /**
    * Fake constructor. Do not instantiate!
    */
   private ArrayLikeUtil() {

@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
+import java.util.Comparator;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,8 +27,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-
-import java.util.Comparator;
 
 /**
  * A heap as used in OPTICS that allows updating entries.

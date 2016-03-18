@@ -25,22 +25,25 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-
 /**
  * Binary heap for primitive types.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.6.0
  * 
  * @apiviz.has UnsortedIter
- * @param <K> Key type
+ * @param <V> Value type
  */
-public class ComparableMaxHeap<K extends Comparable<? super K>> implements ObjectHeap<K> {
+public class DoubleObjectMaxHeap<V> implements DoubleObjectHeap<V> {
   /**
    * Base heap.
    */
-  protected Comparable<Object>[] twoheap;
+  protected double[] twoheap;
+
+  /**
+   * Base heap values.
+   */
+  protected Object[] twovals;
 
   /**
    * Current size of heap.
@@ -55,12 +58,13 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
   /**
    * Constructor, with default size.
    */
-  @SuppressWarnings("unchecked")
-  public ComparableMaxHeap() {
+  public DoubleObjectMaxHeap() {
     super();
-    Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, TWO_HEAP_INITIAL_SIZE);
+    double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
+    Object[] twovals = new Object[TWO_HEAP_INITIAL_SIZE];
 
     this.twoheap = twoheap;
+    this.twovals = twovals;
   }
 
   /**
@@ -68,19 +72,21 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    * 
    * @param minsize Minimum size
    */
-  @SuppressWarnings("unchecked")
-  public ComparableMaxHeap(int minsize) {
+  public DoubleObjectMaxHeap(int minsize) {
     super();
-    final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
-    Comparable<Object>[] twoheap = (Comparable<Object>[]) java.lang.reflect.Array.newInstance(Comparable.class, size);
+    final int size = HeapUtil.nextPow2Int(minsize + 1) - 1;
+    double[] twoheap = new double[size];
+    Object[] twovals = new Object[size];
       
     this.twoheap = twoheap;
+    this.twovals = twovals;
   }
 
   @Override
   public void clear() {
     size = 0;
-    Arrays.fill(twoheap, null);
+    Arrays.fill(twoheap, 0.0);
+    Arrays.fill(twovals, null);
   }
 
   @Override
@@ -94,35 +100,34 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public void add(K o) {
-    final Comparable<Object> co = (Comparable<Object>)o;
+  public void add(double o, V v) {
+    final double co = o;
+    final Object cv = (Object)v;
     // System.err.println("Add: " + o);
     if (size >= twoheap.length) {
       // Grow by one layer.
       twoheap = Arrays.copyOf(twoheap, twoheap.length + twoheap.length + 1);
+      twovals = Arrays.copyOf(twovals, twovals.length + twovals.length + 1);
     }
     final int twopos = size;
     twoheap[twopos] = co;
+    twovals[twopos] = cv;
     ++size;
-    heapifyUp(twopos, co);
+    heapifyUp(twopos, co, cv);
   }
 
   @Override
-  public void add(K key, int max) {
+  public void add(double key, V val, int max) {
     if (size < max) {
-      add(key);
-    } else if (twoheap[0].compareTo(key) > 0) {
-      replaceTopElement(key);
+      add(key, val);
+    } else if (twoheap[0] > key) {
+      replaceTopElement(key, val);
     }
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public K replaceTopElement(K reinsert) {
-    final Comparable<Object> ret = twoheap[0];
-    heapifyDown((Comparable<Object>) reinsert);
-    return (K)ret;
+  public void replaceTopElement(double reinsert, V val) {
+    heapifyDown(reinsert, (Object)val);
   }
 
   /**
@@ -130,73 +135,84 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    * 
    * @param twopos Position in 2-ary heap.
    * @param cur Current object
+   * @param val Current value
    */
-  private void heapifyUp(int twopos, Comparable<Object> cur) {
+  private void heapifyUp(int twopos, double cur, Object val) {
     while (twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
-      Comparable<Object> par = twoheap[parent];
-      if (cur.compareTo(par) <= 0) {
+      double par = twoheap[parent];
+      if (cur <= par) {
         break;
       }
       twoheap[twopos] = par;
+      twovals[twopos] = twovals[parent];
       twopos = parent;
     }
     twoheap[twopos] = cur;
+    twovals[twopos] = val;
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public K poll() {
-    final Comparable<Object> ret = twoheap[0];
+  public void poll() {
     --size;
     // Replacement object:
     if (size > 0) {
-      final Comparable<Object> reinsert = twoheap[size];
-      twoheap[size] = null;
-      heapifyDown(reinsert);
+      final double reinsert = twoheap[size];
+      final Object reinsertv = twovals[size];
+      twoheap[size] = 0.0;
+      twovals[size] = null;
+      heapifyDown(reinsert, reinsertv);
     } else {
-      twoheap[0] = null;
+      twoheap[0] = 0.0;
+      twovals[0] = null;
     }
-    return (K)ret;
   }
 
   /**
    * Invoke heapify-down for the root object.
    * 
    * @param cur Object to insert.
+   * @param val Value to reinsert.
    */
-  private void heapifyDown(Comparable<Object> cur) {
+  private void heapifyDown(double cur, Object val) {
     final int stop = size >>> 1;
     int twopos = 0;
     while (twopos < stop) {
       int bestchild = (twopos << 1) + 1;
-      Comparable<Object> best = twoheap[bestchild];
+      double best = twoheap[bestchild];
       final int right = bestchild + 1;
-      if (right < size && best.compareTo(twoheap[right]) < 0) {
+      if (right < size && best < twoheap[right]) {
         bestchild = right;
         best = twoheap[right];
       }
-      if (cur.compareTo(best) >= 0) {
+      if (cur >= best) {
         break;
       }
       twoheap[twopos] = best;
+      twovals[twopos] = twovals[bestchild];
       twopos = bestchild;
     }
     twoheap[twopos] = cur;
+    twovals[twopos] = val;
+  }
+
+  @Override
+  public double peekKey() {
+    return twoheap[0];
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public K peek() {
-    return (K)twoheap[0];
+  public V peekValue() {
+    return (V)twovals[0];
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(ComparableMaxHeap.class.getSimpleName()).append(" [");
+    buf.append(DoubleObjectMaxHeap.class.getSimpleName()).append(" [");
     for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
-      buf.append(iter.get()).append(',');
+      buf.append(iter.getKey()).append(':').append(iter.getValue()).append(',');
     }
     buf.append(']');
     return buf.toString();
@@ -214,7 +230,7 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    * 
    * <pre>
    * {@code
-   * for (ObjectHeap.UnsortedIter<K> iter = heap.unsortedIter(); iter.valid(); iter.next()) {
+   * for (DoubleObjectHeap.UnsortedIter<V> iter = heap.unsortedIter(); iter.valid(); iter.next()) {
    *   doSomething(iter.get());
    * }
    * }
@@ -222,7 +238,7 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
    * 
    * @author Erich Schubert
    */
-  private class UnsortedIter implements ObjectHeap.UnsortedIter<K> {
+  private class UnsortedIter implements DoubleObjectHeap.UnsortedIter<V> {
     /**
      * Iterator position.
      */
@@ -239,11 +255,16 @@ public class ComparableMaxHeap<K extends Comparable<? super K>> implements Objec
       return this;
     }
 
+    @Override
+    public double getKey() {
+      return twoheap[pos];
+    }
+
     @SuppressWarnings("unchecked")
 
     @Override
-    public K get() {
-      return (K)twoheap[pos];
+    public V getValue() {
+      return (V)twovals[pos];
     }
   }
 }

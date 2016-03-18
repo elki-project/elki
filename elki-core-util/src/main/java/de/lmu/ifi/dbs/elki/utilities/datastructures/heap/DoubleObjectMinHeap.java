@@ -25,8 +25,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-
 /**
  * Binary heap for primitive types.
  * 
@@ -36,7 +34,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @apiviz.has UnsortedIter
  * @param <V> Value type
  */
-public class DoubleObjectMaxHeap<V> implements DoubleObjectHeap<V> {
+public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
   /**
    * Base heap.
    */
@@ -60,7 +58,7 @@ public class DoubleObjectMaxHeap<V> implements DoubleObjectHeap<V> {
   /**
    * Constructor, with default size.
    */
-  public DoubleObjectMaxHeap() {
+  public DoubleObjectMinHeap() {
     super();
     double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
     Object[] twovals = new Object[TWO_HEAP_INITIAL_SIZE];
@@ -74,9 +72,9 @@ public class DoubleObjectMaxHeap<V> implements DoubleObjectHeap<V> {
    * 
    * @param minsize Minimum size
    */
-  public DoubleObjectMaxHeap(int minsize) {
+  public DoubleObjectMinHeap(int minsize) {
     super();
-    final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
+    final int size = HeapUtil.nextPow2Int(minsize + 1) - 1;
     double[] twoheap = new double[size];
     Object[] twovals = new Object[size];
       
@@ -122,7 +120,7 @@ public class DoubleObjectMaxHeap<V> implements DoubleObjectHeap<V> {
   public void add(double key, V val, int max) {
     if (size < max) {
       add(key, val);
-    } else if (twoheap[0] > key) {
+    } else if (twoheap[0] < key) {
       replaceTopElement(key, val);
     }
   }
@@ -143,7 +141,7 @@ public class DoubleObjectMaxHeap<V> implements DoubleObjectHeap<V> {
     while (twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
       double par = twoheap[parent];
-      if (cur <= par) {
+      if (cur >= par) {
         break;
       }
       twoheap[twopos] = par;
@@ -183,11 +181,11 @@ public class DoubleObjectMaxHeap<V> implements DoubleObjectHeap<V> {
       int bestchild = (twopos << 1) + 1;
       double best = twoheap[bestchild];
       final int right = bestchild + 1;
-      if (right < size && best < twoheap[right]) {
+      if (right < size && best > twoheap[right]) {
         bestchild = right;
         best = twoheap[right];
       }
-      if (cur >= best) {
+      if (cur <= best) {
         break;
       }
       twoheap[twopos] = best;
@@ -212,7 +210,7 @@ public class DoubleObjectMaxHeap<V> implements DoubleObjectHeap<V> {
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(DoubleObjectMaxHeap.class.getSimpleName()).append(" [");
+    buf.append(DoubleObjectMinHeap.class.getSimpleName()).append(" [");
     for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
       buf.append(iter.getKey()).append(':').append(iter.getValue()).append(',');
     }

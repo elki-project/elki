@@ -25,18 +25,15 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-
 /**
  * Binary heap for primitive types.
  * 
  * @author Erich Schubert
- * @since 0.6.0
+ * @since 0.5.5
  * 
  * @apiviz.has UnsortedIter
- * @param <V> Value type
  */
-public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
+public class DoubleLongMaxHeap implements DoubleLongHeap {
   /**
    * Base heap.
    */
@@ -45,7 +42,7 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
   /**
    * Base heap values.
    */
-  protected Object[] twovals;
+  protected long[] twovals;
 
   /**
    * Current size of heap.
@@ -60,10 +57,10 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
   /**
    * Constructor, with default size.
    */
-  public DoubleObjectMinHeap() {
+  public DoubleLongMaxHeap() {
     super();
     double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
-    Object[] twovals = new Object[TWO_HEAP_INITIAL_SIZE];
+    long[] twovals = new long[TWO_HEAP_INITIAL_SIZE];
 
     this.twoheap = twoheap;
     this.twovals = twovals;
@@ -74,11 +71,11 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
    * 
    * @param minsize Minimum size
    */
-  public DoubleObjectMinHeap(int minsize) {
+  public DoubleLongMaxHeap(int minsize) {
     super();
-    final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
+    final int size = HeapUtil.nextPow2Int(minsize + 1) - 1;
     double[] twoheap = new double[size];
-    Object[] twovals = new Object[size];
+    long[] twovals = new long[size];
       
     this.twoheap = twoheap;
     this.twovals = twovals;
@@ -88,7 +85,7 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
   public void clear() {
     size = 0;
     Arrays.fill(twoheap, 0.0);
-    Arrays.fill(twovals, null);
+    Arrays.fill(twovals, 0);
   }
 
   @Override
@@ -102,9 +99,9 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
   }
 
   @Override
-  public void add(double o, V v) {
+  public void add(double o, long v) {
     final double co = o;
-    final Object cv = (Object)v;
+    final long cv = v;
     // System.err.println("Add: " + o);
     if (size >= twoheap.length) {
       // Grow by one layer.
@@ -119,17 +116,17 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
   }
 
   @Override
-  public void add(double key, V val, int max) {
+  public void add(double key, long val, int max) {
     if (size < max) {
       add(key, val);
-    } else if (twoheap[0] < key) {
+    } else if (twoheap[0] > key) {
       replaceTopElement(key, val);
     }
   }
 
   @Override
-  public void replaceTopElement(double reinsert, V val) {
-    heapifyDown(reinsert, (Object)val);
+  public void replaceTopElement(double reinsert, long val) {
+    heapifyDown(reinsert, val);
   }
 
   /**
@@ -139,11 +136,11 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
    * @param cur Current object
    * @param val Current value
    */
-  private void heapifyUp(int twopos, double cur, Object val) {
+  private void heapifyUp(int twopos, double cur, long val) {
     while (twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
       double par = twoheap[parent];
-      if (cur >= par) {
+      if (cur <= par) {
         break;
       }
       twoheap[twopos] = par;
@@ -160,13 +157,13 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
     // Replacement object:
     if (size > 0) {
       final double reinsert = twoheap[size];
-      final Object reinsertv = twovals[size];
+      final long reinsertv = twovals[size];
       twoheap[size] = 0.0;
-      twovals[size] = null;
+      twovals[size] = 0;
       heapifyDown(reinsert, reinsertv);
     } else {
       twoheap[0] = 0.0;
-      twovals[0] = null;
+      twovals[0] = 0;
     }
   }
 
@@ -176,18 +173,18 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
    * @param cur Object to insert.
    * @param val Value to reinsert.
    */
-  private void heapifyDown(double cur, Object val) {
+  private void heapifyDown(double cur, long val) {
     final int stop = size >>> 1;
     int twopos = 0;
     while (twopos < stop) {
       int bestchild = (twopos << 1) + 1;
       double best = twoheap[bestchild];
       final int right = bestchild + 1;
-      if (right < size && best > twoheap[right]) {
+      if (right < size && best < twoheap[right]) {
         bestchild = right;
         best = twoheap[right];
       }
-      if (cur <= best) {
+      if (cur >= best) {
         break;
       }
       twoheap[twopos] = best;
@@ -204,15 +201,14 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
   }
 
   @Override
-  @SuppressWarnings("unchecked")
-  public V peekValue() {
-    return (V)twovals[0];
+  public long peekValue() {
+    return twovals[0];
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(DoubleObjectMinHeap.class.getSimpleName()).append(" [");
+    buf.append(DoubleLongMaxHeap.class.getSimpleName()).append(" [");
     for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
       buf.append(iter.getKey()).append(':').append(iter.getValue()).append(',');
     }
@@ -232,7 +228,7 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
    * 
    * <pre>
    * {@code
-   * for (DoubleObjectHeap.UnsortedIter<V> iter = heap.unsortedIter(); iter.valid(); iter.next()) {
+   * for (DoubleLongHeap.UnsortedIter iter = heap.unsortedIter(); iter.valid(); iter.next()) {
    *   doSomething(iter.get());
    * }
    * }
@@ -240,7 +236,7 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
    * 
    * @author Erich Schubert
    */
-  private class UnsortedIter implements DoubleObjectHeap.UnsortedIter<V> {
+  private class UnsortedIter implements DoubleLongHeap.UnsortedIter {
     /**
      * Iterator position.
      */
@@ -262,11 +258,9 @@ public class DoubleObjectMinHeap<V> implements DoubleObjectHeap<V> {
       return twoheap[pos];
     }
 
-    @SuppressWarnings("unchecked")
-
     @Override
-    public V getValue() {
-      return (V)twovals[pos];
+    public long getValue() {
+      return twovals[pos];
     }
   }
 }

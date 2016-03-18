@@ -25,8 +25,6 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-
 /**
  * Binary heap for primitive types.
  * 
@@ -68,7 +66,7 @@ public class DoubleMaxHeap implements DoubleHeap {
    */
   public DoubleMaxHeap(int minsize) {
     super();
-    final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
+    final int size = HeapUtil.nextPow2Int(minsize + 1) - 1;
     double[] twoheap = new double[size];
       
     this.twoheap = twoheap;

@@ -25,27 +25,20 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-
 /**
  * Binary heap for primitive types.
- * 
+ *
  * @author Erich Schubert
- * @since 0.6.0
- * 
+ * @since 0.4.0
+ *
  * @apiviz.has UnsortedIter
- * @param <V> Value type
+ * @param <K> Key type
  */
-public class IntegerObjectMaxHeap<V> implements IntegerObjectHeap<V> {
+public class ComparatorMaxHeap<K> implements ObjectHeap<K> {
   /**
    * Base heap.
    */
-  protected int[] twoheap;
-
-  /**
-   * Base heap values.
-   */
-  protected Object[] twovals;
+  protected Object[] twoheap;
 
   /**
    * Current size of heap.
@@ -57,38 +50,45 @@ public class IntegerObjectMaxHeap<V> implements IntegerObjectHeap<V> {
    */
   private final static int TWO_HEAP_INITIAL_SIZE = (1 << 5) - 1;
 
+
+  /**
+   * Comparator
+   */
+  protected java.util.Comparator<Object> comparator;
+
   /**
    * Constructor, with default size.
+   * @param comparator Comparator
    */
-  public IntegerObjectMaxHeap() {
+  @SuppressWarnings("unchecked")
+  public ComparatorMaxHeap(java.util.Comparator<? super K> comparator) {
     super();
-    int[] twoheap = new int[TWO_HEAP_INITIAL_SIZE];
-    Object[] twovals = new Object[TWO_HEAP_INITIAL_SIZE];
+    this.comparator = (java.util.Comparator<Object>) java.util.Comparator.class.cast(comparator);
+    Object[] twoheap = new Object[TWO_HEAP_INITIAL_SIZE];
 
     this.twoheap = twoheap;
-    this.twovals = twovals;
   }
 
   /**
    * Constructor, with given minimum size.
-   * 
+   *
    * @param minsize Minimum size
+   * @param comparator Comparator
    */
-  public IntegerObjectMaxHeap(int minsize) {
+  @SuppressWarnings("unchecked")
+  public ComparatorMaxHeap(int minsize, java.util.Comparator<? super K> comparator) {
     super();
-    final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
-    int[] twoheap = new int[size];
-    Object[] twovals = new Object[size];
-      
+    this.comparator = (java.util.Comparator<Object>) java.util.Comparator.class.cast(comparator);
+    final int size = HeapUtil.nextPow2Int(minsize + 1) - 1;
+    Object[] twoheap = new Object[size];
+
     this.twoheap = twoheap;
-    this.twovals = twovals;
   }
 
   @Override
   public void clear() {
     size = 0;
-    Arrays.fill(twoheap, 0);
-    Arrays.fill(twovals, null);
+    Arrays.fill(twoheap, null);
   }
 
   @Override
@@ -102,119 +102,108 @@ public class IntegerObjectMaxHeap<V> implements IntegerObjectHeap<V> {
   }
 
   @Override
-  public void add(int o, V v) {
-    final int co = o;
-    final Object cv = (Object)v;
+  public void add(K o) {
+    final Object co = o;
     // System.err.println("Add: " + o);
     if (size >= twoheap.length) {
       // Grow by one layer.
       twoheap = Arrays.copyOf(twoheap, twoheap.length + twoheap.length + 1);
-      twovals = Arrays.copyOf(twovals, twovals.length + twovals.length + 1);
     }
     final int twopos = size;
     twoheap[twopos] = co;
-    twovals[twopos] = cv;
     ++size;
-    heapifyUp(twopos, co, cv);
+    heapifyUp(twopos, co);
   }
 
   @Override
-  public void add(int key, V val, int max) {
+  public void add(K key, int max) {
     if (size < max) {
-      add(key, val);
-    } else if (twoheap[0] > key) {
-      replaceTopElement(key, val);
+      add(key);
+    } else if (comparator.compare(twoheap[0], key) > 0) {
+      replaceTopElement(key);
     }
-  }
-
-  @Override
-  public void replaceTopElement(int reinsert, V val) {
-    heapifyDown(reinsert, (Object)val);
-  }
-
-  /**
-   * Heapify-Up method for 2-ary heap.
-   * 
-   * @param twopos Position in 2-ary heap.
-   * @param cur Current object
-   * @param val Current value
-   */
-  private void heapifyUp(int twopos, int cur, Object val) {
-    while (twopos > 0) {
-      final int parent = (twopos - 1) >>> 1;
-      int par = twoheap[parent];
-      if (cur <= par) {
-        break;
-      }
-      twoheap[twopos] = par;
-      twovals[twopos] = twovals[parent];
-      twopos = parent;
-    }
-    twoheap[twopos] = cur;
-    twovals[twopos] = val;
-  }
-
-  @Override
-  public void poll() {
-    --size;
-    // Replacement object:
-    if (size > 0) {
-      final int reinsert = twoheap[size];
-      final Object reinsertv = twovals[size];
-      twoheap[size] = 0;
-      twovals[size] = null;
-      heapifyDown(reinsert, reinsertv);
-    } else {
-      twoheap[0] = 0;
-      twovals[0] = null;
-    }
-  }
-
-  /**
-   * Invoke heapify-down for the root object.
-   * 
-   * @param cur Object to insert.
-   * @param val Value to reinsert.
-   */
-  private void heapifyDown(int cur, Object val) {
-    final int stop = size >>> 1;
-    int twopos = 0;
-    while (twopos < stop) {
-      int bestchild = (twopos << 1) + 1;
-      int best = twoheap[bestchild];
-      final int right = bestchild + 1;
-      if (right < size && best < twoheap[right]) {
-        bestchild = right;
-        best = twoheap[right];
-      }
-      if (cur >= best) {
-        break;
-      }
-      twoheap[twopos] = best;
-      twovals[twopos] = twovals[bestchild];
-      twopos = bestchild;
-    }
-    twoheap[twopos] = cur;
-    twovals[twopos] = val;
-  }
-
-  @Override
-  public int peekKey() {
-    return twoheap[0];
   }
 
   @Override
   @SuppressWarnings("unchecked")
-  public V peekValue() {
-    return (V)twovals[0];
+  public K replaceTopElement(K reinsert) {
+    final Object ret = twoheap[0];
+    heapifyDown( reinsert);
+    return (K)ret;
+  }
+
+  /**
+   * Heapify-Up method for 2-ary heap.
+   *
+   * @param twopos Position in 2-ary heap.
+   * @param cur Current object
+   */
+  private void heapifyUp(int twopos, Object cur) {
+    while (twopos > 0) {
+      final int parent = (twopos - 1) >>> 1;
+      Object par = twoheap[parent];
+      if (comparator.compare(cur, par) <= 0) {
+        break;
+      }
+      twoheap[twopos] = par;
+      twopos = parent;
+    }
+    twoheap[twopos] = cur;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public K poll() {
+    final Object ret = twoheap[0];
+    --size;
+    // Replacement object:
+    if (size > 0) {
+      final Object reinsert = twoheap[size];
+      twoheap[size] = null;
+      heapifyDown(reinsert);
+    } else {
+      twoheap[0] = null;
+    }
+    return (K)ret;
+  }
+
+  /**
+   * Invoke heapify-down for the root object.
+   *
+   * @param cur Object to insert.
+   */
+  private void heapifyDown(Object cur) {
+    final int stop = size >>> 1;
+    int twopos = 0;
+    while (twopos < stop) {
+      int bestchild = (twopos << 1) + 1;
+      Object best = twoheap[bestchild];
+      final int right = bestchild + 1;
+      if (right < size && comparator.compare(best, twoheap[right]) < 0) {
+        bestchild = right;
+        best = twoheap[right];
+      }
+      if (comparator.compare(cur, best) >= 0) {
+        break;
+      }
+      twoheap[twopos] = best;
+      twopos = bestchild;
+    }
+    twoheap[twopos] = cur;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public K peek() {
+    return (K)twoheap[0];
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(IntegerObjectMaxHeap.class.getSimpleName()).append(" [");
+    buf.append(ComparatorMaxHeap.class.getSimpleName()).append(" [");
     for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
-      buf.append(iter.getKey()).append(':').append(iter.getValue()).append(',');
+      buf.append(iter.get()).append(',');
     }
     buf.append(']');
     return buf.toString();
@@ -227,20 +216,20 @@ public class IntegerObjectMaxHeap<V> implements IntegerObjectHeap<V> {
 
   /**
    * Unsorted iterator - in heap order. Does not poll the heap.
-   * 
+   *
    * Use this class as follows:
-   * 
+   *
    * <pre>
    * {@code
-   * for (IntegerObjectHeap.UnsortedIter<V> iter = heap.unsortedIter(); iter.valid(); iter.next()) {
+   * for (ObjectHeap.UnsortedIter<K> iter = heap.unsortedIter(); iter.valid(); iter.next()) {
    *   doSomething(iter.get());
    * }
    * }
    * </pre>
-   * 
+   *
    * @author Erich Schubert
    */
-  private class UnsortedIter implements IntegerObjectHeap.UnsortedIter<V> {
+  private class UnsortedIter implements ObjectHeap.UnsortedIter<K> {
     /**
      * Iterator position.
      */
@@ -257,16 +246,11 @@ public class IntegerObjectMaxHeap<V> implements IntegerObjectHeap<V> {
       return this;
     }
 
-    @Override
-    public int getKey() {
-      return twoheap[pos];
-    }
-
     @SuppressWarnings("unchecked")
 
     @Override
-    public V getValue() {
-      return (V)twovals[pos];
+    public K get() {
+      return (K)twoheap[pos];
     }
   }
 }

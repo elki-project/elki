@@ -25,21 +25,19 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-
 /**
  * Binary heap for primitive types.
  * 
  * @author Erich Schubert
- * @since 0.4.0
+ * @since 0.5.5
  * 
  * @apiviz.has UnsortedIter
  */
-public class IntegerMaxHeap implements IntegerHeap {
+public class DoubleMinHeap implements DoubleHeap {
   /**
    * Base heap.
    */
-  protected int[] twoheap;
+  protected double[] twoheap;
 
   /**
    * Current size of heap.
@@ -54,9 +52,9 @@ public class IntegerMaxHeap implements IntegerHeap {
   /**
    * Constructor, with default size.
    */
-  public IntegerMaxHeap() {
+  public DoubleMinHeap() {
     super();
-    int[] twoheap = new int[TWO_HEAP_INITIAL_SIZE];
+    double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
 
     this.twoheap = twoheap;
   }
@@ -66,10 +64,10 @@ public class IntegerMaxHeap implements IntegerHeap {
    * 
    * @param minsize Minimum size
    */
-  public IntegerMaxHeap(int minsize) {
+  public DoubleMinHeap(int minsize) {
     super();
-    final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
-    int[] twoheap = new int[size];
+    final int size = HeapUtil.nextPow2Int(minsize + 1) - 1;
+    double[] twoheap = new double[size];
       
     this.twoheap = twoheap;
   }
@@ -77,7 +75,7 @@ public class IntegerMaxHeap implements IntegerHeap {
   @Override
   public void clear() {
     size = 0;
-    Arrays.fill(twoheap, 0);
+    Arrays.fill(twoheap, 0.0);
   }
 
   @Override
@@ -91,8 +89,8 @@ public class IntegerMaxHeap implements IntegerHeap {
   }
 
   @Override
-  public void add(int o) {
-    final int co = o;
+  public void add(double o) {
+    final double co = o;
     // System.err.println("Add: " + o);
     if (size >= twoheap.length) {
       // Grow by one layer.
@@ -105,17 +103,17 @@ public class IntegerMaxHeap implements IntegerHeap {
   }
 
   @Override
-  public void add(int key, int max) {
+  public void add(double key, int max) {
     if (size < max) {
       add(key);
-    } else if (twoheap[0] > key) {
+    } else if (twoheap[0] <= key) {
       replaceTopElement(key);
     }
   }
 
   @Override
-  public int replaceTopElement(int reinsert) {
-    final int ret = twoheap[0];
+  public double replaceTopElement(double reinsert) {
+    final double ret = twoheap[0];
     heapifyDown( reinsert);
     return ret;
   }
@@ -126,11 +124,11 @@ public class IntegerMaxHeap implements IntegerHeap {
    * @param twopos Position in 2-ary heap.
    * @param cur Current object
    */
-  private void heapifyUp(int twopos, int cur) {
+  private void heapifyUp(int twopos, double cur) {
     while (twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
-      int par = twoheap[parent];
-      if (cur <= par) {
+      double par = twoheap[parent];
+      if (cur >= par) {
         break;
       }
       twoheap[twopos] = par;
@@ -140,16 +138,16 @@ public class IntegerMaxHeap implements IntegerHeap {
   }
 
   @Override
-  public int poll() {
-    final int ret = twoheap[0];
+  public double poll() {
+    final double ret = twoheap[0];
     --size;
     // Replacement object:
     if (size > 0) {
-      final int reinsert = twoheap[size];
-      twoheap[size] = 0;
+      final double reinsert = twoheap[size];
+      twoheap[size] = 0.0;
       heapifyDown(reinsert);
     } else {
-      twoheap[0] = 0;
+      twoheap[0] = 0.0;
     }
     return ret;
   }
@@ -159,18 +157,18 @@ public class IntegerMaxHeap implements IntegerHeap {
    * 
    * @param cur Object to insert.
    */
-  private void heapifyDown(int cur) {
+  private void heapifyDown(double cur) {
     final int stop = size >>> 1;
     int twopos = 0;
     while (twopos < stop) {
       int bestchild = (twopos << 1) + 1;
-      int best = twoheap[bestchild];
+      double best = twoheap[bestchild];
       final int right = bestchild + 1;
-      if (right < size && best < twoheap[right]) {
+      if (right < size && best > twoheap[right]) {
         bestchild = right;
         best = twoheap[right];
       }
-      if (cur >= best) {
+      if (cur <= best) {
         break;
       }
       twoheap[twopos] = best;
@@ -180,14 +178,14 @@ public class IntegerMaxHeap implements IntegerHeap {
   }
 
   @Override
-  public int peek() {
+  public double peek() {
     return twoheap[0];
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(IntegerMaxHeap.class.getSimpleName()).append(" [");
+    buf.append(DoubleMinHeap.class.getSimpleName()).append(" [");
     for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
       buf.append(iter.get()).append(',');
     }
@@ -207,7 +205,7 @@ public class IntegerMaxHeap implements IntegerHeap {
    * 
    * <pre>
    * {@code
-   * for (IntegerHeap.UnsortedIter iter = heap.unsortedIter(); iter.valid(); iter.next()) {
+   * for (DoubleHeap.UnsortedIter iter = heap.unsortedIter(); iter.valid(); iter.next()) {
    *   doSomething(iter.get());
    * }
    * }
@@ -215,7 +213,7 @@ public class IntegerMaxHeap implements IntegerHeap {
    * 
    * @author Erich Schubert
    */
-  private class UnsortedIter implements IntegerHeap.UnsortedIter {
+  private class UnsortedIter implements DoubleHeap.UnsortedIter {
     /**
      * Iterator position.
      */
@@ -233,7 +231,7 @@ public class IntegerMaxHeap implements IntegerHeap {
     }
 
     @Override
-    public int get() {
+    public double get() {
       return twoheap[pos];
     }
   }

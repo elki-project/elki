@@ -25,26 +25,25 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
-
 /**
  * Binary heap for primitive types.
  * 
  * @author Erich Schubert
- * @since 0.5.5
+ * @since 0.6.0
  * 
  * @apiviz.has UnsortedIter
+ * @param <V> Value type
  */
-public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
+public class IntegerObjectMinHeap<V> implements IntegerObjectHeap<V> {
   /**
    * Base heap.
    */
-  protected double[] twoheap;
+  protected int[] twoheap;
 
   /**
    * Base heap values.
    */
-  protected int[] twovals;
+  protected Object[] twovals;
 
   /**
    * Current size of heap.
@@ -59,10 +58,10 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
   /**
    * Constructor, with default size.
    */
-  public DoubleIntegerMaxHeap() {
+  public IntegerObjectMinHeap() {
     super();
-    double[] twoheap = new double[TWO_HEAP_INITIAL_SIZE];
-    int[] twovals = new int[TWO_HEAP_INITIAL_SIZE];
+    int[] twoheap = new int[TWO_HEAP_INITIAL_SIZE];
+    Object[] twovals = new Object[TWO_HEAP_INITIAL_SIZE];
 
     this.twoheap = twoheap;
     this.twovals = twovals;
@@ -73,11 +72,11 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
    * 
    * @param minsize Minimum size
    */
-  public DoubleIntegerMaxHeap(int minsize) {
+  public IntegerObjectMinHeap(int minsize) {
     super();
-    final int size = MathUtil.nextPow2Int(minsize + 1) - 1;
-    double[] twoheap = new double[size];
-    int[] twovals = new int[size];
+    final int size = HeapUtil.nextPow2Int(minsize + 1) - 1;
+    int[] twoheap = new int[size];
+    Object[] twovals = new Object[size];
       
     this.twoheap = twoheap;
     this.twovals = twovals;
@@ -86,8 +85,8 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
   @Override
   public void clear() {
     size = 0;
-    Arrays.fill(twoheap, 0.0);
-    Arrays.fill(twovals, 0);
+    Arrays.fill(twoheap, 0);
+    Arrays.fill(twovals, null);
   }
 
   @Override
@@ -101,9 +100,9 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
   }
 
   @Override
-  public void add(double o, int v) {
-    final double co = o;
-    final int cv = v;
+  public void add(int o, V v) {
+    final int co = o;
+    final Object cv = (Object)v;
     // System.err.println("Add: " + o);
     if (size >= twoheap.length) {
       // Grow by one layer.
@@ -118,17 +117,17 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
   }
 
   @Override
-  public void add(double key, int val, int max) {
+  public void add(int key, V val, int max) {
     if (size < max) {
       add(key, val);
-    } else if (twoheap[0] > key) {
+    } else if (twoheap[0] < key) {
       replaceTopElement(key, val);
     }
   }
 
   @Override
-  public void replaceTopElement(double reinsert, int val) {
-    heapifyDown(reinsert, val);
+  public void replaceTopElement(int reinsert, V val) {
+    heapifyDown(reinsert, (Object)val);
   }
 
   /**
@@ -138,11 +137,11 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
    * @param cur Current object
    * @param val Current value
    */
-  private void heapifyUp(int twopos, double cur, int val) {
+  private void heapifyUp(int twopos, int cur, Object val) {
     while (twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
-      double par = twoheap[parent];
-      if (cur <= par) {
+      int par = twoheap[parent];
+      if (cur >= par) {
         break;
       }
       twoheap[twopos] = par;
@@ -158,14 +157,14 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
     --size;
     // Replacement object:
     if (size > 0) {
-      final double reinsert = twoheap[size];
-      final int reinsertv = twovals[size];
-      twoheap[size] = 0.0;
-      twovals[size] = 0;
+      final int reinsert = twoheap[size];
+      final Object reinsertv = twovals[size];
+      twoheap[size] = 0;
+      twovals[size] = null;
       heapifyDown(reinsert, reinsertv);
     } else {
-      twoheap[0] = 0.0;
-      twovals[0] = 0;
+      twoheap[0] = 0;
+      twovals[0] = null;
     }
   }
 
@@ -175,18 +174,18 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
    * @param cur Object to insert.
    * @param val Value to reinsert.
    */
-  private void heapifyDown(double cur, int val) {
+  private void heapifyDown(int cur, Object val) {
     final int stop = size >>> 1;
     int twopos = 0;
     while (twopos < stop) {
       int bestchild = (twopos << 1) + 1;
-      double best = twoheap[bestchild];
+      int best = twoheap[bestchild];
       final int right = bestchild + 1;
-      if (right < size && best < twoheap[right]) {
+      if (right < size && best > twoheap[right]) {
         bestchild = right;
         best = twoheap[right];
       }
-      if (cur >= best) {
+      if (cur <= best) {
         break;
       }
       twoheap[twopos] = best;
@@ -198,19 +197,20 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
   }
 
   @Override
-  public double peekKey() {
+  public int peekKey() {
     return twoheap[0];
   }
 
   @Override
-  public int peekValue() {
-    return twovals[0];
+  @SuppressWarnings("unchecked")
+  public V peekValue() {
+    return (V)twovals[0];
   }
 
   @Override
   public String toString() {
     StringBuilder buf = new StringBuilder();
-    buf.append(DoubleIntegerMaxHeap.class.getSimpleName()).append(" [");
+    buf.append(IntegerObjectMinHeap.class.getSimpleName()).append(" [");
     for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
       buf.append(iter.getKey()).append(':').append(iter.getValue()).append(',');
     }
@@ -230,7 +230,7 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
    * 
    * <pre>
    * {@code
-   * for (DoubleIntegerHeap.UnsortedIter iter = heap.unsortedIter(); iter.valid(); iter.next()) {
+   * for (IntegerObjectHeap.UnsortedIter<V> iter = heap.unsortedIter(); iter.valid(); iter.next()) {
    *   doSomething(iter.get());
    * }
    * }
@@ -238,7 +238,7 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
    * 
    * @author Erich Schubert
    */
-  private class UnsortedIter implements DoubleIntegerHeap.UnsortedIter {
+  private class UnsortedIter implements IntegerObjectHeap.UnsortedIter<V> {
     /**
      * Iterator position.
      */
@@ -256,13 +256,15 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
     }
 
     @Override
-    public double getKey() {
+    public int getKey() {
       return twoheap[pos];
     }
 
+    @SuppressWarnings("unchecked")
+
     @Override
-    public int getValue() {
-      return twovals[pos];
+    public V getValue() {
+      return (V)twovals[pos];
     }
   }
 }

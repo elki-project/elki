@@ -1,10 +1,9 @@
-package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
-
+package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,35 +22,32 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-
 /**
- * Use a DBID array in a generic array-like context.
- * 
+ * Next power of 2, for heaps.
+ *
+ * Usually, you should prefer the version in the
+ * {@link de.lmu.ifi.dbs.elki.math.MathUtil} class. This copy exists to avoid
+ * depending onto math from these data structures.
+ *
  * @author Erich Schubert
- * @since 0.4.0
- * 
- * @apiviz.uses ArrayDBIDs
  */
-public class ArrayDBIDsAdapter implements ArrayAdapter<DBID, ArrayDBIDs> {
+public final class HeapUtil {
   /**
-   * Constructor.
-   * 
-   * Protected - use the static instance from {@link ArrayLikeUtil}!
+   * Find the next power of 2.
+   *
+   * Classic bit operation, for signed 32-bit. Valid for positive integers only
+   * (0 otherwise).
+   *
+   * @param x original integer
+   * @return Next power of 2
    */
-  protected ArrayDBIDsAdapter() {
-    super();
-  }
-
-  @Override
-  public int size(ArrayDBIDs array) {
-    return array.size();
-  }
-
-  @Override
-  @Deprecated
-  public DBID get(ArrayDBIDs array, int off) throws IndexOutOfBoundsException {
-    return array.get(off);
+  public static int nextPow2Int(int x) {
+    --x;
+    x |= x >>> 1;
+    x |= x >>> 2;
+    x |= x >>> 4;
+    x |= x >>> 8;
+    x |= x >>> 16;
+    return ++x;
   }
 }

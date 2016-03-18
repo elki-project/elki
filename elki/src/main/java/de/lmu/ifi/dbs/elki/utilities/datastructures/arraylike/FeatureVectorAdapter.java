@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
 
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,20 +23,22 @@ import de.lmu.ifi.dbs.elki.data.FeatureVector;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.data.FeatureVector;
+
 /**
  * Adapter to use a feature vector as an array of features.
- * 
+ *
  * Use the static instance from {@link ArrayLikeUtil}!
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @param <F> Feature type
  */
 public class FeatureVectorAdapter<F> implements ArrayAdapter<F, FeatureVector<F>> {
   /**
    * Constructor.
-   * 
+   *
    * Use the static instance from {@link ArrayLikeUtil}!
    */
   protected FeatureVectorAdapter() {
