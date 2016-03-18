@@ -52,8 +52,6 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.KDDTask;
-import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
@@ -250,6 +248,13 @@ public class DocumentParameters {
     ExecutorService es = Executors.newSingleThreadExecutor();
     List<Class<?>> objs = ELKIServiceRegistry.findAllImplementations(Object.class, false, true);
     Collections.sort(objs, new ELKIServiceScanner.ClassSorter());
+    Class<?> appc = null;
+    try {
+      appc = Class.forName("de.lmu.ifi.dbs.elki.application.AbstractApplication");
+    }
+    catch(Exception e) {
+      // Not serious.
+    }
     for(final Class<?> cls : objs) {
       // Doesn't have a proper name?
       if(cls.getCanonicalName() == null) {
@@ -257,7 +262,7 @@ public class DocumentParameters {
       }
       // Some of the "applications" do currently not have appropriate
       // constructors / parameterizers and may start AWT threads - skip them.
-      if(AbstractApplication.class.isAssignableFrom(cls)) {
+      if(appc != null && appc.isAssignableFrom(cls)) {
         continue;
       }
 
@@ -620,10 +625,18 @@ public class DocumentParameters {
     List<Class<?>> classes = new ArrayList<>(byclass.keySet());
     Collections.sort(classes, new ELKIServiceScanner.ClassSorter());
 
+    Class<?> base = null;
+    try {
+      base = Class.forName("de.lmu.ifi.dbs.elki.KDDTask");
+    }
+    catch(ClassNotFoundException e) {
+      // Just worse links, not serious.
+    }
+
     for(Class<?> cls : classes) {
       out.indent = 0;
       out.printitem("'''");
-      out.javadocLink(cls, KDDTask.class);
+      out.javadocLink(cls, base);
       out.println("''':");
       out.indent = 1;
       out.newline = 1; // No BR needed, we increase the indent.
