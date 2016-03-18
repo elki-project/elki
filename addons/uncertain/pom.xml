@@ -7,7 +7,7 @@
 		<groupId>de.lmu.ifi.dbs.elki</groupId>
 		<version>0.7.2-SNAPSHOT</version>
 		<artifactId>elki-project</artifactId>
-		<relativePath>../</relativePath>
+		<relativePath>../../</relativePath>
 	</parent>
 
 	<artifactId>elki-uncertain</artifactId>
