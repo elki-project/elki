@@ -22,8 +22,8 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.math.BigInteger;
 import java.util.BitSet;
@@ -31,16 +31,13 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
-
 /**
  * Test bit manipulation code.
  * 
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class BitsUtilTest implements JUnit4Test {
+public class BitsUtilTest {
   @Test
   public void testAgainstBigInteger() {
     BigInteger bigint = new BigInteger("123");

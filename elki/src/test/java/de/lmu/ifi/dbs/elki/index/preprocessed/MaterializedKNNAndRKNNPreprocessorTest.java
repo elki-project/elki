@@ -32,7 +32,6 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
@@ -74,7 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Elke Achtert
  * @since 0.4.0
  */
-public class MaterializedKNNAndRKNNPreprocessorTest implements JUnit4Test {
+public class MaterializedKNNAndRKNNPreprocessorTest {
   // the following values depend on the data set used!
   static String dataset = "data/testdata/unittests/3clusters-and-noise-2d.csv";
 

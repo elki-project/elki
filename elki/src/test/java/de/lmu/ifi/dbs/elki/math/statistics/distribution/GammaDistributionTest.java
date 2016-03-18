@@ -28,7 +28,6 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaChoiWetteEstimator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class GammaDistributionTest extends AbstractDistributionTest implements JUnit4Test {
+public class GammaDistributionTest extends AbstractDistributionTest {
   public static final double[] P_CDFPDF = { //
   0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 1e-05, 1e-10, 0.1234567, 3.14159265359, 2.71828182846, 0.314159265359, 0.271828182846 //
   };

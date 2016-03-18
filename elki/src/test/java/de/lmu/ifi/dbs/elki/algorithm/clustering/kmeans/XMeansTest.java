@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality.BayesianInformationCriterion;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class XMeansTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class XMeansTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testXMeans() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);

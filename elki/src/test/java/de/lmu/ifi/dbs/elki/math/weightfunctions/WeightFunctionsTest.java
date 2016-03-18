@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ConstantWeight;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcStddevWeight;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ErfcWeight;
@@ -44,7 +43,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction
  * @since 0.2
  * 
  */
-public class WeightFunctionsTest implements JUnit4Test {
+public class WeightFunctionsTest {
   /**
    * Just a 'boring' value test for completeness.
    */

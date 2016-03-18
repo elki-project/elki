@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 
 /**
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class DerivativeDTWDistanceFunctionTest implements JUnit4Test {
+public class DerivativeDTWDistanceFunctionTest {
   /**
    * Some test series.
    */

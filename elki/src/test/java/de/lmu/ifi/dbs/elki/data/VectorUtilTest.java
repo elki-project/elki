@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 
@@ -39,7 +38,7 @@ import gnu.trove.map.hash.TIntDoubleHashMap;
  *
  * @author Erich Schubert
  */
-public class VectorUtilTest implements JUnit4Test {
+public class VectorUtilTest {
   @Test
   public void denseAngle() {
     NumberVector v1 = new DoubleVector(new double[] { 1.0, 2.0, 3.0 });

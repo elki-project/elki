@@ -32,8 +32,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test to validate proper OnDiskArray operation.
  * 
@@ -41,7 +39,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * @since 0.2
  */
 // TODO: also test with a static sample file.
-public class OnDiskArrayTest implements JUnit4Test {
+public class OnDiskArrayTest {
   File file = new File("OnDiskArrayTestFile.test.dat");
 
   /**

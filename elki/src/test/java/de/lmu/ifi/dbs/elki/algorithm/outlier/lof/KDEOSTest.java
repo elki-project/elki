@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class KDEOSTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class KDEOSTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testKDEOS() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);

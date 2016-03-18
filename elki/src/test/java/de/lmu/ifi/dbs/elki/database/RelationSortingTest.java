@@ -5,7 +5,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
@@ -50,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @since 0.5.5
  * 
  */
-public class RelationSortingTest implements JUnit4Test {
+public class RelationSortingTest {
   public static final String filename = "data/testdata/unittests/hierarchical-3d2d1d.csv";
 
   @Test

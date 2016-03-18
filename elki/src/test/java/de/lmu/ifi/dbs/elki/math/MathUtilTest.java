@@ -30,15 +30,13 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Unit test for some basic math functions.
  *
  * @author Erich Schubert
  * @since 0.4.1
  */
-public class MathUtilTest implements JUnit4Test {
+public class MathUtilTest {
   @Test
   public void testBitMath() {
     assertEquals("Bit math issues", 1024, MathUtil.nextPow2Int(912));

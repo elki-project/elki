@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class AnderbergHierarchicalClusteringTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class AnderbergHierarchicalClusteringTest extends AbstractSimpleAlgorithmTest {
   // TODO: add more data sets.
 
   /**

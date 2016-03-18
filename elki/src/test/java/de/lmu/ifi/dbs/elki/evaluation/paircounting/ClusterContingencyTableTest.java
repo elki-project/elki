@@ -28,7 +28,6 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise;
@@ -51,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.2
  */
-public class ClusterContingencyTableTest implements JUnit4Test {
+public class ClusterContingencyTableTest {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
 

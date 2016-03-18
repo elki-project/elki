@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 
 /**
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class LinearKernelFunctionTest implements JUnit4Test {
+public class LinearKernelFunctionTest {
   @Test
   public void testToyExamples() {
     DoubleVector v1 = DoubleVector.wrap(new double[] { 1, 0, 0 });

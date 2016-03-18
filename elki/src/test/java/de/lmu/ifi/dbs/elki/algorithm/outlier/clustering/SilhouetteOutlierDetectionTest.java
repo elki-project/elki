@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.clustering;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class SilhouetteOutlierDetectionTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class SilhouetteOutlierDetectionTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testSilhouetteOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);

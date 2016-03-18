@@ -27,15 +27,13 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test formatting code.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class FormatUtilTest implements JUnit4Test {
+public class FormatUtilTest {
   @Test
   public void testStringSize() {
     long[] specialL = new long[] { 0L, 999L, 1001L, Long.MIN_VALUE, Long.MAX_VALUE };

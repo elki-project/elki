@@ -31,7 +31,6 @@ import java.util.HashSet;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 
 /**
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class HashMapHierarchyTest implements JUnit4Test {
+public class HashMapHierarchyTest {
   @Test
   public void testEmpty() {
     HashMapHierarchy<Object> hier = new HashMapHierarchy<>();

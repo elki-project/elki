@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance.parallel;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Lucia Cichella
  * @since 0.4.0
  */
-public class ParallelKNNWeightOutlierTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class ParallelKNNWeightOutlierTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testKNNWeightOutlier() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);

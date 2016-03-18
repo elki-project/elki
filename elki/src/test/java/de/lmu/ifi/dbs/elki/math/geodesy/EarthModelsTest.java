@@ -28,8 +28,6 @@ import static org.junit.Assert.assertFalse;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Unit test that cross-validates some distance computations with different
  * implementations. Note that it is common to see some difference in these
@@ -39,7 +37,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class EarthModelsTest implements JUnit4Test {
+public class EarthModelsTest {
   // New York City
   final double[] NEW_YORK = new double[] { 40.67, -73.94 };
 

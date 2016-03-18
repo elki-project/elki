@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -44,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.7.1
  */
-public class COPTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class COPTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testCOP() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);

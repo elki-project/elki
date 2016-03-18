@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class PrecisionAtKEvaluationTest implements JUnit4Test {
+public class PrecisionAtKEvaluationTest {
   /**
    * Test Precision@k score computation.
    */

@@ -30,7 +30,6 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class JensenShannonEquiwidthDependenceMeasureTest implements JUnit4Test {
+public class JensenShannonEquiwidthDependenceMeasureTest {
   double[][] data = { //
   { 1, 2, 3, 4 }, //
   { 1, 3, 5, 7 }, //

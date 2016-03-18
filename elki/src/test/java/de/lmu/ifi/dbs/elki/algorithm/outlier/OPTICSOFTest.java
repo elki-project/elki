@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.AbstractOPTICS;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Lucia Cichella
  * @since 0.4.0
  */
-public class OPTICSOFTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class OPTICSOFTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testOPTICSOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);

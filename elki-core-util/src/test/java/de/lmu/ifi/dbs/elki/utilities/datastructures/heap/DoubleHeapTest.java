@@ -29,15 +29,13 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Perform standard unit tests on the double-indexed heap structures.
  * 
  * @author Erich Schubert
  * @since 0.5.5
  */
-public class DoubleHeapTest implements JUnit4Test {
+public class DoubleHeapTest {
   @Test
   public void testDoubleMinHeap() {
     Random r = new Random();

@@ -27,15 +27,13 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Validate the Anderson Darling test.
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class AndersonDarlingTestTest implements JUnit4Test {
+public class AndersonDarlingTestTest {
   double[][] noncentral = { //
   { -1.877827740862672, -1.2459409569318343, -0.61175121460353787, -0.55626980422641181, //
   -0.35332777321703612, -0.24551480507545068, -0.23557108046219447, -0.080637593585376352, //

@@ -26,15 +26,13 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Unit test for Levenshtein distance.
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class NormalizedLevenshteinDistanceFunctionTest implements JUnit4Test {
+public class NormalizedLevenshteinDistanceFunctionTest {
   /**
    * Some test strings, from the Wikipedia article.
    */

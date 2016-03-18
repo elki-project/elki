@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -44,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.StarBasedReferencePoints;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class ReferenceBasedOutlierDetectionTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class ReferenceBasedOutlierDetectionTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testReferenceBasedOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);

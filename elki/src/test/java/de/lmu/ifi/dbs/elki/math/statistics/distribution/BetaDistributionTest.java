@@ -24,8 +24,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  */
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Unit test for the Beta distribution in ELKI.
  * 
@@ -34,7 +32,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class BetaDistributionTest extends AbstractDistributionTest implements JUnit4Test {
+public class BetaDistributionTest extends AbstractDistributionTest {
   public static final double[] P_CDFPDF = { //
   1e-10, 1e-05, 0.1, 0.1234567, 0.2, 0.271828182846, 0.3, 0.314159265359, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.71828182846, 3.14159265359 //
   };

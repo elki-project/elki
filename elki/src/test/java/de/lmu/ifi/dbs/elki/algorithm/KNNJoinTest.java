@@ -28,7 +28,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -62,7 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class KNNJoinTest implements JUnit4Test {
+public class KNNJoinTest {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/uebungsblatt-2d-mini.csv";
 

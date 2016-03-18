@@ -28,15 +28,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test class for Prim's minmum spanning tree algorithm.
  * 
  * @author Erich Schubert
  * @since 0.5.5
  */
-public class PrimsMinimumSpanningTreeTest implements JUnit4Test {
+public class PrimsMinimumSpanningTreeTest {
   @Test
   public void testSimple() {
     // A simple test.

@@ -32,15 +32,13 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test the specialized heap structures.
  * 
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class TiedTopBoundedUpdatableHeapTest implements JUnit4Test {
+public class TiedTopBoundedUpdatableHeapTest {
   @Test
   public void testTiedTopBoundedUpdatableHeap() {
     final int iters = 100;

@@ -25,9 +25,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -40,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Lucia Cichella
  * @since 0.4.0
  */
-public class KNNOutlierTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class KNNOutlierTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testKNNOutlier() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);

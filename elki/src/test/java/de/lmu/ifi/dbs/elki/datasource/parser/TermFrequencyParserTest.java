@@ -30,7 +30,6 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -54,7 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class TermFrequencyParserTest implements JUnit4Test {
+public class TermFrequencyParserTest {
   /** Test data set to use. */
   public static String DBLP_DATA = "data/testdata/parsing/termfreq-dblp.ascii.gz";
 

@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 
 /**
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
  * @author Erich Schubert
  * @since 0.7.1
  */
-public class PolynomialKernelFunctionTest implements JUnit4Test {
+public class PolynomialKernelFunctionTest {
   @Test
   public void testToyExamplesPoly2() {
     DoubleVector v1 = DoubleVector.wrap(new double[] { 1, 0, 0 });

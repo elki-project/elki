@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class FastOPTICSTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class FastOPTICSTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testFastOPTICS() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);

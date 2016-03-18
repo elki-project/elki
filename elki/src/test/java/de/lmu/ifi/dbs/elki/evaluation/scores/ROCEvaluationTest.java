@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class ROCEvaluationTest implements JUnit4Test {
+public class ROCEvaluationTest {
   /**
    * Test ROC curve generation, including curve simplification
    */

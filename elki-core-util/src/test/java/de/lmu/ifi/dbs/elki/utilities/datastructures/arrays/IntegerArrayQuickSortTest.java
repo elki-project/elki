@@ -29,15 +29,13 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test the integer array (index array) quick sort.
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class IntegerArrayQuickSortTest implements JUnit4Test {
+public class IntegerArrayQuickSortTest {
   /**
    * Array size to use.
    */

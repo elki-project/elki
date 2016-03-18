@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class AbstractDependenceMeasureTest implements JUnit4Test {
+public class AbstractDependenceMeasureTest {
   @Test
   public void testIndexing() {
     double[] data = { 1e-10, 1, 1e-5, 1, 2, 1 };

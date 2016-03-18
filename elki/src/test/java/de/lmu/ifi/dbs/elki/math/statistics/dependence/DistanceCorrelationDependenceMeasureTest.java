@@ -29,7 +29,6 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 
 /**
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class DistanceCorrelationDependenceMeasureTest implements JUnit4Test {
+public class DistanceCorrelationDependenceMeasureTest {
   double[][] data = { //
   { 1, 2, 3, 4 }, //
   { 1, 3, 5, 7 }, //

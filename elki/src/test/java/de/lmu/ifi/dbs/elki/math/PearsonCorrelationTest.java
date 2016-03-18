@@ -28,15 +28,13 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Unit test for pearson correlation.
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class PearsonCorrelationTest implements JUnit4Test {
+public class PearsonCorrelationTest {
   @Test
   public void testPearsonCorrelation() {
     final int size = 1000;

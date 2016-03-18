@@ -27,9 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-
 /**
  * Test class to test rounding of the linear scale.
  * 
@@ -37,7 +34,7 @@ import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
  * @since 0.2
  * 
  */
-public class LinearScaleTest implements JUnit4Test {
+public class LinearScaleTest {
 
   /**
    * Produces a simple linear scale and verifies the tick lines are placed as

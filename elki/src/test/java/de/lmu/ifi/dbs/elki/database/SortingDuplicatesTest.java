@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.database;
  */
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class SortingDuplicatesTest implements JUnit4Test {
+public class SortingDuplicatesTest {
   @Test(timeout = 100)
   public void testDuplicateKeys() {
     // We need an ide, but no real data.

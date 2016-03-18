@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.GaussianFittingFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
 
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.fitting.LevenbergMarquardtMethod;
  * @since 0.2
  * 
  */
-public class LevenbergMarquardtGaussianFittingTest implements JUnit4Test {
+public class LevenbergMarquardtGaussianFittingTest {
   /**
    * Evaluate on a symmetric Gaussian distribution. Traditional estimation
    * already has the mean quite good, but is far off on the stddev. The improved

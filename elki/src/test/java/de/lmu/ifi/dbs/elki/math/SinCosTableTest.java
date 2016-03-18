@@ -26,15 +26,13 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test the sin-cos lookup table.
  *
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class SinCosTableTest implements JUnit4Test {
+public class SinCosTableTest {
   @Test
   public void testSinCosTable() {
     doSinCosTableTest(360);

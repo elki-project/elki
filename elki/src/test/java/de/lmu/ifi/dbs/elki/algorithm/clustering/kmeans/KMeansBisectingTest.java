@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality.WithinClusterVarianceQualityMeasure;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Stephan Baier
  * @since 0.6.0
  */
-public class KMeansBisectingTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class KMeansBisectingTest extends AbstractSimpleAlgorithmTest {
   /**
    * Run KMeansBisecting with fixed parameters and compare cluster size to
    * expected value.

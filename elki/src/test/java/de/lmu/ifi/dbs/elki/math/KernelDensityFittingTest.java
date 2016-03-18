@@ -29,7 +29,6 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -53,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.2
  */
-public class KernelDensityFittingTest implements JUnit4Test {
+public class KernelDensityFittingTest {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/gaussian-1d-for-fitting.csv";
 

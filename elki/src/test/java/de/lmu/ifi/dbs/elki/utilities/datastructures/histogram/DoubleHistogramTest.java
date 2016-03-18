@@ -28,15 +28,13 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * JUnit test to test the {@link ReplacingHistogram} class.
  * 
  * @author Erich Schubert
  * @since 0.2
  */
-public class DoubleHistogramTest implements JUnit4Test {
+public class DoubleHistogramTest {
   /**
    * Test that adds some data to the histogram and compares results.
    */

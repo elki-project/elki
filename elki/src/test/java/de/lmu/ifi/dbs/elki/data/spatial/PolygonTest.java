@@ -30,15 +30,13 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test the polygon class.
  * 
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class PolygonTest implements JUnit4Test {
+public class PolygonTest {
   @Test
   public void testPolygonContainment() {
     final Polygon p1, p2, p3;

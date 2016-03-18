@@ -27,7 +27,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -46,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Evgeniy Faerman
  * @since 0.7.0
  */
-public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testHashFunctionOneProjection() {
     // test with {1,1,-1,1,-1}

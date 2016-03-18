@@ -27,15 +27,13 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Validate the two-sample anderson darling test.
  * 
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class StandardizedTwoSampleAndersonDarlingTestTest implements JUnit4Test {
+public class StandardizedTwoSampleAndersonDarlingTestTest {
   // Table 4, Scholz and Stephens (1987, p.922)
   double[][] pairs = { //
   { 38.7, 41.5, 43.8, 44.5, 45.5, 46.0, 47.7, 58.0 },//

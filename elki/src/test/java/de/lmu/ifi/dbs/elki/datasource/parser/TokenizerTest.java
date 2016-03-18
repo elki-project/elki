@@ -31,7 +31,6 @@ import java.util.regex.Pattern;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
 
 /**
@@ -42,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class TokenizerTest implements JUnit4Test {
+public class TokenizerTest {
   Tokenizer t = new Tokenizer(Pattern.compile("\\s"), "\"'");
 
   @Test

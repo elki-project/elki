@@ -32,7 +32,6 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -52,7 +51,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
  * @since 0.5.0
  * 
  */
-public class SpatialPrimitiveDistanceFunctionTest implements JUnit4Test {
+public class SpatialPrimitiveDistanceFunctionTest {
   @Test
   public void testSpatialDistanceConsistency() {
     final Random rnd = new Random(0);

@@ -22,8 +22,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,15 +30,13 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test the updateable heap used by OPTICS.
  *
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class UpdatableHeapTest implements JUnit4Test {
+public class UpdatableHeapTest {
   @Test
   public void testUpdatableHeap() {
     final int iters = 100;

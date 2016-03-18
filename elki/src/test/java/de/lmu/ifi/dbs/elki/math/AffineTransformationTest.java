@@ -33,7 +33,6 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
@@ -44,7 +43,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * @since 0.2
  * 
  */
-public class AffineTransformationTest implements JUnit4Test {
+public class AffineTransformationTest {
   /**
    * Test identity transform
    */

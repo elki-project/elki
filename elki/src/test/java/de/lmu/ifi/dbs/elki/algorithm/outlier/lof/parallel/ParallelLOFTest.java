@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class ParallelLOFTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class ParallelLOFTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testParallelLOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);

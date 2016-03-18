@@ -28,15 +28,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test parser functionality.
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.1
  */
-public class ParseUtilTest implements JUnit4Test {
+public class ParseUtilTest {
   @Test
   public void testParseDouble() {
     assertEquals(0., ParseUtil.parseDouble("0"), 0.);

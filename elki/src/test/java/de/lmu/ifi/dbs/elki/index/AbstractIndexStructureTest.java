@@ -25,7 +25,7 @@ package de.lmu.ifi.dbs.elki.index;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import de.lmu.ifi.dbs.elki.JUnit4Test;
+
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -46,15 +46,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 /**
  * Test case to validate some index structures for accuracy. For a known data
  * set and query point, the top 10 nearest neighbors are queried and verified.
- * 
+ *
  * Note that the internal operation of the index structure is not tested this
  * way, only whether the database object with the index still returns reasonable
  * results.
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
  */
-public abstract class AbstractIndexStructureTest implements JUnit4Test {
+public abstract class AbstractIndexStructureTest {
   // the following values depend on the data set used!
   String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
 
@@ -113,7 +113,7 @@ public abstract class AbstractIndexStructureTest implements JUnit4Test {
 
   /**
    * Actual test routine.
-   * 
+   *
    * @param inputparams
    */
   protected void testExactEuclidean(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
@@ -170,7 +170,7 @@ public abstract class AbstractIndexStructureTest implements JUnit4Test {
 
   /**
    * Actual test routine, for cosine distance
-   * 
+   *
    * @param inputparams
    */
   protected void testExactCosine(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {

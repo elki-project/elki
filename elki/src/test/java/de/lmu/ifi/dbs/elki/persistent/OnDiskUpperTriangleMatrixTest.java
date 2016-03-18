@@ -31,8 +31,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * Test the on-disk OnDiskUpperTriangleMatrix class.
  * 
@@ -41,7 +39,7 @@ import de.lmu.ifi.dbs.elki.JUnit4Test;
  * 
  */
 // TODO: also test with a static sample file.
-public class OnDiskUpperTriangleMatrixTest implements JUnit4Test {
+public class OnDiskUpperTriangleMatrixTest {
   static File file = new File("UpperTriangleTestFile.test.dat");
 
   /**

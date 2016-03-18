@@ -29,7 +29,6 @@ import java.nio.ByteBuffer;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
 /**
@@ -38,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class ByteArrayUtilTest implements JUnit4Test {
+public class ByteArrayUtilTest {
   /**
    * Test the Varint functions
    */

@@ -27,7 +27,6 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class MatrixTest implements JUnit4Test {
+public class MatrixTest {
 
   @Test
   public void testTransposedOperations() {

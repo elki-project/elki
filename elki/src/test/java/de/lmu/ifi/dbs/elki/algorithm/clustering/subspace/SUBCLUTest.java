@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -46,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.3
  */
-public class SUBCLUTest extends AbstractSimpleAlgorithmTest implements JUnit4Test {
+public class SUBCLUTest extends AbstractSimpleAlgorithmTest {
   /**
    * Run SUBCLU with fixed parameters and compare the result to a golden
    * standard.

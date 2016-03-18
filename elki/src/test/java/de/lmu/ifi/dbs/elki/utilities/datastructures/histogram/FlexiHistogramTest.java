@@ -30,15 +30,13 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.JUnit4Test;
-
 /**
  * JUnit test to test the {@link AbstractObjDynamicHistogram} class.
  * 
  * @author Erich Schubert
  * @since 0.5.5
  */
-public class FlexiHistogramTest implements JUnit4Test {
+public class FlexiHistogramTest {
   /**
    * Test that adds some data to the histogram and compares results.
    */
