@@ -707,7 +707,9 @@ public class MiniGUI extends AbstractApplication {
       StringBuilder msg = new StringBuilder();
       msg.append("Your Java class path is incomplete.\n");
       if(e.getCause() != null) {
-        msg.append(e.getCause().toString()).append("\n");
+        for(Throwable t = e.getCause(); t != null; t = t.getCause()) {
+          msg.append(t.toString()).append("\n");
+        }
       }
       else {
         msg.append(e.toString()).append("\n");
