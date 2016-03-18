@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 
@@ -43,7 +42,21 @@ public class ELKILauncher {
   /**
    * Application to run by default.
    */
-  public static final Class<? extends AbstractApplication> DEFAULT_APPLICATION = MiniGUI.class;
+  public static final Class<? extends AbstractApplication> DEFAULT_APPLICATION;
+
+  // Try to load the MiniGUI, fall back to KDDCLIApplication.
+  static {
+    Class<? extends AbstractApplication> clz = KDDCLIApplication.class;
+    try {
+      @SuppressWarnings("unchecked")
+      Class<? extends AbstractApplication> minigui = (Class<? extends AbstractApplication>) Class.forName("de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI");
+      clz = minigui;
+    }
+    catch(ClassNotFoundException e) {
+      // MiniGUI probably not included.
+    }
+    DEFAULT_APPLICATION = clz;
+  }
 
   /**
    * Launch ELKI.
