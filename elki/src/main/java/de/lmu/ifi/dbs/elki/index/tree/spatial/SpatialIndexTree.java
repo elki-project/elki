@@ -30,20 +30,20 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * Abstract super class for all spatial index tree classes.
- * 
+ *
  * @author Elke Achtert
  * @since 0.2
- * 
+ *
  * @apiviz.landmark
  * @apiviz.has SpatialNode oneway - - contains
- * 
+ *
  * @param <N> Node type
  * @param <E> Entry type
  */
 public abstract class SpatialIndexTree<N extends SpatialNode<N, E>, E extends SpatialEntry> extends IndexTree<N, E> {
   /**
    * Constructor.
-   * 
+   *
    * @param pagefile Page file
    */
   public SpatialIndexTree(PageFile<N> pagefile) {
@@ -52,7 +52,7 @@ public abstract class SpatialIndexTree<N extends SpatialNode<N, E>, E extends Sp
 
   /**
    * Add a new leaf entry to the tree.
-   * 
+   *
    * @param leaf Leaf entry
    */
   public abstract void insertLeaf(E leaf);
@@ -60,7 +60,7 @@ public abstract class SpatialIndexTree<N extends SpatialNode<N, E>, E extends Sp
   /**
    * Returns a list of entries pointing to the leaf entries of this spatial
    * index.
-   * 
+   *
    * @return a list of entries pointing to the leaf entries of this spatial
    *         index
    */

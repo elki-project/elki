@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
@@ -68,13 +67,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
- * DeliClu: Density-Based Hierarchical Clustering, a hierarchical algorithm to
- * find density-connected sets in a database.
+ * DeliClu: Density-Based Hierarchical Clustering
+ *
+ * A hierarchical algorithm to find density-connected sets in a database,
+ * closely related to OPTICS but exploiting the structure of a R-tree for
+ * acceleration.
+ *
+ * Reference:
  * <p>
- * Reference: <br>
- * E. Achtert, C. Böhm, P. Kröger: DeLiClu: Boosting Robustness, Completeness,
- * Usability, and Efficiency of Hierarchical Clustering by a Closest Pair
- * Ranking. <br>
+ * E. Achtert, C. Böhm, P. Kröger<br />
+ * DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of
+ * Hierarchical Clustering by a Closest Pair Ranking.<br />
  * In Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining
  * (PAKDD 2006), Singapore, 2006.
  * </p>
@@ -86,11 +89,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("DeliClu: Density-Based Hierarchical Clustering")
 @Description("Hierachical algorithm to find density-connected sets in a database based on the parameter 'minpts'.")
 @Reference(authors = "E. Achtert, C. Böhm, P. Kröger", //
-title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", //
-booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", //
-url = "http://dx.doi.org/10.1007/11731139_16")
+    title = "DeLiClu: Boosting Robustness, Completeness, Usability, and Efficiency of Hierarchical Clustering by a Closest Pair Ranking", //
+    booktitle = "Proc. 10th Pacific-Asia Conference on Knowledge Discovery and Data Mining (PAKDD 2006), Singapore, 2006", //
+    url = "http://dx.doi.org/10.1007/11731139_16")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu" })
-public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgorithm<NV, ClusterOrder>implements OPTICSTypeAlgorithm {
+public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgorithm<NV, ClusterOrder> implements OPTICSTypeAlgorithm {
   /**
    * The logger for this class.
    */
@@ -141,7 +144,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
     if(LOG.isVerbose()) {
       LOG.verbose("knnJoin...");
     }
-    DataStore<KNNList> knns = knnJoin.run(relation);
+    Relation<KNNList> knns = knnJoin.run(relation);
     DBIDs ids = relation.getDBIDs();
     final int size = ids.size();
 
@@ -202,7 +205,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
    * @param nodePair the pair of nodes to be expanded
    * @param knns the knn list
    */
-  private void expandNodes(DeLiCluTree index, SpatialPrimitiveDistanceFunction<NV> distFunction, SpatialObjectPair nodePair, DataStore<KNNList> knns) {
+  private void expandNodes(DeLiCluTree index, SpatialPrimitiveDistanceFunction<NV> distFunction, SpatialObjectPair nodePair, Relation<KNNList> knns) {
     DeLiCluNode node1 = index.getNode(((SpatialDirectoryEntry) nodePair.entry1).getPageID());
     DeLiCluNode node2 = index.getNode(((SpatialDirectoryEntry) nodePair.entry2).getPageID());
 
@@ -259,7 +262,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
    * @param node2 the second node
    * @param knns the knn list
    */
-  private void expandLeafNodes(SpatialPrimitiveDistanceFunction<NV> distFunction, DeLiCluNode node1, DeLiCluNode node2, DataStore<KNNList> knns) {
+  private void expandLeafNodes(SpatialPrimitiveDistanceFunction<NV> distFunction, DeLiCluNode node1, DeLiCluNode node2, Relation<KNNList> knns) {
     if(LOG.isDebuggingFinest()) {
       LOG.debugFinest("ExpandLeafNodes: " + node1.getPageID() + " + " + node2.getPageID());
     }
@@ -295,7 +298,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
    * @param path the path of the object inserted last
    * @param knns the knn list
    */
-  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV> distFunction, DeLiCluTree index, IndexTreePath<DeLiCluEntry> path, DataStore<KNNList> knns) {
+  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV> distFunction, DeLiCluTree index, IndexTreePath<DeLiCluEntry> path, Relation<KNNList> knns) {
     int l = 0; // Count the number of components.
     for(IndexTreePath<DeLiCluEntry> it = path; it != null; it = it.getParentPath()) {
       l++;
@@ -306,17 +309,17 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
     for(; it.getParentPath() != null; it = it.getParentPath()) {
       p.add(it);
     }
-    assert(p.size() == l - 1);
+    assert (p.size() == l - 1);
     DeLiCluEntry rootEntry = it.getEntry();
     reinsertExpanded(distFunction, index, p, l - 2, rootEntry, knns);
   }
 
-  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV> distFunction, DeLiCluTree index, List<IndexTreePath<DeLiCluEntry>> path, int pos, DeLiCluEntry parentEntry, DataStore<KNNList> knns) {
+  private void reinsertExpanded(SpatialPrimitiveDistanceFunction<NV> distFunction, DeLiCluTree index, List<IndexTreePath<DeLiCluEntry>> path, int pos, DeLiCluEntry parentEntry, Relation<KNNList> knns) {
     DeLiCluNode parentNode = index.getNode(parentEntry);
     SpatialEntry entry2 = path.get(pos).getEntry();
 
     if(entry2.isLeafEntry()) {
-      assert(pos == 0);
+      assert (pos == 0);
       for(int i = 0; i < parentNode.getNumEntries(); i++) {
         DeLiCluEntry entry1 = parentNode.getEntry(i);
         if(entry1.hasHandled()) {

@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
+import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
@@ -243,6 +244,11 @@ public final class TypeUtil {
    * Spatial objects.
    */
   public static final SimpleTypeInformation<SpatialComparable> SPATIAL_OBJECT = new SimpleTypeInformation<>(SpatialComparable.class);
+
+  /**
+   * KNN lists.
+   */
+  public static final SimpleTypeInformation<KNNList> KNNLIST = new SimpleTypeInformation<>(KNNList.class);
 
   /**
    * Make a type array easily.

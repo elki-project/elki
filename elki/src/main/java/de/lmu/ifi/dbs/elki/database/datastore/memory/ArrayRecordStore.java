@@ -30,10 +30,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * A class to answer representation queries using the stored Array.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.composedOf DataStoreIDMap
  * @apiviz.has ArrayRecordStore.StorageAccessor oneway - - projectsTo
  */
@@ -50,7 +50,7 @@ public class ArrayRecordStore implements WritableRecordStore {
 
   /**
    * Constructor with existing data
-   * 
+   *
    * @param data Existing data
    * @param idmap Map for array offsets
    */
@@ -68,7 +68,7 @@ public class ArrayRecordStore implements WritableRecordStore {
 
   /**
    * Actual getter
-   * 
+   *
    * @param id Database ID
    * @param index column index
    * @return current value
@@ -80,7 +80,7 @@ public class ArrayRecordStore implements WritableRecordStore {
 
   /**
    * Actual setter
-   * 
+   *
    * @param id Database ID
    * @param index column index
    * @param value New value
@@ -95,9 +95,9 @@ public class ArrayRecordStore implements WritableRecordStore {
 
   /**
    * Access a single record in the given data.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <T> Object data type to access
    */
   protected class StorageAccessor<T> implements WritableDataStore<T> {
@@ -108,7 +108,7 @@ public class ArrayRecordStore implements WritableRecordStore {
 
     /**
      * Constructor.
-     * 
+     *
      * @param index In-record index
      */
     protected StorageAccessor(int index) {
@@ -140,16 +140,6 @@ public class ArrayRecordStore implements WritableRecordStore {
     @Override
     public void clear() {
       throw new UnsupportedOperationException("ArrayStore record columns cannot (yet) be cleared.");
-    }
-
-    @Override
-    public String getLongName() {
-      return "raw";
-    }
-
-    @Override
-    public String getShortName() {
-      return "raw";
     }
   }
 

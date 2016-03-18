@@ -1,12 +1,10 @@
 package de.lmu.ifi.dbs.elki.database.datastore.memory;
 
-import java.util.Arrays;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +22,8 @@ import java.util.Arrays;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap;
 import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
@@ -95,15 +95,5 @@ public class ArrayStore<T> implements WritableDataStore<T> {
   @Override
   public void clear() {
     Arrays.fill(data, null);
-  }
-
-  @Override
-  public String getLongName() {
-    return "raw";
-  }
-
-  @Override
-  public String getShortName() {
-    return "raw";
   }
 }

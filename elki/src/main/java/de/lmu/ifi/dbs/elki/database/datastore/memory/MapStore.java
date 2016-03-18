@@ -34,10 +34,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 /**
  * A class to answer representation queries using a map. Basically, it is just a
  * wrapper around a regular map.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @param <T> Representation object type
  */
 public class MapStore<T> implements WritableDataStore<T> {
@@ -48,7 +48,7 @@ public class MapStore<T> implements WritableDataStore<T> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param data Existing map
    */
   public MapStore(Map<DBID, T> data) {
@@ -90,15 +90,5 @@ public class MapStore<T> implements WritableDataStore<T> {
   @Override
   public void clear() {
     data.clear();
-  }
-
-  @Override
-  public String getLongName() {
-    return "raw";
-  }
-
-  @Override
-  public String getShortName() {
-    return "raw";
   }
 }

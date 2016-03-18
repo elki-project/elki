@@ -31,10 +31,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * A class to answer representation queries using the stored Array.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
  */
 public class ArrayIntegerStore implements WritableIntegerDataStore {
@@ -55,7 +55,7 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
 
   /**
    * Constructor.
-   * 
+   *
    * @param size Size
    * @param idmap ID map
    */
@@ -65,7 +65,7 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
 
   /**
    * Constructor.
-   * 
+   *
    * @param size Size
    * @param idmap ID map
    * @param def Default value
@@ -136,15 +136,5 @@ public class ArrayIntegerStore implements WritableIntegerDataStore {
   @Override
   public void clear() {
     Arrays.fill(data, def);
-  }
-
-  @Override
-  public String getLongName() {
-    return "raw";
-  }
-
-  @Override
-  public String getShortName() {
-    return "raw";
   }
 }

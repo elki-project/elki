@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -59,7 +59,7 @@ public class KNNJoinMaterializeKNNPreprocessor<V extends NumberVector> extends A
   protected void preprocess() {
     // Run KNNJoin
     KNNJoin<V, ?, ?> knnjoin = new KNNJoin<V, RStarTreeNode, SpatialEntry>(distanceFunction, k);
-    storage = knnjoin.run(relation);
+    storage = knnjoin.run(relation, relation.getDBIDs());
   }
 
   @Override

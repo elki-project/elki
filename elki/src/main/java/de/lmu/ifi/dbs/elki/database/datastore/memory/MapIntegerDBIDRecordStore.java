@@ -33,10 +33,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 /**
  * A class to answer representation queries using a map and an index within the
  * record.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.has MapIntegerDBIDRecordStore.StorageAccessor oneway - - projectsTo
  */
 public class MapIntegerDBIDRecordStore implements WritableRecordStore {
@@ -52,7 +52,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
 
   /**
    * Constructor with existing data.
-   * 
+   *
    * @param rlen Number of columns (record length)
    * @param data Existing data map
    */
@@ -64,7 +64,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
 
   /**
    * Constructor without existing data.
-   * 
+   *
    * @param rlen Number of columns (record length)
    */
   public MapIntegerDBIDRecordStore(int rlen) {
@@ -73,7 +73,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
 
   /**
    * Constructor without existing data.
-   * 
+   *
    * @param size Expected size
    * @param rlen Number of columns (record length)
    */
@@ -89,7 +89,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
 
   /**
    * Actual getter.
-   * 
+   *
    * @param id Database ID
    * @param index column index
    * @param <T> type
@@ -106,7 +106,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
 
   /**
    * Actual setter.
-   * 
+   *
    * @param id Database ID
    * @param index column index
    * @param value new value
@@ -127,9 +127,9 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
 
   /**
    * Access a single record in the given data.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <T> Object data type to access
    */
   protected class StorageAccessor<T> implements WritableDataStore<T> {
@@ -140,7 +140,7 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
 
     /**
      * Constructor.
-     * 
+     *
      * @param index In-record index
      */
     protected StorageAccessor(int index) {
@@ -172,16 +172,6 @@ public class MapIntegerDBIDRecordStore implements WritableRecordStore {
     @Override
     public void clear() {
       throw new UnsupportedOperationException("Record storage accessors cannot be cleared.");
-    }
-
-    @Override
-    public String getLongName() {
-      return "raw";
-    }
-
-    @Override
-    public String getShortName() {
-      return "raw";
     }
   }
 

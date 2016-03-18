@@ -31,10 +31,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
  * A class to answer representation queries using the stored Array.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
  */
 public class ArrayDoubleStore implements WritableDoubleDataStore {
@@ -42,7 +42,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
    * Data array
    */
   private double[] data;
-  
+
   /**
    * Default value.
    */
@@ -55,7 +55,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
 
   /**
    * Constructor.
-   * 
+   *
    * @param size Size
    * @param idmap ID map
    */
@@ -65,7 +65,7 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
 
   /**
    * Constructor.
-   * 
+   *
    * @param size Size
    * @param idmap ID map
    * @param def Default value
@@ -135,15 +135,5 @@ public class ArrayDoubleStore implements WritableDoubleDataStore {
   @Override
   public void delete(DBIDRef id) {
     throw new UnsupportedOperationException("Can't delete from a static array storage.");
-  }
-
-  @Override
-  public String getLongName() {
-    return "raw";
-  }
-
-  @Override
-  public String getShortName() {
-    return "raw";
   }
 }

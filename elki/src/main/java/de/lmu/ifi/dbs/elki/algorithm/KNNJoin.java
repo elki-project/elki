@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,7 +30,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
@@ -39,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
@@ -67,7 +67,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * Since this method compares the MBR of every single leaf with every other
  * leaf, it is essentially quadratic in the number of leaves, which may not be
- * appropriate for large trees.
+ * appropriate for large trees. It does currently not yet use the tree structure
+ * for pruning.
+ *
+ * TODO: exploit the tree structure.
  *
  * @author Elke Achtert
  * @author Erich Schubert
@@ -79,7 +82,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("K-Nearest Neighbor Join")
 @Description("Algorithm to find the k-nearest neighbors of each object in a spatial database")
-public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<V, DataStore<KNNList>> {
+public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm<V, Relation<KNNList>> {
   /**
    * The logger for this class.
    */
@@ -107,8 +110,23 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    * @param relation Relation to process
    * @return result
    */
+  public Relation<KNNList> run(Relation<V> relation) {
+    DBIDs ids = relation.getDBIDs();
+    WritableDataStore<KNNList> knnLists = run(relation, ids);
+    // Wrap as relation:
+    return new MaterializedRelation<>("k nearest neighbors", "kNNs", TypeUtil.KNNLIST, knnLists, ids);
+  }
+
+  /**
+   * Inner run method. This returns a double store, and is used by
+   * {@link de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNJoinMaterializeKNNPreprocessor}
+   *
+   * @param relation Data relation
+   * @param ids Object IDs
+   * @return Data store
+   */
   @SuppressWarnings("unchecked")
-  public WritableDataStore<KNNList> run(Relation<V> relation) {
+  public WritableDataStore<KNNList> run(Relation<V> relation, DBIDs ids) {
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
@@ -119,13 +137,11 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     // FIXME: Ensure were looking at the right relation!
     SpatialIndexTree<N, E> index = indexes.iterator().next();
     SpatialPrimitiveDistanceFunction<V> distFunction = (SpatialPrimitiveDistanceFunction<V>) getDistanceFunction();
-    DBIDs ids = relation.getDBIDs();
 
     // data pages
     List<E> ps_candidates = new ArrayList<>(index.getLeaves());
     // knn heaps
     List<List<KNNHeap>> heaps = new ArrayList<>(ps_candidates.size());
-    ComparableMinHeap<Task> pq = new ComparableMinHeap<>(ps_candidates.size() * ps_candidates.size() / 10);
 
     // Initialize with the page self-pairing
     for(int i = 0; i < ps_candidates.size(); i++) {
@@ -135,25 +151,26 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     }
 
     // Build priority queue
-    final int sqsize = ps_candidates.size() * (ps_candidates.size() - 1) >> 1;
+    final int sqsize = ps_candidates.size() * (ps_candidates.size() - 1) >>> 1;
+    ComparableMinHeap<Task> pq = new ComparableMinHeap<>(sqsize);
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("Number of leaves: " + ps_candidates.size() + " so " + sqsize + " MBR computations.");
     }
     FiniteProgress mprogress = LOG.isVerbose() ? new FiniteProgress("Comparing leaf MBRs", sqsize, LOG) : null;
     for(int i = 0; i < ps_candidates.size(); i++) {
       E pr_entry = ps_candidates.get(i);
+      N pr = index.getNode(pr_entry);
       List<KNNHeap> pr_heaps = heaps.get(i);
       double pr_knn_distance = computeStopDistance(pr_heaps);
 
       for(int j = i + 1; j < ps_candidates.size(); j++) {
         E ps_entry = ps_candidates.get(j);
+        N ps = index.getNode(ps_entry);
         List<KNNHeap> ps_heaps = heaps.get(j);
         double ps_knn_distance = computeStopDistance(ps_heaps);
         double minDist = distFunction.minDist(pr_entry, ps_entry);
         // Resolve immediately:
         if(minDist <= 0.) {
-          N pr = index.getNode(ps_candidates.get(i));
-          N ps = index.getNode(ps_candidates.get(j));
           processDataPages(distFunction, pr_heaps, ps_heaps, pr, ps);
         }
         else if(minDist <= pr_knn_distance || minDist <= ps_knn_distance) {
@@ -185,7 +202,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
           if(dor) {
             processDataPages(distFunction, pr_heaps, null, pr, ps);
           }
-          else /* dos */{
+          else /* dos */ {
             processDataPages(distFunction, ps_heaps, null, ps, pr);
           }
         }
@@ -247,13 +264,14 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     // Compare pairwise
     for(int j = 0; j < ps.getNumEntries(); j++) {
       final SpatialPointLeafEntry s_e = (SpatialPointLeafEntry) ps.getEntry(j);
-      DBID s_id = s_e.getDBID();
+      final KNNHeap hj = ps_heaps != null ? ps_heaps.get(j) : null;
+      final DBID s_id = s_e.getDBID();
       for(int i = 0; i < pr.getNumEntries(); i++) {
         final SpatialPointLeafEntry r_e = (SpatialPointLeafEntry) pr.getEntry(i);
         double distance = df.minDist(s_e, r_e);
         pr_heaps.get(i).insert(distance, s_id);
-        if(pr != ps && ps_heaps != null) {
-          ps_heaps.get(j).insert(distance, r_e.getDBID());
+        if(hj != null) {
+          hj.insert(distance, r_e.getDBID());
         }
       }
     }
@@ -341,10 +359,11 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
    */
   public static class Parameterizer<V extends NumberVector, N extends SpatialNode<N, E>, E extends SpatialEntry> extends AbstractDistanceBasedAlgorithm.Parameterizer<V> {
     /**
-     * Parameter that specifies the k-nearest neighbors to be assigned, must be an
-     * integer greater than 0. Default value: 1.
+     * Parameter that specifies the k-nearest neighbors to be assigned, must be
+     * an integer greater than 0. Default value: 1.
      */
     public static final OptionID K_ID = new OptionID("knnjoin.k", "Specifies the k-nearest neighbors to be assigned.");
+
     /**
      * K parameter.
      */

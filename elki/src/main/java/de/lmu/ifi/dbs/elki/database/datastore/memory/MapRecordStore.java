@@ -35,10 +35,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 /**
  * A class to answer representation queries using a map and an index within the
  * record.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.has MapRecordStore.StorageAccessor oneway - - projectsTo
  */
 public class MapRecordStore implements WritableRecordStore {
@@ -55,7 +55,7 @@ public class MapRecordStore implements WritableRecordStore {
 
   /**
    * Constructor with existing data.
-   * 
+   *
    * @param rlen Number of columns (record length)
    * @param data Existing data map
    */
@@ -67,7 +67,7 @@ public class MapRecordStore implements WritableRecordStore {
 
   /**
    * Constructor without existing data.
-   * 
+   *
    * @param rlen Number of columns (record length)
    */
   public MapRecordStore(int rlen) {
@@ -82,7 +82,7 @@ public class MapRecordStore implements WritableRecordStore {
 
   /**
    * Actual getter.
-   * 
+   *
    * @param id Database ID
    * @param index column index
    * @param <T> type
@@ -99,7 +99,7 @@ public class MapRecordStore implements WritableRecordStore {
 
   /**
    * Actual setter.
-   * 
+   *
    * @param id Database ID
    * @param index column index
    * @param value new value
@@ -120,9 +120,9 @@ public class MapRecordStore implements WritableRecordStore {
 
   /**
    * Access a single record in the given data.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <T> Object data type to access
    */
   protected class StorageAccessor<T> implements WritableDataStore<T> {
@@ -133,7 +133,7 @@ public class MapRecordStore implements WritableRecordStore {
 
     /**
      * Constructor.
-     * 
+     *
      * @param index In-record index
      */
     protected StorageAccessor(int index) {
@@ -166,21 +166,10 @@ public class MapRecordStore implements WritableRecordStore {
     public void delete(DBIDRef id) {
       throw new UnsupportedOperationException("Record storage values cannot be deleted.");
     }
-
-    @Override
-    public String getLongName() {
-      return "raw";
-    }
-
-    @Override
-    public String getShortName() {
-      return "raw";
-    }
   }
 
   @Override
   public boolean remove(DBIDRef id) {
     return data.remove(id) != null;
   }
-
 }

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 
 /**
  * Writable data store for double values.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
@@ -43,7 +43,7 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
 
   /**
    * Constructor.
-   * 
+   *
    * @param size Expected size
    */
   public MapIntegerDBIDDoubleStore(int size) {
@@ -52,7 +52,7 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
 
   /**
    * Constructor.
-   * 
+   *
    * @param size Expected size
    * @param def Default value
    */
@@ -70,16 +70,6 @@ public class MapIntegerDBIDDoubleStore implements WritableDoubleDataStore {
   @Override
   public double doubleValue(DBIDRef id) {
     return map.get(DBIDUtil.asInteger(id));
-  }
-
-  @Override
-  public String getLongName() {
-    return "raw";
-  }
-
-  @Override
-  public String getShortName() {
-    return "raw";
   }
 
   @Override

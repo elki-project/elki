@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -59,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 
 /**
  * Unit test for kNN joins.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
@@ -129,7 +128,7 @@ public class KNNJoinTest implements JUnit4Test {
 
   /**
    * Test {@link RStarTree} using a file based database connection.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test
@@ -143,7 +142,7 @@ public class KNNJoinTest implements JUnit4Test {
 
   /**
    * Test {@link RStarTree} using a file based database connection.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test
@@ -157,7 +156,7 @@ public class KNNJoinTest implements JUnit4Test {
 
   /**
    * Test {@link DeLiCluTree} using a file based database connection.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test
@@ -171,7 +170,7 @@ public class KNNJoinTest implements JUnit4Test {
 
   /**
    * Actual test routine.
-   * 
+   *
    * @param inputparams
    * @throws ParameterException
    */
@@ -193,7 +192,7 @@ public class KNNJoinTest implements JUnit4Test {
     // Euclidean
     {
       KNNJoin<DoubleVector, ?, ?> knnjoin = new KNNJoin<DoubleVector, RStarTreeNode, SpatialEntry>(EuclideanDistanceFunction.STATIC, 2);
-      DataStore<KNNList> result = knnjoin.run(db);
+      Relation<KNNList> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {
@@ -206,7 +205,7 @@ public class KNNJoinTest implements JUnit4Test {
     // Manhattan
     {
       KNNJoin<DoubleVector, ?, ?> knnjoin = new KNNJoin<DoubleVector, RStarTreeNode, SpatialEntry>(ManhattanDistanceFunction.STATIC, 2);
-      DataStore<KNNList> result = knnjoin.run(db);
+      Relation<KNNList> result = knnjoin.run(db);
 
       MeanVariance meansize = new MeanVariance();
       for(DBIDIter id = relation.getDBIDs().iter(); id.valid(); id.advance()) {

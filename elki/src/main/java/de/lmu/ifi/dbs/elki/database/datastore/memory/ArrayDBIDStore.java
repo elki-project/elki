@@ -33,10 +33,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 
 /**
  * A class to answer representation queries using the stored Array.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreIDMap
  */
 public class ArrayDBIDStore implements WritableDBIDDataStore {
@@ -52,7 +52,7 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
 
   /**
    * Constructor.
-   * 
+   *
    * @param size Size
    * @param idmap ID map
    */
@@ -120,15 +120,5 @@ public class ArrayDBIDStore implements WritableDBIDDataStore {
   @Override
   public void delete(DBIDRef id) {
     put(id, DBIDUtil.invalid());
-  }
-
-  @Override
-  public String getLongName() {
-    return "raw";
-  }
-
-  @Override
-  public String getShortName() {
-    return "raw";
   }
 }
