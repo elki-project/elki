@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.datasource.ArrayAdapterDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.DatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.math.random.RandomFactory;
+import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Example program to generate a random data set, and run k-means on it.
