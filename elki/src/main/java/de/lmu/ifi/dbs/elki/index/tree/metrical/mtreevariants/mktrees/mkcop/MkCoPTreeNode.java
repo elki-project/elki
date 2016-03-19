@@ -154,7 +154,7 @@ class MkCoPTreeNode<O> extends AbstractMTreeNode<O, MkCoPTreeNode<O>, MkCoPEntry
     super.integrityCheckParameters(parentEntry, parent, index, mTree);
     // test conservative approximation
     MkCoPEntry entry = parent.getEntry(index);
-    int k_max = ((MkCoPTree<O>) mTree).getK_max();
+    int k_max = ((MkCoPTree<O>) mTree).getKmax();
     ApproximationLine approx = conservativeKnnDistanceApproximation(k_max);
     if(!entry.getConservativeKnnDistanceApproximation().equals(approx)) {
       String soll = approx.toString();

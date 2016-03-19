@@ -69,7 +69,7 @@ public abstract class AbstractMkTreeUnified<O, N extends AbstractMTreeNode<O, N,
    */
   @Override
   protected TreeIndexHeader createHeader() {
-    return new MkTreeHeader(getPageSize(), dirCapacity, leafCapacity, settings.k_max);
+    return new MkTreeHeader(getPageSize(), dirCapacity, leafCapacity, settings.kmax);
   }
 
   @Override
@@ -91,7 +91,7 @@ public abstract class AbstractMkTreeUnified<O, N extends AbstractMTreeNode<O, N,
     }
 
     // do batch nn
-    Map<DBID, KNNList> knnLists = batchNN(getRoot(), ids, settings.k_max);
+    Map<DBID, KNNList> knnLists = batchNN(getRoot(), ids, settings.kmax);
 
     // adjust the knn distances
     kNNdistanceAdjustment(getRootEntry(), knnLists);
@@ -115,6 +115,6 @@ public abstract class AbstractMkTreeUnified<O, N extends AbstractMTreeNode<O, N,
    * @return k_max value.
    */
   public int getKmax() {
-    return settings.k_max;
+    return settings.kmax;
   }
 }

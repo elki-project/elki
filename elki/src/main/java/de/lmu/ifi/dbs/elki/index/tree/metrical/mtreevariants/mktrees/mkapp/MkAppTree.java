@@ -123,7 +123,7 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
     }
 
     // do batch nn
-    Map<DBID, KNNList> knnLists = batchNN(getRoot(), ids, settings.k_max + 1);
+    Map<DBID, KNNList> knnLists = batchNN(getRoot(), ids, settings.kmax + 1);
 
     // adjust the knn distances
     adjustApproximatedKNNDistances(getRootEntry(), knnLists);
@@ -198,7 +198,7 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
    * @return the value of the k_max parameter
    */
   public int getK_max() {
-    return settings.k_max;
+    return settings.kmax;
   }
 
   /**
@@ -247,17 +247,17 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
   }
 
   private double[] getMeanKNNList(DBIDs ids, Map<DBID, KNNList> knnLists) {
-    double[] means = new double[settings.k_max];
+    double[] means = new double[settings.kmax];
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       DBID id = DBIDUtil.deref(iter);
       KNNList knns = knnLists.get(id);
       int k = 0;
-      for(DoubleDBIDListIter it = knns.iter(); k < settings.k_max && it.valid(); it.advance(), k++) {
+      for(DoubleDBIDListIter it = knns.iter(); k < settings.kmax && it.valid(); it.advance(), k++) {
         means[k] += it.doubleValue();
       }
     }
 
-    for(int k = 0; k < settings.k_max; k++) {
+    for(int k = 0; k < settings.kmax; k++) {
       means[k] /= ids.size();
     }
 
@@ -330,7 +330,7 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
     // count the zero distances (necessary of log-log space is used)
     int k_0 = 0;
     if(settings.log) {
-      for(int i = 0; i < settings.k_max; i++) {
+      for(int i = 0; i < settings.kmax; i++) {
         double dist = knnDistances[i];
         if(dist == 0) {
           k_0++;
@@ -341,10 +341,10 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
       }
     }
 
-    double[] x = new double[settings.k_max - k_0];
-    double[] y = new double[settings.k_max - k_0];
+    double[] x = new double[settings.kmax - k_0];
+    double[] y = new double[settings.kmax - k_0];
 
-    for(int k = 0; k < settings.k_max - k_0; k++) {
+    for(int k = 0; k < settings.kmax - k_0; k++) {
       if(settings.log) {
         x[k] = Math.log(k + k_0);
         y[k] = Math.log(knnDistances[k + k_0]);

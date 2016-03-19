@@ -125,7 +125,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
       else {
         node = getNode(entry);
         result.append("\n\n").append(node).append(", numEntries = ").append(node.getNumEntries());
-        result.append("\n").append(entry.toString());
+        result.append('\n').append(entry.toString());
 
         if(node.isLeaf()) {
           leafNodes++;
@@ -137,8 +137,8 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     }
 
     result.append(getClass().getName()).append(" hat ").append((levels + 1)).append(" Ebenen \n");
-    result.append("DirCapacity = ").append(dirCapacity).append("\n");
-    result.append("LeafCapacity = ").append(leafCapacity).append("\n");
+    result.append("DirCapacity = ").append(dirCapacity).append('\n');
+    result.append("LeafCapacity = ").append(leafCapacity).append('\n');
     result.append(dirNodes).append(" Directory Nodes \n");
     result.append(leafNodes).append(" Leaf Nodes \n");
     result.append(objects).append(" Objects \n");

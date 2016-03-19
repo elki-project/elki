@@ -82,7 +82,7 @@ public abstract class AbstractMkTreeUnifiedFactory<O, N extends AbstractMTreeNod
       k_maxP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
 
       if(config.grab(k_maxP)) {
-        settings.k_max = k_maxP.getValue();
+        settings.kmax = k_maxP.getValue();
       }
     }
 

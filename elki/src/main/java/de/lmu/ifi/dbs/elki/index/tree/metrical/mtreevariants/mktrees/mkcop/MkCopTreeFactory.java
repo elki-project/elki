@@ -87,7 +87,7 @@ public class MkCopTreeFactory<O> extends AbstractMTreeFactory<O, MkCoPTreeNode<O
       IntParameter k_maxP = new IntParameter(K_ID);
       k_maxP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(k_maxP)) {
-        settings.k_max = k_maxP.intValue();
+        settings.kmax = k_maxP.intValue();
       }
     }
 

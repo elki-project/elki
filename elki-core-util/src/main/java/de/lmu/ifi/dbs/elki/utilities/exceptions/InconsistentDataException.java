@@ -1,10 +1,10 @@
-package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
+package de.lmu.ifi.dbs.elki.utilities.exceptions;
 
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -21,25 +21,37 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees;
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
-import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
+*/
 
 /**
- * Class with settings for MkTrees.
+ * Data inconsistency exception.
+ * 
+ * Thrown when inconsistent data was detected e.g. in an index.
  * 
  * @author Erich Schubert
- * @since 0.4.0
- *
- * @param <O> Object type
- * @param <N> Node type
- * @param <E> Entry type
  */
-public class MkTreeSettings<O, N extends AbstractMTreeNode<O, N, E>, E extends MTreeEntry> extends MTreeSettings<O, N, E> {
+public class InconsistentDataException extends RuntimeException {
   /**
-   * Holds the maximum value of k to support.
+   * Serial version.
    */
-  public int kmax;
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * Constructor.
+   * 
+   * @param msg Error message
+   */
+  public InconsistentDataException(String msg) {
+    super(msg);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param msg Error message
+   * @param cause Error cause
+   */
+  public InconsistentDataException(String msg, Throwable cause) {
+    super(msg, cause);
+  }
 }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,6 +28,7 @@ import java.util.logging.Logger;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.InconsistentDataException;
 
 /**
  * Abstract super class for nodes in M-Tree variants.
@@ -110,10 +111,10 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
       for(int i = 0; i < getCapacity(); i++) {
         E e = getEntry(i);
         if(i < getNumEntries() && e == null) {
-          throw new RuntimeException("i < numEntries && entry == null");
+          throw new InconsistentDataException("i < numEntries && entry == null");
         }
         if(i >= getNumEntries() && e != null) {
-          throw new RuntimeException("i >= numEntries && entry != null");
+          throw new InconsistentDataException("i >= numEntries && entry != null");
         }
       }
     }
@@ -126,11 +127,11 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
         E e = getEntry(i);
 
         if(i < getNumEntries() && e == null) {
-          throw new RuntimeException("i < numEntries && entry == null");
+          throw new InconsistentDataException("i < numEntries && entry == null");
         }
 
         if(i >= getNumEntries() && e != null) {
-          throw new RuntimeException("i >= numEntries && entry != null");
+          throw new InconsistentDataException("i >= numEntries && entry != null");
         }
 
         if(e != null) {
@@ -141,11 +142,11 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
               mTree.getNode(getEntry(k));
             }
 
-            throw new RuntimeException("Wrong Child in " + this + " at " + i);
+            throw new InconsistentDataException("Wrong Child in " + this + " at " + i);
           }
 
           if(!childIsLeaf && node.isLeaf()) {
-            throw new RuntimeException("Wrong Child: child id no leaf, but node is leaf!");
+            throw new InconsistentDataException("Wrong Child: child id no leaf, but node is leaf!");
           }
 
           // noinspection unchecked
@@ -174,16 +175,14 @@ public abstract class AbstractMTreeNode<O, N extends AbstractMTreeNode<O, N, E>,
     E entry = parent.getEntry(index);
     double parentDistance = mTree.distance(entry.getRoutingObjectID(), parentEntry.getRoutingObjectID());
     if(Math.abs(entry.getParentDistance() - parentDistance) > 1E-10) {
-      throw new RuntimeException("Wrong parent distance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + parentDistance + ",\n ist: " + entry.getParentDistance());
+      throw new InconsistentDataException("Wrong parent distance in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + parentDistance + ",\n ist: " + entry.getParentDistance());
     }
 
     // test if covering radius is correctly set
     double mincover = parentDistance + entry.getCoveringRadius();
-    if(parentEntry.getCoveringRadius() < mincover) {
-      if(Math.abs(parentDistance - entry.getCoveringRadius()) > 1e-10) {
-        String msg = "pcr < pd + cr \n" + parentEntry.getCoveringRadius() + " < " + parentDistance + " + " + entry.getCoveringRadius() + "in node " + parent.getPageID() + " at index " + index + " (child " + entry + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")";
-        throw new RuntimeException(msg);
-      }
+    if(parentEntry.getCoveringRadius() < mincover && //
+        Math.abs(parentDistance - entry.getCoveringRadius()) > 1e-10) {
+      throw new InconsistentDataException("pcr < pd + cr \n" + parentEntry.getCoveringRadius() + " < " + parentDistance + " + " + entry.getCoveringRadius() + "in node " + parent.getPageID() + " at index " + index + " (child " + entry + "):\n" + "dist(" + entry.getRoutingObjectID() + " - " + parentEntry.getRoutingObjectID() + ")" + " >  cr(" + entry + ")");
     }
   }
 }

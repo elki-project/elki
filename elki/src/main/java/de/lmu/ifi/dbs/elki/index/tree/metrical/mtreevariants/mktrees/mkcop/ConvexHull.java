@@ -143,8 +143,8 @@ public class ConvexHull {
 
     msg.append("lower and upper hull\n");
     for(int i = 0; i < i; i++) {
-      msg.append("  uhull ").append(i).append("=").append(upperHull[i]).append(" y=").append(y[upperHull[i]]).append("\n");
-      msg.append("  lhull ").append(i).append("=").append(lowerHull[i]).append(" y=").append(y[lowerHull[i]]).append("\n");
+      msg.append("  uhull ").append(i).append('=').append(upperHull[i]).append(" y=").append(y[upperHull[i]]).append('\n');
+      msg.append("  lhull ").append(i).append('=').append(lowerHull[i]).append(" y=").append(y[lowerHull[i]]).append('\n');
     }
   }
 }
