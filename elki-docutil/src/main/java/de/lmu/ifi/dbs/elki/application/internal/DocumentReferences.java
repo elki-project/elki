@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.internal;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -44,7 +44,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Comment;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -88,45 +87,37 @@ public class DocumentReferences {
     }
 
     List<Pair<Reference, TreeSet<Object>>> refs = sortedReferences();
-    try {
-      File references = new File(args[0]);
-      FileOutputStream reffo = new FileOutputStream(references);
+    File references = new File(args[0]);
+    try (FileOutputStream reffo = new FileOutputStream(references); //
+        OutputStream refstream = new BufferedOutputStream(reffo)) {
       Document refdoc = documentReferences(refs);
-      OutputStream refstream = new BufferedOutputStream(reffo);
       HTMLUtil.writeXHTML(refdoc, refstream);
-      refstream.flush();
-      refstream.close();
-      reffo.close();
     }
     catch(IOException e) {
       LoggingUtil.exception("IO Exception writing HTML output.", e);
-      throw new RuntimeException(e);
+      System.exit(1);
     }
     if(args.length > 1) {
-      try {
-        File refwiki = new File(args[1]);
-        FileOutputStream reffow = new FileOutputStream(refwiki);
-        PrintStream refstreamW = new PrintStream(reffow, false, "UTF-8");
+      File refwiki = new File(args[1]);
+      try (FileOutputStream reffow = new FileOutputStream(refwiki); //
+          PrintStream refstreamW = new PrintStream(reffow, false, "UTF-8")) {
         documentReferencesWiki(refs, refstreamW);
-        refstreamW.flush();
-        refstreamW.close();
-        reffow.close();
       }
       catch(IOException e) {
         LoggingUtil.exception("IO Exception writing Wiki output.", e);
-        throw new RuntimeException(e);
+        System.exit(1);
       }
     }
   }
 
-  private static Document documentReferences(List<Pair<Reference, TreeSet<Object>>> refs) {
+  private static Document documentReferences(List<Pair<Reference, TreeSet<Object>>> refs) throws IOException {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
       builder = factory.newDocumentBuilder();
     }
     catch(ParserConfigurationException e1) {
-      throw new RuntimeException(e1);
+      throw new IOException(e1);
     }
     DOMImplementation impl = builder.getDOMImplementation();
     Document htmldoc = impl.createDocument(HTMLUtil.HTML_NAMESPACE, HTMLUtil.HTML_HTML_TAG, null);
@@ -137,12 +128,8 @@ public class DocumentReferences {
     Element body = htmldoc.createElement(HTMLUtil.HTML_BODY_TAG);
     htmldoc.getDocumentElement().appendChild(body);
     // modification warnings
-    {
-      Comment warn = htmldoc.createComment(MODIFICATION_WARNING);
-      head.appendChild(warn);
-      Comment warn2 = htmldoc.createComment(MODIFICATION_WARNING);
-      body.appendChild(warn2);
-    }
+    head.appendChild(htmldoc.createComment(MODIFICATION_WARNING));
+    body.appendChild(htmldoc.createComment(MODIFICATION_WARNING));
     // meta with charset information
     {
       Element meta = htmldoc.createElement(HTMLUtil.HTML_META_TAG);
@@ -261,33 +248,30 @@ public class DocumentReferences {
   private static void documentReferencesWiki(List<Pair<Reference, TreeSet<Object>>> refs, PrintStream refstreamW) {
     for(Pair<Reference, TreeSet<Object>> pair : refs) {
       // JavaDoc links for relevant classes and packages.
-      {
-        boolean first = true;
-        for(Object o : pair.second) {
-          if(!first) {
-            refstreamW.println(",[[br]]");
-          }
-          if(o instanceof Class<?>) {
-            Class<?> cls = (Class<?>) o;
-            refstreamW.print("[[javadoc(");
-            refstreamW.print(cls.getName());
-            refstreamW.print(",");
-            refstreamW.print(cls.getName());
-            refstreamW.print(")]]");
-          }
-          else if(o instanceof Package) {
-            Package pkg = (Package) o;
-            refstreamW.print("[[javadoc(");
-            refstreamW.print(pkg.getName());
-            refstreamW.print(",");
-            refstreamW.print(pkg.getName());
-            refstreamW.print(")]]");
-          }
-
-          first = false;
+      boolean first = true;
+      for(Object o : pair.second) {
+        if(!first) {
+          refstreamW.println(",[[br]]");
         }
+        if(o instanceof Class<?>) {
+          Class<?> cls = (Class<?>) o;
+          refstreamW.print("[[javadoc(");
+          refstreamW.print(cls.getName());
+          refstreamW.print(',');
+          refstreamW.print(cls.getName());
+          refstreamW.print(")]]");
+        }
+        else if(o instanceof Package) {
+          Package pkg = (Package) o;
+          refstreamW.print("[[javadoc(");
+          refstreamW.print(pkg.getName());
+          refstreamW.print(',');
+          refstreamW.print(pkg.getName());
+          refstreamW.print(")]]");
+        }
+        first = false;
       }
-      refstreamW.println("");
+      refstreamW.println();
 
       String indent = " ";
       {
@@ -310,8 +294,8 @@ public class DocumentReferences {
           refstreamW.println(indent + "Online: [" + ref.url() + "][[br]]");
         }
       }
-      refstreamW.println("");
-      refstreamW.println("");
+      refstreamW.println();
+      refstreamW.println();
     }
   }
 
@@ -350,9 +334,9 @@ public class DocumentReferences {
        */
       private int compareNull(String s1, String s2) {
         return (s1 == s2) ? 0 //
-        : (s1 == null) ? -1 //
-        : (s2 == null) ? +1 //
-        : s1.compareTo(s2);
+            : (s1 == null) ? -1 //
+                : (s2 == null) ? +1 //
+                    : s1.compareTo(s2);
       }
     });
     return refs;
@@ -385,14 +369,12 @@ public class DocumentReferences {
       }
       for(Method m : cls.getDeclaredMethods()) {
         if(m.isAnnotationPresent(Reference.class)) {
-          Reference ref = m.getAnnotation(Reference.class);
-          addReference(cls, ref, refs, map);
+          addReference(cls, m.getAnnotation(Reference.class), refs, map);
         }
       }
       for(Field f : cls.getDeclaredFields()) {
         if(f.isAnnotationPresent(Reference.class)) {
-          Reference ref = f.getAnnotation(Reference.class);
-          addReference(cls, ref, refs, map);
+          addReference(cls, f.getAnnotation(Reference.class), refs, map);
         }
       }
     }
@@ -404,8 +386,7 @@ public class DocumentReferences {
   private static void addReference(Object cls, Reference ref, List<Pair<Reference, TreeSet<Object>>> refs, Map<Reference, TreeSet<Object>> map) {
     TreeSet<Object> list = map.get(ref);
     if(list == null) {
-      list = new TreeSet<>(COMPARATOR);
-      map.put(ref, list);
+      map.put(ref, list = new TreeSet<>(COMPARATOR));
       refs.add(new Pair<>(ref, list));
     }
     list.add(cls);
@@ -413,17 +394,16 @@ public class DocumentReferences {
 
   private static void inspectPackage(Package p, List<Pair<Reference, TreeSet<Object>>> refs, Map<Reference, TreeSet<Object>> map) {
     if(p.isAnnotationPresent(Reference.class)) {
-      Reference ref = p.getAnnotation(Reference.class);
-      addReference(p, ref, refs, map);
+      addReference(p, p.getAnnotation(Reference.class), refs, map);
     }
   }
 
   private static String linkForClassName(String name) {
-    return name.replace(".", "/") + ".html";
+    return name.replace('.', '/') + ".html";
   }
 
   private static String linkForPackageName(String name) {
-    return name.replace(".", "/") + "/package-summary.html";
+    return name.replace('.', '/') + "/package-summary.html";
   }
 
   /**

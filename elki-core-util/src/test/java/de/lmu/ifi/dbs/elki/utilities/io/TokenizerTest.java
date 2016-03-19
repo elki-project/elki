@@ -101,7 +101,7 @@ public class TokenizerTest {
           long val = t.getLongBase10();
           fail("The value " + t.getSubstring() + " was expected to be not parseable as long integer, but returned: " + val);
         }
-        catch(Exception ex) {
+        catch(NumberFormatException ex) {
           // pass. this is expected to fail.
         }
       }

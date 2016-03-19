@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.internal;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.application.internal;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -47,7 +46,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.w3c.dom.Comment;
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -151,95 +149,47 @@ public class DocumentParameters {
       System.exit(1);
     }
 
-    {
-      FileOutputStream byclassfo;
-      try {
-        byclassfo = new FileOutputStream(byclsname);
-      }
-      catch(FileNotFoundException e) {
-        LOG.exception("Can't create output stream!", e);
-        throw new RuntimeException(e);
-      }
-      OutputStream byclassstream = new BufferedOutputStream(byclassfo);
+    try (FileOutputStream byclassfo = new FileOutputStream(byclsname); //
+        OutputStream byclassstream = new BufferedOutputStream(byclassfo)) {
       Document byclassdoc = makeByClassOverviewHTML(byclass);
-      try {
-        HTMLUtil.writeXHTML(byclassdoc, byclassstream);
-        byclassstream.flush();
-        byclassstream.close();
-        byclassfo.close();
-      }
-      catch(IOException e) {
-        LOG.exception("IO Exception writing output.", e);
-        throw new RuntimeException(e);
-      }
+      HTMLUtil.writeXHTML(byclassdoc, byclassstream);
+    }
+    catch(IOException e) {
+      LOG.exception("IO Exception writing output.", e);
+      System.exit(1);
     }
     if(byclsnamew != null) {
-      FileOutputStream byclassfo;
-      try {
-        byclassfo = new FileOutputStream(byclsnamew);
-      }
-      catch(FileNotFoundException e) {
-        LOG.exception("Can't create output stream!", e);
-        throw new RuntimeException(e);
-      }
-      try {
-        PrintStream byclassstream = new PrintStream(new BufferedOutputStream(byclassfo), false, "UTF-8");
+      try (FileOutputStream byclassfo = new FileOutputStream(byclsnamew); //
+          PrintStream byclassstream = new PrintStream(new BufferedOutputStream(byclassfo), false, "UTF-8")) {
         makeByClassOverviewWiki(byclass, new WikiStream(byclassstream));
-        byclassstream.flush();
-        byclassstream.close();
-        byclassfo.close();
       }
       catch(IOException e) {
         LOG.exception("IO Exception writing output.", e);
-        throw new RuntimeException(e);
+        System.exit(1);
       }
     }
 
-    {
-      FileOutputStream byoptfo;
-      try {
-        byoptfo = new FileOutputStream(byoptname);
-      }
-      catch(FileNotFoundException e) {
-        LOG.exception("Can't create output stream!", e);
-        throw new RuntimeException(e);
-      }
-      OutputStream byoptstream = new BufferedOutputStream(byoptfo);
+    try (FileOutputStream byoptfo = new FileOutputStream(byoptname); //
+        OutputStream byoptstream = new BufferedOutputStream(byoptfo)) {
       Document byoptdoc = makeByOptOverviewHTML(byopt);
-      try {
-        HTMLUtil.writeXHTML(byoptdoc, byoptfo);
-        byoptstream.flush();
-        byoptstream.close();
-        byoptfo.close();
-      }
-      catch(IOException e) {
-        LOG.exception("IO Exception writing output.", e);
-        throw new RuntimeException(e);
-      }
+      HTMLUtil.writeXHTML(byoptdoc, byoptfo);
+    }
+    catch(IOException e) {
+      LOG.exception("IO Exception writing output.", e);
+      System.exit(1);
     }
 
     if(byoptnamew != null) {
-      FileOutputStream byoptfo;
-      try {
-        byoptfo = new FileOutputStream(byoptnamew);
-      }
-      catch(FileNotFoundException e) {
-        LOG.exception("Can't create output stream!", e);
-        throw new RuntimeException(e);
-      }
-      try {
-        PrintStream byoptstream = new PrintStream(new BufferedOutputStream(byoptfo));
+      try (FileOutputStream byoptfo = new FileOutputStream(byoptnamew); //
+          PrintStream byoptstream = new PrintStream(new BufferedOutputStream(byoptfo))) {
         makeByOptOverviewWiki(byopt, new WikiStream(byoptstream));
-        byoptstream.flush();
-        byoptstream.close();
-        byoptfo.close();
       }
       catch(IOException e) {
         LOG.exception("IO Exception writing output.", e);
         throw new RuntimeException(e);
       }
     }
-    // Forcibly terminate, as some class may have screwed up.
+    // Forcibly terminate, as some class may have spawned a thread.
     System.exit(0);
   }
 
@@ -248,13 +198,7 @@ public class DocumentParameters {
     ExecutorService es = Executors.newSingleThreadExecutor();
     List<Class<?>> objs = ELKIServiceRegistry.findAllImplementations(Object.class, false, true);
     Collections.sort(objs, new ELKIServiceScanner.ClassSorter());
-    Class<?> appc = null;
-    try {
-      appc = Class.forName("de.lmu.ifi.dbs.elki.application.AbstractApplication");
-    }
-    catch(Exception e) {
-      // Not serious.
-    }
+    Class<?> appc = appBaseClass();
     for(final Class<?> cls : objs) {
       // Doesn't have a proper name?
       if(cls.getCanonicalName() == null) {
@@ -267,85 +211,20 @@ public class DocumentParameters {
       }
 
       UnParameterization config = new UnParameterization();
-      final TrackParameters track = new TrackParameters(config, cls);
-      // LoggingUtil.warning("Instantiating " + cls.getName());
-      FutureTask<?> instantiator = new FutureTask<>(new Runnable() {
-        @Override
-        public void run() {
-          // Try a V3 style parameterizer first.
-          Parameterizer par = ClassGenericsUtil.getParameterizer(cls);
-          if(par != null) {
-            par.configure(track);
-          }
-          else {
-            try {
-              ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
-            }
-            catch(java.lang.NoSuchMethodException
-                | java.lang.IllegalAccessException e) {
-              // LOG.warning("Could not instantiate class " + cls.getName() +
-              // " - no appropriate constructor or parameterizer found.");
-            }
-            catch(java.lang.reflect.InvocationTargetException e) {
-              if(e.getCause() instanceof RuntimeException) {
-                throw (RuntimeException) e.getCause();
-              }
-              if(e.getCause() instanceof Error) {
-                throw (Error) e.getCause();
-              }
-              throw new RuntimeException(e.getCause());
-            }
-            catch(RuntimeException e) {
-              throw e;
-            }
-            catch(Exception | java.lang.Error e) {
-              throw new RuntimeException(e);
-            }
-          }
-          for(TrackedParameter pair : track.getAllParameters()) {
-            if(pair.getOwner() == null) {
-              LOG.warning("No owner for parameter " + pair.getParameter() + " expected a " + cls.getName());
-              continue;
-            }
-            options.add(pair);
-          }
-        }
-      }, null);
-      es.submit(instantiator);
+      TrackParameters track = new TrackParameters(config, cls);
       try {
         // Wait up to one second.
-        instantiator.get(1L, TimeUnit.SECONDS);
+        es.submit(new FutureTask<Object>(//
+            new Instancer(cls, track, options), null))//
+            .get(1L, TimeUnit.SECONDS);
       }
       catch(TimeoutException e) {
         LOG.warning("Timeout on instantiating " + cls.getName());
         es.shutdownNow();
         throw new RuntimeException(e);
       }
-      catch(java.util.concurrent.ExecutionException e) {
-        // Do full reporting only on release branch.
-        if(cls.getName().startsWith("de.lmu.ifi.dbs.elki")) {
-          LOG.warning("Error instantiating " + cls.getName(), e.getCause());
-        }
-        else {
-          LOG.warning("Error instantiating " + cls.getName());
-        }
-        // es.shutdownNow();
-        // if(e.getCause() instanceof RuntimeException) {
-        // throw (RuntimeException) e.getCause();
-        // }
-        // throw new RuntimeException(e.getCause());
-        continue;
-      }
       catch(Exception e) {
-        // Do full reporting only on release branch.
-        if(cls.getName().startsWith("de.lmu.ifi.dbs.elki")) {
-          LOG.warning("Error instantiating " + cls.getName(), e.getCause());
-        }
-        else {
-          LOG.warning("Error instantiating " + cls.getName());
-        }
-        // es.shutdownNow();
-        // throw new RuntimeException(e);
+        LOG.warning("Error instantiating " + cls.getName(), e.getCause());
         continue;
       }
     }
@@ -355,13 +234,7 @@ public class DocumentParameters {
         LOG.debugFiner("Null: " + pp.getOwner() + " " + pp.getParameter());
         continue;
       }
-      Class<?> c;
-      if(pp.getOwner() instanceof Class) {
-        c = (Class<?>) pp.getOwner();
-      }
-      else {
-        c = pp.getOwner().getClass();
-      }
+      Class<?> c = (Class<?>) ((pp.getOwner() instanceof Class) ? pp.getOwner() : pp.getOwner().getClass());
       Parameter<?> o = pp.getParameter();
 
       // just collect unique occurrences
@@ -379,8 +252,7 @@ public class DocumentParameters {
         if(!inlist) {
           List<Parameter<?>> ex = byclass.get(c);
           if(ex == null) {
-            ex = new ArrayList<>();
-            byclass.put(c, ex);
+            byclass.put(c, ex = new ArrayList<>());
           }
           ex.add(o);
         }
@@ -399,14 +271,26 @@ public class DocumentParameters {
         if(!inlist) {
           List<Pair<Parameter<?>, Class<?>>> ex = byopt.get(o.getOptionID());
           if(ex == null) {
-            ex = new ArrayList<>();
-            byopt.put(o.getOptionID(), ex);
+            byopt.put(o.getOptionID(), ex = new ArrayList<>());
           }
           ex.add(new Pair<Parameter<?>, Class<?>>(o, c));
         }
       }
     }
-    LOG.debug("byClass: " + byclass.size() + " byOpt: " + byopt.size());
+  }
+
+  /**
+   * Get the base application class (to be ignored).
+   * 
+   * @return Application class.
+   */
+  private static Class<?> appBaseClass() {
+    try {
+      return Class.forName("de.lmu.ifi.dbs.elki.application.AbstractApplication");
+    }
+    catch(ClassNotFoundException e) {
+      return null;
+    }
   }
 
   protected static Constructor<?> getConstructor(final Class<?> cls) {
@@ -414,20 +298,93 @@ public class DocumentParameters {
       return cls.getConstructor(Parameterization.class);
     }
     catch(java.lang.NoClassDefFoundError e) {
-      // Class not actually found
+      return null;
     }
     catch(RuntimeException e) {
       // Not parameterizable, usually not even found ...
       LOG.warning("RuntimeException: ", e);
+      return null;
     }
     catch(Exception e) {
       // Not parameterizable.
+      return null;
     }
     catch(java.lang.Error e) {
       // Not parameterizable.
       LOG.warning("Error: ", e);
+      return null;
     }
-    return null;
+  }
+
+  private static class Instancer implements Runnable {
+    /**
+     * Class to instantiate.
+     */
+    private Class<?> cls;
+
+    /**
+     * Parameter tracking helper.
+     */
+    private TrackParameters track;
+
+    /**
+     * Options list.
+     */
+    private ArrayList<TrackedParameter> options;
+
+    /**
+     * Constructor.
+     * 
+     * @param cls Class to instantiate
+     * @param track Parameter tracking helper
+     * @param options Options list.
+     */
+    public Instancer(Class<?> cls, TrackParameters track, ArrayList<TrackedParameter> options) {
+      this.cls = cls;
+      this.track = track;
+      this.options = options;
+    }
+
+    @Override
+    public void run() {
+      // Try a V3 style parameterizer first.
+      Parameterizer par = ClassGenericsUtil.getParameterizer(cls);
+      if(par != null) {
+        par.configure(track);
+      }
+      else {
+        try {
+          ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
+        }
+        catch(java.lang.NoSuchMethodException
+            | java.lang.IllegalAccessException e) {
+          // LOG.warning("Could not instantiate class " + cls.getName() +
+          // " - no appropriate constructor or parameterizer found.");
+        }
+        catch(java.lang.reflect.InvocationTargetException e) {
+          if(e.getCause() instanceof RuntimeException) {
+            throw (RuntimeException) e.getCause();
+          }
+          if(e.getCause() instanceof Error) {
+            throw (Error) e.getCause();
+          }
+          throw new RuntimeException(e.getCause());
+        }
+        catch(RuntimeException e) {
+          throw e;
+        }
+        catch(Exception | java.lang.Error e) {
+          throw new RuntimeException(e);
+        }
+      }
+      for(TrackedParameter pair : track.getAllParameters()) {
+        if(pair.getOwner() == null) {
+          LOG.warning("No owner for parameter " + pair.getParameter() + " expected a " + cls.getName());
+          continue;
+        }
+        options.add(pair);
+      }
+    }
   }
 
   private static Document makeByClassOverviewHTML(Map<Class<?>, List<Parameter<?>>> byclass) {
@@ -448,12 +405,8 @@ public class DocumentParameters {
     Element body = htmldoc.createElement(HTMLUtil.HTML_BODY_TAG);
     htmldoc.getDocumentElement().appendChild(body);
     // modification warnings
-    {
-      Comment warn = htmldoc.createComment(MODIFICATION_WARNING);
-      head.appendChild(warn);
-      Comment warn2 = htmldoc.createComment(MODIFICATION_WARNING);
-      body.appendChild(warn2);
-    }
+    head.appendChild(htmldoc.createComment(MODIFICATION_WARNING));
+    body.appendChild(htmldoc.createComment(MODIFICATION_WARNING));
     // meta with charset information
     {
       Element meta = htmldoc.createElement(HTMLUtil.HTML_META_TAG);
@@ -559,7 +512,7 @@ public class DocumentParameters {
   private static class WikiStream {
     PrintStream out;
 
-    public int indent = 0;
+    int indent = 0;
 
     // Newline mode.
     int newline = 0;
@@ -569,12 +522,19 @@ public class DocumentParameters {
       this.newline = -1;
     }
 
-    void print(String p) {
+    WikiStream print(String p) {
       insertNewline();
       out.print(p);
+      return this;
     }
 
-    private void insertNewline() {
+    WikiStream print(char c) {
+      insertNewline();
+      out.print(c);
+      return this;
+    }
+
+    WikiStream insertNewline() {
       if(newline == 2) {
         out.print("[[br]]");
       }
@@ -582,72 +542,66 @@ public class DocumentParameters {
         printIndent();
         newline = 0;
       }
+      return this;
     }
 
-    private void printIndent() {
+    WikiStream printIndent() {
       if(newline > 0) {
         out.println();
       }
       for(int i = indent; i > 0; i--) {
         out.print(' ');
       }
+      return this;
     }
 
-    void println(String p) {
+    WikiStream println(String p) {
       insertNewline();
       out.print(p);
       newline = 2;
+      return this;
     }
 
-    void println() {
+    WikiStream println() {
       newline = 2;
+      return this;
     }
 
-    void printitem(String item) {
+    WikiStream printitem(String item) {
       printIndent();
       newline = 0;
       print(item);
+      return this;
     }
 
-    void javadocLink(Class<?> cls, Class<?> base) {
+    WikiStream javadocLink(Class<?> cls, Class<?> base) {
       insertNewline();
       out.print("[[javadoc(");
       out.print(cls.getCanonicalName());
       if(base != null) {
-        out.print(",");
+        out.print(',');
         out.print(ClassParameter.canonicalClassName(cls, base));
       }
       out.print(")]]");
+      return this;
     }
   }
 
   private static void makeByClassOverviewWiki(Map<Class<?>, List<Parameter<?>>> byclass, WikiStream out) {
     List<Class<?>> classes = new ArrayList<>(byclass.keySet());
     Collections.sort(classes, new ELKIServiceScanner.ClassSorter());
-
-    Class<?> base = null;
-    try {
-      base = Class.forName("de.lmu.ifi.dbs.elki.KDDTask");
-    }
-    catch(ClassNotFoundException e) {
-      // Just worse links, not serious.
-    }
+    Class<?> base = getBaseClass();
 
     for(Class<?> cls : classes) {
       out.indent = 0;
-      out.printitem("'''");
-      out.javadocLink(cls, base);
-      out.println("''':");
+      out.printitem("'''").javadocLink(cls, base).println("''':");
       out.indent = 1;
       out.newline = 1; // No BR needed, we increase the indent.
       for(Parameter<?> opt : byclass.get(cls)) {
         out.printitem("* ");
-        out.print("{{{"); // typewriter
-        out.print(SerializedParameterization.OPTION_PREFIX);
-        out.print(opt.getName());
-        out.print(" ");
-        out.print(opt.getSyntax());
-        out.println("}}}");
+        out.print("{{{").print(SerializedParameterization.OPTION_PREFIX) //
+            .print(opt.getName()).print(' ').print(opt.getSyntax()) //
+            .println("}}}");
         if(opt.getShortDescription() != null) {
           appendMultilineTextWiki(out, opt.getShortDescription());
         }
@@ -674,22 +628,34 @@ public class DocumentParameters {
     }
   }
 
-  private static int appendMultilineTextWiki(WikiStream out, String text) {
-    final String[] lines = text.split("\n");
-    for(int i = 0; i < lines.length; i++) {
-      out.println(lines[i]);
+  /**
+   * Get the base class, for naming.
+   * 
+   * @return Base class.
+   */
+  private static Class<?> getBaseClass() {
+    try {
+      return Class.forName("de.lmu.ifi.dbs.elki.KDDTask");
     }
-    return lines.length;
+    catch(ClassNotFoundException e) {
+      return null; // Just worse links, not serious.
+    }
   }
 
-  private static Document makeByOptOverviewHTML(Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) {
+  private static void appendMultilineTextWiki(WikiStream out, String text) {
+    for(String line : text.split("\n")) {
+      out.println(line);
+    }
+  }
+
+  private static Document makeByOptOverviewHTML(Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) throws IOException {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
     DocumentBuilder builder;
     try {
       builder = factory.newDocumentBuilder();
     }
     catch(ParserConfigurationException e1) {
-      throw new RuntimeException(e1);
+      throw new IOException(e1);
     }
     DOMImplementation impl = builder.getDOMImplementation();
     Document htmldoc = impl.createDocument(HTMLUtil.HTML_NAMESPACE, HTMLUtil.HTML_HTML_TAG, null);
@@ -700,12 +666,8 @@ public class DocumentParameters {
     Element body = htmldoc.createElement(HTMLUtil.HTML_BODY_TAG);
     htmldoc.getDocumentElement().appendChild(body);
     // modification warnings
-    {
-      Comment warn = htmldoc.createComment(MODIFICATION_WARNING);
-      head.appendChild(warn);
-      Comment warn2 = htmldoc.createComment(MODIFICATION_WARNING);
-      body.appendChild(warn2);
-    }
+    head.appendChild(htmldoc.createComment(MODIFICATION_WARNING));
+    body.appendChild(htmldoc.createComment(MODIFICATION_WARNING));
     // meta with charset information
     {
       Element meta = htmldoc.createElement(HTMLUtil.HTML_META_TAG);
@@ -775,28 +737,8 @@ public class DocumentParameters {
         optdd.appendChild(elemp);
       }
       // class restriction?
-      Class<?> superclass = null;
-      if(firstopt instanceof ClassParameter<?>) {
-        superclass = ((ClassParameter<?>) firstopt).getRestrictionClass();
-      }
-      else if(firstopt instanceof ClassListParameter<?>) {
-        superclass = ((ClassListParameter<?>) firstopt).getRestrictionClass();
-      }
+      Class<?> superclass = getRestrictionClass(oid, firstopt, byopt);
       if(superclass != null) {
-        for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
-          if(clinst.getFirst() instanceof ClassParameter) {
-            ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
-            if(!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
-              superclass = cls.getRestrictionClass();
-            }
-          }
-          if(clinst.getFirst() instanceof ClassListParameter) {
-            ClassListParameter<?> cls = (ClassListParameter<?>) clinst.getFirst();
-            if(!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
-              superclass = cls.getRestrictionClass();
-            }
-          }
-        }
         appendClassRestriction(htmldoc, superclass, optdd);
       }
       // default value?
@@ -845,17 +787,50 @@ public class DocumentParameters {
             appendDefaultValueIfSet(htmldoc, param, classli);
           }
         }
-        else {
-          if(firstopt.getDefaultValue() != null) {
-            appendNoDefaultValue(htmldoc, classli);
-          }
+        else if(firstopt.getDefaultValue() != null) {
+          appendNoDefaultValue(htmldoc, classli);
         }
-
         classesul.appendChild(classli);
       }
     }
     return htmldoc;
+  }
 
+  /**
+   * Get the restriction class of an option.
+   * 
+   * @param oid
+   * @param firstopt
+   * @param byopt
+   * @return
+   */
+  private static Class<?> getRestrictionClass(OptionID oid, final Parameter<?> firstopt, Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt) {
+    Class<?> superclass;
+    if(firstopt instanceof ClassParameter<?>) {
+      superclass = ((ClassParameter<?>) firstopt).getRestrictionClass();
+    }
+    else if(firstopt instanceof ClassListParameter<?>) {
+      superclass = ((ClassListParameter<?>) firstopt).getRestrictionClass();
+    }
+    else {
+      return null;
+    }
+    // Also look for more general restrictions:
+    for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
+      if(clinst.getFirst() instanceof ClassParameter) {
+        ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
+        if(!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
+          superclass = cls.getRestrictionClass();
+        }
+      }
+      if(clinst.getFirst() instanceof ClassListParameter) {
+        ClassListParameter<?> cls = (ClassListParameter<?>) clinst.getFirst();
+        if(!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
+          superclass = cls.getRestrictionClass();
+        }
+      }
+    }
+    return superclass;
   }
 
   private static void makeByOptOverviewWiki(Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt, WikiStream out) {
@@ -865,28 +840,15 @@ public class DocumentParameters {
     for(OptionID oid : opts) {
       final Parameter<?> firstopt = byopt.get(oid).get(0).getFirst();
       out.indent = 1;
-      out.printitem("");
-      out.print("{{{");
-      out.print(SerializedParameterization.OPTION_PREFIX);
-      out.print(firstopt.getName());
-      out.print(" ");
-      out.print(firstopt.getSyntax());
-      out.println("}}}:: ");
+      out.printitem("").print("{{{").print(SerializedParameterization.OPTION_PREFIX) //
+          .print(firstopt.getName()).print(' ').print(firstopt.getSyntax()).println("}}}:: ");
       out.newline = 1; // No BR needed, we increase the indent.
       out.indent = 2;
 
       appendMultilineTextWiki(out, firstopt.getShortDescription());
       // class restriction?
-      Class<?> superclass = null;
-      if(firstopt instanceof ClassParameter<?>) {
-        // Find superclass heuristically
-        superclass = ((ClassParameter<?>) firstopt).getRestrictionClass();
-        for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
-          ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
-          if(!cls.getRestrictionClass().equals(superclass) && cls.getRestrictionClass().isAssignableFrom(superclass)) {
-            superclass = cls.getRestrictionClass();
-          }
-        }
+      Class<?> superclass = getRestrictionClass(oid, firstopt, byopt);
+      if(superclass != null) {
         appendClassRestrictionWiki(out, superclass);
       }
       // default value?
@@ -902,9 +864,7 @@ public class DocumentParameters {
         out.println("Used by:");
         for(Pair<Parameter<?>, Class<?>> clinst : byopt.get(oid)) {
           out.indent = 3;
-          out.printitem("* ");
-          out.javadocLink(clinst.getSecond(), null);
-          out.println();
+          out.printitem("* ").javadocLink(clinst.getSecond(), null).println();
           if(clinst.getFirst() instanceof ClassParameter<?> && firstopt instanceof ClassParameter<?>) {
             ClassParameter<?> cls = (ClassParameter<?>) clinst.getFirst();
             if(cls.getRestrictionClass() != null) {
@@ -923,12 +883,10 @@ public class DocumentParameters {
               appendDefaultValueWiki(out, param);
             }
           }
-          else {
-            if(firstopt.getDefaultValue() != null) {
-              appendNoDefaultValueWiki(out);
-            }
+          else if(firstopt.getDefaultValue() != null) {
+            appendNoDefaultValueWiki(out);
           }
-          out.println("");
+          out.println();
         }
       }
     }
@@ -942,10 +900,7 @@ public class DocumentParameters {
   }
 
   private static void appendClassRestriction(Document htmldoc, Class<?> restriction, Element elemdd) {
-    if(restriction == null) {
-      LOG.warning("No restriction class!");
-      return;
-    }
+    assert (restriction != null);
     Element p = htmldoc.createElement(HTMLUtil.HTML_P_TAG);
     p.appendChild(htmldoc.createTextNode(HEADER_CLASS_RESTRICTION));
     if(restriction.isInterface()) {
@@ -969,25 +924,14 @@ public class DocumentParameters {
   }
 
   private static void appendClassRestrictionWiki(WikiStream out, Class<?> restriction) {
-    if(restriction == null) {
-      LOG.warning("No restriction class!");
-      return;
-    }
-    out.print(HEADER_CLASS_RESTRICTION);
-    if(restriction.isInterface()) {
-      out.print(HEADER_CLASS_RESTRICTION_IMPLEMENTING);
-    }
-    else {
-      out.print(HEADER_CLASS_RESTRICTION_EXTENDING);
-    }
-    out.javadocLink(restriction, null);
-    out.println();
+    assert (restriction != null);
+    out.print(HEADER_CLASS_RESTRICTION) //
+        .print(restriction.isInterface() ? HEADER_CLASS_RESTRICTION_IMPLEMENTING : HEADER_CLASS_RESTRICTION_EXTENDING) //
+        .javadocLink(restriction, null).println();
   }
 
   private static void appendNoClassRestrictionWiki(WikiStream out) {
-    out.print(HEADER_CLASS_RESTRICTION);
-    out.print(NO_CLASS_RESTRICTION);
-    out.println();
+    out.print(HEADER_CLASS_RESTRICTION).print(NO_CLASS_RESTRICTION).println();
   }
 
   private static void appendKnownImplementationsIfNonempty(Document htmldoc, Class<?> restriction, Element elemdd) {
@@ -1028,9 +972,7 @@ public class DocumentParameters {
     out.println(HEADER_KNOWN_IMPLEMENTATIONS);
     out.indent++;
     for(Class<?> c : implementations) {
-      out.printitem("* ");
-      out.javadocLink(c, restriction);
-      out.println();
+      out.printitem("* ").javadocLink(c, restriction).println();
     }
     out.indent--;
   }
@@ -1076,20 +1018,18 @@ public class DocumentParameters {
     out.print(HEADER_DEFAULT_VALUE);
     if(par instanceof ClassParameter<?>) {
       final Class<?> name = ((ClassParameter<?>) par).getDefaultValue();
-      out.javadocLink(name, null);
+      out.javadocLink(name, null).println();
     }
     else if(par instanceof RandomParameter && par.getDefaultValue() == RandomFactory.DEFAULT) {
-      out.print("use global random seed");
+      out.println("use global random seed");
     }
     else {
-      out.print(par.getDefaultValueAsString());
+      out.println(par.getDefaultValueAsString());
     }
-    out.println();
   }
 
   private static void appendNoDefaultValueWiki(WikiStream out) {
-    out.print(HEADER_DEFAULT_VALUE);
-    out.println(NO_DEFAULT_VALUE);
+    out.print(HEADER_DEFAULT_VALUE).println(NO_DEFAULT_VALUE);
   }
 
   /**
@@ -1099,8 +1039,7 @@ public class DocumentParameters {
    * @return (relative) link destination
    */
   private static String linkForClassName(String name) {
-    String link = name.replace(".", "/") + ".html";
-    return link;
+    return name.replace('.', '/') + ".html";
   }
 
   /**
