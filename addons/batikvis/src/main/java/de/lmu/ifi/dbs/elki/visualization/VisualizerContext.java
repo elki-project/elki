@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -113,18 +113,14 @@ public class VisualizerContext implements DataStoreListener, Result {
   private Result baseResult;
 
   /**
-   * Relation currently visualized.
-   */
-  private Relation<?> relation;
-
-  /**
    * Constructor. We currently require a Database and a Result.
    *
    * @param hier Result hierarchy
    * @param start Starting result
+   * @param stylelib Style library
    * @param factories Visualizer Factories to use
    */
-  public VisualizerContext(ResultHierarchy hier, Result start, Relation<?> relation, StyleLibrary stylelib, Collection<VisualizationProcessor> factories) {
+  public VisualizerContext(ResultHierarchy hier, Result start, StyleLibrary stylelib, Collection<VisualizationProcessor> factories) {
     super();
     this.hier = hier;
     this.baseResult = start;
@@ -289,23 +285,6 @@ public class VisualizerContext implements DataStoreListener, Result {
   public void setSelection(DBIDSelection sel) {
     selection.setSelection(sel);
     getHierarchy().resultChanged(selection);
-  }
-
-  /**
-   * Current relation.
-   */
-  public Relation<?> getRelation() {
-    return relation;
-  }
-
-  /**
-   * Set the current relation.
-   *
-   * @param rel Relation
-   */
-  public void setRelation(Relation<?> rel) {
-    this.relation = rel;
-    getHierarchy().resultChanged(this);
   }
 
   /**

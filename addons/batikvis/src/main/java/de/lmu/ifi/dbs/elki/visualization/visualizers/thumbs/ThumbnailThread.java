@@ -55,17 +55,17 @@ public class ThumbnailThread extends Thread {
    * 
    * @param callback Callback
    */
-  public synchronized static Task QUEUE(Listener callback) {
+  public synchronized static Task queue(Listener callback) {
     final Task task = new Task(callback);
     if(THREAD != null) {
       // TODO: synchronization?
       if(THREAD.isAlive()) {
-        THREAD.queue(task);
+        THREAD.queue.add(task);
         return task;
       }
     }
     THREAD = new ThumbnailThread();
-    THREAD.queue(task);
+    THREAD.queue.add(task);
     THREAD.start();
     return task;
   }
@@ -75,30 +75,12 @@ public class ThumbnailThread extends Thread {
    * 
    * @param task Task to remove.
    */
-  public static void UNQUEUE(Task task) {
+  public static void unqueue(Task task) {
     if(THREAD != null) {
       synchronized(THREAD) {
         THREAD.queue.remove(task);
       }
     }
-  }
-
-  /**
-   * Shutdown the thumbnailer thread.
-   */
-  public static synchronized void SHUTDOWN() {
-    if(THREAD != null && THREAD.isAlive()) {
-      THREAD.shutdown();
-    }
-  }
-
-  /**
-   * Queue a new thumbnail task.
-   * 
-   * @param task Thumbnail task
-   */
-  private void queue(Task task) {
-    this.queue.add(task);
   }
 
   /**
@@ -115,14 +97,6 @@ public class ThumbnailThread extends Thread {
     while(!queue.isEmpty() && !shutdown) {
       generateThumbnail(queue.poll());
     }
-  }
-
-  /**
-   * Set the shutdown flag.
-   */
-  private void shutdown() {
-    this.shutdown = true;
-    queue.clear();
   }
 
   /**

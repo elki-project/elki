@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.greedyensemble;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -261,7 +261,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     for(; it.valid(); it.advance()) {
       VisualizationTask task = it.get();
       if(task.getFactory() == factory) {
-        showVisualization(context, factory, task);
+        showVisualization(factory, task);
       }
     }
   }
@@ -269,11 +269,10 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   /**
    * Show a single visualization.
    *
-   * @param context Visualization context
    * @param factory Visualizer factory
    * @param task Visualization task
    */
-  private void showVisualization(VisualizerContext context, SimilarityMatrixVisualizer factory, VisualizationTask task) {
+  private void showVisualization(SimilarityMatrixVisualizer factory, VisualizationTask task) {
     VisualizationPlot plot = new VisualizationPlot();
     Visualization vis = factory.makeVisualization(task, plot, 1.0, 1.0, null);
     plot.getRoot().appendChild(vis.getLayer());

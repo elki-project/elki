@@ -117,7 +117,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   @Override
   public void destroy() {
     if(pendingThumbnail != null) {
-      ThumbnailThread.UNQUEUE(pendingThumbnail);
+      ThumbnailThread.unqueue(pendingThumbnail);
     }
     // TODO: remove image from registry?
     super.destroy();
@@ -144,7 +144,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       // LoggingUtil.warning("Generating new thumbnail " + this);
       layer.appendChild(SVGUtil.svgWaitIcon(plot.getDocument(), 0, 0, getWidth(), getHeight()));
       if(pendingThumbnail == null) {
-        pendingThumbnail = ThumbnailThread.QUEUE(this);
+        pendingThumbnail = ThumbnailThread.queue(this);
       }
       return;
     }

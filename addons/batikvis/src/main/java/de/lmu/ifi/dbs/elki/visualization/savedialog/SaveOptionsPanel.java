@@ -261,30 +261,30 @@ public class SaveOptionsPanel extends JPanel {
     if(index != formatSelector.getSelectedIndex() && index >= 0) {
       formatSelector.setSelectedIndex(index);
     }
-    if(format.equals("jpeg") || format.equals("jpg")) {
+    if("jpeg".equals(format) || "jpg".equals(format)) {
       sizePanel.setVisible(true);
       qualPanel.setVisible(true);
     }
-    else if(format.equals("png")) {
+    else if("png".equals(format)) {
       sizePanel.setVisible(true);
       qualPanel.setVisible(false);
     }
-    else if(format.equals("pdf")) {
+    else if("pdf".equals(format)) {
       sizePanel.setVisible(false);
       qualPanel.setVisible(false);
       mainPanel.validate();
     }
-    else if(format.equals("ps")) {
+    else if("ps".equals(format)) {
       sizePanel.setVisible(false);
       qualPanel.setVisible(false);
       mainPanel.validate();
     }
-    else if(format.equals("eps")) {
+    else if("eps".equals(format)) {
       sizePanel.setVisible(false);
       qualPanel.setVisible(false);
       mainPanel.validate();
     }
-    else if(format.equals("svg")) {
+    else if("svg".equals(format)) {
       sizePanel.setVisible(false);
       qualPanel.setVisible(false);
       mainPanel.validate();

@@ -58,7 +58,7 @@ public class SVGHyperCube {
     SVGPath path = new SVGPath();
     ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
-    recDrawEdges(path, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
+    recDrawEdges(path, rv_min[0], rv_min[1], edges, BitsUtil.zero(edges.size()));
     return path.makeElement(svgp);
   }
 
@@ -75,7 +75,7 @@ public class SVGHyperCube {
     SVGPath path = new SVGPath();
     ArrayList<double[]> edges = getVisibleEdges(proj, min, max);
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
-    recDrawEdges(path, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
+    recDrawEdges(path, rv_min[0], rv_min[1], edges, BitsUtil.zero(edges.size()));
     return path.makeElement(svgp);
   }
 
@@ -96,7 +96,7 @@ public class SVGHyperCube {
       min[i] = box.getMin(i);
     }
     double[] rv_min = proj.fastProjectDataToRenderSpace(min);
-    recDrawEdges(path, rv_min[0], rv_min[1], edges, 0, BitsUtil.zero(edges.size()));
+    recDrawEdges(path, rv_min[0], rv_min[1], edges, BitsUtil.zero(edges.size()));
     return path.makeElement(svgp);
   }
 
@@ -239,10 +239,9 @@ public class SVGHyperCube {
    * @param minx starting corner
    * @param miny starting corner
    * @param r_edges edge vectors
-   * @param off recursion offset (to avoid multi-recursion)
    * @param b bit set of drawn edges
    */
-  private static void recDrawEdges(SVGPath path, double minx, double miny, List<double[]> r_edges, int off, long[] b) {
+  private static void recDrawEdges(SVGPath path, double minx, double miny, List<double[]> r_edges, long[] b) {
     // Draw all "missing" edges
     for(int i = 0; i < r_edges.size(); i++) {
       if(BitsUtil.get(b, i)) {
@@ -261,7 +260,7 @@ public class SVGHyperCube {
       path.drawTo(x_i, y_i);
       // Recursion
       BitsUtil.setI(b, i);
-      recDrawEdges(path, x_i, y_i , r_edges, i + 1, b);
+      recDrawEdges(path, x_i, y_i , r_edges, b);
       BitsUtil.clearI(b, i);
     }
   }

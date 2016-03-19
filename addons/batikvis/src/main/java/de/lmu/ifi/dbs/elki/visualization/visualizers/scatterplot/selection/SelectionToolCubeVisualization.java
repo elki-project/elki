@@ -222,7 +222,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
     public boolean endDrag(SVGPoint startPoint, SVGPoint dragPoint, Event evt, boolean inside) {
       deleteChildren(rtag);
       if(startPoint.getX() != dragPoint.getX() || startPoint.getY() != dragPoint.getY()) {
-        updateSelection(proj, startPoint, dragPoint);
+        updateSelection(startPoint, dragPoint);
       }
       return true;
     }
@@ -230,11 +230,10 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
     /**
      * Update the selection in the context.
      *
-     * @param proj The projection
      * @param p1 First Point of the selected rectangle
      * @param p2 Second Point of the selected rectangle
      */
-    private void updateSelection(Projection proj, SVGPoint p1, SVGPoint p2) {
+    private void updateSelection(SVGPoint p1, SVGPoint p2) {
       if(p1 == null || p2 == null) {
         LOG.warning("no rect selected: p1: " + p1 + " p2: " + p2);
         return;

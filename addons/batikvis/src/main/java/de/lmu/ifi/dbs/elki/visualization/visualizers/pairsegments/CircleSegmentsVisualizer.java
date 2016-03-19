@@ -115,7 +115,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
   @Override
   public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+    return new Instance(task, plot, width, height);
   }
 
   @Override
@@ -258,9 +258,8 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
-     * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height) {
       super(task, plot, width, height);
       policy = task.getResult();
       segments = policy.segments;

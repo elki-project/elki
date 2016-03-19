@@ -351,7 +351,7 @@ public class SVGPlot {
       cssman.addClass(cls);
     }
     catch(CSSNamingConflict e) {
-      de.lmu.ifi.dbs.elki.logging.LoggingUtil.exception(e);
+      LoggingUtil.exception(e);
     }
   }
 
@@ -550,22 +550,22 @@ public class SVGPlot {
    */
   public void saveAsANY(File file, int width, int height, double quality) throws IOException, TranscoderException, TransformerFactoryConfigurationError, TransformerException, ClassNotFoundException {
     String extension = FileUtil.getFilenameExtension(file);
-    if(extension.equals("svg")) {
+    if("svg".equals(extension)) {
       saveAsSVG(file);
     }
-    else if(extension.equals("pdf")) {
+    else if("pdf".equals(extension)) {
       saveAsPDF(file);
     }
-    else if(extension.equals("ps")) {
+    else if("ps".equals(extension)) {
       saveAsPS(file);
     }
-    else if(extension.equals("eps")) {
+    else if("eps".equals(extension)) {
       saveAsEPS(file);
     }
-    else if(extension.equals("png")) {
+    else if("png".equals(extension)) {
       saveAsPNG(file, width, height);
     }
-    else if(extension.equals("jpg") || extension.equals("jpeg")) {
+    else if("jpg".equals(extension) || "jpeg".equals(extension)) {
       saveAsJPEG(file, width, height, quality);
     }
     else {

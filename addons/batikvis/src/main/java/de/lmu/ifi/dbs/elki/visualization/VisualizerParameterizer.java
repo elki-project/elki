@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -130,12 +129,8 @@ public class VisualizerParameterizer {
    * @return New context
    */
   public VisualizerContext newContext(ResultHierarchy hier, Result start) {
-    Relation<?> relation = null;
     Collection<Relation<?>> rels = ResultUtil.filterResults(hier, Relation.class);
     for(Relation<?> rel : rels) {
-      if(!TypeUtil.DBID.isAssignableFrom(rel.getDataTypeInformation()) && relation == null) {
-        relation = rel;
-      }
       if(samplesize == 0) {
         continue;
       }
@@ -148,7 +143,7 @@ public class VisualizerParameterizer {
         ResultUtil.addChildResult(rel, sample);
       }
     }
-    return new VisualizerContext(hier, start, relation, stylelib, factories);
+    return new VisualizerContext(hier, start, stylelib, factories);
   }
 
   /**
