@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,8 +22,9 @@ package de.lmu.ifi.dbs.elki.algorithm;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -99,7 +100,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @return Database
    */
   protected <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params, Class<?>[] filters) {
-    org.junit.Assert.assertTrue("Test data set not found: " + filename, (new File(filename)).exists());
+    assertTrue("Test data set not found: " + filename, (new File(filename)).exists());
     params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, filename);
 
     List<Class<?>> filterlist = new ArrayList<>();
@@ -117,7 +118,7 @@ public abstract class AbstractSimpleAlgorithmTest {
 
     db.initialize();
     Relation<?> rel = db.getRelation(TypeUtil.ANY);
-    org.junit.Assert.assertEquals("Database size does not match.", expectedSize, rel.size());
+    assertEquals("Database size does not match.", expectedSize, rel.size());
     return db;
   }
 
@@ -163,7 +164,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     if(logger.isVerbose()) {
       logger.verbose(this.getClass().getSimpleName() + " score: " + score + " expect: " + expected);
     }
-    org.junit.Assert.assertEquals(this.getClass().getSimpleName() + ": Score does not match.", expected, score, 0.0001);
+    assertEquals(this.getClass().getSimpleName() + ": Score does not match.", expected, score, 0.0001);
   }
 
   /**
@@ -211,10 +212,10 @@ public abstract class AbstractSimpleAlgorithmTest {
     rocCurve.processNewResult(hier, result);
     // Find the ROC results
     Collection<OutlierROCCurve.ROCResult> rocs = ResultUtil.filterResults(hier, result, OutlierROCCurve.ROCResult.class);
-    org.junit.Assert.assertTrue("No ROC result found.", !rocs.isEmpty());
+    assertTrue("No ROC result found.", !rocs.isEmpty());
     double auc = rocs.iterator().next().getAUC();
-    org.junit.Assert.assertFalse("More than one ROC result found.", rocs.size() > 1);
-    org.junit.Assert.assertEquals("ROC value does not match.", expected, auc, 0.0001);
+    assertFalse("More than one ROC result found.", rocs.size() > 1);
+    assertEquals("ROC value does not match.", expected, auc, 0.0001);
   }
 
   /**
@@ -225,11 +226,11 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param expected expected value
    */
   protected void testSingleScore(OutlierResult result, int id, double expected) {
-    org.junit.Assert.assertNotNull("No outlier result", result);
-    org.junit.Assert.assertNotNull("No score result.", result.getScores());
+    assertNotNull("No outlier result", result);
+    assertNotNull("No score result.", result.getScores());
     final DBID dbid = DBIDUtil.importInteger(id);
-    org.junit.Assert.assertNotNull("No result for ID " + id, result.getScores().doubleValue(dbid));
+    assertNotNull("No result for ID " + id, result.getScores().doubleValue(dbid));
     double actual = result.getScores().doubleValue(dbid);
-    org.junit.Assert.assertEquals("Outlier score of object " + id + " doesn't match.", expected, actual, 0.0001);
+    assertEquals("Outlier score of object " + id + " doesn't match.", expected, actual, 0.0001);
   }
 }

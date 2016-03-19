@@ -1,10 +1,10 @@
-package de.lmu.ifi.dbs.elki.datasource.parser;
+package de.lmu.ifi.dbs.elki.utilities.io;
 
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,14 +24,13 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.regex.Pattern;
 
 import org.junit.Test;
-
-import de.lmu.ifi.dbs.elki.utilities.io.Tokenizer;
 
 /**
  * Simple unit test for testing the new tokenizer
@@ -111,7 +110,7 @@ public class TokenizerTest {
           double val = t.getDouble();
           fail("The value " + t.getSubstring() + " was expected to be not parseable as double, but returned: " + val);
         }
-        catch(Exception ex) {
+        catch(NumberFormatException ex) {
           // pass. this is expected to fail.
         }
       }
@@ -128,7 +127,7 @@ public class TokenizerTest {
       }
     }
     if(t.valid()) {
-      assertTrue("Spurous data after expected end: " + t.getSubstring(), !t.valid());
+      assertFalse("Spurous data after expected end: " + t.getSubstring(), t.valid());
     }
   }
 }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed;
  */
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -64,7 +65,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 /**
  * Test case to validate the dynamic updates of materialized kNN and RkNN
  * preprocessors.
- * 
  * 
  * some index structures for accuracy. For a known data set and query point, the
  * top 10 nearest neighbors are queried and verified.
@@ -121,8 +121,8 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
     RKNNQuery<DoubleVector> preproc_rknn_query = preproc.getRKNNQuery(distanceQuery);
     // add as index
     db.getHierarchy().add(rep, preproc);
-    assertTrue("Preprocessor knn query class incorrect.", !(preproc_knn_query instanceof LinearScanDistanceKNNQuery));
-    assertTrue("Preprocessor rknn query class incorrect.", !(preproc_rknn_query instanceof LinearScanDistanceKNNQuery));
+    assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
+    assertFalse("Preprocessor rknn query class incorrect.", preproc_rknn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries
     testKNNQueries(rep, lin_knn_query, preproc_knn_query, k);
@@ -139,8 +139,7 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
       DoubleVector obj = VectorUtil.randomVector(o, dim, random);
       insertions.add(obj);
     }
-    System.out.println("Insert " + insertions);
-    System.out.println();
+    // System.out.println("Insert " + insertions);
     DBIDs deletions = db.insert(MultipleObjectsBundle.makeSimple(rep.getDataTypeInformation(), insertions));
 
     // test queries
@@ -148,7 +147,7 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
     testRKNNQueries(rep, lin_rknn_query, preproc_rknn_query, k);
 
     // delete objects
-    System.out.println("Delete " + deletions);
+    // System.out.println("Delete " + deletions);
     db.delete(deletions);
 
     // test queries
@@ -165,13 +164,7 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
       KNNList pre_knn = preproc_knn_ids.get(i);
       DoubleDBIDListIter lin = lin_knn.iter(), pre = pre_knn.iter();
       for(; lin.valid() && pre.valid(); lin.advance(), pre.advance(), i++) {
-        if(!DBIDUtil.equal(lin, pre) && lin.doubleValue() != pre.doubleValue()) {
-          System.out.print("LIN kNN #" + i + " " + lin.getPair());
-          System.out.print(" <=> ");
-          System.out.print("PRE kNN #" + i + " " + pre.getPair());
-          System.out.println();
-          break;
-        }
+        assertTrue(DBIDUtil.equal(lin, pre) || lin.doubleValue() == pre.doubleValue());
       }
       assertEquals("kNN sizes do not agree.", lin_knn.size(), pre_knn.size());
       for(int j = 0; j < lin_knn.size(); j++) {
@@ -179,7 +172,6 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
         assertTrue("kNNs of linear scan and preprocessor do not match!", lin_knn.get(j).doubleValue() == pre_knn.get(j).doubleValue());
       }
     }
-    System.out.println("knns ok");
   }
 
   private void testRKNNQueries(Relation<DoubleVector> rep, RKNNQuery<DoubleVector> lin_rknn_query, RKNNQuery<DoubleVector> preproc_rknn_query, int k) {
@@ -192,13 +184,7 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
 
       DoubleDBIDListIter lin = lin_rknn.iter(), pre = pre_rknn.iter();
       for(; lin.valid() && pre.valid(); lin.advance(), pre.advance(), i++) {
-        if(!DBIDUtil.equal(lin, pre) || lin.doubleValue() != pre.doubleValue()) {
-          System.out.print("LIN RkNN #" + i + " " + lin);
-          System.out.print(" <=> ");
-          System.out.print("PRE RkNN #" + i + " " + pre);
-          System.out.println();
-          break;
-        }
+        assertTrue(DBIDUtil.equal(lin, pre) || lin.doubleValue() == pre.doubleValue());
       }
       assertEquals("rkNN sizes do not agree for k=" + k, lin_rknn.size(), pre_rknn.size());
       for(int j = 0; j < lin_rknn.size(); j++) {
@@ -206,7 +192,5 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
         assertTrue("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).doubleValue() == pre_rknn.get(j).doubleValue());
       }
     }
-    System.out.println("rknns ok");
-    System.out.println();
   }
 }
