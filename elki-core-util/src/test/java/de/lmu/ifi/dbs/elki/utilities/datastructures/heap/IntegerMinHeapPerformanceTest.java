@@ -33,12 +33,13 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Random;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * Unit test to ensure that our heap is not significantly worse than SUN javas
  * regular PriorityQueue.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
@@ -49,6 +50,7 @@ public class IntegerMinHeapPerformanceTest {
 
   final private long seed = 123456L;
 
+  @Ignore
   @Test
   public void testRuntime() throws Exception {
     // prepare the data set
@@ -90,7 +92,7 @@ public class IntegerMinHeapPerformanceTest {
       }
     }
     long pqtime = System.nanoTime() - pqstart;
-    System.err.println("Heap performance test: us: " + htime*1E-9 + " java: " + pqtime*1E-9);
+    // System.err.println("Heap performance test: us: " + htime*1E-9 + " java: " + pqtime*1E-9);
     assertTrue("Heap performance regression - run test individually, since the hotspot optimizations may make the difference! " + htime + " >>= " + pqtime, htime < 1.05 * pqtime);
     // 1.05 allows some difference in measuring
   }
@@ -101,11 +103,12 @@ public class IntegerMinHeapPerformanceTest {
       pq.add(elements.get(i));
     }
     // Poll first half.
-    for(int i = 0; i < elements.size() >> 1; i++) {
+    final int half = elements.size() >> 1;
+    for(int i = 0; i < half; i++) {
       assertEquals(pq.poll(), i);
       // assertEquals((int) pq.poll(), queueSize - 1 - i);
     }
-    assertTrue("Heap not half-empty?", pq.size() == (elements.size() >> 1));
+    assertEquals("Heap not half-empty?", elements.size() - half, pq.size());
     pq.clear();
   }
 
@@ -115,11 +118,12 @@ public class IntegerMinHeapPerformanceTest {
       pq.add(elements.get(i));
     }
     // Poll first half.
-    for(int i = 0; i < elements.size() >> 1; i++) {
+    final int half = elements.size() >> 1;
+    for(int i = 0; i < half; i++) {
       assertEquals((int) pq.poll(), i);
       // assertEquals((int) pq.poll(), queueSize - 1 - i);
     }
-    assertTrue("Heap not half-empty?", pq.size() == (elements.size() >> 1));
+    assertEquals("Heap not half-empty?", elements.size() - half, pq.size());
     pq.clear();
   }
 }

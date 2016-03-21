@@ -65,11 +65,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 /**
  * Test case to validate the dynamic updates of materialized kNN and RkNN
  * preprocessors.
- * 
+ *
  * some index structures for accuracy. For a known data set and query point, the
  * top 10 nearest neighbors are queried and verified.
- * 
- * 
+ *
+ *
  * @author Elke Achtert
  * @since 0.4.0
  */
@@ -90,7 +90,7 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
 
   /**
    * Actual test routine.
-   * 
+   *
    * @throws ParameterException
    * @throws UnableToComplyException
    */
@@ -169,7 +169,7 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
       assertEquals("kNN sizes do not agree.", lin_knn.size(), pre_knn.size());
       for(int j = 0; j < lin_knn.size(); j++) {
         assertTrue("kNNs of linear scan and preprocessor do not match!", DBIDUtil.equal(lin_knn.get(j), pre_knn.get(j)));
-        assertTrue("kNNs of linear scan and preprocessor do not match!", lin_knn.get(j).doubleValue() == pre_knn.get(j).doubleValue());
+        assertEquals("kNNs of linear scan and preprocessor do not match!", lin_knn.get(j).doubleValue(), pre_knn.get(j).doubleValue(), 0.);
       }
     }
   }
@@ -189,7 +189,7 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
       assertEquals("rkNN sizes do not agree for k=" + k, lin_rknn.size(), pre_rknn.size());
       for(int j = 0; j < lin_rknn.size(); j++) {
         assertTrue("rkNNs of linear scan and preprocessor do not match!", DBIDUtil.equal(lin_rknn.get(j), pre_rknn.get(j)));
-        assertTrue("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).doubleValue() == pre_rknn.get(j).doubleValue());
+        assertEquals("rkNNs of linear scan and preprocessor do not match!", lin_rknn.get(j).doubleValue(), pre_rknn.get(j).doubleValue(), 0.);
       }
     }
   }

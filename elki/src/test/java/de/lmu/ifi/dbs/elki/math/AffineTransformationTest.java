@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,10 +26,9 @@ package de.lmu.ifi.dbs.elki.math;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.euclideanLength;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
 
 import org.junit.Test;
 
@@ -38,10 +37,10 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
  * JUnit Test for the class {@link AffineTransformation}
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
- * 
+ *
  */
 public class AffineTransformationTest {
   /**
@@ -61,10 +60,10 @@ public class AffineTransformationTest {
       dv[i] = i * i + testdim;
     }
     double[] v3 = t.apply(dv);
-    assertTrue("identity transformation wasn't identical", Arrays.equals(dv, v3));
+    assertArrayEquals("identity transformation wasn't identical", dv, v3, 0.);
 
     double[] v4 = t.applyInverse(dv);
-    assertTrue("inverse of identity wasn't identity", Arrays.equals(dv, v4));
+    assertArrayEquals("inverse of identity wasn't identity", dv, v4, 0.);
   }
 
   /**
@@ -102,22 +101,22 @@ public class AffineTransformationTest {
     }
 
     double[] v1t = t.apply(v1);
-    assertTrue("Vector wasn't translated properly forward.", Arrays.equals(v2t, v1t));
+    assertArrayEquals("Vector wasn't translated properly forward.", v2t, v1t, 0.);
     double[] v2b = t.applyInverse(v2t);
-    assertTrue("Vector wasn't translated properly backwards.", Arrays.equals(v1, v2b));
+    assertArrayEquals("Vector wasn't translated properly backwards.", v1, v2b, 0.);
     double[] v1b = t.applyInverse(v1t);
-    assertTrue("Vector wasn't translated properly back and forward.", Arrays.equals(v1, v1b));
+    assertArrayEquals("Vector wasn't translated properly back and forward.", v1, v1b, 0.);
 
     // Translation
     double[] vd = minus(v1, v2b);
     double[] vtd = minus(v1t, v2t);
-    assertTrue("Translation changed vector difference.", Arrays.equals(vd, vtd));
+    assertArrayEquals("Translation changed vector difference.", vd, vtd, 0.);
 
     // Translation shouldn't change relative vectors.
-    assertTrue("Relative vectors weren't left unchanged by translation!", Arrays.equals(v1, t.applyRelative(v1)));
-    assertTrue("Relative vectors weren't left unchanged by translation!", Arrays.equals(v2t, t.applyRelative(v2t)));
-    assertTrue("Relative vectors weren't left unchanged by translation!", Arrays.equals(v1t, t.applyRelative(v1t)));
-    assertTrue("Relative vectors weren't left unchanged by translation!", Arrays.equals(v2b, t.applyRelative(v2b)));
+    assertArrayEquals("Relative vectors weren't left unchanged by translation!", v1, t.applyRelative(v1), 0.);
+    assertArrayEquals("Relative vectors weren't left unchanged by translation!", v2t, t.applyRelative(v2t), 0.);
+    assertArrayEquals("Relative vectors weren't left unchanged by translation!", v1t, t.applyRelative(v1t), 0.);
+    assertArrayEquals("Relative vectors weren't left unchanged by translation!", v2b, t.applyRelative(v2b), 0.);
   }
 
   /**
@@ -175,7 +174,7 @@ public class AffineTransformationTest {
 
     // Rotation shouldn't disagree for relative vectors.
     // (they just are not affected by translation!)
-    assertTrue("Relative vectors were affected differently by pure rotation!", Arrays.equals(v2, t.applyRelative(v1)));
+    assertArrayEquals("Relative vectors were affected differently by pure rotation!", v2, t.applyRelative(v1), 0.);
 
     // should do the same as built-in rotation!
     AffineTransformation t2 = new AffineTransformation(testdim);

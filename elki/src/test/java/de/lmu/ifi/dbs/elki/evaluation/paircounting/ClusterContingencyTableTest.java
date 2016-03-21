@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.paircounting;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.evaluation.paircounting;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
@@ -46,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 /**
  * Validate {@link ClusterContingencyTable} with respect to its ability to compare
  * data clusterings.
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
  */
@@ -60,7 +59,7 @@ public class ClusterContingencyTableTest {
   /**
    * Validate {@link ClusterContingencyTable} with respect to its ability to
    * compare data clusterings.
-   * 
+   *
    * @throws ParameterException on errors.
    */
   @Test
@@ -75,7 +74,7 @@ public class ClusterContingencyTableTest {
 
     // verify data set size.
     Relation<?> rel = db.getRelation(TypeUtil.ANY);
-    assertTrue(rel.size() == shoulds);
+    assertEquals("Data set size not as expected", shoulds, rel.size());
 
     // run all-in-one
     TrivialAllInOne allinone = new TrivialAllInOne();

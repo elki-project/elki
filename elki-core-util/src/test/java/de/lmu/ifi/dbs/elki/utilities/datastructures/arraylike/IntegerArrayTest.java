@@ -31,7 +31,7 @@ import org.junit.Test;
 
 /**
  * Unit test for this arraylist of primitive ints.
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.1
  */
@@ -39,14 +39,14 @@ public class IntegerArrayTest {
   @Test
   public void basicTest() {
     IntegerArray arr = new IntegerArray(11);
-    assertTrue("Allocation does not match.", arr.data.length == 11);
-    assertTrue("Initial size is not empty.", arr.size() == 0);
+    assertEquals("Allocation does not match.", 11, arr.data.length);
+    assertEquals("Initial size is not empty.", 0, arr.size());
 
     Random r = new Random(0L);
     for(int i = 0; i < 11; i++) {
       arr.add(r.nextInt());
     }
-    assertTrue("Array is not full.", arr.data.length == arr.size());
+    assertEquals("Array is not full.", arr.data.length, arr.size());
     arr.add(r.nextInt());
     assertEquals("Allocation does not match after resize.", 17, arr.data.length);
     for(int i = 0; i < 81; i++) {

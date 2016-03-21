@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 
 /**
  * Unit test for dynamic time warping distance.
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
  */
@@ -63,7 +63,7 @@ public class DTWDistanceFunctionTest {
 
   /**
    * Triangular matrix with deltas.
-   * 
+   *
    * Infinity arises when lengths are too different!
    */
   final double[][] CONSTRAINED_SCORES = { //
@@ -91,9 +91,6 @@ public class DTWDistanceFunctionTest {
     for(int i = 0; i < vecs.length; i++) {
       for(int j = 0; j < vecs.length; j++) {
         double dist = f.distance(vecs[i], vecs[j]);
-        if(j - i > FULLWIDTH_SCORES[i].length) {
-          System.err.println("Missing distance is: " + dist);
-        }
         double exp = (i == j) ? 0. : (i < j) ? FULLWIDTH_SCORES[i][j - i - 1] : FULLWIDTH_SCORES[j][i - j - 1];
         assertEquals("Distance does not agree: " + vecs[i] + " <-> " + vecs[j], exp, dist, 1e-15);
       }

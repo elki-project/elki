@@ -33,10 +33,10 @@ import org.junit.Test;
 
 /**
  * Test the on-disk OnDiskUpperTriangleMatrix class.
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
- * 
+ *
  */
 // TODO: also test with a static sample file.
 public class OnDiskUpperTriangleMatrixTest {
@@ -44,11 +44,11 @@ public class OnDiskUpperTriangleMatrixTest {
 
   /**
    * Check that we don't overwrite any file.
-   * 
+   *
    * @throws Exception on errors.
    */
   @Before
-  public void safetyCheck() throws Exception {
+  public void safetyCheck() {
     if(file.exists()) {
       Assert.fail("Could not run test - test file already exists.");
     }
@@ -56,11 +56,11 @@ public class OnDiskUpperTriangleMatrixTest {
 
   /**
    * Clean up afterwards
-   * 
+   *
    * @throws Exception on errors.
    */
   @After
-  public void cleanup() throws Exception {
+  public void cleanup() {
     if(file != null && file.exists()) {
       if(!file.delete()) {
         Assert.fail("Error cleaning up: can't remove test file.");
@@ -70,7 +70,7 @@ public class OnDiskUpperTriangleMatrixTest {
 
   /**
    * Test the ondisk triangle matrix
-   * 
+   *
    * @throws IOException on errors.
    */
   @Test

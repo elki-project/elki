@@ -95,7 +95,7 @@ public class HeapPerformanceTest {
     }
     long htime = System.nanoTime() - hstart;
 
-    System.err.println("Heap performance test: us: " + htime*1E-9 + " java: " + pqtime*1E-9);
+    // System.err.println("Heap performance test: us: " + htime*1E-9 + " java: " + pqtime*1E-9);
     assertTrue("Heap performance regression - run test individually, since the hotspot optimizations may make the difference! " + htime + " >>= " + pqtime, htime < 1.1 * pqtime);
     // 1.1 allows some difference in measuring, which can occur e.g. due to Jacoco instrumentation
   }
@@ -106,11 +106,12 @@ public class HeapPerformanceTest {
       pq.add(elements.get(i));
     }
     // Poll first half.
-    for(int i = 0; i < elements.size() >> 1; i++) {
+    final int half = elements.size() >> 1;
+    for(int i = 0; i < half; i++) {
       assertEquals((int) pq.poll(), i);
       // assertEquals((int) pq.poll(), queueSize - 1 - i);
     }
-    assertTrue("Heap not half-empty?", pq.size() == (elements.size() >> 1));
+    assertEquals("Heap not half-empty?", elements.size() - half, pq.size());
     pq.clear();
   }
 
@@ -120,11 +121,12 @@ public class HeapPerformanceTest {
       pq.add(elements.get(i));
     }
     // Poll first half.
-    for(int i = 0; i < elements.size() >> 1; i++) {
+    final int half = elements.size() >> 1;
+    for(int i = 0; i < half; i++) {
       assertEquals((int) pq.poll(), i);
       // assertEquals((int) pq.poll(), queueSize - 1 - i);
     }
-    assertTrue("Heap not half-empty?", pq.size() == (elements.size() >> 1));
+    assertEquals("Heap not half-empty?", elements.size() - half, pq.size());
     pq.clear();
   }
 }

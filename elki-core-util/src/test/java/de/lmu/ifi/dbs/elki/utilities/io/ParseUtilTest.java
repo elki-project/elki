@@ -79,10 +79,10 @@ public class ParseUtilTest {
     assertEquals(00000000002.2250738585072012e-308, ParseUtil.parseDouble("00000000002.2250738585072012e-308"), 0.);
     assertEquals(2.2250738585072012e-00308, ParseUtil.parseDouble("2.2250738585072012e-00308"), 0.);
 
-    assertTrue(Double.POSITIVE_INFINITY == ParseUtil.parseDouble("inf"));
-    assertTrue(Double.NEGATIVE_INFINITY == ParseUtil.parseDouble("-inf"));
-    assertTrue(Double.POSITIVE_INFINITY == ParseUtil.parseDouble("∞"));
-    assertTrue(Double.NEGATIVE_INFINITY == ParseUtil.parseDouble("-∞"));
+    assertEquals(Double.POSITIVE_INFINITY, ParseUtil.parseDouble("inf"), 0.);
+    assertEquals(Double.NEGATIVE_INFINITY, ParseUtil.parseDouble("-inf"), 0.);
+    assertEquals(Double.POSITIVE_INFINITY, ParseUtil.parseDouble("∞"), 0.);
+    assertEquals(Double.NEGATIVE_INFINITY, ParseUtil.parseDouble("-∞"), 0.);
     assertTrue(Double.isNaN(ParseUtil.parseDouble("nan")));
 
     assertEquals(1, ParseUtil.parseDouble("+1"), 0.);
