@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -43,8 +42,6 @@ public class KMeansElkanTest extends AbstractSimpleAlgorithmTest {
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.
-   *
-   * @throws ParameterException
    */
   @Test
   public void testKMeansElkan() {

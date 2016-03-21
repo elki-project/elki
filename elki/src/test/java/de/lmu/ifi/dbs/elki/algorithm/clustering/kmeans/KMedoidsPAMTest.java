@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -39,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * from the data set labels. This test ensures that KMeans's performance doesn't
  * unexpectedly drop on this data set (and also ensures that the algorithms
  * work, as a side effect).
- * 
+ *
  * @author Katharina Rausch
  * @author Erich Schubert
  * @since 0.4.0
@@ -48,8 +47,6 @@ public class KMedoidsPAMTest extends AbstractSimpleAlgorithmTest {
   /**
    * Run KMedians PAM with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testKMedoidsPAM() {

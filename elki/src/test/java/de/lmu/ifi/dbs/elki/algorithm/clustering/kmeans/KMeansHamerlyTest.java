@@ -30,12 +30,11 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Regression test for Hamerly k-means.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
@@ -43,8 +42,6 @@ public class KMeansHamerlyTest extends AbstractSimpleAlgorithmTest {
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testKMeansHamerly() {

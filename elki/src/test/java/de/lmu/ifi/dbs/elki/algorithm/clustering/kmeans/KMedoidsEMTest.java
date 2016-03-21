@@ -32,12 +32,11 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Test k-Medoids using the EM approach.
- * 
+ *
  * @author Katharina Rausch
  * @author Erich Schubert
  * @since 0.4.0
@@ -46,8 +45,6 @@ public class KMedoidsEMTest extends AbstractSimpleAlgorithmTest {
   /**
    * Run KMedoidsEM with fixed parameters and compare the result to a golden
    * standard.
-   * 
-   * @throws ParameterException
    */
   @Test
   public void testKMedoidsEM() {
