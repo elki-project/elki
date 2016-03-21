@@ -310,10 +310,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
    *
    * @param varstat Statistics log instance
    * @param varsum Variance sum per cluster
+   * @return Total varsum
    */
-  protected void logVarstat(DoubleStatistic varstat, double[] varsum) {
+  protected double logVarstat(DoubleStatistic varstat, double[] varsum) {
     if(varstat == null) {
-      return;
+      return Double.NaN;
     }
     double s = 0.;
     for(double v : varsum) {
@@ -321,6 +322,7 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
     }
     varstat.setDouble(s);
     getLogger().statistics(varstat);
+    return s;
   }
 
   /**

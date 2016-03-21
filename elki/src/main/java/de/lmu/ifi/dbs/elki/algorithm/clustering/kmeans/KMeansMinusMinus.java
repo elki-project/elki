@@ -1,12 +1,10 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
-
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2014
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,6 +30,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -52,9 +51,9 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Vector;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMinHeap;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -63,42 +62,63 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
- * The k-means-- algorithm, using Lloyd-style bulk iterations.
- * 
- * 
+ * k-means--: A Unified Approach to Clustering and Outlier Detection.
+ *
+ * Similar to Lloyds K-means algorithm, but ignores the farthest points when
+ * updating the means, considering them to be outliers.
+ *
+ * Reference:
+ * <p>
+ * S. Chawla and A. Gionis<br />
+ * k-means--: A Unified Approach to Clustering and Outlier Detection<br />
+ * In Proc. 13th SIAM International Conference on Data Mining
+ * </p>
+ *
  * @author Jonas Steinke
- * 
+ * @since 0.7.2
+ *
  * @apiviz.landmark
  * @apiviz.has KMeansModel
- * 
+ *
  * @param <V> vector datatype
  */
 @Title("K-Means--")
-@Description("Finds a least-squared partitioning into k clusters.")
-public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
+@Reference(authors = "S. Chawla and A. Gionis", //
+    title = "k-means--: A Unified Approach to Clustering and Outlier Detection", //
+    booktitle = "Proc. 13th SIAM International Conference on Data Mining", //
+    url = "")
+public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, KMeansModel> {
   /**
    * The logger for this class.
    */
-  private static final Logging LOG = Logging.getLogger(KMeansLloyd.class);
+  private static final Logging LOG = Logging.getLogger(KMeansMinusMinus.class);
 
   /**
    * Key for statistics logging.
    */
-  private static final String KEY = KMeansLloyd.class.getName();
-  
-  public boolean noiseFlag;
-  public DoubleMinHeap minHeap;  
+  private static final String KEY = KMeansMinusMinus.class.getName();
+
+  /**
+   * Outlier rate.
+   */
   public double rate;
-  
+
+  /**
+   * Create a noise cluster, otherwise assign to the nearest cluster.
+   */
+  public boolean noiseFlag;
+
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction distance function
    * @param k k parameter
    * @param maxiter Maxiter parameter
    * @param initializer Initialization method
+   * @param noiseFlag Create a noise cluster instead of assigning to the nearest
+   *        cluster
    */
-  public KMeansLloydMM(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, double rate, boolean noiseFlag) {
+  public KMeansMinusMinus(NumberVectorDistanceFunction<? super V> distanceFunction, int k, int maxiter, KMeansInitialization<? super V> initializer, double rate, boolean noiseFlag) {
     super(distanceFunction, k, maxiter, initializer);
     this.rate = rate;
     this.noiseFlag = noiseFlag;
@@ -113,77 +133,65 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(KEY + ".initialization", initializer.toString()));
     }
-    
-    //Intialisieren der means
-    List<Vector> means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction(), Vector.FACTORY);
-    
-    //initialisieren vom Heap
-    minHeap = new DoubleMinHeap();
-    int heapsize = (int) (relation.size()*rate);
-    
+
+    // Intialisieren der means
+    double[][] means = initializer.chooseInitialMeans(database, relation, k, getDistanceFunction());
+
+    // initialisieren vom Heap
+    final int heapsize = (int) (rate < 1. ? Math.ceil(relation.size() * rate) : rate);
+    DoubleMinHeap minHeap = new DoubleMinHeap(heapsize);
+
     // Setup cluster assignment store
     List<ModifiableDoubleDBIDList> clusters = new ArrayList<>();
     for(int i = 0; i < k; i++) {
       clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
     }
-    
+
     WritableIntegerDataStore assignment = DataStoreUtil.makeIntegerStorage(relation.getDBIDs(), DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, -1);
     double[] varsum = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
     DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
-    
+
     int iteration = 0;
-    //*****************************************************************************\\
+    double prevvartotal = 0.;
     for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       minHeap.clear();
-      if(heapsize==0)
-        minHeap.add(Double.MAX_VALUE);
-      for(int i=0; i<k; i++)
+      for(int i = 0; i < k; i++) {
         clusters.get(i).clear();
-      double oldvarsum = 0.0;
-      if(iteration==0){
-        oldvarsum = Double.MAX_VALUE;
-      } else {
-        for(int i=0; i< varsum.length; i++)
-          oldvarsum += varsum[i];
       }
       LOG.incrementProcessed(prog);
-      boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum, heapsize);
-      logVarstat(varstat, varsum);
-      double newvarsum = 0;
-      for(int i=0; i< varsum.length; i++)
-        newvarsum += varsum[i];
-   // Stop if no cluster assignment changed, or the new varsum ist higher than old
-      if(!changed || newvarsum > oldvarsum) {
+      boolean changed = assignToNearestCluster(relation, means, clusters, assignment, varsum, minHeap, heapsize);
+      double vartotal = logVarstat(varstat, varsum);
+      // Stop if no cluster assignment changed, or the new varsum is higher
+      // than the previous value.
+      if(!changed || vartotal > prevvartotal) {
         break;
       }
-      
+      prevvartotal = vartotal;
+
       // Recompute means.
-//      System.out.println(minHeap.peek());
-      means = meansWithTreshhold(clusters, means, relation, minHeap.peek());
+      means = meansWithTreshhold(clusters, means, relation, heapsize > 0 ? minHeap.peek() : Double.POSITIVE_INFINITY);
     }
 
-    //create noisecluster if wanted
-    if(noiseFlag){
-      clusters.add(DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
+    // create noisecluster if wanted
+    ModifiableDoubleDBIDList noiseids = null;
+    if(noiseFlag && heapsize > 0) {
+      clusters.add(noiseids = DBIDUtil.newDistanceDBIDList((int) (relation.size() * 2. / k)));
       double tresh = minHeap.peek();
-      for(int i = 0; i < k; i++)
-      {
-        for(DoubleDBIDListMIter it = clusters.get(i).iter(); it.valid(); it.advance())
-        {
-          if(it.doubleValue() >= tresh)
-          {
-            //zuweisung an den noise Cluster
-            clusters.get(k).add(it.getPair());
+      for(int i = 0; i < k; i++) {
+        for(DoubleDBIDListMIter it = clusters.get(i).iter(); it.valid(); it.advance()) {
+          final double dist = it.doubleValue();
+          // Add to the noise cluster:
+          if(dist >= tresh) {
+            noiseids.add(dist, it);
             assignment.putInt(it, k);
             it.remove();
-            it.retract();
           }
         }
       }
     }
-   
+
     LOG.setCompleted(prog);
     if(LOG.isStatistics()) {
       LOG.statistics(new LongStatistic(KEY + ".iterations", iteration));
@@ -196,141 +204,134 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
       if(ids.size() == 0) {
         continue;
       }
-      KMeansModel model = new KMeansModel(means.get(i), varsum[i]);
+      KMeansModel model = new KMeansModel(means[i], varsum[i]);
       result.addToplevelCluster(new Cluster<>(ids, model));
     }
-    
-    //Noise Cluster
-    if(noiseFlag){
+
+    // Noise Cluster
+    if(noiseFlag) {
       KMeansModel model = new KMeansModel(null, 0);
-      DBIDs ids = clusters.get(k);
-      if(ids.size() == 0)
+      DBIDs ids = noiseids;
+      if(ids.size() == 0) {
         return result;
+      }
       result.addToplevelCluster(new Cluster<>(ids, true, model));
     }
     return result;
   }
 
-//*************************************************************************************//
-  
+  /**
+   * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
+   * those FeatureVectors, that are nearest to the k<sup>th</sup> mean. And
+   * saves the distance in a MinHeap
+   *
+   * @param relation the database to cluster
+   * @param means a list of k means
+   * @param clusters cluster assignment
+   * @param assignment Current cluster assignment
+   * @param varsum Variance sum output
+   * @param minHeap Heap for minimum values
+   * @param heapsize the size of the minheap
+   * @return true when the object was reassigned
+   */
+  protected boolean assignToNearestCluster(Relation<? extends V> relation, double[][] means, List<? extends ModifiableDoubleDBIDList> clusters, WritableIntegerDataStore assignment, double[] varsum, DoubleMinHeap minHeap, int heapsize) {
+    assert (k == means.length);
+    boolean changed = false;
+    Arrays.fill(varsum, 0.);
+    final NumberVectorDistanceFunction<?> df = getDistanceFunction();
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      double mindist = Double.POSITIVE_INFINITY;
+
+      V fv = relation.get(iditer);
+
+      int minIndex = 0;
+      for(int i = 0; i < k; i++) {
+        double dist = df.distance(fv, DoubleVector.wrap(means[i]));
+        if(dist < mindist) {
+          minIndex = i;
+          mindist = dist;
+        }
+      }
+
+      if(heapsize > 0) {
+        minHeap.add(mindist, heapsize);
+      }
+
+      varsum[minIndex] += mindist;
+      clusters.get(minIndex).add(mindist, iditer);
+      changed |= assignment.putInt(iditer, minIndex) != minIndex;
+    }
+    return changed;
+  }
+
+  /**
+   * Returns the mean vectors of the given clusters in the given database.
+   *
+   * @param clusters the clusters to compute the means
+   * @param means the recent means
+   * @param database the database containing the vectors
+   * @return the mean vectors of the given clusters in the given database
+   */
+  protected double[][] meansWithTreshhold(List<? extends ModifiableDoubleDBIDList> clusters, double[][] means, Relation<V> database, Double tresh) {
+    // TODO: use Kahan summation for better numerical precision?
+    double[][] newMeans = new double[k][];
+    for(int i = 0; i < k; i++) {
+      DoubleDBIDList list = clusters.get(i);
+      double[] raw = null;
+      int count = 0;
+      // Update with remaining instances
+      for(DoubleDBIDListIter iter = list.iter(); iter.valid(); iter.advance()) {
+        if(iter.doubleValue() >= tresh) {
+          continue;
+        }
+        NumberVector vec = database.get(iter);
+        if(raw == null) { // Initialize:
+          raw = vec.toArray();
+        }
+        for(int j = 0; j < raw.length; j++) {
+          raw[j] += vec.doubleValue(j);
+        }
+        count++;
+      }
+      newMeans[i] = (raw != null) ? VMath.timesEquals(raw, 1.0 / count) : means[i];
+    }
+    return newMeans;
+  }
+
   @Override
   protected Logging getLogger() {
     return LOG;
   }
 
   /**
-   * Returns a list of clusters. The k<sup>th</sup> cluster contains the ids of
-   * those FeatureVectors, that are nearest to the k<sup>th</sup> mean.
-   * And saves the distance in a MinHeap
-   * 
-   * 
-   * @param relation the database to cluster
-   * @param means a list of k means
-   * @param clusters cluster assignment
-   * @param assignment Current cluster assignment
-   * @param varsum Variance sum output
-   * @param heapsize the size of the minheap
-   * @return true when the object was reassigned
-   */
-  protected boolean assignToNearestCluster(Relation<? extends V> relation, List<? extends NumberVector> means, List<? extends ModifiableDoubleDBIDList> clusters, WritableIntegerDataStore assignment, double[] varsum, int heapsize) {
-    assert(k == means.size());
-    boolean changed = false;
-    Arrays.fill(varsum, 0.);
-    final NumberVectorDistanceFunction<?> df = getDistanceFunction();
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      //Optimieren, indem man nur eine mindist hat
-      double mindist = Double.POSITIVE_INFINITY;
-      
-      //fv ist der aktuelle Pkt
-      V fv = relation.get(iditer);
-      
-      //Index des Clusterpunktes
-      int minIndex = 0;
-      for(int i = 0; i < k; i++) {
-        double dist = df.distance(fv, means.get(i));
-        if(dist < mindist) {
-          minIndex = i;
-          mindist = dist;
-        }
-      }
-      
-      //zuweisung zum Heap
-      minHeap.add(mindist, heapsize);
-      
-      varsum[minIndex] += mindist;
-      changed |= updateAssignmentWithDistance(iditer, clusters, assignment, minIndex, mindist);
-    }
-    return changed;
-  }
-  
-//*************************************************************************************//
-  
-  protected boolean updateAssignmentWithDistance(DBIDIter iditer, List<? extends ModifiableDoubleDBIDList> clusters, WritableIntegerDataStore assignment, int newA, double mindist) {
-    clusters.get(newA).add(mindist, iditer);
-    return assignment.putInt(iditer, newA) != newA;
-  }
-  
-//*************************************************************************************//
-  
-  /**
-   * Returns the mean vectors of the given clusters in the given database.
-   * 
-   * @param clusters the clusters to compute the means
-   * @param means the recent means
-   * @param database the database containing the vectors
-   * @return the mean vectors of the given clusters in the given database
-   */
-  protected List<Vector> meansWithTreshhold(List<? extends ModifiableDoubleDBIDList> clusters, List<? extends NumberVector> means, Relation<V> database, Double tresh) {
-    // TODO: use Kahan summation for better numerical precision?
-    List<Vector> newMeans = new ArrayList<>(k);
-    for(int i = 0; i < k; i++) {        
-      DoubleDBIDList list = clusters.get(i);
-      Vector mean = null;
-      double[] raw = null;
-        int count = 0;
-        // Update with remaining instances
-        for(DoubleDBIDListIter iter = list.iter(); iter.valid(); iter.advance()) {
-          if(iter.doubleValue() >= tresh) {
-//            System.out.println("Hier stimmt was nicht: " + iter.doubleValue() + " " + tresh );
-            continue;
-          }
-          NumberVector vec = database.get(iter);
-          if (mean == null) { // Initialize:
-            mean = vec.getColumnVector();
-            raw = mean.getArrayRef();
-          }
-          for(int j = 0; j < mean.getDimensionality(); j++) {
-            raw[j] += vec.doubleValue(j);
-          }
-          count++;
-        }
-      if (mean != null) {
-        mean.timesEquals(1.0 / count);
-      } else {
-        // Keep degenerated means as-is for now.
-        mean = means.get(i).getColumnVector();
-      }
-      newMeans.add(mean);
-    }
-    return newMeans;
-  }
-  
-  //*************************************************************************************//
-  
-  
-  /**
    * Parameterization class.
-   * 
-   * @author Erich Schubert
-   * 
+   *
+   * @author Jonas Steinke
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractKMeans.Parameterizer<V> {
-    public static final OptionID RATE_ID = new OptionID("K-MeansMM-Rate", "determines the ignorationrate");
-    public static final OptionID NOISE_FLAG_ID = new OptionID("CreatingNoiseCluster", "Should a noisecluster be created?");
+    /**
+     * Parameter to specify the number of neighbors to ignore.
+     */
+    public static final OptionID RATE_ID = new OptionID("kmeansmm.l", "Number of outliers to ignore, or (if less than 1) a relative rate.");
+
+    /**
+     * Flag to produce a "noise" cluster, instead of assigning them to the
+     * nearest neighbor.
+     */
+    public static final OptionID NOISE_FLAG_ID = new OptionID("kmeansmm.noisecluster", "Create a noise cluster, instead of assigning the noise objects.");
+
+    /**
+     * Outlier rate.
+     */
     private double rate;
+
+    /**
+     * Noise cluster flag.
+     */
     private boolean noiseFlag;
-    
+
     @Override
     protected Logging getLogger() {
       return LOG;
@@ -340,20 +341,19 @@ public class KMeansLloydMM<V extends NumberVector> extends AbstractKMeans<V, KMe
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleParameter rateP = new DoubleParameter(RATE_ID, 0.05)//
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE)//
-          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
-          if(config.grab(rateP)) {
-            rate = rateP.doubleValue();
-          }
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+      if(config.grab(rateP)) {
+        rate = rateP.doubleValue();
+      }
       Flag createNoiseCluster = new Flag(NOISE_FLAG_ID);
-      if(config.grab(createNoiseCluster)){
+      if(config.grab(createNoiseCluster)) {
         noiseFlag = createNoiseCluster.getValue();
       }
     }
 
     @Override
-    protected KMeansLloydMM<V> makeInstance() {
-      return new KMeansLloydMM<V>(distanceFunction, k, maxiter, initializer, rate, noiseFlag);
+    protected KMeansMinusMinus<V> makeInstance() {
+      return new KMeansMinusMinus<V>(distanceFunction, k, maxiter, initializer, rate, noiseFlag);
     }
   }
 }
