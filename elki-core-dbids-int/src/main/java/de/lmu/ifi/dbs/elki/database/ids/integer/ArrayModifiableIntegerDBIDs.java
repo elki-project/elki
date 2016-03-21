@@ -356,7 +356,7 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
 
     @Override
     public void remove() {
-      ArrayModifiableIntegerDBIDs.this.remove(pos);
+      ArrayModifiableIntegerDBIDs.this.remove(pos--);
     }
 
     @Override

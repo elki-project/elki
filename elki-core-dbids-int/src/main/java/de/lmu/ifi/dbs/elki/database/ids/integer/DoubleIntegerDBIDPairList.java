@@ -267,7 +267,7 @@ class DoubleIntegerDBIDPairList implements ModifiableDoubleDBIDList, IntegerDBID
 
     @Override
     public void remove() {
-      DoubleIntegerDBIDPairList.this.remove(pos);
+      DoubleIntegerDBIDPairList.this.remove(pos--);
     }
   }
 }
