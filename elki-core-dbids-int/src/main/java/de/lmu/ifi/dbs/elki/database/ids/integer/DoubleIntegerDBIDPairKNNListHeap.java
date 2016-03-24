@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
@@ -203,6 +204,12 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
   @Override
   public DoubleIntegerDBIDPair get(int index) {
     return data[index];
+  }
+
+  @Override
+  public DBIDVar assignVar(int index, DBIDVar var) {
+    var.set(data[index]);
+    return var;
   }
 
   @Override

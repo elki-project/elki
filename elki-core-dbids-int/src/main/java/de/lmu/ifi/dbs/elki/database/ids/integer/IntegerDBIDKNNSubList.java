@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 
 /**
@@ -83,6 +84,12 @@ public class IntegerDBIDKNNSubList implements IntegerDBIDKNNList {
   public DoubleIntegerDBIDPair get(int index) {
     assert (index < size) : "Access beyond design size of list.";
     return inner.get(index);
+  }
+
+  @Override
+  public DBIDVar assignVar(int index, DBIDVar var) {
+    assert (index < size) : "Access beyond design size of list.";
+    return inner.assignVar(index, var);
   }
 
   @Override

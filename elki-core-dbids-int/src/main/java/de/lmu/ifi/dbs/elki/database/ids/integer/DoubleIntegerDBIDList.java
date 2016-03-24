@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
@@ -114,8 +115,20 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
   }
 
   @Override
+  @Deprecated
   public DoubleIntegerDBIDPair get(int index) {
     return new DoubleIntegerDBIDPair(dists[index], ids[index]);
+  }
+
+  @Override
+  public DBIDVar assignVar(int index, DBIDVar var) {
+    if(var instanceof IntegerDBIDVar) {
+      ((IntegerDBIDVar) var).internalSetIndex(ids[index]);
+    }
+    else {
+      var.set(new IntegerDBID(ids[index]));
+    }
+    return var;
   }
 
   /**

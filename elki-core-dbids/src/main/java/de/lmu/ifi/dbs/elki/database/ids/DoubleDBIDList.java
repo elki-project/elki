@@ -69,6 +69,14 @@ public interface DoubleDBIDList extends DBIDs {
    */
   DoubleDBIDPair get(int off);
 
+  /**
+   * Assign a DBID variable the value of position {@code index}.
+   *
+   * @param index Position
+   * @param var Variable to assign the value to.
+   */
+  DBIDVar assignVar(int index, DBIDVar var);
+
   @Override
   DoubleDBIDListIter iter();
 }

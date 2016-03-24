@@ -25,13 +25,14 @@ package de.lmu.ifi.dbs.elki.database.ids.generic;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 
 /**
  * Sublist of an existing result to contain only the first k elements.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.5
  */
@@ -53,7 +54,7 @@ public class KNNSubList implements KNNList {
 
   /**
    * Constructor.
-   * 
+   *
    * @param inner Inner instance
    * @param k k value
    */
@@ -89,6 +90,12 @@ public class KNNSubList implements KNNList {
   }
 
   @Override
+  public DBIDVar assignVar(int index, DBIDVar var) {
+    assert (index < size) : "Access beyond design size of list.";
+    return inner.assignVar(index, var);
+  }
+
+  @Override
   public double getKNNDistance() {
     return inner.get(k).doubleValue();
   }
@@ -120,9 +127,9 @@ public class KNNSubList implements KNNList {
 
   /**
    * Iterator for the sublist.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class Itr implements DoubleDBIDListIter {
