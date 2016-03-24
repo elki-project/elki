@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -50,7 +50,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -90,12 +89,10 @@ public class OnlineLOFTest {
    * First, run the {@link LOF} algorithm on the database. Second, run the
    * {@link OnlineLOF} algorithm on the database, insert new objects and
    * afterwards delete them. Then, compare the two results for equality.
-   *
-   * @throws UnableToComplyException
    */
   @SuppressWarnings("unchecked")
   @Test
-  public void testOnlineLOF() throws UnableToComplyException {
+  public void testOnlineLOF() {
     // LoggingConfiguration.setLevelFor("de.lmu.ifi.dbs.elki.algorithm.outlier.lof",
     // Level.FINEST.toString());
 
@@ -123,7 +120,7 @@ public class OnlineLOFTest {
    * Run OnlineLOF (with insertions and removals) on database.
    */
   @SuppressWarnings("unchecked")
-  private static OutlierResult runOnlineLOF(UpdatableDatabase db) throws UnableToComplyException {
+  private static OutlierResult runOnlineLOF(UpdatableDatabase db) {
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
 
     // setup algorithm

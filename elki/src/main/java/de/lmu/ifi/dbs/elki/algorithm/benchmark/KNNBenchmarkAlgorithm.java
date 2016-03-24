@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.benchmark;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Util;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.IncompatibleDataException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -56,12 +56,12 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Benchmarking algorithm that computes the k nearest neighbors for each query
  * point. The query points can either come from a separate data source, or from
  * the original database.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.5
- * 
+ *
  * @param <O> Object type
- * 
+ *
  * @apiviz.uses KNNQuery
  */
 public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, Result> {
@@ -92,7 +92,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function to use
    * @param k K parameter
    * @param queries Query data set (may be null!)
@@ -109,7 +109,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
 
   /**
    * Run the algorithm.
-   * 
+   *
    * @param database Database
    * @param relation Relation
    * @return Null result
@@ -157,7 +157,7 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
         }
       }
       if(col < 0) {
-        throw new AbortException("No compatible data type in query input was found. Expected: " + res.toString());
+        throw new IncompatibleDataException("No compatible data type in query input was found. Expected: " + res.toString());
       }
       // Random sampling is a bit of hack, sorry.
       // But currently, we don't (yet) have an "integer random sample" function.
@@ -205,11 +205,11 @@ public class KNNBenchmarkAlgorithm<O> extends AbstractDistanceBasedAlgorithm<O, 
 
   /**
    * Parameterization class
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.MissingPrerequisitesException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -129,7 +130,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
   public ClusterOrder run(Database database, Relation<NV> relation) {
     Collection<DeLiCluTreeIndex<NV>> indexes = ResultUtil.filterResults(database.getHierarchy(), relation, DeLiCluTreeIndex.class);
     if(indexes.size() != 1) {
-      throw new AbortException("DeLiClu found " + indexes.size() + " DeLiCluTree indexes. DeLiClu needs a special index to operate, therefore you need to add this index to your database.");
+      throw new MissingPrerequisitesException("DeLiClu found " + indexes.size() + " DeLiCluTree indexes. DeLiClu needs a special index to operate, therefore you need to add this index to your database.");
     }
     DeLiCluTreeIndex<NV> index = indexes.iterator().next();
     // FIXME: check that the index matches the relation!

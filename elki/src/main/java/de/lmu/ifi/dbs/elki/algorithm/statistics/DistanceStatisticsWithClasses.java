@@ -58,7 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.LongArrayStaticHis
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.EmptyDataException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.OnlyOneIsAllowedToBeSetGlobalConstraint;
@@ -300,7 +300,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
 
     DBIDIter iter = relation.iterDBIDs();
     if(!iter.valid()) {
-      throw new IllegalStateException(ExceptionMessages.DATABASE_EMPTY);
+      throw new EmptyDataException();
     }
     DBID firstid = DBIDUtil.deref(iter);
     iter.advance();

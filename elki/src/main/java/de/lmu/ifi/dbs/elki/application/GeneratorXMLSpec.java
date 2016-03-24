@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,12 +23,7 @@ package de.lmu.ifi.dbs.elki.application;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.iterator.TIntIterator;
-import gnu.trove.list.TIntList;
-import gnu.trove.list.array.TIntArrayList;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -45,16 +40,19 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
+import gnu.trove.iterator.TIntIterator;
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+
 /**
  * Generate a data set based on a specified model (using an XML specification)
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
- * 
+ *
  * @apiviz.composedOf GeneratorXMLDatabaseConnection
  */
 public class GeneratorXMLSpec extends AbstractApplication {
@@ -80,7 +78,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
 
   /**
    * Constructor.
-   * 
+   *
    * @param output Output file
    * @param generator GeneratorXMLDatabaseConnection
    */
@@ -94,7 +92,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
    * Runs the wrapper with the specified arguments.
    */
   @Override
-  public void run() throws UnableToComplyException {
+  public void run() {
     MultipleObjectsBundle data = generator.loadData();
     if(LOG.isVerbose()) {
       LOG.verbose("Writing output ...");
@@ -110,11 +108,8 @@ public class GeneratorXMLSpec extends AbstractApplication {
         writeClusters(outStream, data);
       }
     }
-    catch(FileNotFoundException e) {
-      throw new UnableToComplyException(e);
-    }
     catch(IOException e) {
-      throw new UnableToComplyException(e);
+      throw new AbortException("IO Error in data generator.", e);
     }
     if(LOG.isVerbose()) {
       LOG.verbose("Done.");
@@ -123,7 +118,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
 
   /**
    * Write the resulting clusters to an output stream.
-   * 
+   *
    * @param outStream output stream
    * @param data Generated data
    * @throws IOException thrown on write errors
@@ -212,9 +207,9 @@ public class GeneratorXMLSpec extends AbstractApplication {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
@@ -244,7 +239,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
 
   /**
    * Main method to run this application.
-   * 
+   *
    * @param args the arguments to run this application
    */
   public static void main(String[] args) {

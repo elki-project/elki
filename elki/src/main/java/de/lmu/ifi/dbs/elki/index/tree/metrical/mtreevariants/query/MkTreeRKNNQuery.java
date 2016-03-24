@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,15 +32,14 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.rknn.AbstractRKNNQuery;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 
 /**
  * Instance of a rKNN query for a particular spatial index.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.uses AbstractMkTree
  */
 public class MkTreeRKNNQuery<O> extends AbstractRKNNQuery<O> {
@@ -51,7 +50,7 @@ public class MkTreeRKNNQuery<O> extends AbstractRKNNQuery<O> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param index Index to use
    * @param distanceQuery Distance query used
    */
@@ -73,6 +72,6 @@ public class MkTreeRKNNQuery<O> extends AbstractRKNNQuery<O> {
   @Override
   public List<? extends DoubleDBIDList> getRKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     // TODO: implement
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 }

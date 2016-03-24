@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -46,15 +46,14 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSetti
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MkTreeRKNNQuery;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 
 /**
  * MkMax tree
- * 
+ *
  * @author Elke Achtert
  * @since 0.4.0
- * 
+ *
  * @param <O> Object type
  */
 public class MkMaxTreeIndex<O> extends MkMaxTree<O>implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
@@ -65,7 +64,7 @@ public class MkMaxTreeIndex<O> extends MkMaxTree<O>implements RangeIndex<O>, KNN
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation
    * @param pagefile Page file
    * @param settings Tree settings
@@ -109,25 +108,25 @@ public class MkMaxTreeIndex<O> extends MkMaxTree<O>implements RangeIndex<O>, KNN
   /**
    * Throws an UnsupportedOperationException since deletion of objects is not
    * yet supported by an M-Tree.
-   * 
+   *
    * @throws UnsupportedOperationException thrown, since deletions aren't
    *         implemented yet.
    */
   @Override
   public final boolean delete(DBIDRef id) {
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   /**
    * Throws an UnsupportedOperationException since deletion of objects is not
    * yet supported by an M-Tree.
-   * 
+   *
    * @throws UnsupportedOperationException thrown, since deletions aren't
    *         implemented yet.
    */
   @Override
   public void deleteAll(DBIDs ids) {
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   @Override

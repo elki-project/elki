@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.IncompatibleDataException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
@@ -78,14 +78,14 @@ import gnu.trove.map.hash.TLongObjectHashMap;
 
 /**
  * Using Grid for Accelerating Density-Based Clustering.
- * 
+ *
  * An accelerated DBSCAN version for numerical data and Lp-norms only, by
  * partitioning the data set into overlapping grid cells. For best efficiency,
  * the overlap of the grid cells must be chosen well. The authors suggest a grid
  * width of 10 times epsilon.
- * 
+ *
  * Because of partitioning the data, this version does not make use of indexes.
- * 
+ *
  * Reference:
  * <p>
  * S. Mahran and K. Mahar: <br />
@@ -95,9 +95,9 @@ import gnu.trove.map.hash.TLongObjectHashMap;
  *
  * @author Erich Schubert
  * @since 0.7.1
- * 
+ *
  * @apiviz.composedOf Instance
- * 
+ *
  * @param <V> the type of vector the algorithm is applied to
  */
 @Reference(authors = "S. Mahran and K. Mahar", //
@@ -163,9 +163,9 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
   /**
    * Instance, for a single run.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <V> Vector type
    */
   protected static class Instance<V extends NumberVector> {
@@ -266,7 +266,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
     /**
      * Performs the DBSCAN algorithm on the given database.
-     * 
+     *
      * @param relation Relation to process
      */
     public Clustering<Model> run(Relation<V> relation) {
@@ -408,7 +408,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
     /**
      * Compute the grid base offset.
-     * 
+     *
      * @return Total number of grid cells
      */
     private long computeGridBaseOffsets() {
@@ -418,7 +418,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
       for(int d = 0; d < dim; d++) {
         final double mi = min[d], ma = max[d], wi = ma - mi;
         if(mi == Double.NEGATIVE_INFINITY || ma == Double.POSITIVE_INFINITY || mi != mi || ma != ma) {
-          throw new AbortException("Dimension " + d + " contains non-finite values.");
+          throw new IncompatibleDataException("Dimension " + d + " contains non-finite values.");
         }
         int c = cells[d] = Math.max(1, (int) Math.ceil(wi / gridwidth));
         offset[d] = mi - (c * gridwidth - wi) * .5;
@@ -450,7 +450,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
     /**
      * Build the data grid.
-     * 
+     *
      * @param relation Data relation
      * @param numcells Total number of cells
      * @param offset Offset
@@ -495,7 +495,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
     /**
      * Perform some sanity checks on the grid cells.
-     * 
+     *
      * @param numcell Number of cells
      * @param size Relation size
      * @return Number of cells with minPts points
@@ -596,7 +596,7 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
 
     /**
      * Merge cluster information.
-     * 
+     *
      * @param cellids IDs in current cell
      * @param temporary Temporary assignments
      * @param clusterids Merged cluster assignment
@@ -682,13 +682,13 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
    * @author Erich Schubert
    *
    * @apiviz.exclude
-   * 
+   *
    * @param <O> Vector type to use
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
      * Parameter to control the grid width.
-     * 
+     *
      * Must be at least two times epsilon.
      */
     public static final OptionID GRID_ID = new OptionID("gridbscan.gridwidth", "Width of the grid used, must be at least two times epsilon.");

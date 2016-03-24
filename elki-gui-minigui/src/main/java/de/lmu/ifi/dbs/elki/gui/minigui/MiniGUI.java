@@ -68,7 +68,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.UnspecifiedParameterException;
@@ -687,7 +686,7 @@ public class MiniGUI extends AbstractApplication {
   }
 
   @Override
-  public void run() throws UnableToComplyException {
+  public void run() {
     frame.setVisible(true);
     outputArea.becomeDefaultLogger();
   }

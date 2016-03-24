@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.data.model.GeneratorModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Class to generate a single cluster according to a model as well as getting
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  *
  * @author Erich Schubert
  * @since 0.2
- * 
+ *
  * @apiviz.composedOf Distribution
  * @apiviz.composedOf AffineTransformation
  */
@@ -118,12 +118,10 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * so far!
    *
    * @param gen Distribution generator
-   * @throws UnableToComplyException thrown when no new generators may be added
-   *         anymore
    */
-  public void addGenerator(Distribution gen) throws UnableToComplyException {
+  public void addGenerator(Distribution gen) {
     if(trans != null) {
-      throw new UnableToComplyException("Generators may no longer be added when transformations have been applied.");
+      throw new AbortException("Generators may no longer be added when transformations have been applied.");
     }
     axes.add(gen);
     dim++;
@@ -162,13 +160,12 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    *
    * @param min Minimum values for clipping
    * @param max Maximum values for clipping
-   * @throws UnableToComplyException thrown when invalid vectors were given.
    */
-  public void setClipping(double[] min, double[] max) throws UnableToComplyException {
+  public void setClipping(double[] min, double[] max) {
     // if only one dimension was given, expand to all dimensions.
     if(min.length == 1 && max.length == 1) {
       if(min[0] >= max[0]) {
-        throw new UnableToComplyException("Clipping range empty.");
+        throw new AbortException("Clipping range empty.");
       }
       clipmin = new double[dim];
       clipmax = new double[dim];
@@ -177,14 +174,14 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
       return;
     }
     if(dim != min.length) {
-      throw new UnableToComplyException("Clipping double[] dimensionalities do not match: " + dim + " vs. " + min.length);
+      throw new AbortException("Clipping double[] dimensionalities do not match: " + dim + " vs. " + min.length);
     }
     if(dim != max.length) {
-      throw new UnableToComplyException("Clipping double[] dimensionalities do not match: " + dim + " vs. " + max.length);
+      throw new AbortException("Clipping double[] dimensionalities do not match: " + dim + " vs. " + max.length);
     }
     for(int i = 0; i < dim; i++) {
       if(min[i] >= max[i]) {
-        throw new UnableToComplyException("Clipping range empty in dimension " + (i + 1));
+        throw new AbortException("Clipping range empty in dimension " + (i + 1));
       }
     }
     clipmin = min;
@@ -225,7 +222,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
    * @see de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorInterface#generate(int)
    */
   @Override
-  public List<double[]> generate(int count) throws UnableToComplyException {
+  public List<double[]> generate(int count) {
     ArrayList<double[]> result = new ArrayList<>(count);
     while(result.size() < count) {
       double[] d = new double[dim];
@@ -237,7 +234,7 @@ public class GeneratorSingleCluster implements GeneratorInterfaceDynamic {
       }
       if(testClipping(d)) {
         if(--retries < 0) {
-          throw new UnableToComplyException("Maximum retry count in generator exceeded.");
+          throw new AbortException("Maximum retry count in generator exceeded.");
         }
         continue;
       }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -47,7 +47,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeQueryUtil;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
@@ -186,7 +185,7 @@ public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>
    */
   @Override
   public final boolean delete(DBIDRef id) {
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   /**
@@ -198,7 +197,7 @@ public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>
    */
   @Override
   public void deleteAll(DBIDs ids) {
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   @Override

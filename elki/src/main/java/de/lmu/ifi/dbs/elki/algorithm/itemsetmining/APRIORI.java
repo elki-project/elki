@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -48,13 +48,13 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.InconsistentDataException;
 import gnu.trove.iterator.TLongIntIterator;
 import gnu.trove.map.hash.TLongIntHashMap;
 
 /**
  * The APRIORI algorithm for Mining Association Rules.
- * 
+ *
  * Reference:
  * <p>
  * R. Agrawal, R. Srikant:<br />
@@ -62,18 +62,18 @@ import gnu.trove.map.hash.TLongIntHashMap;
  * In Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de
  * Chile, Chile 1994.
  * </p>
- * 
+ *
  * This implementation uses some simple optimizations for 1- and 2-itemsets.
- * 
+ *
  * Note: this algorithm scales well to a large number of transactions, but not
  * so well to a large number of frequent itemsets (items). For best results, use
  * domain-specific preprocessing to aggregate items into groups. Use statistics
  * logging to keep track of candidate set sizes.
- * 
+ *
  * @author Arthur Zimek
  * @author Erich Schubert
  * @since 0.2
- * 
+ *
  * @apiviz.has Itemset
  * @apiviz.uses BitVector
  */
@@ -97,7 +97,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Constructor with minimum frequency.
-   * 
+   *
    * @param minfreq Minimum frequency
    * @param minlength Minimum length
    * @param maxlength Maximum length
@@ -108,7 +108,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Constructor with minimum frequency.
-   * 
+   *
    * @param minfreq Minimum frequency
    */
   public APRIORI(double minfreq) {
@@ -117,7 +117,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Performs the APRIORI algorithm on the given database.
-   * 
+   *
    * @param relation the Relation to process
    * @return the AprioriResult learned by this APRIORI
    */
@@ -188,7 +188,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Build the 1-itemsets.
-   * 
+   *
    * @param relation Data relation
    * @param dim Maximum dimensionality
    * @param needed Minimum support needed
@@ -219,7 +219,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Build the 2-itemsets.
-   * 
+   *
    * @param oneitems Frequent 1-itemsets
    * @param relation Data relation
    * @param dim Maximum dimensionality
@@ -279,7 +279,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
   /**
    * Prunes a given set of candidates to keep only those BitSets where all
    * subsets of bits flipping one bit are frequent already.
-   * 
+   *
    * @param supported Support map
    * @param length Itemset length
    * @param dim Dimensionality
@@ -365,7 +365,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
       }
     }
     else {
-      throw new AbortException("Unexpected itemset type " + ref.getClass());
+      throw new InconsistentDataException("Unexpected itemset type " + ref.getClass());
     }
     if(LOG.isStatistics()) {
       // Naive pairwise approach
@@ -381,7 +381,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
   /**
    * Returns the frequent BitSets out of the given BitSets with respect to the
    * given database.
-   * 
+   *
    * @param candidates the candidates to be evaluated
    * @param relation the database to evaluate the candidates on
    * @param needed Minimum support needed
@@ -434,7 +434,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
   /**
    * Returns the frequent BitSets out of the given BitSets with respect to the
    * given database. Optimized implementation for SparseItemset.
-   * 
+   *
    * @param candidates the candidates to be evaluated
    * @param relation the database to evaluate the candidates on
    * @param needed Minimum support needed
@@ -490,7 +490,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Initialize the scratch itemset.
-   * 
+   *
    * @param bv Bit vector data source
    * @param scratchi Scratch itemset
    * @param iters Iterator array
@@ -509,7 +509,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Advance scratch itemset to the next.
-   * 
+   *
    * @param bv Bit vector data source
    * @param scratchi Scratch itemset
    * @param iters Iterator array
@@ -530,7 +530,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Binary-search for the next-larger element.
-   * 
+   *
    * @param candidates Candidates to search for
    * @param scratch Scratch space
    * @param begin Search interval begin
@@ -559,7 +559,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Debug method: output all itemsets.
-   * 
+   *
    * @param msg Output buffer
    * @param candidates Itemsets to dump
    * @param meta Metadata for item labels
@@ -587,9 +587,9 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractFrequentItemsetAlgorithm.Parameterizer {

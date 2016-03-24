@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -56,7 +56,6 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.HaltonUniformDistributio
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.UniformDistribution;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -229,13 +228,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     if(LOG.isVerbose()) {
       LOG.verbose("Loading specification ...");
     }
-    GeneratorMain gen;
-    try {
-      gen = loadXMLSpecification();
-    }
-    catch(UnableToComplyException e) {
-      throw new AbortException("Cannot load XML specification", e);
-    }
+    GeneratorMain gen = loadXMLSpecification();
     if(testAgainstModel != null) {
       gen.setTestAgainstModel(testAgainstModel.booleanValue());
     }
@@ -244,22 +237,15 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     if(LOG.isVerbose()) {
       LOG.verbose("Generating clusters ...");
     }
-    try {
-      return super.invokeBundleFilters(gen.generate());
-    }
-    catch(UnableToComplyException e) {
-      throw new AbortException("Data generation failed. ", e);
-    }
+    return super.invokeBundleFilters(gen.generate());
   }
 
   /**
    * Load the XML configuration file.
    *
-   * @throws UnableToComplyException
-   *
    * @return Generator
    */
-  private GeneratorMain loadXMLSpecification() throws UnableToComplyException {
+  private GeneratorMain loadXMLSpecification() {
     try {
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
@@ -285,20 +271,20 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
         return gen;
       }
       else {
-        throw new UnableToComplyException("Experiment specification has incorrect document element: " + root.getNodeName());
+        throw new AbortException("Experiment specification has incorrect document element: " + root.getNodeName());
       }
     }
     catch(FileNotFoundException e) {
-      throw new UnableToComplyException("Can't open specification file.", e);
+      throw new AbortException("Can't open specification file.", e);
     }
     catch(SAXException e) {
-      throw new UnableToComplyException("Error parsing specification file.", e);
+      throw new AbortException("Error parsing specification file.", e);
     }
     catch(IOException e) {
-      throw new UnableToComplyException("IO Exception loading specification file.", e);
+      throw new AbortException("IO Exception loading specification file.", e);
     }
     catch(ParserConfigurationException e) {
-      throw new UnableToComplyException("Parser Configuration Error", e);
+      throw new AbortException("Parser Configuration Error", e);
     }
   }
 
@@ -307,9 +293,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param gen Generator
    * @param cur Current document nod
-   * @throws UnableToComplyException
    */
-  private void processElementDataset(GeneratorMain gen, Node cur) throws UnableToComplyException {
+  private void processElementDataset(GeneratorMain gen, Node cur) {
     // *** get parameters
     String seedstr = ((Element) cur).getAttribute(ATTR_SEED);
     if(seedstr != null && seedstr.length() > 0) {
@@ -340,9 +325,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param gen Generator
    * @param cur Current document nod
-   * @throws UnableToComplyException
    */
-  private void processElementCluster(GeneratorMain gen, Node cur) throws UnableToComplyException {
+  private void processElementCluster(GeneratorMain gen, Node cur) {
     int size = -1;
     double overweight = 1.0;
 
@@ -359,10 +343,10 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     }
 
     if(size < 0) {
-      throw new UnableToComplyException("No valid cluster size given in specification file.");
+      throw new AbortException("No valid cluster size given in specification file.");
     }
     if(name == null || name.length() == 0) {
-      throw new UnableToComplyException("No cluster name given in specification file.");
+      throw new AbortException("No cluster name given in specification file.");
     }
 
     // *** add new cluster object
@@ -407,9 +391,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param cluster
    * @param cur Current document nod
-   * @throws UnableToComplyException
    */
-  private void processElementUniform(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
+  private void processElementUniform(GeneratorSingleCluster cluster, Node cur) {
     double min = 0.0;
     double max = 1.0;
 
@@ -442,9 +425,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param cluster
    * @param cur Current document nod
-   * @throws UnableToComplyException
    */
-  private void processElementNormal(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
+  private void processElementNormal(GeneratorSingleCluster cluster, Node cur) {
     double mean = 0.0;
     double stddev = 1.0;
     String meanstr = ((Element) cur).getAttribute(ATTR_MEAN);
@@ -476,9 +458,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param cluster
    * @param cur Current document nod
-   * @throws UnableToComplyException
    */
-  private void processElementGamma(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
+  private void processElementGamma(GeneratorSingleCluster cluster, Node cur) {
     double k = 1.0;
     double theta = 1.0;
     String kstr = ((Element) cur).getAttribute(ATTR_K);
@@ -510,9 +491,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param cluster
    * @param cur Current document nod
-   * @throws UnableToComplyException
    */
-  private void processElementHalton(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
+  private void processElementHalton(GeneratorSingleCluster cluster, Node cur) {
     double min = 0.0;
     double max = 1.0;
 
@@ -545,9 +525,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param cluster
    * @param cur Current document nod
-   * @throws UnableToComplyException
    */
-  private void processElementRotate(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
+  private void processElementRotate(GeneratorSingleCluster cluster, Node cur) {
     int axis1 = 0;
     int axis2 = 0;
     double angle = 0.0;
@@ -565,13 +544,13 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
       angle = ParseUtil.parseDouble(anstr);
     }
     if(axis1 <= 0 || axis1 > cluster.getDim()) {
-      throw new UnableToComplyException("Invalid axis1 number given in specification file.");
+      throw new AbortException("Invalid axis1 number given in specification file.");
     }
     if(axis2 <= 0 || axis2 > cluster.getDim()) {
-      throw new UnableToComplyException("Invalid axis2 number given in specification file.");
+      throw new AbortException("Invalid axis2 number given in specification file.");
     }
     if(axis1 == axis2) {
-      throw new UnableToComplyException("Invalid axis numbers given in specification file.");
+      throw new AbortException("Invalid axis numbers given in specification file.");
     }
 
     // Add rotation to cluster.
@@ -592,16 +571,15 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param cluster
    * @param cur Current document nod
-   * @throws UnableToComplyException
    */
-  private void processElementTranslate(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
+  private void processElementTranslate(GeneratorSingleCluster cluster, Node cur) {
     double[] offset = null;
     String vstr = ((Element) cur).getAttribute(ATTR_VECTOR);
     if(vstr != null && vstr.length() > 0) {
       offset = parseVector(vstr);
     }
     if(offset == null) {
-      throw new UnableToComplyException("No translation vector given.");
+      throw new AbortException("No translation vector given.");
     }
 
     // *** add new translation
@@ -622,9 +600,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param cluster
    * @param cur Current document nod
-   * @throws UnableToComplyException
    */
-  private void processElementClipping(GeneratorSingleCluster cluster, Node cur) throws UnableToComplyException {
+  private void processElementClipping(GeneratorSingleCluster cluster, Node cur) {
     double[] cmin = null, cmax = null;
 
     String minstr = ((Element) cur).getAttribute(ATTR_MIN);
@@ -636,7 +613,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
       cmax = parseVector(maxstr);
     }
     if(cmin == null || cmax == null) {
-      throw new UnableToComplyException("No or incomplete clipping vectors given.");
+      throw new AbortException("No or incomplete clipping vectors given.");
     }
 
     // *** set clipping
@@ -657,12 +634,11 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param gen Generator
    * @param cur Current document nod
-   * @throws UnableToComplyException
    */
-  private void processElementStatic(GeneratorMain gen, Node cur) throws UnableToComplyException {
+  private void processElementStatic(GeneratorMain gen, Node cur) {
     String name = ((Element) cur).getAttribute(ATTR_NAME);
     if(name == null) {
-      throw new UnableToComplyException("No cluster name given in specification file.");
+      throw new AbortException("No cluster name given in specification file.");
     }
 
     ArrayList<double[]> points = new ArrayList<>();
@@ -691,16 +667,15 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param points current list of points (to append to)
    * @param cur Current document nod
-   * @throws UnableToComplyException
    */
-  private void processElementPoint(List<double[]> points, Node cur) throws UnableToComplyException {
+  private void processElementPoint(List<double[]> points, Node cur) {
     double[] point = null;
     String vstr = ((Element) cur).getAttribute(ATTR_VECTOR);
     if(vstr != null && vstr.length() > 0) {
       point = parseVector(vstr);
     }
     if(point == null) {
-      throw new UnableToComplyException("No translation vector given.");
+      throw new AbortException("No translation vector given.");
     }
 
     // *** add new point
@@ -723,9 +698,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
    *
    * @param s String to parse
    * @return Vector
-   * @throws UnableToComplyException
    */
-  private double[] parseVector(String s) throws UnableToComplyException {
+  private double[] parseVector(String s) {
     String[] entries = WHITESPACE_PATTERN.split(s);
     double[] d = new double[entries.length];
     for(int i = 0; i < entries.length; i++) {
@@ -733,7 +707,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
         d[i] = ParseUtil.parseDouble(entries[i]);
       }
       catch(NumberFormatException e) {
-        throw new UnableToComplyException("Could not parse vector.");
+        throw new AbortException("Could not parse vector.");
       }
     }
     return d;

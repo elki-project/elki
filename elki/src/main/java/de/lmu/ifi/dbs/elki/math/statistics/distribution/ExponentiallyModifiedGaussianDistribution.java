@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,6 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -36,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 /**
  * Exponentially modified Gaussian (EMG) distribution (ExGaussian distribution)
  * is a combination of a normal distribution and an exponential distribution.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
@@ -59,7 +58,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
 
   /**
    * Constructor for ExGaussian distribution
-   * 
+   *
    * @param mean Mean
    * @param stddev Standard Deviation
    * @param lambda Rate
@@ -74,7 +73,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
 
   /**
    * Constructor for ExGaussian distribution
-   * 
+   *
    * @param mean Mean
    * @param stddev Standard Deviation
    * @param lambda Rate
@@ -89,7 +88,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
 
   /**
    * Constructor for ExGaussian distribution
-   * 
+   *
    * @param mean Mean
    * @param stddev Standard Deviation
    * @param lambda Rate
@@ -152,7 +151,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
 
   /**
    * Probability density function of the ExGaussian distribution.
-   * 
+   *
    * @param x The value.
    * @param mu The mean.
    * @param sigma The standard deviation.
@@ -168,7 +167,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
 
   /**
    * Cumulative probability density function (CDF) of an exgauss distribution.
-   * 
+   *
    * @param x value to evaluate CDF at.
    * @param mu Mean value.
    * @param sigma Standard deviation.
@@ -186,26 +185,26 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
   /**
    * Inverse cumulative probability density function (probit) of an exgauss
    * distribution.
-   * 
+   *
    * @param x value to evaluate probit function at.
    * @param mu Mean value.
    * @param sigma Standard deviation.
    * @param lambda Rate parameter.
    * @return The probit of the given exgauss distribution at x.
-   * 
+   *
    * @deprecated Not yet implemented!
    */
   @Deprecated
   public static double quantile(double x, double mu, double sigma, double lambda) {
     // FIXME: implement!
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {

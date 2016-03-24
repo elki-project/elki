@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.experiments;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.RVEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.ZipfEstimator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -100,7 +99,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
   }
 
   @Override
-  public void run() throws UnableToComplyException {
+  public void run() {
     ArrayList<String> abbreviat = new ArrayList<>();
     ArrayList<IntrinsicDimensionalityEstimator> estimators = new ArrayList<>();
     // Hill estimator

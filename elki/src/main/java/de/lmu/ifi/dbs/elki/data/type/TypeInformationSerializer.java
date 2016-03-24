@@ -29,24 +29,24 @@ import java.nio.ByteBuffer;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
 
 /**
  * Class to handle the serialization and deserialization of type information.
- * 
+ *
  * The serialization format is custom, and not very extensible. However, the
  * standard Java "serializable" API did not seem well suited for this task, and
  * assumes an object stream context, while we intend to focus on Java NIO.
- * 
+ *
  * TODO: on the long run, this code needs to be refactored, and a more
  * extensible format needs to be created. Maybe, a protobuf based API would be
  * possible.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.5
- * 
+ *
  * @apiviz.composedOf SimpleTypeSerializer
  * @apiviz.composedOf VectorTypeSerializer
  * @apiviz.composedOf VectorFieldTypeSerializer
@@ -144,9 +144,9 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
 
   /**
    * Serialization class for pure simple types.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses SimpleTypeInformation
    */
   static class SimpleTypeSerializer implements ByteBufferSerializer<SimpleTypeInformation<?>> {
@@ -221,11 +221,11 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
 
   /**
    * Serialization class for non-field vector types.
-   * 
+   *
    * FIXME: "label" is actually not supported.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses VectorTypeInformation
    */
   static class VectorTypeSerializer implements ByteBufferSerializer<VectorTypeInformation<?>> {
@@ -244,7 +244,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         int maxdim = ByteArrayUtil.readSignedVarint(buffer);
         // FIXME: should/must provide a factory now!
         return new VectorTypeInformation<>(factory, serializer, mindim, maxdim);
-      } catch (UnableToComplyException e) {
+      } catch (ClassInstantiationException e) {
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate factory: "+e, e);
       } catch (ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: "+e, e);
@@ -309,11 +309,11 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
 
   /**
    * Serialization class for field vector types.
-   * 
+   *
    * FIXME: "relation label" is actually not properly supported.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses VectorFieldTypeInformation
    */
   static class VectorFieldTypeSerializer implements ByteBufferSerializer<VectorFieldTypeInformation<?>> {
@@ -345,7 +345,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         } else {
           return new VectorFieldTypeInformation<>(factory, mindim, maxdim, serializer);
         }
-      } catch (UnableToComplyException e) {
+      } catch (ClassInstantiationException e) {
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate factory: "+e, e);
       } catch (ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: "+e, e);
@@ -385,7 +385,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       } else {
         ByteArrayUtil.writeUnsignedVarint(buffer, labels.length);
         for (String s : labels) {
-          ByteArrayUtil.writeString(buffer, s);            
+          ByteArrayUtil.writeString(buffer, s);
         }
       }
     }
@@ -422,7 +422,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       } else {
         total += ByteArrayUtil.getUnsignedVarintSize(labels.length);
         for (String s : labels) {
-          total += ByteArrayUtil.getStringSize(s);            
+          total += ByteArrayUtil.getStringSize(s);
         }
       }
       return total;

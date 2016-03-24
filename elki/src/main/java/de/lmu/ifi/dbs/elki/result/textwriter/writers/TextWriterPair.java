@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.result.textwriter.writers;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,15 +27,13 @@ import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterWriterInterface;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Write a pair
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
- *
  */
 public class TextWriterPair extends TextWriterWriterInterface<Pair<?,?>> {
   /**
@@ -43,13 +41,13 @@ public class TextWriterPair extends TextWriterWriterInterface<Pair<?,?>> {
    */
   @Override
   @SuppressWarnings("unchecked")
-  public void write(TextWriterStream out, String label, Pair<?,?> object) throws UnableToComplyException, IOException {
+  public void write(TextWriterStream out, String label, Pair<?,?> object) throws IOException {
     if (object != null) {
       Object first = object.getFirst();
       if (first != null) {
         TextWriterWriterInterface<Object> tw = (TextWriterWriterInterface<Object>) out.getWriterFor(first);
         if (tw == null) {
-          throw new UnableToComplyException("No handler for database object itself: " + first.getClass().getSimpleName());
+          throw new IOException("No handler for database object itself: " + first.getClass().getSimpleName());
         }
         tw.write(out, label, first);
       }
@@ -57,7 +55,7 @@ public class TextWriterPair extends TextWriterWriterInterface<Pair<?,?>> {
       if (second != null) {
         TextWriterWriterInterface<Object> tw = (TextWriterWriterInterface<Object>) out.getWriterFor(second);
         if (tw == null) {
-          throw new UnableToComplyException("No handler for database object itself: " + second.getClass().getSimpleName());
+          throw new IOException("No handler for database object itself: " + second.getClass().getSimpleName());
         }
         tw.write(out, label, second);
       }

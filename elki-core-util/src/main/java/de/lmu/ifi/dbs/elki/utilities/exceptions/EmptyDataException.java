@@ -1,10 +1,9 @@
-package de.lmu.ifi.dbs.elki.result.textwriter;
-
+package de.lmu.ifi.dbs.elki.utilities.exceptions;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,37 +22,21 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.io.IOException;
-
 /**
- * Base class for object writers.
+ * Exception thrown when a database / relation is empty.
  *
  * @author Erich Schubert
- * @since 0.2
- *
- * @param <O> Object type (usually the class itself)
  */
-public abstract class TextWriterWriterInterface<O> {
+public class EmptyDataException extends AbortException {
   /**
-   * Write a given object to the output stream.
-   *
-   * @param out Output stream
-   * @param label Label to prefix
-   * @param object object to output
-   * @throws IOException on IO errors
+   * Serial version
    */
-  public abstract void write(TextWriterStream out, String label, O object) throws IOException;
+  private static final long serialVersionUID = 1L;
 
   /**
-   * Non-type-checking version.
-   *
-   * @param out Output stream
-   * @param label Label to prefix
-   * @param object object to output
-   * @throws IOException on IO errors
+   * Constructor.
    */
-  @SuppressWarnings("unchecked")
-  public final void writeObject(TextWriterStream out, String label, Object object) throws IOException {
-    write(out, label, (O) object);
+  public EmptyDataException() {
+    super("Database/Relation/Subset is empty.");
   }
 }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Generate a data set according to a given model.
@@ -49,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
  * model that we specified.
  *
  * The drawbacks are that on one hand, specifications might be unsatisfiable.
- * For this a retry count is kept and an {@link UnableToComplyException} is
+ * For this a retry count is kept and an {@link AbortException} is
  * thrown when the maximum number of retries is exceeded.
  *
  * On the other hand, the model might not be exactly as specified. When the
@@ -109,19 +109,17 @@ public class GeneratorMain {
    * Main loop to generate data set.
    *
    * @return Generated data set
-   * @throws UnableToComplyException when model not satisfiable or no clusters
-   *         specified.
    */
-  public MultipleObjectsBundle generate() throws UnableToComplyException {
+  public MultipleObjectsBundle generate() {
     // we actually need some clusters.
     if(generators.size() < 1) {
-      throw new UnableToComplyException("No clusters specified.");
+      throw new AbortException("No clusters specified.");
     }
     // Assert that cluster dimensions agree.
     final int dim = generators.get(0).getDim();
     for(GeneratorInterface c : generators) {
       if(c.getDim() != dim) {
-        throw new UnableToComplyException("Cluster dimensions do not agree.");
+        throw new AbortException("Cluster dimensions do not agree.");
       }
     }
     // Prepare result bundle

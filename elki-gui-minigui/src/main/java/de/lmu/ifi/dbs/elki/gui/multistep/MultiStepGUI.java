@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.gui.multistep;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.logging.CLISmartHandler;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
@@ -59,10 +58,10 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
  * Experimenter-style multi step GUI.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.landmark
  * @apiviz.composedOf AlgorithmTabPanel
  * @apiviz.composedOf EvaluationTabPanel
@@ -201,7 +200,7 @@ public class MultiStepGUI extends AbstractApplication {
 
   /**
    * Set the parameters.
-   * 
+   *
    * @param config Parameterization
    */
   public void setParameters(Parameterization config) {
@@ -221,7 +220,7 @@ public class MultiStepGUI extends AbstractApplication {
 
   /**
    * Get the serialized parameters
-   * 
+   *
    * @return Serialized parameters
    */
   public ArrayList<String> serializeParameters() {
@@ -235,14 +234,14 @@ public class MultiStepGUI extends AbstractApplication {
   }
 
   @Override
-  public void run() throws UnableToComplyException {
+  public void run() {
     frame.setVisible(true);
     outputArea.becomeDefaultLogger();
   }
 
   /**
    * Main method that just spawns the UI.
-   * 
+   *
    * @param args command line parameters
    */
   public static void main(final String[] args) {

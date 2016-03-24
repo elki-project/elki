@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,13 +35,12 @@ import java.util.NoSuchElementException;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.persistent.AbstractExternalizablePage;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * Abstract superclass for nodes in an tree based index structure.
- * 
+ *
  * @author Elke Achtert
  * @since 0.2
  * @param <E> the type of Entry used in the index
@@ -55,7 +54,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   /**
    * The entries (children) of this node.
    */
-  protected E[] entries;
+  protected Entry[] entries;
 
   /**
    * Indicates whether this node is a leaf node.
@@ -71,7 +70,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
 
   /**
    * Creates a new Node with the specified parameters.
-   * 
+   *
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
@@ -80,8 +79,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   public AbstractNode(int capacity, boolean isLeaf, Class<? super E> eclass) {
     super();
     this.numEntries = 0;
-    Class<E> cls = ClassGenericsUtil.uglyCastIntoSubclass(eclass);
-    this.entries = ClassGenericsUtil.newArrayOfNull(capacity, cls);
+    this.entries = new Entry[capacity];
     this.isLeaf = isLeaf;
   }
 
@@ -99,7 +97,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
       public IndexTreePath<E> nextElement() {
         synchronized(AbstractNode.this) {
           if(count < numEntries) {
-            return new IndexTreePath<>(parentPath, entries[count], count++);
+            return new IndexTreePath<>(parentPath, getEntry(count), count++);
           }
         }
         throw new NoSuchElementException();
@@ -117,9 +115,10 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
     return isLeaf;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public final E getEntry(int index) {
-    return entries[index];
+    return (E) entries[index];
   }
 
   /**
@@ -137,7 +136,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   /**
    * Reads the id of this node, the numEntries and the entries array from the
    * specified stream.
-   * 
+   *
    * @param in the stream to read data from in order to restore the object
    * @throws java.io.IOException if I/O errors occur
    * @throws ClassNotFoundException If the class for an object being restored
@@ -157,7 +156,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
    * instance and <code>super.equals(o)</code> returns <code>true</code> and
    * both nodes are of the same type (leaf node or directory node) and have
    * contain the same entries, <code>false</code> otherwise.
-   * 
+   *
    * @see de.lmu.ifi.dbs.elki.persistent.AbstractExternalizablePage#equals(Object)
    */
   @Override
@@ -180,7 +179,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
 
   /**
    * Returns a string representation of this node.
-   * 
+   *
    * @return the type of this node (LeafNode or DirNode) followed by its id
    */
   @Override
@@ -197,7 +196,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
    * Adds a new leaf entry to this node's children and returns the index of the
    * entry in this node's children array. An UnsupportedOperationException will
    * be thrown if the entry is not a leaf entry or this node is not a leaf node.
-   * 
+   *
    * @param entry the leaf entry to be added
    * @return the index of the entry in this node's children array
    * @throws UnsupportedOperationException if entry is not a leaf entry or this
@@ -223,7 +222,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
    * the entry in this node's children array. An UnsupportedOperationException
    * will be thrown if the entry is not a directory entry or this node is not a
    * directory node.
-   * 
+   *
    * @param entry the directory entry to be added
    * @return the index of the entry in this node's children array
    * @throws UnsupportedOperationException if entry is not a directory entry or
@@ -246,7 +245,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   /**
    * Deletes the entry at the specified index and shifts all entries after the
    * index to left.
-   * 
+   *
    * @param index the index at which the entry is to be deleted
    * @return true id deletion was successful
    */
@@ -268,7 +267,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
 
   /**
    * Returns the capacity of this node (i.e. the length of the entries arrays).
-   * 
+   *
    * @return the capacity of this node
    */
   public final int getCapacity() {
@@ -277,18 +276,19 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
 
   /**
    * Returns a list of the entries.
-   * 
+   *
    * @return a list of the entries
-   * 
+   *
    * @deprecated Using this method means an extra copy - usually at the cost of
    *             performance.
    */
+  @SuppressWarnings("unchecked")
   @Deprecated
   public final List<E> getEntries() {
     List<E> result = new ArrayList<>(numEntries);
-    for(E entry : entries) {
+    for(Entry entry : entries) {
       if(entry != null) {
-        result.add(entry);
+        result.add((E) entry);
       }
     }
     return result;
@@ -297,7 +297,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   /**
    * Adds the specified entry to the entries array and increases the numEntries
    * counter.
-   * 
+   *
    * @param entry the entry to be added
    * @return the current number of entries
    */
@@ -308,7 +308,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
 
   /**
    * Remove entries according to the given mask.
-   * 
+   *
    * @param mask Mask to remove
    */
   public void removeMask(long[] mask) {
@@ -334,7 +334,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
 
   /**
    * Redistribute entries according to the given sorting.
-   * 
+   *
    * @param newNode Node to split to
    * @param sorting Sorting to use
    * @param splitPoint Split point
@@ -366,7 +366,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
 
   /**
    * Splits the entries of this node into a new node using the given assignments
-   * 
+   *
    * @param newNode Node to split to
    * @param assignmentsToFirst the assignment to this node
    * @param assignmentsToSecond the assignment to the new node
@@ -398,7 +398,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
 
   /**
    * Splits the entries of this node into a new node using the given assignments
-   * 
+   *
    * @param newNode Node to split to
    * @param assignment Assignment mask
    */
@@ -413,7 +413,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
     while(pos < numEntries) {
       if(BitsUtil.get(assignment, pos)) {
         // Move to new node
-        newNode.addEntry(entries[pos]);
+        newNode.addEntry(getEntry(pos));
       }
       else {
         // Move to new position

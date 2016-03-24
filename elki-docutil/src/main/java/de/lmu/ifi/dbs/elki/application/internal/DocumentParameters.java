@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceScanner;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -281,7 +282,7 @@ public class DocumentParameters {
 
   /**
    * Get the base application class (to be ignored).
-   * 
+   *
    * @return Application class.
    */
   private static Class<?> appBaseClass() {
@@ -334,7 +335,7 @@ public class DocumentParameters {
 
     /**
      * Constructor.
-     * 
+     *
      * @param cls Class to instantiate
      * @param track Parameter tracking helper
      * @param options Options list.
@@ -356,19 +357,16 @@ public class DocumentParameters {
         try {
           ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
         }
-        catch(java.lang.NoSuchMethodException
-            | java.lang.IllegalAccessException e) {
-          // LOG.warning("Could not instantiate class " + cls.getName() +
-          // " - no appropriate constructor or parameterizer found.");
-        }
-        catch(java.lang.reflect.InvocationTargetException e) {
+        catch(ClassInstantiationException e) {
           if(e.getCause() instanceof RuntimeException) {
             throw (RuntimeException) e.getCause();
           }
           if(e.getCause() instanceof Error) {
             throw (Error) e.getCause();
           }
-          throw new RuntimeException(e.getCause());
+          // Probably not serious, just not parameterizable?
+          // LOG.warning("Could not instantiate class " + cls.getName() +
+          // " - no appropriate constructor or parameterizer found.");
         }
         catch(RuntimeException e) {
           throw e;
@@ -630,7 +628,7 @@ public class DocumentParameters {
 
   /**
    * Get the base class, for naming.
-   * 
+   *
    * @return Base class.
    */
   private static Class<?> getBaseClass() {
@@ -798,7 +796,7 @@ public class DocumentParameters {
 
   /**
    * Get the restriction class of an option.
-   * 
+   *
    * @param oid
    * @param firstopt
    * @param byopt

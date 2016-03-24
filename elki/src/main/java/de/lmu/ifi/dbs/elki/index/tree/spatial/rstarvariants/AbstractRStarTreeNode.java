@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.index.tree.AbstractNode;
+import de.lmu.ifi.dbs.elki.index.tree.Entry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
@@ -41,7 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 
 /**
  * Abstract superclass for nodes in a R*-Tree.
- * 
+ *
  * @author Elke Achtert
  * @since 0.2
  * @param <N> Node type
@@ -57,7 +58,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
   /**
    * Creates a new AbstractRStarTreeNode with the specified parameters.
-   * 
+   *
    * @param capacity the capacity (maximum number of entries plus 1 for
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
@@ -69,7 +70,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
   /**
    * Recomputing the MBR is rather expensive.
-   * 
+   *
    * @return MBR
    */
   public ModifiableHyperBoundingBox computeMBR() {
@@ -87,7 +88,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
 
   /**
    * Adjusts the parameters of the entry representing this node.
-   * 
+   *
    * @param entry the entry representing this node
    */
   public boolean adjustEntry(E entry) {
@@ -120,7 +121,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   /**
    * Adjusts the parameters of the entry representing this node. Only applicable
    * if one object was inserted or the size of an existing node increased.
-   * 
+   *
    * @param entry the entry representing this node
    * @param responsibleMBR the MBR of the object or node which is responsible
    *        for the call of the method
@@ -193,7 +194,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   /**
    * Tests, if the parameters of the entry representing this node, are correctly
    * set. Subclasses may need to overwrite this method.
-   * 
+   *
    * @param parent the parent holding the entry representing this node
    * @param index the index of the entry in the parents child array
    */
@@ -221,7 +222,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
     super.writeExternal(out);
     // TODO: do we need to write/read the capacity?
     out.writeInt(entries.length);
-    for(E entry : entries) {
+    for(Entry entry : entries) {
       if(entry == null) {
         break;
       }
@@ -232,7 +233,7 @@ public abstract class AbstractRStarTreeNode<N extends AbstractRStarTreeNode<N, E
   /**
    * Reads the id of this node, the numEntries and the entries array from the
    * specified stream.
-   * 
+   *
    * @param in the stream to read data from in order to restore the object
    * @throws java.io.IOException if I/O errors occur
    * @throws ClassNotFoundException If the class for an object being restored

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,13 +26,10 @@ package de.lmu.ifi.dbs.elki.utilities;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
@@ -101,33 +98,30 @@ public final class ClassGenericsUtil {
    * @param type desired Class type of the Object to retrieve
    * @param className name of the class to instantiate
    * @return a new instance of the given type for the specified className
-   * @throws UnableToComplyException if the instantiation cannot be performed
-   *         successfully
+   * @throws ClassInstantiationException When a class cannot be instantiated.
    */
-  public static <T> T instantiate(Class<T> type, String className) throws UnableToComplyException {
-    T instance;
+  public static <T> T instantiate(Class<T> type, String className) throws ClassInstantiationException {
     try {
       try {
-        instance = type.cast(loader.loadClass(className).newInstance());
+        return type.cast(loader.loadClass(className).newInstance());
       }
       catch(ClassNotFoundException e) {
         // try package of type
-        instance = type.cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
+        return type.cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
     }
     catch(InstantiationException e) {
-      throw new UnableToComplyException(e);
+      throw new ClassInstantiationException(e);
     }
     catch(IllegalAccessException e) {
-      throw new UnableToComplyException(e);
+      throw new ClassInstantiationException(e);
     }
     catch(ClassNotFoundException e) {
-      throw new UnableToComplyException(e);
+      throw new ClassInstantiationException(e);
     }
     catch(ClassCastException e) {
-      throw new UnableToComplyException(e);
+      throw new ClassInstantiationException(e);
     }
-    return instance;
   }
 
   /**
@@ -149,36 +143,33 @@ public final class ClassGenericsUtil {
    * @param type desired Class type of the Object to retrieve
    * @param className name of the class to instantiate
    * @return a new instance of the given type for the specified className
-   * @throws UnableToComplyException if the instantiation cannot be performed
-   *         successfully
+   * @throws ClassInstantiationException When a class cannot be instantiated.
    */
   @SuppressWarnings("unchecked")
-  public static <T> T instantiateGenerics(Class<?> type, String className) throws UnableToComplyException {
-    T instance;
+  public static <T> T instantiateGenerics(Class<?> type, String className) throws ClassInstantiationException {
     // TODO: can we do a verification that type conforms to T somehow?
     // (probably not because generics are implemented via erasure.
     try {
       try {
-        instance = ((Class<T>) type).cast(loader.loadClass(className).newInstance());
+        return ((Class<T>) type).cast(loader.loadClass(className).newInstance());
       }
       catch(ClassNotFoundException e) {
         // try package of type
-        instance = ((Class<T>) type).cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
+        return ((Class<T>) type).cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
     }
     catch(InstantiationException e) {
-      throw new UnableToComplyException(e);
+      throw new ClassInstantiationException(e);
     }
     catch(IllegalAccessException e) {
-      throw new UnableToComplyException(e);
+      throw new ClassInstantiationException(e);
     }
     catch(ClassNotFoundException e) {
-      throw new UnableToComplyException(e);
+      throw new ClassInstantiationException(e);
     }
     catch(ClassCastException e) {
-      throw new UnableToComplyException(e);
+      throw new ClassInstantiationException(e);
     }
-    return instance;
   }
 
   /**
@@ -237,44 +228,46 @@ public final class ClassGenericsUtil {
    * @param c Class to instantiate
    * @param config Configuration to use for instantiation.
    * @return Instance
-   * @throws InvocationTargetException when an exception occurred within the
-   *         constructor
-   * @throws NoSuchMethodException when no suitable constructor was found
-   * @throws Exception when other instantiation errors occurred
+   * @throws ClassInstantiationException When a class cannot be instantiated.
    */
-  public static <C> C tryInstantiate(Class<C> r, Class<?> c, Parameterization config) throws InvocationTargetException, NoSuchMethodException, Exception {
+  public static <C> C tryInstantiate(Class<C> r, Class<?> c, Parameterization config) throws ClassInstantiationException {
     if(c == null) {
-      // TODO: better class? AbortException maybe?
-      throw new UnsupportedOperationException("Trying to instantiate 'null' class!");
+      throw new ClassInstantiationException("Trying to instantiate 'null' class!");
     }
-    // Try a V3 parameterization class
-    Parameterizer par = getParameterizer(c);
-    // TODO: API good?
-    if(par instanceof AbstractParameterizer) {
-      final Object instance = ((AbstractParameterizer) par).make(config);
-      return r.cast(instance);
-    }
-    // Try a V2 static parameterization method
     try {
-      final Method factory = getParameterizationFactoryMethod(c, r);
-      final Object instance = factory.invoke(null, config);
+      // Try a V3 parameterization class
+      Parameterizer par = getParameterizer(c);
+      // TODO: API good?
+      if(par instanceof AbstractParameterizer) {
+        final Object instance = ((AbstractParameterizer) par).make(config);
+        return r.cast(instance);
+      }
+      // Try a V2 static parameterization method
+      try {
+        final Method factory = getParameterizationFactoryMethod(c, r);
+        final Object instance = factory.invoke(null, config);
+        return r.cast(instance);
+      }
+      catch(NoSuchMethodException e) {
+        // continue.
+      }
+      // Try a regular "parameterization" constructor
+      try {
+        final Constructor<?> constructor = c.getConstructor(Parameterization.class);
+        final Object instance = constructor.newInstance(config);
+        return r.cast(instance);
+      }
+      catch(NoSuchMethodException e) {
+        // continue
+      }
+      // Try a default constructor.
+      final Object instance = c.getConstructor().newInstance();
       return r.cast(instance);
     }
-    catch(NoSuchMethodException e) {
-      // continue.
+    catch(InstantiationException | InvocationTargetException
+        | IllegalAccessException | NoSuchMethodException e) {
+      throw new ClassInstantiationException(e);
     }
-    // Try a regular "parameterization" constructor
-    try {
-      final Constructor<?> constructor = c.getConstructor(Parameterization.class);
-      final Object instance = constructor.newInstance(config);
-      return r.cast(instance);
-    }
-    catch(NoSuchMethodException e) {
-      // continue
-    }
-    // Try a default constructor.
-    final Object instance = c.getConstructor().newInstance();
-    return r.cast(instance);
   }
 
   /**
@@ -310,74 +303,6 @@ public final class ClassGenericsUtil {
         throw new AbortException("Instantiation failed", e);
       }
     }
-  }
-
-  /**
-   * Create an array (of null values)
-   *
-   * This is a common unchecked cast we have to do due to Java Generics
-   * limitations.
-   *
-   * @param <T> Type the array elements have
-   * @param len array size
-   * @param base template class for array creation.
-   * @return new array of null pointers.
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> T[] newArrayOfNull(int len, Class<T> base) {
-    return (T[]) java.lang.reflect.Array.newInstance(base, len);
-  }
-
-  /**
-   * Convert a collection to an array.
-   *
-   * @param <B> Base type
-   * @param <T> Type the array elements have
-   * @param coll collection to convert.
-   * @param base Template class for array creation.
-   * @return new array with the collection contents.
-   */
-  @SuppressWarnings("unchecked")
-  public static <B, T extends B> T[] toArray(Collection<T> coll, Class<B> base) {
-    return coll.toArray((T[]) newArray(base, 0));
-  }
-
-  /**
-   * Create an array of <code>len</code> empty ArrayLists.
-   *
-   * This is a common unchecked cast we have to do due to Java Generics
-   * limitations.
-   *
-   * @param <T> Type the list elements have
-   * @param len array size
-   * @return new array of ArrayLists
-   */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public static <T> ArrayList<T>[] newArrayOfEmptyArrayList(int len) {
-    ArrayList[] result = new ArrayList[len];
-    for(int i = 0; i < len; i++) {
-      result[i] = new ArrayList<>();
-    }
-    return result;
-  }
-
-  /**
-   * Create an array of <code>len</code> empty HashSets.
-   *
-   * This is a common unchecked cast we have to do due to Java Generics
-   * limitations.
-   *
-   * @param <T> Type the set elements have
-   * @param len array size
-   * @return new array of HashSets
-   */
-  @SuppressWarnings({ "unchecked", "rawtypes" })
-  public static <T> HashSet<T>[] newArrayOfEmptyHashSet(int len) {
-    HashSet[] result = new HashSet[len];
-    for(int i = 0; i < len; i++) {
-      result[i] = new HashSet<>();
-    }
-    return result;
   }
 
   /**
@@ -436,144 +361,6 @@ public final class ClassGenericsUtil {
       throw new ClassCastException(cls.getName() + " is not a superclass of " + base);
     }
     return (Class<TO>) cls;
-  }
-
-  /**
-   * Cast an object at a base class, but return a subclass (for Generics!).
-   *
-   * The main goal of this is to allow casting an object from e.g. "
-   * <code>List</code>" to "<code>List&lt;Something&gt;</code>" without having
-   * to add SuppressWarnings everywhere.
-   *
-   * @param <B> Base type to cast at
-   * @param <T> Derived type returned
-   * @param base Base class to cast at
-   * @param obj Object
-   * @return Cast object or null.
-   */
-  @SuppressWarnings("unchecked")
-  public static <B, T extends B> T castWithGenericsOrNull(Class<B> base, Object obj) {
-    try {
-      return (T) base.cast(obj);
-    }
-    catch(ClassCastException e) {
-      return null;
-    }
-  }
-
-  /**
-   * Generic newInstance that tries to clone an object.
-   *
-   * @param <T> Object type, generic
-   * @param obj Master copy - must not be null.
-   * @return New instance, if possible
-   * @throws InstantiationException on error
-   * @throws IllegalAccessException on error
-   * @throws InvocationTargetException on error
-   * @throws NoSuchMethodException on error
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> T newInstance(T obj) throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
-    try {
-      Object n = obj.getClass().getConstructor().newInstance();
-      return (T) n;
-    }
-    catch(NullPointerException e) {
-      throw new IllegalArgumentException("Null pointer exception in newInstance()", e);
-    }
-  }
-
-  /**
-   * Retrieve the component type of a given array. For cloning.
-   *
-   * @param <T> Array type, generic
-   * @param a Existing array
-   * @return Component type of the given array.
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> Class<? extends T> getComponentType(T[] a) {
-    Class<?> k = a.getClass().getComponentType();
-    return (Class<? extends T>) k;
-  }
-
-  /**
-   * Make a new array of the given class and size.
-   *
-   * @param <T> Generic type
-   * @param k Class
-   * @param size Size
-   * @return new array of the given type
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> T[] newArray(Class<? extends T> k, int size) {
-    if(k.isPrimitive()) {
-      throw new IllegalArgumentException("Argument cannot be primitive: " + k);
-    }
-    Object a = java.lang.reflect.Array.newInstance(k, size);
-    return (T[]) a;
-  }
-
-  /**
-   * Clone an array of the given type.
-   *
-   * @param <T> Generic type
-   * @param a existing array
-   * @param size array size
-   * @return new array
-   */
-  public static <T> T[] newArray(T[] a, int size) {
-    return newArray(getComponentType(a), size);
-  }
-
-  /**
-   * Clone a collection. Collection must have an empty constructor!
-   *
-   * @param <T> Data type
-   * @param <C> Collection type
-   * @param coll Existing collection
-   * @return Cloned collection
-   */
-  public static <T, C extends Collection<T>> C cloneCollection(C coll) {
-    try {
-      C copy = newInstance(coll);
-      copy.addAll(coll);
-      return copy;
-    }
-    catch(InstantiationException e) {
-      throw new RuntimeException(e);
-    }
-    catch(IllegalAccessException e) {
-      throw new RuntimeException(e);
-    }
-    catch(InvocationTargetException e) {
-      throw new RuntimeException(e);
-    }
-    catch(NoSuchMethodException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  /**
-   * Transform a collection to an Array
-   *
-   * @param <T> object type
-   * @param c Collection
-   * @param a Array to write to or replace (i.e. sample array)
-   * @return new array containing the collection elements
-   */
-  public static <T> T[] collectionToArray(Collection<T> c, T[] a) {
-    if(a.length < c.size()) {
-      a = newArray(a, c.size());
-    }
-    int i = 0;
-    for(T x : c) {
-      a[i] = x;
-      i++;
-    }
-    if(i < a.length) {
-      a[i] = null;
-    }
-    return a;
   }
 
   /**

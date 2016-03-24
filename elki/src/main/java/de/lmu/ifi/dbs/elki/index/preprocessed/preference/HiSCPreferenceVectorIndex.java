@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.preference;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.EmptyDataException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -54,12 +54,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 /**
  * Preprocessor for HiSC preference vector assignment to objects of a certain
  * database.
- * 
+ *
  * @author Elke Achtert
  * @since 0.4.0
- * 
+ *
  * @see HiSC
- * 
+ *
  * @param <V> Vector type
  */
 @Title("HiSC Preprocessor")
@@ -82,7 +82,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation in use
    * @param alpha Alpha value
    * @param k k value
@@ -96,7 +96,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
   @Override
   public void initialize() {
     if(relation == null || relation.size() <= 0) {
-      throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
+      throw new EmptyDataException();
     }
 
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
@@ -137,7 +137,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
   /**
    * Determines the preference vector according to the specified neighbor ids.
-   * 
+   *
    * @param relation the database storing the objects
    * @param id the id of the object for which the preference vector should be
    *        determined
@@ -190,12 +190,12 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
   /**
    * Factory class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.stereotype factory
    * @apiviz.uses HiSCPreferenceVectorIndex oneway - - «create»
-   * 
+   *
    * @param <V> Vector type
    */
   public static class Factory<V extends NumberVector> extends AbstractPreferenceVectorIndex.Factory<V, HiSCPreferenceVectorIndex<V>> {
@@ -241,7 +241,7 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
     /**
      * Constructor.
-     * 
+     *
      * @param alpha Alpha
      * @param k k
      */
@@ -265,9 +265,9 @@ public class HiSCPreferenceVectorIndex<V extends NumberVector> extends AbstractP
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {

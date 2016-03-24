@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.xml;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,11 +27,9 @@ import java.util.Iterator;
 
 import org.w3c.dom.Node;
 
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
-
 /**
  * Simple adapter class to iterate over a DOM tree nodes children.
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
  */
@@ -43,7 +41,7 @@ public final class XMLNodeIterator implements Iterator<Node> {
 
   /**
    * Constructor with first element to iterate over.
-   * 
+   *
    * @param first first child of parent node.
    */
   public XMLNodeIterator(Node first) {
@@ -52,7 +50,7 @@ public final class XMLNodeIterator implements Iterator<Node> {
   }
 
   /**
-   * Check if the next node is defined. 
+   * Check if the next node is defined.
    */
   @Override
   public boolean hasNext() {
@@ -74,6 +72,6 @@ public final class XMLNodeIterator implements Iterator<Node> {
    */
   @Override
   public void remove() {
-    throw new UnsupportedOperationException(this.getClass().getSimpleName()+": "+ExceptionMessages.UNSUPPORTED_REMOVE);
+    throw new UnsupportedOperationException();
   }
 }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -39,22 +39,22 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
  * Median Absolute Deviation is used for scaling the data set as follows:
- * 
+ *
  * First, the median, and median absolute deviation are computed in each axis.
  * Then, each value is projected to (x - median(X)) / MAD(X).
- * 
+ *
  * This is similar to z-standardization of data sets, except that it is more
  * robust towards outliers, and only slightly more expensive to compute.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  * @param <V> vector type
- * 
+ *
  * @apiviz.uses NumberVector
  */
 // TODO: extract superclass AbstractAttributeWiseNormalization
@@ -180,12 +180,12 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
 
   @Override
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   /**
    * Normalize a single dimension.
-   * 
+   *
    * @param d Dimension
    * @param val Value
    * @return Normalized value
@@ -196,7 +196,7 @@ public class AttributeWiseMADNormalization<V extends NumberVector> implements No
 
   /**
    * Restore a single dimension.
-   * 
+   *
    * @param d Dimension
    * @param val Value
    * @return Normalized value

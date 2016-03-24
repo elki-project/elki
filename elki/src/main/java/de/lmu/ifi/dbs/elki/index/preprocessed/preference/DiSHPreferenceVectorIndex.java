@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.preference;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -52,10 +52,9 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.OnedimensionalDist
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.EmptyDataException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
@@ -130,7 +129,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
   @Override
   public void initialize() {
     if(relation == null || relation.size() == 0) {
-      throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
+      throw new EmptyDataException();
     }
 
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, long[].class);
@@ -383,8 +382,8 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
    *         preference vectors
    */
   private RangeQuery<V>[] initRangeQueries(Relation<V> relation, int dimensionality) {
-    Class<RangeQuery<V>> rqcls = ClassGenericsUtil.uglyCastIntoSubclass(RangeQuery.class);
-    RangeQuery<V>[] rangeQueries = ClassGenericsUtil.newArrayOfNull(dimensionality, rqcls);
+    @SuppressWarnings("unchecked")
+    RangeQuery<V>[] rangeQueries = (RangeQuery<V>[]) new RangeQuery[dimensionality];
     for(int d = 0; d < dimensionality; d++) {
       rangeQueries[d] = relation.getRangeQuery(new PrimitiveDistanceQuery<>(relation, new OnedimensionalDistanceFunction(d)));
     }

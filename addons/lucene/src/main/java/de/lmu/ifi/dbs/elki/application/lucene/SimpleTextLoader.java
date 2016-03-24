@@ -38,7 +38,6 @@ import org.apache.lucene.util.Version;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -46,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 
 /**
  * Simple text loader, assuming a folder with plain text files.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
@@ -58,7 +57,7 @@ public class SimpleTextLoader extends AbstractApplication {
 
   /**
    * Constructor.
-   * 
+   *
    * @param index Index folder
    * @param source Source folder
    */
@@ -69,7 +68,7 @@ public class SimpleTextLoader extends AbstractApplication {
   }
 
   @Override
-  public void run() throws UnableToComplyException {
+  public void run() {
     try {
       final Directory dir = FSDirectory.open(index);
       IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_36, new StandardAnalyzer(Version.LUCENE_36));
@@ -124,7 +123,7 @@ public class SimpleTextLoader extends AbstractApplication {
 
   /**
    * Main method.
-   * 
+   *
    * @param args Command line parameters.
    */
   public static void main(String[] args) {

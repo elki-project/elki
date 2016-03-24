@@ -1,10 +1,9 @@
 package de.lmu.ifi.dbs.elki.utilities.exceptions;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,49 +22,33 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 /**
- * General Exception to state inability to execute an operation.
- * 
- * @author Arthur Zimek
- * @since 0.2
+ * Exception thrown when prerequisites are not satisfied.
+ *
+ * @author Erich Schubert
  */
-@SuppressWarnings("serial")
-public class UnableToComplyException extends Exception {
+public class MissingPrerequisitesException extends AbortException {
   /**
-   * Exception to state inability to execute an operation.
-   * 
+   * Serial version.
    */
-  public UnableToComplyException() {
-    super();
-  }
+  private static final long serialVersionUID = 1L;
 
   /**
-   * Exception to state inability to execute an operation.
-   * 
-   * @param message a message to describe cause of exception
+   * Constructor.
+   *
+   * @param message Error message.
    */
-  public UnableToComplyException(String message) {
+  public MissingPrerequisitesException(String message) {
     super(message);
   }
 
   /**
-   * Exception to state inability to execute an operation.
-   * 
-   * @param message a message to describe cause of exception
-   * @param cause cause of exception
+   * Constructor.
+   *
+   * @param message Error message
+   * @param cause Cause
    */
-  public UnableToComplyException(String message, Throwable cause) {
+  public MissingPrerequisitesException(String message, Throwable cause) {
     super(message, cause);
   }
-
-  /**
-   * Exception to state inability to execute an operation.
-   * 
-   * @param cause cause of exception
-   */
-  public UnableToComplyException(Throwable cause) {
-    super(cause);
-  }
-
 }

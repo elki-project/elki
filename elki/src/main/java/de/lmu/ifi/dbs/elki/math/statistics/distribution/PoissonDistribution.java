@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,7 +26,6 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -37,15 +36,15 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * INCOMPLETE implementation of the poisson distribution.
- * 
+ *
  * TODO: continue implementing, CDF, invcdf and nextRandom are missing
- * 
+ *
  * References:
  * <p>
  * Catherine Loader<br />
  * Fast and Accurate Computation of Binomial Probabilities.
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
@@ -77,7 +76,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Exact table values for n <= 15 in steps of 0.5
-   * 
+   *
    * sfe[n] = ln( (n!*e^n)/((n^n)*sqrt(2*pi*n)) )
    */
   private static final double STIRLING_EXACT_ERROR[] = {//
@@ -116,7 +115,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Constructor.
-   * 
+   *
    * @param n Number of tries
    * @param p Success probability
    */
@@ -126,7 +125,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Constructor.
-   * 
+   *
    * @param n Number of tries
    * @param p Success probability
    * @param random Random generator
@@ -139,7 +138,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Constructor.
-   * 
+   *
    * @param n Number of tries
    * @param p Success probability
    * @param random Random generator
@@ -152,7 +151,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Poisson probability mass function (PMF) for integer values.
-   * 
+   *
    * @param x integer values
    * @return Probability
    */
@@ -168,7 +167,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Poisson probability mass function (PMF) for integer values.
-   * 
+   *
    * @param x integer values
    * @return Probability
    */
@@ -210,29 +209,29 @@ public class PoissonDistribution extends AbstractDistribution {
     return Math.exp(lc) / Math.sqrt(f);
   }
 
-  // FIXME: implement!
   @Override
   public double cdf(double val) {
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    // FIXME: implement!
+    throw new NotImplementedException();
   }
 
-  // FIXME: implement!
   @Override
   public double quantile(double val) {
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    // FIXME: implement!
+    throw new NotImplementedException();
   }
 
-  // FIXME: implement!
   @Override
   public double nextRandom() {
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    // FIXME: implement!
+    throw new NotImplementedException();
   }
 
   /**
    * Compute the poisson distribution PDF with an offset of + 1
-   * 
+   *
    * pdf(x_plus_1 - 1, lambda)
-   * 
+   *
    * @param x_plus_1 x+1
    * @param lambda Lambda
    * @return pdf
@@ -254,9 +253,9 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Compute the poisson distribution PDF with an offset of + 1
-   * 
+   *
    * log pdf(x_plus_1 - 1, lambda)
-   * 
+   *
    * @param x_plus_1 x+1
    * @param lambda Lambda
    * @return pdf
@@ -278,9 +277,9 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Calculates the Striling Error
-   * 
+   *
    * stirlerr(n) = ln(n!) - ln(sqrt(2*pi*n)*(n/e)^n)
-   * 
+   *
    * @param n Parameter n
    * @return Stirling error
    */
@@ -306,9 +305,9 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Calculates the Striling Error
-   * 
+   *
    * stirlerr(n) = ln(n!) - ln(sqrt(2*pi*n)*(n/e)^n)
-   * 
+   *
    * @param n Parameter n
    * @return Stirling error
    */
@@ -339,9 +338,9 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Evaluate the deviance term of the saddle point approximation.
-   * 
+   *
    * bd0(x,np) = x*ln(x/np)+np-x
-   * 
+   *
    * @param x probability density function position
    * @param np product of trials and success probability: n*p
    * @return Deviance term
@@ -367,9 +366,9 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Poisson distribution probability, but also for non-integer arguments.
-   * 
+   *
    * lb^x exp(-lb) / x!
-   * 
+   *
    * @param x X
    * @param lambda lambda
    * @return Poisson distribution probability
@@ -397,9 +396,9 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Poisson distribution probability, but also for non-integer arguments.
-   * 
+   *
    * lb^x exp(-lb) / x!
-   * 
+   *
    * @param x X
    * @param lambda lambda
    * @return Poisson distribution probability
@@ -431,9 +430,9 @@ public class PoissonDistribution extends AbstractDistribution {
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {

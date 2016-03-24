@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,9 +25,7 @@ package de.lmu.ifi.dbs.elki.utilities.exceptions;
 
 /**
  * Exception thrown when a particular code path was not yet implemented.
- * 
- * See {@link ExceptionMessages} for common explanations.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
@@ -54,5 +52,12 @@ public class NotImplementedException extends AbortException {
    */
   public NotImplementedException(String message) {
     super(message);
+  }
+
+  /**
+   * "Not implemented yet" exception.
+   */
+  public NotImplementedException() {
+    super("Sorry, not implemented yet. Please contribute to ELKI.");
   }
 }

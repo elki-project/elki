@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,13 +23,12 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -81,7 +80,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
     // invalid cast.
     this.restrictionClass = (Class<C>) restrictionClass;
     if(restrictionClass == null) {
-      LoggingUtil.warning("Restriction class 'null' for parameter '" + optionID + "'", new Throwable());
+      LOG.warning("Restriction class 'null' for parameter '" + optionID + "'", new Throwable());
     }
   }
 
@@ -104,7 +103,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
     // invalid cast.
     this.restrictionClass = (Class<C>) restrictionClass;
     if(restrictionClass == null) {
-      LoggingUtil.warning("Restriction class 'null' for parameter '" + optionID + "'", new Throwable());
+      LOG.warning("Restriction class 'null' for parameter '" + optionID + "'", new Throwable());
     }
   }
 
@@ -225,31 +224,16 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
    * @return a new instance for the value of this class parameter
    */
   public C instantiateClass(Parameterization config) {
-    try {
-      if(getValue() == null /* && !optionalParameter */) {
-        throw new UnusedParameterException("Value of parameter " + getName() + " has not been specified.");
-      }
-      C instance;
-      try {
-        config = config.descend(this);
-        instance = ClassGenericsUtil.tryInstantiate(restrictionClass, getValue(), config);
-      }
-      catch(InvocationTargetException e) {
-        throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class.", e);
-      }
-      catch(NoSuchMethodException e) {
-        throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class - no usable public constructor.");
-      }
-      catch(Exception e) {
-        if(LOG.isVerbose()) {
-          LOG.exception("Class initialization failed.", e);
-        }
-        throw new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class.", e);
-      }
-      return instance;
+    if(getValue() == null /* && !optionalParameter */) {
+      config.reportError(new UnusedParameterException("Value of parameter " + getName() + " has not been specified."));
+      return null;
     }
-    catch(ParameterException e) {
-      config.reportError(e);
+    try {
+      config = config.descend(this);
+      return ClassGenericsUtil.tryInstantiate(restrictionClass, getValue(), config);
+    }
+    catch(ClassInstantiationException e) {
+      config.reportError(new WrongParameterValueException(this, getValue().getCanonicalName(), "Error instantiating class.", e));
       return null;
     }
   }

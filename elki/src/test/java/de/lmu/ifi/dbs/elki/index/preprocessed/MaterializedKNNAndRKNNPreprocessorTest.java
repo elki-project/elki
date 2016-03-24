@@ -58,8 +58,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -88,14 +86,8 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
   // size of the data set
   int shoulds = 330;
 
-  /**
-   * Actual test routine.
-   *
-   * @throws ParameterException
-   * @throws UnableToComplyException
-   */
   @Test
-  public void testPreprocessor() throws ParameterException, UnableToComplyException {
+  public void testPreprocessor() {
     ListParameterization params = new ListParameterization();
     params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
 

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -68,7 +68,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterPair;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -77,12 +76,12 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
  * Class to write a result to human-readable text output.
- * 
+ *
  * Note: these classes need to be rewritten. Contributions welcome!
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
- * 
+ *
  * @apiviz.landmark
  * @apiviz.uses TextWriterStream oneway - - writesTo
  * @apiviz.composedOf TextWriterWriterInterface
@@ -133,7 +132,7 @@ public class TextWriter {
 
   /**
    * Try to find a unique file name.
-   * 
+   *
    * @param result Result we print
    * @param filenamepre File name prefix to use
    * @return unique filename
@@ -162,16 +161,15 @@ public class TextWriter {
 
   /**
    * Stream output.
-   * 
+   *
    * @param db Database object
    * @param r Result class
    * @param streamOpener output stream manager
    * @param filter Filter pattern
-   * @throws UnableToComplyException when no usable results were found
    * @throws IOException on IO error
    */
   @SuppressWarnings("unchecked")
-  public void output(Database db, Result r, StreamFactory streamOpener, Pattern filter) throws UnableToComplyException, IOException {
+  public void output(Database db, Result r, StreamFactory streamOpener, Pattern filter) throws IOException {
     List<Relation<?>> ra = new LinkedList<>();
     List<OrderingResult> ro = new LinkedList<>();
     List<Clustering<?>> rc = new LinkedList<>();
@@ -235,7 +233,7 @@ public class TextWriter {
     }
   }
 
-  private void printObject(TextWriterStream out, Database db, final DBIDRef objID, List<Relation<?>> ra) throws UnableToComplyException, IOException {
+  private void printObject(TextWriterStream out, Database db, final DBIDRef objID, List<Relation<?>> ra) throws IOException {
     SingleObjectBundle bundle = db.getBundle(objID);
     // Write database element itself.
     for(int i = 0; i < bundle.metaLength(); i++) {
@@ -243,7 +241,7 @@ public class TextWriter {
       if(obj != null) {
         TextWriterWriterInterface<?> owriter = out.getWriterFor(obj);
         if(owriter == null) {
-          throw new UnableToComplyException("No handler for database object itself: " + obj.getClass().getSimpleName());
+          throw new IOException("No handler for database object itself: " + obj.getClass().getSimpleName());
         }
         String lbl = null;
         // TODO: ugly compatibility hack...
@@ -278,7 +276,7 @@ public class TextWriter {
     out.flush();
   }
 
-  private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming) throws FileNotFoundException, UnableToComplyException, IOException {
+  private void writeClusterResult(Database db, StreamFactory streamOpener, Clustering<Model> clustering, Cluster<Model> clus, List<Relation<?>> ra, NamingScheme naming) throws FileNotFoundException, IOException {
     String filename = null;
     if(naming != null) {
       filename = filenameFromLabel(naming.getNameFor(clus));
@@ -320,7 +318,7 @@ public class TextWriter {
     streamOpener.closeStream(outStream);
   }
 
-  private void writeIterableResult(StreamFactory streamOpener, IterableResult<?> ri) throws UnableToComplyException, IOException {
+  private void writeIterableResult(StreamFactory streamOpener, IterableResult<?> ri) throws IOException {
     PrintStream outStream = streamOpener.openStream(getFilename(ri, ri.getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers);
 
@@ -347,7 +345,7 @@ public class TextWriter {
     streamOpener.closeStream(outStream);
   }
 
-  private void writeOrderingResult(Database db, StreamFactory streamOpener, OrderingResult or, List<Relation<?>> ra) throws IOException, UnableToComplyException {
+  private void writeOrderingResult(Database db, StreamFactory streamOpener, OrderingResult or, List<Relation<?>> ra) throws IOException {
     PrintStream outStream = streamOpener.openStream(getFilename(or, or.getShortName()));
     TextWriterStream out = new TextWriterStream(outStream, writers);
 
@@ -358,7 +356,7 @@ public class TextWriter {
     streamOpener.closeStream(outStream);
   }
 
-  private void writeSettingsResult(StreamFactory streamOpener, List<SettingsResult> rs) throws UnableToComplyException, IOException {
+  private void writeSettingsResult(StreamFactory streamOpener, List<SettingsResult> rs) throws IOException {
     if(rs.size() < 1) {
       return;
     }
@@ -412,13 +410,13 @@ public class TextWriter {
     streamOpener.closeStream(outStream);
   }
 
-  private void writeOtherResult(StreamFactory streamOpener, Result r) throws UnableToComplyException, IOException {
+  private void writeOtherResult(StreamFactory streamOpener, Result r) throws IOException {
     if(writers.getHandler(r) != null) {
       PrintStream outStream = streamOpener.openStream(getFilename(r, r.getShortName()));
       TextWriterStream out = new TextWriterStream(outStream, writers);
       TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
       if(owriter == null) {
-        throw new UnableToComplyException("No handler for result class: " + r.getClass().getSimpleName());
+        throw new IOException("No handler for result class: " + r.getClass().getSimpleName());
       }
       // Write data
       owriter.writeObject(out, null, r);
@@ -429,7 +427,7 @@ public class TextWriter {
 
   /**
    * Derive a file name from the cluster label.
-   * 
+   *
    * @param label cluster label
    * @return cleaned label suitable for file names.
    */

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -34,9 +33,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Student's t distribution.
- * 
+ *
  * FIXME: add quantile and random function!
- * 
+ *
  * @author Jan Brusis
  * @since 0.5.0
  */
@@ -48,7 +47,7 @@ public class StudentsTDistribution extends AbstractDistribution {
 
   /**
    * Constructor.
-   * 
+   *
    * @param v Degrees of freedom
    */
   public StudentsTDistribution(int v) {
@@ -57,7 +56,7 @@ public class StudentsTDistribution extends AbstractDistribution {
 
   /**
    * Constructor.
-   * 
+   *
    * @param v Degrees of freedom
    * @param random Random generator
    */
@@ -68,7 +67,7 @@ public class StudentsTDistribution extends AbstractDistribution {
 
   /**
    * Constructor.
-   * 
+   *
    * @param v Degrees of freedom
    * @param random Random generator
    */
@@ -87,21 +86,21 @@ public class StudentsTDistribution extends AbstractDistribution {
     return cdf(val, v);
   }
 
-  // FIXME: implement!
   @Override
   public double quantile(double val) {
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    // FIXME: implement!
+    throw new NotImplementedException();
   }
 
-  // FIXME: implement!
   @Override
   public double nextRandom() {
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    // FIXME: implement!
+    throw new NotImplementedException();
   }
 
   /**
    * Static version of the t distribution's PDF.
-   * 
+   *
    * @param val value to evaluate
    * @param v degrees of freedom
    * @return f(val,v)
@@ -113,7 +112,7 @@ public class StudentsTDistribution extends AbstractDistribution {
 
   /**
    * Static version of the CDF of the t-distribution for t > 0
-   * 
+   *
    * @param val value to evaluate
    * @param v degrees of freedom
    * @return F(val, v)
@@ -130,9 +129,9 @@ public class StudentsTDistribution extends AbstractDistribution {
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {

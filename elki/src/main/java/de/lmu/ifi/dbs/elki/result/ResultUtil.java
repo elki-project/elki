@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 
 /**
@@ -61,7 +60,7 @@ public class ResultUtil {
       return anns;
     }
     if(r instanceof HierarchicalResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults(((HierarchicalResult) r).getHierarchy(), r, Relation.class));
+      return filterResults(((HierarchicalResult) r).getHierarchy(), r, Relation.class);
     }
     return Collections.emptyList();
   }
@@ -97,7 +96,7 @@ public class ResultUtil {
       return crs;
     }
     if(r instanceof HierarchicalResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults(((HierarchicalResult) r).getHierarchy(), r, Clustering.class));
+      return filterResults(((HierarchicalResult) r).getHierarchy(), r, Clustering.class);
     }
     return Collections.emptyList();
   }
@@ -115,7 +114,7 @@ public class ResultUtil {
       return crs;
     }
     if(r instanceof HierarchicalResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults(((HierarchicalResult) r).getHierarchy(), r, CollectionResult.class));
+      return filterResults(((HierarchicalResult) r).getHierarchy(), r, CollectionResult.class);
     }
     return Collections.emptyList();
   }
@@ -133,7 +132,7 @@ public class ResultUtil {
       return irs;
     }
     if(r instanceof HierarchicalResult) {
-      return ClassGenericsUtil.castWithGenericsOrNull(List.class, filterResults(((HierarchicalResult) r).getHierarchy(), r, IterableResult.class));
+      return filterResults(((HierarchicalResult) r).getHierarchy(), r, IterableResult.class);
     }
     return Collections.emptyList();
   }

@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -255,11 +254,8 @@ public abstract class AbstractApplication {
 
   /**
    * Runs the application.
-   *
-   * @throws UnableToComplyException if an error occurs during running the
-   *         application
    */
-  public abstract void run() throws UnableToComplyException;
+  public abstract void run();
 
   /**
    * Parameterization class.
@@ -376,12 +372,12 @@ public abstract class AbstractApplication {
       }
       return null;
     }
-    
+
     /**
      * Parse the option string to configure logging.
-     * 
+     *
      * @param param Parameter to process.
-     * 
+     *
      * @throws WrongParameterValueException On parsing errors
      */
     public static final void parseDebugParameter(StringParameter param) throws WrongParameterValueException {

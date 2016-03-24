@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,21 +23,19 @@ package de.lmu.ifi.dbs.elki.utilities.pairs;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-
 /**
  * Simple class wrapping two objects.
- * 
+ *
  * <b>Do not use this for primitive types such as {@code Integer} and
  * {@code Double} - avoid the memory waste and garbage collection overhead!</b>
- * 
+ *
  * Does not implement any "special" interfaces such as Comparable. If you need
  * more complicated pairs, please use <em>domain specific</em> code, with more
  * meaningful field names and comparators.
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
- * 
+ *
  * @param <FIRST> first type
  * @param <SECOND> second type
  */
@@ -54,7 +52,7 @@ public class Pair<FIRST, SECOND> {
 
   /**
    * Initialize pair
-   * 
+   *
    * @param first first parameter
    * @param second second parameter
    */
@@ -73,7 +71,7 @@ public class Pair<FIRST, SECOND> {
 
   /**
    * Getter for first
-   * 
+   *
    * @return first element in pair
    */
   public final FIRST getFirst() {
@@ -82,7 +80,7 @@ public class Pair<FIRST, SECOND> {
 
   /**
    * Setter for first
-   * 
+   *
    * @param first new value for first element
    */
   public final void setFirst(FIRST first) {
@@ -91,7 +89,7 @@ public class Pair<FIRST, SECOND> {
 
   /**
    * Getter for second element in pair
-   * 
+   *
    * @return second element in pair
    */
   public final SECOND getSecond() {
@@ -100,7 +98,7 @@ public class Pair<FIRST, SECOND> {
 
   /**
    * Setter for second
-   * 
+   *
    * @param second new value for second element
    */
   public final void setSecond(SECOND second) {
@@ -108,26 +106,13 @@ public class Pair<FIRST, SECOND> {
   }
 
   /**
-   * Create a new array of the given size (for generics)
-   * 
-   * @param <F> First class
-   * @param <S> Second class
-   * @param size array size
-   * @return empty array of the new type.
-   */
-  public static final <F, S> Pair<F, S>[] newPairArray(int size) {
-    Class<Pair<F, S>> paircls = ClassGenericsUtil.uglyCastIntoSubclass(Pair.class);
-    return ClassGenericsUtil.newArrayOfNull(size, paircls);
-  }
-
-  /**
    * Simple equals statement.
-   * 
+   *
    * This Pair equals another Object if they are identical or if the other
    * Object is also a Pair and the {@link #first} and {@link #second} element of
    * this Pair equal the {@link #first} and {@link #second} element,
    * respectively, of the other Pair.
-   * 
+   *
    * @param obj Object to compare to
    */
   @SuppressWarnings("unchecked")

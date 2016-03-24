@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 
 /**
  * Interface for cluster generators
@@ -54,9 +53,8 @@ public interface GeneratorInterface {
    *
    * @param count Number of points to generate
    * @return List of generated points
-   * @throws UnableToComplyException when generation fails
    */
-  List<double[]> generate(int count) throws UnableToComplyException;
+  List<double[]> generate(int count);
 
   /**
    * Get the density of the given vector

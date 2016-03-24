@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.localpca;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.EmptyDataException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -50,13 +50,13 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Abstract base class for a local PCA based index.
- * 
+ *
  * @author Elke Achtert
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.has PCAFilteredRunner
- * 
+ *
  * @param <NV> Vector type
  */
 @Title("Local PCA Preprocessor")
@@ -74,7 +74,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
 
   /**
    * Constructor.
-   * 
+   *
    * @param relation Relation to use
    * @param pca PCA runner to use
    * @param filter Filter for Eigenvectors
@@ -88,7 +88,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
   @Override
   public void initialize() {
     if(relation == null || relation.size() <= 0) {
-      throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
+      throw new EmptyDataException();
     }
 
     // Note: this is required for ERiC to work properly, otherwise the data is
@@ -134,7 +134,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
   /**
    * Returns the objects to be considered within the PCA for the specified query
    * object.
-   * 
+   *
    * @param id the id of the query object for which a PCA should be performed
    * @return the list of the objects (i.e. the ids and the distances to the
    *         query object) to be considered within the PCA
@@ -143,9 +143,9 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
 
   /**
    * Factory class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.stereotype factory
    * @apiviz.uses AbstractFilteredPCAIndex oneway - - «create»
    */
@@ -168,7 +168,7 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
 
     /**
      * Constructor.
-     * 
+     *
      * @param pcaDistanceFunction distance Function
      * @param pca PCA runner
      * @param filter Eigenvector filter
@@ -190,15 +190,15 @@ public abstract class AbstractFilteredPCAIndex<NV extends NumberVector> extends 
 
     /**
      * Parameterization class.
-     * 
+     *
      * @author Erich Schubert
-     * 
+     *
      * @apiviz.exclude
      */
     public abstract static class Parameterizer<NV extends NumberVector, I extends AbstractFilteredPCAIndex<NV>> extends AbstractParameterizer {
       /**
        * Parameter to specify the distance function used for running PCA.
-       * 
+       *
        * Key: {@code -localpca.distancefunction}
        */
       public static final OptionID PCA_DISTANCE_ID = new OptionID("localpca.distancefunction", "The distance function used to select objects for running PCA.");

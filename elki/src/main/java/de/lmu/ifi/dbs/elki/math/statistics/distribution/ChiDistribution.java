@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -33,10 +32,10 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Chi distribution.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @apiviz.composedOf ChiSquaredDistribution
  */
 public class ChiDistribution extends AbstractDistribution {
@@ -52,7 +51,7 @@ public class ChiDistribution extends AbstractDistribution {
 
   /**
    * Constructor.
-   * 
+   *
    * @param dof Degrees of freedom. Usually integer.
    */
   public ChiDistribution(double dof) {
@@ -61,7 +60,7 @@ public class ChiDistribution extends AbstractDistribution {
 
   /**
    * Constructor.
-   * 
+   *
    * @param dof Degrees of freedom. Usually integer.
    * @param random Random number generator.
    */
@@ -73,7 +72,7 @@ public class ChiDistribution extends AbstractDistribution {
 
   /**
    * Constructor.
-   * 
+   *
    * @param dof Degrees of freedom. Usually integer.
    * @param random Random number generator.
    */
@@ -95,7 +94,7 @@ public class ChiDistribution extends AbstractDistribution {
 
   /**
    * PDF function
-   * 
+   *
    * @param val Value
    * @param dof Degrees of freedom
    * @return Pdf value
@@ -114,7 +113,7 @@ public class ChiDistribution extends AbstractDistribution {
 
   /**
    * Cumulative density function.
-   * 
+   *
    * @param val Value
    * @param dof Degrees of freedom.
    * @return CDF value
@@ -126,7 +125,7 @@ public class ChiDistribution extends AbstractDistribution {
   // FIXME: implement!
   @Override
   public double quantile(double val) {
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   @Override
@@ -136,9 +135,9 @@ public class ChiDistribution extends AbstractDistribution {
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {

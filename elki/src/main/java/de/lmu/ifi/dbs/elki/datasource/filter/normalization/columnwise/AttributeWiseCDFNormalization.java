@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.BestFitEs
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -55,18 +55,18 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
  * distribution of values along each dimension independently, then rescaling
  * objects to the cumulative density function (CDF) value at the original
  * coordinate.
- * 
+ *
  * This process is for example also discussed in section 3.4 of
  * <p>
  * Effects of Feature Normalization on Image Retrieval <br/>
  * S. Aksoy, R. M. Haralick
  * </p>
  * but they do not detail how to obtain an appropriate function `F`.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  * @param <V> vector type
- * 
+ *
  * @apiviz.uses NumberVector
  * @apiviz.uses DistributionEstimator
  */
@@ -95,7 +95,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
 
   /**
    * Constructor.
-   * 
+   *
    * @param estimators Distribution estimators
    */
   public AttributeWiseCDFNormalization(List<DistributionEstimator<?>> estimators) {
@@ -162,7 +162,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
 
   /**
    * Find the best fitting distribution.
-   * 
+   *
    * @param col Column of table
    * @param adapter Adapter for accessing the data
    * @param d Dimension
@@ -211,7 +211,7 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
 
   /**
    * Test if an attribute is constant zero.
-   * 
+   *
    * @param column Column
    * @param adapter Data accessor.
    * @return {@code true} if all values are zero
@@ -227,12 +227,12 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
 
   @Override
   public V restore(V featureVector) throws NonNumericFeaturesException {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   @Override
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   @Override
@@ -254,9 +254,9 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
 
   /**
    * Array adapter class for vectors.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private static class Adapter implements NumberArrayAdapter<Double, List<? extends NumberVector>> {
@@ -308,9 +308,9 @@ public class AttributeWiseCDFNormalization<V extends NumberVector> implements No
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {

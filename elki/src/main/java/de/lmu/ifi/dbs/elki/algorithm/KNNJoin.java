@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.MissingPrerequisitesException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -132,7 +132,7 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     }
     Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(relation.getHierarchy(), relation, SpatialIndexTree.class);
     if(indexes.size() != 1) {
-      throw new AbortException("KNNJoin found " + indexes.size() + " spatial indexes, expected exactly one.");
+      throw new MissingPrerequisitesException("KNNJoin found " + indexes.size() + " spatial indexes, expected exactly one.");
     }
     // FIXME: Ensure were looking at the right relation!
     SpatialIndexTree<N, E> index = indexes.iterator().next();

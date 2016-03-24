@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.result;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.result.textwriter.MultipleFilesOutput;
 import de.lmu.ifi.dbs.elki.result.textwriter.SingleStreamOutput;
 import de.lmu.ifi.dbs.elki.result.textwriter.StreamFactory;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriter;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -44,9 +43,9 @@ import de.lmu.ifi.dbs.elki.workflow.OutputStep;
 
 /**
  * Result handler that feeds the data into a TextWriter.
- * 
+ *
  * Note: these classes need to be rewritten. Contributions welcome!
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
  */
@@ -78,7 +77,7 @@ public class ResultWriter implements ResultHandler {
 
   /**
    * Constructor.
-   * 
+   *
    * @param out Output file
    * @param gzip Gzip compression
    * @param warnoverwrite Warn before overwriting files
@@ -124,16 +123,14 @@ public class ResultWriter implements ResultHandler {
       writer.output(db, result, output, filter);
     } catch (IOException e) {
       throw new IllegalStateException("Input/Output error while writing result.", e);
-    } catch (UnableToComplyException e) {
-      throw new IllegalStateException("Unable to comply while writing result.", e);
     }
   }
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

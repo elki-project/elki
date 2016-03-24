@@ -34,13 +34,12 @@ import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.BundleWriter;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Convert an input file to the more efficient ELKI bundle format.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.5
  */
@@ -62,7 +61,7 @@ public class ConvertToBundleApplication extends AbstractApplication {
 
   /**
    * Constructor.
-   * 
+   *
    * @param input Data source configuration
    * @param outfile Output filename
    */
@@ -73,7 +72,7 @@ public class ConvertToBundleApplication extends AbstractApplication {
   }
 
   @Override
-  public void run() throws UnableToComplyException {
+  public void run() {
     if(LOG.isVerbose()) {
       LOG.verbose("Loading data.");
     }
@@ -97,9 +96,9 @@ public class ConvertToBundleApplication extends AbstractApplication {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {
@@ -131,7 +130,7 @@ public class ConvertToBundleApplication extends AbstractApplication {
 
   /**
    * Run command line application.
-   * 
+   *
    * @param args Command line parameters
    */
   public static void main(String[] args) {

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.biclustering;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 
 /**
  * Abstract class as a convenience for different biclustering approaches.
@@ -51,7 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
  * The database is supposed to present a data matrix with a row representing an
  * entry ({@link NumberVector}), a column representing a dimension (attribute)
  * of the {@link NumberVector}s.
- * 
+ *
  * @author Arthur Zimek
  * @since 0.2
  * @param <V> a certain subtype of NumberVector - the data matrix is supposed to
@@ -100,15 +99,12 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
    * <p/>
    * Any concrete algorithm should be implemented within method
    * {@link #biclustering()} by an inheriting biclustering approach.
-   * 
+   *
    * @param relation Relation to process
    * @return Clustering result
    */
   public final Clustering<M> run(Relation<V> relation) {
     this.relation = relation;
-    if (this.relation == null || this.relation.size() == 0) {
-      throw new IllegalArgumentException(ExceptionMessages.DATABASE_EMPTY);
-    }
     colDim = RelationUtil.dimensionality(relation);
     rowIDs = DBIDUtil.ensureArray(this.relation.getDBIDs());
     iter = rowIDs.iter();
@@ -126,7 +122,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * Convert a bitset into integer column ids.
-   * 
+   *
    * @param cols
    * @return integer column ids
    */
@@ -142,7 +138,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * Convert a bitset into integer row ids.
-   * 
+   *
    * @param rows
    * @return integer row ids
    */
@@ -158,7 +154,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * Defines a Bicluster as given by the included rows and columns.
-   * 
+   *
    * @param rows the rows included in the Bicluster
    * @param cols the columns included in the Bicluster
    * @return a Bicluster as given by the included rows and columns
@@ -171,7 +167,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * Defines a Bicluster as given by the included rows and columns.
-   * 
+   *
    * @param rows the rows included in the Bicluster
    * @param cols the columns included in the Bicluster
    * @return A Bicluster as given by the included rows and columns
@@ -185,7 +181,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
   /**
    * Returns the value of the data matrix at row <code>row</code> and column
    * <code>col</code>.
-   * 
+   *
    * @param row the row in the data matrix according to the current order of
    *        rows (refers to database entry
    *        <code>database.get(rowIDs[row])</code>)
@@ -202,7 +198,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * Get the DBID of a certain row
-   * 
+   *
    * @param row Row number
    * @return DBID of this row
    * @deprecated Expensive!
@@ -214,7 +210,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * Convert a bitset into integer column ids.
-   * 
+   *
    * @param cols
    * @return integer column ids
    */
@@ -239,7 +235,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * Convert a bitset into integer row ids.
-   * 
+   *
    * @param rows
    * @return integer row ids
    */
@@ -267,7 +263,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * The number of rows of the data matrix.
-   * 
+   *
    * @return the number of rows of the data matrix
    */
   protected int getRowDim() {
@@ -276,7 +272,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * The number of columns of the data matrix.
-   * 
+   *
    * @return the number of columns of the data matrix
    */
   protected int getColDim() {
@@ -285,7 +281,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * Getter for database.
-   * 
+   *
    * @return database
    */
   public Database getDatabase() {
@@ -294,7 +290,7 @@ public abstract class AbstractBiclustering<V extends NumberVector, M extends Bic
 
   /**
    * Getter for the relation.
-   * 
+   *
    * @return relation
    */
   public Relation<V> getRelation() {

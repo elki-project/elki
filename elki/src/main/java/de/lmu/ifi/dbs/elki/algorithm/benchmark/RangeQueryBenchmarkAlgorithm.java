@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Util;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.IncompatibleDataException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -60,39 +61,39 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * database. In the latter case, the database is expected to have an additional,
  * 1-dimensional vector field. For the separate data source, the last dimension
  * will be cut off and used as query radius.
- * 
+ *
  * The simplest data setup clearly is to have an input file:
- * 
+ *
  * <pre>
  * x y z label
  * 1 2 3 Example1
  * 4 5 6 Example2
  * 7 8 9 Example3
  * </pre>
- * 
+ *
  * and a query file:
- * 
+ *
  * <pre>
  * x y z radius
  * 1 2 3 1.2
  * 4 5 6 3.3
  * 7 8 9 4.1
  * </pre>
- * 
+ *
  * where the additional column is the radius.
- * 
+ *
  * Alternatively, if you work with a single file, you need to use the filter
  * command <tt>-dbc.filter SplitNumberVectorFilter -split.dims 1,2,3</tt> to
  * split the relation into a 3-dimensional data vector, and 1 dimensional radius
  * vector.
- * 
+ *
  * TODO: alternatively, allow using a fixed radius?
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.5
- * 
+ *
  * @param <O> Vector type
- * 
+ *
  * @apiviz.uses RangeQuery
  */
 public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, Result> {
@@ -118,7 +119,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
 
   /**
    * Constructor.
-   * 
+   *
    * @param distanceFunction Distance function to use
    * @param queries Query data set (may be null!)
    * @param sampling Sampling rate
@@ -133,7 +134,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
 
   /**
    * Run the algorithm, with separate radius relation
-   * 
+   *
    * @param database Database
    * @param relation Relation
    * @param radrel Radius relation
@@ -172,7 +173,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
 
   /**
    * Run the algorithm, with a separate query set.
-   * 
+   *
    * @param database Database
    * @param relation Relation
    * @return Null result
@@ -208,7 +209,7 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
         }
         buf.append(bundle.meta(i).toString());
       }
-      throw new AbortException(buf.toString());
+      throw new IncompatibleDataException(buf.toString());
     }
     // Random sampling is a bit of hack, sorry.
     // But currently, we don't (yet) have an "integer random sample" function.
@@ -262,11 +263,11 @@ public class RangeQueryBenchmarkAlgorithm<O extends NumberVector> extends Abstra
 
   /**
    * Parameterization class
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @param <O> Object type
    */
   public static class Parameterizer<O extends NumberVector> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {

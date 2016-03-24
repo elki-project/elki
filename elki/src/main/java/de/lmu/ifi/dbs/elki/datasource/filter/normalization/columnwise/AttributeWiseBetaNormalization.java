@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -42,9 +42,8 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.DistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.meta.BestFitEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
-import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -53,16 +52,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParamet
 
 /**
  * Project the data using a Beta distribution.
- * 
+ *
  * This is a crude heuristic, that may or may not work for your data set. There
  * currently is no theoretical foundation of why it may be sensible or not to do
  * this.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @param <V> vector type
- * 
+ *
  * @apiviz.uses NumberVector
  * @apiviz.uses DistributionEstimator
  */
@@ -94,7 +93,7 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
 
   /**
    * Constructor.
-   * 
+   *
    * @param estimators Distribution estimators
    */
   public AttributeWiseBetaNormalization(List<DistributionEstimator<?>> estimators, double alpha) {
@@ -194,12 +193,12 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
 
   @Override
   public V restore(V featureVector) throws NonNumericFeaturesException {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   @Override
   public LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) {
-    throw new UnsupportedOperationException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   @Override
@@ -221,9 +220,9 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
 
   /**
    * Array adapter class for vectors.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private static class Adapter implements NumberArrayAdapter<Double, List<? extends NumberVector>> {
@@ -275,9 +274,9 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {

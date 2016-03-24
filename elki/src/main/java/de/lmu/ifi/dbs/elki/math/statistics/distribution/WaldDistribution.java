@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,6 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -35,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Inverse Gaussian distribution aka Wald distribution
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
  */
@@ -53,7 +52,7 @@ public class WaldDistribution extends AbstractDistribution {
 
   /**
    * Constructor for wald distribution
-   * 
+   *
    * @param mean Mean
    * @param shape Shape parameter
    * @param random Random generator
@@ -66,7 +65,7 @@ public class WaldDistribution extends AbstractDistribution {
 
   /**
    * Constructor for wald distribution
-   * 
+   *
    * @param mean Mean
    * @param shape Shape parameter
    * @param random Random generator
@@ -79,7 +78,7 @@ public class WaldDistribution extends AbstractDistribution {
 
   /**
    * Constructor for Gaussian distribution
-   * 
+   *
    * @param mean Mean
    * @param shape Shape parameter
    */
@@ -126,8 +125,8 @@ public class WaldDistribution extends AbstractDistribution {
 
   /**
    * Probability density function of the Wald distribution.
-   * 
-   * 
+   *
+   *
    * @param x The value.
    * @param mu The mean.
    * @param shape Shape parameter
@@ -143,7 +142,7 @@ public class WaldDistribution extends AbstractDistribution {
 
   /**
    * Cumulative probability density function (CDF) of a Wald distribution.
-   * 
+   *
    * @param x value to evaluate CDF at
    * @param mu Mean value
    * @param shape Shape parameter
@@ -168,25 +167,25 @@ public class WaldDistribution extends AbstractDistribution {
   /**
    * Inverse cumulative probability density function (probit) of a Wald
    * distribution.
-   * 
+   *
    * @param x value to evaluate probit function at
    * @param mu Mean value
    * @param shape Shape parameter
    * @return The probit of the given Wald distribution at x.
-   * 
+   *
    * @deprecated NOT YET IMPLEMENTED.
    */
   @Deprecated
   public static double quantile(double x, double mu, double shape) {
     // FIXME: implement!
-    throw new NotImplementedException(ExceptionMessages.UNSUPPORTED_NOT_YET);
+    throw new NotImplementedException();
   }
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractDistribution.Parameterizer {

@@ -31,7 +31,6 @@ import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel.MapMode;
 import java.nio.channels.FileLock;
 
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ExceptionMessages;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
 /**
@@ -133,7 +132,7 @@ public class OnDiskArray {
 
     // do not allow overwriting, unless empty
     if (filename.exists() && filename.length() > 0) {
-      throw new IOException(ExceptionMessages.FILE_EXISTS);
+      throw new IOException("File already exists");
     }
 
     // open file.

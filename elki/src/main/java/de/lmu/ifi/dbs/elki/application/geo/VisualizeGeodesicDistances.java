@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphereUtil;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.UnableToComplyException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
@@ -45,9 +44,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Visualization function for Cross-track distance function
- * 
+ *
  * TODO: make origin point / rectangle configurable.
- * 
+ *
  * @author Niels Dörre
  * @author Erich Schubert
  * @since 0.5.5
@@ -60,9 +59,9 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
 
   /**
    * Visualization mode.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static enum Mode {
@@ -101,7 +100,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
 
   /**
    * Constructor.
-   * 
+   *
    * @param out Output filename
    * @param steps Number of steps in the color map
    * @param mode Visualization mode
@@ -118,7 +117,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
   }
 
   @Override
-  public void run() throws UnableToComplyException {
+  public void run() {
     // Format: Latitude, Longitude
     // München:
     DoubleVector stap = DoubleVector.wrap(new double[] { 48.133333, 11.566667 });
@@ -216,7 +215,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
 
   /**
    * Main method for application.
-   * 
+   *
    * @param args Parameters
    */
   public static void main(String[] args) {
@@ -225,9 +224,9 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractApplication.Parameterizer {

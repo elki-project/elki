@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleDynamicHisto
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleStaticHistogram.Iter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.TooManyRetriesException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Linear manifold clustering in high dimensional spaces by stochastic search.
- * 
+ *
  * Reference:
  * <p>
  * Robert Haralick, Rave Harpaz<br />
@@ -77,13 +77,13 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * <br/>
  * In: Pattern Recognition volume 40, Issue 10
  * </p>
- * 
+ *
  * Implementation note: the LMCLUS algorithm seems to lack good stopping
  * criterions. We can't entirely reproduce the good results from the original
  * publication, in particular not on noisy data. But the questionable parts are
  * as in the original publication, associated thesis and published source code.
  * The minimum cluster size however can serve as a hidden stopping criterion.
- * 
+ *
  * @author Ernst Waas
  * @author Erich Schubert
  * @since 0.5.0
@@ -132,7 +132,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
 
   /**
    * Constructor.
-   * 
+   *
    * @param maxdim Maximum dimensionality
    * @param minsize Minimum cluster size
    * @param samplingLevel Sampling level
@@ -151,7 +151,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * The main LMCLUS (Linear manifold clustering algorithm) is processed in this
    * method.
-   * 
+   *
    * <PRE>
    * The algorithm samples random linear manifolds and tries to find clusters in it.
    * It calculates a distance histogram searches for a threshold and partitions the
@@ -161,7 +161,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * The last cluster should contain all the outliers. (or the whole data if no clusters have been found.)
    * For details see {@link LMCLUS}.
    * </PRE>
-   * 
+   *
    * @param database The database to operate on
    * @param relation Relation
    * @return Clustering result
@@ -239,7 +239,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
 
   /**
    * Deviation from a manifold described by beta.
-   * 
+   *
    * @param delta Delta from origin vector
    * @param beta Manifold
    * @return Deviation score
@@ -254,7 +254,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * This method samples a number of linear manifolds an tries to determine
    * which the one with the best cluster is.
-   * 
+   *
    * <PRE>
    * A number of sample points according to the dimension of the linear manifold are taken.
    * The basis (B) and the origin(o) of the manifold are calculated.
@@ -263,7 +263,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
    * The overall goodness of the threshold is determined.
    * The process is redone until a specific number of samples is taken.
    * </PRE>
-   * 
+   *
    * @param relation The vector relation
    * @param currentids Current DBIDs
    * @param dimension the dimension of the linear manifold to sample.
@@ -298,9 +298,8 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
         if(basis == null) {
           // new sample has to be taken.
           i--;
-          remaining_retries--;
-          if(remaining_retries < 0) {
-            throw new AbortException("Too many retries in sampling, and always a linear dependant data set.");
+          if(--remaining_retries < 0) {
+            throw new TooManyRetriesException("Too many retries in sampling, and always a linear dependant data set.");
           }
           continue;
         }
@@ -331,14 +330,14 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * This Method generates an orthonormal basis from a set of Vectors. It uses
    * the established Gram-Schmidt algorithm for orthonormalisation:
-   * 
+   *
    * <PRE>
    * u_1 = v_1
    * u_k = v_k -proj_u1(v_k)...proj_u(k-1)(v_k);
-   * 
+   *
    * Where proj_u(v) = <v,u>/<u,u> *u
    * </PRE>
-   * 
+   *
    * @param vectors The set of vectors to generate the orthonormal basis from
    * @return the orthonormal basis generated by this method.
    * @throws RuntimeException if the given vectors are not linear independent.
@@ -379,7 +378,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
 
   /**
    * Evaluate the histogram to find a suitable threshold
-   * 
+   *
    * @param histogram Histogram to evaluate
    * @return Position and goodness
    */
@@ -474,9 +473,9 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
 
   /**
    * Class to represent a linear manifold separation
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private static class Separation {
@@ -503,9 +502,9 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
 
   /**
    * Parameterization class
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

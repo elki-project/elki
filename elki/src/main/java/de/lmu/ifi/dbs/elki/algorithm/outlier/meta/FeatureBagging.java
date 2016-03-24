@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.meta;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -63,20 +63,20 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * A simple ensemble method called "Feature bagging" for outlier detection.
- * 
+ *
  * <p>
  * Since the proposed method is only sensible to run on multiple instances of
  * the same algorithm (due to incompatible score ranges), we do not allow using
  * arbitrary algorithms.
  * </p>
- * 
+ *
  * <p>
  * Reference: <br>
  * A. Lazarevic, V. Kumar: Feature Bagging for Outlier Detection<br />
  * In: Proc. of the 11th ACM SIGKDD international conference on Knowledge
  * discovery in data mining
  * </p>
- * 
+ *
  * @author Erich Schubert
  * @author Remigius Wojdanowski
  * @since 0.4.0
@@ -111,7 +111,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
 
   /**
    * Constructor.
-   * 
+   *
    * @param k k Parameter for LOF
    * @param num Number of subspaces to use
    * @param breadth Flag for breadth-first merging
@@ -127,7 +127,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
 
   /**
    * Run the algorithm on a data set.
-   * 
+   *
    * @param database Database context
    * @param relation Relation to use
    * @return Outlier detection result
@@ -158,7 +158,8 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
     DoubleMinMax minmax = new DoubleMinMax();
     if(breadth) {
       FiniteProgress cprog = LOG.isVerbose() ? new FiniteProgress("Combining results", relation.size(), LOG) : null;
-      Pair<DBIDIter, DoubleRelation>[] IDVectorOntoScoreVector = Pair.newPairArray(results.size());
+      @SuppressWarnings("unchecked")
+      Pair<DBIDIter, DoubleRelation>[] IDVectorOntoScoreVector = (Pair<DBIDIter, DoubleRelation>[]) new Pair[results.size()];
 
       // Mapping score-sorted DBID-Iterators onto their corresponding scores.
       // We need to initialize them now be able to iterate them "in parallel".
@@ -217,7 +218,7 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
 
   /**
    * Choose a random subspace.
-   * 
+   *
    * @param alldim Number of total dimensions
    * @param mindim Minimum number to choose
    * @param maxdim Maximum number to choose
@@ -253,9 +254,9 @@ public class FeatureBagging extends AbstractAlgorithm<OutlierResult> implements 
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
