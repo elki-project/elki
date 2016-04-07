@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,8 +26,10 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleIntegerHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
 
 /**
@@ -268,5 +270,76 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
    */
   protected int peekInternalDBID() {
     return (numties > 0) ? ties[numties - 1] : heap.peekValue();
+  }
+
+  @Override
+  public DoubleDBIDListIter unorderedIterator() {
+    return new UnorderedIter();
+  }
+
+  private class UnorderedIter implements DoubleDBIDListIter {
+    /**
+     * Iterator of the real heap.
+     */
+    private DoubleIntegerHeap.UnsortedIter it = heap.unsortedIter();
+
+    /**
+     * Position in ties.
+     */
+    private int t = 0;
+
+    @Override
+    public int internalGetIndex() {
+      return it.valid() ? it.getValue() : ties[t];
+    }
+
+    @Override
+    public boolean valid() {
+      return it.valid() || t < numties;
+    }
+
+    @Override
+    public int getOffset() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public double doubleValue() {
+      return it.valid() ? it.getValue() : kdist;
+    }
+
+    @Override
+    public DoubleDBIDPair getPair() {
+      return new DoubleIntegerDBIDPair(doubleValue(), internalGetIndex());
+    }
+
+    @Override
+    public DoubleDBIDListIter advance() {
+      if(it.valid()) {
+        it.advance();
+      }
+      else {
+        ++t;
+      }
+      return this;
+    }
+
+    @Override
+    public DoubleDBIDListIter advance(int count) {
+      while(count-- > 0) {
+        advance();
+      }
+      return this;
+    }
+
+    @Override
+    public DoubleDBIDListIter retract() {
+      throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DoubleDBIDListIter seek(int off) {
+      throw new UnsupportedOperationException();
+    }
   }
 }

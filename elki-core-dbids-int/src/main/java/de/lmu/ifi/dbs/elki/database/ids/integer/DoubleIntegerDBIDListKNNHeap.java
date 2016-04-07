@@ -150,4 +150,9 @@ class DoubleIntegerDBIDListKNNHeap extends DoubleIntegerDBIDKNNList implements K
     buf.append(']');
     return buf.toString();
   }
+
+  @Override
+  public DoubleDBIDListIter unorderedIterator() {
+    return iter();
+  }
 }

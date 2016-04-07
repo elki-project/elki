@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -123,4 +123,11 @@ public interface KNNHeap {
    * @return The current largest element.
    */
   DoubleDBIDPair peek();
+
+  /**
+   * Unordered iterator over the heap.
+   *
+   * @return Iterator
+   */
+  DoubleDBIDListIter unorderedIterator();
 }

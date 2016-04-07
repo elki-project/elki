@@ -237,6 +237,11 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
     return size == 0;
   }
 
+  @Override
+  public DoubleDBIDListIter unorderedIterator() {
+    return new Itr();
+  }
+
   /**
    * Iterator.
    *
