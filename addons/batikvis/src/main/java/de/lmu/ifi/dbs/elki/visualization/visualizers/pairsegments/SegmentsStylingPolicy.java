@@ -277,10 +277,8 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
         // remove highlight
         deselectSegment(unpaired);
       }
-      if(selectedSegments.remove(segment)) {
-        if(segment.getDBIDs() != null) {
-          unselectedObjects.addDBIDs(segment.getDBIDs());
-        }
+      if(selectedSegments.remove(segment) && segment.getDBIDs() != null) {
+        unselectedObjects.addDBIDs(segment.getDBIDs());
       }
     }
   }

@@ -239,10 +239,8 @@ public class ELKIServiceScanner {
             }
             // Classes
             if(localname.endsWith(CLASS_EXT)) {
-              if(localname.indexOf('$') >= 0) {
-                if(!localname.endsWith(FACTORY_FILE_EXT)) {
-                  continue;
-                }
+              if(localname.indexOf('$') >= 0 && !localname.endsWith(FACTORY_FILE_EXT)) {
+                continue;
               }
               final String fullname = new File(path, localname).toString();
               files.add(fullname.substring(prefix.length(), fullname.length() - CLASS_EXT_LENGTH).replace(File.separatorChar, '.'));

@@ -243,11 +243,9 @@ public class KMedoidsEM<V> extends AbstractDistanceBasedAlgorithm<V, Clustering<
         // Remove from previous cluster
         // TODO: keep a list of cluster assignments to save this search?
         for(int i = 0; i < k; i++) {
-          if(i != minIndex) {
-            if(clusters.get(i).remove(iditer)) {
-              mdist[minIndex].put(dists[i], -1);
-              break;
-            }
+          if(i != minIndex && clusters.get(i).remove(iditer)) {
+            mdist[minIndex].put(dists[i], -1);
+            break;
           }
         }
       }

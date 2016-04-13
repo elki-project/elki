@@ -410,10 +410,8 @@ public class P3C<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
       }
       for(int k = 0; k < clusterCores.size(); k++) {
         Signature other = clusterCores.get(k);
-        if(other != clusterCore) {
-          if(other.isSuperset(clusterCore)) {
-            continue outer;
-          }
+        if(other != clusterCore && other.isSuperset(clusterCore)) {
+          continue outer;
         }
       }
       if(LOG.isDebugging()) {

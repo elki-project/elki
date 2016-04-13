@@ -212,10 +212,8 @@ public class CSSClass {
    * @param value Value or null (to unset)
    */
   public void setStatement(String key, String value) {
-    if (value != null) {
-      if (!checkCSSStatement(key, value)) {
-        throw new InvalidCSS("Invalid CSS statement.");
-      }
+    if (value != null && !checkCSSStatement(key, value)) {
+      throw new InvalidCSS("Invalid CSS statement.");
     }
     for (Pair<String, String> pair : statements) {
       if (pair.getFirst().equals(key)) {

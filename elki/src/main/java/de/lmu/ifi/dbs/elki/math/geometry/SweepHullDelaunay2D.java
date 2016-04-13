@@ -810,20 +810,14 @@ public class SweepHullDelaunay2D {
           return Orientation.ORIENT_CA_AC;
         }
       }
-      if(this.b == oth.b) {
-        if(this.c == oth.a) {
-          return Orientation.ORIENT_BC_BA;
-        }
+      if(this.b == oth.b && this.c == oth.a) {
+        return Orientation.ORIENT_BC_BA;
       }
-      if(this.b == oth.c) {
-        if(this.c == oth.b) {
-          return Orientation.ORIENT_BC_CB;
-        }
+      if(this.b == oth.c && this.c == oth.b) {
+        return Orientation.ORIENT_BC_CB;
       }
-      if(this.b == oth.a) {
-        if(this.c == oth.c) {
-          return Orientation.ORIENT_BC_AC;
-        }
+      if(this.b == oth.a && this.c == oth.c) {
+        return Orientation.ORIENT_BC_AC;
       }
       return null;
     }

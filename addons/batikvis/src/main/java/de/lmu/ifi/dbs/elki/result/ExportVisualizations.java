@@ -120,10 +120,8 @@ public class ExportVisualizations implements ResultHandler {
     if(output.isFile()) {
       throw new AbortException("Output folder cannot be an existing file.");
     }
-    if(!output.exists()) {
-      if(!output.mkdirs()) {
-        throw new AbortException("Could not create output directory.");
-      }
+    if(!output.exists() && !output.mkdirs()) {
+      throw new AbortException("Could not create output directory.");
     }
     if(this.baseResult == null) {
       this.baseResult = newResult;

@@ -227,71 +227,63 @@ public class JSONWebServer implements HttpHandler {
     // logger.debug(FormatUtil.format(parts, ",") + " " + partpos + " " + cur);
 
     // Result structure discovery via "children" parameter.
-    if(parts.length == partpos + 1) {
-      if("children".equals(parts[partpos])) {
-        re.appendKeyArray("children");
-        for(Hierarchy.Iter<Result> iter = hier.iterChildren(cur); iter.valid(); iter.advance()) {
-          Result child = iter.get();
-          re.startHash();
-          re.appendKeyValue("name", child.getShortName());
-          re.appendKeyValue("type", child.getClass().getSimpleName());
-          re.closeHash();
-        }
-        re.closeArray();
+    if(parts.length == partpos + 1 && "children".equals(parts[partpos])) {
+      re.appendKeyArray("children");
+      for(Hierarchy.Iter<Result> iter = hier.iterChildren(cur); iter.valid(); iter.advance()) {
+        Result child = iter.get();
+        re.startHash();
+        re.appendKeyValue("name", child.getShortName());
+        re.appendKeyValue("type", child.getClass().getSimpleName());
+        re.closeHash();
+      }
+      re.closeArray();
+      return;
+    }
+
+    // Database object access
+    if(cur instanceof Database && parts.length == partpos + 1) {
+      DBID id = stringToDBID(parts[partpos]);
+      if(id != null) {
+        bundleToJSON(re, id);
+        return;
+      }
+      else {
+        re.appendKeyValue("error", "Object not found");
         return;
       }
     }
 
-    // Database object access
-    if(cur instanceof Database) {
-      if(parts.length == partpos + 1) {
-        DBID id = stringToDBID(parts[partpos]);
-        if(id != null) {
-          bundleToJSON(re, id);
-          return;
-        }
-        else {
-          re.appendKeyValue("error", "Object not found");
-          return;
-        }
-      }
-    }
-
     // Relation object access
-    if(cur instanceof Relation) {
-      if(parts.length == partpos + 1) {
-        Relation<?> rel = (Relation<?>) cur;
-        DBID id = stringToDBID(parts[partpos]);
-        if(id != null) {
-          Object data = rel.get(id);
-          re.appendKeyValue("data", data);
-        }
-        else {
-          re.appendKeyValue("error", "Object not found");
-          return;
-        }
+    if(cur instanceof Relation && parts.length == partpos + 1) {
+      Relation<?> rel = (Relation<?>) cur;
+      DBID id = stringToDBID(parts[partpos]);
+      if(id != null) {
+        Object data = rel.get(id);
+        re.appendKeyValue("data", data);
+      }
+      else {
+        re.appendKeyValue("error", "Object not found");
+        return;
       }
     }
 
     // Neighbor access
-    if(cur instanceof NeighborSetPredicate) {
-      if(parts.length == partpos + 1) {
-        NeighborSetPredicate pred = (NeighborSetPredicate) cur;
-        DBID id = stringToDBID(parts[partpos]);
-        if(id != null) {
-          DBIDs neighbors = pred.getNeighborDBIDs(id);
-          re.appendKeyValue("DBID", id);
-          re.appendKeyArray("neighbors");
-          for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
-            re.appendString(iter.toString());
-          }
-          re.closeArray();
-          return;
+    if(cur instanceof NeighborSetPredicate && parts.length == partpos + 1) {
+      NeighborSetPredicate pred = (NeighborSetPredicate) cur;
+      DBID id = stringToDBID(parts[partpos]);
+      if(id != null) {
+        DBIDs neighbors = pred.getNeighborDBIDs(id);
+        re.appendKeyValue("DBID", id);
+        re.appendKeyArray("neighbors");
+        for(DBIDIter iter = neighbors.iter(); iter.valid(); iter.advance()) {
+          re.appendString(iter.toString());
         }
-        else {
-          re.appendKeyValue("error", "Object not found");
-          return;
-        }
+        re.closeArray();
+        return;
+      }
+      else {
+        re.appendKeyValue("error", "Object not found");
+        return;
       }
     }
 
