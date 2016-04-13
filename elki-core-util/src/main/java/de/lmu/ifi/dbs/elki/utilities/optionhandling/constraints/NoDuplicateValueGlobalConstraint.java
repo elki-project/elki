@@ -80,11 +80,9 @@ public class NoDuplicateValueGlobalConstraint implements GlobalParameterConstrai
     Set<Object> numbers = new HashSet<>();
 
     for(Parameter<?> param : parameters) {
-      if(param.isDefined()) {
-        if(!numbers.add(param.getValue())) {
-          throw new WrongParameterValueException("Global Parameter Constraint Error:\n" + //
+      if(param.isDefined() && !numbers.add(param.getValue())) {
+        throw new WrongParameterValueException("Global Parameter Constraint Error:\n" + //
         "Parameters " + OptionUtil.optionsNamesToString(parameters) + " must have different values. Current values: " + OptionUtil.parameterNamesAndValuesToString(parameters) + ".\n");
-        }
       }
     }
   }

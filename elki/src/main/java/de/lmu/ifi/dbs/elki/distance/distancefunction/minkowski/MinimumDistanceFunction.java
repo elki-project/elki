@@ -79,10 +79,8 @@ public class MinimumDistanceFunction extends AbstractSpatialNorm {
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     // Some optimizations for simpler cases.
-    if(mbr1 instanceof NumberVector) {
-      if(mbr2 instanceof NumberVector) {
-        return distance((NumberVector) mbr1, (NumberVector) mbr2);
-      }
+    if(mbr1 instanceof NumberVector && mbr2 instanceof NumberVector) {
+      return distance((NumberVector) mbr1, (NumberVector) mbr2);
     }
     // TODO: add optimization for point to MBR?
     final int dim = dimensionality(mbr1, mbr2);

@@ -303,10 +303,8 @@ public class VisualizerParameterizer {
       }
       PatternParameter enablevisP = new PatternParameter(ENABLEVIS_ID) //
       .setOptional(true);
-      if(config.grab(enablevisP)) {
-        if(!"all".equals(enablevisP.getValueAsString())) {
-          enableVisualizers = enablevisP.getValue();
-        }
+      if(config.grab(enablevisP) && !"all".equals(enablevisP.getValueAsString())) {
+        enableVisualizers = enablevisP.getValue();
       }
       MergedParameterization merged = new MergedParameterization(config);
       factories = collectFactorys(merged, enableVisualizers);

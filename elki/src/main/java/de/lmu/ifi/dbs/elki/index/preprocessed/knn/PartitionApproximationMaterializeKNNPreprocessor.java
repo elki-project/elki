@@ -130,10 +130,8 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
         ksize.put(kNN.size());
         storage.put(iter, kNN.toKNNList());
       }
-      if(LOG.isDebugging()) {
-        if(cache.size() > 0) {
-          LOG.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
-        }
+      if(LOG.isDebugging() && cache.size() > 0) {
+        LOG.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
       }
       LOG.incrementProcessed(progress);
     }

@@ -83,10 +83,8 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractSpatialNor
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     // Optimization for the simplest case
-    if(mbr1 instanceof NumberVector) {
-      if(mbr2 instanceof NumberVector) {
-        return distance((NumberVector) mbr1, (NumberVector) mbr2);
-      }
+    if(mbr1 instanceof NumberVector && mbr2 instanceof NumberVector) {
+      return distance((NumberVector) mbr1, (NumberVector) mbr2);
     }
     // TODO: optimize for more simpler cases: obj vs. rect?
     final int dim = dimensionality(mbr1, mbr2, weights.length);

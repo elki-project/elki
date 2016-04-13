@@ -277,11 +277,9 @@ public class GeneratorMain {
           return -1;
         }
         // Reassignment logic:
-        if(reassign && labels[j] != null) {
-          if(dens > bestd) {
-            bestd = dens;
-            bestc = j;
-          }
+        if(reassign && labels[j] != null && dens > bestd) {
+          bestd = dens;
+          bestc = j;
         }
       }
       return bestc;
