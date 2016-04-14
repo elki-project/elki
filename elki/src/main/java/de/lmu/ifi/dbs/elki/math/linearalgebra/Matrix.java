@@ -148,7 +148,7 @@ public class Matrix {
    * @param m Number of rows.
    * @throws IllegalArgumentException Array length must be a multiple of m.
    */
-  public Matrix(final double values[], final int m) {
+  public Matrix(final double[] values, final int m) {
     columndimension = (m != 0 ? values.length / m : 0);
     if(m * columndimension != values.length) {
       throw new IllegalArgumentException("Array length must be a multiple of m.");
@@ -1408,7 +1408,7 @@ public class Matrix {
     while(tokenizer.nextToken() == StreamTokenizer.TT_WORD);
 
     int n = v.size(); // Now we've got the number of columns!
-    double row[] = v.toArray();
+    double[] row = v.toArray();
     ArrayList<double[]> rowV = new ArrayList<>();
     rowV.add(row); // Start storing rows instead of columns.
     while(tokenizer.nextToken() == StreamTokenizer.TT_WORD) {

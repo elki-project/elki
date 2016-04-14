@@ -116,7 +116,7 @@ public class Unique<E> extends TObjectHash<E> {
   protected void rehash(int newCapacity) {
     final int oldCapacity = _set.length, oldSize = size();
     // Replace data storage:
-    Object oldSet[] = _set;
+    Object[] oldSet = _set;
     _set = new Object[newCapacity];
     Arrays.fill(_set, FREE);
 

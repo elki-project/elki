@@ -345,7 +345,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
         final NumberVector vec = relation.get(it);
         // Build combined ensemble.
         {
-          double buf[] = new double[ensemble.size() + 1];
+          double[] buf = new double[ensemble.size() + 1];
           for(int i = 0; i < dim; i++) {
             int j = 0;
             for(DBIDIter iter = ensemble.iter(); iter.valid(); iter.advance()) {
@@ -493,7 +493,7 @@ public class GreedyEnsembleExperiment extends AbstractApplication {
    * @param vec
    */
   protected void singleEnsemble(final double[] ensemble, final NumberVector vec) {
-    double buf[] = new double[1];
+    double[] buf = new double[1];
     for(int i = 0; i < ensemble.length; i++) {
       buf[0] = vec.doubleValue(i);
       ensemble[i] = voting.combine(buf, 1);

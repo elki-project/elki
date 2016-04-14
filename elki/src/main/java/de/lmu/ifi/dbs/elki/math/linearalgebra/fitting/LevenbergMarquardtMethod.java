@@ -142,7 +142,7 @@ public class LevenbergMarquardtMethod {
    * @param params Initial parameters
    * @param dofit Flags on which parameters to optimize
    */
-  public LevenbergMarquardtMethod(FittingFunction func, double params[], boolean dofit[], double[] x, double[] y, double[] s) {
+  public LevenbergMarquardtMethod(FittingFunction func, double[] params, boolean[] dofit, double[] x, double[] y, double[] s) {
     assert x.length == y.length;
     assert x.length == s.length;
     assert params.length == dofit.length;

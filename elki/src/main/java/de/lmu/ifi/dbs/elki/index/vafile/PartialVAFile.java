@@ -201,7 +201,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
    * @return Vector approximation
    */
   protected VectorApproximation calculateFullApproximation(DBID id, V dv) {
-    int approximation[] = new int[dv.getDimensionality()];
+    int[] approximation = new int[dv.getDimensionality()];
     for(int d = 0; d < splitPartitions.length; d++) {
       double[] split = daFiles.get(d).getSplitPositions();
       final double val = dv.doubleValue(d);

@@ -224,7 +224,7 @@ public class CheckParameterizables {
     int checkResult = 0;
     try {
       par.getConstructor();
-      final Method methods[] = par.getDeclaredMethods();
+      final Method[] methods = par.getDeclaredMethods();
       for(int i = 0; i < methods.length; ++i) {
         final Method meth = methods[i];
         if(meth.getName().equals("makeInstance")) {
