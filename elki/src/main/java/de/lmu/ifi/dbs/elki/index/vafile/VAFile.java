@@ -180,7 +180,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
    * @return Vector approximation
    */
   public VectorApproximation calculateApproximation(DBID id, V dv) {
-    int approximation[] = new int[dv.getDimensionality()];
+    int[] approximation = new int[dv.getDimensionality()];
     for(int d = 0; d < splitPositions.length; d++) {
       final double val = dv.doubleValue(d);
       final int lastBorderIndex = splitPositions[d].length - 1;

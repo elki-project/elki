@@ -54,8 +54,8 @@ public abstract class AbstractUncertainObject implements UncertainObject {
     assert(samples.length > 0) : "Cannot compute bounding box of empty set.";
     // Compute bounds:
     final int dimensions = samples[0].getDimensionality();
-    final double min[] = new double[dimensions];
-    final double max[] = new double[dimensions];
+    final double[] min = new double[dimensions];
+    final double[] max = new double[dimensions];
     NumberVector first = samples[0];
     for(int d = 0; d < dimensions; d++) {
       min[d] = max[d] = first.doubleValue(d);

@@ -121,7 +121,7 @@ public class ELKILogRecord extends LogRecord {
    */
   private final void inferCallerELKI() {
     needToInferCaller = false;
-    StackTraceElement stack[] = (new Throwable()).getStackTrace();
+    StackTraceElement[] stack = (new Throwable()).getStackTrace();
     int ix = 0;
     // skip back to the logger.
     while(ix < stack.length) {

@@ -183,7 +183,7 @@ public class DoubleMinMax {
    * @return initialized array
    */
   public static DoubleMinMax[] newArray(int size) {
-    DoubleMinMax ret[] = new DoubleMinMax[size];
+    DoubleMinMax[] ret = new DoubleMinMax[size];
     for(int i = 0; i < size; i++) {
       ret[i] = new DoubleMinMax();
     }

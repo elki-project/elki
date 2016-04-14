@@ -180,7 +180,7 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
   public static void doubleCenterSymmetric(double[][] m) {
     final int size = m.length;
     // Storage for mean values - initially all 0.
-    double means[] = new double[size];
+    double[] means = new double[size];
     for(int x = 0; x < m.length; x++) {
       final double[] rowx = m[x];
       // We already added "x" values in previous iterations.

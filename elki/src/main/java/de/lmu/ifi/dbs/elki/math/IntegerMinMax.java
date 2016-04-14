@@ -186,7 +186,7 @@ public class IntegerMinMax {
    * @return initialized array
    */
   public static IntegerMinMax[] newArray(int size) {
-    IntegerMinMax ret[] = new IntegerMinMax[size];
+    IntegerMinMax[] ret = new IntegerMinMax[size];
     for(int i = 0; i < size; i++) {
       ret[i] = new IntegerMinMax();
     }

@@ -79,7 +79,7 @@ public class PoissonDistribution extends AbstractDistribution {
    *
    * sfe[n] = ln( (n!*e^n)/((n^n)*sqrt(2*pi*n)) )
    */
-  private static final double STIRLING_EXACT_ERROR[] = {//
+  private static final double[] STIRLING_EXACT_ERROR = {//
   0.0, // 0.0
   0.1534264097200273452913848, // 0.5
   0.0810614667953272582196702, // 1.0
