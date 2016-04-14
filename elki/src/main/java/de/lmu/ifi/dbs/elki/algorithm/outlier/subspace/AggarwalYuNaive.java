@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
  */
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -99,7 +100,7 @@ public class AggarwalYuNaive<V extends NumberVector> extends AbstractAggarwalYuO
   public OutlierResult run(Relation<V> relation) {
     final int dimensionality = RelationUtil.dimensionality(relation);
     final int size = relation.size();
-    ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
+    List<List<DBIDs>> ranges = buildRanges(relation);
 
     ArrayList<ArrayList<IntIntPair>> Rk;
     // Build a list of all subspaces

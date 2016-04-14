@@ -411,7 +411,7 @@ public class DocumentReferences {
    *
    * @return All classes with the reference annotation.
    */
-  public static ArrayList<Class<?>> findAllClassesWithReferences() {
+  public static List<Class<?>> findAllClassesWithReferences() {
     ArrayList<Class<?>> references = new ArrayList<>();
     for(final Class<?> cls : ELKIServiceRegistry.findAllImplementations(Object.class, true, false)) {
       if(cls.isAnnotationPresent(Reference.class)) {

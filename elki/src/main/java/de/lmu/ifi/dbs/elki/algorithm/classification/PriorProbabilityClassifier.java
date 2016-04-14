@@ -28,6 +28,7 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
@@ -103,7 +104,7 @@ public class PriorProbabilityClassifier extends AbstractClassifier<Object, Resul
     }
   }
 
-  public double[] classProbabilities(Object instance, ArrayList<ClassLabel> labels) {
+  public double[] classProbabilities(Object instance, List<ClassLabel> labels) {
     return alignLabels(this.labels, distribution, labels);
   }
 

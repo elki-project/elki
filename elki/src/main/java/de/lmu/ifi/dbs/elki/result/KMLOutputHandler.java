@@ -151,8 +151,8 @@ public class KMLOutputHandler implements ResultHandler {
 
   @Override
   public void processNewResult(ResultHierarchy hier, Result newResult) {
-    ArrayList<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
-    ArrayList<Clustering<?>> crs = ResultUtil.filterResults(hier, newResult, Clustering.class);
+    List<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
+    List<Clustering<?>> crs = ResultUtil.filterResults(hier, newResult, Clustering.class);
     if(ors.size() + crs.size() > 1) {
       throw new AbortException("More than one visualizable result found. The KML writer only supports a single result!");
     }

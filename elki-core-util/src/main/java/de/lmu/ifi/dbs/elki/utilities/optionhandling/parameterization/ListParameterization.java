@@ -159,7 +159,7 @@ public class ListParameterization extends AbstractParameterization {
    *
    * @return Array list of parameters
    */
-  public ArrayList<String> serialize() {
+  public List<String> serialize() {
     ArrayList<String> params = new ArrayList<>();
     for(ParameterPair pair : parameters) {
       params.add("-" + pair.option.toString());

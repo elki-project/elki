@@ -28,6 +28,7 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -126,7 +127,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
     /**
      * Hash functions to use.
      */
-    ArrayList<? extends LocalitySensitiveHashFunction<? super V>> hashfunctions;
+    List<? extends LocalitySensitiveHashFunction<? super V>> hashfunctions;
 
     /**
      * The actual table
@@ -144,7 +145,7 @@ public class InMemoryLSHIndex<V> implements IndexFactory<V, InMemoryLSHIndex<V>.
      * @param relation Relation to index.
      * @param hashfunctions Hash functions.
      */
-    public Instance(Relation<V> relation, ArrayList<? extends LocalitySensitiveHashFunction<? super V>> hashfunctions, int numberOfBuckets) {
+    public Instance(Relation<V> relation, List<? extends LocalitySensitiveHashFunction<? super V>> hashfunctions, int numberOfBuckets) {
       super(relation);
       this.hashfunctions = hashfunctions;
       this.numberOfBuckets = numberOfBuckets;

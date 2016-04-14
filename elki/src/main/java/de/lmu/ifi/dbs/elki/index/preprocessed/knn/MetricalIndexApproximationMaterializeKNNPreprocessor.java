@@ -1,6 +1,5 @@
 package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -157,7 +156,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    */
   private MetricalIndexTree<O, N, E> getMetricalIndex(Relation<O> relation) throws IllegalStateException {
     Class<MetricalIndexTree<O, N, E>> mcls = ClassGenericsUtil.uglyCastIntoSubclass(MetricalIndexTree.class);
-    ArrayList<MetricalIndexTree<O, N, E>> indexes = ResultUtil.filterResults(relation.getHierarchy(), relation, mcls);
+    List<MetricalIndexTree<O, N, E>> indexes = ResultUtil.filterResults(relation.getHierarchy(), relation, mcls);
     // FIXME: check we got the right the representation
     if(indexes.size() == 1) {
       return indexes.get(0);

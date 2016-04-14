@@ -32,6 +32,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
@@ -41,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  * @author Erich Schubert
  * @since 0.3
  */
-public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String>>> {
+public class SavedSettingsFile implements Iterable<Pair<String, List<String>>> {
   /**
    * Comment prefix
    */
@@ -55,7 +56,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   /**
    * Data store
    */
-  private ArrayList<Pair<String, ArrayList<String>>> store;
+  private List<Pair<String, List<String>>> store;
 
   /**
    * Constructor.
@@ -76,7 +77,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   public void save() throws FileNotFoundException {
     PrintStream p = new PrintStream(file);
     p.println(COMMENT_PREFIX + "Saved ELKI settings. First line is title, remaining lines are parameters.");
-    for (Pair<String, ArrayList<String>> settings : store) {
+    for (Pair<String, List<String>> settings : store) {
       p.println(settings.first);
       for (String str : settings.second) {
         p.println(str);
@@ -94,7 +95,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
    */
   public void load() throws FileNotFoundException, IOException {
     BufferedReader is = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-    ArrayList<String> buf = new ArrayList<>();
+    List<String> buf = new ArrayList<>();
     while (is.ready()) {
       String line = is.readLine();
       // skip comments
@@ -118,7 +119,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
   }
 
   @Override
-  public Iterator<Pair<String, ArrayList<String>>> iterator() {
+  public Iterator<Pair<String, List<String>>> iterator() {
     return store.iterator();
   }
 
@@ -128,7 +129,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
    * @param key Key to remove
    */
   public void remove(String key) {
-    Iterator<Pair<String, ArrayList<String>>> it = store.iterator();
+    Iterator<Pair<String, List<String>>> it = store.iterator();
     while (it.hasNext()) {
       String thisKey = it.next().first;
       if (key.equals(thisKey)) {
@@ -144,10 +145,10 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
    * @param key Key to search for
    * @return saved settings for this key
    */
-  public ArrayList<String> get(String key) {
-    Iterator<Pair<String, ArrayList<String>>> it = store.iterator();
+  public List<String> get(String key) {
+    Iterator<Pair<String, List<String>>> it = store.iterator();
     while (it.hasNext()) {
-      Pair<String, ArrayList<String>> pair = it.next();
+      Pair<String, List<String>> pair = it.next();
       if (key.equals(pair.first)) {
         return pair.second;
       }
@@ -168,10 +169,10 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
    * @param key Key
    * @param value (New) value.
    */
-  public void put(String key, ArrayList<String> value) {
-    Iterator<Pair<String, ArrayList<String>>> it = store.iterator();
+  public void put(String key, List<String> value) {
+    Iterator<Pair<String, List<String>>> it = store.iterator();
     while (it.hasNext()) {
-      Pair<String, ArrayList<String>> pair = it.next();
+      Pair<String, List<String>> pair = it.next();
       if (key.equals(pair.first)) {
         pair.second = value;
         return;
@@ -195,7 +196,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
    * @param index settings index
    * @return pair at this index
    */
-  public Pair<String, ArrayList<String>> getElementAt(int index) {
+  public Pair<String, List<String>> getElementAt(int index) {
     return store.get(index);
   }
 }

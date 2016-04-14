@@ -22,7 +22,7 @@ package tutorial.outlier;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -43,7 +43,7 @@ public class SimpleScoreDumper implements ResultHandler {
   @Override
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     // Get all new outlier results
-    ArrayList<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
+    List<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
     for (OutlierResult o : ors) {
       DoubleRelation scores = o.getScores();
       for (DBIDIter iter = scores.iterDBIDs(); iter.valid(); iter.advance()) {

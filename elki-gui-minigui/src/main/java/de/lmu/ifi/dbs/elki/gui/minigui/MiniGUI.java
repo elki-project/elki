@@ -336,7 +336,7 @@ public class MiniGUI extends AbstractApplication {
       @Override
       public void actionPerformed(ActionEvent e) {
         String key = savedSettingsModel.getSelectedItem();
-        ArrayList<String> settings = store.get(key);
+        List<String> settings = store.get(key);
         if(settings != null) {
           doSetParameters(settings);
         }
@@ -613,7 +613,7 @@ public class MiniGUI extends AbstractApplication {
   protected void loadLatest() {
     int size = store.size();
     if(size > 0) {
-      final Pair<String, ArrayList<String>> pair = store.getElementAt(size - 1);
+      final Pair<String, List<String>> pair = store.getElementAt(size - 1);
       savedSettingsModel.setSelectedItem(pair.first);
       doSetParameters(pair.second);
     }

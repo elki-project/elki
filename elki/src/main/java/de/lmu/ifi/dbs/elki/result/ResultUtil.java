@@ -184,7 +184,7 @@ public class ResultUtil {
    */
   // We can't ensure that restrictionClass matches C exactly.
   @SuppressWarnings("unchecked")
-  public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Result r, Class<? super C> restrictionClass) {
+  public static <C extends Result> List<C> filterResults(ResultHierarchy hier, Result r, Class<? super C> restrictionClass) {
     ArrayList<C> res = new ArrayList<>();
     if(restrictionClass.isInstance(r)) {
       res.add((C) restrictionClass.cast(r));
@@ -208,7 +208,7 @@ public class ResultUtil {
    */
   // We can't ensure that restrictionClass matches C exactly.
   @SuppressWarnings("unchecked")
-  public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Class<? super C> restrictionClass) {
+  public static <C extends Result> List<C> filterResults(ResultHierarchy hier, Class<? super C> restrictionClass) {
     ArrayList<C> res = new ArrayList<>();
     for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
       Result result = iter.get();

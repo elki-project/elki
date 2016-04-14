@@ -23,7 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 
@@ -47,7 +47,7 @@ public class ConfusionMatrix {
   /**
    * Holds the class labels.
    */
-  private ArrayList<ClassLabel> labels;
+  private List<ClassLabel> labels;
 
   /**
    * Provides a confusion matrix for the given values.
@@ -64,7 +64,7 @@ public class ConfusionMatrix {
    *         not complete or if the length of class labels does not conform the
    *         length of the confusion matrix
    */
-  public ConfusionMatrix(ArrayList<ClassLabel> labels, int[][] confusion) throws IllegalArgumentException {
+  public ConfusionMatrix(List<ClassLabel> labels, int[][] confusion) throws IllegalArgumentException {
     for(int i = 0; i < confusion.length; i++) {
       if(confusion.length != confusion[i].length) {
         throw new IllegalArgumentException("Confusion matrix irregular: row-dimension = " + confusion.length + ", col-dimension in col" + i + " = " + confusion[i].length);

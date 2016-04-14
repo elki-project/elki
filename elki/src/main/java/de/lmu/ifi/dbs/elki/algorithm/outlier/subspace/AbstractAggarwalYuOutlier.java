@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
  */
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
@@ -112,10 +113,10 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
    * @param relation Relation to process
    * @return range map
    */
-  protected ArrayList<ArrayList<DBIDs>> buildRanges(Relation<V> relation) {
+  protected List<List<DBIDs>> buildRanges(Relation<V> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final int size = relation.size();
-    final ArrayList<ArrayList<DBIDs>> ranges = new ArrayList<>();
+    final List<List<DBIDs>> ranges = new ArrayList<>();
 
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(relation.getDBIDs());
     SortDBIDsBySingleDimension sorter = new SortDBIDsBySingleDimension(relation);
@@ -165,7 +166,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
    * @param ranges List of DBID ranges
    * @return ids
    */
-  protected DBIDs computeSubspace(ArrayList<IntIntPair> subspace, ArrayList<ArrayList<DBIDs>> ranges) {
+  protected DBIDs computeSubspace(List<IntIntPair> subspace, List<List<DBIDs>> ranges) {
     HashSetModifiableDBIDs ids = DBIDUtil.newHashSet(ranges.get(subspace.get(0).first).get(subspace.get(0).second));
     // intersect all selected dimensions
     for(int i = 1; i < subspace.size(); i++) {
@@ -185,7 +186,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
    * @param ranges Database ranges
    * @return resulting DBIDs
    */
-  protected DBIDs computeSubspaceForGene(short[] gene, ArrayList<ArrayList<DBIDs>> ranges) {
+  protected DBIDs computeSubspaceForGene(short[] gene, List<List<DBIDs>> ranges) {
     HashSetModifiableDBIDs m = null;
     // intersect all present restrictions
     for(int i = 0; i < gene.length; i++) {

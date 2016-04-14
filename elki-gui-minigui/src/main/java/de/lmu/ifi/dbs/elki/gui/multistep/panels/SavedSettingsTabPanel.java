@@ -29,7 +29,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
@@ -121,7 +121,7 @@ public class SavedSettingsTabPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
           String key = savedSettingsModel.getSelectedItem();
-          ArrayList<String> settings = store.get(key);
+          List<String> settings = store.get(key);
           SerializedParameterization config = new SerializedParameterization(settings);
           gui.setParameters(config);
           config.logUnusedParameters();

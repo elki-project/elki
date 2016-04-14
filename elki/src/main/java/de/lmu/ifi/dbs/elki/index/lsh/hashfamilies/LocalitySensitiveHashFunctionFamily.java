@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.index.lsh.hashfamilies;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -53,7 +53,7 @@ public interface LocalitySensitiveHashFunctionFamily<V> {
    * @param l Number of hash tables to use
    * @return Family of hash functions
    */
-  ArrayList<? extends LocalitySensitiveHashFunction<? super V>> generateHashFunctions(Relation<? extends V> relation, int l);
+  List<? extends LocalitySensitiveHashFunction<? super V>> generateHashFunctions(Relation<? extends V> relation, int l);
 
   /**
    * Check whether the given distance function can be accelerated using this

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -137,7 +138,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
    */
   public OutlierResult run(Database database, Relation<V> relation) {
     final int dbsize = relation.size();
-    ArrayList<ArrayList<DBIDs>> ranges = buildRanges(relation);
+    List<List<DBIDs>> ranges = buildRanges(relation);
 
     Heap<Individuum>.UnorderedIter individuums = (new EvolutionarySearch(relation, ranges, m, rnd.getSingleThreadedRandom())).run();
 
@@ -193,7 +194,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     /**
      * Database ranges.
      */
-    final ArrayList<ArrayList<DBIDs>> ranges;
+    final List<List<DBIDs>> ranges;
 
     /**
      * m to use.
@@ -213,7 +214,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
      * @param m Population size
      * @param random Random generator
      */
-    public EvolutionarySearch(Relation<V> relation, ArrayList<ArrayList<DBIDs>> ranges, int m, Random random) {
+    public EvolutionarySearch(Relation<V> relation, List<List<DBIDs>> ranges, int m, Random random) {
       super();
       this.ranges = ranges;
       this.m = m;

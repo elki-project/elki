@@ -632,7 +632,7 @@ public class SweepHullDelaunay2D {
    * 
    * @return Triangle list
    */
-  public ArrayList<Triangle> getDelaunay() {
+  public List<Triangle> getDelaunay() {
     if(tris == null) {
       run(false);
     }

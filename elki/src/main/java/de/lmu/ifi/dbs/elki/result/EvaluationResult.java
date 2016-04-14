@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
@@ -144,7 +145,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
    * @return Evaluation result
    */
   public static EvaluationResult findOrCreate(ResultHierarchy hierarchy, Result parent, String name, String shortname) {
-    ArrayList<EvaluationResult> ers = ResultUtil.filterResults(hierarchy, parent, EvaluationResult.class);
+    List<EvaluationResult> ers = ResultUtil.filterResults(hierarchy, parent, EvaluationResult.class);
     EvaluationResult ev = null;
     for(EvaluationResult e : ers) {
       if(shortname.equals(e.getShortName())) {

@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.evaluation.classification.holdout;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -60,7 +60,7 @@ public interface Holdout {
    *
    * @return Class labels
    */
-  ArrayList<ClassLabel> getLabels();
+  List<ClassLabel> getLabels();
 
   /**
    * How many partitions to test.

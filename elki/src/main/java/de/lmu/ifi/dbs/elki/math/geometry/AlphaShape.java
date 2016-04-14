@@ -51,7 +51,7 @@ public class AlphaShape {
   /**
    * Delaunay triangulation
    */
-  private ArrayList<SweepHullDelaunay2D.Triangle> delaunay = null;
+  private List<SweepHullDelaunay2D.Triangle> delaunay = null;
 
   public AlphaShape(List<double[]> points, double alpha) {
     this.alpha2 = alpha * alpha;
