@@ -193,7 +193,7 @@ public class CheckELKIServices {
     catch(IOException e) {
       LOG.exception(e);
     }
-    if(names.size() > 0) {
+    if(!names.isEmpty()) {
       // format for copy & paste to properties file:
       ArrayList<String> sorted = new ArrayList<>(names);
       // TODO: sort by package, then classname

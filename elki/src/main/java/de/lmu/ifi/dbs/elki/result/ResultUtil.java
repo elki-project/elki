@@ -227,7 +227,7 @@ public class ResultUtil {
    */
   public static void ensureClusteringResult(final Database db, final Result result) {
     Collection<Clustering<?>> clusterings = ResultUtil.filterResults(db.getHierarchy(), result, Clustering.class);
-    if(clusterings.size() == 0) {
+    if(clusterings.isEmpty()) {
       ClusteringAlgorithm<Clustering<Model>> split = new ByLabelOrAllInOneClustering();
       Clustering<Model> c = split.run(db);
       addChildResult(db, c);
@@ -258,7 +258,7 @@ public class ResultUtil {
    */
   public static SamplingResult getSamplingResult(final Relation<?> rel) {
     Collection<SamplingResult> selections = ResultUtil.filterResults(rel.getHierarchy(), rel, SamplingResult.class);
-    if(selections.size() == 0) {
+    if(selections.isEmpty()) {
       final SamplingResult newsam = new SamplingResult(rel);
       addChildResult(rel, newsam);
       return newsam;
@@ -274,7 +274,7 @@ public class ResultUtil {
    */
   public static ScalesResult getScalesResult(final Relation<? extends SpatialComparable> rel) {
     Collection<ScalesResult> scas = ResultUtil.filterResults(rel.getHierarchy(), rel, ScalesResult.class);
-    if(scas.size() == 0) {
+    if(scas.isEmpty()) {
       final ScalesResult newsca = new ScalesResult(rel);
       addChildResult(rel, newsca);
       return newsca;

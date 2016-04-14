@@ -176,7 +176,7 @@ public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, 
      * @return {@code true}, if this is a leaf node.
      */
     public boolean isLeaf() {
-      return children == null || children.size() == 0;
+      return children == null || children.isEmpty();
     }
   }
 
@@ -300,7 +300,7 @@ public class CoverTree<O> extends AbstractCoverTree<O>implements RangeIndex<O>, 
       for(Node chi : cur.children) {
         checkCoverTree(chi, counts, depth);
       }
-      assert(cur.children.size() > 0) : "Empty childs list.";
+      assert(!cur.children.isEmpty()) : "Empty childs list.";
     }
   }
 

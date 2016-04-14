@@ -65,7 +65,7 @@ public class UnParameterization implements Parameterization {
 
   @Override
   public boolean hasErrors() {
-    return errors.size() > 0;
+    return !errors.isEmpty();
   }
 
   @Override

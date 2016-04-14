@@ -215,7 +215,7 @@ public class SimplePolygonParser extends AbstractStreamingParser {
       final int len = tokenizer.getEnd() - tokenizer.getStart();
       if(POLYGON_SEPARATOR.length() == len && //
       reader.getBuffer().subSequence(tokenizer.getStart(), tokenizer.getEnd()).equals(POLYGON_SEPARATOR)) {
-        if(coords.size() > 0) {
+        if(!coords.isEmpty()) {
           polys.add(new Polygon(new ArrayList<>(coords)));
         }
         continue;
@@ -230,11 +230,11 @@ public class SimplePolygonParser extends AbstractStreamingParser {
       }
     }
     // Complete polygon
-    if(coords.size() > 0) {
+    if(!coords.isEmpty()) {
       polys.add(new Polygon(coords));
     }
     curpoly = new PolygonsObject(polys);
-    curlbl = (haslabels || labels.size() > 0) ? LabelList.make(labels) : null;
+    curlbl = (haslabels || !labels.isEmpty()) ? LabelList.make(labels) : null;
     return true;
   }
 

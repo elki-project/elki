@@ -286,7 +286,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
   @Override
   public void processNewResult(ResultHierarchy hier, Result result) {
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
-    if(crs.size() < 1) {
+    if(crs.isEmpty()) {
       return;
     }
     Database db = ResultUtil.findDatabase(hier);

@@ -180,7 +180,7 @@ public class VisualizerContext implements DataStoreListener, Result {
     final Database db = ResultUtil.findDatabase(hier);
     stylelibrary = stylelib;
     List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(db);
-    if(clusterings.size() > 0) {
+    if(!clusterings.isEmpty()) {
       stylepolicy = new ClusterStylingPolicy(clusterings.get(0), stylelib);
     }
     else {

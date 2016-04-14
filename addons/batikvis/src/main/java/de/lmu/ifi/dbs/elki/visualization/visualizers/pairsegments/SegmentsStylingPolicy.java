@@ -244,7 +244,7 @@ public class SegmentsStylingPolicy implements ClassStylingPolicy {
    * Deselect all currently selected segments
    */
   public void deselectAllSegments() {
-    while(selectedSegments.size() > 0) {
+    while(!selectedSegments.isEmpty()) {
       deselectSegment(selectedSegments.get(selectedSegments.size() - 1));
     }
   }

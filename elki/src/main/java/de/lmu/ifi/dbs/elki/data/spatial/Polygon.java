@@ -63,7 +63,7 @@ public class Polygon implements SpatialComparable {
     super();
     this.points = points;
     // Compute the bounds.
-    if (points.size() > 0) {
+    if (!points.isEmpty()) {
       final Iterator<double[]> iter = points.iterator();
       final double[] first = iter.next();
       final int dim = first.length;

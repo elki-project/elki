@@ -342,8 +342,8 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
     if(scanprog != null) {
       scanprog.setProcessed(clusterOrder.size(), LOG);
     }
-    if(curclusters.size() > 0 || unclaimedids.size() > 0) {
-      if(unclaimedids.size() > 0) {
+    if(!curclusters.isEmpty() || !unclaimedids.isEmpty()) {
+      if(!unclaimedids.isEmpty()) {
         final Cluster<OPTICSModel> allcluster;
         if(reach.doubleValue(tmp.seek(clusterOrder.size() - 1)) >= Double.POSITIVE_INFINITY) {
           allcluster = new Cluster<>("Noise", unclaimedids, true, new OPTICSModel(0, clusterOrder.size() - 1));

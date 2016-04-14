@@ -112,7 +112,7 @@ public class GeneratorMain {
    */
   public MultipleObjectsBundle generate() {
     // we actually need some clusters.
-    if(generators.size() < 1) {
+    if(generators.isEmpty()) {
       throw new AbortException("No clusters specified.");
     }
     // Assert that cluster dimensions agree.

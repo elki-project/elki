@@ -132,7 +132,7 @@ public class ReferenceBasedOutlierDetection extends AbstractNumberVectorDistance
     @SuppressWarnings("unchecked")
     PrimitiveDistanceQuery<? super NumberVector> distq = (PrimitiveDistanceQuery<? super NumberVector>) database.getDistanceQuery(relation, distanceFunction);
     Collection<? extends NumberVector> refPoints = refp.getReferencePoints(relation);
-    if(refPoints.size() < 1) {
+    if(refPoints.isEmpty()) {
       throw new AbortException("Cannot compute ROS without reference points!");
     }
 

@@ -70,7 +70,7 @@ public class OPTICSProjector implements Projector {
   public Collection<PlotItem> arrange(VisualizerContext context) {
     List<PlotItem> col = new ArrayList<>(1);
     List<VisualizationTask> tasks = context.getVisTasks(this);
-    if(tasks.size() > 0) {
+    if(!tasks.isEmpty()) {
       final PlotItem it = new PlotItem(4., 1., new OPTICSProjection(this));
       it.tasks = tasks;
       col.add(it);

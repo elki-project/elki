@@ -151,7 +151,7 @@ public class CLISmartHandler extends Handler {
       Collection<Progress> progresses = ptrack.getProgresses();
 
       StringBuilder buf = new StringBuilder();
-      if(completed.size() > 0) {
+      if(!completed.isEmpty()) {
         buf.append(OutputStreamLogger.CARRIAGE_RETURN);
         for(Progress prog : completed) {
           // TODO: use formatter, somehow?
@@ -159,7 +159,7 @@ public class CLISmartHandler extends Handler {
           buf.append(OutputStreamLogger.NEWLINE);
         }
       }
-      if(progresses.size() > 0) {
+      if(!progresses.isEmpty()) {
         boolean first = true;
         buf.append(OutputStreamLogger.CARRIAGE_RETURN);
         for(Progress prog : progresses) {

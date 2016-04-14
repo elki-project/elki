@@ -231,7 +231,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
           ArrayList<double[]> ps = new ArrayList<>();
           double weight = addRecursively(ps, hier, clu);
           List<Polygon> polys;
-          if(ps.size() < 1) {
+          if(ps.isEmpty()) {
             continue;
           }
           if(ps.size() > 2) {

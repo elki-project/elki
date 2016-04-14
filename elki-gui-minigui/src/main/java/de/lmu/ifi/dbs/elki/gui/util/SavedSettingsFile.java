@@ -101,7 +101,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
       if (line.startsWith(COMMENT_PREFIX)) {
         continue;
       }
-      if (line.length() == 0 && buf.size() > 0) {
+      if (line.length() == 0 && !buf.isEmpty()) {
         String title = buf.remove(0);
         store.add(new Pair<>(title, buf));
         buf = new ArrayList<>();
@@ -109,7 +109,7 @@ public class SavedSettingsFile implements Iterable<Pair<String, ArrayList<String
         buf.add(line);
       }
     }
-    if (buf.size() > 0) {
+    if (!buf.isEmpty()) {
       String title = buf.remove(0);
       store.add(new Pair<>(title, buf));
       buf = new ArrayList<>();

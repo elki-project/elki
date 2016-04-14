@@ -81,7 +81,7 @@ public class ScatterPlotProjector<V extends SpatialComparable> implements Projec
   public Collection<PlotItem> arrange(VisualizerContext context) {
     List<PlotItem> layout = new ArrayList<>(1);
     List<VisualizationTask> tasks = context.getVisTasks(this);
-    if(tasks.size() > 0) {
+    if(!tasks.isEmpty()) {
       ScalesResult scales = ResultUtil.getScalesResult(rel);
       final PlotItem master;
       if(dmax == 2) {

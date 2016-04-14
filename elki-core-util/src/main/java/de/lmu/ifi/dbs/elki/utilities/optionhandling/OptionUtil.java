@@ -200,7 +200,7 @@ public final class OptionUtil {
       @SuppressWarnings("unused")
       Object p = ClassGenericsUtil.tryInstantiate(Object.class, pcls, track);
       Collection<TrackedParameter> options = track.getAllParameters();
-      if(options.size() > 0) {
+      if(!options.isEmpty()) {
         OptionUtil.formatForConsole(buf, width, indent, options);
       }
       // TODO: report global constraints?

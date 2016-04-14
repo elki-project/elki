@@ -78,7 +78,7 @@ public class AlphaShape {
           processNeighbor(cur, used, i, tri.bc, tri.c);
           processNeighbor(cur, used, i, tri.ca, tri.a);
         }
-        if(cur.size() > 0) {
+        if(!cur.isEmpty()) {
           polys.add(new Polygon(cur));
           cur = new ArrayList<>();
         }

@@ -391,7 +391,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
    * @return Itemsets with sufficient support
    */
   protected List<? extends Itemset> frequentItemsets(List<? extends Itemset> candidates, Relation<BitVector> relation, int needed, DBIDs ids, ArrayModifiableDBIDs survivors, int length) {
-    if(candidates.size() < 1) {
+    if(candidates.isEmpty()) {
       return Collections.emptyList();
     }
     Itemset first = candidates.get(0);
