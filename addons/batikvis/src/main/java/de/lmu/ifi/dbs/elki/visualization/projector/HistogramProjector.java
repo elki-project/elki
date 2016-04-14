@@ -79,7 +79,7 @@ public class HistogramProjector<V extends NumberVector> implements Projector {
   public Collection<PlotItem> arrange(VisualizerContext context) {
     List<PlotItem> layout = new ArrayList<>(1 + dmax);
     List<VisualizationTask> tasks = context.getVisTasks(this);
-    if(tasks.size() > 0) {
+    if(!tasks.isEmpty()) {
       final double xoff = (dmax > 1) ? .1 : 0.;
       final double hheight = .5;
       final double lheight = .1;

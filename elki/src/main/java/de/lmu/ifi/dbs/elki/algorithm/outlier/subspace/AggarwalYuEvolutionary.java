@@ -281,7 +281,7 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
      * @return Convergence
      */
     private boolean checkConvergence(Collection<Individuum> pop) {
-      if(pop.size() == 0) {
+      if(pop.isEmpty()) {
         return true;
       }
 

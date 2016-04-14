@@ -115,7 +115,7 @@ public class EvaluateClustering implements Evaluator {
     }
     Database db = ResultUtil.findDatabase(hier);
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(newResult);
-    if(crs == null || crs.size() < 1) {
+    if(crs == null || crs.isEmpty()) {
       return;
     }
     // Compute the reference clustering
@@ -144,7 +144,7 @@ public class EvaluateClustering implements Evaluator {
       LOG.debug("Generating a new reference clustering.");
       Result refres = referencealg.run(db);
       List<Clustering<?>> refcrs = ResultUtil.getClusteringResults(refres);
-      if(refcrs.size() == 0) {
+      if(refcrs.isEmpty()) {
         LOG.warning("Reference algorithm did not return a clustering result!");
         return;
       }

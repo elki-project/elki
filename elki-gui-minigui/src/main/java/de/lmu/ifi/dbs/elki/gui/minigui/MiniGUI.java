@@ -463,7 +463,7 @@ public class MiniGUI extends AbstractApplication {
    * @param params Parameters
    */
   protected void doSetParameters(List<String> params) {
-    if(params.size() > 0) {
+    if(!params.isEmpty()) {
       String first = params.get(0);
       if(!first.startsWith("-")) {
         Class<? extends AbstractApplication> c = ELKIServiceRegistry.findImplementation(AbstractApplication.class, first);
@@ -480,7 +480,7 @@ public class MiniGUI extends AbstractApplication {
     config.logUnusedParameters();
     // config.logAndClearReportedErrors();
     final boolean hasErrors = (config.getErrors().size() > 0);
-    if(hasErrors && params.size() > 0) {
+    if(hasErrors && !params.isEmpty()) {
       reportErrors(config);
     }
     runButton.setEnabled(!hasErrors);
@@ -741,7 +741,7 @@ public class MiniGUI extends AbstractApplication {
           if(args != null && args.length > 0) {
             params = new ArrayList<>(Arrays.asList(args));
             // TODO: it would be nicer to use the Parameterization API for this!
-            if(params.size() > 0) {
+            if(!params.isEmpty()) {
               Class<? extends AbstractApplication> c = ELKIServiceRegistry.findImplementation(AbstractApplication.class, params.get(0));
               if(c != null) {
                 gui.maincls = c;

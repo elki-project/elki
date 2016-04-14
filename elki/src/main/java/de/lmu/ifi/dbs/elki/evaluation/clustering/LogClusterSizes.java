@@ -99,7 +99,7 @@ public class LogClusterSizes implements Evaluator {
   @Override
   public void processNewResult(ResultHierarchy hier, Result result) {
     List<Clustering<?>> crs = ResultUtil.getClusteringResults(result);
-    if(crs == null || crs.size() < 1) {
+    if(crs == null || crs.isEmpty()) {
       return;
     }
     for(Clustering<?> c : crs) {

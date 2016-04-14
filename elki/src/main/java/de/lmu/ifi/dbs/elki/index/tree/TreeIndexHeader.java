@@ -221,7 +221,7 @@ public class TreeIndexHeader extends DefaultPageHeader {
    * @throws IOException thrown on IO errors
    */
   public void writeEmptyPages(Stack<Integer> emptyPages, RandomAccessFile file) throws IOException {
-    if(emptyPages.size() == 0) {
+    if(emptyPages.isEmpty()) {
       this.emptyPagesSize = 0;
       return; // nothing to write
     }

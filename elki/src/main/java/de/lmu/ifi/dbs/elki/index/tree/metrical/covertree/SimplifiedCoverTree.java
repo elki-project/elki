@@ -157,7 +157,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
      * @return {@code true}, if this is a leaf node.
      */
     public boolean isLeaf() {
-      return children == null || children.size() == 0;
+      return children == null || children.isEmpty();
     }
   }
 
@@ -281,7 +281,7 @@ public class SimplifiedCoverTree<O> extends AbstractCoverTree<O>implements Range
       for(Node chi : cur.children) {
         checkCoverTree(chi, counts, depth);
       }
-      assert(cur.children.size() > 0) : "Empty childs list.";
+      assert(!cur.children.isEmpty()) : "Empty childs list.";
     }
   }
 

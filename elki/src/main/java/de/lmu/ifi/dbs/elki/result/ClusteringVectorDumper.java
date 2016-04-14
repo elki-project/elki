@@ -112,7 +112,7 @@ public class ClusteringVectorDumper implements ResultHandler {
   @Override
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     List<Clustering<?>> cs = ResultUtil.getClusteringResults(newResult);
-    if(cs.size() < 1) {
+    if(cs.isEmpty()) {
       return;
     }
     if(forceLabel != null && forceLabel.length() > 0 && cs.size() > 1) {

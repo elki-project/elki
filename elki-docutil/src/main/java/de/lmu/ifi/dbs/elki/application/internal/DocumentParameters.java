@@ -964,7 +964,7 @@ public class DocumentParameters {
 
   private static void appendKnownImplementationsWiki(WikiStream out, Class<?> restriction) {
     List<Class<?>> implementations = ELKIServiceRegistry.findAllImplementations(restriction);
-    if(implementations.size() == 0) {
+    if(implementations.isEmpty()) {
       return;
     }
     out.println(HEADER_KNOWN_IMPLEMENTATIONS);

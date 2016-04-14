@@ -357,7 +357,7 @@ public class TextWriter {
   }
 
   private void writeSettingsResult(StreamFactory streamOpener, List<SettingsResult> rs) throws IOException {
-    if(rs.size() < 1) {
+    if(rs.isEmpty()) {
       return;
     }
     SettingsResult r = rs.get(0);

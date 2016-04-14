@@ -68,7 +68,7 @@ public class ParallelPlotProjector<V extends SpatialComparable> implements Proje
   public Collection<PlotItem> arrange(VisualizerContext context) {
     List<PlotItem> col = new ArrayList<>(1);
     List<VisualizationTask> tasks = context.getVisTasks(this);
-    if(tasks.size() > 0) {
+    if(!tasks.isEmpty()) {
       ScalesResult scales = ResultUtil.getScalesResult(rel);
       ProjectionParallel proj = new SimpleParallel(this, scales.getScales());
 

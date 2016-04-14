@@ -76,7 +76,7 @@ public class MaxExtensionBulkSplit extends AbstractBulkSplit {
     List<List<N>> partitions = new ArrayList<>();
     List<N> objects = new ArrayList<>(spatialObjects);
 
-    while (objects.size() > 0) {
+    while (!objects.isEmpty()) {
       StringBuilder msg = new StringBuilder();
 
       // get the split axis and split point

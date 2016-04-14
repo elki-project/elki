@@ -713,7 +713,7 @@ public final class FormatUtil {
     if(d == null) {
       return "null";
     }
-    if(d.size() == 0) {
+    if(d.isEmpty()) {
       return "";
     }
     if(d.size() == 1) {

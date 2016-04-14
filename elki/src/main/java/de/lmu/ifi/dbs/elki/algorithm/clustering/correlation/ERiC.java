@@ -265,7 +265,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
 
     // Delete dimensionalities not found.
     for(int i = dimensionality; i > 0; i--) {
-      if(clusterMap.get(i).size() > 0) {
+      if(!clusterMap.get(i).isEmpty()) {
         break;
       }
       clusterMap.remove(i);

@@ -204,7 +204,7 @@ public class ExportVisualizations implements ResultHandler {
         }
       }
     }
-    if(layers.size() <= 0) {
+    if(layers.isEmpty()) {
       return;
     }
     for(Visualization layer : layers) {
