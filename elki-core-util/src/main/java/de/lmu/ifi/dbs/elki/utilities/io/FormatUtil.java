@@ -904,10 +904,7 @@ public final class FormatUtil {
     try {
       return Integer.parseInt(System.getenv("COLUMNS")) - 1;
     }
-    catch(SecurityException e) {
-      return default_termwidth;
-    }
-    catch(NumberFormatException e) {
+    catch(SecurityException|NumberFormatException e) {
       return default_termwidth;
     }
   }

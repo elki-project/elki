@@ -163,9 +163,7 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
         return new SimpleTypeInformation<>(clz, label, serializer);
       } catch (ClassNotFoundException e) {
         throw new UnsupportedOperationException("Cannot deserialize - class not found: " + e, e);
-      } catch (InstantiationException e) {
-        throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: " + e.getMessage(), e);
-      } catch (IllegalAccessException e) {
+      } catch (InstantiationException|IllegalAccessException e) {
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate serializer: " + e.getMessage(), e);
       }
     }

@@ -225,13 +225,7 @@ public class PersistentPageFile<P extends ExternalizablePage> extends AbstractSt
           page = pageclass.newInstance();
           page.readExternal(ois);
         }
-        catch(InstantiationException e) {
-          throw new AbortException("Error instanciating an index page", e);
-        }
-        catch(IllegalAccessException e) {
-          throw new AbortException("Error instanciating an index page", e);
-        }
-        catch(ClassNotFoundException e) {
+        catch(InstantiationException|IllegalAccessException|ClassNotFoundException e) {
           throw new AbortException("Error instanciating an index page", e);
         }
         return page;

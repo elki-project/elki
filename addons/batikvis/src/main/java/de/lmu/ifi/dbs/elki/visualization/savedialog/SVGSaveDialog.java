@@ -25,17 +25,14 @@ package de.lmu.ifi.dbs.elki.visualization.savedialog;
 
 import java.awt.Component;
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.apache.batik.ext.awt.image.spi.ImageTagRegistry;
 import org.apache.batik.ext.awt.image.spi.ImageWriterRegistry;
-import org.apache.batik.transcoder.TranscoderException;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
@@ -166,23 +163,7 @@ public class SVGSaveDialog {
       catch(ClassNotFoundException e) {
         showError(fc, "Error saving image.", "A class was not found when saving this image. Maybe installing Apache FOP will help (for PDF, PS and EPS output).\n" + e.toString());
       }
-      catch(IOException e) {
-        LOG.exception(e);
-        showError(fc, "Error saving image.", e.toString());
-      }
-      catch(TranscoderException e) {
-        LOG.exception(e);
-        showError(fc, "Error saving image.", e.toString());
-      }
-      catch(TransformerFactoryConfigurationError e) {
-        LOG.exception(e);
-        showError(fc, "Error saving image.", e.toString());
-      }
-      catch(TransformerException e) {
-        LOG.exception(e);
-        showError(fc, "Error saving image.", e.toString());
-      }
-      catch(Exception e) {
+      catch(TransformerFactoryConfigurationError|Exception e) {
         LOG.exception(e);
         showError(fc, "Error saving image.", e.toString());
       }
