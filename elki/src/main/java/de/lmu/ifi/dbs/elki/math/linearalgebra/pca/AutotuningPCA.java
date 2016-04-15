@@ -253,10 +253,7 @@ public class AutotuningPCA extends PCARunner {
       try {
         ModifiableDoubleDBIDList.class.cast(results).sort();
       }
-      catch(ClassCastException e) {
-        LoggingUtil.warning("WARNING: results not sorted by distance!", e);
-      }
-      catch(UnsupportedOperationException e) {
+      catch(ClassCastException|UnsupportedOperationException e) {
         LoggingUtil.warning("WARNING: results not sorted by distance!", e);
       }
     }

@@ -44,10 +44,7 @@ public class DoubleParameter extends NumberParameter<DoubleParameter, Double> {
     try {
       return ParseUtil.parseDouble(obj.toString());
     }
-    catch(NullPointerException e) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
-    }
-    catch(NumberFormatException e) {
+    catch(NullPointerException|NumberFormatException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
     }
   }
