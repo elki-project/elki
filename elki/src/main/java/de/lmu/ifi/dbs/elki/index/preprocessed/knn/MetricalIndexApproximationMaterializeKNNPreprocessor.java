@@ -216,8 +216,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
 
     @Override
     public MetricalIndexApproximationMaterializeKNNPreprocessor<O, N, E> instantiate(Relation<O> relation) {
-      MetricalIndexApproximationMaterializeKNNPreprocessor<O, N, E> instance = new MetricalIndexApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
-      return instance;
+      return new MetricalIndexApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
     }
 
     /**

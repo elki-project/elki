@@ -301,8 +301,7 @@ public class SaveOptionsPanel extends JPanel {
    * @return file format identification
    */
   public String getSelectedFormat() {
-    String format = (String) formatSelector.getSelectedItem();
-    return format;
+    return (String) formatSelector.getSelectedItem();
   }
 
   /**

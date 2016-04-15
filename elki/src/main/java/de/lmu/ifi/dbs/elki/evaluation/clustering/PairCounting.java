@@ -138,8 +138,7 @@ public class PairCounting {
    */
   public double fMeasure(double beta) {
     final double beta2 = beta * beta;
-    double fmeasure = ((1 + beta2) * pairconfuse[0]) / ((1 + beta2) * pairconfuse[0] + beta2 * pairconfuse[1] + pairconfuse[2]);
-    return fmeasure;
+    return ((1 + beta2) * pairconfuse[0]) / ((1 + beta2) * pairconfuse[0] + beta2 * pairconfuse[1] + pairconfuse[2]);
   }
 
   /**

@@ -71,7 +71,6 @@ public final class DocumentationUtil {
    * @return Reference or {@code null}
    */
   public static Reference getReference(Class<?> c) {
-    Reference ref = c.getAnnotation(Reference.class);
-    return ref;
+    return c.getAnnotation(Reference.class);
   }
 }

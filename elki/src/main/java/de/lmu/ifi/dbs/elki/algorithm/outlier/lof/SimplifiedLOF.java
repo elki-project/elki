@@ -130,9 +130,7 @@ public class SimplifiedLOF<O> extends AbstractDistanceBasedAlgorithm<O, OutlierR
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Simplified Local Outlier Factor", "simplified-lof-outlier", lofs, ids);
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0., Double.POSITIVE_INFINITY, 1.);
-    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-
-    return result;
+    return new OutlierResult(scoreMeta, scoreResult);
   }
 
   /**

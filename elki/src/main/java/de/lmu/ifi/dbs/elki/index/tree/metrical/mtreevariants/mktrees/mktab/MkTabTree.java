@@ -270,8 +270,7 @@ public abstract class MkTabTree<O> extends AbstractMkTreeUnified<O, MkTabTreeNod
    * @return a knn distance list with all distances set to null distance
    */
   private double[] initKnnDistanceList() {
-    double[] knnDistances = new double[getKmax()];
-    return knnDistances;
+    return new double[getKmax()];
   }
 
   @Override

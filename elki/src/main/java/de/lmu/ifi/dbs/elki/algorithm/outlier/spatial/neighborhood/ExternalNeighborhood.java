@@ -123,8 +123,7 @@ public class ExternalNeighborhood extends AbstractPrecomputedNeighborhood {
     @Override
     public NeighborSetPredicate instantiate(Database database, Relation<?> relation) {
       DataStore<DBIDs> store = loadNeighbors(database, relation);
-      ExternalNeighborhood neighborhood = new ExternalNeighborhood(store);
-      return neighborhood;
+      return new ExternalNeighborhood(store);
     }
 
     @Override

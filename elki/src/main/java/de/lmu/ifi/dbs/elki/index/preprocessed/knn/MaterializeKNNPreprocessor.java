@@ -408,8 +408,7 @@ public class MaterializeKNNPreprocessor<O> extends AbstractMaterializeKNNPreproc
 
     @Override
     public MaterializeKNNPreprocessor<O> instantiate(Relation<O> relation) {
-      MaterializeKNNPreprocessor<O> instance = new MaterializeKNNPreprocessor<>(relation, distanceFunction, k);
-      return instance;
+      return new MaterializeKNNPreprocessor<>(relation, distanceFunction, k);
     }
 
     /**

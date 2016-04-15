@@ -822,16 +822,14 @@ public final class SphereUtil {
         final double slatN2 = Math.sin((plat - rmaxlat) * .5);
         final double slon = Math.sin(lngE * .5);
         final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
-        final double distN = 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
-        return distN;
+        return 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
       }
       else {
         // Haversine to south corner.
         final double slatS2 = Math.sin((plat - rminlat) * .5);
         final double slon = Math.sin(lngE * .5);
         final double aS = slatS2 * slatS2 + slon * slon * clatQ * clatS;
-        final double distS = 2 * Math.atan2(Math.sqrt(aS), Math.sqrt(1 - aS));
-        return distS;
+        return 2 * Math.atan2(Math.sqrt(aS), Math.sqrt(1 - aS));
       }
     }
     else { // West, to max edge
@@ -859,16 +857,14 @@ public final class SphereUtil {
         final double slatN2 = Math.sin((plat - rmaxlat) * .5);
         final double slon = Math.sin(lngW * .5);
         final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
-        final double distN = 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
-        return distN;
+        return 2 * Math.atan2(Math.sqrt(aN), Math.sqrt(1 - aN));
       }
       else {
         // Haversine to south corner.
         final double slatS2 = Math.sin((plat - rminlat) * .5);
         final double slon = Math.sin(lngW * .5);
         final double aS = slatS2 * slatS2 + slon * slon * clatQ * clatS;
-        final double distS = 2 * Math.atan2(Math.sqrt(aS), Math.sqrt(1 - aS));
-        return distS;
+        return 2 * Math.atan2(Math.sqrt(aS), Math.sqrt(1 - aS));
       }
     }
   }

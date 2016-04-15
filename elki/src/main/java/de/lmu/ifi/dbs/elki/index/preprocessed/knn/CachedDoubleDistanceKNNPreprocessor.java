@@ -163,8 +163,7 @@ public class CachedDoubleDistanceKNNPreprocessor<O> extends AbstractMaterializeK
 
     @Override
     public CachedDoubleDistanceKNNPreprocessor<O> instantiate(Relation<O> relation) {
-      CachedDoubleDistanceKNNPreprocessor<O> instance = new CachedDoubleDistanceKNNPreprocessor<>(relation, distanceFunction, k, filename);
-      return instance;
+      return new CachedDoubleDistanceKNNPreprocessor<>(relation, distanceFunction, k, filename);
     }
 
     /**

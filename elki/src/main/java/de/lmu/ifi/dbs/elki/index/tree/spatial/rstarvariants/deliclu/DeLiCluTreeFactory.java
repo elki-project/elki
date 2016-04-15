@@ -55,8 +55,7 @@ public class DeLiCluTreeFactory<O extends NumberVector> extends AbstractRStarTre
   @Override
   public DeLiCluTreeIndex<O> instantiate(Relation<O> relation) {
     PageFile<DeLiCluNode> pagefile = makePageFile(getNodeClass());
-    DeLiCluTreeIndex<O> index = new DeLiCluTreeIndex<>(relation, pagefile, settings);
-    return index;
+    return new DeLiCluTreeIndex<>(relation, pagefile, settings);
   }
 
   protected Class<DeLiCluNode> getNodeClass() {

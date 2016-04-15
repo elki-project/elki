@@ -210,8 +210,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     }
 
     // add all current clusters to the result
-    Clustering<M> result = new Clustering<>("X-Means Result", "X-Means", clusters);
-    return result;
+    return new Clustering<>("X-Means Result", "X-Means", clusters);
   }
 
   /**

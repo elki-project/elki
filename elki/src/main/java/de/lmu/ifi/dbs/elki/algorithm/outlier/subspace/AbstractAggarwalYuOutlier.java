@@ -154,8 +154,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
     // calculate sparsity c
     final double f = 1. / phi;
     final double fK = MathUtil.powi(f, k);
-    final double sC = (setsize - (dbsize * fK)) / Math.sqrt(dbsize * fK * (1 - fK));
-    return sC;
+    return (setsize - (dbsize * fK)) / Math.sqrt(dbsize * fK * (1 - fK));
   }
 
   /**

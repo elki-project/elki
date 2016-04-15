@@ -428,8 +428,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
       // Complete data set only?
       name = "clu_" + DBIDUtil.toString(lead);
     }
-    Cluster<DendrogramModel> cluster = new Cluster<>(name, members, new DendrogramModel(depth));
-    return cluster;
+    return new Cluster<>(name, members, new DendrogramModel(depth));
   }
 
   @Override

@@ -78,8 +78,7 @@ public class MkCoPTreeIndex<O> extends MkCoPTree<O>implements RangeIndex<O>, KNN
    *        the parent node
    */
   protected MkCoPEntry createNewLeafEntry(DBID id, O object, double parentDistance) {
-    MkCoPLeafEntry leafEntry = new MkCoPLeafEntry(id, parentDistance, null, null);
-    return leafEntry;
+    return new MkCoPLeafEntry(id, parentDistance, null, null);
   }
 
   @Override

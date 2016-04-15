@@ -509,8 +509,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
       }
     }
 
-    ApproximationLine lowerApproximation = new ApproximationLine(k_0, low_m, low_t);
-    return lowerApproximation;
+    return new ApproximationLine(k_0, low_m, low_t);
   }
 
   private ApproximationLine approximateUpperHull(ConvexHull convexHull, double[] log_k, double[] log_kDist) {
@@ -699,8 +698,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
       }
     }
 
-    ApproximationLine upperApproximation = new ApproximationLine(k_0, upp_m, upp_t);
-    return upperApproximation;
+    return new ApproximationLine(k_0, upp_m, upp_t);
   }
 
   /**

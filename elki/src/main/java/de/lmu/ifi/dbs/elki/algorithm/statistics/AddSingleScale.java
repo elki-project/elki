@@ -113,8 +113,7 @@ public class AddSingleScale implements Algorithm {
         scales[i] = scale;
       }
     }
-    ScalesResult res = new ScalesResult(scales);
-    return res;
+    return new ScalesResult(scales);
   }
 
   @Override
