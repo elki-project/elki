@@ -97,6 +97,8 @@ public class StockIcon {
 
   private static final Map<String, SoftReference<Icon>> iconcache = new HashMap<>();
 
+  private StockIcon() {}
+  
   /**
    * Get a particular stock icon.
    * 

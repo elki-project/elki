@@ -62,6 +62,9 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  * @apiviz.composedOf SaveOptionsPanel
  */
 public class SVGSaveDialog {
+  
+  private SVGSaveDialog() {}
+  
   /** The default title. "Save as ...". */
   public static final String DEFAULT_TITLE = "Save as ...";
 

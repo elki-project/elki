@@ -32,6 +32,9 @@ import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
  * @since 0.7.0
  */
 public class UnionFindUtil {
+  
+  private UnionFindUtil() {}
+  
   /**
    * Make a new instance (automatically choosing the best implementation).
    *

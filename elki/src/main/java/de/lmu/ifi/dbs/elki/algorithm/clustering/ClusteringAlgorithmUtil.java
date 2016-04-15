@@ -35,6 +35,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * @since 0.7.0
  */
 public class ClusteringAlgorithmUtil {
+  
+  private ClusteringAlgorithmUtil() {}
+  
   /**
    * Collect clusters from their [0;k-1] integer labels.
    * 

@@ -56,6 +56,9 @@ import gnu.trove.map.hash.TObjectIntHashMap;
  * @apiviz.uses Element oneway - - «create»
  */
 public final class SVGUtil {
+  
+  private SVGUtil() {}
+  
   /**
    * Formatter to output numbers in a valid SVG number format.
    */

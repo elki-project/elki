@@ -35,6 +35,9 @@ import org.w3c.dom.Element;
  * @apiviz.uses SVGPath
  */
 public final class SVGArrow {
+  
+  private SVGArrow() {}
+  
   /**
    * Direction constants
    * 

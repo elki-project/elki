@@ -39,6 +39,9 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
  * @apiviz.uses Projection2D
  */
 public class SVGHyperSphere {
+  
+  private SVGHyperSphere() {}
+  
   /**
    * Factor used for approximating circles with cubic beziers.
    *

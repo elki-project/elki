@@ -47,6 +47,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 title = "Dual-Pivot Quicksort", booktitle = "http://iaroslavski.narod.ru/quicksort/", //
 url = "http://iaroslavski.narod.ru/quicksort/")
 public class IntegerArrayQuickSort {
+  
+  private IntegerArrayQuickSort() {}
+  
   /**
    * Threshold for using insertion sort. Value taken from Javas QuickSort,
    * assuming that it will be similar for our data sets.

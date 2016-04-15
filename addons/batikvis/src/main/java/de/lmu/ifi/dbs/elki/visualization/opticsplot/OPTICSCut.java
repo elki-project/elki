@@ -44,6 +44,9 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
  */
 // TODO: add non-flat clusterings
 public class OPTICSCut {
+  
+  private OPTICSCut() {}
+  
   /**
    * Compute an OPTICS cut clustering
    *

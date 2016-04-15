@@ -41,6 +41,9 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
  * @apiviz.uses Projection2D
  */
 public class VoronoiDraw {
+  
+  private VoronoiDraw() {}
+  
   /**
    * Draw the Delaunay triangulation.
    * 

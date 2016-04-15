@@ -30,6 +30,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * @author Erich Schubert
  */
 public final class ParseUtil {
+  
+  private ParseUtil() {}
+  
   /**
    * Preallocated exceptions.
    */

@@ -40,6 +40,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
  * @apiviz.uses NumberVector
  */
 public final class ModelUtil {
+  
+  private ModelUtil() {}
+  
   /**
    * Get (and convert!) the representative vector for a cluster model.
    * 

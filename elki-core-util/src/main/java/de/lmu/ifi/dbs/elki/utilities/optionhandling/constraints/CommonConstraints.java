@@ -33,6 +33,9 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints;
  * @apiviz.composedOf ParameterConstraint
  */
 public final class CommonConstraints {
+  
+  private CommonConstraints() {}
+  
   /**
    * Integer constraint: >= -1
    */
