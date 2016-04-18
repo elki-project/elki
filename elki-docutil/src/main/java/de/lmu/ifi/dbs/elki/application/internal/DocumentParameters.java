@@ -56,7 +56,6 @@ import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceScanner;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.Parameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -348,40 +347,19 @@ public class DocumentParameters {
 
     @Override
     public void run() {
-      // Try a V3 style parameterizer first.
+      // Only support V3 style parameterizers now:
       Parameterizer par = ClassGenericsUtil.getParameterizer(cls);
       if(par != null) {
         par.configure(track);
-      }
-      else {
-        try {
-          ClassGenericsUtil.tryInstantiate(Object.class, cls, track);
-        }
-        catch(ClassInstantiationException e) {
-          if(e.getCause() instanceof RuntimeException) {
-            throw (RuntimeException) e.getCause();
+        for(TrackedParameter pair : track.getAllParameters()) {
+          if(pair.getOwner() == null) {
+            LOG.warning("No owner for parameter " + pair.getParameter() + " expected a " + cls.getName());
+            continue;
           }
-          if(e.getCause() instanceof Error) {
-            throw (Error) e.getCause();
-          }
-          // Probably not serious, just not parameterizable?
-          // LOG.warning("Could not instantiate class " + cls.getName() +
-          // " - no appropriate constructor or parameterizer found.");
-        }
-        catch(RuntimeException e) {
-          throw e;
-        }
-        catch(Exception | java.lang.Error e) {
-          throw new RuntimeException(e);
+          options.add(pair);
         }
       }
-      for(TrackedParameter pair : track.getAllParameters()) {
-        if(pair.getOwner() == null) {
-          LOG.warning("No owner for parameter " + pair.getParameter() + " expected a " + cls.getName());
-          continue;
-        }
-        options.add(pair);
-      }
+      // Not parameterizable.
     }
   }
 

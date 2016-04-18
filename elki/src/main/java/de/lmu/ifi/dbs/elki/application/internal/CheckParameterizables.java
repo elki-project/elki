@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.internal;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,9 +25,7 @@ package de.lmu.ifi.dbs.elki.application.internal;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -40,12 +38,10 @@ import java.util.jar.JarFile;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceLoader;
 import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
  * Perform some consistency checks on classes that cannot be specified as Java
@@ -134,14 +130,6 @@ public class CheckParameterizables {
         if(state == State.ERROR) {
           continue;
         }
-        state = checkV2Parameterization(cls, state);
-        if(state == State.ERROR) {
-          continue;
-        }
-        state = checkV1Parameterization(cls, state);
-        if(state == State.ERROR) {
-          continue;
-        }
         state = checkDefaultConstructor(cls, state);
         if(state == State.ERROR) {
           continue;
@@ -190,42 +178,6 @@ public class CheckParameterizables {
     INSTANTIABLE, //
     DEFAULT_INSTANTIABLE, //
     ERROR, //
-  }
-
-  /** Check for a V1 constructor. */
-  private State checkV1Parameterization(Class<?> cls, State state) throws NoClassDefFoundError {
-    final Constructor<?> constructor;
-    try {
-      constructor = cls.getDeclaredConstructor(Parameterization.class);
-      if(state == State.INSTANTIABLE) {
-        LOG.warning("More than one parameterization method in class " + cls.getName());
-      }
-      LOG.warning("V1 constructor found in class: " + cls.getName());
-      if(!Modifier.isPublic(constructor.getModifiers())) {
-        LOG.verbose("Constructor for class " + cls.getName() + " is not public!");
-      }
-      return State.INSTANTIABLE;
-    }
-    catch(NoSuchMethodException e) {
-      // Not parameterizable?
-      return state;
-    }
-  }
-
-  /** Check for a V2 constructor. */
-  private State checkV2Parameterization(Class<?> cls, State state) throws NoClassDefFoundError {
-    try {
-      ClassGenericsUtil.getParameterizationFactoryMethod(cls, Object.class);
-      if(state == State.INSTANTIABLE) {
-        LOG.warning("More than one parameterization method in class " + cls.getName());
-      }
-      LOG.warning("V2 factory method found in class: " + cls.getName());
-      return State.INSTANTIABLE;
-    }
-    catch(NoSuchMethodException e) {
-      // do nothing.
-      return state;
-    }
   }
 
   /** Check for a V3 constructor. */

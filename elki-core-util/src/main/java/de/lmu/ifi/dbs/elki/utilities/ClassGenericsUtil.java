@@ -23,9 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -173,33 +171,6 @@ public final class ClassGenericsUtil {
   }
 
   /**
-   * Inspect the class for a static "parameterize" method that satisfies certain
-   * constraints.
-   *
-   * @param <C> Return class type
-   * @param c Class to inspect.
-   * @param ret Expected return type
-   * @return factory method that can be called with
-   *         {@code factory(null, Parameterization)}.
-   * @throws NoSuchMethodException When no factory method was found, or it
-   *         doesn't fit the constraints.
-   * @throws Exception On other errors such as security exceptions
-   */
-  public static <C> Method getParameterizationFactoryMethod(Class<C> c, Class<?> ret) throws NoSuchMethodException {
-    Method m = c.getMethod(FACTORY_METHOD_NAME, Parameterization.class);
-    if(m == null) {
-      throw new NoSuchMethodException("No parameterization method found.");
-    }
-    if(!ret.isAssignableFrom(m.getReturnType())) {
-      throw new NoSuchMethodException("Return type doesn't match: " + m.getReturnType().getName() + ", expected: " + ret.getName());
-    }
-    if(!java.lang.reflect.Modifier.isStatic(m.getModifiers())) {
-      throw new NoSuchMethodException("Factory method is not static.");
-    }
-    return m;
-  }
-
-  /**
    * Get a parameterizer for the given class.
    *
    * @param c Class
@@ -237,32 +208,11 @@ public final class ClassGenericsUtil {
     try {
       // Try a V3 parameterization class
       Parameterizer par = getParameterizer(c);
-      // TODO: API good?
       if(par instanceof AbstractParameterizer) {
-        final Object instance = ((AbstractParameterizer) par).make(config);
-        return r.cast(instance);
-      }
-      // Try a V2 static parameterization method
-      try {
-        final Method factory = getParameterizationFactoryMethod(c, r);
-        final Object instance = factory.invoke(null, config);
-        return r.cast(instance);
-      }
-      catch(NoSuchMethodException e) {
-        // continue.
-      }
-      // Try a regular "parameterization" constructor
-      try {
-        final Constructor<?> constructor = c.getConstructor(Parameterization.class);
-        final Object instance = constructor.newInstance(config);
-        return r.cast(instance);
-      }
-      catch(NoSuchMethodException e) {
-        // continue
+        return r.cast(((AbstractParameterizer) par).make(config));
       }
       // Try a default constructor.
-      final Object instance = c.getConstructor().newInstance();
-      return r.cast(instance);
+      return r.cast(c.getConstructor().newInstance());
     }
     catch(InstantiationException | InvocationTargetException
         | IllegalAccessException | NoSuchMethodException e) {
