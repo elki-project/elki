@@ -143,10 +143,8 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
         ksize.put(kNN.size());
         storage.put(id, kNN.toKNNList());
       }
-      if(getLogger().isDebugging()) {
-        if(cache.size() > 0) {
-          getLogger().warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
-        }
+      if(getLogger().isDebugging() && cache.size() > 0) {
+        getLogger().warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
       }
       getLogger().incrementProcessed(progress);
     }

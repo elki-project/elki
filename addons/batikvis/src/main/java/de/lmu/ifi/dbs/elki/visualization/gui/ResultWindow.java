@@ -465,15 +465,11 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         if(e instanceof DetailViewSelectedEvent) {
           showSubplot((DetailViewSelectedEvent) e);
         }
-        if(OverviewPlot.OVERVIEW_REFRESHING == e.getActionCommand()) {
-          if(currentSubplot == null) {
-            showPlot(null);
-          }
+        if(OverviewPlot.OVERVIEW_REFRESHING == e.getActionCommand() && currentSubplot == null) {
+          showPlot(null);
         }
-        if(OverviewPlot.OVERVIEW_REFRESHED == e.getActionCommand()) {
-          if(currentSubplot == null) {
-            showOverview();
-          }
+        if(OverviewPlot.OVERVIEW_REFRESHED == e.getActionCommand() && currentSubplot == null) {
+          showOverview();
         }
       }
     });

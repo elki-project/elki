@@ -126,13 +126,11 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
   @Override
   public void putData(double coord, T value) {
     // Store in cache
-    if(cachefill >= 0) {
-      if(cachefill < cacheposs.length) {
-        cacheposs[cachefill] = coord;
-        cachevals[cachefill] = cloneForCache(value);
-        ++cachefill;
-        return;
-      }
+    if(cachefill >= 0 && cachefill < cacheposs.length) {
+      cacheposs[cachefill] = coord;
+      cachevals[cachefill] = cloneForCache(value);
+      ++cachefill;
+      return;
     }
     if(coord == Double.NEGATIVE_INFINITY) {
       aggregateSpecial(value, 0);

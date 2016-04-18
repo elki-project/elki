@@ -132,14 +132,12 @@ public class ByLabelHierarchicalClustering extends AbstractAlgorithm<Clustering<
     for (Cluster<Model> cur : clusters) {
       boolean isrootcluster = true;
       for (Cluster<Model> oth : clusters) {
-        if (oth != cur) {
-          if (oth.getName().startsWith(cur.getName())) {
-            clustering.addChildCluster(oth, cur);
-            if (LOG.isDebuggingFiner()) {
-              LOG.debugFiner(oth.getName() + " is a child of " + cur.getName());
-            }
-            isrootcluster = false;
+        if (oth != cur && oth.getName().startsWith(cur.getName())) {
+          clustering.addChildCluster(oth, cur);
+          if (LOG.isDebuggingFiner()) {
+            LOG.debugFiner(oth.getName() + " is a child of " + cur.getName());
           }
+          isrootcluster = false;
         }
       }
       if (isrootcluster) {

@@ -147,12 +147,10 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
       labels.add(curterm);
     }
     haslabels |= (labels.size() > 0);
-    if(normalize) {
-      if(Math.abs(len - 1.0) > Double.MIN_NORMAL) {
-        for(TIntDoubleIterator iter = values.iterator(); iter.hasNext();) {
-          iter.advance();
-          iter.setValue(iter.value() / len);
-        }
+    if(normalize && Math.abs(len - 1.0) > Double.MIN_NORMAL) {
+      for(TIntDoubleIterator iter = values.iterator(); iter.hasNext();) {
+        iter.advance();
+        iter.setValue(iter.value() / len);
       }
     }
 

@@ -98,10 +98,8 @@ public class GeneratorXMLSpec extends AbstractApplication {
       LOG.verbose("Writing output ...");
     }
     try {
-      if(outputFile.exists()) {
-        if(LOG.isVerbose()) {
-          LOG.verbose("The file " + outputFile + " already exists, " + "the generator result will be APPENDED.");
-        }
+      if(outputFile.exists() && LOG.isVerbose()) {
+        LOG.verbose("The file " + outputFile + " already exists, " + "the generator result will be APPENDED.");
       }
 
       try (OutputStreamWriter outStream = new FileWriter(outputFile, true)) {

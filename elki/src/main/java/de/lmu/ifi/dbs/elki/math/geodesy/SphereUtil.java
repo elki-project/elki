@@ -808,14 +808,12 @@ public final class SphereUtil {
       // Math.atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
       // Bearing from north
       final double bn = Math.atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
-      if(bs < MathUtil.HALFPI) {
-        if(bn > MathUtil.HALFPI) {
-          // Radians from south pole = abs(ATD)
-          final double radFromS = -MathUtil.HALFPI - plat;
+      if(bs < MathUtil.HALFPI && bn > MathUtil.HALFPI) {
+        // Radians from south pole = abs(ATD)
+        final double radFromS = -MathUtil.HALFPI - plat;
 
-          // Cross-track-distance to longitude line.
-          return Math.asin(Math.sin(radFromS) * -slngD);
-        }
+        // Cross-track-distance to longitude line.
+        return Math.asin(Math.sin(radFromS) * -slngD);
       }
       if(bs - MathUtil.HALFPI < MathUtil.HALFPI - bn) {
         // Haversine to north corner.
@@ -846,13 +844,11 @@ public final class SphereUtil {
       // Math.atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
       // Bearing from north
       final double bn = Math.atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
-      if(bs > -MathUtil.HALFPI) {
-        if(bn < -MathUtil.HALFPI) {
-          // Radians from south = abs(ATD) = distance from pole
-          final double radFromS = -MathUtil.HALFPI - plat;
-          // Cross-track-distance to longitude line.
-          return Math.asin(Math.sin(radFromS) * slngD);
-        }
+      if(bs > -MathUtil.HALFPI && bn < -MathUtil.HALFPI) {
+        // Radians from south = abs(ATD) = distance from pole
+        final double radFromS = -MathUtil.HALFPI - plat;
+        // Cross-track-distance to longitude line.
+        return Math.asin(Math.sin(radFromS) * slngD);
       }
       if(-MathUtil.HALFPI - bs < bn + MathUtil.HALFPI) {
         // Haversine to north corner.

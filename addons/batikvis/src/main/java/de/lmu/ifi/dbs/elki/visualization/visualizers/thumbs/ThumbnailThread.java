@@ -57,12 +57,10 @@ public class ThumbnailThread extends Thread {
    */
   public synchronized static Task queue(Listener callback) {
     final Task task = new Task(callback);
-    if(THREAD != null) {
-      // TODO: synchronization?
-      if(THREAD.isAlive()) {
-        THREAD.queue.add(task);
-        return task;
-      }
+    // TODO: synchronization?
+    if(THREAD != null && THREAD.isAlive()) {
+      THREAD.queue.add(task);
+      return task;
     }
     THREAD = new ThumbnailThread();
     THREAD.queue.add(task);
