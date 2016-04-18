@@ -73,10 +73,7 @@ public class LongParameter extends NumberParameter<LongParameter, Long> {
       String v = obj.toString();
       return ParseUtil.parseLongBase10(v);
     }
-    catch(NullPointerException e) {
-      throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long value, read: " + obj + "!\n");
-    }
-    catch(NumberFormatException e) {
+    catch(NullPointerException|NumberFormatException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long value, read: " + obj + "!\n");
     }
   }

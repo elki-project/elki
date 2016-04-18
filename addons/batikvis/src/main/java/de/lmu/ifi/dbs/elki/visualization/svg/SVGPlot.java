@@ -438,10 +438,7 @@ public class SVGPlot {
       Object t = Class.forName("org.apache.fop.svg.PDFTranscoder").newInstance();
       transcode(file, (Transcoder) t);
     }
-    catch(InstantiationException e) {
-      throw new ClassNotFoundException("Could not instantiate PDF transcoder - is Apache FOP installed?", e);
-    }
-    catch(IllegalAccessException e) {
+    catch(InstantiationException|IllegalAccessException e) {
       throw new ClassNotFoundException("Could not instantiate PDF transcoder - is Apache FOP installed?", e);
     }
   }
@@ -459,10 +456,7 @@ public class SVGPlot {
       Object t = Class.forName("org.apache.fop.render.ps.PSTranscoder").newInstance();
       transcode(file, (Transcoder) t);
     }
-    catch(InstantiationException e) {
-      throw new ClassNotFoundException("Could not instantiate PS transcoder - is Apache FOP installed?", e);
-    }
-    catch(IllegalAccessException e) {
+    catch(InstantiationException|IllegalAccessException e) {
       throw new ClassNotFoundException("Could not instantiate PS transcoder - is Apache FOP installed?", e);
     }
   }
@@ -480,10 +474,7 @@ public class SVGPlot {
       Object t = Class.forName("org.apache.fop.render.ps.EPSTranscoder").newInstance();
       transcode(file, (Transcoder) t);
     }
-    catch(InstantiationException e) {
-      throw new ClassNotFoundException("Could not instantiate EPS transcoder - is Apache FOP installed?", e);
-    }
-    catch(IllegalAccessException e) {
+    catch(InstantiationException|IllegalAccessException e) {
       throw new ClassNotFoundException("Could not instantiate EPS transcoder - is Apache FOP installed?", e);
     }
   }

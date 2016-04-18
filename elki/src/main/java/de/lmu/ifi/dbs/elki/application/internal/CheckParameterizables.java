@@ -195,11 +195,7 @@ public class CheckParameterizables {
             state = State.INSTANTIABLE;
           }
         }
-        catch(Exception e) {
-          LOG.verbose("Could not run Parameterizer: " + inner.getName() + ": " + e.getMessage());
-          // continue. Probably non-public
-        }
-        catch(Error e) {
+        catch(Exception|Error e) {
           LOG.verbose("Could not run Parameterizer: " + inner.getName() + ": " + e.getMessage());
           // continue. Probably non-public
         }

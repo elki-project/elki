@@ -201,10 +201,7 @@ public class OnDiskArrayPageFile<P extends Page> extends AbstractStoringPageFile
       } else {
         throw new IllegalArgumentException("Unknown type: " + type);
       }
-    } catch (IOException e) {
-      LoggingUtil.exception(e);
-      return null;
-    } catch (ClassNotFoundException e) {
+    } catch (IOException|ClassNotFoundException e) {
       LoggingUtil.exception(e);
       return null;
     }

@@ -108,16 +108,7 @@ public final class ClassGenericsUtil {
         return type.cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
     }
-    catch(InstantiationException e) {
-      throw new ClassInstantiationException(e);
-    }
-    catch(IllegalAccessException e) {
-      throw new ClassInstantiationException(e);
-    }
-    catch(ClassNotFoundException e) {
-      throw new ClassInstantiationException(e);
-    }
-    catch(ClassCastException e) {
+    catch(InstantiationException|IllegalAccessException|ClassNotFoundException|ClassCastException e) {
       throw new ClassInstantiationException(e);
     }
   }
@@ -156,16 +147,7 @@ public final class ClassGenericsUtil {
         return ((Class<T>) type).cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
     }
-    catch(InstantiationException e) {
-      throw new ClassInstantiationException(e);
-    }
-    catch(IllegalAccessException e) {
-      throw new ClassInstantiationException(e);
-    }
-    catch(ClassNotFoundException e) {
-      throw new ClassInstantiationException(e);
-    }
-    catch(ClassCastException e) {
+    catch(InstantiationException|IllegalAccessException|ClassNotFoundException|ClassCastException e) {
       throw new ClassInstantiationException(e);
     }
   }
