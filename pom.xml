@@ -40,6 +40,16 @@
 		<excludeTests>**/HeapPerformanceTest*</excludeTests>
 		<elki.projdir>${basedir}</elki.projdir>
 		<year>2015</year>
+		<!-- For manually enabling ApiViz doclet (needs patches) -->
+		<doclet.doclet>
+		</doclet.doclet>
+		<doclet.path>
+		</doclet.path>
+		<doclet.params>
+		</doclet.params>
+		<!-- For Java8 doclint: -->
+		<doclint.flags>
+		</doclint.flags>
 	</properties>
 
 	<build>
@@ -173,7 +183,7 @@
 					<windowtitle><![CDATA[ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures]]></windowtitle>
 					<docletPath>${doclet.path}</docletPath>
 					<doclet>${doclet.doclet}</doclet>
-					<additionalparam>${doclet.params}</additionalparam>
+					<additionalparam>${doclet.params}${doclint.flags}</additionalparam>
 					<groups>
 						<group>
 							<title>Algorithms</title>
@@ -345,6 +355,16 @@
 				<module>addons/joglviz</module>
 			</modules>
 		</profile>
+		<!-- Avoid Oracle Java 8 JavaDoc problems -->
+		<profile>
+			<id>disable-java8-doclint</id>
+			<activation>
+				<jdk>[1.8,)</jdk>
+			</activation>
+			<properties>
+				<doclint.flags>-Xdoclint:none</doclint.flags>
+			</properties>
+		</profile>
 		<!-- Profile for publishing to Sonatype Maven repository. -->
 		<profile>
 			<id>publish</id>
@@ -390,6 +410,7 @@
 				</plugins>
 			</build>
 		</profile>
+		<!-- Code coverage -->
 		<profile>
 			<id>codecov</id>
 			<build>
