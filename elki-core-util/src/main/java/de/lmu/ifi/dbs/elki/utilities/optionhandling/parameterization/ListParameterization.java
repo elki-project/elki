@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Parameterization handler using a List and OptionIDs, for programmatic use.
- * 
+ *
  * @author Erich Schubert
  * @since 0.3
  */
@@ -56,7 +56,7 @@ public class ListParameterization extends AbstractParameterization {
 
   /**
    * Constructor with an existing collection.
-   * 
+   *
    * @param dbParameters existing parameter collection
    */
   public ListParameterization(Collection<ParameterPair> dbParameters) {
@@ -69,7 +69,7 @@ public class ListParameterization extends AbstractParameterization {
 
   /**
    * Add a flag to the parameter list
-   * 
+   *
    * @param optionid Option ID
    */
   public void addFlag(OptionID optionid) {
@@ -78,7 +78,7 @@ public class ListParameterization extends AbstractParameterization {
 
   /**
    * Add a parameter to the parameter list
-   * 
+   *
    * @param optionid Option ID
    * @param value Value
    */
@@ -88,7 +88,7 @@ public class ListParameterization extends AbstractParameterization {
 
   /**
    * Convenience - add a Flag option directly.
-   * 
+   *
    * @param flag Flag to add, if set
    */
   public void forwardOption(Flag flag) {
@@ -99,7 +99,7 @@ public class ListParameterization extends AbstractParameterization {
 
   /**
    * Convenience - add a Parameter for forwarding
-   * 
+   *
    * @param param Parameter to add
    */
   public void forwardOption(Parameter<?> param) {
@@ -124,7 +124,7 @@ public class ListParameterization extends AbstractParameterization {
 
   /**
    * Return the yet unused parameters.
-   * 
+   *
    * @return Unused parameters.
    */
   public List<ParameterPair> getRemainingParameters() {
@@ -133,7 +133,7 @@ public class ListParameterization extends AbstractParameterization {
 
   @Override
   public boolean hasUnusedParameters() {
-    return (!parameters.isEmpty());
+    return !parameters.isEmpty();
   }
 
   /**
@@ -156,7 +156,7 @@ public class ListParameterization extends AbstractParameterization {
 
   /**
    * Serialize parameters.
-   * 
+   *
    * @return Array list of parameters
    */
   public ArrayList<String> serialize() {

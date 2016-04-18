@@ -35,9 +35,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Manage a parameterization serialized as String array, e.g. from command line.
- * 
+ *
  * When building parameter lists, use {@link ListParameterization} where possible.
- * 
+ *
  * @author Erich Schubert
  * @since 0.3
  */
@@ -65,8 +65,8 @@ public class SerializedParameterization extends AbstractParameterization {
 
   /**
    * Constructor
-   * 
-   * @param args Parameters 
+   *
+   * @param args Parameters
    */
   public SerializedParameterization(String[] args) {
     this();
@@ -77,8 +77,8 @@ public class SerializedParameterization extends AbstractParameterization {
 
   /**
    * Constructor
-   * 
-   * @param args Parameter list 
+   *
+   * @param args Parameter list
    */
   public SerializedParameterization(List<String> args) {
     this();
@@ -87,7 +87,7 @@ public class SerializedParameterization extends AbstractParameterization {
 
   /**
    * Return the yet unused parameters.
-   * 
+   *
    * @return Unused parameters.
    */
   public List<String> getRemainingParameters() {
@@ -96,7 +96,7 @@ public class SerializedParameterization extends AbstractParameterization {
 
   @Override
   public boolean hasUnusedParameters() {
-    return (!parameters.isEmpty());
+    return !parameters.isEmpty();
   }
 
   /**
@@ -164,7 +164,7 @@ public class SerializedParameterization extends AbstractParameterization {
   }
 
   /** {@inheritDoc}
-   * Default implementation, for flat parameterizations. 
+   * Default implementation, for flat parameterizations.
    */
   @Override
   public Parameterization descend(Object option) {
