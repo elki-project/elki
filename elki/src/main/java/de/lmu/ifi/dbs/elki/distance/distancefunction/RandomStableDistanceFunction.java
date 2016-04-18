@@ -104,8 +104,7 @@ public class RandomStableDistanceFunction extends AbstractDatabaseDistanceFuncti
     // Use 53 bit total:
     final int r1 = (int) (l1 >>> 22); // 48 - 22 = 26
     final int r2 = (int) (l2 >>> 21); // 48 - 21 = 27
-    double random = ((((long) r1) << 27) + r2) / (double) (1L << 53);
-    return random;
+    return ((((long) r1) << 27) + r2) / (double) (1L << 53);
   }
 
   @Override

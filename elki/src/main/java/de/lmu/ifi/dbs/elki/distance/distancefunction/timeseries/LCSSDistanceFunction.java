@@ -153,8 +153,7 @@ public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
       min = (v < min) ? v : min;
       max = (v > max) ? v : max;
     }
-    final double range = max - min;
-    return range;
+    return max - min;
   }
 
   @Override

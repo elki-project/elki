@@ -314,8 +314,7 @@ public class OnDiskArray {
    * @return file position
    */
   private long indexToFileposition(long index) {
-    long pos = headersize + index * recordsize;
-    return pos;
+    return headersize + index * recordsize;
   }
 
   /**

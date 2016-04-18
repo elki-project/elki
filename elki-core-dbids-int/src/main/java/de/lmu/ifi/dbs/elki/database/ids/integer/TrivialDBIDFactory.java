@@ -59,8 +59,7 @@ final public class TrivialDBIDFactory extends AbstractIntegerDBIDFactory {
     if(id == Integer.MAX_VALUE) {
       throw new AbortException("DBID allocation error - too many objects allocated!");
     }
-    DBID ret = new IntegerDBID(id);
-    return ret;
+    return new IntegerDBID(id);
   }
 
   @Override
@@ -74,8 +73,7 @@ final public class TrivialDBIDFactory extends AbstractIntegerDBIDFactory {
     if(start > next.get()) {
       throw new AbortException("DBID range allocation error - too many objects allocated!");
     }
-    DBIDRange alloc = new IntegerDBIDRange(start, size);
-    return alloc;
+    return new IntegerDBIDRange(start, size);
   }
 
   @Override

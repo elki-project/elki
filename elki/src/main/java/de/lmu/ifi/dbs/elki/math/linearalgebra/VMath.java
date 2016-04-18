@@ -780,8 +780,7 @@ public final class VMath {
    * @return the zero matrix of the specified dimension
    */
   public static final double[][] zeroMatrix(final int dim) {
-    final double[][] z = new double[dim][dim];
-    return z;
+    return new double[dim][dim];
   }
 
   /**

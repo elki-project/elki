@@ -276,8 +276,7 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
     }
     DoubleRelation scoreResult = new MaterializedDoubleRelation("HilOut weight", "hilout-weight", hilout_weight, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
-    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    return result;
+    return new OutlierResult(scoreMeta, scoreResult);
   }
 
   /**

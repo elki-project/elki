@@ -115,8 +115,7 @@ public class ExtendedNeighborhood extends AbstractPrecomputedNeighborhood {
     @Override
     public NeighborSetPredicate instantiate(Database database, Relation<? extends O> relation) {
       DataStore<DBIDs> store = extendNeighborhood(database, relation);
-      ExtendedNeighborhood neighborhood = new ExtendedNeighborhood(store);
-      return neighborhood;
+      return new ExtendedNeighborhood(store);
     }
 
     @Override

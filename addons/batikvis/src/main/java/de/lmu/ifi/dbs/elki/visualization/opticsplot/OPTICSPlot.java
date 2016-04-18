@@ -285,10 +285,9 @@ public class OPTICSPlot implements Result {
     // if (plots.size() > 0) {
     // return plots.get(0);
     // }
-    final StylingPolicy policy = context.getStylingPolicy();
-    OPTICSPlot opticsplot = new OPTICSPlot(co, policy);
+    final StylingPolicy policy = context.getStylingPolicy();    
     // co.addChildResult(opticsplot);
-    return opticsplot;
+    return new OPTICSPlot(co, policy);
   }
 
   /**

@@ -232,8 +232,7 @@ public class ThumbnailRegistryEntry extends AbstractRegistryEntry implements URL
       LOG.debugFinest("parseURL: " + urlStr);
     }
     if(urlStr.startsWith(INTERNAL_PREFIX)) {
-      InternalParsedURLData ret = new InternalParsedURLData(urlStr.substring(INTERNAL_PREFIX.length()));
-      return ret;
+      return new InternalParsedURLData(urlStr.substring(INTERNAL_PREFIX.length()));
     }
     return null;
   }

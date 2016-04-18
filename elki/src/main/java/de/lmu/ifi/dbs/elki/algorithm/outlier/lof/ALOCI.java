@@ -245,8 +245,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     LOG.ensureCompleted(progressLOCI);
     DoubleRelation scoreResult = new MaterializedDoubleRelation("aLOCI normalized MDEF", "aloci-mdef-outlier", mdef_norm, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new QuotientOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
-    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-    return result;
+    return new OutlierResult(scoreMeta, scoreResult);
   }
 
   /**

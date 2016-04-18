@@ -291,8 +291,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
      * @return Index of the object
      */
     private int getSelectedIndex(ClusterOrder order, SVGPoint cPt) {
-      int mouseActIndex = (int) ((cPt.getX() / plotwidth) * order.size());
-      return mouseActIndex;
+      return (int) ((cPt.getX() / plotwidth) * order.size());
     }
 
     /**

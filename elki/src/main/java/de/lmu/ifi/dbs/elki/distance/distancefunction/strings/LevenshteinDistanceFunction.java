@@ -104,8 +104,7 @@ public class LevenshteinDistanceFunction extends AbstractPrimitiveDistanceFuncti
         curr[j + 1] = Math.min(prev[j + 1] + 1, Math.min(curr[j] + 1, prev[j] + cost));
       }
     }
-    final int cost = curr[o2.length()];
-    return cost;
+    return curr[o2.length()];
   }
 
   @Override

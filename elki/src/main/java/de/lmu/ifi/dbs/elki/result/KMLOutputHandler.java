@@ -622,8 +622,7 @@ public class KMLOutputHandler implements ResultHandler {
         final int g = (int) ((1 - mix) * prev.getGreen() + mix * next.getGreen());
         final int b = (int) ((1 - mix) * prev.getBlue() + mix * next.getBlue());
         final int a = (int) ((1 - mix) * prev.getAlpha() + mix * next.getAlpha());
-        Color col = new Color(r, g, b, a);
-        return col;
+        return new Color(r, g, b, a);
       }
     }
     return cols[cols.length - 1];

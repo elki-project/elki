@@ -430,8 +430,7 @@ public class QuickSelect {
     else {
       quickSelect(data, ileft + 1, end, ileft + 1);
       // Mix:
-      double mix = data[ileft] + (data[ileft + 1] - data[ileft]) * err;
-      return mix;
+      return data[ileft] + (data[ileft + 1] - data[ileft]) * err;
     }
   }
 

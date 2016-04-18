@@ -232,8 +232,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       prep.put(iter, new ParameterizationFunction(vrel.get(iter)));
     }
 
-    MaterializedRelation<ParameterizationFunction> prel = new MaterializedRelation<>(type, ids, null, prep);
-    return prel;
+    return new MaterializedRelation<>(type, ids, null, prep);
   }
 
   /**
@@ -736,8 +735,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       DependencyDerivator<DoubleVector> derivator = new DependencyDerivator<>(null, FormatUtil.NF4, pca, filter, 0, false);
 
       CorrelationAnalysisSolution<DoubleVector> model = derivator.run(derivatorDB);
-      LinearEquationSystem les = model.getNormalizedLinearEquationSystem(null);
-      return les;
+      return model.getNormalizedLinearEquationSystem(null);
     }
     catch(NonNumericFeaturesException e) {
       throw new IllegalStateException("Error during normalization" + e);

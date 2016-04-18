@@ -200,8 +200,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
 
     @Override
     public SpatialApproximationMaterializeKNNPreprocessor<NumberVector, N, E> instantiate(Relation<NumberVector> relation) {
-      SpatialApproximationMaterializeKNNPreprocessor<NumberVector, N, E> instance = new SpatialApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
-      return instance;
+      return new SpatialApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k);
     }
 
     /**

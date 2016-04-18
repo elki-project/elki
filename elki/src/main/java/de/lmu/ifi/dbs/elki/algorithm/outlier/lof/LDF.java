@@ -211,9 +211,7 @@ public class LDF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<
     // Build result representation.
     DoubleRelation scoreResult = new MaterializedDoubleRelation("Local Density Factor", "ldf-outlier", ldfs, ids);
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(lofminmax.getMin(), lofminmax.getMax(), 0.0, 1. / c, 1 / (1 + c));
-    OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
-
-    return result;
+    return new OutlierResult(scoreMeta, scoreResult);
   }
 
   @Override

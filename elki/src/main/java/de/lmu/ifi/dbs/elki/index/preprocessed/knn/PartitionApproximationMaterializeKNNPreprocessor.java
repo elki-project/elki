@@ -199,8 +199,7 @@ public class PartitionApproximationMaterializeKNNPreprocessor<O> extends Abstrac
 
     @Override
     public PartitionApproximationMaterializeKNNPreprocessor<O> instantiate(Relation<O> relation) {
-      PartitionApproximationMaterializeKNNPreprocessor<O> instance = new PartitionApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k, partitions, rnd);
-      return instance;
+      return new PartitionApproximationMaterializeKNNPreprocessor<>(relation, distanceFunction, k, partitions, rnd);
     }
 
     /**

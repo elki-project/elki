@@ -207,8 +207,7 @@ public class NaiveMeanShiftClustering<V extends NumberVector> extends AbstractDi
     if(noise.size() > 0) {
       cs.add(new Cluster<MeanModel>(noise, true));
     }
-    Clustering<MeanModel> c = new Clustering<>("Mean-shift Clustering", "mean-shift-clustering", cs);
-    return c;
+    return new Clustering<>("Mean-shift Clustering", "mean-shift-clustering", cs);
   }
 
   @Override
