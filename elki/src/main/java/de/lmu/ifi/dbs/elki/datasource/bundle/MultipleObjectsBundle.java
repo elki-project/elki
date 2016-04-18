@@ -106,7 +106,7 @@ public class MultipleObjectsBundle implements ObjectBundle {
 
   @Override
   public int dataLength() {
-    return (ids != null) ? ids.size() : (columns.size() == 0) ? 0 : columns.get(0).size();
+    return (ids != null) ? ids.size() : (columns.isEmpty()) ? 0 : columns.get(0).size();
   }
 
   /**

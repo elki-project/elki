@@ -198,14 +198,14 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
         else if(cNotSpurious) {
           // Fully merge oclus into cclus
           cclus.addDBIDs(oclus.newids);
-          assert (oclus.children.size() == 0);
+          assert (oclus.children.isEmpty());
           cclus.depth = dist; // Update height
           cluster_map.put(succ, cclus);
         }
         else {
           // Fully merge cclus into oclus
           oclus.addDBIDs(cclus.newids);
-          assert (cclus.children.size() == 0);
+          assert (cclus.children.isEmpty());
           oclus.depth = dist; // Update height
         }
       }
@@ -333,7 +333,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
      * @return {@code true} if spurious
      */
     public boolean isNotSpurious(int minClSize) {
-      return children.size() > 0 || newids.size() >= minClSize;
+      return !children.isEmpty() || newids.size() >= minClSize;
     }
 
     /**

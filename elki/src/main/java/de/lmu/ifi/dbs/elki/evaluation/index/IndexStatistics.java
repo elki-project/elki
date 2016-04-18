@@ -58,7 +58,7 @@ public class IndexStatistics implements Evaluator {
     Database db = ResultUtil.findDatabase(hier);
     Collection<String> header = null;
     final ArrayList<IndexTree<?, ?>> indexes = ResultUtil.filterResults(hier, newResult, IndexTree.class);
-    if (indexes == null || indexes.size() <= 0) {
+    if (indexes == null || indexes.isEmpty()) {
       return;
     }
     for(IndexTree<?, ?> index : indexes) {

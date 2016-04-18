@@ -64,7 +64,7 @@ public class IndexPurity implements Evaluator {
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     Database database = ResultUtil.findDatabase(hier);
     final ArrayList<SpatialIndexTree<?, ?>> indexes = ResultUtil.filterResults(hier, newResult, SpatialIndexTree.class);
-    if(indexes == null || indexes.size() <= 0) {
+    if(indexes == null || indexes.isEmpty()) {
       return;
     }
     Relation<String> lblrel = DatabaseUtil.guessLabelRepresentation(database);

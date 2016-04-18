@@ -200,7 +200,7 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
    * @param entries Entries to insert
    */
   public void insertAll(List<E> entries) {
-    if(!initialized && entries.size() > 0) {
+    if(!initialized && !entries.isEmpty()) {
       initialize(entries.get(0));
     }
     for(E entry : entries) {

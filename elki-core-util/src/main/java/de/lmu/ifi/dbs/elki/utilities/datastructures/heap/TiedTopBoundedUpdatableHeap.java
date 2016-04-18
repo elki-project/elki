@@ -92,7 +92,7 @@ public class TiedTopBoundedUpdatableHeap<E> extends TopBoundedUpdatableHeap<E> {
       throw new AbortException("Heap corrupt - should not be reached");
     }
     // Updated object will be worse than the current ties
-    if(pos >= 0 && ties.size() > 0 && compare(e, ties.get(0)) < 0) {
+    if(pos >= 0 && !ties.isEmpty() && compare(e, ties.get(0)) < 0) {
       removeAt(pos);
       index.remove(e);
       // assert(checkHeap() == null) : "removeObject broke heap: "+ checkHeap();

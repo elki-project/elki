@@ -81,7 +81,7 @@ public class ELKIServiceScanner {
     if(MASTER_CACHE == null) {
       initialize();
     }
-    if(MASTER_CACHE.size() == 0) {
+    if(MASTER_CACHE.isEmpty()) {
       return;
     }
     Iterator<Class<?>> iter = MASTER_CACHE.iterator();
@@ -124,7 +124,7 @@ public class ELKIServiceScanner {
     if(MASTER_CACHE == null) {
       initialize();
     }
-    if(MASTER_CACHE.size() == 0) {
+    if(MASTER_CACHE.isEmpty()) {
       return Collections.emptyIterator();
     }
     return MASTER_CACHE.iterator();
@@ -177,7 +177,7 @@ public class ELKIServiceScanner {
       }
     }
     MASTER_CACHE = Collections.unmodifiableList(res);
-    if(LOG.isDebuggingFinest() && MASTER_CACHE.size() > 0) {
+    if(LOG.isDebuggingFinest() && !MASTER_CACHE.isEmpty()) {
       LOG.debugFinest("Classes found by scanning the development classpath: " + MASTER_CACHE.size());
     }
   }
@@ -218,17 +218,17 @@ public class ELKIServiceScanner {
 
     @Override
     public boolean hasNext() {
-      if(files.size() == 0) {
+      if(files.isEmpty()) {
         findNext();
       }
-      return (files.size() > 0);
+      return (!files.isEmpty());
     }
 
     /**
      * Find the next entry, since we need to skip some directories.
      */
     private void findNext() {
-      while(folders.size() > 0) {
+      while(!folders.isEmpty()) {
         File path = folders.remove(folders.size() - 1);
         // recurse into directories
         if(path.isDirectory()) {
@@ -260,10 +260,10 @@ public class ELKIServiceScanner {
 
     @Override
     public String next() {
-      if(files.size() == 0) {
+      if(files.isEmpty()) {
         findNext();
       }
-      if(files.size() > 0) {
+      if(!files.isEmpty()) {
         return files.remove(files.size() - 1);
       }
       return null;

@@ -203,7 +203,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
           curclu.addToplevelCluster(new Cluster<Model>(iter2.value(), ClusterModel.CLUSTER));
         }
         // Label handling.
-        if(!haslbl && lbl.size() > 0) {
+        if(!haslbl && !lbl.isEmpty()) {
           haslbl = true;
           metaupdate = true;
         }

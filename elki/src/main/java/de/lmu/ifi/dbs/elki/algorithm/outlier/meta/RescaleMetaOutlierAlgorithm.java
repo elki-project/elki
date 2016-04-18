@@ -132,7 +132,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
    */
   private OutlierResult getOutlierResult(ResultHierarchy hier, Result result) {
     List<OutlierResult> ors = ResultUtil.filterResults(hier, result, OutlierResult.class);
-    if(ors.size() > 0) {
+    if(!ors.isEmpty()) {
       return ors.get(0);
     }
     throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");

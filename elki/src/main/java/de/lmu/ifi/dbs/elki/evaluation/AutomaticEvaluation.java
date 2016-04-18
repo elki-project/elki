@@ -79,11 +79,11 @@ public class AutomaticEvaluation implements Evaluator {
     if(LOG.isDebugging()) {
       LOG.debug("Number of new outlier results: " + outliers.size());
     }
-    if(outliers.size() > 0) {
+    if(!outliers.isEmpty()) {
       Database db = ResultUtil.findDatabase(hier);
       ResultUtil.ensureClusteringResult(db, db);
       Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, db, Clustering.class);
-      if(clusterings.size() == 0) {
+      if(clusterings.isEmpty()) {
         LOG.warning("Could not find a clustering result, even after running 'ensureClusteringResult'?!?");
         return;
       }
@@ -147,7 +147,7 @@ public class AutomaticEvaluation implements Evaluator {
         c.remove();
       }
     }
-    if(clusterings.size() > 0) {
+    if(!clusterings.isEmpty()) {
       try {
         new EvaluateClustering(new ByLabelClustering(), false, true).processNewResult(hier, newResult);
       }

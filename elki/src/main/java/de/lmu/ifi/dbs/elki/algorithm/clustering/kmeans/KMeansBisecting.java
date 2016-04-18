@@ -108,7 +108,7 @@ public class KMeansBisecting<V extends NumberVector, M extends MeanModel> extend
 
     for (int j = 0; j < this.k - 1; j++) {
       // Choose a cluster to split and project database to cluster
-      if (currentClusterList.size() == 0) {
+      if (currentClusterList.isEmpty()) {
         proxyDB = new ProxyDatabase(relation.getDBIDs(), database);
       } else {
         Cluster<M> largestCluster = null;

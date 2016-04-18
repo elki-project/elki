@@ -146,7 +146,7 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
     if(curterm != null) {
       labels.add(curterm);
     }
-    haslabels |= (labels.size() > 0);
+    haslabels |= (!labels.isEmpty());
     if(normalize) {
       if(Math.abs(len - 1.0) > Double.MIN_NORMAL) {
         for(TIntDoubleIterator iter = values.iterator(); iter.hasNext();) {

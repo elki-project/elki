@@ -251,7 +251,7 @@ public class ComputeOutlierHistogram implements Evaluator {
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     final Database db = ResultUtil.findDatabase(hier);
     List<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
-    if(ors == null || ors.size() <= 0) {
+    if(ors == null || ors.isEmpty()) {
       // logger.warning("No outlier results found for "+ComputeOutlierHistogram.class.getSimpleName());
       return;
     }

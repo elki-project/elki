@@ -131,7 +131,7 @@ public class TrivialGeneratedOutlier extends AbstractAlgorithm<OutlierResult> im
         generators.add((GeneratorSingleCluster) model);
       }
     }
-    if(generators.size() == 0) {
+    if(generators.isEmpty()) {
       LOG.warning("No generator models found for dataset - all points will be considered outliers.");
     }
     for(GeneratorSingleCluster gen : generators) {

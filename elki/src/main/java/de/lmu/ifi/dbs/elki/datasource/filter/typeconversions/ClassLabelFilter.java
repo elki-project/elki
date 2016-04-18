@@ -114,7 +114,7 @@ public class ClassLabelFilter implements ObjectFilter {
             lbuf.add(ll.get(j));
           }
           lblcol.add(LabelList.make(lbuf));
-          if(lbuf.size() > 0) {
+          if(!lbuf.isEmpty()) {
             keeplabelcol = true;
           }
         }

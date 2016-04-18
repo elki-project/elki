@@ -93,7 +93,8 @@ public class PolygonsObject implements SpatialComparable {
 
   @Override
   public int getDimensionality() {
-    assert (polygons.size() > 0);
+
+    assert (!polygons.isEmpty());
     return polygons.iterator().next().getDimensionality();
   }
 

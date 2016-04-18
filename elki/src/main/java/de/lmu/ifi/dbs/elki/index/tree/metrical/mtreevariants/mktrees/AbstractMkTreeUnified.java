@@ -74,7 +74,7 @@ public abstract class AbstractMkTreeUnified<O, N extends AbstractMTreeNode<O, N,
 
   @Override
   public void insertAll(List<E> entries) {
-    if (entries.size() <= 0) {
+    if (entries.isEmpty()) {
       return;
     }
     if (!initialized) {

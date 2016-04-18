@@ -353,7 +353,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
         this.aggregate += 1. / dist;
       }
       else {
-        assert (other.children.size() == 0);
+        assert (other.children.isEmpty());
         this.members.addDBIDs(other.members);
         this.aggregate += other.members.size() / dist;
         other.members = null; // Invalidate
@@ -425,7 +425,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      * @return {@code true} if spurious
      */
     public boolean isSpurious(int minClSize) {
-      return children.size() == 0 && members.size() < minClSize;
+      return children.isEmpty() && members.size() < minClSize;
     }
 
     /**

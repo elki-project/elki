@@ -96,7 +96,7 @@ public class SerializedParameterization extends AbstractParameterization {
 
   @Override
   public boolean hasUnusedParameters() {
-    return (parameters.size() > 0);
+    return (!parameters.isEmpty());
   }
 
   /**
