@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -151,7 +152,7 @@ public class ComputeOutlierHistogram implements Evaluator {
    * @param or Outlier result
    * @return Result
    */
-  public HistogramResult<double[]> evaluateOutlierResult(Database database, OutlierResult or) {
+  public HistogramResult<DoubleVector> evaluateOutlierResult(Database database, OutlierResult or) {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
       oscaling.prepare(or);
@@ -239,10 +240,10 @@ public class ComputeOutlierHistogram implements Evaluator {
         hist.putData(result, positive);
       }
     }
-    Collection<double[]> collHist = new ArrayList<>(hist.getNumBins());
+    Collection<DoubleVector> collHist = new ArrayList<>(hist.getNumBins());
     for(ObjHistogram.Iter<DoubleDoublePair> iter = hist.iter(); iter.valid(); iter.advance()) {
       DoubleDoublePair data = iter.getValue();
-      collHist.add(new double[] { iter.getCenter(), data.first, data.second });
+      collHist.add(new DoubleVector(new double[] { iter.getCenter(), data.first, data.second }));
     }
     return new HistogramResult<>("Outlier Score Histogram", "outlier-histogram", collHist);
   }
