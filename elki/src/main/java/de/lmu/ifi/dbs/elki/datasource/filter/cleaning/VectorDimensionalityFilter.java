@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractStreamFilter;
 import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -42,10 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 
 /**
  * Filter to remove all vectors that do not have the desired dimensionality.
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @param <V> Vector type
  */
 public class VectorDimensionalityFilter<V extends NumberVector> extends AbstractStreamFilter {
@@ -71,7 +70,7 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
 
   /**
    * Constructor.
-   * 
+   *
    * @param dim Dimensionality to enforce (use -1 to use the dimensionality of
    *        the first vector in the data set)
    */
@@ -184,11 +183,11 @@ public class VectorDimensionalityFilter<V extends NumberVector> extends Abstract
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
-   * 
+   *
    * @param <V> Vector type
    */
   public static class Parameterizer<V extends NumberVector> extends AbstractParameterizer {

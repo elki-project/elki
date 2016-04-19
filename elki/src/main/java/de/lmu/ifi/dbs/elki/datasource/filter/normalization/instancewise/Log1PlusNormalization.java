@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
-import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;

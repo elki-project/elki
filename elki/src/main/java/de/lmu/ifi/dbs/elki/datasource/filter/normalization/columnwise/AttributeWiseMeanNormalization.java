@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
