@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
@@ -79,7 +78,7 @@ public class HistogramVisualization extends AbstractVisFactory {
   @Override
   public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     VisualizerContext context = task.getContext();
-    HistogramResult<? extends NumberVector> curve = task.getResult();
+    HistogramResult<double[]> curve = task.getResult();
 
     final StyleLibrary style = context.getStyleLibrary();
     final double sizex = StyleLibrary.SCALE;
@@ -93,17 +92,17 @@ public class HistogramVisualization extends AbstractVisFactory {
     int dim = -1;
     DoubleMinMax xminmax = new DoubleMinMax();
     DoubleMinMax yminmax = new DoubleMinMax();
-    for(NumberVector vec : curve) {
-      xminmax.put(vec.doubleValue(0));
+    for(double[] point : curve) {
+      xminmax.put(point[0]);
       if(dim < 0) {
-        dim = vec.getDimensionality();
+        dim = point.length;
       }
       else {
         // TODO: test and throw always
-        assert(dim == vec.getDimensionality());
+        assert(dim == point.length);
       }
       for(int i = 1; i < dim; i++) {
-        yminmax.put(vec.doubleValue(i));
+        yminmax.put(point[i]);
       }
     }
     // Minimum should always start at 0 for histograms
@@ -124,10 +123,10 @@ public class HistogramVisualization extends AbstractVisFactory {
     }
 
     // draw curves.
-    for(NumberVector vec : curve) {
+    for(double[] point : curve) {
       for(int d = 0; d < dim; d++) {
-        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(0) - binwidth * .5)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 1))));
-        path[d].lineTo(sizex * (xscale.getScaled(vec.doubleValue(0) + binwidth * .5)), sizey * (1 - yscale.getScaled(vec.doubleValue(d + 1))));
+        path[d].lineTo(sizex * (xscale.getScaled(point[0] - binwidth * .5)), sizey * (1 - yscale.getScaled(point[d + 1])));
+        path[d].lineTo(sizex * (xscale.getScaled(point[0] + binwidth * .5)), sizey * (1 - yscale.getScaled(point[d + 1])));
       }
     }
 
