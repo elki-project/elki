@@ -47,7 +47,7 @@ import javax.swing.event.ChangeListener;
 /**
  * A component (JPanel) which can be displayed in the save dialog to show
  * additional options when saving as JPEG or PNG.
- * 
+ *
  * @author Simon Mittermüller
  * @since 0.2
  */
@@ -74,18 +74,6 @@ public class SaveOptionsPanel extends JPanel {
 
   /** The fileChooser on which this panel is installed. */
   private JFileChooser fc;
-
-  /**
-   * The width of the exported image (if exported to JPEG or PNG). Default is
-   * 1024.
-   */
-  protected int width = 1024;
-
-  /**
-   * The height of the exported image (if exported to JPEG or PNG). Default is
-   * 768.
-   */
-  protected int height = 768;
 
   /** Ratio for easier size adjustment */
   double ratio = 16.0 / 10.0;
@@ -122,15 +110,13 @@ public class SaveOptionsPanel extends JPanel {
 
   /**
    * Construct a new Save Options Panel.
-   * 
+   *
    * @param fc File chooser to display in
-   * @param w Default image width
-   * @param h Default image height
+   * @param width Default image width
+   * @param height Default image height
    */
-  public SaveOptionsPanel(JFileChooser fc, int w, int h) {
-    this.width = w;
-    this.height = h;
-    this.ratio = (double) w / (double) h;
+  public SaveOptionsPanel(JFileChooser fc, final int width, final int height) {
+    this.ratio = (double) width / (double) height;
     this.fc = fc;
 
     mainPanel = new JPanel();
@@ -297,29 +283,40 @@ public class SaveOptionsPanel extends JPanel {
 
   /**
    * Return the selected file format.
-   * 
+   *
    * @return file format identification
    */
   public String getSelectedFormat() {
-    String format = (String) formatSelector.getSelectedItem();
-    return format;
+    return (String) formatSelector.getSelectedItem();
+  }
+
+  /**
+   * Get the user selected width.
+   *
+   * @return Width
+   */
+  public int getSelectedWidth() {
+    return (int) (modelWidth.getValue());
+  }
+
+  /**
+   * Get the user selected height.
+   *
+   * @return Height
+   */
+  public int getSelectedHeight() {
+    return (int) (modelHeight.getValue());
   }
 
   /**
    * Returns the quality value in the quality field.
-   * 
+   *
    * It is ensured that return value is in the range of [0:1]
-   * 
+   *
    * @return Quality value for JPEG.
    */
   public double getJPEGQuality() {
-    double qual =modelQuality.getNumber().doubleValue();
-    if(qual > 1.0) {
-      qual = 1.0;
-    }
-    if(qual < 0) {
-      qual = 0.0;
-    }
-    return qual;
+    double qual = modelQuality.getNumber().doubleValue();
+    return (qual > 1.) ? 1. : (qual < 0.) ? 0. : qual;
   }
 }

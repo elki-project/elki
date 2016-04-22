@@ -127,6 +127,8 @@ public class SVGSaveDialog {
     if(ret == JFileChooser.APPROVE_OPTION) {
       File file = fc.getSelectedFile();
       String format = optionsPanel.getSelectedFormat();
+      width = optionsPanel.getSelectedWidth();
+      height = optionsPanel.getSelectedHeight();
       if(format == null || AUTOMAGIC_FORMAT.equals(format)) {
         format = guessFormat(file.getName());
       }
@@ -163,7 +165,7 @@ public class SVGSaveDialog {
       catch(ClassNotFoundException e) {
         showError(fc, "Error saving image.", "A class was not found when saving this image. Maybe installing Apache FOP will help (for PDF, PS and EPS output).\n" + e.toString());
       }
-      catch(TransformerFactoryConfigurationError|Exception e) {
+      catch(TransformerFactoryConfigurationError | Exception e) {
         LOG.exception(e);
         showError(fc, "Error saving image.", e.toString());
       }
