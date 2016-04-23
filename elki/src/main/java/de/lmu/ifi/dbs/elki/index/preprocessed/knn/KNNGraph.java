@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.memory.MapStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -36,9 +35,13 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
-public class KNNGraph<O extends NumberVector> extends AbstractMaterializeKNNPreprocessor<O> {
+public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Logger
    */
@@ -74,8 +77,11 @@ public class KNNGraph<O extends NumberVector> extends AbstractMaterializeKNNPrep
     DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
     storage = new MapStore<KNNList>();
     MapStore<KNNHeap> store = new MapStore<KNNHeap>();
+    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing KNN-Graph (k=" + k + ")", relation.size(), getLogger()) : null;
+
     //TODO avoid double storage
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      //TODO single-threaded random?
       final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
       KNNHeap heap = DBIDUtil.newHeap(k);
       for (DBIDIter siter = sample.iter(); siter.valid(); siter.advance()){
@@ -98,6 +104,11 @@ public class KNNGraph<O extends NumberVector> extends AbstractMaterializeKNNPrep
         allNeighbors.addDBIDs(rev);
         trueNeighborHash.put(id, allNeighbors);
         //TODO use other types so that unorderedIterator for KNNHeap is used
+//         // KNNList has contains-method
+//         KNNList list = get(iditer);
+//         list.contains(o);
+        
+        
       }
       counter = 0;
       //iterate through dataset
@@ -117,6 +128,10 @@ public class KNNGraph<O extends NumberVector> extends AbstractMaterializeKNNPrep
                 // TODO Heap should have always the same size --> contains-method?
                 // TODO 1 if heap is changed, 0 if not --> also better with contains-method
                 double newDistance = newNeighbors.insert(distance, id);
+//                System.out.println("distance: "+distance+", newDistance: "+newDistance);
+                if (newDistance == 0){
+                  System.out.println(id.compareTo(nn));
+                }
                 if (distance <= newDistance){
                   counter=1;
                 }
@@ -125,6 +140,8 @@ public class KNNGraph<O extends NumberVector> extends AbstractMaterializeKNNPrep
         }
       }
       allNeighbors.clear();
+      trueNeighborHash.clear();
+      getLogger().incrementProcessed(progress);
     }
     //convert store to storage
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -132,6 +149,7 @@ public class KNNGraph<O extends NumberVector> extends AbstractMaterializeKNNPrep
       KNNList list = heap.toKNNList();
       storage.put(iditer, list);
     }
+    getLogger().ensureCompleted(progress);
   }
 
   private HashSetModifiableDBIDs reverse(DBID id, MapStore<KNNHeap> store) {
@@ -147,8 +165,7 @@ public class KNNGraph<O extends NumberVector> extends AbstractMaterializeKNNPrep
 
   @Override
   protected Logging getLogger() {
-    // TODO Auto-generated method stub
-    return null;
+    return LOG;
   }
 
   @Override
@@ -162,6 +179,70 @@ public class KNNGraph<O extends NumberVector> extends AbstractMaterializeKNNPrep
     // TODO Auto-generated method stub
     return null;
   }
+  
+  public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
+    /**
+     * Random generator
+     */
+    private final RandomFactory rnd;
 
+    /**
+     * Constructor.
+     *
+     * @param k K
+     * @param distanceFunction distance function
+     * @param rnd Random generator
+     */
+    public Factory(int k, DistanceFunction<? super O> distanceFunction, RandomFactory rnd) {
+      super(k, distanceFunction);
+      this.rnd = rnd;
+    }
+
+    @Override
+    public KNNGraph<O> instantiate(Relation<O> relation) {
+      return new KNNGraph<>(relation, distanceFunction, k, rnd);
+    }
+
+    /**
+     * Parameterization class
+     *
+     * @author Erich Schubert
+     *
+     * @apiviz.exclude
+     *
+     * @param <O> Object type
+     */
+    public static class Parameterizer<O> extends AbstractMaterializeKNNPreprocessor.Factory.Parameterizer<O> {
+      /**
+       * Random number generator seed.
+       *
+       * <p>
+       * Key: {@code -knngraph.seed}
+       * </p>
+       */
+      public static final OptionID SEED_ID = new OptionID("randomknn.seed", "The random number seed.");
+      
+      /**
+       * Random generator
+       */
+      private RandomFactory rnd;
+
+      @Override
+      protected void makeOptions(Parameterization config) {
+        super.makeOptions(config);
+        RandomParameter rndP = new RandomParameter(SEED_ID);
+        if(config.grab(rndP)) {
+          rnd = rndP.getValue();
+        }
+      }
+
+      @Override
+      protected KNNGraph.Factory<O> makeInstance() {
+        return new KNNGraph.Factory<>(k, distanceFunction, rnd);
+      }
+    }
+  }
 }
+
+
 
