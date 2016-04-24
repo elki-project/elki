@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
@@ -68,7 +69,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   
   @Override
   public void logStatistics() {
-    // TODO Auto-generated method stub
+    // TODO which statistics to log?
     
   }
 
@@ -78,16 +79,16 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     storage = new MapStore<KNNList>();
     MapStore<KNNHeap> store = new MapStore<KNNHeap>();
     FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing KNN-Graph (k=" + k + ")", relation.size(), getLogger()) : null;
-
-    //TODO avoid double storage
+    
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       //TODO single-threaded random?
+      DBID id = DBIDUtil.deref(iditer);
       final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
       KNNHeap heap = DBIDUtil.newHeap(k);
       for (DBIDIter siter = sample.iter(); siter.valid(); siter.advance()){
         heap.insert(distanceQuery.distance(iditer, siter), siter);
       }
-      store.put(iditer,heap);
+      store.put(id,heap);
     }
     int counter = 1;
     
@@ -97,50 +98,52 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         //build reverse neighbors
         DBID id = DBIDUtil.deref(iditer);
-        DBIDs neighbors = store.get(iditer).toKNNList();
+        KNNHeap heap = store.get(iditer);
         DBIDs rev = reverse(id,store);
-        //join with neighbors
-        allNeighbors.addDBIDs(neighbors);
+
+        //join neighbors with reverse neighbors
+        allNeighbors.clear();
+        for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
+          allNeighbors.add(heapiter);
+        }
         allNeighbors.addDBIDs(rev);
+        
         trueNeighborHash.put(id, allNeighbors);
-        //TODO use other types so that unorderedIterator for KNNHeap is used
-//         // KNNList has contains-method
-//         KNNList list = get(iditer);
-//         list.contains(o);
-        
-        
+        //TODO use other types???
       }
       counter = 0;
       //iterate through dataset
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         //for every neighbor of a neighbor do
         DBID id = DBIDUtil.deref(iditer);
-        KNNHeap newNeighbors = store.get(id);
-        HashSetModifiableDBIDs trueNeighbors = trueNeighborHash.get(id);
+        KNNHeap newNeighbors = store.get(iditer);
+        HashSetModifiableDBIDs trueNeighbors = trueNeighborHash.get(iditer);
+        
         for(DBIDMIter neighboriter = trueNeighbors.iter(); neighboriter.valid(); neighboriter.advance()) {
-          DBID neighbor = DBIDUtil.deref(neighboriter);
-          HashSetModifiableDBIDs nNeighbors = trueNeighborHash.get(neighbor);
-          for (DBIDMIter nniter = nNeighbors.iter(); nniter.valid(); nniter.advance()){
-            DBID nn = DBIDUtil.deref(nniter);
-            if (nn.compareTo(id)!= 0){
+          HashSetModifiableDBIDs nNeighbors = trueNeighborHash.get(neighboriter);
+          
+          for (DBIDMIter nniter = nNeighbors.iter(); nniter.valid(); nniter.advance()){            
+            if (id.compareTo(nniter)!= 0){
                 //calculate similarity of v and u2
-                double distance = distanceQuery.distance(neighbor,nn);
-                // TODO Heap should have always the same size --> contains-method?
-                // TODO 1 if heap is changed, 0 if not --> also better with contains-method
-                double newDistance = newNeighbors.insert(distance, id);
-//                System.out.println("distance: "+distance+", newDistance: "+newDistance);
-                if (newDistance == 0){
-                  System.out.println(id.compareTo(nn));
+                double distance = distanceQuery.distance(iditer,nniter);
+                //see if actual object is already contained in hash
+                boolean contained=false;
+                for (DoubleDBIDListIter heapiter = newNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()){
+                  if (id.compareTo(heapiter)!=0){
+                    contained=true;
+                  }
                 }
-                if (distance <= newDistance){
-                  counter=1;
+                if (contained){
+                  //TODO what happens in this case? the distance-value for iditer has to be updated
+                }
+                else{
+                  newNeighbors.insert(distance, iditer);
+                  counter = 1;
                 }
             } 
           }
         }
       }
-      allNeighbors.clear();
-      trueNeighborHash.clear();
       getLogger().incrementProcessed(progress);
     }
     //convert store to storage
@@ -155,9 +158,11 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   private HashSetModifiableDBIDs reverse(DBID id, MapStore<KNNHeap> store) {
     HashSetModifiableDBIDs rev = DBIDUtil.newHashSet(k);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      KNNList neighbors = store.get(iditer).toKNNList();
-      if (neighbors.contains(id)){
-        rev.add(id);
+      KNNHeap heap = store.get(iditer);
+      for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
+        if (id.compareTo(heapiter)==0){
+          rev.add(iditer);
+        }
       }
     }
     return rev;
@@ -170,14 +175,12 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
 
   @Override
   public String getLongName() {
-    // TODO Auto-generated method stub
-    return null;
+    return "NNDescent kNN";
   }
 
   @Override
   public String getShortName() {
-    // TODO Auto-generated method stub
-    return null;
+    return "nn-descent-knn";
   }
   
   public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
