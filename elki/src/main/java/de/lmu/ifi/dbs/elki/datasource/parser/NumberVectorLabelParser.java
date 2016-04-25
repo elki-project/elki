@@ -292,6 +292,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
       haslabels = false;
       curvec = null;
       curlbl = null;
+      labels.clear();
       return false;
     }
     // Pass outside via class variables
