@@ -287,7 +287,7 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
       }
     }
     // Maybe a label row?
-    if(reader.getLineNumber() == 1 && attributes.size == 0) {
+    if(curvec == null && attributes.size == 0) {
       columnnames = new ArrayList<>(labels);
       haslabels = false;
       curvec = null;
