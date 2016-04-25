@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.result;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,33 +27,31 @@ import java.util.Collection;
 
 /**
  * Histogram result.
- * 
+ *
  * @author Erich Schubert
  * @since 0.3
- *
- * @param <O> Object class (e.g. {@link de.lmu.ifi.dbs.elki.data.DoubleVector})
  */
-public class HistogramResult<O> extends CollectionResult<O> {
+public class HistogramResult extends CollectionResult<double[]> {
   /**
    * Constructor
-   * 
+   *
    * @param name The long name (for pretty printing)
    * @param shortname the short name (for filenames etc.)
    * @param col Collection
    */
-  public HistogramResult(String name, String shortname, Collection<O> col) {
+  public HistogramResult(String name, String shortname, Collection<double[]> col) {
     super(name, shortname, col);
   }
 
   /**
    * Constructor
-   * 
+   *
    * @param name The long name (for pretty printing)
    * @param shortname the short name (for filenames etc.)
    * @param col Collection
    * @param header Header information
    */
-  public HistogramResult(String name, String shortname, Collection<O> col, Collection<String> header) {
+  public HistogramResult(String name, String shortname, Collection<double[]> col, Collection<String> header) {
     super(name, shortname, col, header);
   }
 }

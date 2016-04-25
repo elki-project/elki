@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.histogram;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -59,14 +59,14 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 
 /**
  * Compute a Histogram to evaluate a ranking algorithm.
- * 
+ *
  * The parameter {@code -hist.positive} specifies the class label of "positive"
  * hits.
- * 
+ *
  * @author Lisa Reichert
  * @author Erich Schubert
  * @since 0.3
- * 
+ *
  * @apiviz.landmark
  * @apiviz.uses OutlierResult
  * @apiviz.has ScalingFunction
@@ -130,7 +130,7 @@ public class ComputeOutlierHistogram implements Evaluator {
 
   /**
    * Constructor.
-   * 
+   *
    * @param positive_class_name Class name
    * @param bins Bins
    * @param scaling Scaling
@@ -146,12 +146,12 @@ public class ComputeOutlierHistogram implements Evaluator {
 
   /**
    * Evaluate a single outlier result as histogram.
-   * 
+   *
    * @param database Database to process
    * @param or Outlier result
    * @return Result
    */
-  public HistogramResult<double[]> evaluateOutlierResult(Database database, OutlierResult or) {
+  public HistogramResult evaluateOutlierResult(Database database, OutlierResult or) {
     if(scaling instanceof OutlierScalingFunction) {
       OutlierScalingFunction oscaling = (OutlierScalingFunction) scaling;
       oscaling.prepare(or);
@@ -244,7 +244,7 @@ public class ComputeOutlierHistogram implements Evaluator {
       DoubleDoublePair data = iter.getValue();
       collHist.add(new double[] { iter.getCenter(), data.first, data.second });
     }
-    return new HistogramResult<>("Outlier Score Histogram", "outlier-histogram", collHist);
+    return new HistogramResult("Outlier Score Histogram", "outlier-histogram", collHist);
   }
 
   @Override
@@ -263,9 +263,9 @@ public class ComputeOutlierHistogram implements Evaluator {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {

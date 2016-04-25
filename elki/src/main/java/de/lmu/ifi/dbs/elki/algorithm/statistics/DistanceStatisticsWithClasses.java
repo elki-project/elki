@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -115,7 +115,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
   }
 
   @Override
-  public HistogramResult<double[]> run(Database database) {
+  public HistogramResult run(Database database) {
     final Relation<O> relation = database.getRelation(getInputTypeRestriction()[0]);
     final DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
 
@@ -266,7 +266,7 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
       final double ocaf = ((double) value[1]) / bnum / histogram.getBinsize();
       binstat.add(new double[] { iter.getCenter(), icof, icaf, ocof, ocaf });
     }
-    HistogramResult<double[]> result = new HistogramResult<>("Distance Histogram", "distance-histogram", binstat);
+    HistogramResult result = new HistogramResult("Distance Histogram", "distance-histogram", binstat);
 
     result.addHeader("Absolute minimum distance (abs): " + gminmax.getMin());
     result.addHeader("Absolute maximum distance (abs): " + gminmax.getMax());

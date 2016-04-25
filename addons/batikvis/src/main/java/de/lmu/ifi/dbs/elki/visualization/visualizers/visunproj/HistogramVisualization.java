@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -78,7 +78,7 @@ public class HistogramVisualization extends AbstractVisFactory {
   @Override
   public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     VisualizerContext context = task.getContext();
-    HistogramResult<double[]> curve = task.getResult();
+    HistogramResult curve = task.getResult();
 
     final StyleLibrary style = context.getStyleLibrary();
     final double sizex = StyleLibrary.SCALE;
@@ -99,7 +99,7 @@ public class HistogramVisualization extends AbstractVisFactory {
       }
       else {
         // TODO: test and throw always
-        assert(dim == point.length);
+        assert (dim == point.length);
       }
       for(int i = 1; i < dim; i++) {
         yminmax.put(point[i]);
@@ -162,9 +162,9 @@ public class HistogramVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<HistogramResult<?>> it = VisualizationTree.filterResults(context, start, HistogramResult.class);
+    Hierarchy.Iter<HistogramResult> it = VisualizationTree.filterResults(context, start, HistogramResult.class);
     for(; it.valid(); it.advance()) {
-      HistogramResult<?> histogram = it.get();
+      HistogramResult histogram = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, histogram, null, HistogramVisualization.this);
       task.reqwidth = 2.0;
       task.reqheight = 1.0;

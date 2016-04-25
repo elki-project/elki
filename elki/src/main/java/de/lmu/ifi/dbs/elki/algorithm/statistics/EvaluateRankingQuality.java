@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -109,7 +109,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
   }
 
   @Override
-  public HistogramResult<double[]> run(Database database) {
+  public HistogramResult run(Database database) {
     final Relation<V> relation = database.getRelation(getInputTypeRestriction()[0]);
     final DistanceQuery<V> distQuery = database.getDistanceQuery(relation, getDistanceFunction());
     final KNNQuery<V> knnQuery = database.getKNNQuery(distQuery, relation.size());
@@ -165,7 +165,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
     for(ObjHistogram.Iter<MeanVariance> iter = hist.iter(); iter.valid(); iter.advance()) {
       res.add(new double[] { iter.getCenter(), iter.getValue().getCount(), iter.getValue().getMean(), iter.getValue().getSampleVariance() });
     }
-    return new HistogramResult<>("Ranking Quality Histogram", "ranking-histogram", res);
+    return new HistogramResult("Ranking Quality Histogram", "ranking-histogram", res);
   }
 
   @Override
