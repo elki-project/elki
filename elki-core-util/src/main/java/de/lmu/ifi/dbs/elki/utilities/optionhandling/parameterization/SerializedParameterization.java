@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -70,9 +71,7 @@ public class SerializedParameterization extends AbstractParameterization {
    */
   public SerializedParameterization(String[] args) {
     this();
-    for (String arg : args) {
-      parameters.add(arg);
-    }
+    Collections.addAll(parameters, args);
   }
 
   /**

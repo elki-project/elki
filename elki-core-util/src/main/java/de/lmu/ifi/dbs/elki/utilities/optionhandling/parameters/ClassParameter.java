@@ -148,10 +148,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
     if(!restrictionClass.isAssignableFrom(obj)) {
       throw new WrongParameterValueException(this, obj.getName(), "Given class not a subclass / implementation of " + restrictionClass.getName());
     }
-    if(!super.validate(obj)) {
-      return false;
-    }
-    return true;
+    return super.validate(obj);
   }
 
   /**

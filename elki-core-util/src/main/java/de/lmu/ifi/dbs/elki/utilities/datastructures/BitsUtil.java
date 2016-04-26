@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -353,9 +353,7 @@ public final class BitsUtil {
   public static long[] setI(long[] v, long[] o) {
     assert (o.length <= v.length) : "Bit set sizes do not agree.";
     final int max = Math.min(v.length, o.length);
-    for(int i = 0; i < max; i++) {
-      v[i] = o[i];
-    }
+    System.arraycopy(o, 0, v, 0, max);
     return v;
   }
 

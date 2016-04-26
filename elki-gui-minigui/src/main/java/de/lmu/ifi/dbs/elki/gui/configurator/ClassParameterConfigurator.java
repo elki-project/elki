@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.gui.configurator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,6 +29,7 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Objects;
 
 import javax.swing.Icon;
 import javax.swing.JButton;
@@ -174,7 +175,7 @@ public class ClassParameterConfigurator extends AbstractSingleParameterConfigura
       return;
     }
     if(e.getSource() == popup) {
-      if (e.getActionCommand() == TreePopup.ACTION_CANCELED) {
+      if (Objects.equals(e.getActionCommand(), TreePopup.ACTION_CANCELED)) {
         popup.setVisible(false);
         textfield.requestFocus();
         return;

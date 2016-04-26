@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization;
  */
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -58,9 +59,7 @@ public class ChainedParameterization extends AbstractParameterization {
    * @param ps Parameterizations
    */
   public ChainedParameterization(Parameterization... ps) {
-    for(Parameterization p : ps) {
-      chain.add(p);
-    }
+    Collections.addAll(chain, ps);
     //logger.warning("Chain length: "+chain.size()+ " for "+this);
   }
 

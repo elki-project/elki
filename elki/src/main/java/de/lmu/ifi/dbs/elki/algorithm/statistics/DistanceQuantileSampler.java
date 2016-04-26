@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
@@ -151,7 +152,7 @@ public class DistanceQuantileSampler<O> extends AbstractDistanceBasedAlgorithm<O
     LOG.statistics(new LongStatistic(PREFIX + ".samplesize", ssize));
     LOG.statistics(new DoubleStatistic(PREFIX + ".distance", heap.peek()));
     LOG.ensureCompleted(prog);
-    Collection<String> header = Arrays.asList(new String[] { "Distance" });
+    Collection<String> header = Collections.singletonList("Distance");
     Collection<double[]> data = Arrays.asList(new double[][] { new double[] { heap.peek() } });
     return new CollectionResult<double[]>("Distances sample", "distance-sample", data, header);
   }

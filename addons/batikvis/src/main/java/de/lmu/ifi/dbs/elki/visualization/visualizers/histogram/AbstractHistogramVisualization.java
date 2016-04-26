@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -65,7 +65,6 @@ public abstract class AbstractHistogramVisualization extends AbstractVisualizati
     super.resultChanged(current);
     if(proj != null && current == proj) {
       svgp.requestRedraw(this.task, this);
-      return;
     }
   }
 }

@@ -31,14 +31,7 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -333,7 +326,7 @@ public class DocumentReferences {
        * @return Order
        */
       private int compareNull(String s1, String s2) {
-        return (s1 == s2) ? 0 //
+        return (Objects.equals(s1, s2)) ? 0 //
             : (s1 == null) ? -1 //
                 : (s2 == null) ? +1 //
                     : s1.compareTo(s2);

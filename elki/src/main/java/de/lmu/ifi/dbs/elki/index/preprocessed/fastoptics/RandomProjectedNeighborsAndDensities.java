@@ -7,7 +7,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.fastoptics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -224,9 +224,7 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
     FiniteProgress splitp = LOG.isVerbose() ? new FiniteProgress("Splitting data", nPointSetSplits, LOG) : null;
     for(int avgP = 0; avgP < nPointSetSplits; avgP++) {
       // shuffle projections
-      for(int i = 0; i < nProject1d; i++) {
-        tmpPro[i] = projectedPoints[i];
-      }
+      System.arraycopy(projectedPoints, 0, tmpPro, 0, nProject1d);
       proind.shuffle(rand);
       TIntIterator it = proind.iterator();
       int i = 0;

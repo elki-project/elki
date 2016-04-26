@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -248,7 +248,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
     // sort by name otherwise.
     String name1 = this.getMenuName();
     String name2 = other.getMenuName();
-    if(name1 != null && name2 != null && name1 != name2) {
+    if(name1 != null && name2 != null && !name1.equals(name2)) {
       return name1.compareTo(name2);
     }
     return 0;

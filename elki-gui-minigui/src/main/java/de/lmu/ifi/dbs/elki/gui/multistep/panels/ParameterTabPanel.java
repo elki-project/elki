@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.gui.multistep.panels;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -313,10 +313,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    */
   public boolean canRun() {
     Status status = getStatus();
-    if (Status.STATUS_READY.equals(status) || Status.STATUS_COMPLETE.equals(status)) {
-      return true;
-    }
-    return false;
+    return Status.STATUS_READY.equals(status) || Status.STATUS_COMPLETE.equals(status);
   }
 
   /**
@@ -326,10 +323,7 @@ public abstract class ParameterTabPanel extends JPanel implements ChangeListener
    */
   public boolean isComplete() {
     Status status = getStatus();
-    if (Status.STATUS_COMPLETE.equals(status)) {
-      return true;
-    }
-    return false;
+    return Status.STATUS_COMPLETE.equals(status);
   }
 
   /**
