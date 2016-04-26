@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
-import de.lmu.ifi.dbs.elki.datasource.filter.FilterUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
@@ -47,21 +46,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * Rescale the data set using multidimensional scaling, MDS.
- * 
+ *
  * Note: the current implementation is rather expensive, both memory- and
  * runtime wise. Don't use for large data sets! Instead, have a look at
  * {@link FastMultidimensionalScalingTransform} which uses power iterations
  * instead.
- * 
+ *
  * @author Erich Schubert
  * @since 0.6.0
- * 
+ *
  * @apiviz.composedOf SingularValueDecomposition
- * 
- * @param <O> Data type
+ *
+ * @param <I> Input data type
+ * @param <O> Output vector type
  */
 @Alias({ "mds" })
-public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter {
+public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> implements ObjectFilter {
   /**
    * Class logger.
    */
@@ -70,7 +70,7 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
   /**
    * Distance function to use.
    */
-  PrimitiveDistanceFunction<? super O> dist = null;
+  PrimitiveDistanceFunction<? super I> dist = null;
 
   /**
    * Target dimensionality
@@ -78,15 +78,22 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
   int tdim;
 
   /**
+   * Vector factory.
+   */
+  NumberVector.Factory<O> factory;
+
+  /**
    * Constructor.
-   * 
+   *
    * @param tdim Target dimensionality.
    * @param dist Distance function to use.
+   * @param factory Vector factory.
    */
-  public ClassicMultidimensionalScalingTransform(int tdim, PrimitiveDistanceFunction<? super O> dist) {
+  public ClassicMultidimensionalScalingTransform(int tdim, PrimitiveDistanceFunction<? super I> dist, NumberVector.Factory<O> factory) {
     super();
     this.tdim = tdim;
     this.dist = dist;
+    this.factory = factory;
   }
 
   @Override
@@ -108,21 +115,8 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
       }
       // Get the replacement type information
       @SuppressWarnings("unchecked")
-      final List<O> castColumn = (List<O>) column;
-      NumberVector.Factory<? extends NumberVector> factory = null;
-      {
-        if(type instanceof VectorFieldTypeInformation) {
-          final VectorFieldTypeInformation<?> ctype = (VectorFieldTypeInformation<?>) type;
-          // Note two-step cast, to make stricter compilers happy.
-          @SuppressWarnings("unchecked")
-          final VectorFieldTypeInformation<? extends NumberVector> vtype = (VectorFieldTypeInformation<? extends NumberVector>) ctype;
-          factory = FilterUtil.guessFactory(vtype);
-        }
-        else {
-          factory = DoubleVector.FACTORY;
-        }
-        bundle.appendColumn(new VectorFieldTypeInformation<>(factory, tdim), castColumn);
-      }
+      final List<I> castColumn = (List<I>) column;
+      bundle.appendColumn(new VectorFieldTypeInformation<>(factory, tdim), castColumn);
 
       // Compute distance matrix.
       Matrix mat = new Matrix(computeDistanceMatrix(castColumn, size));
@@ -150,14 +144,14 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
     return bundle;
   }
 
-  protected double[][] computeDistanceMatrix(final List<O> castColumn, final int size) {
+  protected double[][] computeDistanceMatrix(final List<I> castColumn, final int size) {
     double[][] imat = new double[size][size];
     boolean squared = dist instanceof SquaredEuclideanDistanceFunction;
     FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix", (size * (size - 1)) >>> 1, LOG) : null;
     for(int x = 0; x < size; x++) {
-      final O ox = castColumn.get(x);
+      final I ox = castColumn.get(x);
       for(int y = x + 1; y < size; y++) {
-        final O oy = castColumn.get(y);
+        final I oy = castColumn.get(y);
         double distance = dist.distance(ox, oy);
         distance *= (squared ? -.5 : -.5 * distance);
         imat[x][y] = distance;
@@ -171,10 +165,10 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
 
   /**
    * Double-center the given matrix (only upper triangle is used).
-   * 
+   *
    * For improved numerical precision, we perform incremental updates to the
    * mean values, instead of computing a large sum and then performing division.
-   * 
+   *
    * @param m Matrix to double-center.
    */
   public static void doubleCenterSymmetric(double[][] m) {
@@ -215,12 +209,15 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
+   *
+   * @param <I> Input vector type
+   * @param <O> Output vector type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractParameterizer {
+  public static class Parameterizer<I, O extends NumberVector> extends AbstractParameterizer {
     /**
      * Desired dimensionality.
      */
@@ -232,6 +229,11 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
     public static final OptionID DISTANCE_ID = new OptionID("mds.distance", "Distance function to use.");
 
     /**
+     * Parameter to specify the type of vectors to produce.
+     */
+    public static final OptionID VECTOR_TYPE_ID = new OptionID("mds.vector-type", "The type of vectors to create.");
+
+    /**
      * Target dimensionality.
      */
     int tdim;
@@ -239,7 +241,12 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
     /**
      * Distance function to use.
      */
-    PrimitiveDistanceFunction<? super O> dist = null;
+    PrimitiveDistanceFunction<? super I> dist = null;
+
+    /**
+     * Vector factory.
+     */
+    NumberVector.Factory<O> factory;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -250,15 +257,20 @@ public class ClassicMultidimensionalScalingTransform<O> implements ObjectFilter 
         tdim = dimP.intValue();
       }
 
-      ObjectParameter<PrimitiveDistanceFunction<? super O>> distP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<PrimitiveDistanceFunction<? super I>> distP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
       if(config.grab(distP)) {
         dist = distP.instantiateClass(config);
+      }
+
+      ObjectParameter<NumberVector.Factory<O>> factoryP = new ObjectParameter<>(VECTOR_TYPE_ID, NumberVector.Factory.class, DoubleVector.Factory.class);
+      if(config.grab(factoryP)) {
+        factory = factoryP.instantiateClass(config);
       }
     }
 
     @Override
-    protected ClassicMultidimensionalScalingTransform<O> makeInstance() {
-      return new ClassicMultidimensionalScalingTransform<>(tdim, dist);
+    protected ClassicMultidimensionalScalingTransform<I, O> makeInstance() {
+      return new ClassicMultidimensionalScalingTransform<>(tdim, dist, factory);
     }
   }
 }
