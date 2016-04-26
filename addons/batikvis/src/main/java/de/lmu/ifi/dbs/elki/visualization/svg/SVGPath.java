@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,6 +29,8 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
+
+import java.util.Objects;
 
 /**
  * Element used for building an SVG path using a string buffer.
@@ -635,7 +637,7 @@ public class SVGPath {
    * @param ds coordinates.
    */
   private void append(String action, double... ds) {
-    if(lastaction != action) {
+    if(!Objects.equals(lastaction, action)) {
       buf.append(action);
       lastaction = action;
     }
@@ -651,7 +653,7 @@ public class SVGPath {
    * @return path object, for compact syntax.
    */
   public SVGPath close() {
-    if(lastaction != SVGConstants.PATH_CLOSE) {
+    if(!Objects.equals(lastaction, SVGConstants.PATH_CLOSE)) {
       buf.append(SVGConstants.PATH_CLOSE);
       lastaction = SVGConstants.PATH_CLOSE;
     }

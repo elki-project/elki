@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.gui;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -465,10 +465,10 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
         if(e instanceof DetailViewSelectedEvent) {
           showSubplot((DetailViewSelectedEvent) e);
         }
-        if(OverviewPlot.OVERVIEW_REFRESHING == e.getActionCommand() && currentSubplot == null) {
+        if(OverviewPlot.OVERVIEW_REFRESHING.equals(e.getActionCommand()) && currentSubplot == null) {
           showPlot(null);
         }
-        if(OverviewPlot.OVERVIEW_REFRESHED == e.getActionCommand() && currentSubplot == null) {
+        if(OverviewPlot.OVERVIEW_REFRESHED.equals(e.getActionCommand()) && currentSubplot == null) {
           showOverview();
         }
       }

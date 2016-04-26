@@ -5,7 +5,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -94,9 +94,7 @@ public class PredefinedInitialMeans extends AbstractKMeansInitialization<NumberV
    */
   public void setInitialMeans(double[][] initialMeans) {
     double[][] vecs = new double[initialMeans.length][];
-    for(int i = 0; i < initialMeans.length; ++i) {
-      vecs[i] = initialMeans[i]; // TODO: clone?
-    }
+    System.arraycopy(initialMeans, 0, vecs, 0, initialMeans.length);
     this.initialMeans = vecs;
   }
 

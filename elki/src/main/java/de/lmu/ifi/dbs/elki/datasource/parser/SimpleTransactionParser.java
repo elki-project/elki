@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -118,7 +118,7 @@ public class SimpleTransactionParser extends AbstractStreamingParser {
       return ret;
     }
     try {
-      while(reader.nextLineExceptComments()) {
+      if(reader.nextLineExceptComments()) {
         // Don't reuse bitsets, will not be copied by BitVector constructor.
         buf.clear();
         for(/* initialized by nextLineExceptComments() */; tokenizer.valid(); tokenizer.advance()) {

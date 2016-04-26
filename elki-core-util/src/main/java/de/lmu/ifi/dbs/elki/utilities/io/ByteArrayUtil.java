@@ -853,13 +853,13 @@ public final class ByteArrayUtil {
       @Override
       public Object run() {
         try {
-          Method getCleanerMethod = map.getClass().getMethod("cleaner", new Class[0]);
+          Method getCleanerMethod = map.getClass().getMethod("cleaner");
           if(getCleanerMethod == null) {
             return null;
           }
 
           getCleanerMethod.setAccessible(true);
-          Object cleaner = getCleanerMethod.invoke(map, new Object[0]);
+          Object cleaner = getCleanerMethod.invoke(map);
           Method cleanMethod = cleaner.getClass().getMethod("clean");
           if(cleanMethod == null) {
             return null;

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.gui.util;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,6 +34,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.File;
+import java.util.Objects;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.Action;
@@ -338,7 +339,7 @@ public class ParameterTable extends JTable {
         if(sval.startsWith(DynamicParameters.STRING_USE_DEFAULT)) {
           sval = "";
         }
-        if(sval != "") {
+        if(!sval.equals("")) {
           comboBox.addItem(sval);
           comboBox.setSelectedIndex(0);
         }
@@ -573,7 +574,7 @@ public class ParameterTable extends JTable {
         return;
       }
       if(e.getSource() == popup) {
-        if(e.getActionCommand() == TreePopup.ACTION_CANCELED) {
+        if(Objects.equals(e.getActionCommand(), TreePopup.ACTION_CANCELED)) {
           popup.setVisible(false);
           textfield.requestFocus();
           return;

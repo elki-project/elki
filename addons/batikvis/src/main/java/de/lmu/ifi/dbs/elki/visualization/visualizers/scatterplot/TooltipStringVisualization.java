@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -172,7 +172,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
     protected Element makeTooltip(DBIDRef id, double x, double y, double dotsize) {
       final Object data = result.get(id);
       String label = (data == null) ? "null" : data.toString();
-      label = (label == "" || label == null) ? "null" : label;
+      label = (label == null || label.equals("")) ? "null" : label;
       return svgp.svgText(x + dotsize, y + fontsize * 0.07, label);
     }
 
