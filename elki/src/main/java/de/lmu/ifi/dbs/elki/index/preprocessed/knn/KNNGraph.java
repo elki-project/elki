@@ -89,6 +89,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         heap.insert(distanceQuery.distance(iditer, siter), siter);
       }
       store.put(id,heap);
+      getLogger().incrementProcessed(progress);
     }
     int counter = 1;
     
@@ -109,7 +110,6 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         allNeighbors.addDBIDs(rev);
         
         trueNeighborHash.put(id, allNeighbors);
-        //TODO use other types???
       }
       counter = 0;
       //iterate through dataset
@@ -144,7 +144,6 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
           }
         }
       }
-      getLogger().incrementProcessed(progress);
     }
     //convert store to storage
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
