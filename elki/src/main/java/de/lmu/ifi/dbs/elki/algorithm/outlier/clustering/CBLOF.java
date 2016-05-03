@@ -76,7 +76,6 @@ import java.util.List;
  * </p>
  *
  * @author Patrick Kostjens
- * @since 0.7.2
  * 
  * @param <O> the type of data objects handled by this algorithm
  */
@@ -85,7 +84,6 @@ import java.util.List;
 title = "Discovering cluster-based local outliers", //
 booktitle = "Pattern Recognition Letters 24(9-10)", //
 url = "http://dx.doi.org/10.1016/S0167-8655(03)00003-5")
-@Alias("de.lmu.ifi.dbs.elki.algorithm.outlier.CBLOF")
 public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -155,11 +153,8 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
         return Integer.compare(o2.size(), o1.size());
       }
     });
-    Integer clusterBoundary = getClusterBoundary(relation, clusters);
+    int clusterBoundary = getClusterBoundary(relation, clusters);
 
-    if (clusterBoundary == null) {
-      clusterBoundary = clusters.size() - 1;
-    }
     List<? extends Cluster<MeanModel>> largeClusters = clusters.subList(0, clusterBoundary + 1);
     List<? extends Cluster<MeanModel>> smallClusters = clusters.subList(clusterBoundary + 1, clusters.size());
 
@@ -184,9 +179,9 @@ public class CBLOF<O extends NumberVector> extends AbstractDistanceBasedAlgorith
    * @param clusters All clusters that were found
    * @return Index of boundary between large and small cluster.
    */
-  private Integer getClusterBoundary(Relation<O> relation, List<? extends Cluster<MeanModel>> clusters) {
+  private int getClusterBoundary(Relation<O> relation, List<? extends Cluster<MeanModel>> clusters) {
     int totalSize = relation.size();
-    Integer clusterBoundary = null;
+    int clusterBoundary = clusters.size() - 1;
     int cumulativeSize = 0;
     for (int i = 0; i < clusters.size() - 1; i++) {
       cumulativeSize += clusters.get(i).size();

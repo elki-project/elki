@@ -37,7 +37,6 @@ import org.junit.Test;
  * Tests the CBLOF outlier detection algorithm.
  *
  * @author Patrick Kostjens
- * @since 0.7.2
  */
 public class CBLOFTest extends AbstractSimpleAlgorithmTest {
   @Test
