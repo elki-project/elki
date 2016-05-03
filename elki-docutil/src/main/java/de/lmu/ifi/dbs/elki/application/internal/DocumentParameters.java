@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Constructor;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -138,6 +139,21 @@ public class DocumentParameters {
     File byoptname = new File(args[1]);
     File byclsnamew = args.length >= 3 ? new File(args[2]) : null;
     File byoptnamew = args.length >= 4 ? new File(args[3]) : null;
+
+    try {
+      Files.createDirectories(byclsname.toPath().getParent());
+      Files.createDirectories(byoptname.toPath().getParent());
+      if(byclsnamew != null) {
+        Files.createDirectories(byclsnamew.toPath().getParent());
+      }
+      if(byoptnamew != null) {
+        Files.createDirectories(byoptnamew.toPath().getParent());
+      }
+    }
+    catch(IOException e) {
+      LOG.exception(e);
+      System.exit(1);
+    }
 
     Map<Class<?>, List<Parameter<?>>> byclass = new HashMap<>();
     Map<OptionID, List<Pair<Parameter<?>, Class<?>>>> byopt = new HashMap<>();
