@@ -32,7 +32,7 @@ for f in glob.glob(os.path.join(jdir, "*.jar")):
 		if row[3].search(f):
 			matchers.append(row)
 	if len(matchers) == 0:
-		print >>sys.stderr, "No extraction rules for: ", f
+		sys.stderr.write("No extraction rules for: %s\n" % f)
 		continue
 	matchers = filter(lambda x: x[1] is not None, matchers)
 	if len(matchers) == 0: continue # Ignore
@@ -45,7 +45,7 @@ for f in glob.glob(os.path.join(jdir, "*.jar")):
 			m = row[4].search(n)
 			if not m: continue
 			if out and out != m.expand(row[2]):
-				print >>sys.stderr, "Renaming conflict:", n, out, m.expand(row[2])
+				sys.stderr.write("Renaming conflict: %s %s %s\n" % (n, out, m.expand(row[2])))
 				continue
 			out = m.expand(row[2])
 			# print >>sys.stderr, n, m.expand(row[2]), row[0]
@@ -56,9 +56,9 @@ for f in glob.glob(os.path.join(jdir, "*.jar")):
 		if os.path.isfile(out):
 			exist = open(out,"r").read()
 			if exist == by: continue
-			print >>sys.stderr, "Warning: overwriting", out
+			sys.stderr.write("Warning: overwriting %s\n" % out)
 		if not os.path.isdir(os.path.dirname(out)):
 			os.makedirs(os.path.dirname(out))
 		open(out,"w").write(by)
-	print >>sys.stderr, "Processed:", f, "extracted", count, "files"
+	sys.stderr.write("Processed: %s extracted %d files\n" % (f, count))
 	z.close()
