@@ -8,7 +8,7 @@
 	<artifactId>elki-project</artifactId>
 	<packaging>pom</packaging>
 
-	<name>ELKI Data Mining Framework - Parent Project</name>
+	<name>ELKI Data Mining Framework</name>
 	<url>http://elki.dbs.ifi.lmu.de/</url>
 	<organization>
 		<name>ELKI Development Team, Lehr- und Forschungseinheit für Datenbanksysteme, Ludwig-Maximilians-Universität München</name>
