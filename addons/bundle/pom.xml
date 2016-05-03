@@ -38,38 +38,54 @@
 			<artifactId>elki</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>elki-libsvm</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>${project.groupId}</groupId>
-			<artifactId>elki-batik-visualization</artifactId>
-			<version>${project.version}</version>
-		</dependency>
 	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>svg</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>elki-batik-visualization</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>svm</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>elki-libsvm</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>uncertain</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>elki-uncertain</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>tutorial</id>
+			<dependencies>
+				<dependency>
+					<groupId>${project.groupId}</groupId>
+					<artifactId>elki-tutorial</artifactId>
+					<version>${project.version}</version>
+				</dependency>
+			</dependencies>
+		</profile>
+	</profiles>
+
 
 	<build>
 		<plugins>
-			<!-- Ensure the directory exists, for code below. -->
-			<plugin>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>createJavadocDir</id>
-						<phase>compile</phase><!-- abuse compile to run before prepare-package -->
-						<configuration>
-						<target>
-								<mkdir dir="${project.build.directory}/apidocs" />
-						</target>
-						</configuration>
-						<goals>
-							<goal>run</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 			<!-- Copy dependencies earlier: -->
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>

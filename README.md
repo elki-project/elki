@@ -83,3 +83,10 @@ To build the SVG based visualization add-on, use
 which produces an executable `jar` file named `addons/batikvis/target/elki-batik-visualization-<VERSION>.jar`
 
 Required dependencies can be found in the folder `dependency` next to the `jar` file.
+
+To build a *standalone jar*, use the `bundle` profile (requires Python for cleaning up the license documentation).
+When using IntelliJ, it seems that the best strategy is to run within the
+bundle project, as IntelliJ then manages to set up the classpath correctly
+(feel free to discuss and suggest better solutions for IntelliJ or NetBeans
+support - we are using Eclipse, so we need expert recommendations for
+effectively using other IDEs)
