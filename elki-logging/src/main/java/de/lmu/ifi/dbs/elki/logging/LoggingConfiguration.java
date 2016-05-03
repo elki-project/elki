@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.logging;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging.Level;
 
 /**
  * Facility for configuration of logging.
- * 
+ *
  * @author Erich Schubert
  * @since 0.2
  */
@@ -79,7 +79,7 @@ public final class LoggingConfiguration {
   /**
    * Static instance of the configuration
    */
-  protected static LoggingConfiguration config = new LoggingConfiguration(confbase, LOGGING_PROPERTIES_FILE);
+  protected static LoggingConfiguration config = new LoggingConfiguration(confbase, System.getProperty("java.util.logging.config.file", LOGGING_PROPERTIES_FILE));
 
   /**
    * Configure Java Logging API: {@link java.util.logging.LogManager}
@@ -90,7 +90,7 @@ public final class LoggingConfiguration {
 
   /**
    * Reconfigure logging.
-   * 
+   *
    * @param pkg Package name the configuration file comes from
    * @param name File name.
    */
@@ -100,7 +100,7 @@ public final class LoggingConfiguration {
 
   /**
    * Reconfigure logging.
-   * 
+   *
    * @param pkg Package name the configuration file comes from
    * @param name File name.
    */
@@ -143,7 +143,7 @@ public final class LoggingConfiguration {
   /**
    * Private copy from FileUtil, to avoid cross-dependencies. Try to open a
    * file, first trying the file system, then falling back to the classpath.
-   * 
+   *
    * @param filename File name in system notation
    * @return Input stream
    * @throws FileNotFoundException When no file was found.
@@ -172,7 +172,7 @@ public final class LoggingConfiguration {
 
   /**
    * Reconfigure logging to enable 'verbose' logging at the top level.
-   * 
+   *
    * @param verbose verbosity level.
    */
   public static void setVerbose(java.util.logging.Level verbose) {
@@ -220,7 +220,7 @@ public final class LoggingConfiguration {
 
   /**
    * Add a handler to the root logger.
-   * 
+   *
    * @param handler Handler
    */
   public static void addHandler(Handler handler) {
@@ -229,10 +229,10 @@ public final class LoggingConfiguration {
 
   /**
    * Replace the default log handler with the given log handler.
-   * 
+   *
    * This will remove all {@link CLISmartHandler} found on the root logger. It
    * will leave any other handlers in place.
-   * 
+   *
    * @param handler Logging handler.
    */
   public static void replaceDefaultHandler(Handler handler) {
@@ -247,7 +247,7 @@ public final class LoggingConfiguration {
 
   /**
    * Set the logging level for a particular package/class.
-   * 
+   *
    * @param pkg Package
    * @param level Level name
    * @throws IllegalArgumentException thrown when logger or level was not found
@@ -264,7 +264,7 @@ public final class LoggingConfiguration {
 
   /**
    * Set the default level.
-   * 
+   *
    * @param level level
    */
   public static void setDefaultLevel(java.util.logging.Level level) {
