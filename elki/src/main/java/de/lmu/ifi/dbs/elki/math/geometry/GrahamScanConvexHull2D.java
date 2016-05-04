@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.geometry;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -37,15 +37,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 /**
  * Classes to compute the convex hull of a set of points in 2D, using the
  * classic Grahams scan. Also computes a bounding box.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
- * 
+ *
  * @apiviz.has Polygon
  */
 @Reference(authors = "Paul Graham", //
-title = "An Efficient Algorithm for Determining the Convex Hull of a Finite Planar Set", //
-booktitle = "Information Processing Letters 1")
+    title = "An Efficient Algorithm for Determining the Convex Hull of a Finite Planar Set", //
+    booktitle = "Information Processing Letters 1")
 public class GrahamScanConvexHull2D {
   /**
    * The current set of points
@@ -69,7 +69,7 @@ public class GrahamScanConvexHull2D {
 
   /**
    * Scaling factor if we have very small polygons.
-   * 
+   *
    * TODO: needed? Does this actually improve things?
    */
   private double factor = 1.0;
@@ -83,10 +83,10 @@ public class GrahamScanConvexHull2D {
 
   /**
    * Add a single point to the list (this does not compute the hull!)
-   * 
+   *
    * @param point Point to add
    */
-  public void add(double[] point) {
+  public void add(double... point) {
     if(this.ok) {
       this.points = new LinkedList<>(this.points);
       this.ok = false;
@@ -156,7 +156,7 @@ public class GrahamScanConvexHull2D {
 
   /**
    * Get the relative X coordinate to the origin.
-   * 
+   *
    * @param a
    * @param origin origin double[]
    * @return relative X coordinate
@@ -167,7 +167,7 @@ public class GrahamScanConvexHull2D {
 
   /**
    * Get the relative Y coordinate to the origin.
-   * 
+   *
    * @param a
    * @param origin origin double[]
    * @return relative Y coordinate
@@ -178,7 +178,7 @@ public class GrahamScanConvexHull2D {
 
   /**
    * Test whether a point is left of the other wrt. the origin.
-   * 
+   *
    * @param a double[] A
    * @param b double[] B
    * @param o Origin double[]
@@ -197,18 +197,18 @@ public class GrahamScanConvexHull2D {
 
   /**
    * Manhattan distance.
-   * 
+   *
    * @param a double[] A
    * @param b double[] B
    * @return Manhattan distance
    */
   private double mdist(double[] a, double[] b) {
-    return Math.abs(a[0] * factor - b[0] * factor) + Math.abs(a[1] * factor - b[1] * factor);
+    return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
   }
 
   /**
    * Simple convexity test.
-   * 
+   *
    * @param a double[] A
    * @param b double[] B
    * @param c double[] C
@@ -216,11 +216,8 @@ public class GrahamScanConvexHull2D {
    */
   private final boolean isConvex(double[] a, double[] b, double[] c) {
     // We're using factor to improve numerical contrast for small polygons.
-    double area = (b[0] * factor - a[0] * factor) * (c[1] * factor - a[1] * factor) - (c[0] * factor - a[0] * factor) * (b[1] * factor - a[1] * factor);
-    if(area == 0) {
-      return (mdist(b, c) >= mdist(a, b) + mdist(a, c));
-    }
-    return (area < 0);
+    double area = (b[0] - a[0]) * factor * (c[1] - a[1]) - (c[0] - a[0]) * factor * (b[1] - a[1]);
+    return (area == 0) ? (mdist(b, c) > mdist(a, b) + mdist(a, c)) : (area < 0);
   }
 
   /**
@@ -233,13 +230,20 @@ public class GrahamScanConvexHull2D {
     Iterator<double[]> iter = points.iterator();
     Stack<double[]> stack = new Stack<>();
     // Start with the first two points on the stack
-    stack.add(iter.next());
-    stack.add(iter.next());
+    final double[] first = iter.next();
+    stack.add(first);
+    while(iter.hasNext()) {
+      double[] n = iter.next();
+      if(mdist(first, n) > 0) {
+        stack.add(n);
+        break;
+      }
+    }
     while(iter.hasNext()) {
       double[] next = iter.next();
       double[] curr = stack.pop();
       double[] prev = stack.peek();
-      while((stack.size() > 1) && !isConvex(prev, curr, next)) {
+      while((stack.size() > 1) && (mdist(curr, next) == 0 || !isConvex(prev, curr, next))) {
         curr = stack.pop();
         prev = stack.peek();
       }
@@ -251,7 +255,7 @@ public class GrahamScanConvexHull2D {
 
   /**
    * Compute the convex hull, and return the resulting polygon.
-   * 
+   *
    * @return Polygon of the hull
    */
   public Polygon getHull() {

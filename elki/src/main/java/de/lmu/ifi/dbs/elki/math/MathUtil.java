@@ -107,6 +107,11 @@ public final class MathUtil {
   public static final double ONE_BY_LOG2 = 1. / Math.log(2.);
 
   /**
+   * One third.
+   */
+  public static final double ONE_THIRD = 1. / 3.;
+
+  /**
    * Logarithm of 2 to the basis e, for logarithm conversion.
    */
   public static final double LOG2 = Math.log(2.);
@@ -756,9 +761,9 @@ public final class MathUtil {
    */
   public static double max(double a, double b, double c, double d) {
     return a >= b ? //
-    a >= c ? (a >= d ? a : d) : (c >= d ? c : d) //
-    : //
-    b >= c ? (b >= d ? b : d) : (c >= d ? c : d);
+        a >= c ? (a >= d ? a : d) : (c >= d ? c : d) //
+        : //
+        b >= c ? (b >= d ? b : d) : (c >= d ? c : d);
   }
 
   /**
@@ -798,9 +803,9 @@ public final class MathUtil {
    */
   public static int max(int a, int b, int c, int d) {
     return a >= b ? //
-    a >= c ? (a >= d ? a : d) : (c >= d ? c : d) //
-    : //
-    b >= c ? (b >= d ? b : d) : (c >= d ? c : d);
+        a >= c ? (a >= d ? a : d) : (c >= d ? c : d) //
+        : //
+        b >= c ? (b >= d ? b : d) : (c >= d ? c : d);
   }
 
   /**
@@ -851,9 +856,9 @@ public final class MathUtil {
    */
   public static double min(double a, double b, double c, double d) {
     return a <= b ? //
-    a <= c ? (a <= d ? a : d) : (c <= d ? c : d) //
-    : //
-    b <= c ? (b <= d ? b : d) : (c <= d ? c : d);
+        a <= c ? (a <= d ? a : d) : (c <= d ? c : d) //
+        : //
+        b <= c ? (b <= d ? b : d) : (c <= d ? c : d);
   }
 
   /**
@@ -899,8 +904,8 @@ public final class MathUtil {
    */
   public static int min(int a, int b, int c, int d) {
     return a <= b ? //
-    a <= c ? (a <= d ? a : d) : (c <= d ? c : d) //
-    : //
-    b <= c ? (b <= d ? b : d) : (c <= d ? c : d);
+        a <= c ? (a <= d ? a : d) : (c <= d ? c : d) //
+        : //
+        b <= c ? (b <= d ? b : d) : (c <= d ? c : d);
   }
 }

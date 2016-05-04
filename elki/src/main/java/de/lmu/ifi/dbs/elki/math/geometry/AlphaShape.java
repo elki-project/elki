@@ -30,10 +30,10 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
  * Compute the alpha-Shape of a point set, using Delaunay triangulation.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
- * 
+ *
  * @apiviz.uses SweepHullDelaunay2D
  * @apiviz.has Polygon
  */
@@ -53,6 +53,12 @@ public class AlphaShape {
    */
   private ArrayList<SweepHullDelaunay2D.Triangle> delaunay = null;
 
+  /**
+   * Constructor.
+   *
+   * @param points Point set
+   * @param alpha
+   */
   public AlphaShape(List<double[]> points, double alpha) {
     this.alpha2 = alpha * alpha;
     this.points = points;
@@ -69,19 +75,20 @@ public class AlphaShape {
     List<double[]> cur = new ArrayList<>();
 
     for(int i = 0 /* = used.nextClearBit(0) */; i < delaunay.size() && i >= 0; i = BitsUtil.nextClearBit(used, i + 1)) {
-      if(!BitsUtil.get(used, i)) {
-        BitsUtil.setI(used, i);
-        SweepHullDelaunay2D.Triangle tri = delaunay.get(i);
-        if(tri.r2 <= alpha2) {
-          // Check neighbors
-          processNeighbor(cur, used, i, tri.ab, tri.b);
-          processNeighbor(cur, used, i, tri.bc, tri.c);
-          processNeighbor(cur, used, i, tri.ca, tri.a);
-        }
-        if(!cur.isEmpty()) {
-          polys.add(new Polygon(cur));
-          cur = new ArrayList<>();
-        }
+      if(BitsUtil.get(used, i)) {
+        continue;
+      }
+      BitsUtil.setI(used, i);
+      SweepHullDelaunay2D.Triangle tri = delaunay.get(i);
+      if(tri.r2 <= alpha2) {
+        // Check neighbors
+        processNeighbor(cur, used, i, tri.ab, tri.b);
+        processNeighbor(cur, used, i, tri.bc, tri.c);
+        processNeighbor(cur, used, i, tri.ca, tri.a);
+      }
+      if(!cur.isEmpty()) {
+        polys.add(new Polygon(cur));
+        cur = new ArrayList<>();
       }
     }
 

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.geometry;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,25 +34,30 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.DoubleIntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
 
 /**
  * Compute the Convex Hull and/or Delaunay Triangulation, using the sweep-hull
  * approach of David Sinclair.
- * 
+ *
  * Note: This implementation does not check or handle duplicate points!
- * 
+ *
+ * TODO: Handle duplicates.
+ *
+ * TODO: optimize data structures for memory usage
+ *
  * @author Erich Schubert
  * @since 0.5.0
  *
  * @apiviz.has Polygon
  */
 @Reference(authors = "David Sinclair", //
-title = "S-hull: a fast sweep-hull routine for Delaunay triangulation", //
-booktitle = "Online: http://s-hull.org/")
+    title = "S-hull: a fast sweep-hull routine for Delaunay triangulation", //
+    booktitle = "Online: http://s-hull.org/")
 public class SweepHullDelaunay2D {
   /**
    * Class logger
@@ -61,7 +66,7 @@ public class SweepHullDelaunay2D {
 
   /**
    * The current set of points.
-   * 
+   *
    * Note: this list should not be changed after running the algorithm, since we
    * use it for object indexing, and the ids should not change
    */
@@ -86,7 +91,7 @@ public class SweepHullDelaunay2D {
 
   /**
    * Constructor.
-   * 
+   *
    * @param points Existing points
    */
   public SweepHullDelaunay2D(List<double[]> points) {
@@ -96,10 +101,10 @@ public class SweepHullDelaunay2D {
   /**
    * Add a single point to the list (this does not compute or update the
    * triangulation!)
-   * 
+   *
    * @param point Point to add
    */
-  public void add(double[] point) {
+  public void add(double... point) {
     this.points.add(point);
     // Invalidate
     hull = null;
@@ -108,7 +113,7 @@ public class SweepHullDelaunay2D {
 
   /**
    * Run the actual algorithm
-   * 
+   *
    * @param hullonly
    */
   void run(boolean hullonly) {
@@ -119,64 +124,60 @@ public class SweepHullDelaunay2D {
     hull = new LinkedList<>();
     tris = hullonly ? null : new ArrayList<Triangle>(len);
 
+    // 1. Seed point x_0
     final double[] seed;
     final int seedid = 0;
-    final DoubleIntPair[] sort = new DoubleIntPair[len];
+
+    final double[] sortd = new double[len];
+    final int[] sorti = new int[len];
+    Arrays.fill(sorti, -42); // To cause errors
     // TODO: remove duplicates.
 
-    // Select seed, sort by squared euclidean distance
+    // 2. sort by squared Euclidean distance
     {
       Iterator<double[]> iter = points.iterator();
       seed = iter.next();
-      for(int i = 0; iter.hasNext(); i++) {
-        assert (i < len);
-        double[] p = iter.next();
-        // Pair with distance, list-position
-        sort[i] = new DoubleIntPair(quadraticEuclidean(seed, p), i + 1);
+      for(int i = 0, j = 1; iter.hasNext(); j++, i++) {
+        double dist = quadraticEuclidean(seed, iter.next());
+        if(dist <= 0.) { // Duplicate.
+          --len; // Decrease candidate set size
+          --i; // Increase j, but not i.
+          continue;
+        }
+        sortd[i] = dist;
+        sorti[i] = j;
       }
-      assert (sort[len - 1] != null);
-      Arrays.sort(sort);
+      DoubleIntegerArrayQuickSort.sort(sortd, sorti, len);
     }
-    assert (sort[0].first > 0);
+    // Detect some degenerate situations:
+    if(len < 2) {
+      hull.add(new IntIntPair(seedid, -1));
+      if(len == 1) {
+        hull.add(new IntIntPair(sorti[0], -1));
+      }
+      return;
+    }
+    assert (sortd[0] > 0);
     // final double[] seed2 = points.get(sort[0].second);
-    final int seed2id = sort[0].second;
-    int start = 1;
+    final int seed2id = sorti[0];
 
-    // Find minimal triangle for these two points:
-    Triangle besttri = new Triangle(seedid, seed2id, -1);
-    {
-      besttri.r2 = Double.MAX_VALUE;
-      Triangle testtri = new Triangle(seedid, seed2id, -1);
-      int besti = -1;
-      for(int i = start; i < len; i++) {
-        // Update test triad
-        testtri.c = sort[i].second;
-        if(testtri.updateCircumcircle(points) && testtri.r2 < besttri.r2) {
-          besttri.copyFrom(testtri);
-          besti = i;
-        }
-        else if(besttri.r2 * 4. < sort[i].first) {
-          // Stop early, points are too far away from seed.
-          break;
-        }
-      }
-      assert (besti != -1);
-      // Rearrange - remove third seed point.
-      if(besti > 1) {
-        DoubleIntPair tmp = sort[besti];
-        System.arraycopy(sort, 1, sort, 2, besti - 1);
-        sort[1] = tmp;
-      }
+    // 3. Find minimal triangle for these two points:
+    Triangle besttri = findSmallest(seedid, seed2id, sortd, sorti, len);
+    if(besttri == null) { // Degenerate
+      hull.add(new IntIntPair(seedid, -1));
+      hull.add(new IntIntPair(seed2id, -1));
+      return;
     }
-    start = 2; // First two points have already been processed.
+    // Note: sortd no longer accurate, recompute below!
+    int start = 2; // First two points have already been processed.
 
-    // Make right-handed:
+    // 5. Make right-handed:
     besttri.makeClockwise(points);
     // Seed triangulation
     if(!hullonly) {
       tris.add(besttri);
     }
-    // Seed convex hull
+    // Seed convex hull (point, triangle)
     hull.add(new IntIntPair(besttri.a, 0));
     hull.add(new IntIntPair(besttri.b, 0));
     hull.add(new IntIntPair(besttri.c, 0));
@@ -185,16 +186,16 @@ public class SweepHullDelaunay2D {
       debugHull();
     }
 
-    // Resort from triangle center
+    // 6. Resort from triangle circumcircle center
     double[] center = besttri.m;
     for(int i = start; i < len; i++) {
-      sort[i].first = quadraticEuclidean(center, points.get(sort[i].second));
+      sortd[i] = quadraticEuclidean(center, points.get(sorti[i]));
     }
-    Arrays.sort(sort, start, len);
+    DoubleIntegerArrayQuickSort.sort(sortd, sorti, start, len);
 
     // Grow hull and triangles
     for(int i = start; i < len; i++) {
-      final int pointId = sort[i].second;
+      final int pointId = sorti[i];
       final double[] newpoint = points.get(pointId);
 
       LinkedList<Triangle> newtris = hullonly ? null : new LinkedList<Triangle>();
@@ -317,7 +318,8 @@ public class SweepHullDelaunay2D {
         }
       }
       else {
-        // System.err.println("Case #2 "+pointId+" "+hstart+" "+hend+" "+hullsize);
+        // System.err.println("Case #2 "+pointId+" "+hstart+" "+hend+"
+        // "+hullsize);
         ListIterator<IntIntPair> iter = hull.listIterator();
         // Remove end
         int p = hullsize;
@@ -394,19 +396,69 @@ public class SweepHullDelaunay2D {
     // Now check for triangles that need flipping.
     if(!hullonly) {
       final int size = tris.size();
-      long[] flippedA = BitsUtil.zero(size);
-      long[] flippedB = BitsUtil.zero(size);
+      long[] flippedA = BitsUtil.zero(size), flippedB = BitsUtil.zero(size);
       // Initial flip
-      int flipped = flipTriangles(null, flippedA);
-      for(int iterations = 1; iterations < 2000 && flipped > 0; iterations++) {
-        if(iterations % 2 == 1) {
-          flipped = flipTriangles(flippedA, flippedB);
-        }
-        else {
-          flipped = flipTriangles(flippedB, flippedA);
+      if(flipTriangles(flippedA) > 0) {
+        for(int iterations = 1; iterations < 1000; iterations += 2) {
+          if(LOG.isDebuggingFinest()) {
+            debugHull();
+          }
+          if(flipTriangles(flippedA, flippedB) == 0) {
+            break;
+          }
+          if(LOG.isDebuggingFinest()) {
+            debugHull();
+          }
+          if(flipTriangles(flippedB, flippedA) == 0) {
+            break;
+          }
         }
       }
     }
+  }
+
+  /**
+   * @param seedid First seed point
+   * @param seed2id Second seed point
+   * @param sorti Points
+   * @param len Number of points
+   * @return Best triangle
+   */
+  public Triangle findSmallest(int seedid, int seed2id, double[] sortd, int[] sorti, int len) {
+    Triangle besttri = new Triangle(seedid, seed2id, -1);
+    besttri.r2 = Double.MAX_VALUE;
+    Triangle testtri = new Triangle(seedid, seed2id, -1);
+    int besti = -1;
+    for(int i = 1; i < len; i++) {
+      // Update test triad
+      testtri.c = sorti[i];
+      if(!testtri.updateCircumcircle(points)) {
+        continue; // Degenerated.
+      }
+      assert (testtri.r2 > 0.);
+      if(testtri.r2 < besttri.r2) {
+        besttri.copyFrom(testtri);
+        besti = i;
+      }
+      else if(besttri.r2 * 4. < sortd[i]) {
+        // Stop early, points are too far away from seed.
+        break;
+      }
+    }
+    if(besti == -1) {
+      // Degenerated result, everything is colinear.
+      hull.add(new IntIntPair(0, sorti[len - 1]));
+      return null;
+    }
+    assert (besti >= 1);
+    // Rearrange - remove third seed point.
+    if(besti > 1) {
+      // Note: we do NOT update the distances, they will be overwritten next.
+      int i = sorti[besti];
+      System.arraycopy(sorti, 1, sorti, 2, besti - 1);
+      sorti[1] = i;
+    }
+    return besttri;
   }
 
   /**
@@ -415,41 +467,54 @@ public class SweepHullDelaunay2D {
   void debugHull() {
     StringBuilder buf = new StringBuilder();
     for(IntIntPair p : hull) {
-      buf.append(p).append(' ');
+      buf.append(p.first).append(" (").append(p.second).append(") ");
     }
     LOG.debugFinest(buf);
   }
 
   /**
    * Flip triangles as necessary
-   * 
+   *
+   * @param flippedB Bit set to mark triangles as done
+   */
+  int flipTriangles(long[] flippedB) {
+    final int size = tris.size();
+    int numflips = 0;
+    BitsUtil.zeroI(flippedB);
+    for(int i = 0; i < size; i++) {
+      if(!BitsUtil.get(flippedB, i) && flipTriangle(i, flippedB) >= 0) {
+        numflips += 2;
+      }
+    }
+    if(LOG.isDebuggingFinest()) {
+      LOG.debugFinest("Flips: " + numflips);
+    }
+    return numflips;
+  }
+
+  /**
+   * Flip triangles as necessary
+   *
    * @param flippedA Bit set for triangles to test
    * @param flippedB Bit set to mark triangles as done
    */
   int flipTriangles(long[] flippedA, long[] flippedB) {
-    final int size = tris.size();
     int numflips = 0;
     BitsUtil.zeroI(flippedB);
-    if(flippedA == null) {
-      for(int i = 0; i < size; i++) {
-        if(flipTriangle(i, flippedB) > 0) {
-          numflips += 2;
-        }
+    for(int i = BitsUtil.nextSetBit(flippedA, 0); i > -1; i = BitsUtil.nextSetBit(flippedA, i + 1)) {
+      if(!BitsUtil.get(flippedB, i) && flipTriangle(i, flippedB) >= 0) {
+        numflips += 2;
       }
     }
-    else {
-      for(int i = BitsUtil.nextSetBit(flippedA, 0); i > -1; i = BitsUtil.nextSetBit(flippedA, i + 1)) {
-        if(flipTriangle(i, flippedB) > 0) {
-          numflips += 2;
-        }
-      }
+    if(LOG.isDebuggingFinest()) {
+      LOG.debugFinest("Flips: " + numflips);
     }
     return numflips;
   }
 
   /**
    * Flip a single triangle, if necessary.
-   * 
+   *
    * @param i Triangle number
    * @param flipped Bitset to modify
    * @return number of other triangle, or -1
@@ -481,7 +546,7 @@ public class SweepHullDelaunay2D {
       default:
         throw new RuntimeException("Neighbor triangles not aligned?");
       }
-      if(cur.inCircle(points.get(opp))) {
+      if(cur.inCircle(points.get(opp))) { // if(cur.inCircle(points.get(opp))) {
         // Replace edge AB, connect c with "opp" instead.
         final int a = cur.c, b = cur.a, c = opp, d = cur.b;
         final int ab = cur.ca, bc = lef, cd = rig, da = cur.bc;
@@ -527,9 +592,9 @@ public class SweepHullDelaunay2D {
         rig = oth.bc;
         break;
       default:
-        throw new RuntimeException("Neighbor triangles not aligned?");
+        throw new RuntimeException("Neighbor triangles not aligned? " + orient);
       }
-      if(cur.inCircle(points.get(opp))) {
+      if(cur.inCircle(points.get(opp))) { // if(cur.inCircle(points.get(opp))) {
         // Replace edge BC, connect A with "opp" instead.
         final int a = cur.a, b = cur.b, c = opp, d = cur.c;
         final int ab = cur.ab, bc = lef, cd = rig, da = cur.ca;
@@ -577,7 +642,7 @@ public class SweepHullDelaunay2D {
       default:
         throw new RuntimeException("Neighbor triangles not aligned?");
       }
-      if(cur.inCircle(points.get(opp))) {
+      if(cur.inCircle(points.get(opp))) { // if(cur.inCircle(points.get(opp))) {
         // Replace edge CA, connect B with "opp" instead.
         final int a = cur.b, b = cur.c, c = opp, d = cur.a;
         final int ab = cur.bc, bc = lef, cd = rig, da = cur.ab;
@@ -605,10 +670,10 @@ public class SweepHullDelaunay2D {
 
   /**
    * Get the convex hull only.
-   * 
+   *
    * Note: if you also want the Delaunay Triangulation, you should get that
    * first!
-   * 
+   *
    * @return Convex hull
    */
   public Polygon getHull() {
@@ -629,7 +694,7 @@ public class SweepHullDelaunay2D {
 
   /**
    * Get the Delaunay triangulation.
-   * 
+   *
    * @return Triangle list
    */
   public ArrayList<Triangle> getDelaunay() {
@@ -641,40 +706,37 @@ public class SweepHullDelaunay2D {
 
   /**
    * Squared euclidean distance. 2d.
-   * 
+   *
    * @param v1 First double[]
    * @param v2 Second double[]
    * @return Quadratic distance
    */
   public static double quadraticEuclidean(double[] v1, double[] v2) {
-    final double d1 = v1[0] - v2[0];
-    final double d2 = v1[1] - v2[1];
+    final double d1 = v1[0] - v2[0], d2 = v1[1] - v2[1];
     return (d1 * d1) + (d2 * d2);
   }
 
   /**
    * Test if the double[] AD is right of AB.
-   * 
+   *
    * @param a Starting point
    * @param b Reference point
    * @param d Test point
    * @return true when on the left side
    */
   boolean leftOf(double[] a, double[] b, double[] d) {
-    final double bax = b[0] - a[0];
-    final double bay = b[1] - a[1];
-    final double dax = d[0] - a[0];
-    final double day = d[1] - a[1];
+    final double bax = b[0] - a[0], bay = b[1] - a[1];
+    final double dax = d[0] - a[0], day = d[1] - a[1];
     final double cross = bax * day - bay * dax;
-    return cross > 0;
+    return cross > 1e-10 * Math.max(Math.max(bax, bay), Math.max(dax, day));
   }
 
   /**
    * The possible orientations two triangles can have to each other. (Shared
    * edges must have different directions!)
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   static enum Orientation {
@@ -683,9 +745,9 @@ public class SweepHullDelaunay2D {
 
   /**
    * Class representing a triangle, by referencing points in a list.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Triangle {
@@ -711,7 +773,7 @@ public class SweepHullDelaunay2D {
 
     /**
      * Constructor.
-     * 
+     *
      * @param x
      * @param y
      * @param z
@@ -724,7 +786,7 @@ public class SweepHullDelaunay2D {
 
     /**
      * Replace an edge
-     * 
+     *
      * @param a First point
      * @param b Second point
      * @param ol Previous value
@@ -750,7 +812,7 @@ public class SweepHullDelaunay2D {
 
     /**
      * Update the triangle.
-     * 
+     *
      * @param a First point
      * @param ab Edge
      * @param b Second point
@@ -759,6 +821,9 @@ public class SweepHullDelaunay2D {
      * @param ca Edge
      */
     void set(int a, int ab, int b, int bc, int c, int ca) {
+      assert (ab != bc);
+      assert (ab != ca);
+      assert (bc != ca);
       this.a = a;
       this.ab = ab;
       this.b = b;
@@ -769,19 +834,18 @@ public class SweepHullDelaunay2D {
 
     /**
      * Test whether a point is within the circumference circle.
-     * 
+     *
      * @param opp Test double[]
      * @return true when contained
      */
     public boolean inCircle(double[] opp) {
-      double dx = opp[0] - m[0];
-      double dy = opp[1] - m[1];
-      return (dx * dx + dy * dy) <= r2;
+      final double dx = opp[0] - m[0], dy = opp[1] - m[1];
+      return (dx * dx + dy * dy) < r2;
     }
 
     /**
      * Find the orientation of the triangles to each other.
-     * 
+     *
      * @param oth Other triangle
      * @return shared edge
      */
@@ -842,20 +906,19 @@ public class SweepHullDelaunay2D {
      * Verify that the triangle is clockwise
      */
     boolean isClockwise(List<double[]> points) {
-      // Mean
-      double centX = (points.get(a)[0] + points.get(b)[0] + points.get(c)[0]) / 3.0f;
-      double centY = (points.get(a)[1] + points.get(b)[1] + points.get(c)[1]) / 3.0f;
+      final double[] pa = points.get(a), pb = points.get(b), pc = points.get(c);
+      // Mean. NOT the circumcircle center here.
+      final double mX = (pa[0] + pb[0] + pc[0]) * MathUtil.ONE_THIRD;
+      final double mY = (pa[1] + pb[1] + pc[1]) * MathUtil.ONE_THIRD;
 
-      double dr0 = points.get(a)[0] - centX, dc0 = points.get(a)[1] - centY;
-      double dx01 = points.get(b)[0] - points.get(a)[0], dy01 = points.get(b)[1] - points.get(a)[1];
-
-      double df = -dx01 * dc0 + dy01 * dr0;
-      return (df <= 0);
+      final double max = pa[0] - mX, may = pa[1] - mY;
+      final double abx = pb[0] - pa[0], aby = pb[1] - pa[1];
+      return (-abx * may + aby * max <= 0);
     }
 
     /**
      * Copy the values from another triangle.
-     * 
+     *
      * @param o object to copy from
      */
     void copyFrom(Triangle o) {
@@ -869,48 +932,47 @@ public class SweepHullDelaunay2D {
 
     /**
      * Recompute the location and squared radius of circumcircle.
-     * 
-     * Note: numerical stability is important!
-     * 
+     *
+     * Note: numerical stability is important; and this is not entirely robust
+     * to degenerate cases.
+     *
+     * Careful: the midpoint of the circumcircle is <i>not</i> the average of
+     * the corners!
+     *
      * @return success
      */
-    boolean updateCircumcircle(List<double[]> points) {
+    private final boolean updateCircumcircle(List<double[]> points) {
       double[] pa = points.get(a), pb = points.get(b), pc = points.get(c);
 
       // Compute vectors from A: AB, AC:
       final double abx = pb[0] - pa[0], aby = pb[1] - pa[1];
-      final double acx = pc[0] - pa[0], acy = pc[1] - pa[1];
+      final double bcx = pc[0] - pb[0], bcy = pc[1] - pb[1];
 
-      // Squared euclidean lengths
-      final double ablen = abx * abx + aby * aby;
-      final double aclen = acx * acx + acy * acy;
-
-      // Compute D
-      final double D = 2 * (abx * acy - aby * acx);
-
-      // No circumcircle:
+      // Degenerated:
+      final double D = abx * bcy - aby * bcx;
       if(D == 0) {
+        m[0] = Double.NaN;
+        m[1] = Double.NaN;
+        r2 = Double.NaN;
         return false;
       }
 
-      // Compute offset:
-      final double offx = (acy * ablen - aby * aclen) / D;
-      final double offy = (abx * aclen - acx * ablen) / D;
+      // Midpoints of AB and BC:
+      final double mabx = (pa[0] + pb[0]) * .5, maby = (pa[1] + pb[1]) * .5;
+      final double mbcx = (pb[0] + pc[0]) * .5, mbcy = (pb[1] + pc[1]) * .5;
 
-      // Avoid degeneration:
-      r2 = offx * offx + offy * offy;
-      if((r2 > 1e10 * ablen || r2 > 1e10 * aclen)) {
-        return false;
-      }
+      final double beta = (abx * (mbcx - mabx) + aby * (mbcy - maby)) / D;
 
-      m[0] = pa[0] + offx;
-      m[1] = pa[1] + offy;
+      m[0] = mbcx - bcy * beta;
+      m[1] = mbcy + bcx * beta;
+      final double rx = pa[0] - m[0], ry = pa[1] - m[1];
+      r2 = rx * rx + ry * ry;
       return true;
     }
 
     @Override
     public String toString() {
-      return "Triangle [a=" + a + ", b=" + b + ", c=" + c + ", ab=" + ab + ", ac=" + ca + ", bc=" + bc + "]";
+      return "Triangle [a=" + a + ", b=" + b + ", c=" + c + ", ab=" + ab + ", bc=" + bc + ", ca=" + ca + "]";
     }
   }
 
@@ -920,7 +982,7 @@ public class SweepHullDelaunay2D {
     Random r = new Random(1);
     final int num = 100000;
     for(int i = 0; i < num; i++) {
-      final double[] v = new double[]{r.nextDouble(), r.nextDouble()};
+      final double[] v = new double[] { r.nextDouble(), r.nextDouble() };
       // System.err.println(i + ": " + FormatUtil.format(v.getArrayRef(), " "));
       d.add(v);
     }
