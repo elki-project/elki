@@ -22,7 +22,12 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.memory.MapStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
@@ -37,6 +42,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -76,38 +83,45 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   @Override
   protected void preprocess() {
     DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
+    
     storage = new MapStore<KNNList>();
     MapStore<KNNHeap> store = new MapStore<KNNHeap>();
-    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Materializing KNN-Graph (k=" + k + ")", relation.size(), getLogger()) : null;
     
+    IndefiniteProgress progress = LOG.isVerbose() ? new IndefiniteProgress("KNNGraph iteration", LOG) : null;
+    
+    Random random = rnd.getSingleThreadedRandom();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      //TODO single-threaded random?
       DBID id = DBIDUtil.deref(iditer);
-      final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
+      
+      final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), k, random);
       KNNHeap heap = DBIDUtil.newHeap(k);
       for (DBIDIter siter = sample.iter(); siter.valid(); siter.advance()){
         heap.insert(distanceQuery.distance(iditer, siter), siter);
       }
       store.put(id,heap);
-      getLogger().incrementProcessed(progress);
     }
+    
     int counter = 1;
     
     MapStore<HashSetModifiableDBIDs> trueNeighborHash = new MapStore<HashSetModifiableDBIDs>();    
-    HashSetModifiableDBIDs allNeighbors = DBIDUtil.newHashSet(2*k);
     while (counter != 0){
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         //build reverse neighbors
         DBID id = DBIDUtil.deref(iditer);
         KNNHeap heap = store.get(iditer);
         DBIDs rev = reverse(id,store);
-
+//        String s = "";
+//        for (DBIDIter riter = rev.iter(); riter.valid(); riter.advance()){
+//          s+=DBIDUtil.deref(riter)+"\t";
+//        }
+//        System.out.println(s);
         //join neighbors with reverse neighbors
-        allNeighbors.clear();
+        HashSetModifiableDBIDs allNeighbors = DBIDUtil.newHashSet(2*k);
         for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
           allNeighbors.add(heapiter);
         }
         allNeighbors.addDBIDs(rev);
+        //join neighbors with reverse
         
         trueNeighborHash.put(id, allNeighbors);
       }
@@ -117,33 +131,35 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         //for every neighbor of a neighbor do
         DBID id = DBIDUtil.deref(iditer);
         KNNHeap newNeighbors = store.get(iditer);
+
         HashSetModifiableDBIDs trueNeighbors = trueNeighborHash.get(iditer);
         
         for(DBIDMIter neighboriter = trueNeighbors.iter(); neighboriter.valid(); neighboriter.advance()) {
           HashSetModifiableDBIDs nNeighbors = trueNeighborHash.get(neighboriter);
           
-          for (DBIDMIter nniter = nNeighbors.iter(); nniter.valid(); nniter.advance()){            
-            if (id.compareTo(nniter)!= 0){
-                //calculate similarity of v and u2
-                double distance = distanceQuery.distance(iditer,nniter);
+          for (DBIDMIter nniter = nNeighbors.iter(); nniter.valid(); nniter.advance()){
+            if (DBIDUtil.compare(id, nniter)!= 0){
                 //see if actual object is already contained in hash
                 boolean contained=false;
-                for (DoubleDBIDListIter heapiter = newNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()){
-                  if (id.compareTo(heapiter)!=0){
+                for (DoubleDBIDListIter heapiter = newNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()){                 
+                  if (DBIDUtil.compare(heapiter, nniter)==0){
                     contained=true;
                   }
                 }
-                if (contained){
-                  //TODO what happens in this case? the distance-value for iditer has to be updated
-                }
-                else{
-                  newNeighbors.insert(distance, iditer);
-                  counter = 1;
+                if (!contained){
+                  //calculate similarity of v and u2
+                  double distance = distanceQuery.distance(iditer,nniter);
+                  double newDistance = newNeighbors.insert(distance,nniter);
+                  if (distance <= newDistance){
+                    counter++;
+                  }
                 }
             } 
           }
         }
+        store.put(iditer, newNeighbors);
       }
+      LOG.incrementProcessed(progress);
     }
     //convert store to storage
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -151,7 +167,15 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       KNNList list = heap.toKNNList();
       storage.put(iditer, list);
     }
-    getLogger().ensureCompleted(progress);
+    LOG.setCompleted(progress);
+  }
+
+  private String print(KNNHeap heap) {
+    String s ="";
+    for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
+      s+=DBIDUtil.deref(heapiter)+"\t";
+    }
+    return s;
   }
 
   private HashSetModifiableDBIDs reverse(DBID id, MapStore<KNNHeap> store) {
