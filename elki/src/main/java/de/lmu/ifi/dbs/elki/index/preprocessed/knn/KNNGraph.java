@@ -37,9 +37,12 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingKNNPreprocessor.SpaceFillingKNNQuery;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
@@ -213,6 +216,16 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   @Override
   public String getShortName() {
     return "nn-descent-knn";
+  }
+  
+  @Override
+  public KNNQuery<O> getKNNQuery(DistanceQuery<O> distanceQuery, Object... hints) {
+    for(Object hint : hints) {
+      if(DatabaseQuery.HINT_EXACT.equals(hint)) {
+        return null;
+      }
+    }
+    return super.getKNNQuery(distanceQuery, hints);
   }
   
   public static class Factory<O> extends AbstractMaterializeKNNPreprocessor.Factory<O> {
