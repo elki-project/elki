@@ -43,6 +43,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -73,15 +75,10 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     super(relation, distanceFunction, k);
     this.rnd = rnd;
   }
-  
-  @Override
-  public void logStatistics() {
-    // TODO which statistics to log?
-    
-  }
 
   @Override
   protected void preprocess() {
+    final long starttime = System.currentTimeMillis();
     DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
     
     storage = new MapStore<KNNList>();
@@ -160,6 +157,9 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         store.put(iditer, newNeighbors);
       }
       LOG.incrementProcessed(progress);
+      if (LOG.isStatistics()){
+        LOG.statistics(new StringStatistic("Distance computations in this iteration",Integer.toString(counter)));
+      }
     }
     //convert store to storage
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -168,6 +168,10 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       storage.put(iditer, list);
     }
     LOG.setCompleted(progress);
+    final long end = System.currentTimeMillis();
+    if(LOG.isStatistics()) {
+      LOG.statistics(new LongStatistic(this.getClass().getCanonicalName() + ".construction-time.ms", end - starttime));
+    }
   }
 
   private String print(KNNHeap heap) {
@@ -194,6 +198,11 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+  
+  @Override
+  public void logStatistics() {
+    // TODO log scan rate
   }
 
   @Override
