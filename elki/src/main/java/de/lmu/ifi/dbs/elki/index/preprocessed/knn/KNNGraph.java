@@ -24,10 +24,7 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.memory.MapStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
@@ -42,13 +39,11 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingKNNPreprocessor.SpaceFillingKNNQuery;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleIntegerMaxHeap;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
@@ -65,6 +60,11 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
    * Random generator
    */
   private final RandomFactory rnd;
+  
+  /*
+   * total distance computations
+   */
+  private double counter_all=0.0;
 
   /**
    * Constructor.
@@ -159,10 +159,12 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         }
         store.put(iditer, newNeighbors);
       }
+      counter_all+=counter;
       LOG.incrementProcessed(progress);
       if (LOG.isStatistics()){
         LOG.statistics(new StringStatistic("Distance computations in this iteration",Integer.toString(counter)));
       }
+
     }
     //convert store to storage
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -205,7 +207,10 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   
   @Override
   public void logStatistics() {
-    // TODO log scan rate
+    double size = (double) relation.size();
+    if (LOG.isStatistics()){
+      LOG.statistics(new DoubleStatistic("Scan rate",counter_all/(size*(size-1.0)/2.0)));
+    }
   }
 
   @Override
