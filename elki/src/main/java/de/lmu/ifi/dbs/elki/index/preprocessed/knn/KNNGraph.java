@@ -73,6 +73,11 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   private double delta = 0.001;
   
   /**
+   * sample rate
+   */
+  private double rho = 1.0;
+  
+  /**
    * Constructor.
    *
    * @param relation Relation to index
@@ -80,10 +85,11 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
    * @param k k
    * @param rnd Random generator
    */
-  public KNNGraph(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, RandomFactory rnd, double delta) {
+  public KNNGraph(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, RandomFactory rnd, double delta, double rho) {
     super(relation, distanceFunction, k);
     this.rnd = rnd;
     this.delta = delta;
+    this.rho = rho;
   }
 
   @Override
@@ -254,21 +260,27 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     private final double delta;
     
     /**
+     * sample rate
+     */
+    private final double rho;
+    
+    /**
      * Constructor.
      *
      * @param k K
      * @param distanceFunction distance function
      * @param rnd Random generator
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction, RandomFactory rnd, double delta) {
+    public Factory(int k, DistanceFunction<? super O> distanceFunction, RandomFactory rnd, double delta, double rho) {
       super(k, distanceFunction);
       this.rnd = rnd;
       this.delta = delta;
+      this.rho = rho;
     }
 
     @Override
     public KNNGraph<O> instantiate(Relation<O> relation) {
-      return new KNNGraph<>(relation, distanceFunction, k, rnd, delta);
+      return new KNNGraph<>(relation, distanceFunction, k, rnd, delta, rho);
     }
 
     /**
@@ -296,6 +308,11 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       public static final OptionID DELTA_ID = new OptionID("knngraph.delta", "The early termination parameter.");
       
       /**
+       * Sample rate.
+       */
+      public static final OptionID RHO_ID = new OptionID("knngraph.rho", "The sample rate parameter");
+      
+      /**
        * Random generator
        */
       private RandomFactory rnd;
@@ -304,7 +321,12 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
        * early termination parameter
        */
       private double delta;
-
+      
+      /**
+       * sample rate
+       */
+      private double rho;
+      
       @Override
       protected void makeOptions(Parameterization config) {
         super.makeOptions(config);
@@ -316,11 +338,15 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         if(config.grab(deltaP)) {
           delta = deltaP.getValue();
         }
+        DoubleParameter rhoP = new DoubleParameter(RHO_ID, 1);
+        if (config.grab(rhoP)){
+          rho = rhoP.getValue();
+        }
       }
 
       @Override
       protected KNNGraph.Factory<O> makeInstance() {
-        return new KNNGraph.Factory<>(k, distanceFunction, rnd, delta);
+        return new KNNGraph.Factory<>(k, distanceFunction, rnd, delta, rho);
       }
     }
   }
