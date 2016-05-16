@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
@@ -310,6 +311,10 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         RandomParameter rndP = new RandomParameter(SEED_ID);
         if(config.grab(rndP)) {
           rnd = rndP.getValue();
+        }
+        DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.001);
+        if(config.grab(deltaP)) {
+          delta = deltaP.getValue();
         }
       }
 
