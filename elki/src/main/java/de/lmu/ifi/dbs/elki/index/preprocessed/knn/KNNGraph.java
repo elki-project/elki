@@ -61,11 +61,16 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
    */
   private final RandomFactory rnd;
   
-  /*
+  /**
    * total distance computations
    */
   private double counter_all=0.0;
-
+  
+  /**
+   * early termination parameter
+   */
+  private double delta = 0.001;
+  
   /**
    * Constructor.
    *
@@ -74,9 +79,10 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
    * @param k k
    * @param rnd Random generator
    */
-  public KNNGraph(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, RandomFactory rnd) {
+  public KNNGraph(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, RandomFactory rnd, double delta) {
     super(relation, distanceFunction, k);
     this.rnd = rnd;
+    this.delta = delta;
   }
 
   @Override
@@ -101,10 +107,12 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       store.put(id,heap);
     }
     
-    int counter = 1;
+    int size = relation.size();
+    int counter = size;
     
     MapStore<HashSetModifiableDBIDs> trueNeighborHash = new MapStore<HashSetModifiableDBIDs>();    
-    while (counter != 0){
+//    while (counter != 0){
+    while (counter >= delta*k*size){
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         //build reverse neighbors
         DBID id = DBIDUtil.deref(iditer);
@@ -240,20 +248,26 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     private final RandomFactory rnd;
 
     /**
+     * early termination parameter
+     */
+    private final double delta;
+    
+    /**
      * Constructor.
      *
      * @param k K
      * @param distanceFunction distance function
      * @param rnd Random generator
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction, RandomFactory rnd) {
+    public Factory(int k, DistanceFunction<? super O> distanceFunction, RandomFactory rnd, double delta) {
       super(k, distanceFunction);
       this.rnd = rnd;
+      this.delta = delta;
     }
 
     @Override
     public KNNGraph<O> instantiate(Relation<O> relation) {
-      return new KNNGraph<>(relation, distanceFunction, k, rnd);
+      return new KNNGraph<>(relation, distanceFunction, k, rnd, delta);
     }
 
     /**
@@ -273,12 +287,22 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
        * Key: {@code -knngraph.seed}
        * </p>
        */
-      public static final OptionID SEED_ID = new OptionID("randomknn.seed", "The random number seed.");
+      public static final OptionID SEED_ID = new OptionID("knngraph.seed", "The random number seed.");
+      
+      /**
+       * Early termination parameter.
+       */
+      public static final OptionID DELTA_ID = new OptionID("knngraph.delta", "The early termination parameter.");
       
       /**
        * Random generator
        */
       private RandomFactory rnd;
+      
+      /**
+       * early termination parameter
+       */
+      private double delta;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -291,7 +315,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
 
       @Override
       protected KNNGraph.Factory<O> makeInstance() {
-        return new KNNGraph.Factory<>(k, distanceFunction, rnd);
+        return new KNNGraph.Factory<>(k, distanceFunction, rnd, delta);
       }
     }
   }
