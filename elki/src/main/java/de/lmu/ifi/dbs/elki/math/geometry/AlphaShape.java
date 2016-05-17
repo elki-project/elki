@@ -102,7 +102,7 @@ public class AlphaShape {
       }
       BitsUtil.setI(used, ab);
       final SweepHullDelaunay2D.Triangle next = delaunay.get(ab);
-      if(next.r2 < alpha2) {
+      if(next.r2 <= alpha2) {
         // Continue where we left off...
         if(next.ab == i) {
           processNeighbor(cur, used, ab, next.bc, next.c);
