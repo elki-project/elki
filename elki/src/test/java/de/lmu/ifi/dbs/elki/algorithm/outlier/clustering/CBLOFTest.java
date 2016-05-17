@@ -23,15 +23,16 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.clustering;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import org.junit.Test;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansSort;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import org.junit.Test;
 
 /**
  * Tests the CBLOF outlier detection algorithm.
@@ -47,7 +48,7 @@ public class CBLOFTest extends AbstractSimpleAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(CBLOF.Parameterizer.ALPHPA_ID, 0.8);
     params.addParameter(CBLOF.Parameterizer.BETA_ID, 3);
-    params.addParameter(CBLOF.Parameterizer.CLUSTERING_ID, KMeansHamerly.class);
+    params.addParameter(CBLOF.Parameterizer.CLUSTERING_ID, KMeansSort.class);
     params.addParameter(KMeans.K_ID, 1);
 
     // setup Algorithm

@@ -31,6 +31,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSHeap de.lmu.ifi.dbs.elki.a
 de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSList
 de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DeLiClu de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu
 de.lmu.ifi.dbs.elki.algorithm.outlier.clustering.SilhouetteOutlierDetection
+de.lmu.ifi.dbs.elki.algorithm.outlier.clustering.CBLOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.COP
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.DBOutlierDetection de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.distance.DBOutlierScore de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierScore
