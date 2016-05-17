@@ -115,6 +115,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     }
     
     int size = relation.size();
+//    int counter = 1;
     int counter = size;
     
     MapStore<HashSetModifiableDBIDs> trueNeighborHash = new MapStore<HashSetModifiableDBIDs>();    
@@ -125,11 +126,6 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         DBID id = DBIDUtil.deref(iditer);
         KNNHeap heap = store.get(iditer);
         DBIDs rev = reverse(id,store);
-//        String s = "";
-//        for (DBIDIter riter = rev.iter(); riter.valid(); riter.advance()){
-//          s+=DBIDUtil.deref(riter)+"\t";
-//        }
-//        System.out.println(s);
         //join neighbors with reverse neighbors
         HashSetModifiableDBIDs allNeighbors = DBIDUtil.newHashSet(2*k);
         for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
@@ -150,25 +146,16 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         HashSetModifiableDBIDs trueNeighbors = trueNeighborHash.get(iditer);
         
         for(DBIDMIter neighboriter = trueNeighbors.iter(); neighboriter.valid(); neighboriter.advance()) {
+//          KNNHeap neighbors1 = store.get(neighboriter);
           HashSetModifiableDBIDs nNeighbors = trueNeighborHash.get(neighboriter);
           
           for (DBIDMIter nniter = nNeighbors.iter(); nniter.valid(); nniter.advance()){
-            if (DBIDUtil.compare(id, nniter)!= 0){
+//          for(DBIDMIter nniter = trueNeighbors.iter(); neighboriter.valid(); neighboriter.advance()) {
+//            KNNHeap neighbors2 = store.get(nniter);
+          if (DBIDUtil.compare(id, nniter)!= 0){
+//            if (DBIDUtil.compare(neighboriter, nniter)!=0){
                 //see if actual object is already contained in hash
-                boolean contained=false;
-                for (DoubleDBIDListIter heapiter = newNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()){                 
-                  if (DBIDUtil.compare(heapiter, nniter)==0){
-                    contained=true;
-                  }
-                }
-                if (!contained){
-                  //calculate similarity of v and u2
-                  double distance = distanceQuery.distance(iditer,nniter);
-                  double newDistance = newNeighbors.insert(distance,nniter);
-                  if (distance <= newDistance){
-                    counter++;
-                  }
-                }
+                counter += add (newNeighbors, iditer, nniter);
             } 
           }
         }
@@ -192,6 +179,25 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     if(LOG.isStatistics()) {
       LOG.statistics(new LongStatistic(this.getClass().getCanonicalName() + ".construction-time.ms", end - starttime));
     }
+  }
+
+  private int add(KNNHeap newNeighbors, DBIDIter iditer, DBIDMIter nniter) {
+    int ret = 0;
+    boolean contained=false;
+    for (DoubleDBIDListIter heapiter = newNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()){                 
+      if (DBIDUtil.compare(heapiter, nniter)==0){
+        contained=true;
+      }
+    }
+    if (!contained){
+      //calculate similarity of v and u2
+      double distance = distanceQuery.distance(iditer,nniter);
+      double newDistance = newNeighbors.insert(distance,nniter);
+      if (distance <= newDistance){
+        ret++;
+      }
+    }
+    return ret;
   }
 
   private String print(KNNHeap heap) {
