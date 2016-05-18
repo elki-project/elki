@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.memory.MapStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
@@ -115,11 +116,9 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     }
     
     int size = relation.size();
-//    int counter = 1;
     int counter = size;
     
     MapStore<HashSetModifiableDBIDs> trueNeighborHash = new MapStore<HashSetModifiableDBIDs>();    
-//    while (counter != 0){
     while (counter >= delta*k*size){
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         //build reverse neighbors
@@ -139,27 +138,20 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       counter = 0;
       //iterate through dataset
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        //for every neighbor of a neighbor do
-        DBID id = DBIDUtil.deref(iditer);
-        KNNHeap newNeighbors = store.get(iditer);
-
+        //for every pair of neighbors do
         HashSetModifiableDBIDs trueNeighbors = trueNeighborHash.get(iditer);
-        
-        for(DBIDMIter neighboriter = trueNeighbors.iter(); neighboriter.valid(); neighboriter.advance()) {
-//          KNNHeap neighbors1 = store.get(neighboriter);
-          HashSetModifiableDBIDs nNeighbors = trueNeighborHash.get(neighboriter);
-          
-          for (DBIDMIter nniter = nNeighbors.iter(); nniter.valid(); nniter.advance()){
-//          for(DBIDMIter nniter = trueNeighbors.iter(); neighboriter.valid(); neighboriter.advance()) {
-//            KNNHeap neighbors2 = store.get(nniter);
-          if (DBIDUtil.compare(id, nniter)!= 0){
-//            if (DBIDUtil.compare(neighboriter, nniter)!=0){
-                //see if actual object is already contained in hash
-                counter += add (newNeighbors, iditer, nniter);
-            } 
+        for(DBIDMIter niter = trueNeighbors.iter(); niter.valid(); niter.advance()) {
+          KNNHeap neighbors = store.get(niter);
+          for(DBIDMIter niter2 = trueNeighbors.iter(); niter2.valid(); niter2.advance()) {
+            KNNHeap neighbors2 = store.get(niter2);
+            if (DBIDUtil.compare(niter, niter2)!=0){
+                counter += add (neighbors, niter, niter2);
+                counter += add (neighbors2, niter2, niter);
+            }
+            store.put(niter2, neighbors2);
           }
+          store.put(niter, neighbors);
         }
-        store.put(iditer, newNeighbors);
       }
       counter_all+=counter;
       LOG.incrementProcessed(progress);
@@ -181,8 +173,18 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     }
   }
 
-  private int add(KNNHeap newNeighbors, DBIDIter iditer, DBIDMIter nniter) {
+  /**
+   * 
+   * add nniter to iditer-hash newNeighbors
+   * 
+   * @param newNeighbors
+   * @param iditer
+   * @param nniter
+   * @return
+   */
+  private int add(KNNHeap newNeighbors, DBIDRef iditer, DBIDRef nniter) {
     int ret = 0;
+    //see if actual object is already contained in hash
     boolean contained=false;
     for (DoubleDBIDListIter heapiter = newNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()){                 
       if (DBIDUtil.compare(heapiter, nniter)==0){
