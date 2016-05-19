@@ -101,6 +101,8 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     storage = new MapStore<KNNList>();
     MapStore<KNNHeap> store = new MapStore<KNNHeap>();
     
+    MapStore<HashSetModifiableDBIDs> newNeighborHash = new MapStore<HashSetModifiableDBIDs>();    
+    
     IndefiniteProgress progress = LOG.isVerbose() ? new IndefiniteProgress("KNNGraph iteration", LOG) : null;
     
     Random random = rnd.getSingleThreadedRandom();
@@ -109,48 +111,93 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       
       final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), k, random);
       KNNHeap heap = DBIDUtil.newHeap(k);
+      HashSetModifiableDBIDs newNeighbors = DBIDUtil.newHashSet(k);
       for (DBIDIter siter = sample.iter(); siter.valid(); siter.advance()){
         heap.insert(distanceQuery.distance(iditer, siter), siter);
+        newNeighbors.add(siter);
       }
       store.put(id,heap);
+      newNeighborHash.put(id, newNeighbors);
     }
     
     int size = relation.size();
-    int counter = size;
+    int counter = k * size;
     
-    MapStore<HashSetModifiableDBIDs> trueNeighborHash = new MapStore<HashSetModifiableDBIDs>();    
     while (counter >= delta*k*size){
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        //build reverse neighbors
-        DBID id = DBIDUtil.deref(iditer);
-        KNNHeap heap = store.get(iditer);
-        DBIDs rev = reverse(id,store);
-        //join neighbors with reverse neighbors
-        HashSetModifiableDBIDs allNeighbors = DBIDUtil.newHashSet(2*k);
-        for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
-          allNeighbors.add(heapiter);
-        }
-        allNeighbors.addDBIDs(rev);
-        //join neighbors with reverse
-        
-        trueNeighborHash.put(id, allNeighbors);
-      }
       counter = 0;
       //iterate through dataset
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         //for every pair of neighbors do
-        HashSetModifiableDBIDs trueNeighbors = trueNeighborHash.get(iditer);
-        for(DBIDMIter niter = trueNeighbors.iter(); niter.valid(); niter.advance()) {
+        //calculate also reverse neighbors separately for old and new
+        HashSetModifiableDBIDs newNeighbors = newNeighborHash.get(iditer);
+        DBID id = DBIDUtil.deref(iditer);
+        KNNHeap heap = store.get(iditer);
+        HashSetModifiableDBIDs allNewNeighbors = DBIDUtil.newHashSet();
+        HashSetModifiableDBIDs oldNeighbors = DBIDUtil.newHashSet();
+        for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
+          if (newNeighbors.contains(heapiter)){
+            allNewNeighbors.add(heapiter);
+          }
+          else{
+            oldNeighbors.add(heapiter);
+          }
+        }
+        //Sampling
+        final DBIDs sampleNew = DBIDUtil.randomSample(allNewNeighbors, rho * k, random);        
+        DBIDs newRev = reverse(id, sampleNew, store);
+        
+        //determine the sampled new neighbors (also reserve)
+        HashSetModifiableDBIDs usedNew = DBIDUtil.newHashSet(sampleNew);
+        usedNew.addDBIDs(DBIDUtil.randomSample(newRev, rho * k, random));
+        
+        //determine old neighbors and sampled reverse ones
+        DBIDs oldRev = reverse(id, oldNeighbors, store);
+        oldNeighbors.addDBIDs(DBIDUtil.randomSample(oldRev, rho * k, random));
+        
+        for(DBIDMIter niter = usedNew.iter(); niter.valid(); niter.advance()) {
+          newNeighbors.remove(niter);
+          HashSetModifiableDBIDs niternew = newNeighborHash.get(niter);
           KNNHeap neighbors = store.get(niter);
-          for(DBIDMIter niter2 = trueNeighbors.iter(); niter2.valid(); niter2.advance()) {
+          for(DBIDMIter niter2 = usedNew.iter(); niter2.valid(); niter2.advance()) {
+            newNeighbors.remove(niter2);
+            HashSetModifiableDBIDs niternew2 = newNeighborHash.get(niter);
             KNNHeap neighbors2 = store.get(niter2);
-            if (DBIDUtil.compare(niter, niter2)!=0){
-                counter += add (neighbors, niter, niter2);
-                counter += add (neighbors2, niter2, niter);
+            if (DBIDUtil.compare(niter, niter2)<0){
+              int add = add (neighbors, niter, niter2);
+              if (add > 0){
+                counter++;
+                niternew.add(niter2);
+              }
+              int add2 = add (neighbors2, niter2, niter);
+              if (add2 > 0){
+                counter++;
+                niternew2.add(niter);
+              }
             }
             store.put(niter2, neighbors2);
+            newNeighborHash.put(niter2, niternew2);
+          }
+          
+          for(DBIDMIter niter2 = oldNeighbors.iter(); niter2.valid(); niter2.advance()) {
+            HashSetModifiableDBIDs niternew2 = newNeighborHash.get(niter);
+            KNNHeap neighbors2 = store.get(niter2);
+            if (DBIDUtil.compare(niter, niter2)!=0){
+              int add = add (neighbors, niter, niter2);
+              if (add > 0){
+                counter++;
+                niternew.add(niter2);
+              }
+              int add2 = add (neighbors2, niter2, niter);
+              if (add2 > 0){
+                counter++;
+                niternew2.add(niter);
+              }
+            }
+            store.put(niter2, neighbors2);
+            newNeighborHash.put(niter2, niternew2);
           }
           store.put(niter, neighbors);
+          newNeighborHash.put(niter, niternew);
         }
       }
       counter_all+=counter;
@@ -210,12 +257,19 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     return s;
   }
 
-  private HashSetModifiableDBIDs reverse(DBID id, MapStore<KNNHeap> store) {
+  /**
+   * 
+   * @param id - object for which reverse neighbors are calculated
+   * @param neighbors - neighbors which should be considered
+   * @param store - location of neighbor structure
+   * @return reverse neighbors from the ones contained neighbors-Hash
+   */
+  private HashSetModifiableDBIDs reverse(DBID id, DBIDs neighbors, MapStore<KNNHeap> store) {
     HashSetModifiableDBIDs rev = DBIDUtil.newHashSet(k);
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       KNNHeap heap = store.get(iditer);
       for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
-        if (id.compareTo(heapiter)==0){
+        if (neighbors.contains(id) && id.compareTo(heapiter)==0){
           rev.add(iditer);
         }
       }
