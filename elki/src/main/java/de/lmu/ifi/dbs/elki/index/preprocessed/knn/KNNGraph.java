@@ -118,7 +118,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       DBID id = DBIDUtil.deref(iditer);
       
-      final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd);
+      final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd, DBIDUtil.deref(iditer));
       KNNHeap heap = DBIDUtil.newHeap(k);
       HashSetModifiableDBIDs newNeighbors = DBIDUtil.newHashSet(k);
       for (DBIDIter siter = sample.iter(); siter.valid(); siter.advance()){
@@ -134,17 +134,24 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     
     boolean first = true;
     
+    MapStore<DBIDs> sampleNewHash = new MapStore<>();
+    
     while (counter >= delta*k*size){
       LOG.incrementProcessed(progress);
       counter = 0;
       
+      sampleNewHash = sampleNew(newNeighborHash);
+      
       //calculate reverse neighbors separately for old and new
       newReverseNeighbors.clear();
       oldReverseNeighbors.clear();
-      reverse(store, newNeighborHash);      
+      reverse(store, sampleNewHash);      
+      
       
       //iterate through dataset
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        
+        
         //determine new and old neighbors
         KNNHeap heap = store.get(iditer);
         HashSetModifiableDBIDs newNeighbors = newNeighborHash.get(iditer);
@@ -162,7 +169,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         int items = (int) Math.round(rho*k);
         
         //Sampling
-        final DBIDs sampleNew = DBIDUtil.randomSample(allNewNeighbors, Math.min(items, allNewNeighbors.size()), rnd);    
+        final DBIDs sampleNew = sampleNewHash.get(iditer);
         DBIDs newRev = DBIDUtil.newHashSet();
         if (newReverseNeighbors.get(iditer) != null){
           newRev = newReverseNeighbors.get(iditer);
@@ -249,16 +256,27 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     }
   }
 
+  private MapStore<DBIDs> sampleNew(MapStore<HashSetModifiableDBIDs> newNeighborHash) {
+    MapStore<DBIDs> sampleNewNeighbors = new MapStore<>();
+    for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()){
+      DBIDs newNeighbors = newNeighborHash.get(iditer);
+      int items = (int) Math.round(rho*k);
+      DBIDs sampleNew = DBIDUtil.randomSample(newNeighbors, Math.min(items, newNeighbors.size()), rnd);
+      sampleNewNeighbors.put(iditer, sampleNew);
+    }
+    return sampleNewNeighbors;
+  }
+
   /**
    * calculates new and old neighbors for database
    * @param store - neighbors for every object
-   * @param newNeighborHash - new neighbors for every object
+   * @param sampleNewHash - new neighbors for every object
    */
-  private void reverse(MapStore<KNNHeap> store, MapStore<HashSetModifiableDBIDs> newNeighborHash) {
+  private void reverse(MapStore<KNNHeap> store, MapStore<DBIDs> sampleNewHash) {
     for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()){
       KNNHeap heap = store.get(iditer);
       //TODO newNeighbors wird an dieser Stelle geleert
-      HashSetModifiableDBIDs newNeighbors = newNeighborHash.get(iditer);
+      DBIDs newNeighbors = sampleNewHash.get(iditer);
       for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
         if (newNeighbors.contains(heapiter)){
           HashSetModifiableDBIDs newReverse = newReverseNeighbors.get(heapiter);
