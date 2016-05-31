@@ -58,16 +58,16 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 
 /**
  * Parser to load WEKA .arff files into ELKI.
- * 
+ *
  * This parser is quite hackish, and contains lots of not yet configurable
  * magic.
- * 
+ *
  * TODO: Allow configuration of the vector types (double, float)
- * 
+ *
  * TODO: when encountering integer columns, produce integer vectors.
- * 
+ *
  * TODO: allow optional class labels.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  */
@@ -134,14 +134,14 @@ public class ArffParser implements Parser {
 
   /**
    * Factory for dense vectors.
-   * 
+   *
    * TODO: Make parameterizable
    */
   NumberVector.Factory<?> denseFactory = DoubleVector.FACTORY;
 
   /**
    * Constructor.
-   * 
+   *
    * @param magic_eid Magic to recognize external IDs
    * @param magic_class Magic to recognize class labels
    */
@@ -153,7 +153,7 @@ public class ArffParser implements Parser {
 
   /**
    * Constructor.
-   * 
+   *
    * @param magic_eid Magic to recognize external IDs
    * @param magic_class Magic to recognize class labels
    */
@@ -272,11 +272,8 @@ public class ArffParser implements Parser {
         for(TIntObjectIterator<Object> iter = map.iterator(); iter.hasNext();) {
           iter.advance();
           int i = iter.key();
-          if(i < s) {
+          if(i < s || i >= s + dimsize[out]) {
             continue;
-          }
-          if(i >= s + dimsize[out]) {
-            break;
           }
           double v = ((Double) iter.value()).doubleValue();
           f.put(i - s, v);
@@ -392,7 +389,7 @@ public class ArffParser implements Parser {
 
   /**
    * Make a StreamTokenizer for the ARFF format.
-   * 
+   *
    * @param br Buffered reader
    * @return Tokenizer
    */
@@ -419,7 +416,7 @@ public class ArffParser implements Parser {
 
   /**
    * Setup the headers for the object bundle.
-   * 
+   *
    * @param names Attribute names
    * @param targ Target columns
    * @param etyp ELKI type information
@@ -473,7 +470,7 @@ public class ArffParser implements Parser {
 
   /**
    * Read the dataset header part of the ARFF file, to ensure consistency.
-   * 
+   *
    * @param br Buffered Reader
    * @throws IOException
    */
@@ -499,7 +496,7 @@ public class ArffParser implements Parser {
 
   /**
    * Parse the "@attribute" section of the ARFF file.
-   * 
+   *
    * @param br Input
    * @param names List (to fill) of attribute names
    * @param types List (to fill) of attribute types
@@ -546,7 +543,7 @@ public class ArffParser implements Parser {
    * Process the column types (and names!) into ELKI relation style. Note that
    * this will for example merge successive numerical columns into a single
    * vector.
-   * 
+   *
    * @param names Attribute names
    * @param types Attribute types
    * @param targ Target dimension mapping (ARFF to ELKI), return value
@@ -607,7 +604,7 @@ public class ArffParser implements Parser {
 
   /**
    * Helper function for token handling.
-   * 
+   *
    * @param tokenizer Tokenizer
    * @throws IOException
    */
@@ -650,9 +647,9 @@ public class ArffParser implements Parser {
 
   /**
    * Parameterization class.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
