@@ -86,13 +86,13 @@
 
 	<build>
 		<plugins>
-			<!-- Copy dependencies earlier: -->
+			<!-- Copy dependencies: -->
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
-						<phase>compile</phase> <!-- abuse compile to run before prepare-package -->
+						<phase>process-sources</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
@@ -136,12 +136,13 @@
 								<!-- This is a hack, because these applications will currently ignore 
 									jars, so we need the folders on the classpath, too -->
 								<argument>-cp</argument>
-								<argument>${project.build.directory}/dependency/*:${elki.projdir}/elki/target/classes:${elki.projdir}/addons/batikvis/target/classes:${elki.projdir}/addons/libsvm/target/classes</argument>
+								<argument>${project.build.directory}/dependency/*:${elki.projdir}/elki-docutil/target/classes:${elki.projdir}/elki/target/classes:${elki.projdir}/addons/batikvis/target/classes:${elki.projdir}/addons/libsvm/target/classes</argument>
 								<!-- Generate algorithm parameter documentations -->
 								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentParameters</argument>
 								<argument>${project.build.directory}/apidocs/parameters-byclass.html</argument>
 								<argument>${project.build.directory}/apidocs/parameters-byopt.html</argument>
 							</arguments>
+							<skip>${maven.javadoc.skip}</skip>
 						</configuration>
 					</execution>
 					<execution>
@@ -157,12 +158,13 @@
 								<!-- This is a hack, because these applications will currently ignore 
 									jars, so we need the folders on the classpath, too -->
 								<argument>-cp</argument>
-								<argument>${project.build.directory}/dependency/*:${elki.projdir}/elki/target/classes:${elki.projdir}/addons/batikvis/target/classes:${elki.projdir}/addons/libsvm/target/classes</argument>
+								<argument>${project.build.directory}/dependency/*:${elki.projdir}/elki-docutil/target/classes:${elki.projdir}/elki/target/classes:${elki.projdir}/addons/batikvis/target/classes:${elki.projdir}/addons/libsvm/target/classes</argument>
 								<!-- Generate literature reference documentations -->
 								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentReferences</argument>
 								<argument>${project.build.directory}/apidocs/references.html</argument>
 								<argument>${project.build.directory}/apidocs/references.trac</argument>
 							</arguments>
+							<skip>${maven.javadoc.skip}</skip>
 						</configuration>
 					</execution>
 				</executions>

@@ -103,11 +103,12 @@
 							<executable>java</executable>
 							<arguments>
 								<argument>-cp</argument>
-								<classpath />
+								<argument>${project.build.directory}/dependency/*:${project.build.directory}/classes</argument>
 								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentParameters</argument>
 								<argument>${project.build.directory}/apidocs/parameters-byclass.html</argument>
 								<argument>${project.build.directory}/apidocs/parameters-byopt.html</argument>
 							</arguments>
+							<skip>${maven.javadoc.skip}</skip>
 						</configuration>
 					</execution>
 					<execution>
@@ -120,11 +121,12 @@
 							<executable>java</executable>
 							<arguments>
 								<argument>-cp</argument>
-								<classpath />
+								<argument>${project.build.directory}/dependency/*:${project.build.directory}/classes</argument>
 								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentReferences</argument>
 								<argument>${project.build.directory}/apidocs/references.html</argument>
 								<argument>${project.build.directory}/apidocs/references.trac</argument>
 							</arguments>
+							<skip>${maven.javadoc.skip}</skip>
 						</configuration>
 					</execution>
 				</executions>
@@ -179,7 +181,7 @@
 			<groupId>de.lmu.ifi.dbs.elki</groupId>
 			<artifactId>elki-docutil</artifactId>
 			<version>${project.version}</version>
-			<scope>compile</scope>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>

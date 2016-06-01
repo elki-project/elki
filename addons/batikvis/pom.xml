@@ -75,11 +75,12 @@
 							<executable>java</executable>
 							<arguments>
 								<argument>-cp</argument>
-								<classpath />
+								<argument>${project.build.directory}/dependency/*:${project.build.directory}/classes</argument>
 								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentParameters</argument>
 								<argument>${project.build.directory}/apidocs/parameters-byclass-vis.html</argument>
 								<argument>${project.build.directory}/apidocs/parameters-byopt-vis.html</argument>
 							</arguments>
+							<skip>${maven.javadoc.skip}</skip>
 						</configuration>
 					</execution>
 					<execution>
@@ -92,11 +93,12 @@
 							<executable>java</executable>
 							<arguments>
 								<argument>-cp</argument>
-								<classpath />
+								<argument>${project.build.directory}/dependency/*:${project.build.directory}/classes</argument>
 								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentReferences</argument>
 								<argument>${project.build.directory}/apidocs/references-vis.html</argument>
 								<argument>${project.build.directory}/apidocs/references-vis.trac</argument>
 							</arguments>
+							<skip>${maven.javadoc.skip}</skip>
 						</configuration>
 					</execution>
 				</executions>
@@ -145,6 +147,13 @@
 			<groupId>de.lmu.ifi.dbs.elki</groupId>
 			<artifactId>elki-gui-minigui</artifactId>
 			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki-docutil</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
