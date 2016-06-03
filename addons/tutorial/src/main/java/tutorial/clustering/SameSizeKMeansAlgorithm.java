@@ -4,7 +4,7 @@ package tutorial.clustering;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -148,12 +149,12 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
       Meta c = new Meta(k);
       V fv = relation.get(id);
       for(int i = 0; i < k; i++) {
-        c.dists[i] = df.distance(fv, DoubleVector.wrap(means[i]));
+        final double d = c.dists[i] = df.distance(fv, DoubleVector.wrap(means[i]));
         if(i > 0) {
-          if(c.dists[i] < c.dists[c.primary]) {
+          if(d < c.dists[c.primary]) {
             c.primary = i;
           }
-          else if(c.dists[i] > c.dists[c.secondary]) {
+          else if(d > c.dists[c.secondary]) {
             c.secondary = i;
           }
         }
@@ -182,18 +183,18 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
     // Initialization phase:
     for(int start = 0; start < tids.size();) {
       tids.sort(start, tids.size(), comp);
-      for(id.seek(start); id.valid();) {
+      for(id.seek(start); id.valid(); id.advance()) {
         Meta c = metas.get(id);
         // Assigning to best cluster - which cannot be full yet!
         ModifiableDBIDs cluster = clusters.get(c.primary);
+        assert (cluster.size() <= maxsize);
         cluster.add(id);
         start++;
-        id.advance();
         // Now the cluster may have become completely filled:
         if(cluster.size() == maxsize) {
           final int full = c.primary;
           // Refresh the not yet assigned objects where necessary:
-          for(; id.valid(); id.advance()) {
+          for(id.advance(); id.valid(); id.advance()) {
             Meta ca = metas.get(id);
             if(ca.primary == full) {
               // Update the best index:
@@ -271,10 +272,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
       }
     };
     // List for sorting cluster preferences
-    int[] preferences = new int[k];
-    for(int i = 0; i < k; i++) {
-      preferences[i] = i;
-    }
+    final int[] preferences = MathUtil.sequence(0, k);
     // Comparator for this list.
     final PreferenceComparator pcomp = new PreferenceComparator();
 
@@ -284,43 +282,45 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
       transfers[i] = DBIDUtil.newArray();
     }
 
+    DBIDArrayIter id = tids.iter();
     for(int iter = 0; maxiter <= 0 || iter < maxiter; iter++) {
       updateDistances(relation, means, metas, df);
       tids.sort(comp);
       int active = 0; // Track if anything has changed
-      for(DBIDIter id = tids.iter(); id.valid(); id.advance()) {
+      for(id.seek(0); id.valid(); id.advance()) {
         Meta c = metas.get(id);
-        ModifiableDBIDs source = clusters.get(c.primary);
         IntegerArrayQuickSort.sort(preferences, pcomp.select(c));
-        boolean transferred = false;
-        for(int i : preferences) {
+        ModifiableDBIDs source = clusters.get(c.primary);
+        assert (source.contains(id));
+        tloop: for(int i : preferences) {
           if(i == c.primary) {
-            continue; // Cannot transfer to the same cluster!
+            continue; // Already assigned here
           }
           ModifiableDBIDs dest = clusters.get(i);
           // Can we pair this transfer?
+          final double gain = c.gain(i);
           for(DBIDMIter other = transfers[i].iter(); other.valid(); other.advance()) {
             Meta c2 = metas.get(other);
-            if(c.gain(i) + c2.gain(c.primary) > 0) {
+            if(gain + c2.gain(c.primary) > 0) {
               transfer(metas, c2, dest, source, other, c.primary);
               transfer(metas, c, source, dest, id, i);
               active += 2;
-              transferred = true;
-              other.remove(); // last, as this invalides the reference!
-              break;
+              other.remove(); // last, as this invalidates the reference!
+              source = dest; // We are assigned here now.
+              continue tloop; // Can try another transfer, with next cluster.
             }
           }
           // If cluster sizes allow, move a single object.
-          if(c.gain(i) > 0 && (dest.size() < maxsize && source.size() > minsize)) {
+          if(gain > 0 && (dest.size() < maxsize && source.size() > minsize)) {
             transfer(metas, c, source, dest, id, i);
             active += 1;
-            transferred = true;
-            break;
+            source = dest; // We are assigned here now.
+            continue tloop;
           }
         }
         // If the object would prefer a different cluster, put in outgoing
         // transfer list.
-        if(!transferred && (c.dists[c.primary] > c.dists[c.secondary])) {
+        if(c.primary != preferences[0]) {
           transfers[c.primary].add(id);
         }
       }
@@ -333,7 +333,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
         transfers[i].clear();
       }
       if(LOG.isDebuggingFine()) {
-        LOG.debugFine("Performed " + active + " transfers in iteration " + iter + " skipped " + pending);
+        LOG.debugFine("Iteration #" + iter + ": performed " + active + " transfers skipped " + pending);
       }
       if(active <= 0) {
         break;
@@ -354,7 +354,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @param id Object ID
    * @param dstnum Destination cluster number
    */
-  protected void transfer(final WritableDataStore<Meta> metas, Meta meta, ModifiableDBIDs src, ModifiableDBIDs dst, DBIDRef id, Integer dstnum) {
+  protected void transfer(final WritableDataStore<Meta> metas, Meta meta, ModifiableDBIDs src, ModifiableDBIDs dst, DBIDRef id, int dstnum) {
     src.remove(id);
     dst.add(id);
     meta.primary = dstnum;
