@@ -177,7 +177,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
         return -Double.compare(c1.priority(), c2.priority());
       }
     };
-    // We will use this iterator below. It support seeking!
+    // We will use this iterator below. It allows seeking!
     DBIDArrayIter id = tids.iter();
 
     // Initialization phase:
@@ -257,7 +257,6 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
    * @return final means
    */
   protected double[][] refineResult(Relation<V> relation, double[][] means, List<ModifiableDBIDs> clusters, final WritableDataStore<Meta> metas, ArrayModifiableDBIDs tids) {
-    // This is a safe cast - see constructor.
     NumberVectorDistanceFunction<? super V> df = getDistanceFunction();
     // Our desired cluster size:
     final int minsize = tids.size() / k; // rounded down
@@ -320,7 +319,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
         }
         // If the object would prefer a different cluster, put in outgoing
         // transfer list.
-        if(c.primary != preferences[0]) {
+        if (c.primary != preferences[0] && c.dists[c.primary] > c.dists[preferences[0]]) {
           transfers[c.primary].add(id);
         }
       }
@@ -376,7 +375,7 @@ public class SameSizeKMeansAlgorithm<V extends NumberVector> extends AbstractKMe
 
     /**
      * Indexes: primary assignment (current or best), secondary assignment
-     * (second best or worst). The actual meanin changes from initialization to
+     * (second best or worst). The actual meaning differs from initialization to
      * iteration phase!
      */
     int primary, secondary;
