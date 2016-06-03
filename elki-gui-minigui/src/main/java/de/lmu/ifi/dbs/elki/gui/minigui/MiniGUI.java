@@ -182,6 +182,9 @@ public class MiniGUI extends AbstractApplication {
     super();
     // Create and set up the window.
     frame = new JFrame("ELKI MiniGUI Command Line Builder");
+    Dimension screen = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+    int ppi = java.awt.Toolkit.getDefaultToolkit().getScreenResolution();
+    frame.setPreferredSize(new Dimension(Math.min(10 * ppi, screen.width), Math.min(10 * ppi, screen.height - 32)));
     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     try {
       frame.setIconImage(new ImageIcon(KDDTask.class.getResource("elki-icon.png")).getImage());

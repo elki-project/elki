@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.gui.util;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.gui.util;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FileDialog;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
@@ -71,10 +70,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
 
 /**
  * Class showing a table of ELKI parameters.
- * 
+ *
  * @author Erich Schubert
  * @since 0.3
- * 
+ *
  * @apiviz.composedOf ParametersModel
  * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.ColorfulRenderer
  * @apiviz.owns de.lmu.ifi.dbs.elki.gui.util.ParameterTable.DropdownEditor
@@ -120,7 +119,7 @@ public class ParameterTable extends JTable {
 
   /**
    * Constructor
-   * 
+   *
    * @param frame Containing frame
    * @param pm Parameter Model
    * @param parameters Parameter storage
@@ -129,7 +128,6 @@ public class ParameterTable extends JTable {
     super(pm);
     this.frame = frame;
     this.parameters = parameters;
-    this.setPreferredScrollableViewportSize(new Dimension(800, 400));
     this.setFillsViewportHeight(true);
     final ColorfulRenderer colorfulRenderer = new ColorfulRenderer();
     this.setDefaultRenderer(Parameter.class, colorfulRenderer);
@@ -138,20 +136,22 @@ public class ParameterTable extends JTable {
     this.setDefaultEditor(String.class, editor);
     this.setAutoResizeMode(AUTO_RESIZE_ALL_COLUMNS);
     TableColumn col1 = this.getColumnModel().getColumn(0);
-    col1.setPreferredWidth(150);
+    final int ppi = java.awt.Toolkit.getDefaultToolkit().getScreenResolution();
+    col1.setPreferredWidth(2 * ppi);
     TableColumn col2 = this.getColumnModel().getColumn(1);
-    col2.setPreferredWidth(650);
+    col2.setPreferredWidth(8 * ppi);
     this.addKeyListener(new Handler());
 
     // Increase row height, to make editors usable.
-    setRowHeight(getRowHeight() + 4);
+    // FIXME: Heuristic hack. Any way to make this more reasonable?
+    setRowHeight(getRowHeight() + (int) (ppi * 0.05));
   }
 
   /**
    * Internal key listener.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   protected class Handler implements KeyListener {
@@ -193,7 +193,7 @@ public class ParameterTable extends JTable {
 
   /**
    * Renderer for the table that colors the entries according to their bitmask.
-   * 
+   *
    * @author Erich Schubert
    */
   private class ColorfulRenderer extends DefaultTableCellRenderer {
@@ -266,7 +266,7 @@ public class ParameterTable extends JTable {
 
   /**
    * Editor using a Dropdown box to offer known values to choose from.
-   * 
+   *
    * @author Erich Schubert
    */
   private class DropdownEditor extends DefaultCellEditor implements KeyListener {
@@ -287,7 +287,7 @@ public class ParameterTable extends JTable {
 
     /**
      * Constructor.
-     * 
+     *
      * @param comboBox Combo box we're going to use
      */
     public DropdownEditor(JComboBox<String> comboBox) {
@@ -374,7 +374,7 @@ public class ParameterTable extends JTable {
 
   /**
    * Editor for selecting input and output file and folders names
-   * 
+   *
    * @author Erich Schubert
    */
   private class FileNameEditor extends AbstractCellEditor implements TableCellEditor, ActionListener, KeyListener {
@@ -499,7 +499,7 @@ public class ParameterTable extends JTable {
 
   /**
    * Editor for choosing classes.
-   * 
+   *
    * @author Erich Schubert
    */
   private class ClassListEditor extends AbstractCellEditor implements TableCellEditor, ActionListener, KeyListener {
@@ -682,11 +682,11 @@ public class ParameterTable extends JTable {
    * This Editor will adjust to the type of the Option: Sometimes just a plain
    * text editor, sometimes a ComboBox to offer known choices, and sometime a
    * file selector dialog.
-   * 
+   *
    * TODO: class list parameters etc.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    */
   private class AdjustingEditor extends AbstractCellEditor implements TableCellEditor {
     /**
@@ -780,11 +780,11 @@ public class ParameterTable extends JTable {
 
   /**
    * This is a panel that will dispatch keystrokes to a particular component.
-   * 
+   *
    * This makes the tabular GUI much more user friendly.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.exclude
    */
   private class DispatchingPanel extends JPanel {
@@ -800,7 +800,7 @@ public class ParameterTable extends JTable {
 
     /**
      * Constructor.
-     * 
+     *
      * @param component Component to dispatch to.
      */
     public DispatchingPanel(JComponent component) {
