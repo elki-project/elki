@@ -134,13 +134,14 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     
     boolean first = true;
     
-    MapStore<DBIDs> sampleNewHash = new MapStore<>();
+    MapStore<HashSetModifiableDBIDs> sampleNewHash = new MapStore<HashSetModifiableDBIDs>();
     
     while (counter >= delta*k*size){
       LOG.incrementProcessed(progress);
       counter = 0;
       
-      sampleNewHash = sampleNew(newNeighborHash);
+      //TODO find an efficient way to view only "real" new neighbors
+      sampleNewHash = sampleNew(store,newNeighborHash);
       
       //calculate reverse neighbors separately for old and new
       newReverseNeighbors.clear();
@@ -155,13 +156,9 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         //determine new and old neighbors
         KNNHeap heap = store.get(iditer);
         HashSetModifiableDBIDs newNeighbors = newNeighborHash.get(iditer);
-        HashSetModifiableDBIDs allNewNeighbors = DBIDUtil.newHashSet();
         HashSetModifiableDBIDs oldNeighbors = DBIDUtil.newHashSet();
         for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
-          if (newNeighbors.contains(heapiter)){
-            allNewNeighbors.add(heapiter);
-          }
-          else{
+          if (!newNeighbors.contains(heapiter)){
             oldNeighbors.add(heapiter);
           }
         }
@@ -170,43 +167,113 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         
         //Sampling
         final DBIDs sampleNew = sampleNewHash.get(iditer);
-        DBIDs newRev = DBIDUtil.newHashSet();
-        if (newReverseNeighbors.get(iditer) != null){
+        for(DBIDIter niter = sampleNew.iter(); niter.valid(); niter.advance()) {
+          newNeighbors.remove(niter);
+        }
+        newNeighborHash.put(iditer, newNeighbors);
+        HashSetModifiableDBIDs newRev = DBIDUtil.newHashSet();
+        if (first){
+          final DBIDs sample = DBIDUtil.randomSample(relation.getDBIDs(), k, rnd, DBIDUtil.deref(iditer));
+          for (DBIDIter siter = sample.iter(); siter.valid(); siter.advance()){
+            newRev.add(siter);
+          }
+        }
+        if (!first && newReverseNeighbors.get(iditer) != null){
           newRev = newReverseNeighbors.get(iditer);
         }
         
-        //determine the sampled new neighbors (also reserve)
-        HashSetModifiableDBIDs usedNew = DBIDUtil.newHashSet(sampleNew);
-        usedNew.addDBIDs(DBIDUtil.randomSample(newRev, Math.min(items, newRev.size()), rnd));
+//        //determine the sampled new neighbors (also reserve)
+//        HashSetModifiableDBIDs usedNew = DBIDUtil.newHashSet(sampleNew);
+//        usedNew.addDBIDs(DBIDUtil.randomSample(newRev, Math.min(items, newRev.size()), rnd));       
+        newRev = DBIDUtil.newHashSet(DBIDUtil.randomSample(newRev, Math.min(items, newRev.size()), rnd));
+
+       
         
+        DBIDs oldRev = DBIDUtil.newHashSet();
         if (!first){
           //determine old neighbors and sampled reverse ones
-          DBIDs oldRev = DBIDUtil.newHashSet();
+          
           if (oldReverseNeighbors.get(iditer) != null){
             oldRev = oldReverseNeighbors.get(iditer);
           }
-          oldNeighbors.addDBIDs(DBIDUtil.randomSample(oldRev, Math.min(items, oldRev.size()), rnd));
+//          oldNeighbors.addDBIDs(DBIDUtil.randomSample(oldRev, Math.min(items, oldRev.size()), rnd));
+          oldRev = DBIDUtil.randomSample(oldRev, Math.min(items, oldRev.size()), rnd);
         }
         
         //for every pair of sampled objects (new + new or new + old) do
-        for(DBIDMIter niter = usedNew.iter(); niter.valid(); niter.advance()) {
-          newNeighbors.remove(niter);
+//        for(DBIDMIter niter = usedNew.iter(); niter.valid(); niter.advance()) {
+//          for(DBIDMIter niter2 = usedNew.iter(); niter2.valid(); niter2.advance()){
+//            if (!first){for(DBIDMIter niter2 = oldNeighbors.iter(); niter2.valid(); niter2.advance()) { 
+//          }
+//        }
+        //TODO Distanz pro Schleife nur einmal berechnen
+//        System.out.println(sampleNew.size()+"\t"+newRev.size()+"\t"+oldNeighbors.size()+"\t"+oldRev.size());
+//        //TODO newRev and oldNeighbors size near 0, sampleNew immer 20
+        //3 loops
+        //nn_new
+          //nn_new
+          //nn_old
+        for(DBIDIter niter = sampleNew.iter(); niter.valid(); niter.advance()) {
           HashSetModifiableDBIDs niternew = newNeighborHash.get(niter);
           KNNHeap neighbors = store.get(niter);
-          for(DBIDMIter niter2 = usedNew.iter(); niter2.valid(); niter2.advance()){
+          for(DBIDIter niter2 = sampleNew.iter(); niter2.valid(); niter2.advance()){
             if (DBIDUtil.compare(niter, niter2)<0){
               HashSetModifiableDBIDs niternew2 = newNeighborHash.get(niter2);
               KNNHeap neighbors2 = store.get(niter2);
               int add = add (neighbors, niter, niter2);
               if (add > 0){
-                counter++;
                 niternew.add(niter2);
               }
               int add2 = add (neighbors2, niter2, niter);
               if (add2 > 0){
-                counter++;
                 niternew2.add(niter);
               }
+              counter++;
+              store.put(niter2, neighbors2);
+              newNeighborHash.put(niter2, niternew2);
+            }
+          }
+          store.put(niter, neighbors);
+          newNeighborHash.put(niter, niternew);
+            for(DBIDMIter niter2 = oldNeighbors.iter(); niter2.valid(); niter2.advance()) {       
+              if (DBIDUtil.compare(niter, niter2)!=0){
+                HashSetModifiableDBIDs niternew2 = newNeighborHash.get(niter2);
+                KNNHeap neighbors2 = store.get(niter2);
+                int add = add (neighbors, niter, niter2);
+                if (add > 0){
+                  niternew.add(niter2);
+                }
+                int add2 = add (neighbors2, niter2, niter);
+                if (add2 > 0){
+                  niternew2.add(niter);
+                }
+                counter++;
+                store.put(niter2, neighbors2);
+                newNeighborHash.put(niter2, niternew2);
+              }
+          }
+          store.put(niter, neighbors);
+          newNeighborHash.put(niter, niternew);
+        }
+      //rnn_new
+        //rnn_new
+        //rnn_old
+        for(DBIDIter niter = newRev.iter(); niter.valid(); niter.advance()) {
+          HashSetModifiableDBIDs niternew = newNeighborHash.get(niter);
+          KNNHeap neighbors = store.get(niter);
+          for(DBIDIter niter2 = newRev.iter(); niter2.valid(); niter2.advance()){
+            if (DBIDUtil.compare(niter, niter2)<0){
+              HashSetModifiableDBIDs niternew2 = newNeighborHash.get(niter2);
+              KNNHeap neighbors2 = store.get(niter2);
+              int add = add (neighbors, niter, niter2);
+              if (add > 0){
+                niternew.add(niter2);
+              }
+              int add2 = add (neighbors2, niter2, niter);
+              if (add2 > 0){
+                niternew2.add(niter);
+              }
+              counter++;
               store.put(niter2, neighbors2);
               newNeighborHash.put(niter2, niternew2);
             }
@@ -214,23 +281,93 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
           store.put(niter, neighbors);
           newNeighborHash.put(niter, niternew);
           if (!first){
-            for(DBIDMIter niter2 = oldNeighbors.iter(); niter2.valid(); niter2.advance()) {       
+            for(DBIDIter niter2 = oldRev.iter(); niter2.valid(); niter2.advance()) {       
               if (DBIDUtil.compare(niter, niter2)!=0){
                 HashSetModifiableDBIDs niternew2 = newNeighborHash.get(niter2);
                 KNNHeap neighbors2 = store.get(niter2);
                 int add = add (neighbors, niter, niter2);
                 if (add > 0){
-                  counter++;
                   niternew.add(niter2);
                 }
                 int add2 = add (neighbors2, niter2, niter);
                 if (add2 > 0){
-                  counter++;
                   niternew2.add(niter);
                 }
+                counter++;
                 store.put(niter2, neighbors2);
                 newNeighborHash.put(niter2, niternew2);
               }
+            }
+          }
+          store.put(niter, neighbors);
+          newNeighborHash.put(niter, niternew);
+        }
+        
+      //nn_new
+        //rnn_old
+        //rnn_new
+        for(DBIDIter niter = sampleNew.iter(); niter.valid(); niter.advance()) {
+          HashSetModifiableDBIDs niternew = newNeighborHash.get(niter);
+          KNNHeap neighbors = store.get(niter);
+          for(DBIDIter niter2 = oldRev.iter(); niter2.valid(); niter2.advance()){
+            if (DBIDUtil.compare(niter, niter2)!=0){
+              HashSetModifiableDBIDs niternew2 = newNeighborHash.get(niter2);
+              KNNHeap neighbors2 = store.get(niter2);
+              int add = add (neighbors, niter, niter2);
+              if (add > 0){
+                niternew.add(niter2);
+              }
+              int add2 = add (neighbors2, niter2, niter);
+              if (add2 > 0){
+                niternew2.add(niter);
+              }
+              counter++;
+              store.put(niter2, neighbors2);
+              newNeighborHash.put(niter2, niternew2);
+            }
+          }
+          store.put(niter, neighbors);
+          newNeighborHash.put(niter, niternew);
+            for(DBIDIter niter2 = newRev.iter(); niter2.valid(); niter2.advance()) {       
+              if (DBIDUtil.compare(niter, niter2)!=0){
+                HashSetModifiableDBIDs niternew2 = newNeighborHash.get(niter2);
+                KNNHeap neighbors2 = store.get(niter2);
+                int add = add (neighbors, niter, niter2);
+                if (add > 0){
+                  niternew.add(niter2);
+                }
+                int add2 = add (neighbors2, niter2, niter);
+                if (add2 > 0){
+                  niternew2.add(niter);
+                }
+                counter++;
+                store.put(niter2, neighbors2);
+                newNeighborHash.put(niter2, niternew2);
+              }
+            }
+          store.put(niter, neighbors);
+          newNeighborHash.put(niter, niternew);
+        }
+        //nn_old
+          //rnn_new
+        for(DBIDIter niter = oldNeighbors.iter(); niter.valid(); niter.advance()) {
+          HashSetModifiableDBIDs niternew = newNeighborHash.get(niter);
+          KNNHeap neighbors = store.get(niter);
+          for(DBIDIter niter2 = newRev.iter(); niter2.valid(); niter2.advance()){
+            if (DBIDUtil.compare(niter, niter2)!=0){
+              HashSetModifiableDBIDs niternew2 = newNeighborHash.get(niter2);
+              KNNHeap neighbors2 = store.get(niter2);
+              int add = add (neighbors, niter, niter2);
+              if (add > 0){
+                niternew.add(niter2);
+              }
+              int add2 = add (neighbors2, niter2, niter);
+              if (add2 > 0){
+                niternew2.add(niter);
+              }
+              counter++;
+              store.put(niter2, neighbors2);
+              newNeighborHash.put(niter2, niternew2);
             }
           }
           store.put(niter, neighbors);
@@ -256,12 +393,19 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     }
   }
 
-  private MapStore<DBIDs> sampleNew(MapStore<HashSetModifiableDBIDs> newNeighborHash) {
-    MapStore<DBIDs> sampleNewNeighbors = new MapStore<>();
+  private MapStore<HashSetModifiableDBIDs> sampleNew(MapStore<KNNHeap> store, MapStore<HashSetModifiableDBIDs> newNeighborHash) {
+    MapStore<HashSetModifiableDBIDs> sampleNewNeighbors = new MapStore<>();
     for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()){
-      DBIDs newNeighbors = newNeighborHash.get(iditer);
+      KNNHeap realNeighbors = store.get(iditer);
+      HashSetModifiableDBIDs newNeighbors = newNeighborHash.get(iditer);
+      HashSetModifiableDBIDs realNewNeighbors = DBIDUtil.newHashSet();
+      for (DoubleDBIDListIter heapiter = realNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()){
+        if (newNeighbors.contains(heapiter)){
+          realNewNeighbors.add(heapiter);
+        }
+      }      
       int items = (int) Math.round(rho*k);
-      DBIDs sampleNew = DBIDUtil.randomSample(newNeighbors, Math.min(items, newNeighbors.size()), rnd);
+      HashSetModifiableDBIDs sampleNew = DBIDUtil.newHashSet(DBIDUtil.randomSample(realNewNeighbors, Math.min(items, realNewNeighbors.size()), rnd));
       sampleNewNeighbors.put(iditer, sampleNew);
     }
     return sampleNewNeighbors;
@@ -272,11 +416,12 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
    * @param store - neighbors for every object
    * @param sampleNewHash - new neighbors for every object
    */
-  private void reverse(MapStore<KNNHeap> store, MapStore<DBIDs> sampleNewHash) {
+  private void reverse(MapStore<KNNHeap> store, MapStore<HashSetModifiableDBIDs> sampleNewHash) {
     for (DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()){
       KNNHeap heap = store.get(iditer);
       //TODO newNeighbors wird an dieser Stelle geleert
       DBIDs newNeighbors = sampleNewHash.get(iditer);
+//      System.out.println(newNeighbors.size());
       for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
         if (newNeighbors.contains(heapiter)){
           HashSetModifiableDBIDs newReverse = newReverseNeighbors.get(heapiter);
