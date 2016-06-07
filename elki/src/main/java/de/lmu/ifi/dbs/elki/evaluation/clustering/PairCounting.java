@@ -29,14 +29,14 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * Pair-counting measures.
- * 
+ *
  * @author Erich Schubert
  * @since 0.5.0
  */
 public class PairCounting {
   /**
    * This is the maximum size this implementation can support.
-   * 
+   *
    * Note: this is approximately sqrt(2) * Integer.MAX_VALUE as long = 63 bits
    * (+unused sign bit), int = 31 bits (+unused sign bit)
    */
@@ -64,12 +64,7 @@ public class PairCounting {
           } // else: 0
         }
         else {
-          if(table.selfPairing) {
-            in1 += size * size;
-          }
-          else {
-            in1 += size * (size - 1);
-          }
+          in1 += size * (long) (table.selfPairing ? size : (size - 1));
         }
       }
     }
@@ -83,12 +78,7 @@ public class PairCounting {
           } // else: 0
         }
         else {
-          if(table.selfPairing) {
-            in2 += size * size;
-          }
-          else {
-            in2 += size * (size - 1);
-          }
+          in2 += size * (long) (table.selfPairing ? size : (size - 1));
         }
       }
     }
@@ -102,12 +92,7 @@ public class PairCounting {
           } // else: 0
         }
         else {
-          if(table.selfPairing) {
-            inBoth += size * size;
-          }
-          else {
-            inBoth += size * (size - 1);
-          }
+          inBoth += size * (long) (table.selfPairing ? size : (size - 1));
         }
       }
     }
@@ -119,12 +104,7 @@ public class PairCounting {
     if(tsize < 0 || tsize >= MAX_SIZE) {
       LoggingUtil.warning("Your data set size probably is too big for this implementation, which uses only long precision.");
     }
-    if(table.selfPairing) {
-      total = tsize * tsize;
-    }
-    else {
-      total = tsize * (tsize - 1);
-    }
+    total = tsize * (long) (table.selfPairing ? tsize : (tsize - 1));
     long inFirst = in1 - inBoth, inSecond = in2 - inBoth;
     long inNone = total - (inBoth + inFirst + inSecond);
     pairconfuse = new long[] { inBoth, inFirst, inSecond, inNone };
@@ -132,7 +112,7 @@ public class PairCounting {
 
   /**
    * Get the pair-counting F-Measure
-   * 
+   *
    * @param beta Beta value.
    * @return F-Measure
    */
@@ -144,7 +124,7 @@ public class PairCounting {
 
   /**
    * Get the pair-counting F1-Measure.
-   * 
+   *
    * @return F1-Measure
    */
   public double f1Measure() {
@@ -153,56 +133,56 @@ public class PairCounting {
 
   /**
    * Computes the pair-counting precision.
-   * 
+   *
    * @return pair-counting precision
    */
   public double precision() {
-    return ((double) pairconfuse[0]) / (pairconfuse[0] + pairconfuse[2]);
+    return pairconfuse[0] / (double) (pairconfuse[0] + pairconfuse[2]);
   }
 
   /**
    * Computes the pair-counting recall.
-   * 
+   *
    * @return pair-counting recall
    */
   public double recall() {
-    return ((double) pairconfuse[0]) / (pairconfuse[0] + pairconfuse[1]);
+    return pairconfuse[0] / (double) (pairconfuse[0] + pairconfuse[1]);
   }
 
   /**
    * Computes the pair-counting Fowlkes-mallows (flat only, non-hierarchical!)
-   * 
+   *
    * <p>
    * Fowlkes, E.B. and Mallows, C.L.<br />
    * A method for comparing two hierarchical clusterings<br />
    * In: Journal of the American Statistical Association, Vol. 78 Issue 383
    * </p>
-   * 
+   *
    * @return pair-counting Fowlkes-mallows
    */
   // TODO: implement for non-flat clusterings!
   @Reference(authors = "Fowlkes, E.B. and Mallows, C.L.", //
-  title = "A method for comparing two hierarchical clusterings", //
-  booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383")
+      title = "A method for comparing two hierarchical clusterings", //
+      booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383")
   public double fowlkesMallows() {
     return Math.sqrt(precision() * recall());
   }
 
   /**
    * Computes the Rand index (RI).
-   * 
+   *
    * <p>
    * Rand, W. M.<br />
    * Objective Criteria for the Evaluation of Clustering Methods<br />
    * Journal of the American Statistical Association, Vol. 66 Issue 336
    * </p>
-   * 
+   *
    * @return The Rand index (RI).
    */
   @Reference(authors = "Rand, W. M.", //
-  title = "Objective Criteria for the Evaluation of Clustering Methods", //
-  booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", //
-  url = "http://www.jstor.org/stable/10.2307/2284239")
+      title = "Objective Criteria for the Evaluation of Clustering Methods", //
+      booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", //
+      url = "http://www.jstor.org/stable/10.2307/2284239")
   public double randIndex() {
     final double sum = pairconfuse[0] + pairconfuse[1] + pairconfuse[2] + pairconfuse[3];
     return (pairconfuse[0] + pairconfuse[3]) / sum;
@@ -210,24 +190,21 @@ public class PairCounting {
 
   /**
    * Computes the adjusted Rand index (ARI).
-   * 
+   *
    * @return The adjusted Rand index (ARI).
    */
   public double adjustedRandIndex() {
-    final double nom = pairconfuse[0] * pairconfuse[3] - pairconfuse[1] * pairconfuse[2];
-    final long d1 = (pairconfuse[0] + pairconfuse[1]) * (pairconfuse[1] + pairconfuse[3]);
-    final long d2 = (pairconfuse[0] + pairconfuse[2]) * (pairconfuse[2] + pairconfuse[3]);
-    if(d1 + d2 > 0) {
-      return 2 * nom / (d1 + d2);
-    }
-    else {
-      return 1.;
-    }
+    double d = Math.sqrt(pairconfuse[0] + pairconfuse[1] + pairconfuse[2] + pairconfuse[3]);
+    // Note: avoid (a+b)*(a+c) as this will cause long overflows easily
+    // Because we have O(N^2) pairs, and thus this value is temporarily O(N^4)
+    double exp = (pairconfuse[0] + pairconfuse[1]) / d * (pairconfuse[0] + pairconfuse[2]) / d;
+    double opt = pairconfuse[0] + 0.5 * (pairconfuse[1] + pairconfuse[2]);
+    return (pairconfuse[0] - exp) / (opt - exp);
   }
 
   /**
    * Computes the Jaccard index
-   * 
+   *
    * @return The Jaccard index
    */
   public double jaccard() {
@@ -237,7 +214,7 @@ public class PairCounting {
 
   /**
    * Computes the Mirkin index
-   * 
+   *
    * @return The Mirkin index
    */
   public long mirkin() {
