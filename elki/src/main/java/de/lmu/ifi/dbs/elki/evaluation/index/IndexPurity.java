@@ -63,7 +63,7 @@ public class IndexPurity implements Evaluator {
   @Override
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     Database database = ResultUtil.findDatabase(hier);
-    final ArrayList<SpatialIndexTree<?, ?>> indexes = ResultUtil.filterResults(hier, newResult, SpatialIndexTree.class);
+    final List<SpatialIndexTree<?, ?>> indexes = ResultUtil.filterResults(hier, newResult, SpatialIndexTree.class);
     if(indexes == null || indexes.isEmpty()) {
       return;
     }

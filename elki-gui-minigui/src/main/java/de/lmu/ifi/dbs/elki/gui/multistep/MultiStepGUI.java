@@ -28,7 +28,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -223,7 +223,7 @@ public class MultiStepGUI extends AbstractApplication {
    *
    * @return Serialized parameters
    */
-  public ArrayList<String> serializeParameters() {
+  public List<String> serializeParameters() {
     ListParameterization params = new ListParameterization();
     logTab.appendParameters(params);
     inputTab.appendParameters(params);

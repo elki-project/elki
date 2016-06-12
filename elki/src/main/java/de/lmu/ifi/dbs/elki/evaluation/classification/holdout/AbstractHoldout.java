@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.evaluation.classification.holdout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -42,7 +43,7 @@ public abstract class AbstractHoldout implements Holdout {
   /**
    * Labels in the current data set.
    */
-  protected ArrayList<ClassLabel> labels;
+  protected List<ClassLabel> labels;
 
   /**
    * Column containing the class labels.
@@ -62,7 +63,7 @@ public abstract class AbstractHoldout implements Holdout {
   }
 
   @Override
-  public ArrayList<ClassLabel> getLabels() {
+  public List<ClassLabel> getLabels() {
     return labels;
   }
 
@@ -87,7 +88,7 @@ public abstract class AbstractHoldout implements Holdout {
    * @param bundle Bundle
    * @return Class labels.
    */
-  public static ArrayList<ClassLabel> allClassLabels(MultipleObjectsBundle bundle) {
+  public static List<ClassLabel> allClassLabels(MultipleObjectsBundle bundle) {
     int col = findClassLabelColumn(bundle);
     // TODO: automatically infer class labels?
     if(col < 0) {
@@ -103,7 +104,7 @@ public abstract class AbstractHoldout implements Holdout {
    * @param col Column
    * @return Class labels.
    */
-  public static ArrayList<ClassLabel> allClassLabels(MultipleObjectsBundle bundle, int col) {
+  public static List<ClassLabel> allClassLabels(MultipleObjectsBundle bundle, int col) {
     HashSet<ClassLabel> labels = new HashSet<ClassLabel>();
     for(int i = 0, l = bundle.dataLength(); i < l; ++i) {
       Object o = bundle.data(i, col);

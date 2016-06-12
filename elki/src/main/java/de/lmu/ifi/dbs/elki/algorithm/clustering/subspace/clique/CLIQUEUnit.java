@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.clique;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -144,7 +145,7 @@ public class CLIQUEUnit<V extends NumberVector> {
    * 
    * @return a sorted set of the intervals of which this unit is build
    */
-  public ArrayList<CLIQUEInterval> getIntervals() {
+  public List<CLIQUEInterval> getIntervals() {
     return intervals;
   }
 

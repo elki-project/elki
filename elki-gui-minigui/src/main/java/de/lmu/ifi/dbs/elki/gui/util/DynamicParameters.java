@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.gui.util;
  */
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
@@ -209,7 +210,7 @@ public class DynamicParameters {
    * 
    * @param p Output list (will not be emptied)
    */
-  public synchronized void serializeParameters(ArrayList<String> p) {
+  public synchronized void serializeParameters(List<String> p) {
     for(Node t : parameters) {
       if(t.param != null) {
         if(t.param instanceof RemainingOptions) {

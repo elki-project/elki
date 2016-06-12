@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.evaluation.classification.holdout;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
@@ -39,7 +39,7 @@ public class TrainingAndTestSet {
   /**
    * The overall labels.
    */
-  private ArrayList<ClassLabel> labels;
+  private List<ClassLabel> labels;
 
   /**
    * The training data.
@@ -55,7 +55,7 @@ public class TrainingAndTestSet {
    * Provides a pair of training and test data sets out of the given two
    * databases.
    */
-  public TrainingAndTestSet(MultipleObjectsBundle training, MultipleObjectsBundle test, ArrayList<ClassLabel> labels) {
+  public TrainingAndTestSet(MultipleObjectsBundle training, MultipleObjectsBundle test, List<ClassLabel> labels) {
     this.training = training;
     this.test = test;
     this.labels = labels;
@@ -84,7 +84,7 @@ public class TrainingAndTestSet {
    * 
    * @return all labels
    */
-  public ArrayList<ClassLabel> getLabels() {
+  public List<ClassLabel> getLabels() {
     return labels;
   }
 }

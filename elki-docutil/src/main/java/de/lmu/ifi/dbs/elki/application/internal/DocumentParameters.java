@@ -346,7 +346,7 @@ public class DocumentParameters {
     /**
      * Options list.
      */
-    private ArrayList<TrackedParameter> options;
+    private List<TrackedParameter> options;
 
     /**
      * Constructor.
@@ -355,7 +355,7 @@ public class DocumentParameters {
      * @param track Parameter tracking helper
      * @param options Options list.
      */
-    public Instancer(Class<?> cls, TrackParameters track, ArrayList<TrackedParameter> options) {
+    public Instancer(Class<?> cls, TrackParameters track, List<TrackedParameter> options) {
       this.cls = cls;
       this.track = track;
       this.options = options;

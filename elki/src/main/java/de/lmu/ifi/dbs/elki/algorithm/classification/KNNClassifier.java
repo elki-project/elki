@@ -27,8 +27,8 @@ import gnu.trove.iterator.TObjectIntIterator;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
@@ -121,7 +121,7 @@ public class KNNClassifier<O> extends AbstractDistanceBasedAlgorithm<O, Result> 
     return bestl;
   }
 
-  public double[] classProbabilities(O instance, ArrayList<ClassLabel> labels) {
+  public double[] classProbabilities(O instance, List<ClassLabel> labels) {
     int[] occurences = new int[labels.size()];
 
     KNNList query = knnq.getKNNForObject(instance, k);

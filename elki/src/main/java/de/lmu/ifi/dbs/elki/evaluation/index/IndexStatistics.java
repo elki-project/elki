@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.evaluation.index;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
@@ -57,7 +58,7 @@ public class IndexStatistics implements Evaluator {
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     Database db = ResultUtil.findDatabase(hier);
     Collection<String> header = null;
-    final ArrayList<IndexTree<?, ?>> indexes = ResultUtil.filterResults(hier, newResult, IndexTree.class);
+    final List<IndexTree<?, ?>> indexes = ResultUtil.filterResults(hier, newResult, IndexTree.class);
     if (indexes == null || indexes.isEmpty()) {
       return;
     }

@@ -302,7 +302,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
       }
       else {
         // Compute Delaunay Triangulation
-        ArrayList<Triangle> delaunay = new SweepHullDelaunay2D(means).getDelaunay();
+        List<Triangle> delaunay = new SweepHullDelaunay2D(means).getDelaunay();
         if(mode == Mode.VORONOI || mode == Mode.V_AND_D) {
           Element path = VoronoiDraw.drawVoronoi(proj, delaunay, means).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);

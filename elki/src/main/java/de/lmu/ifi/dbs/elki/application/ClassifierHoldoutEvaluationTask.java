@@ -23,9 +23,9 @@ package de.lmu.ifi.dbs.elki.application;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.classification.Classifier;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
@@ -113,7 +113,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
     LOG.statistics(ptime.end());
 
     Duration time = LOG.newDuration("evaluation.time.total").begin();
-    ArrayList<ClassLabel> labels = holdout.getLabels();
+    List<ClassLabel> labels = holdout.getLabels();
     int[][] confusion = new int[labels.size()][labels.size()];
     for(int p = 0; p < holdout.numberOfPartitions(); p++) {
       TrainingAndTestSet partition = holdout.nextPartitioning();

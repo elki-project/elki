@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.extractor;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
+import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
@@ -73,7 +73,7 @@ public class ExtractFlatClusteringFromHierarchyEvaluator implements Evaluator {
 
   @Override
   public void processNewResult(ResultHierarchy hier, Result newResult) {
-    ArrayList<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(hier, newResult, PointerHierarchyRepresentationResult.class);
+    List<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(hier, newResult, PointerHierarchyRepresentationResult.class);
     for(PointerHierarchyRepresentationResult pointerresult : hrs) {
       DBIDs ids = pointerresult.getDBIDs();
       DBIDDataStore pi = pointerresult.getParentStore();
