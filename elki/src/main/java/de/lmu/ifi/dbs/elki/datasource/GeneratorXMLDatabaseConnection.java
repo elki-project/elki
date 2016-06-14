@@ -192,7 +192,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   /**
    * Random generator used for initializing cluster generators.
    */
-  private Random clusterRandom = null;
+  private RandomFactory clusterRandom = null;
 
   /**
    * Set testAgainstModel flag
@@ -220,7 +220,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     this.sizescale = sizescale;
     this.reassign = reassign;
     this.reassignByDistance = reassignByDistance;
-    this.clusterRandom = clusterRandom.getSingleThreadedRandom();
+    this.clusterRandom = clusterRandom;
   }
 
   @Override
@@ -297,8 +297,8 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
   private void processElementDataset(GeneratorMain gen, Node cur) {
     // *** get parameters
     String seedstr = ((Element) cur).getAttribute(ATTR_SEED);
-    if(seedstr != null && seedstr.length() > 0) {
-      clusterRandom = new Random((int) (Integer.parseInt(seedstr) * sizescale));
+    if(clusterRandom != RandomFactory.DEFAULT && seedstr != null && seedstr.length() > 0) {
+      clusterRandom = new RandomFactory((long) (Integer.parseInt(seedstr) * sizescale));
     }
     String testmod = ((Element) cur).getAttribute(ATTR_TEST);
     if(testmod != null && testmod.length() > 0) {
@@ -350,7 +350,7 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
     }
 
     // *** add new cluster object
-    Random newRand = new Random(clusterRandom.nextLong());
+    Random newRand = clusterRandom.getSingleThreadedRandom();
     GeneratorSingleCluster cluster = new GeneratorSingleCluster(name, size, overweight, newRand);
 
     // TODO: check for unknown attributes.
@@ -804,7 +804,6 @@ public class GeneratorXMLDatabaseConnection extends AbstractDatabaseConnection {
       // Random generator
       final RandomParameter rndP = new RandomParameter(RANDOMSEED_ID);
       if(config.grab(rndP)) {
-        // TODO: use RandomFactory in cluster
         clusterRandom = rndP.getValue();
       }
       super.configFilters(config);
