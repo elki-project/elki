@@ -97,7 +97,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Reference(authors = "F. Angiulli, C. Pizzuti", //
 title = "Fast Outlier Detection in High Dimensional Spaces", //
 booktitle = "Proc. European Conference on Principles of Knowledge Discovery and Data Mining (PKDD'02)", //
-url = "http://dx.doi.org/10.1145/375663.375668")
+url = "http://dx.doi.org/10.1007/3-540-45681-3_2")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.HilOut" })
 public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
