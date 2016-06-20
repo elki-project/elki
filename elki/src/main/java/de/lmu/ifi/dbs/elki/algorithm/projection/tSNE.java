@@ -1,0 +1,234 @@
+package de.lmu.ifi.dbs.elki.algorithm.projection;
+
+import java.util.ArrayList;
+
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2016
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+
+
+public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVector>> {
+  
+  int iteration;
+  static double perplexity;
+  int learning_rate;
+  double momentum;
+  private int dim = 2;
+  private static int size;
+  private static final Logging LOG = Logging.getLogger(tSNE.class);
+  
+  public tSNE(DistanceFunction<? super O> distanceFunction, double [][] points, 
+                double momentum, int learning_rate, int iteration, double perplexity) {
+    super(distanceFunction);
+    this.iteration = iteration;
+    this.perplexity = perplexity;
+    this.learning_rate = learning_rate;
+    this.momentum = momentum;
+    
+  }
+  
+  public Relation<DoubleVector> run(Relation<O> relation){
+    DistanceQuery<O> dq = relation.getDistanceQuery(getDistanceFunction());
+    ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
+    DBIDArrayIter ix = ids.iter(), iy = ids.iter();
+    size = ids.size();
+    double [] [] pij = new double [size] [size];
+    initialize_pijs(pij, dq, ix, iy);
+    
+    
+    WritableDataStore<DoubleVector> proj = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_SORTED, DoubleVector.class);
+    VectorFieldTypeInformation<DoubleVector> otype = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
+    // Beim >Result: it.seek(off)
+    for (ix.seek(0); ix.valid(); ix.advance()){
+      
+//      // Proizierten Vektor berechnen
+//      double[] darray = new double[]{Math.random(), Math.random()};
+//      DoubleVector dv = DoubleVector.copy(darray /* TODO */);
+//      proj.put(ix, dv);
+    }
+    
+    return new MaterializedRelation<>("tSNE", "t-SNE", otype, proj, ids);
+  }
+  
+
+  //protected und <O>,Wozu bei Agnes static ??
+  protected static <O> void initialize_pijs(double[][] pij, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy) {
+    double log2_perp = Math.log(perplexity)/Math.log(2.0);
+    double error = 1e-5;
+    double difference;
+    double [] [] squared_distances = new double [pij.length][pij.length];
+    computeDistances(squared_distances, dq, ix,iy);
+    for(ix.seek(0);ix.valid();ix.advance()){
+      int pos = 0;
+      int tries = 0;
+      double squaredSigma = 1.0;
+      computePij(squaredSigma, squared_distances, pij);
+      double h = computeH(pij,pos);
+      
+      pos++;
+    }
+  }
+  
+
+
+  protected static <O> double computeH(double[][] pij, int point) {
+    double h = 0.0;
+    for(int j = 0;j<pij.length;j++){
+      h = pij[point][j] * Math.log(pij[point][j]) / Math.log(2);
+    }
+    return -h;
+  }
+
+  protected static <O> void computeDistances(double[][] squared_distances, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy) {
+    int pos_1 = 0;
+    for(ix.seek(0);ix.valid();ix.advance()){
+      int pos_2 = 0;
+      for(iy.seek(0);iy.getOffset()<ix.getOffset();iy.advance()){ //double default 0.0
+        double dist = dq.distance(ix, iy);
+        dist = dist*dist;
+        squared_distances[pos_1][pos_2] = dist;
+        squared_distances[pos_2][pos_1] = dist;
+        pos_2++;
+      }
+      pos_1++;
+    }
+  }
+
+  protected static <O> void computePij(double squaredSigma, double[][] squared_distances, double[][] pij) {
+    for(int i = 0;i<size;i++){
+//      int [] indices = new int [size-1]; //-1 da zu allen anderen
+//      indices = getIndicesForSpecificPoint(squared_distances, i);
+      double sum = computeDistanceSum(squared_distances, i, squaredSigma);
+      for(int j = 0; j < i; j++) {
+        double v = (Math.exp(-squared_distances[i][j]/(2*squaredSigma)))/sum;
+        pij[i][j] = v;
+        pij[j][i] = v;
+      }
+    }
+  }
+  
+//  private static int[] getIndicesForSpecificPoint(double[] triangle, int i) {
+//    ArrayList<Integer> indices = new ArrayList<>();
+//    int start = triangleSize(i);
+//    for(int j = 0;j<=i-1 ;j++) //waagrechte Einträge
+//      indices.add(start+j);
+//    
+//    return null;
+//  }
+
+  //Berechnet Nenner der pijs, Call by value/call by refernce mit iy?
+  protected static <O> double computeDistanceSum(double [][] squaredDistanceMatrix, int row, double squaredSigma){
+    double sum = 0.0;
+    for(int j = 0; j < squaredDistanceMatrix.length; j++) {
+      if(row!=j)
+        sum = sum + Math.exp(-squaredDistanceMatrix[row][j]/(2*squaredSigma));
+    }
+    return sum;
+  }
+
+  protected static int triangleSize(int size) { //Ohne Diagonalen
+    return (size*(size-1))>>>1;
+  }
+
+  @Override
+  public TypeInformation[] getInputTypeRestriction() {
+    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+  }
+  
+  
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
+  }
+  
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O>{
+    
+    double momentum;
+    double perplexity;
+    int learning_rate;
+    int iteration;
+    double [][] points; 
+    public static final OptionID MOMENTUM_ID = new OptionID("tSNE.momentum", "The value for the momentum");
+    public static final OptionID LEARNING_RATE_ID = new OptionID("tSNE.learning_rate", "");
+    public static final OptionID ITERATION_ID = new OptionID("tSNE.iteration", "");
+    public static final OptionID PERPLEXITY_ID = new OptionID("tSNE.perplexity", "");
+    
+    @Override
+    protected void makeOptions(Parameterization config) { 
+      //super.makeOptions(config);
+      ObjectParameter<DistanceFunction<O>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, DistanceFunction.class);
+      if(config.grab(distanceFunctionP)){
+        distanceFunction = distanceFunctionP.instantiateClass(config);
+      }
+      
+      DoubleParameter p_momentum = new DoubleParameter(MOMENTUM_ID);
+      if(config.grab(p_momentum)){
+        momentum = p_momentum.getValue();
+      }
+      
+      DoubleParameter p_perplexity = new DoubleParameter(PERPLEXITY_ID).setDefaultValue(40.0);
+      if(config.grab(p_perplexity))
+        perplexity = p_perplexity.getValue();
+      
+      IntParameter p_learning_rate = new IntParameter(LEARNING_RATE_ID);
+      if(config.grab(p_learning_rate))
+        learning_rate = p_learning_rate.getValue();
+      
+      IntParameter p_iteration = new IntParameter(ITERATION_ID);
+      if(config.grab(p_iteration))
+        iteration = p_iteration.getValue();
+      
+    }
+    
+    @Override
+    protected tSNE<O> makeInstance() {
+      return new tSNE<>(distanceFunction, points, momentum, learning_rate, iteration, perplexity);
+    }
+    
+  }
+
+}
