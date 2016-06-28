@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization.KMeansInitialization;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -87,4 +88,11 @@ public interface KMeans<V extends NumberVector, M extends Model> extends Cluster
    * @param distanceFunction Distance function.
    */
   void setDistanceFunction(NumberVectorDistanceFunction<? super V> distanceFunction);
+
+  /**
+   * Set the initialization method.
+   *
+   * @param init Initialization method
+   */
+  void setInitializer(KMeansInitialization<? super V> init);
 }

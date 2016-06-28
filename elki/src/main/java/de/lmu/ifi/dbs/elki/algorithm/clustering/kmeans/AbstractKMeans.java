@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -303,6 +303,11 @@ public abstract class AbstractKMeans<V extends NumberVector, M extends Model> ex
   @Override
   public void setDistanceFunction(NumberVectorDistanceFunction<? super V> distanceFunction) {
     this.distanceFunction = distanceFunction;
+  }
+
+  @Override
+  public void setInitializer(KMeansInitialization<? super V> init) {
+    this.initializer = init;
   }
 
   /**

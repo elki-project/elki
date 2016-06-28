@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -85,9 +85,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @param <M> Model type
  */
 @Reference(authors = "D. Pelleg, A. Moore", //
-title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
-booktitle = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
-url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
+    title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
+    booktitle = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
+    url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
 public class XMeans<V extends NumberVector, M extends MeanModel> extends AbstractKMeans<V, M> {
   /**
    * The logger for this class.
@@ -136,13 +136,15 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
    *        splitting step
    * @param random Random factory
    */
-  public XMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization<? super V> initializer, PredefinedInitialMeans splitInitializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
+  public XMeans(NumberVectorDistanceFunction<? super V> distanceFunction, int k_min, int k_max, int maxiter, KMeans<V, M> innerKMeans, KMeansInitialization<? super V> initializer, KMeansQualityMeasure<V> informationCriterion, RandomFactory random) {
     super(distanceFunction, k_min, maxiter, initializer);
     this.k_min = k_min;
     this.k_max = k_max;
     this.k = k_min;
     this.innerKMeans = innerKMeans;
-    this.splitInitializer = splitInitializer;
+    this.splitInitializer = new PredefinedInitialMeans((double[][]) null);
+    this.innerKMeans.setInitializer(this.splitInitializer);
+    this.innerKMeans.setDistanceFunction(distanceFunction);
     this.informationCriterion = informationCriterion;
     this.rnd = random;
   }
@@ -330,11 +332,6 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     protected KMeans<V, M> innerKMeans;
 
     /**
-     * Class to feed splits to the internal k-means algorithm.
-     */
-    protected PredefinedInitialMeans splitInitializer;
-
-    /**
      * Information criterion.
      */
     protected KMeansQualityMeasure<V> informationCriterion;
@@ -353,12 +350,12 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
     protected void makeOptions(Parameterization config) {
       // Do NOT invoke super.makeOptions to hide the "k" parameter.
       IntParameter kMinP = new IntParameter(K_MIN_ID, 2) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kMinP)) {
         k_min = kMinP.intValue();
       }
       IntParameter kMaxP = new IntParameter(KMeans.K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kMaxP)) {
         k_max = kMaxP.intValue();
       }
@@ -372,13 +369,12 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
       if(config.grab(rndP)) {
         random = rndP.getValue();
       }
-      splitInitializer = new PredefinedInitialMeans((double[][]) null);
 
       ObjectParameter<KMeans<V, M>> innerKMeansP = new ObjectParameter<>(INNER_KMEANS_ID, KMeans.class, KMeansLloyd.class);
       if(config.grab(innerKMeansP)) {
         ListParameterization initialKMeansVariantParameters = new ListParameterization();
         initialKMeansVariantParameters.addParameter(KMeans.K_ID, k_min);
-        initialKMeansVariantParameters.addParameter(KMeans.INIT_ID, splitInitializer);
+        initialKMeansVariantParameters.addParameter(KMeans.INIT_ID, new PredefinedInitialMeans((double[][]) null));
         initialKMeansVariantParameters.addParameter(KMeans.MAXITER_ID, maxiter);
         initialKMeansVariantParameters.addParameter(KMeans.DISTANCE_FUNCTION_ID, distanceFunction);
         ChainedParameterization combinedConfig = new ChainedParameterization(initialKMeansVariantParameters, config);
@@ -399,7 +395,7 @@ public class XMeans<V extends NumberVector, M extends MeanModel> extends Abstrac
 
     @Override
     protected XMeans<V, M> makeInstance() {
-      return new XMeans<V, M>(distanceFunction, k_min, k_max, maxiter, innerKMeans, initializer, splitInitializer, informationCriterion, random);
+      return new XMeans<V, M>(distanceFunction, k_min, k_max, maxiter, innerKMeans, initializer, informationCriterion, random);
     }
   }
 }
