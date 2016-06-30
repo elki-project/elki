@@ -40,19 +40,19 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
 
 /**
  * Class to run processors in parallel, on all available cores.
- * 
+ *
  * TODO: add progress
- * 
+ *
  * @author Erich Schubert
  * @since 0.7.0
- * 
+ *
  * @apiviz.has BlockArrayRunner
  * @apiviz.uses ParallelCore
  */
 public class ParallelExecutor {
   /**
    * Run a task on all available CPUs.
-   * 
+   *
    * @param ids IDs to process
    * @param procs Processors to run
    */
@@ -65,7 +65,7 @@ public class ParallelExecutor {
       final int size = aids.size();
       int numparts = core.getParallelism();
       // TODO: are there better heuristics for choosing this?
-      numparts = (size > numparts * numparts * 16) ? numparts * numparts - 1 : numparts;
+      numparts = (size > numparts * numparts * 16) ? numparts * Math.max(1, numparts - 1) : numparts;
 
       final int blocksize = (size + (numparts - 1)) / numparts;
       List<Future<ArrayDBIDs>> parts = new ArrayList<>(numparts);
@@ -93,9 +93,9 @@ public class ParallelExecutor {
 
   /**
    * Run for an array part, without step size.
-   * 
+   *
    * @author Erich Schubert
-   * 
+   *
    * @apiviz.uses Processor
    */
   protected static class BlockArrayRunner implements Callable<ArrayDBIDs>, Executor {
@@ -126,7 +126,7 @@ public class ParallelExecutor {
 
     /**
      * Constructor.
-     * 
+     *
      * @param ids IDs to process
      * @param start Starting position
      * @param end End position
