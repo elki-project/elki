@@ -33,29 +33,20 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
         Relation<DoubleVector> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
         Relation<LabelList> labellist = database.getRelation(TypeUtil.LABELLIST);
 
-        Map<String, List<double[]>> result = new HashMap<>();
+        List<ChangePoints> result = new ArrayList<>();
 
         for(DBIDIter realtion_iter = relation.getDBIDs().iter(), label_iter = labellist.getDBIDs().iter()
             ; realtion_iter.valid()
             ; realtion_iter.advance(), label_iter.advance()) {
 
-            System.out.println(labellist.get(label_iter).toString());
-            result.put(labellist.get(label_iter).toString()
-                    , multiple_changepoints_with_confidence(relation.get(realtion_iter).getValues(), confidence, bootstrap_steps));
+            result.add(new ChangePoints(
+                    multiple_changepoints_with_confidence(relation.get(realtion_iter).getValues(), confidence, bootstrap_steps)
+                    , labellist.get(label_iter).toString()));
+
+            //result.add(single_changepoint_with_confidence(labellist.get(label_iter).toString(), relation.get(realtion_iter).getValues(), confidence, bootstrap_steps));
         }
 
-        // print results to console
-        for (Map.Entry<String, List<double[]>> entry : result.entrySet())
-        {
-            System.out.println(entry.getKey());
-            for (int i = 0; i < entry.getValue().size(); i++){
-                System.out.println(entry.getValue().get(i)[0] + "," + entry.getValue().get(i)[1]);
-            }
-        }
-
-        ChangePointDetectionResult test = new ChangePointDetectionResult("test", "testshort");
-
-        return test;
+        return new ChangePointDetectionResult("Change Point List", "changepoints", result);
     }
 
     private double[] likelihood_ratio_change_in_mean(double[] values){
@@ -116,19 +107,17 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
 
     }
 
-    private List<double[]> multiple_changepoints_with_confidence(double[] values, int confidence, int bootstrap_steps){
-        List<double[]> result = new ArrayList<>();
+    private List<ChangePoint> multiple_changepoints_with_confidence(double[] values, int confidence, int bootstrap_steps){
+        List<ChangePoint> result = new ArrayList<>();
         result = multiple_changepoints_with_confidence(result, values, confidence, bootstrap_steps, 0);
         return result;
     }
 
-    private List<double[]> multiple_changepoints_with_confidence(List<double[]> result, double[] values, int confidence, int bootstrap_steps, int tmp_arrary_start_index){
+    private List<ChangePoint> multiple_changepoints_with_confidence(List<ChangePoint> result, double[] values, int confidence, int bootstrap_steps, int tmp_arrary_start_index){
         double tmp_conf = confidence_level(values, bootstrap_steps);
         int tmp_max_pos = tmp_arrary_start_index + get_maximum_index(likelihood_ratio_change_in_mean(values)); // return the detected changepoint
 
-        if(tmp_conf < confidence || values.length <=3 || (tmp_max_pos - tmp_arrary_start_index + 1 == values.length)){ // cannot split up arrays of size 3, that would make every element a change point
-            result.add(new double[] {tmp_max_pos, tmp_conf});
-        } else {
+        if(!(tmp_conf < confidence || values.length <=3 || (tmp_max_pos - tmp_arrary_start_index + 1 == values.length))){ // cannot split up arrays of size 3, that would make every element a change poin
             multiple_changepoints_with_confidence(result
                                                     , Arrays.copyOfRange(values, 0, tmp_max_pos - tmp_arrary_start_index)
                                                     , confidence
@@ -139,12 +128,19 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
                                                     , confidence
                                                     , bootstrap_steps
                                                     , tmp_max_pos);
-            double[] res = new double[] {tmp_max_pos, tmp_conf};
-            result.add(res);
+            result.add(new ChangePoint(tmp_max_pos, tmp_conf));
         }
 
         return result;
     }
+
+    //TRY OUT RESULT HANDLING
+    private ChangePoint single_changepoint_with_confidence(String label, double[] values, int confidence, int bootstrap_steps){
+        double conf = confidence_level(values, bootstrap_steps);
+        double index = get_maximum_index(likelihood_ratio_change_in_mean(values));
+        return new ChangePoint(index, conf, label);
+    }
+
 
     private double confidence_level(double[] values, int steps){
         double estimator = get_bootstrap_estimator(likelihood_ratio_change_in_mean(values));
