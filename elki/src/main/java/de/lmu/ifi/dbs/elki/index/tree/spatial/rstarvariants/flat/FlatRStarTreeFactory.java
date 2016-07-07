@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 
@@ -42,14 +42,14 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
  * 
  * @param <O> Object type
  */
-public class FlatRStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, FlatRStarTreeNode, SpatialEntry, FlatRStarTreeIndex<O>, AbstractRTreeSettings> {
+public class FlatRStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, FlatRStarTreeNode, SpatialEntry, FlatRStarTreeIndex<O>, RTreeSettings> {
   /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
    * @param settings Index settings
    */
-  public FlatRStarTreeFactory(PageFileFactory<?> pageFileFactory, AbstractRTreeSettings settings) {
+  public FlatRStarTreeFactory(PageFileFactory<?> pageFileFactory, RTreeSettings settings) {
     super(pageFileFactory, settings);
   }
 
@@ -71,15 +71,15 @@ public class FlatRStarTreeFactory<O extends NumberVector> extends AbstractRStarT
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RTreeSettings> {
     @Override
     protected FlatRStarTreeFactory<O> makeInstance() {
       return new FlatRStarTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected AbstractRTreeSettings createSettings() {
-      return new AbstractRTreeSettings();
+    protected RTreeSettings createSettings() {
+      return new RTreeSettings();
     }
   }
 }

@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, S extends AbstractRTreeSettings> extends AbstractRStarTree<N, E, S> {
+public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, S extends RTreeSettings> extends AbstractRStarTree<N, E, S> {
   /**
    * Constructor.
    * 

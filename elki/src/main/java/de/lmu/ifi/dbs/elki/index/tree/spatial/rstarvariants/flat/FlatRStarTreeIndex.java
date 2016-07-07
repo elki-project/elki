@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query.RStarTreeUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -69,7 +69,7 @@ public class FlatRStarTreeIndex<O extends NumberVector> extends FlatRStarTree im
    * @param pagefile Page file
    * @param settings Tree settings
    */
-  public FlatRStarTreeIndex(Relation<O> relation, PageFile<FlatRStarTreeNode> pagefile, AbstractRTreeSettings settings) {
+  public FlatRStarTreeIndex(Relation<O> relation, PageFile<FlatRStarTreeNode> pagefile, RTreeSettings settings) {
     super(pagefile, settings);
     this.relation = relation;
   }

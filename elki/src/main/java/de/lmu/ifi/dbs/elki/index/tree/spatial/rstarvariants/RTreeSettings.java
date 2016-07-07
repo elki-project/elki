@@ -1,18 +1,10 @@
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.BulkSplit;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.LeastOverlapInsertionStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,6 +23,14 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.Top
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.BulkSplit;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.InsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.insert.LeastOverlapInsertionStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.LimitedReinsertOverflowTreatment;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow.OverflowTreatment;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.SplitStrategy;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.TopologicalSplitter;
+
 /**
  * Class to wrap common Rtree settings.
  * 
@@ -42,7 +42,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.split.Top
  * @apiviz.composedOf InsertionStrategy
  * @apiviz.composedOf OverflowTreatment
  */
-public class AbstractRTreeSettings {
+public class RTreeSettings {
   /**
    * The strategy for bulk load.
    */
@@ -67,6 +67,21 @@ public class AbstractRTreeSettings {
    * Relative minimum fill.
    */
   protected double relativeMinFill = 0.4;
+
+  /**
+   * Constructor with default values.
+   */
+  public RTreeSettings() {
+    super();
+  }
+
+  /**
+   * Constructor with default values and bulk loader.
+   */
+  public RTreeSettings(BulkSplit bulkSplitter) {
+    this();
+    setBulkStrategy(bulkSplitter);
+  }
 
   /**
    * Set the bulk loading strategy.

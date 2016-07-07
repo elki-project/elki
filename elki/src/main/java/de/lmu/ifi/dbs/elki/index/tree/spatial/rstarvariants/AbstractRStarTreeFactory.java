@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -57,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <E> Entry type
  * @param <I> Index type
  */
-public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, I extends AbstractRStarTree<N, E, S> & Index, S extends AbstractRTreeSettings> extends PagedIndexFactory<O, I> {
+public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, I extends AbstractRStarTree<N, E, S> & Index, S extends RTreeSettings> extends PagedIndexFactory<O, I> {
   /**
    * Tree settings
    */
@@ -89,7 +89,7 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
    * @param <O> Object type
    * @param <S> Settings class
    */
-  public abstract static class Parameterizer<O extends NumberVector, S extends AbstractRTreeSettings> extends PagedIndexFactory.Parameterizer<O> {
+  public abstract static class Parameterizer<O extends NumberVector, S extends RTreeSettings> extends PagedIndexFactory.Parameterizer<O> {
     /**
      * Fast-insertion parameter. Optional.
      */
@@ -139,9 +139,9 @@ public abstract class AbstractRStarTreeFactory<O extends NumberVector, N extends
       if(config.grab(splitStrategyP)) {
         settings.nodeSplitter = splitStrategyP.instantiateClass(config);
       }
-      DoubleParameter minimumFillP = new DoubleParameter(MINIMUM_FILL_ID, 0.4);
-      minimumFillP.addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      minimumFillP.addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
+      DoubleParameter minimumFillP = new DoubleParameter(MINIMUM_FILL_ID, 0.4) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_HALF_DOUBLE);
       if(config.grab(minimumFillP)) {
         settings.relativeMinFill = minimumFillP.getValue();
       }

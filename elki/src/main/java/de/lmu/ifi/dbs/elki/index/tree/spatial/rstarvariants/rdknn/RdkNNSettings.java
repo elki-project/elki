@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
  */
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
 
 /**
  * Settings for the RdKNN Tree.
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSetting
  * 
  * @param <O> Object type
  */
-public class RdkNNSettings<O extends NumberVector> extends AbstractRTreeSettings {
+public class RdkNNSettings<O extends NumberVector> extends RTreeSettings {
   /**
    * Parameter k.
    */
@@ -43,5 +43,17 @@ public class RdkNNSettings<O extends NumberVector> extends AbstractRTreeSettings
   /**
    * The distance function.
    */
-  SpatialPrimitiveDistanceFunction<O> distanceFunction;
+  SpatialPrimitiveDistanceFunction<? super O> distanceFunction;
+
+  /**
+   * Constructor.
+   *
+   * @param k_max Maximum k to support
+   * @param distanceFunction Distance function
+   */
+  public RdkNNSettings(int k_max, SpatialPrimitiveDistanceFunction<? super O> distanceFunction) {
+    super();
+    this.k_max = k_max;
+    this.distanceFunction = distanceFunction;
+  }
 }

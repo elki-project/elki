@@ -69,7 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @param <N> Node type
  * @param <E> Entry type
  */
-public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, S extends AbstractRTreeSettings> extends SpatialIndexTree<N, E> {
+public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry, S extends RTreeSettings> extends SpatialIndexTree<N, E> {
   /**
    * Development flag: This will enable some extra integrity checks on the tree.
    */

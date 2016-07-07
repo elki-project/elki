@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 
@@ -41,14 +41,14 @@ import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
  * 
  * @param <O> Object type
  */
-public class DeLiCluTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, DeLiCluNode, DeLiCluEntry, DeLiCluTreeIndex<O>, AbstractRTreeSettings> {
+public class DeLiCluTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, DeLiCluNode, DeLiCluEntry, DeLiCluTreeIndex<O>, RTreeSettings> {
   /**
    * Constructor.
    * 
    * @param pageFileFactory Page file factory
    * @param settings Settings
    */
-  public DeLiCluTreeFactory(PageFileFactory<?> pageFileFactory, AbstractRTreeSettings settings) {
+  public DeLiCluTreeFactory(PageFileFactory<?> pageFileFactory, RTreeSettings settings) {
     super(pageFileFactory, settings);
   }
 
@@ -70,15 +70,15 @@ public class DeLiCluTreeFactory<O extends NumberVector> extends AbstractRStarTre
    * 
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RTreeSettings> {
     @Override
     protected DeLiCluTreeFactory<O> makeInstance() {
       return new DeLiCluTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected AbstractRTreeSettings createSettings() {
-      return new AbstractRTreeSettings();
+    protected RTreeSettings createSettings() {
+      return new RTreeSettings();
     }
   }
 }

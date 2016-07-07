@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeFactory;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRTreeSettings;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.persistent.PageFileFactory;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -44,14 +44,14 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @param <O> Object type
  */
 @Alias({"rstar", "r*"})
-public class RStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RStarTreeIndex<O>, AbstractRTreeSettings> {
+public class RStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RStarTreeNode, SpatialEntry, RStarTreeIndex<O>, RTreeSettings> {
   /**
    * Constructor.
    * 
    * @param pageFileFactory Data storage
    * @param settings Tree settings
    */
-  public RStarTreeFactory(PageFileFactory<?> pageFileFactory, AbstractRTreeSettings settings) {
+  public RStarTreeFactory(PageFileFactory<?> pageFileFactory, RTreeSettings settings) {
     super(pageFileFactory, settings);
   }
 
@@ -74,15 +74,15 @@ public class RStarTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
    * 
    * @param <O> Object type
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, AbstractRTreeSettings> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RTreeSettings> {
     @Override
     protected RStarTreeFactory<O> makeInstance() {
       return new RStarTreeFactory<>(pageFileFactory, settings);
     }
 
     @Override
-    protected AbstractRTreeSettings createSettings() {
-      return new AbstractRTreeSettings();
+    protected RTreeSettings createSettings() {
+      return new RTreeSettings();
     }
   }
 }

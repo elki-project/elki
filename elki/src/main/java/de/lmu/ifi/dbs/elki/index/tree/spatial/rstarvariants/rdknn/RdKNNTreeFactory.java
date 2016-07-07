@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rdknn;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -115,7 +115,7 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
 
     @Override
     protected RdkNNSettings<O> createSettings() {
-      return new RdkNNSettings<>();
+      return new RdkNNSettings<O>(1, EuclideanDistanceFunction.STATIC);
     }
   }
 }
