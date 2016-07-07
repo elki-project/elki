@@ -42,8 +42,6 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
             result.add(new ChangePoints(
                     multiple_changepoints_with_confidence(relation.get(realtion_iter).getValues(), confidence, bootstrap_steps)
                     , labellist.get(label_iter).toString()));
-
-            //result.add(single_changepoint_with_confidence(labellist.get(label_iter).toString(), relation.get(realtion_iter).getValues(), confidence, bootstrap_steps));
         }
 
         return new ChangePointDetectionResult("Change Point List", "changepoints", result);
@@ -77,7 +75,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
         return result;
     }
 
-    // DOES NOT WORK - NOT YET INVESTIGATED
+    // DOES NOT WORK - REASON NOT YET INVESTIGATED
     private double[] likelihood_ratio_change_in_mean_optimised(double[] values){
         double[] result = new double[values.length];
 
