@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
  */
 // TODO: ensure file doesn't become to big - check for overflows in recordsize *
 // numrecs + headersize
-public class OnDiskArray {
+public class OnDiskArray implements AutoCloseable {
   /**
    * Serial version.
    * 
@@ -413,6 +413,10 @@ public class OnDiskArray {
    */
   public synchronized void close() throws IOException {
     writable = false;
+    if (map != null) {
+      ByteArrayUtil.unmapByteBuffer(map);
+      map = null;
+    }
     if (lock != null) {
       lock.release();
       lock = null;

@@ -36,7 +36,7 @@ import java.nio.ByteBuffer;
  * @author Erich Schubert
  * @since 0.2
  */
-public class OnDiskUpperTriangleMatrix {
+public class OnDiskUpperTriangleMatrix implements AutoCloseable {
   /**
    * Serial number, also used for generating a magic
    */

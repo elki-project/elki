@@ -116,5 +116,6 @@ public class OnDiskUpperTriangleMatrixTest {
     Assert.assertArrayEquals("Record 1,2 doesn't match.", record2, buf);
     roarray.getRecordBuffer(2, 2).get(buf);
     Assert.assertArrayEquals("Record 2,2 doesn't match.", record1, buf);
+    roarray.close();
   }
 }
