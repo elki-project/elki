@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.2
  */
 @Alias({ "euclidean", "euclid", "l2", //
-"de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction" })
+    "de.lmu.ifi.dbs.elki.distance.distancefunction.EuclideanDistanceFunction" })
 public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
   /**
    * Static instance. Use this!
@@ -141,40 +141,16 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
     final NumberVector v1 = (mbr1 instanceof NumberVector) ? (NumberVector) mbr1 : null;
     final NumberVector v2 = (mbr2 instanceof NumberVector) ? (NumberVector) mbr2 : null;
 
-    double agg = 0.;
-    if(v1 != null) {
-      if(v2 != null) {
-        agg += preDistance(v1, v2, 0, mindim);
-      }
-      else {
-        agg += preDistanceVM(v1, mbr2, 0, mindim);
-      }
-    }
-    else {
-      if(v2 != null) {
-        agg += preDistanceVM(v2, mbr1, 0, mindim);
-      }
-      else {
-        agg += preDistanceMBR(mbr1, mbr2, 0, mindim);
-      }
-    }
+    double agg = (v1 != null) //
+        ? (v2 != null) ? preDistance(v1, v2, 0, mindim) : preDistanceVM(v1, mbr2, 0, mindim) //
+        : (v2 != null) ? preDistanceVM(v2, mbr1, 0, mindim) : preDistanceMBR(mbr1, mbr2, 0, mindim);
     // first object has more dimensions.
     if(dim1 > mindim) {
-      if(v1 != null) {
-        agg += preNorm(v1, mindim, dim1);
-      }
-      else {
-        agg += preNormMBR(v1, mindim, dim1);
-      }
+      agg += (v1 != null) ? preNorm(v1, mindim, dim1) : preNormMBR(mbr1, mindim, dim1);
     }
     // second object has more dimensions.
     if(dim2 > mindim) {
-      if(v2 != null) {
-        agg += preNorm(v2, mindim, dim2);
-      }
-      else {
-        agg += preNormMBR(mbr2, mindim, dim2);
-      }
+      agg += (v2 != null) ? preNorm(v2, mindim, dim2) : preNormMBR(mbr2, mindim, dim2);
     }
     return Math.sqrt(agg);
   }
