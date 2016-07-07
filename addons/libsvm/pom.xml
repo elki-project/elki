@@ -13,7 +13,7 @@
 	<artifactId>elki-libsvm</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - LibSVM based extensions</name>
+	<name>ELKI - LibSVM based extensions</name>
 
 	<licenses>
 		<license>

@@ -13,7 +13,7 @@
 	<artifactId>elki-tutorial</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - Tutorial Algorithms</name>
+	<name>ELKI - Tutorial Algorithms</name>
 
 	<licenses>
 		<license>

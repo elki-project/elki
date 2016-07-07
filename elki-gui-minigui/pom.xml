@@ -13,7 +13,7 @@
 	<artifactId>elki-gui-minigui</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - MiniGUI Command Line Builder</name>
+	<name>ELKI - MiniGUI Command Line Builder</name>
 
 	<licenses>
 		<license>

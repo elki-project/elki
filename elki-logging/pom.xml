@@ -13,7 +13,7 @@
 	<artifactId>elki-logging</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - Logging</name>
+	<name>ELKI - Logging</name>
 
 	<url>http://elki.dbs.ifi.lmu.de/</url>
 	<issueManagement>

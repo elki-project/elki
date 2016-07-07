@@ -13,7 +13,7 @@
 	<artifactId>elki-batik-visualization</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - Batik Visualization</name>
+	<name>ELKI - Batik Visualization</name>
 
 	<licenses>
 		<license>

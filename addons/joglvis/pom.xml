@@ -13,7 +13,7 @@
 	<artifactId>elki-joglviz</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - OpenGL-based Visualization</name>
+	<name>ELKI - OpenGL-based Visualization</name>
 
 	<licenses>
 		<license>

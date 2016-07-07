@@ -13,7 +13,7 @@
 	<artifactId>elki-core-dbids-int</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - Core DBIDs Integer Implementation</name>
+	<name>ELKI - Core DBIDs Integer Implementation</name>
 
 	<licenses>
 		<license>

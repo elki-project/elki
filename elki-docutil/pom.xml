@@ -13,7 +13,7 @@
 	<artifactId>elki-docutil</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - Documentation Utilities</name>
+	<name>ELKI - Documentation Utilities</name>
 
 	<licenses>
 		<license>

@@ -13,7 +13,7 @@
 	<artifactId>elki-3dpc</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - 3D Parallel Coordinate Trees Visualization</name>
+	<name>ELKI - 3D Parallel Coordinate Trees Visualization</name>
 
 	<licenses>
 		<license>

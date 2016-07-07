@@ -13,7 +13,7 @@
 	<artifactId>elki-lucene</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - Lucene based extensions</name>
+	<name>ELKI - Lucene based extensions</name>
 
 	<licenses>
 		<license>

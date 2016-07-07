@@ -13,7 +13,7 @@
 	<artifactId>elki</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - Main</name>
+	<name>ELKI - Main Module</name>
 
 	<url>http://elki.dbs.ifi.lmu.de/</url>
 	<issueManagement>

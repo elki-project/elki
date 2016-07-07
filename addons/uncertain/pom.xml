@@ -13,7 +13,7 @@
 	<artifactId>elki-uncertain</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - Uncertain data handling</name>
+	<name>ELKI - Uncertain data handling</name>
 
 	<url>http://elki.dbs.ifi.lmu.de/</url>
 	<issueManagement>

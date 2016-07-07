@@ -13,7 +13,7 @@
 	<artifactId>elki-core-util</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - Core Utilities</name>
+	<name>ELKI - Core Utilities</name>
 
 	<licenses>
 		<license>

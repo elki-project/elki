@@ -13,7 +13,7 @@
 	<artifactId>elki-bundle</artifactId>
 	<packaging>jar</packaging>
 
-	<name>ELKI Data Mining Framework - Single-jar Bundle</name>
+	<name>ELKI - Single-jar Bundle</name>
 
 	<url>http://elki.dbs.ifi.lmu.de/</url>
 	<issueManagement>
