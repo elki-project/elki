@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -89,6 +90,11 @@ public class CauchyDistribution extends AbstractDistribution {
   }
 
   @Override
+  public double logpdf(double x) {
+    return logpdf(x, location, shape);
+  }
+
+  @Override
   public double cdf(double x) {
     return cdf(x, location, shape);
   }
@@ -115,6 +121,19 @@ public class CauchyDistribution extends AbstractDistribution {
   public static double pdf(double x, double location, double shape) {
     final double v = (x - location) / shape;
     return 1. / Math.PI * shape * (1 + v * v);
+  }
+
+  /**
+   * PDF function, static version.
+   * 
+   * @param x Value
+   * @param location Location (x0)
+   * @param shape Shape (gamma)
+   * @return PDF value
+   */
+  public static double logpdf(double x, double location, double shape) {
+    final double v = (x - location) / shape;
+    return -MathUtil.LOGPI + Math.log(shape * (1 + v * v));
   }
 
   /**
@@ -167,12 +186,12 @@ public class CauchyDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter locP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(locP)) {
+      if(config.grab(locP)) {
         location = locP.doubleValue();
       }
 
       DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
-      if (config.grab(shapeP)) {
+      if(config.grab(shapeP)) {
         shape = shapeP.doubleValue();
       }
     }

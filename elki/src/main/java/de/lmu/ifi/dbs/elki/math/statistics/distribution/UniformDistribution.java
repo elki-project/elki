@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -122,6 +122,14 @@ public class UniformDistribution extends AbstractDistribution {
       return 0.0;
     }
     return (len > 0.) ? 1.0 / len : Double.POSITIVE_INFINITY;
+  }
+
+  @Override
+  public double logpdf(double val) {
+    if (!(val >= min) || val >= max) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    return (len > 0.) ? Math.log(1.0 / len) : Double.POSITIVE_INFINITY;
   }
 
   @Override

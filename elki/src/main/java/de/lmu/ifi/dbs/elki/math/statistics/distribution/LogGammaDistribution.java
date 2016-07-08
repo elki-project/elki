@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -66,7 +66,7 @@ public class LogGammaDistribution extends AbstractDistribution {
    */
   public LogGammaDistribution(double k, double theta, double shift, Random random) {
     super(random);
-    if (!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
+    if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
       throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
     }
 
@@ -85,7 +85,7 @@ public class LogGammaDistribution extends AbstractDistribution {
    */
   public LogGammaDistribution(double k, double theta, double shift, RandomFactory random) {
     super(random);
-    if (!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
+    if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
       throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
     }
 
@@ -108,6 +108,11 @@ public class LogGammaDistribution extends AbstractDistribution {
   @Override
   public double pdf(double val) {
     return pdf(val, k, theta, shift);
+  }
+
+  @Override
+  public double logpdf(double val) {
+    return logpdf(val, k, theta, shift);
   }
 
   @Override
@@ -159,7 +164,7 @@ public class LogGammaDistribution extends AbstractDistribution {
    */
   public static double cdf(double x, double k, double theta, double shift) {
     x = (x - shift);
-    if (x <= 1.) {
+    if(x <= 1.) {
       return 0.;
     }
     return GammaDistribution.regularizedGammaP(k, Math.log(x));
@@ -175,7 +180,7 @@ public class LogGammaDistribution extends AbstractDistribution {
    */
   public static double logcdf(double x, double k, double theta, double shift) {
     x = (x - shift);
-    if (x <= 1.) {
+    if(x <= 1.) {
       return 0.;
     }
     return GammaDistribution.logregularizedGammaP(k, Math.log(x));
@@ -191,13 +196,28 @@ public class LogGammaDistribution extends AbstractDistribution {
    */
   public static double pdf(double x, double k, double theta, double shift) {
     x = (x - shift);
-    if (x <= 1.) {
+    if(x <= 1.) {
       return 0.;
     }
     return Math.pow(theta, -k) / GammaDistribution.gamma(k) * Math.pow(x, -(1. / theta + 1.)) * Math.pow(Math.log(x), k - 1.);
   }
 
-  // TODO: logpdf
+  /**
+   * LogGamma distribution logPDF
+   * 
+   * @param x query value
+   * @param k Alpha
+   * @param theta Theta = 1 / Beta
+   * @return log probability density
+   */
+  public static double logpdf(double x, double k, double theta, double shift) {
+    x = (x - shift);
+    if(x <= 1.) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    final double logx = Math.log(x);
+    return -k * Math.log(theta) - GammaDistribution.logGamma(k) - (1. / theta + 1.) * logx + (k - 1) * Math.log(logx);
+  }
 
   /**
    * Compute probit (inverse cdf) for LogGamma distributions.
@@ -232,17 +252,17 @@ public class LogGammaDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter kP = new DoubleParameter(GammaDistribution.Parameterizer.K_ID);
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.doubleValue();
       }
 
       DoubleParameter thetaP = new DoubleParameter(GammaDistribution.Parameterizer.THETA_ID);
-      if (config.grab(thetaP)) {
+      if(config.grab(thetaP)) {
         theta = thetaP.doubleValue();
       }
 
       DoubleParameter shiftP = new DoubleParameter(SHIFT_ID);
-      if (config.grab(shiftP)) {
+      if(config.grab(shiftP)) {
         shift = shiftP.doubleValue();
       }
     }

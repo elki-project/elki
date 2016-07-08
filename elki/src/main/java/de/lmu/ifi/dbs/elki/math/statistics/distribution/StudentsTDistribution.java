@@ -82,6 +82,11 @@ public class StudentsTDistribution extends AbstractDistribution {
   }
 
   @Override
+  public double logpdf(double val) {
+    return logpdf(val, v);
+  }
+
+  @Override
   public double cdf(double val) {
     return cdf(val, v);
   }
@@ -107,7 +112,20 @@ public class StudentsTDistribution extends AbstractDistribution {
    */
   public static double pdf(double val, int v) {
     // TODO: improve precision by computing "exp" last?
-    return Math.exp(GammaDistribution.logGamma((v + 1) * .5) - GammaDistribution.logGamma(v * .5)) * (1 / Math.sqrt(v * Math.PI)) * Math.pow(1 + (val * val) / v, -((v + 1) * .5));
+    return Math.exp(GammaDistribution.logGamma((v + 1) * .5) - GammaDistribution.logGamma(v * .5)) //
+        * (1 / Math.sqrt(v * Math.PI)) * Math.pow(1 + (val * val) / v, -((v + 1) * .5));
+  }
+
+  /**
+   * Static version of the t distribution's PDF.
+   *
+   * @param val value to evaluate
+   * @param v degrees of freedom
+   * @return f(val,v)
+   */
+  public static double logpdf(double val, int v) {
+    return GammaDistribution.logGamma((v + 1) * .5) - GammaDistribution.logGamma(v * .5) //
+        - .5 * Math.log(v * Math.PI) + Math.log1p(val * val / v) * -.5 * (v + 1);
   }
 
   /**
@@ -148,7 +166,7 @@ public class StudentsTDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       IntParameter nuP = new IntParameter(NU_ID);
-      if (config.grab(nuP)) {
+      if(config.grab(nuP)) {
         nu = nuP.intValue();
       }
     }

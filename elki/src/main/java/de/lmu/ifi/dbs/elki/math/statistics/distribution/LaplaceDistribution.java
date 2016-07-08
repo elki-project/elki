@@ -121,6 +121,22 @@ public class LaplaceDistribution extends AbstractDistribution {
   }
 
   @Override
+  public double logpdf(double val) {
+    return Math.log(.5 * rate) - rate * Math.abs(val - location);
+  }
+
+  /**
+   * PDF, static version
+   * 
+   * @param val Value to compute PDF at
+   * @param rate Rate parameter (1/scale)
+   * @return probability density
+   */
+  public static double logpdf(double val, double rate) {
+    return Math.log(.5 * rate) - rate * Math.abs(val);
+  }
+
+  @Override
   public double cdf(double val) {
     final double v = .5 * Math.exp(-rate * (val - location));
     return (val < location) ? v : 1 - v;
@@ -140,9 +156,10 @@ public class LaplaceDistribution extends AbstractDistribution {
 
   @Override
   public double quantile(double val) {
-    if (val < .5) {
+    if(val < .5) {
       return Math.log(2 * val) / rate + location;
-    } else {
+    }
+    else {
       return -Math.log(2. - 2. * val) / rate + location;
     }
   }
@@ -156,9 +173,10 @@ public class LaplaceDistribution extends AbstractDistribution {
    * @return Quantile
    */
   public static double quantile(double val, double rate, double location) {
-    if (val < .5) {
+    if(val < .5) {
       return Math.log(2 * val) / rate + location;
-    } else {
+    }
+    else {
       return -Math.log(2. - 2. * val) / rate + location;
     }
   }
@@ -170,9 +188,10 @@ public class LaplaceDistribution extends AbstractDistribution {
   @Override
   public double nextRandom() {
     double val = random.nextDouble();
-    if (val < .5) {
+    if(val < .5) {
       return Math.log(2 * val) / rate + location;
-    } else {
+    }
+    else {
       return -Math.log(2. - 2. * val) / rate + location;
     }
   }
@@ -203,12 +222,12 @@ public class LaplaceDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter locP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(locP)) {
+      if(config.grab(locP)) {
         location = locP.doubleValue();
       }
 
       DoubleParameter rateP = new DoubleParameter(RATE_ID);
-      if (config.grab(rateP)) {
+      if(config.grab(rateP)) {
         rate = rateP.doubleValue();
       }
     }

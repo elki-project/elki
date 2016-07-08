@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -79,6 +80,11 @@ public class LogisticDistribution extends AbstractDistribution {
     this.scale = scale;
   }
 
+  @Override
+  public double pdf(double val) {
+    return pdf(val, location, scale);
+  }
+
   /**
    * Probability density function.
    * 
@@ -94,10 +100,13 @@ public class LogisticDistribution extends AbstractDistribution {
     return e / (scale * f * f);
   }
 
+  @Override
+  public double logpdf(double val) {
+    return logpdf(val, location, scale);
+  }
+
   /**
    * log Probability density function.
-   * 
-   * TODO: untested.
    * 
    * @param val Value
    * @param loc Location
@@ -106,14 +115,13 @@ public class LogisticDistribution extends AbstractDistribution {
    */
   public static double logpdf(double val, double loc, double scale) {
     val = Math.abs((val - loc) / scale);
-    double e = Math.exp(-val);
-    double f = 1.0 + e;
-    return -(val + Math.log(scale * f * f));
+    double f = 1.0 + Math.exp(-val);
+    return -val - Math.log(scale * f * f);
   }
 
   @Override
-  public double pdf(double val) {
-    return pdf(val, location, scale);
+  public double cdf(double val) {
+    return cdf(val, location, scale);
   }
 
   /**
@@ -148,11 +156,6 @@ public class LogisticDistribution extends AbstractDistribution {
     } else {
       return val - Math.exp(val);
     }
-  }
-
-  @Override
-  public double cdf(double val) {
-    return cdf(val, location, scale);
   }
 
   /**

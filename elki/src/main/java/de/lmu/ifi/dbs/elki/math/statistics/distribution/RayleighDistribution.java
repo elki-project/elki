@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -114,11 +114,31 @@ public class RayleighDistribution extends AbstractDistribution {
    * @return PDF at position x.
    */
   public static double pdf(double x, double sigma) {
-    if (x <= 0.) {
+    if(x <= 0.) {
       return 0.;
     }
     final double xs = x / sigma;
     return xs / sigma * Math.exp(-.5 * xs * xs);
+  }
+
+  @Override
+  public double logpdf(double x) {
+    return logpdf(x - mu, sigma);
+  }
+
+  /**
+   * PDF of Rayleigh distribution
+   * 
+   * @param x Value
+   * @param sigma Scale
+   * @return PDF at position x.
+   */
+  public static double logpdf(double x, double sigma) {
+    if(x <= 0.) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    final double xs = x / sigma;
+    return Math.log(xs / sigma) - .5 * xs * xs;
   }
 
   @Override
@@ -134,7 +154,7 @@ public class RayleighDistribution extends AbstractDistribution {
    * @return CDF at position x.
    */
   public static double cdf(double x, double sigma) {
-    if (x <= 0.) {
+    if(x <= 0.) {
       return 0.;
     }
     final double xs = x / sigma;
@@ -154,13 +174,16 @@ public class RayleighDistribution extends AbstractDistribution {
    * @return Quantile function at position x.
    */
   public static double quantile(double val, double sigma) {
-    if (!(val >= 0.) || !(val <= 1.)) {
+    if(!(val >= 0.) || !(val <= 1.)) {
       return Double.NaN;
-    } else if (val == 0.) {
+    }
+    else if(val == 0.) {
       return 0.;
-    } else if (val == 1.) {
+    }
+    else if(val == 1.) {
       return Double.POSITIVE_INFINITY;
-    } else {
+    }
+    else {
       return sigma * Math.sqrt(-2. * Math.log(val));
     }
   }
@@ -191,12 +214,12 @@ public class RayleighDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter meanP = new DoubleParameter(LOCATION_ID, 0.);
-      if (config.grab(meanP)) {
+      if(config.grab(meanP)) {
         mean = meanP.doubleValue();
       }
 
       DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if (config.grab(scaleP)) {
+      if(config.grab(scaleP)) {
         scale = scaleP.doubleValue();
       }
     }

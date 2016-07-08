@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -41,7 +41,7 @@ public class ExponentialDistribution extends AbstractDistribution {
    * Rate, inverse of mean
    */
   double rate;
-  
+
   /**
    * Location parameter.
    */
@@ -104,10 +104,18 @@ public class ExponentialDistribution extends AbstractDistribution {
 
   @Override
   public double pdf(double val) {
-    if (val < location) {
+    if(val < location) {
       return 0.;
     }
     return rate * Math.exp(-rate * (val - location));
+  }
+
+  @Override
+  public double logpdf(double val) {
+    if(val < location) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    return Math.log(rate) - rate * (val - location);
   }
 
   /**
@@ -118,15 +126,29 @@ public class ExponentialDistribution extends AbstractDistribution {
    * @return probability density
    */
   public static double pdf(double val, double rate) {
-    if (val < 0.) {
+    if(val < 0.) {
       return 0.;
     }
     return rate * Math.exp(-rate * val);
   }
 
+  /**
+   * log PDF, static version
+   * 
+   * @param val Value to compute PDF at
+   * @param rate Rate parameter (1/scale)
+   * @return probability density
+   */
+  public static double logpdf(double val, double rate) {
+    if(val < 0.) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    return Math.log(rate) - rate * val;
+  }
+
   @Override
   public double cdf(double val) {
-    if (val < location) {
+    if(val < location) {
       return 0.;
     }
     return 1 - Math.exp(-rate * (val - location));
@@ -140,7 +162,7 @@ public class ExponentialDistribution extends AbstractDistribution {
    * @return cumulative density
    */
   public static double cdf(double val, double rate) {
-    if (val < 0.) {
+    if(val < 0.) {
       return 0.;
     }
     return 1 - Math.exp(-rate * val);
@@ -202,12 +224,12 @@ public class ExponentialDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter locP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(locP)) {
+      if(config.grab(locP)) {
         location = locP.doubleValue();
       }
 
       DoubleParameter rateP = new DoubleParameter(RATE_ID);
-      if (config.grab(rateP)) {
+      if(config.grab(rateP)) {
         rate = rateP.doubleValue();
       }
     }

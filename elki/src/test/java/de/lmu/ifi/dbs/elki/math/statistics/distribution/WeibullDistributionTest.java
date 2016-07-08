@@ -1238,7 +1238,7 @@ public class WeibullDistributionTest extends AbstractDistributionTest {
 
     checkPDF(new WeibullDistribution(1., 1.), P_CDFPDF, GNUR_WEIBULL_PDF_1_1, 1e-15);
     checkPDF(new WeibullDistribution(2., 1.), P_CDFPDF, GNUR_WEIBULL_PDF_2_1, 1e-15);
-    checkPDF(new WeibullDistribution(4., 1.), P_CDFPDF, GNUR_WEIBULL_PDF_4_1, 1e-14);
+    checkPDF(new WeibullDistribution(4., 1.), P_CDFPDF, GNUR_WEIBULL_PDF_4_1, 1e-15);
     checkPDF(new WeibullDistribution(4., 10.), P_CDFPDF, GNUR_WEIBULL_PDF_4_10, 1e-15);
     checkPDF(new WeibullDistribution(.1, 1.), P_CDFPDF, GNUR_WEIBULL_PDF_01_1, 1e-15);
     checkPDF(new WeibullDistribution(.1, 4.), P_CDFPDF, GNUR_WEIBULL_PDF_01_4, 1e-15);

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
@@ -109,6 +110,11 @@ public class LogNormalDistribution extends AbstractDistribution {
   }
 
   @Override
+  public double logpdf(double val) {
+    return logpdf(val - shift, logmean, logstddev);
+  }
+
+  @Override
   public double cdf(double val) {
     return cdf(val - shift, logmean, logstddev);
   }
@@ -125,7 +131,6 @@ public class LogNormalDistribution extends AbstractDistribution {
    * 1/(SQRT(2*pi)*sigma*x) * e^(-log(x-mu)^2/2sigma^2)
    * </pre>
    * 
-   * 
    * @param x The value.
    * @param mu The mean.
    * @param sigma The standard deviation.
@@ -135,9 +140,28 @@ public class LogNormalDistribution extends AbstractDistribution {
     if(x <= 0.) {
       return 0.;
     }
-    final double x_mu = Math.log(x) - mu;
-    final double sigmasq = sigma * sigma;
-    return 1 / (MathUtil.SQRTTWOPI * sigma * x) * Math.exp(-.5 * x_mu * x_mu / sigmasq);
+    final double xrel = (Math.log(x) - mu) / sigma;
+    return 1 / (MathUtil.SQRTTWOPI * sigma * x) * Math.exp(-.5 * xrel * xrel);
+  }
+
+  /**
+   * Probability density function of the normal distribution.
+   * 
+   * <pre>
+   * 1/(SQRT(2*pi)*sigma*x) * e^(-log(x-mu)^2/2sigma^2)
+   * </pre>
+   * 
+   * @param x The value.
+   * @param mu The mean.
+   * @param sigma The standard deviation.
+   * @return logPDF of the given normal distribution at x.
+   */
+  public static double logpdf(double x, double mu, double sigma) {
+    if(x <= 0.) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    final double xrel = (Math.log(x) - mu) / sigma;
+    return MathUtil.LOG_ONE_BY_SQRTTWOPI - Math.log(sigma * x) - .5 * xrel * xrel;
   }
 
   /**

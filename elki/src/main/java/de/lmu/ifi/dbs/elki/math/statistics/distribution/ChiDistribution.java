@@ -100,10 +100,29 @@ public class ChiDistribution extends AbstractDistribution {
    * @return Pdf value
    */
   public static double pdf(double val, double dof) {
-    if (val < 0) {
+    if(val < 0) {
       return 0.0;
     }
     return Math.sqrt(ChiSquaredDistribution.pdf(val, dof));
+  }
+
+  @Override
+  public double logpdf(double val) {
+    return logpdf(val, dof);
+  }
+
+  /**
+   * logPDF function
+   *
+   * @param val Value
+   * @param dof Degrees of freedom
+   * @return logPdf value
+   */
+  public static double logpdf(double val, double dof) {
+    if(val < 0) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    return .5 * ChiSquaredDistribution.logpdf(val, dof);
   }
 
   @Override
@@ -149,7 +168,7 @@ public class ChiDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter dofP = new DoubleParameter(ChiSquaredDistribution.Parameterizer.DOF_ID);
-      if (config.grab(dofP)) {
+      if(config.grab(dofP)) {
         dof = dofP.doubleValue();
       }
     }

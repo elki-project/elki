@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -75,12 +76,13 @@ public class KappaDistribution extends AbstractDistribution {
     this.scale = scale;
     this.shape1 = shape1;
     this.shape2 = shape2;
-    if (shape2 >= 0.) {
-      if (shape1 < -1.) {
+    if(shape2 >= 0.) {
+      if(shape1 < -1.) {
         throw new ArithmeticException("Invalid shape1 parameter - must be greater than -1 if shape2 >= 0.!");
       }
-    } else {
-      if (shape1 < 1. || shape1 > 1. / shape2) {
+    }
+    else {
+      if(shape1 < 1. || shape1 > 1. / shape2) {
         throw new ArithmeticException("Invalid shape1 parameter - must be -1 to +1/shape2 if shape2 < 0.!");
       }
     }
@@ -101,12 +103,13 @@ public class KappaDistribution extends AbstractDistribution {
     this.scale = scale;
     this.shape1 = shape1;
     this.shape2 = shape2;
-    if (shape2 >= 0.) {
-      if (shape1 < -1.) {
+    if(shape2 >= 0.) {
+      if(shape1 < -1.) {
         throw new ArithmeticException("Invalid shape1 parameter - must be greater than -1 if shape2 >= 0.!");
       }
-    } else {
-      if (shape1 < 1. || shape1 > 1. / shape2) {
+    }
+    else {
+      if(shape1 < 1. || shape1 > 1. / shape2) {
         throw new ArithmeticException("Invalid shape1 parameter - must be -1 to +1/shape2 if shape2 < 0.!");
       }
     }
@@ -125,20 +128,47 @@ public class KappaDistribution extends AbstractDistribution {
   public static double pdf(double val, double loc, double scale, double shape1, double shape2) {
     final double c = cdf(val, loc, scale, shape1, shape2);
     val = (val - loc) / scale;
-    if (shape1 != 0.) {
+    if(shape1 != 0.) {
       val = 1 - shape1 * val;
-      if (val < 1e-15) {
+      if(val < 1e-15) {
         return 0.;
       }
       val = (1. - 1. / shape1) * Math.log(val);
     }
-    val = Math.exp(-val);
-    return val / scale * Math.pow(c, 1. - shape2);
+    return Math.exp(-val) / scale * Math.pow(c, 1. - shape2);
   }
 
   @Override
   public double pdf(double val) {
     return pdf(val, location, scale, shape1, shape2);
+  }
+
+  /**
+   * Probability density function.
+   * 
+   * @param val Value
+   * @param loc Location
+   * @param scale Scale
+   * @param shape1 Shape parameter
+   * @param shape2 Shape parameter
+   * @return PDF
+   */
+  public static double logpdf(double val, double loc, double scale, double shape1, double shape2) {
+    final double c = cdf(val, loc, scale, shape1, shape2);
+    val = (val - loc) / scale;
+    if(shape1 != 0.) {
+      val = 1 - shape1 * val;
+      if(val < 1e-15) {
+        return Double.NEGATIVE_INFINITY;
+      }
+      val = (1. - 1. / shape1) * Math.log(val);
+    }
+    return -val - Math.log(scale) + Math.log(c) * (1. - shape2);
+  }
+
+  @Override
+  public double logpdf(double val) {
+    return logpdf(val, location, scale, shape1, shape2);
   }
 
   /**
@@ -153,22 +183,24 @@ public class KappaDistribution extends AbstractDistribution {
    */
   public static double cdf(double val, double loc, double scale, double shape1, double shape2) {
     val = (val - loc) / scale;
-    if (shape1 != 0.) {
+    if(shape1 != 0.) {
       double tmp = 1. - shape1 * val;
-      if (tmp < 1e-15) {
+      if(tmp < 1e-15) {
         return (shape1 < 0.) ? 0. : 1.;
       }
       val = Math.exp(Math.log(tmp) / shape1);
-    } else {
+    }
+    else {
       val = Math.exp(-val);
     }
-    if (shape2 != 0.) {
+    if(shape2 != 0.) {
       double tmp = 1. - shape2 * val;
-      if (tmp < 1e-15) {
+      if(tmp < 1e-15) {
         return 0.;
       }
       val = Math.exp(Math.log(tmp) / shape2);
-    } else {
+    }
+    else {
       val = Math.exp(-val);
     }
     return val;
@@ -190,36 +222,39 @@ public class KappaDistribution extends AbstractDistribution {
    * @return Quantile
    */
   public static double quantile(double val, double loc, double scale, double shape1, double shape2) {
-    if (!(val >= 0.) || !(val <= 1.)) {
+    if(!(val >= 0.) || !(val <= 1.)) {
       return Double.NaN;
     }
-    if (val == 0.) {
-      if (shape2 <= 0.) {
-        if (shape1 < 0.) {
+    if(val == 0.) {
+      if(shape2 <= 0.) {
+        if(shape1 < 0.) {
           return loc + scale / shape1;
-        } else {
+        }
+        else {
           return Double.NEGATIVE_INFINITY;
         }
-      } else {
-        if (shape1 != 0.) {
+      }
+      else {
+        if(shape1 != 0.) {
           return loc + scale / shape1 * (1. - Math.pow(shape2, -shape1));
-        } else {
+        }
+        else {
           return loc + scale * Math.log(shape2);
         }
       }
     }
-    if (val == 1.) {
-      if (shape1 <= 0.) {
+    if(val == 1.) {
+      if(shape1 <= 0.) {
         return Double.NEGATIVE_INFINITY;
       }
       return loc + scale / shape1;
     }
     val = -Math.log(val);
-    if (shape2 != 0.) {
+    if(shape2 != 0.) {
       val = (1 - Math.exp(-shape2 * val)) / shape2;
     }
     val = -Math.log(val);
-    if (shape1 != 0.) {
+    if(shape1 != 0.) {
       val = (1 - Math.exp(-shape1 * val)) / shape1;
     }
     return loc + scale * val;
@@ -267,22 +302,22 @@ public class KappaDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter locationP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(locationP)) {
+      if(config.grab(locationP)) {
         location = locationP.doubleValue();
       }
 
       DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if (config.grab(scaleP)) {
+      if(config.grab(scaleP)) {
         scale = scaleP.doubleValue();
       }
 
       DoubleParameter shape1P = new DoubleParameter(SHAPE1_ID);
-      if (config.grab(shape1P)) {
+      if(config.grab(shape1P)) {
         shape1 = shape1P.doubleValue();
       }
 
       DoubleParameter shape2P = new DoubleParameter(SHAPE2_ID);
-      if (config.grab(shape2P)) {
+      if(config.grab(shape2P)) {
         shape2 = shape2P.doubleValue();
       }
     }

@@ -102,6 +102,11 @@ public final class MathUtil {
   public static final double ONE_BY_SQRTTWOPI = 1. / SQRTTWOPI;
 
   /**
+   * Precomputed value of log(1 / sqrt(2 * pi)) = -.5 * log(2*pi).
+   */
+  public static final double LOG_ONE_BY_SQRTTWOPI = -.5 * Math.log(TWOPI);
+
+  /**
    * 1. / log(2)
    */
   public static final double ONE_BY_LOG2 = 1. / Math.log(2.);

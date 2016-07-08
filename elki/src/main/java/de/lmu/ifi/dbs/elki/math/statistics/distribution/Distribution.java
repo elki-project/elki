@@ -40,6 +40,14 @@ public interface Distribution {
   double pdf(double val);
 
   /**
+   * Return the log density of an existing value
+   * 
+   * @param val existing value
+   * @return log distribution density
+   */
+  double logpdf(double val);
+
+  /**
    * Return the cumulative density function at the given value.
    * 
    * @param val existing value

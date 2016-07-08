@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Reference:
  * <p>
  * Randomized halton sequences<br>
- * Wang, X. and Hickernell, F.J.<br />
+ * X. Wang and F. J. Hickernell<br />
  * Mathematical and Computer Modelling Vol. 32 (7)
  * </p>
  * 
@@ -66,7 +66,10 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.5.5
  */
-@Reference(title = "Randomized halton sequences", authors = "Wang, X. and Hickernell, F.J.", booktitle = "Mathematical and Computer Modelling Vol. 32 (7)", url = "http://dx.doi.org/10.1016/S0895-7177(00)00178-3")
+@Reference(title = "Randomized halton sequences", //
+    authors = "X. Wang and F. J. Hickernell", //
+    booktitle = "Mathematical and Computer Modelling Vol. 32 (7)", //
+    url = "http://dx.doi.org/10.1016/S0895-7177(00)00178-3")
 public class HaltonUniformDistribution implements Distribution {
   /**
    * Minimum
@@ -140,7 +143,7 @@ public class HaltonUniformDistribution implements Distribution {
   public HaltonUniformDistribution(double min, double max, int base, double seed) {
     super();
     // Swap parameters if they were given incorrectly.
-    if (min > max) {
+    if(min > max) {
       double tmp = min;
       min = max;
       max = tmp;
@@ -206,18 +209,26 @@ public class HaltonUniformDistribution implements Distribution {
 
   @Override
   public double pdf(double val) {
-    if (val < min || val >= max) {
+    if(val < min || val >= max) {
       return 0.0;
     }
     return 1.0 / len;
   }
 
   @Override
+  public double logpdf(double val) {
+    if(!(val >= min) || val >= max) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    return (len > 0.) ? Math.log(1.0 / len) : Double.POSITIVE_INFINITY;
+  }
+
+  @Override
   public double cdf(double val) {
-    if (val < min) {
+    if(val < min) {
       return 0.0;
     }
-    if (val > max) {
+    if(val > max) {
       return 1.0;
     }
     return (val - min) / len;
@@ -238,16 +249,16 @@ public class HaltonUniformDistribution implements Distribution {
     // Represent to base b.
     short[] digits = new short[maxi];
     int j;
-    for (j = 0; j < maxi; j++) {
+    for(j = 0; j < maxi; j++) {
       current *= base;
       digits[j] = (short) current;
       current -= digits[j];
-      if (current <= 1e-10) {
+      if(current <= 1e-10) {
         break;
       }
     }
     long inv = 0;
-    for (j = maxi - 1; j >= 0; j--) {
+    for(j = maxi - 1; j >= 0; j--) {
       inv = inv * base + digits[j];
     }
     return inv;
@@ -263,7 +274,7 @@ public class HaltonUniformDistribution implements Distribution {
     double digit = 1.0 / (double) base;
     double radical = digit;
     double inverse = 0.0;
-    while (i > 0) {
+    while(i > 0) {
       inverse += digit * (double) (i % base);
       digit *= radical;
       i /= base;
@@ -279,7 +290,7 @@ public class HaltonUniformDistribution implements Distribution {
   private double nextRadicalInverse() {
     counter++;
     // Do at most MAXFAST appromate steps
-    if (counter >= MAXFAST) {
+    if(counter >= MAXFAST) {
       counter = 0;
       inverse += MAXFAST;
       current = radicalInverse(inverse);
@@ -287,12 +298,13 @@ public class HaltonUniformDistribution implements Distribution {
     }
     // Fast approximation:
     double nextInverse = current + invbase;
-    if (nextInverse < ALMOST_ONE) {
+    if(nextInverse < ALMOST_ONE) {
       current = nextInverse;
       return current;
-    } else {
+    }
+    else {
       double digit1 = invbase, digit2 = invbase * invbase;
-      while (current + digit2 >= ALMOST_ONE) {
+      while(current + digit2 >= ALMOST_ONE) {
         digit1 = digit2;
         digit2 *= invbase;
       }
@@ -343,12 +355,12 @@ public class HaltonUniformDistribution implements Distribution {
       super.makeOptions(config);
 
       DoubleParameter minP = new DoubleParameter(UniformDistribution.Parameterizer.MIN_ID);
-      if (config.grab(minP)) {
+      if(config.grab(minP)) {
         min = minP.doubleValue();
       }
 
       DoubleParameter maxP = new DoubleParameter(UniformDistribution.Parameterizer.MAX_ID);
-      if (config.grab(maxP)) {
+      if(config.grab(maxP)) {
         max = maxP.doubleValue();
       }
     }

@@ -1,9 +1,10 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -33,6 +34,10 @@ import static org.junit.Assert.assertTrue;
  */
 public class AbstractDistributionTest {
   public void checkPDF(Distribution d, double[] x, double[] expected, double err) {
+    assertEquals("Not zero at neginf", 0., d.pdf(Double.NEGATIVE_INFINITY), 0.);
+    assertEquals("Not zero at almost neginf", 0., d.pdf(-Double.MAX_VALUE), 0.);
+    assertEquals("Not zero at posinf", 0., d.pdf(Double.POSITIVE_INFINITY), 0.);
+    assertEquals("Not zero at almost posinf", 0., d.pdf(Double.MAX_VALUE), 0.);
     int maxerrlev = -15;
     for(int i = 0; i < x.length; i++) {
       double val = d.pdf(x[i]);
@@ -51,7 +56,34 @@ public class AbstractDistributionTest {
     assertTrue("Error magnitude is not tight: measured " + maxerrlev + " specified " + given, given <= maxerrlev);
   }
 
+  public void checkLogPDF(Distribution d, double[] x, double[] expected, double err) {
+    assertEquals("Not -inf at neginf", Double.NEGATIVE_INFINITY, d.logpdf(Double.NEGATIVE_INFINITY), 0.);
+    assertEquals("Not -inf at almost neginf", Double.NEGATIVE_INFINITY, d.logpdf(-Double.MAX_VALUE), 0.);
+    assertEquals("Not -inf at posinf", Double.NEGATIVE_INFINITY, d.logpdf(Double.POSITIVE_INFINITY), 0.);
+    assertEquals("Not -inf at almost posinf", Double.NEGATIVE_INFINITY, d.logpdf(Double.MAX_VALUE), 0.);
+    int maxerrlev = -15;
+    for(int i = 0; i < x.length; i++) {
+      double val = d.logpdf(x[i]);
+      if(val == expected[i]) {
+        continue;
+      }
+      double diff = Math.abs(val - expected[i]);
+      final int errlev = (int) Math.ceil(Math.log10(diff / expected[i]));
+      maxerrlev = Math.max(errlev, maxerrlev);
+      if(diff < err || diff / expected[i] < err) {
+        continue;
+      }
+      assertEquals("Error magnitude: 1e" + errlev + " at " + x[i], expected[i], val, err);
+    }
+    int given = (int) Math.floor(Math.log10(err * 1.1));
+    assertTrue("Error magnitude is not tight: measured " + maxerrlev + " specified " + given, given <= maxerrlev);
+  }
+
   public void checkCDF(Distribution d, double[] x, double[] expected, double err) {
+    assertEquals("Not zero at neginf", 0., d.cdf(Double.NEGATIVE_INFINITY), 0.);
+    assertEquals("Not zero at almost neginf", 0., d.cdf(-Double.MAX_VALUE), 0.);
+    assertEquals("Not one at posinf", 1., d.cdf(Double.POSITIVE_INFINITY), 0.);
+    assertEquals("Not one at almost posinf", 1., d.cdf(Double.MAX_VALUE), 0.);
     int maxerrlev = -15;
     for(int i = 0; i < x.length; i++) {
       double val = d.cdf(x[i]);

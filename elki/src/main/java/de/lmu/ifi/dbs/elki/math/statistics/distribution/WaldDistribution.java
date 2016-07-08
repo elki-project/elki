@@ -92,6 +92,11 @@ public class WaldDistribution extends AbstractDistribution {
   }
 
   @Override
+  public double logpdf(double val) {
+    return logpdf(val, mean, shape);
+  }
+
+  @Override
   public double cdf(double val) {
     return cdf(val, mean, shape);
   }
@@ -111,9 +116,10 @@ public class WaldDistribution extends AbstractDistribution {
     v *= v;
     double x = mean + mean * .5 / shape * (mean * v - Math.sqrt(4. * mean * shape * v + mean * mean * v * v));
     double u = random.nextDouble();
-    if (u * (mean + x) <= mean) {
+    if(u * (mean + x) <= mean) {
       return x;
-    } else {
+    }
+    else {
       return mean * mean / x;
     }
   }
@@ -126,18 +132,33 @@ public class WaldDistribution extends AbstractDistribution {
   /**
    * Probability density function of the Wald distribution.
    *
-   *
    * @param x The value.
    * @param mu The mean.
    * @param shape Shape parameter
    * @return PDF of the given Wald distribution at x.
    */
   public static double pdf(double x, double mu, double shape) {
-    if (!(x > 0)) {
+    if(!(x > 0)) {
       return 0;
     }
     final double v = (x - mu);
     return Math.sqrt(shape / (MathUtil.TWOPI * x * x * x)) * Math.exp(-shape * v * v / (2. * mu * mu * x));
+  }
+
+  /**
+   * Probability density function of the Wald distribution.
+   *
+   * @param x The value.
+   * @param mu The mean.
+   * @param shape Shape parameter
+   * @return log PDF of the given Wald distribution at x.
+   */
+  public static double logpdf(double x, double mu, double shape) {
+    if(!(x > 0)) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    final double v = (x - mu);
+    return 0.5 * Math.log(shape / (MathUtil.TWOPI * x * x * x)) - shape * v * v / (2. * mu * mu * x);
   }
 
   /**
@@ -149,7 +170,7 @@ public class WaldDistribution extends AbstractDistribution {
    * @return The CDF of the given Wald distribution at x.
    */
   public static double cdf(double x, double mu, double shape) {
-    if (!(x > 0.)) {
+    if(!(x > 0.)) {
       return 0.;
     }
     // TODO: accelerate by caching exp(2 * shape / mu).
@@ -157,9 +178,10 @@ public class WaldDistribution extends AbstractDistribution {
     final double v1 = Math.sqrt(shape / x);
     double c1 = NormalDistribution.standardNormalCDF(v1 * (v0 - 1.));
     double c2 = NormalDistribution.standardNormalCDF(-v1 * (v0 + 1.));
-    if (c2 > 0.) {
+    if(c2 > 0.) {
       return c1 + Math.exp(2 * shape / mu) * c2;
-    } else {
+    }
+    else {
       return c1;
     }
   }
@@ -197,12 +219,12 @@ public class WaldDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter meanP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(meanP)) {
+      if(config.grab(meanP)) {
         mean = meanP.doubleValue();
       }
 
       DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
-      if (config.grab(shapeP)) {
+      if(config.grab(shapeP)) {
         shape = shapeP.doubleValue();
       }
     }

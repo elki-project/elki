@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -89,6 +89,11 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
     this.k = k;
   }
 
+  @Override
+  public double pdf(double x) {
+    return pdf(x, mu, sigma, k);
+  }
+
   /**
    * PDF of GEV distribution
    * 
@@ -99,6 +104,9 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
    * @return PDF at position x.
    */
   public static double pdf(double x, double mu, double sigma, double k) {
+    if (x == Double.POSITIVE_INFINITY || x == Double.NEGATIVE_INFINITY) {
+      return 0.;
+    }
     x = (x - mu) / sigma;
     if (k > 0 || k < 0) {
       if (k * x < -1) {
@@ -112,8 +120,38 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double pdf(double x) {
-    return pdf(x, mu, sigma, k);
+  public double logpdf(double x) {
+    return logpdf(x, mu, sigma, k);
+  }
+
+  /**
+   * log PDF of GEV distribution
+   * 
+   * @param x Value
+   * @param mu Location parameter mu
+   * @param sigma Scale parameter sigma
+   * @param k Shape parameter k
+   * @return PDF at position x.
+   */
+  public static double logpdf(double x, double mu, double sigma, double k) {
+    if (x == Double.POSITIVE_INFINITY || x == Double.NEGATIVE_INFINITY) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    x = (x - mu) / sigma;
+    if (k > 0 || k < 0) {
+      if (k * x < -1) {
+        return Double.NEGATIVE_INFINITY;
+      }
+      final double tx = Math.pow(1 + k * x, -1. / k);
+      return Math.log(tx) * (k + 1) -tx - Math.log(sigma);
+    } else { // Gumbel case:
+      return -x - Math.exp(-x) - Math.log(sigma);
+    }
+  }
+
+  @Override
+  public double cdf(double val) {
+    return cdf(val, mu, sigma, k);
   }
 
   /**
@@ -138,8 +176,8 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double cdf(double val) {
-    return cdf(val, mu, sigma, k);
+  public double quantile(double val) {
+    return quantile(val, mu, sigma, k);
   }
 
   /**
@@ -162,11 +200,6 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
     } else { // Gumbel
       return mu + sigma * Math.log(1. / Math.log(1. / val));
     }
-  }
-
-  @Override
-  public double quantile(double val) {
-    return quantile(val, mu, sigma, k);
   }
 
   @Override

@@ -1,18 +1,9 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution;
-
-import java.util.Random;
-
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,6 +21,14 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.Random;
+
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Beta Distribution with implementation of the regularized incomplete beta
@@ -94,7 +93,7 @@ public class BetaDistribution extends AbstractDistribution {
    */
   public BetaDistribution(double a, double b, Random random) {
     super(random);
-    if (a <= 0.0 || b <= 0.0) {
+    if(a <= 0.0 || b <= 0.0) {
       throw new IllegalArgumentException("Invalid parameters for Beta distribution.");
     }
 
@@ -112,7 +111,7 @@ public class BetaDistribution extends AbstractDistribution {
    */
   public BetaDistribution(double a, double b, RandomFactory random) {
     super(random);
-    if (a <= 0.0 || b <= 0.0) {
+    if(a <= 0.0 || b <= 0.0) {
       throw new IllegalArgumentException("Invalid parameters for Beta distribution.");
     }
 
@@ -123,48 +122,51 @@ public class BetaDistribution extends AbstractDistribution {
 
   @Override
   public double pdf(double val) {
-    if (val < 0. || val > 1.) {
+    if(val < 0. || val > 1.) {
       return 0.;
     }
-    if (val == 0.) {
-      if (alpha > 1.) {
-        return 0.;
-      }
-      if (alpha < 1.) {
-        return Double.POSITIVE_INFINITY;
-      }
-      return beta;
+    if(val == 0.) {
+      return (alpha > 1.) ? 0. : (alpha < 1.) ? Double.POSITIVE_INFINITY : beta;
     }
-    if (val == 1.) {
-      if (beta > 1.) {
-        return 0.;
-      }
-      if (beta < 1.) {
-        return Double.POSITIVE_INFINITY;
-      }
-      return alpha;
+    if(val == 1.) {
+      return (beta > 1.) ? 0. : (beta < 1.) ? Double.POSITIVE_INFINITY : alpha;
     }
     return Math.exp(-logbab + Math.log(val) * (alpha - 1) + Math.log1p(-val) * (beta - 1));
   }
 
   @Override
+  public double logpdf(double val) {
+    if(val < 0. || val > 1.) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    if(val == 0.) {
+      return (alpha > 1.) ? Double.NEGATIVE_INFINITY : (alpha < 1.) ? Double.POSITIVE_INFINITY : Math.log(beta);
+    }
+    if(val == 1.) {
+      return (beta > 1.) ? Double.NEGATIVE_INFINITY : (beta < 1.) ? Double.POSITIVE_INFINITY : Math.log(alpha);
+    }
+    return -logbab + Math.log(val) * (alpha - 1) + Math.log1p(-val) * (beta - 1);
+  }
+
+  @Override
   public double cdf(double x) {
-    if (alpha <= 0.0 || beta <= 0.0 || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(x)) {
+    if(alpha <= 0.0 || beta <= 0.0 || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(x)) {
       return Double.NaN;
     }
-    if (x <= 0.0) {
+    if(x <= 0.0) {
       return 0.0;
     }
-    if (x >= 1.0) {
+    if(x >= 1.0) {
       return 1.0;
     }
-    if (alpha > SWITCH && beta > SWITCH) {
+    if(alpha > SWITCH && beta > SWITCH) {
       return regularizedIncBetaQuadrature(alpha, beta, x);
     }
     double bt = Math.exp(-logbab + alpha * Math.log(x) + beta * Math.log1p(-x));
-    if (x < (alpha + 1.0) / (alpha + beta + 2.0)) {
+    if(x < (alpha + 1.0) / (alpha + beta + 2.0)) {
       return bt * regularizedIncBetaCF(alpha, beta, x) / alpha;
-    } else {
+    }
+    else {
       return 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
     }
   }
@@ -172,19 +174,20 @@ public class BetaDistribution extends AbstractDistribution {
   @Override
   public double quantile(double x) {
     // Valid parameters
-    if (x < 0 || x > 1 || Double.isNaN(x)) {
+    if(x < 0 || x > 1 || Double.isNaN(x)) {
       return Double.NaN;
     }
-    if (x == 0) {
+    if(x == 0) {
       return 0.0;
     }
-    if (x == 1) {
+    if(x == 1) {
       return 1.0;
     }
     // Simpler to compute inverse?
-    if (x > 0.5) {
+    if(x > 0.5) {
       return 1 - rawQuantile(1 - x, beta, alpha, logbab);
-    } else {
+    }
+    else {
       return rawQuantile(x, alpha, beta, logbab);
     }
   }
@@ -222,29 +225,17 @@ public class BetaDistribution extends AbstractDistribution {
    * @return probability density
    */
   public static double pdf(double val, double alpha, double beta) {
-    if (alpha <= 0. || beta <= 0. || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(val)) {
+    if(alpha <= 0. || beta <= 0. || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(val)) {
       return Double.NaN;
     }
-    if (val < 0. || val > 1.) {
+    if(val < 0. || val > 1.) {
       return 0.;
     }
-    if (val == 0.) {
-      if (alpha > 1.) {
-        return 0.;
-      }
-      if (alpha < 1.) {
-        return Double.POSITIVE_INFINITY;
-      }
-      return beta;
+    if(val == 0.) {
+      return (alpha > 1.) ? 0. : (alpha < 1.) ? Double.POSITIVE_INFINITY : beta;
     }
-    if (val == 1.) {
-      if (beta > 1.) {
-        return 0.;
-      }
-      if (beta < 1.) {
-        return Double.POSITIVE_INFINITY;
-      }
-      return alpha;
+    if(val == 1.) {
+      return (beta > 1.) ? 0. : (beta < 1.) ? Double.POSITIVE_INFINITY : alpha;
     }
     return Math.exp(-logBeta(alpha, beta) + Math.log(val) * (alpha - 1) + Math.log1p(-val) * (beta - 1));
   }
@@ -258,29 +249,17 @@ public class BetaDistribution extends AbstractDistribution {
    * @return probability density
    */
   public static double logpdf(double val, double alpha, double beta) {
-    if (alpha <= 0. || beta <= 0. || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(val)) {
+    if(alpha <= 0. || beta <= 0. || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(val)) {
       return Double.NaN;
     }
-    if (val < 0. || val > 1.) {
+    if(val < 0. || val > 1.) {
       return Double.NEGATIVE_INFINITY;
     }
-    if (val == 0.) {
-      if (alpha > 1.) {
-        return Double.NEGATIVE_INFINITY;
-      }
-      if (alpha < 1.) {
-        return Double.POSITIVE_INFINITY;
-      }
-      return Math.log(beta);
+    if(val == 0.) {
+      return (alpha > 1.) ? Double.NEGATIVE_INFINITY : (alpha < 1.) ? Double.POSITIVE_INFINITY : Math.log(beta);
     }
-    if (val == 1.) {
-      if (beta > 1.) {
-        return Double.NEGATIVE_INFINITY;
-      }
-      if (beta < 1.) {
-        return Double.POSITIVE_INFINITY;
-      }
-      return Math.log(alpha);
+    if(val == 1.) {
+      return (beta > 1.) ? Double.NEGATIVE_INFINITY : (beta < 1.) ? Double.POSITIVE_INFINITY : Math.log(alpha);
     }
     return -logBeta(alpha, beta) + Math.log(val) * (alpha - 1) + Math.log1p(-val) * (beta - 1);
   }
@@ -306,22 +285,23 @@ public class BetaDistribution extends AbstractDistribution {
    * @return Value of the regularized incomplete beta function
    */
   public static double regularizedIncBeta(double x, double alpha, double beta) {
-    if (alpha <= 0.0 || beta <= 0.0 || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(x)) {
+    if(alpha <= 0.0 || beta <= 0.0 || Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(x)) {
       return Double.NaN;
     }
-    if (x <= 0.0) {
+    if(x <= 0.0) {
       return 0.0;
     }
-    if (x >= 1.0) {
+    if(x >= 1.0) {
       return 1.0;
     }
-    if (alpha > SWITCH && beta > SWITCH) {
+    if(alpha > SWITCH && beta > SWITCH) {
       return regularizedIncBetaQuadrature(alpha, beta, x);
     }
     double bt = Math.exp(-logBeta(alpha, beta) + alpha * Math.log(x) + beta * Math.log1p(-x));
-    if (x < (alpha + 1.0) / (alpha + beta + 2.0)) {
+    if(x < (alpha + 1.0) / (alpha + beta + 2.0)) {
       return bt * regularizedIncBetaCF(alpha, beta, x) / alpha;
-    } else {
+    }
+    else {
       return 1.0 - bt * regularizedIncBetaCF(beta, alpha, 1.0 - x) / beta;
     }
   }
@@ -342,37 +322,37 @@ public class BetaDistribution extends AbstractDistribution {
     double qam = alpha - 1.0;
     double c = 1.0;
     double d = 1.0 - qab * x / qap;
-    if (Math.abs(d) < FPMIN) {
+    if(Math.abs(d) < FPMIN) {
       d = FPMIN;
     }
     d = 1.0 / d;
     double h = d;
-    for (int m = 1; m < 10000; m++) {
+    for(int m = 1; m < 10000; m++) {
       int m2 = 2 * m;
       double aa = m * (beta - m) * x / ((qam + m2) * (alpha + m2));
       d = 1.0 + aa * d;
-      if (Math.abs(d) < FPMIN) {
+      if(Math.abs(d) < FPMIN) {
         d = FPMIN;
       }
       c = 1.0 + aa / c;
-      if (Math.abs(c) < FPMIN) {
+      if(Math.abs(c) < FPMIN) {
         c = FPMIN;
       }
       d = 1.0 / d;
       h *= d * c;
       aa = -(alpha + m) * (qab + m) * x / ((alpha + m2) * (qap + m2));
       d = 1.0 + aa * d;
-      if (Math.abs(d) < FPMIN) {
+      if(Math.abs(d) < FPMIN) {
         d = FPMIN;
       }
       c = 1.0 + aa / c;
-      if (Math.abs(c) < FPMIN) {
+      if(Math.abs(c) < FPMIN) {
         c = FPMIN;
       }
       d = 1.0 / d;
       double del = d * c;
       h *= del;
-      if (Math.abs(del - 1.0) <= NUM_PRECISION) {
+      if(Math.abs(del - 1.0) <= NUM_PRECISION) {
         break;
       }
     }
@@ -397,19 +377,20 @@ public class BetaDistribution extends AbstractDistribution {
     final double lnmuc = Math.log1p(-mu);
     double t = Math.sqrt(alpha * beta / (alphapbeta * alphapbeta * (alphapbeta + 1.0)));
     final double xu;
-    if (x > alpha / alphapbeta) {
-      if (x >= 1.0) {
+    if(x > alpha / alphapbeta) {
+      if(x >= 1.0) {
         return 1.0;
       }
       xu = Math.min(1.0, Math.max(mu + 10.0 * t, x + 5.0 * t));
-    } else {
-      if (x <= 0.0) {
+    }
+    else {
+      if(x <= 0.0) {
         return 0.0;
       }
       xu = Math.max(0.0, Math.min(mu - 10.0 * t, x - 5.0 * t));
     }
     double sum = 0.0;
-    for (int i = 0; i < GAUSSLEGENDRE_Y.length; i++) {
+    for(int i = 0; i < GAUSSLEGENDRE_Y.length; i++) {
       t = x + (xu - x) * GAUSSLEGENDRE_Y[i];
       sum += GAUSSLEGENDRE_W[i] * Math.exp(a1 * (Math.log(t) - lnmu) + b1 * (Math.log1p(-t) - lnmuc));
     }
@@ -427,22 +408,23 @@ public class BetaDistribution extends AbstractDistribution {
    */
   public static double quantile(double p, double alpha, double beta) {
     // Valid parameters
-    if (Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(p) || alpha < 0. || beta < 0.) {
+    if(Double.isNaN(alpha) || Double.isNaN(beta) || Double.isNaN(p) || alpha < 0. || beta < 0.) {
       return Double.NaN;
     }
-    if (p < 0 || p > 1) {
+    if(p < 0 || p > 1) {
       return Double.NaN;
     }
-    if (p == 0) {
+    if(p == 0) {
       return 0.0;
     }
-    if (p == 1) {
+    if(p == 1) {
       return 1.0;
     }
     // Simpler to compute inverse?
-    if (p > 0.5) {
+    if(p > 0.5) {
       return 1 - rawQuantile(1 - p, beta, alpha, logBeta(beta, alpha));
-    } else {
+    }
+    else {
       return rawQuantile(p, alpha, beta, logBeta(alpha, beta));
     }
   }
@@ -464,31 +446,34 @@ public class BetaDistribution extends AbstractDistribution {
       double tmp = Math.sqrt(-2 * Math.log(p));
       double y = tmp - (2.30753 + 0.27061 * tmp) / (1. + (0.99229 + 0.04481 * tmp) * tmp);
 
-      if (alpha > 1 && beta > 1) {
+      if(alpha > 1 && beta > 1) {
         double r = (y * y - 3.) / 6.;
         double s = 1. / (alpha + alpha - 1.);
         double t = 1. / (beta + beta - 1.);
         double h = 2. / (s + t);
         double w = y * Math.sqrt(h + r) / h - (t - s) * (r + 5. / 6. - 2. / (3. * h));
         x = alpha / (alpha + beta * Math.exp(w + w));
-      } else {
+      }
+      else {
         double r = beta + beta;
         double t = 1. / (9. * beta);
         final double a = 1. - t + y * Math.sqrt(t);
         t = r * a * a * a;
-        if (t <= 0.) {
+        if(t <= 0.) {
           x = 1. - Math.exp((Math.log1p(-p) + Math.log(beta) + logbeta) / beta);
-        } else {
+        }
+        else {
           t = (4. * alpha + r - 2.) / t;
-          if (t <= 1.) {
+          if(t <= 1.) {
             x = Math.exp((Math.log(p * alpha) + logbeta) / alpha);
-          } else {
+          }
+          else {
             x = 1. - 2. / (t + 1.);
           }
         }
       }
       // Degenerate initial approximations
-      if (x < 3e-308 || x > 1 - 2.22e-16) {
+      if(x < 3e-308 || x > 1 - 2.22e-16) {
         x = 0.5;
       }
     }
@@ -502,29 +487,29 @@ public class BetaDistribution extends AbstractDistribution {
       final double acu = Math.max(1e-300, Math.pow(10., -13 - 2.5 / (alpha * alpha) - .5 / (p * p)));
       double prevstep = 0., y = 0., stepsize = 1;
 
-      for (int outer = 0; outer < 1000; outer++) {
+      for(int outer = 0; outer < 1000; outer++) {
         // Current CDF value
         double ynew = cdf(x, alpha, beta);
-        if (Double.isInfinite(ynew)) { // Degenerated.
+        if(Double.isInfinite(ynew)) { // Degenerated.
           return Double.NaN;
         }
         // Error gradient
         ynew = (ynew - p) * Math.exp(logbeta + ialpha * Math.log(x) + ibeta * Math.log1p(-x));
-        if (ynew * y <= 0.) {
+        if(ynew * y <= 0.) {
           prevstep = Math.max(Math.abs(stepsize), 3e-308);
         }
         // Inner loop: try different step sizes: y * 3^-i
         double g = 1, xnew = 0.;
-        for (int inner = 0; inner < 1000; inner++) {
+        for(int inner = 0; inner < 1000; inner++) {
           stepsize = g * ynew;
-          if (Math.abs(stepsize) < prevstep) {
+          if(Math.abs(stepsize) < prevstep) {
             xnew = x - stepsize; // Candidate x
-            if (xnew >= 0. && xnew <= 1.) {
+            if(xnew >= 0. && xnew <= 1.) {
               // Close enough
-              if (prevstep <= acu || Math.abs(ynew) <= acu) {
+              if(prevstep <= acu || Math.abs(ynew) <= acu) {
                 return x;
               }
-              if (xnew != 0. && xnew != 1.) {
+              if(xnew != 0. && xnew != 1.) {
                 break;
               }
             }
@@ -532,7 +517,7 @@ public class BetaDistribution extends AbstractDistribution {
           g /= 3.;
         }
         // Convergence
-        if (Math.abs(xnew - x) < 1e-15 * x) {
+        if(Math.abs(xnew - x) < 1e-15 * x) {
           return x;
         }
         // Iterate with new values
@@ -570,12 +555,12 @@ public class BetaDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter alphaP = new DoubleParameter(ALPHA_ID);
-      if (config.grab(alphaP)) {
+      if(config.grab(alphaP)) {
         alpha = alphaP.doubleValue();
       }
 
       DoubleParameter betaP = new DoubleParameter(BETA_ID);
-      if (config.grab(betaP)) {
+      if(config.grab(betaP)) {
         beta = betaP.doubleValue();
       }
     }

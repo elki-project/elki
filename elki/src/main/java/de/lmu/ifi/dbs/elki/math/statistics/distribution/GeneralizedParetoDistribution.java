@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -84,7 +84,7 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
   }
 
   /**
-   * PDF of GEV distribution
+   * PDF of GPD distribution
    * 
    * @param x Value
    * @param mu Location parameter mu
@@ -107,7 +107,30 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
   }
 
   /**
-   * CDF of GEV distribution
+   * PDF of GPD distribution
+   * 
+   * @param x Value
+   * @param mu Location parameter mu
+   * @param sigma Scale parameter sigma
+   * @param xi Shape parameter xi (= -kappa)
+   * @return PDF at position x.
+   */
+  public static double logpdf(double x, double mu, double sigma, double xi) {
+    x = (x - mu) / sigma;
+    // Check support:
+    if(x < 0 || (xi < 0 && x > -1. / xi)) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    return ((xi == 0) ? Double.POSITIVE_INFINITY : Math.log(1 + xi * x) * (-1 / xi - 1)) - Math.log(sigma);
+  }
+
+  @Override
+  public double logpdf(double x) {
+    return logpdf(x, mu, sigma, xi);
+  }
+
+  /**
+   * CDF of GPD distribution
    * 
    * @param val Value
    * @param mu Location parameter mu
@@ -133,7 +156,7 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
   }
 
   /**
-   * Quantile function of GEV distribution
+   * Quantile function of GPD distribution
    * 
    * @param val Value
    * @param mu Location parameter mu

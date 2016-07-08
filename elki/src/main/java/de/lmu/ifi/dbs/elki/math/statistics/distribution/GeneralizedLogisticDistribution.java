@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -94,6 +94,11 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
     this.shape = shape;
   }
 
+  @Override
+  public double pdf(double val) {
+    return pdf(val, location, scale, shape);
+  }
+
   /**
    * Probability density function.
    * 
@@ -104,10 +109,18 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
    * @return PDF
    */
   public static double pdf(double val, double loc, double scale, double shape) {
+    if(val == Double.POSITIVE_INFINITY || val == Double.NEGATIVE_INFINITY) {
+      return 0.;
+    }
     val = (val - loc) / scale;
     double e = Math.exp(-val);
     double f = 1. + e;
-    return shape * e / (scale * Math.pow(f, shape + 1.));
+    return e < Double.POSITIVE_INFINITY ? shape * e / (scale * Math.pow(f, shape + 1.)) : 0.;
+  }
+
+  @Override
+  public double logpdf(double val) {
+    return logpdf(val, location, scale, shape);
   }
 
   /**
@@ -128,8 +141,8 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double pdf(double val) {
-    return pdf(val, location, scale, shape);
+  public double cdf(double val) {
+    return cdf(val, location, scale, shape);
   }
 
   /**
@@ -160,11 +173,6 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
   public static double logcdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
     return Math.log1p(Math.exp(-val)) * -shape;
-  }
-
-  @Override
-  public double cdf(double val) {
-    return cdf(val, location, scale, shape);
   }
 
   /**
@@ -212,17 +220,17 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter locationP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(locationP)) {
+      if(config.grab(locationP)) {
         location = locationP.doubleValue();
       }
 
       DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if (config.grab(scaleP)) {
+      if(config.grab(scaleP)) {
         scale = scaleP.doubleValue();
       }
 
       DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
-      if (config.grab(shapeP)) {
+      if(config.grab(shapeP)) {
         shape = shapeP.doubleValue();
       }
     }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -174,6 +174,11 @@ public class NormalDistribution extends AbstractDistribution {
   }
 
   @Override
+  public double logpdf(double val) {
+    return logpdf(val, mean, stddev);
+  }
+
+  @Override
   public double cdf(double val) {
     return cdf(val, mean, stddev);
   }
@@ -296,6 +301,37 @@ public class NormalDistribution extends AbstractDistribution {
   public static double pdf(double x, double mu, double sigma) {
     x = (x - mu) / sigma;
     return MathUtil.ONE_BY_SQRTTWOPI / sigma * Math.exp(-.5 * x * x);
+  }
+
+  /**
+   * Probability density function of the normal distribution.
+   * 
+   * <pre>
+   * 1/(SQRT(2*pi*sigma^2)) * e^(-(x-mu)^2/2sigma^2)
+   * </pre>
+   * 
+   * @param x The value.
+   * @param mu The mean.
+   * @param sigma The standard deviation.
+   * @return PDF of the given normal distribution at x.
+   */
+  public static double logpdf(double x, double mu, double sigma) {
+    x = (x - mu) / sigma;
+    return MathUtil.LOG_ONE_BY_SQRTTWOPI - Math.log(sigma) -.5 * x * x;
+  }
+
+  /**
+   * Probability density function of the normal distribution.
+   * 
+   * <pre>
+   * 1/(SQRT(2*pi*sigma^2)) * e^(-(x-mu)^2/2sigma^2)
+   * </pre>
+   * 
+   * @param x The value.
+   * @return PDF of the given normal distribution at x.
+   */
+  public static double standardNormalLogPDF(double x) {
+    return -.5 * x * x + MathUtil.LOG_ONE_BY_SQRTTWOPI;
   }
 
   /**

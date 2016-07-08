@@ -103,6 +103,11 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
   }
 
   @Override
+  public double logpdf(double val) {
+    return logpdf(val, mean, stddev, lambda);
+  }
+
+  @Override
   public double cdf(double val) {
     return cdf(val, mean, stddev, lambda);
   }
@@ -162,7 +167,23 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
     final double dx = x - mu;
     final double lss = lambda * sigma * sigma;
     final double erfc = NormalDistribution.erfc((lss - dx) / (sigma * MathUtil.SQRT2));
-    return .5 * lambda * Math.exp(lambda * (lss * .5 - dx)) * erfc;
+    return erfc > 0. ? .5 * lambda * Math.exp(lambda * (lss * .5 - dx)) * erfc : 0.;
+  }
+
+  /**
+   * Probability density function of the ExGaussian distribution.
+   *
+   * @param x The value.
+   * @param mu The mean.
+   * @param sigma The standard deviation.
+   * @param lambda Rate parameter.
+   * @return PDF of the given exgauss distribution at x.
+   */
+  public static double logpdf(double x, double mu, double sigma, double lambda) {
+    final double dx = x - mu;
+    final double lss = lambda * sigma * sigma;
+    final double erfc = NormalDistribution.erfc((lss - dx) / (sigma * MathUtil.SQRT2));
+    return erfc > 0 ? Math.log(.5 * lambda * erfc) + lambda * (lss * .5 - dx) : Double.NEGATIVE_INFINITY;
   }
 
   /**
@@ -175,6 +196,12 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
    * @return The CDF of the given exgauss distribution at x.
    */
   public static double cdf(double x, double mu, double sigma, double lambda) {
+    if (x == Double.NEGATIVE_INFINITY) {
+      return 0.;
+    }
+    if (x == Double.POSITIVE_INFINITY) {
+      return 1.;
+    }
     final double u = lambda * (x - mu);
     final double v = lambda * sigma;
     final double v2 = v * v;

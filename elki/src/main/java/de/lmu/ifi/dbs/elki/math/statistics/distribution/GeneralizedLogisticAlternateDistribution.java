@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -73,7 +73,7 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
     this.location = location;
     this.scale = scale;
     this.shape = shape;
-    if (!(shape > -1.) || !(shape < 1.)) {
+    if(!(shape > -1.) || !(shape < 1.)) {
       throw new ArithmeticException("Invalid shape parameter - must be -1 to +1, is: " + shape);
     }
   }
@@ -91,7 +91,7 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
     this.location = location;
     this.scale = scale;
     this.shape = shape;
-    if (!(shape > -1.) || !(shape < 1.)) {
+    if(!(shape > -1.) || !(shape < 1.)) {
       throw new ArithmeticException("Invalid shape parameter - must be -1 to +1, is: " + shape);
     }
   }
@@ -107,7 +107,7 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
    */
   public static double pdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
-    if (shape != 0.) {
+    if(shape != 0.) {
       val = -Math.log(1 - shape * val) / shape;
     }
     double f = 1. + Math.exp(-val);
@@ -117,6 +117,29 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
   @Override
   public double pdf(double val) {
     return pdf(val, location, scale, shape);
+  }
+
+  /**
+   * Probability density function.
+   * 
+   * @param val Value
+   * @param loc Location
+   * @param scale Scale
+   * @param shape Shape
+   * @return PDF
+   */
+  public static double logpdf(double val, double loc, double scale, double shape) {
+    val = (val - loc) / scale;
+    if(shape != 0.) {
+      val = -Math.log(1 - shape * val) / shape;
+    }
+    double f = 1. + Math.exp(-val);
+    return -val * (1 - shape) - Math.log(scale * f * f);
+  }
+
+  @Override
+  public double logpdf(double val) {
+    return logpdf(val, location, scale, shape);
   }
 
   /**
@@ -130,9 +153,9 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
    */
   public static double cdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
-    if (shape != 0.) {
+    if(shape != 0.) {
       final double tmp = 1 - shape * val;
-      if (tmp < 1e-15) {
+      if(tmp < 1e-15) {
         return (shape < 0) ? 0 : 1;
       }
       val = -Math.log(tmp) / shape;
@@ -155,7 +178,7 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
    * @return Quantile
    */
   public static double quantile(double val, double loc, double scale, double shape) {
-    if (shape == 0.) {
+    if(shape == 0.) {
       return loc - scale * Math.log((1 - val) / val);
     }
     return loc + scale * (1 - Math.pow((1 - val) / val, shape)) / shape;
@@ -193,17 +216,17 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
       super.makeOptions(config);
 
       DoubleParameter locationP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(locationP)) {
+      if(config.grab(locationP)) {
         location = locationP.doubleValue();
       }
 
       DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if (config.grab(scaleP)) {
+      if(config.grab(scaleP)) {
         scale = scaleP.doubleValue();
       }
 
       DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
-      if (config.grab(shapeP)) {
+      if(config.grab(shapeP)) {
         shape = shapeP.doubleValue();
       }
     }

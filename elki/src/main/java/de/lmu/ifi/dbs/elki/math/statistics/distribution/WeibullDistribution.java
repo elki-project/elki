@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -118,6 +118,11 @@ public class WeibullDistribution extends AbstractDistribution {
     return pdf(x, k, lambda, theta);
   }
 
+  @Override
+  public double logpdf(double x) {
+    return logpdf(x, k, lambda, theta);
+  }
+
   /**
    * PDF of Weibull distribution
    * 
@@ -128,12 +133,29 @@ public class WeibullDistribution extends AbstractDistribution {
    * @return PDF at position x.
    */
   public static double pdf(double x, double k, double lambda, double theta) {
-    if (x > theta) {
-      double xl = (x - theta) / lambda;
-      return k / lambda * Math.pow(xl, k - 1) * Math.exp(-Math.pow(xl, k));
-    } else {
+    if(x <= theta || x == Double.POSITIVE_INFINITY) {
       return 0.;
     }
+    double xl = (x - theta) / lambda;
+    double p = Math.pow(xl, k - 1), p2 = p * -xl;
+    return p2 != Double.NEGATIVE_INFINITY ? k / lambda * p * Math.exp(p2) : 0.;
+  }
+
+  /**
+   * PDF of Weibull distribution
+   * 
+   * @param x Value
+   * @param k Shape parameter
+   * @param lambda Scale parameter
+   * @param theta Shift offset parameter
+   * @return PDF at position x.
+   */
+  public static double logpdf(double x, double k, double lambda, double theta) {
+    if(x <= theta || x == Double.POSITIVE_INFINITY) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    double xl = (x - theta) / lambda;
+    return Math.log(k / lambda) + (k - 1) * Math.log(xl) - Math.pow(xl, k);
   }
 
   /**
@@ -146,9 +168,10 @@ public class WeibullDistribution extends AbstractDistribution {
    * @return CDF at position x.
    */
   public static double cdf(double val, double k, double lambda, double theta) {
-    if (val > theta) {
+    if(val > theta) {
       return 1.0 - Math.exp(-Math.pow((val - theta) / lambda, k));
-    } else {
+    }
+    else {
       return 0.0;
     }
   }
@@ -168,13 +191,16 @@ public class WeibullDistribution extends AbstractDistribution {
    * @return Quantile function at position x.
    */
   public static double quantile(double val, double k, double lambda, double theta) {
-    if (val < 0.0 || val > 1.0) {
+    if(val < 0.0 || val > 1.0) {
       return Double.NaN;
-    } else if (val == 0) {
+    }
+    else if(val == 0) {
       return 0.0;
-    } else if (val == 1) {
+    }
+    else if(val == 1) {
       return Double.POSITIVE_INFINITY;
-    } else {
+    }
+    else {
       return theta + lambda * Math.pow(-Math.log(1.0 - val), 1.0 / k);
     }
   }
@@ -210,17 +236,17 @@ public class WeibullDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter thetaP = new DoubleParameter(LOCATION_ID, 0.);
-      if (config.grab(thetaP)) {
+      if(config.grab(thetaP)) {
         theta = thetaP.doubleValue();
       }
 
       DoubleParameter lambdaP = new DoubleParameter(SCALE_ID);
-      if (config.grab(lambdaP)) {
+      if(config.grab(lambdaP)) {
         lambda = lambdaP.doubleValue();
       }
 
       DoubleParameter kP = new DoubleParameter(SHAPE_ID);
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.doubleValue();
       }
     }

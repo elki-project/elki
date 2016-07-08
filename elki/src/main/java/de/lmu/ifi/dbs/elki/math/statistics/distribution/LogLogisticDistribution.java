@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -78,6 +78,11 @@ public class LogLogisticDistribution extends AbstractDistribution {
     this.shape = shape;
   }
 
+  @Override
+  public double pdf(double val) {
+    return pdf(val, scale, shape);
+  }
+
   /**
    * Probability density function.
    * 
@@ -87,7 +92,7 @@ public class LogLogisticDistribution extends AbstractDistribution {
    * @return PDF
    */
   public static double pdf(double val, double scale, double shape) {
-    if (val < 0) {
+    if(val < 0) {
       return 0;
     }
     val = Math.abs(val / scale);
@@ -97,8 +102,29 @@ public class LogLogisticDistribution extends AbstractDistribution {
   }
 
   @Override
-  public double pdf(double val) {
-    return pdf(val, scale, shape);
+  public double logpdf(double val) {
+    return logpdf(val, scale, shape);
+  }
+
+  /**
+   * Probability density function.
+   * 
+   * @param val Value
+   * @param scale Scale
+   * @param shape Shape
+   * @return logPDF
+   */
+  public static double logpdf(double val, double scale, double shape) {
+    if(val < 0) {
+      return Double.NEGATIVE_INFINITY;
+    }
+    val = Math.abs(val / scale);
+    return Math.log(shape / scale) + (shape - 1.) * Math.log(val) - 2. * Math.log1p(Math.pow(val, shape));
+  }
+
+  @Override
+  public double cdf(double val) {
+    return cdf(val, scale, shape);
   }
 
   /**
@@ -110,15 +136,15 @@ public class LogLogisticDistribution extends AbstractDistribution {
    * @return CDF
    */
   public static double cdf(double val, double scale, double shape) {
-    if (val < 0) {
+    if(val < 0) {
       return 0;
     }
     return 1. / (1. + Math.pow(val / scale, -shape));
   }
 
   @Override
-  public double cdf(double val) {
-    return cdf(val, scale, shape);
+  public double quantile(double val) {
+    return quantile(val, scale, shape);
   }
 
   /**
@@ -131,11 +157,6 @@ public class LogLogisticDistribution extends AbstractDistribution {
    */
   public static double quantile(double val, double scale, double shape) {
     return scale * Math.pow(val / (1. - val), 1. / shape);
-  }
-
-  @Override
-  public double quantile(double val) {
-    return quantile(val, scale, shape);
   }
 
   @Override
@@ -165,12 +186,12 @@ public class LogLogisticDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter scaleP = new DoubleParameter(SCALE_ID);
-      if (config.grab(scaleP)) {
+      if(config.grab(scaleP)) {
         scale = scaleP.doubleValue();
       }
 
       DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
-      if (config.grab(shapeP)) {
+      if(config.grab(shapeP)) {
         shape = shapeP.doubleValue();
       }
     }

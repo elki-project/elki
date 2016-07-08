@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -67,7 +67,7 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
    */
   public LogGammaAlternateDistribution(double k, double theta, double shift, Random random) {
     super(random);
-    if (!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
+    if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
       throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
     }
 
@@ -86,7 +86,7 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
    */
   public LogGammaAlternateDistribution(double k, double theta, double shift, RandomFactory random) {
     super(random);
-    if (!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
+    if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
       throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
     }
 
@@ -109,6 +109,11 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
   @Override
   public double pdf(double val) {
     return pdf(val, k, theta, shift);
+  }
+
+  @Override
+  public double logpdf(double val) {
+    return logpdf(val, k, theta, shift);
   }
 
   @Override
@@ -159,11 +164,11 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
    * @return cdf value
    */
   public static double cdf(double x, double k, double theta, double shift) {
-    if (x <= shift) {
+    if(x <= shift) {
       return 0.;
     }
-    x = (x - shift) * theta;
-    return GammaDistribution.regularizedGammaP(k, Math.exp(x));
+    final double e = Math.exp((x - shift) * theta);
+    return e < Double.POSITIVE_INFINITY ? GammaDistribution.regularizedGammaP(k, e) : 1.;
   }
 
   /**
@@ -175,11 +180,11 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
    * @return cdf value
    */
   public static double logcdf(double x, double k, double theta, double shift) {
-    if (x <= shift) {
+    if(x <= shift) {
       return 0.;
     }
-    x = (x - shift) * theta;
-    return GammaDistribution.logregularizedGammaP(k, Math.exp(x));
+    final double e = Math.exp((x - shift) * theta);
+    return e < Double.POSITIVE_INFINITY ? GammaDistribution.logregularizedGammaP(k, e) : 0.;
   }
 
   /**
@@ -191,27 +196,29 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
    * @return probability density
    */
   public static double pdf(double x, double k, double theta, double shift) {
-    if (x <= shift) {
+    if(x <= shift || x == Double.POSITIVE_INFINITY) {
       return 0.;
     }
     x = (x - shift) * theta;
-    return theta * Math.exp(k * x - Math.exp(x) - GammaDistribution.logGamma(k));
+    final double ex = Math.exp(x);
+    return ex < Double.POSITIVE_INFINITY ? theta * Math.exp(k * x - ex - GammaDistribution.logGamma(k)) : 0.;
   }
 
   /**
-   * LogGamma distribution PDF (with 0.0 for x &lt; 0)
+   * LogGamma distribution logPDF
    * 
    * @param x query value
    * @param k Alpha
    * @param theta Theta = 1 / Beta
-   * @return probability density
+   * @return log probability density
    */
   public static double logpdf(double x, double k, double theta, double shift) {
-    if (x <= shift) {
-      return 0.0;
+    if(x <= shift || x == Double.POSITIVE_INFINITY) {
+      return Double.NEGATIVE_INFINITY;
     }
     x = (x - shift) * theta;
-    return Math.log(theta) + k * x - Math.exp(x) - GammaDistribution.logGamma(k);
+    double ex = Math.exp(x);
+    return ex < Double.POSITIVE_INFINITY ? Math.log(theta) + k * x - ex - GammaDistribution.logGamma(k) : Double.NEGATIVE_INFINITY;
   }
 
   /**
@@ -247,17 +254,17 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter kP = new DoubleParameter(GammaDistribution.Parameterizer.K_ID);
-      if (config.grab(kP)) {
+      if(config.grab(kP)) {
         k = kP.doubleValue();
       }
 
       DoubleParameter thetaP = new DoubleParameter(GammaDistribution.Parameterizer.THETA_ID);
-      if (config.grab(thetaP)) {
+      if(config.grab(thetaP)) {
         theta = thetaP.doubleValue();
       }
 
       DoubleParameter shiftP = new DoubleParameter(SHIFT_ID);
-      if (config.grab(shiftP)) {
+      if(config.grab(shiftP)) {
         shift = shiftP.doubleValue();
       }
     }

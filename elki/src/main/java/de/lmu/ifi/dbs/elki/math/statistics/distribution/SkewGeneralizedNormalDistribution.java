@@ -105,6 +105,11 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
   }
 
   @Override
+  public double logpdf(double val) {
+    return logpdf(val, mean, stddev, skew);
+  }
+
+  @Override
   public double cdf(double val) {
     return cdf(val, mean, stddev, skew);
   }
@@ -143,6 +148,22 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
       x = -Math.log(1. - skew * x) / skew;
     }
     return MathUtil.SQRTHALF * Math.exp(-.5 * x * x) / sigma / (1 - skew * x);
+  }
+
+  /**
+   * Probability density function of the skewed normal distribution.
+   * 
+   * @param x The value.
+   * @param mu The mean.
+   * @param sigma The standard deviation.
+   * @return log PDF of the given normal distribution at x.
+   */
+  public static double logpdf(double x, double mu, double sigma, double skew) {
+    x = (x - mu) / sigma;
+    if(Math.abs(skew) > 0.) {
+      x = -Math.log(1. - skew * x) / skew;
+    }
+    return -.5 * x * x - Math.log(MathUtil.SQRTHALF * sigma * (1 - skew * x));
   }
 
   /**
