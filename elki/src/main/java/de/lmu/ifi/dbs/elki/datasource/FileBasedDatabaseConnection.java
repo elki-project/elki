@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -59,7 +59,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param infile File to load the data from
    */
   public FileBasedDatabaseConnection(List<ObjectFilter> filters, Parser parser, File infile) {
-    super(filters, parser);
+    super(null, filters, parser);
     try {
       this.in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile)));
     }
@@ -76,7 +76,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param infile File to load the data from
    */
   public FileBasedDatabaseConnection(List<ObjectFilter> filters, Parser parser, String infile) {
-    super(filters, parser);
+    super(null, filters, parser);
     try {
       this.in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(infile)));
     }
@@ -93,8 +93,7 @@ public class FileBasedDatabaseConnection extends InputStreamDatabaseConnection {
    * @param in Input stream
    */
   public FileBasedDatabaseConnection(List<ObjectFilter> filters, Parser parser, InputStream in) {
-    super(filters, parser);
-    this.in = in;
+    super(in, filters, parser);
   }
 
   /**
