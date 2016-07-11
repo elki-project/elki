@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,7 +28,6 @@ package de.lmu.ifi.dbs.elki.data;
  * 
  * @author Erich Schubert
  * @since 0.4.0
- * 
  */
 public interface SparseFeatureVector<D> extends FeatureVector<D> {
   /**
@@ -73,6 +72,14 @@ public interface SparseFeatureVector<D> extends FeatureVector<D> {
    * @return Next iterator position
    */
   int iterAdvance(int iter);
+
+  /**
+   * Retract the iterator to the next position.
+   * 
+   * @param iter Next iterator position
+   * @return Previous iterator position
+   */
+  int iterRetract(int iter);
 
   /**
    * Test the iterator position for validity.
