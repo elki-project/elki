@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -617,6 +617,20 @@ public final class VMath {
       scalarProduct += v1[row] * v2[row];
     }
     return scalarProduct;
+  }
+
+  /**
+   * Sum of the vector
+   * 
+   * @param v1 vector
+   * @return sum of this vector
+   */
+  public static final double sum(final double[] v1) {
+    double acc = 0.;
+    for(int row = 0; row < v1.length; row++) {
+      acc += v1[row];
+    }
+    return acc;
   }
 
   /**
