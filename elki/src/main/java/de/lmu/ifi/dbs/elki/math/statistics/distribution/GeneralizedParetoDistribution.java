@@ -121,7 +121,10 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
     if(x < 0 || (xi < 0 && x > -1. / xi)) {
       return Double.NEGATIVE_INFINITY;
     }
-    return ((xi == 0) ? Double.POSITIVE_INFINITY : Math.log(1 + xi * x) * (-1 / xi - 1)) - Math.log(sigma);
+    if(xi == 0) {
+      return Double.POSITIVE_INFINITY;
+    }
+    return ((xi == -1) ? 0. : Math.log(1 + xi * x) * (-1 / xi - 1)) - Math.log(sigma);
   }
 
   @Override

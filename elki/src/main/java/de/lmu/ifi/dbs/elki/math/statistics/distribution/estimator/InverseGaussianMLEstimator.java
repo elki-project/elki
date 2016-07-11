@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,26 +22,29 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.WaldDistribution;
+
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.InverseGaussianDistribution;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate parameter of the Wald distribution.
+ * Estimate parameter of the inverse Gaussian (Wald) distribution.
  * 
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has WaldDistribution
+ * @apiviz.has InverseGaussianDistribution
  */
-public class WaldMLEstimator implements DistributionEstimator<WaldDistribution> {
+@Alias("de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WaldMLEstimator")
+public class InverseGaussianMLEstimator implements DistributionEstimator<InverseGaussianDistribution> {
   /**
    * Static instance.
    */
-  public static final WaldMLEstimator STATIC = new WaldMLEstimator();
+  public static final InverseGaussianMLEstimator STATIC = new InverseGaussianMLEstimator();
 
   @Override
-  public <A> WaldDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
+  public <A> InverseGaussianDistribution estimate(A data, NumberArrayAdapter<?, A> adapter) {
     final int len = adapter.size(data);
     double mean = 0.;
     for(int i = 0; i < len; i++) {
@@ -57,12 +60,12 @@ public class WaldMLEstimator implements DistributionEstimator<WaldDistribution> 
         invdev += 1. / v - invmean;
       }
     }
-    return new WaldDistribution(mean, len / invdev);
+    return new InverseGaussianDistribution(mean, len / invdev);
   }
 
   @Override
-  public Class<? super WaldDistribution> getDistributionClass() {
-    return WaldDistribution.class;
+  public Class<? super InverseGaussianDistribution> getDistributionClass() {
+    return InverseGaussianDistribution.class;
   }
 
   @Override
@@ -79,7 +82,7 @@ public class WaldMLEstimator implements DistributionEstimator<WaldDistribution> 
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected WaldMLEstimator makeInstance() {
+    protected InverseGaussianMLEstimator makeInstance() {
       return STATIC;
     }
   }

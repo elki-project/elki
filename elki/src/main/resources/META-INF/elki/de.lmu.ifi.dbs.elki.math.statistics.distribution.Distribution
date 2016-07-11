@@ -23,7 +23,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedExtremeValueDistribu
 de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedParetoDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ExponentiallyModifiedGaussianDistribution exgaussian
 de.lmu.ifi.dbs.elki.math.statistics.distribution.RayleighDistribution
-de.lmu.ifi.dbs.elki.math.statistics.distribution.WaldDistribution InverseGaussianDistribution invgauss
+de.lmu.ifi.dbs.elki.math.statistics.distribution.InverseGaussianDistribution de.lmu.ifi.dbs.elki.math.statistics.distribution.WaldDistribution invgauss wald
 de.lmu.ifi.dbs.elki.math.statistics.distribution.KappaDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.ConstantDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.HaltonUniformDistribution

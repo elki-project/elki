@@ -78,7 +78,7 @@ public class ChiSquaredDistribution extends GammaDistribution {
   public static double cdf(double val, double dof) {
     return regularizedGammaP(.5 * dof, .5 * val);
   }
-  
+
   /**
    * Chi-Squared distribution PDF (with 0.0 for x &lt; 0)
    * 
@@ -115,10 +115,9 @@ public class ChiSquaredDistribution extends GammaDistribution {
       return Double.NaN;
     }
     final double k = dof * .5;
-    if(Math.abs(k - 1.0) < Double.MIN_NORMAL) {
-      return Math.exp(-x * 2.0) * 2.0;
-    }
-    return (k - 1.0) * Math.log(x * 2.0) - x * 2.0 - logGamma(k) + MathUtil.LOG2;
+    final double twox = x * 2.0;
+    return twox == Double.POSITIVE_INFINITY ? Double.NEGATIVE_INFINITY : //
+        (k - 1.0) * Math.log(twox) - twox - logGamma(k) + MathUtil.LOG2;
   }
 
   /**

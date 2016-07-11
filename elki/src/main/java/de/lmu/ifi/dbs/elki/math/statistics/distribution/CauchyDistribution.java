@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -120,7 +119,7 @@ public class CauchyDistribution extends AbstractDistribution {
    */
   public static double pdf(double x, double location, double shape) {
     final double v = (x - location) / shape;
-    return 1. / Math.PI * shape * (1 + v * v);
+    return 1. / (Math.PI * shape * (1 + v * v));
   }
 
   /**
@@ -133,7 +132,7 @@ public class CauchyDistribution extends AbstractDistribution {
    */
   public static double logpdf(double x, double location, double shape) {
     final double v = (x - location) / shape;
-    return -MathUtil.LOGPI + Math.log(shape * (1 + v * v));
+    return -Math.log(Math.PI * shape * (1 + v * v));
   }
 
   /**
@@ -157,7 +156,11 @@ public class CauchyDistribution extends AbstractDistribution {
    * @return PDF value
    */
   public static double quantile(double x, double location, double shape) {
-    return location + shape * Math.tan(Math.PI * (x - .5));
+    return (x <= .5) ? (x == .5) ? location //
+        : (x == 0.) ? Double.NEGATIVE_INFINITY //
+            : location - shape / Math.tan(Math.PI * x) //
+        : (x == 1.) ? Double.POSITIVE_INFINITY //
+            : location + shape / Math.tan(Math.PI * (1 - x));
   }
 
   @Override

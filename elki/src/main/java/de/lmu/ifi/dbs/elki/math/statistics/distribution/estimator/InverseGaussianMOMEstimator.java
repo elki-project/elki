@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,33 +22,36 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.WaldDistribution;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.InverseGaussianDistribution;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Estimate parameter of the Wald distribution.
+ * Estimate parameter of the inverse Gaussian (Wald) distribution.
  * 
  * @author Erich Schubert
  * @since 0.6.0
  * 
- * @apiviz.has WaldDistribution
+ * @apiviz.has InverseGaussianDistribution
  */
-public class WaldMOMEstimator extends AbstractMeanVarianceEstimator<WaldDistribution> {
+@Alias("de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WaldMOMEstimator")
+public class InverseGaussianMOMEstimator extends AbstractMeanVarianceEstimator<InverseGaussianDistribution> {
   /**
    * Static instance.
    */
-  public static final WaldMOMEstimator STATIC = new WaldMOMEstimator();
+  public static final InverseGaussianMOMEstimator STATIC = new InverseGaussianMOMEstimator();
 
   @Override
-  public WaldDistribution estimateFromMeanVariance(MeanVariance mv) {
+  public InverseGaussianDistribution estimateFromMeanVariance(MeanVariance mv) {
     double mean = mv.getMean();
-    return new WaldDistribution(mean, mean * mean * mean / mv.getSampleVariance());
+    return new InverseGaussianDistribution(mean, mean * mean * mean / mv.getSampleVariance());
   }
 
   @Override
-  public Class<? super WaldDistribution> getDistributionClass() {
-    return WaldDistribution.class;
+  public Class<? super InverseGaussianDistribution> getDistributionClass() {
+    return InverseGaussianDistribution.class;
   }
 
   @Override
@@ -65,7 +68,7 @@ public class WaldMOMEstimator extends AbstractMeanVarianceEstimator<WaldDistribu
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected WaldMOMEstimator makeInstance() {
+    protected InverseGaussianMOMEstimator makeInstance() {
       return STATIC;
     }
   }

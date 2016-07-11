@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -201,7 +202,7 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
     }
     x = (x - shift) * theta;
     final double ex = Math.exp(x);
-    return ex < Double.POSITIVE_INFINITY ? theta * Math.exp(k * x - ex - GammaDistribution.logGamma(k)) : 0.;
+    return ex < Double.POSITIVE_INFINITY ? Math.exp(k * x - ex - GammaDistribution.logGamma(k)) * theta : 0.;
   }
 
   /**
@@ -218,10 +219,11 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
     }
     x = (x - shift) * theta;
     double ex = Math.exp(x);
-    return ex < Double.POSITIVE_INFINITY ? Math.log(theta) + k * x - ex - GammaDistribution.logGamma(k) : Double.NEGATIVE_INFINITY;
+    return ex < Double.POSITIVE_INFINITY ? k * x - ex - GammaDistribution.logGamma(k) + Math.log(theta) : Double.NEGATIVE_INFINITY;
   }
 
   /**
+   * @deprecated Not yet implemented!
    * Compute probit (inverse cdf) for LogGamma distributions.
    * 
    * @param p Probability
@@ -229,8 +231,10 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @return Probit for Gamma distribution
    */
+  @Deprecated
   public static double quantile(double p, double k, double theta, double shift) {
-    return Math.log(GammaDistribution.quantile(p, k, 1.)) / theta + shift;
+    // TODO: needs inverse incomplete gamma function.
+    throw new NotImplementedException();
   }
 
   /**

@@ -118,7 +118,7 @@ public class UniformDistribution extends AbstractDistribution {
 
   @Override
   public double pdf(double val) {
-    if (!(val >= min) || val >= max) {
+    if (!(val >= min) || val > max) {
       return 0.0;
     }
     return (len > 0.) ? 1.0 / len : Double.POSITIVE_INFINITY;
@@ -126,7 +126,7 @@ public class UniformDistribution extends AbstractDistribution {
 
   @Override
   public double logpdf(double val) {
-    if (!(val >= min) || val >= max) {
+    if (!(val >= min) || val > max) {
       return Double.NEGATIVE_INFINITY;
     }
     return (len > 0.) ? Math.log(1.0 / len) : Double.POSITIVE_INFINITY;

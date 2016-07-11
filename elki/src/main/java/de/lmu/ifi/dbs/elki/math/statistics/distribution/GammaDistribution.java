@@ -709,7 +709,9 @@ public class GammaDistribution extends AbstractDistribution {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @return Probit for Gamma distribution
    */
-  @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi^2$ distribution", authors = "D.J. Best, D. E. Roberts", booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
+  @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi^2$ distribution", //
+      authors = "D.J. Best, D. E. Roberts", //
+      booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
   public static double quantile(double p, double k, double theta) {
     final double EPS2 = 5e-7; // final precision of AS 91
     final int MAXIT = 1000;
@@ -745,7 +747,7 @@ public class GammaDistribution extends AbstractDistribution {
     // Phase I, an initial rough approximation
     // First half of AS 91
     double ch = chisquaredProbitApproximation(p, 2 * k, g);
-    // Second hald of AS 91 follows:
+    // Second half of AS 91 follows:
     // Refine ChiSquared approximation
     chisq: {
       if(Double.isInfinite(ch)) {
@@ -754,7 +756,7 @@ public class GammaDistribution extends AbstractDistribution {
         break chisq;
       }
       if(ch < EPS2) {
-        // Do not iterate, but refine with newton method
+        // Do not iterate, but refine with Newton method
         max_newton_iterations = 20;
         break chisq;
       }

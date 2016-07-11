@@ -73,7 +73,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformEnhance
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMinMaxEstimator;
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WaldMOMEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.InverseGaussianMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.tests.KolmogorovSmirnovTest;
@@ -139,7 +139,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     momests = new ArrayList<>(5);
     momests.add(NormalMOMEstimator.STATIC);
     momests.add(GammaMOMEstimator.STATIC);
-    momests.add(WaldMOMEstimator.STATIC);
+    momests.add(InverseGaussianMOMEstimator.STATIC);
     momests.add(ExponentialMOMEstimator.STATIC);
     momests.add(EMGOlivierNorbergEstimator.STATIC);
     madests = new ArrayList<>(11);

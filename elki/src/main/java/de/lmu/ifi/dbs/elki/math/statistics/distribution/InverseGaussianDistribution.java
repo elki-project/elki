@@ -33,13 +33,21 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * Inverse Gaussian distribution aka Wald distribution
+ * Inverse Gaussian distribution aka Wald distribution.
+ * 
+ * Beware that SciPy uses a different location parameter.
+ * 
+ * <code>InverseGaussian(a, x) ~ scipy.stats.invgauss(a/x, x)</code>
+ * 
+ * Our parameter scheme is in line with common literature. SciPy naming scheme
+ * has comparable notion of location and scale across distributions. So both
+ * have their benefits.
  *
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Alias({ "InverseGaussianDistribution", "invgauss" })
-public class WaldDistribution extends AbstractDistribution {
+@Alias({ "invgauss", "wald", "de.lmu.ifi.dbs.elki.math.statistics.distribution.WaldDistribution" })
+public class InverseGaussianDistribution extends AbstractDistribution {
   /**
    * Location value
    */
@@ -57,7 +65,7 @@ public class WaldDistribution extends AbstractDistribution {
    * @param shape Shape parameter
    * @param random Random generator
    */
-  public WaldDistribution(double mean, double shape, Random random) {
+  public InverseGaussianDistribution(double mean, double shape, Random random) {
     super(random);
     this.mean = mean;
     this.shape = shape;
@@ -70,7 +78,7 @@ public class WaldDistribution extends AbstractDistribution {
    * @param shape Shape parameter
    * @param random Random generator
    */
-  public WaldDistribution(double mean, double shape, RandomFactory random) {
+  public InverseGaussianDistribution(double mean, double shape, RandomFactory random) {
     super(random);
     this.mean = mean;
     this.shape = shape;
@@ -82,7 +90,7 @@ public class WaldDistribution extends AbstractDistribution {
    * @param mean Mean
    * @param shape Shape parameter
    */
-  public WaldDistribution(double mean, double shape) {
+  public InverseGaussianDistribution(double mean, double shape) {
     this(mean, shape, (Random) null);
   }
 
@@ -138,11 +146,12 @@ public class WaldDistribution extends AbstractDistribution {
    * @return PDF of the given Wald distribution at x.
    */
   public static double pdf(double x, double mu, double shape) {
-    if(!(x > 0)) {
+    if(!(x > 0) || x == Double.POSITIVE_INFINITY) {
       return 0;
     }
-    final double v = (x - mu);
-    return Math.sqrt(shape / (MathUtil.TWOPI * x * x * x)) * Math.exp(-shape * v * v / (2. * mu * mu * x));
+    final double v = (x - mu) / mu;
+    double t1 = Math.sqrt(shape / (MathUtil.TWOPI * x * x * x));
+    return t1 > 0 ? t1 * Math.exp(-shape * v * v * .5 / x) : 0;
   }
 
   /**
@@ -154,11 +163,11 @@ public class WaldDistribution extends AbstractDistribution {
    * @return log PDF of the given Wald distribution at x.
    */
   public static double logpdf(double x, double mu, double shape) {
-    if(!(x > 0)) {
+    if(!(x > 0) || x == Double.POSITIVE_INFINITY) {
       return Double.NEGATIVE_INFINITY;
     }
-    final double v = (x - mu);
-    return 0.5 * Math.log(shape / (MathUtil.TWOPI * x * x * x)) - shape * v * v / (2. * mu * mu * x);
+    final double v = (x - mu) / mu;
+    return v < Double.MAX_VALUE ? 0.5 * Math.log(shape / (MathUtil.TWOPI * x * x * x)) - shape * v * v / (2. * x) : Double.NEGATIVE_INFINITY;
   }
 
   /**
@@ -176,14 +185,12 @@ public class WaldDistribution extends AbstractDistribution {
     // TODO: accelerate by caching exp(2 * shape / mu).
     final double v0 = x / mu;
     final double v1 = Math.sqrt(shape / x);
+    if(v1 == 0.) {
+      return v0 > 0. ? 1 : 0.;
+    }
     double c1 = NormalDistribution.standardNormalCDF(v1 * (v0 - 1.));
     double c2 = NormalDistribution.standardNormalCDF(-v1 * (v0 + 1.));
-    if(c2 > 0.) {
-      return c1 + Math.exp(2 * shape / mu) * c2;
-    }
-    else {
-      return c1;
-    }
+    return (c2 > 0.) ? c1 + Math.exp(2 * shape / mu) * c2 : c1;
   }
 
   /**
@@ -230,8 +237,8 @@ public class WaldDistribution extends AbstractDistribution {
     }
 
     @Override
-    protected WaldDistribution makeInstance() {
-      return new WaldDistribution(mean, shape, rnd);
+    protected InverseGaussianDistribution makeInstance() {
+      return new InverseGaussianDistribution(mean, shape, rnd);
     }
   }
 }

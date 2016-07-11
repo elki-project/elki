@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -100,10 +101,11 @@ public class ChiDistribution extends AbstractDistribution {
    * @return Pdf value
    */
   public static double pdf(double val, double dof) {
-    if(val < 0) {
+    if(val <= 0 || val == Double.POSITIVE_INFINITY) {
       return 0.0;
     }
-    return Math.sqrt(ChiSquaredDistribution.pdf(val, dof));
+    final double k = dof * .5;
+    return Math.exp((dof - 1.0) * Math.log(val) + (1 - k) * MathUtil.LOG2 - GammaDistribution.logGamma(k) - val * val / 2.);
   }
 
   @Override
@@ -119,10 +121,11 @@ public class ChiDistribution extends AbstractDistribution {
    * @return logPdf value
    */
   public static double logpdf(double val, double dof) {
-    if(val < 0) {
+    if(val <= 0 || val == Double.POSITIVE_INFINITY) {
       return Double.NEGATIVE_INFINITY;
     }
-    return .5 * ChiSquaredDistribution.logpdf(val, dof);
+    final double k = dof * .5;
+    return (dof - 1.0) * Math.log(val) + (1 - k) * MathUtil.LOG2 - GammaDistribution.logGamma(k) - val * val / 2.;
   }
 
   @Override
@@ -138,7 +141,9 @@ public class ChiDistribution extends AbstractDistribution {
    * @return CDF value
    */
   public static double cdf(double val, double dof) {
-    return GammaDistribution.regularizedGammaP(dof * .5, val * val * .5);
+    double v = val * val * .5;
+    // regularizedGammaP will return NaN for infinite values!
+    return val < 0. ? 0. : v < Double.POSITIVE_INFINITY ? GammaDistribution.regularizedGammaP(dof * .5, v) : 1.;
   }
 
   // FIXME: implement!

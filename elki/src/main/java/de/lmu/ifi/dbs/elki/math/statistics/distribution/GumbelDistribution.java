@@ -92,7 +92,7 @@ public class GumbelDistribution extends AbstractDistribution {
    */
   public static double pdf(double x, double mu, double beta) {
     final double z = (x - mu) / beta;
-    if (x == Double.NEGATIVE_INFINITY) {
+    if(x == Double.NEGATIVE_INFINITY) {
       return 0.;
     }
     return Math.exp(-z - Math.exp(-z)) / beta;
@@ -112,6 +112,9 @@ public class GumbelDistribution extends AbstractDistribution {
    * @return PDF at position x.
    */
   public static double logpdf(double x, double mu, double beta) {
+    if(x == Double.NEGATIVE_INFINITY) {
+      return Double.NEGATIVE_INFINITY;
+    }
     final double z = (x - mu) / beta;
     return -z - Math.exp(-z) - Math.log(beta);
   }
@@ -181,12 +184,12 @@ public class GumbelDistribution extends AbstractDistribution {
       super.makeOptions(config);
 
       DoubleParameter meanP = new DoubleParameter(LOCATION_ID);
-      if (config.grab(meanP)) {
+      if(config.grab(meanP)) {
         mean = meanP.doubleValue();
       }
 
       DoubleParameter shapeP = new DoubleParameter(SHAPE_ID);
-      if (config.grab(shapeP)) {
+      if(config.grab(shapeP)) {
         shape = shapeP.doubleValue();
       }
     }
