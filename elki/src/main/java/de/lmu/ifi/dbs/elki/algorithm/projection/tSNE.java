@@ -218,7 +218,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     double sum = compute_qij_distance_sum(squared_distances);
     for(int i = 0;i<qij.length;i++){
       for(int j = 0; j<i;j++ ){
-        double s = (1/(1+squared_distances[i][j]))/sum;
+        double s = (1/(1+squared_distances[i][j]))/(sum);
         qij[i][j] = s;
         qij[j][i] = s;
       }
@@ -243,8 +243,8 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
       double product = 0.0;
       for(iy.seek(0);iy.valid();iy.advance()){
         int entry = 0;
-       // if(ix.getOffset()!=iy.getOffset()){ nicht notwendig da y_i - y_j dann sowieso 0?
-        double[] difference = minus(proj.get(ix).toArray(), proj.get(iy).toArray()).clone();
+       // if(ix.getOffset()!=iy.getOffset()){ notwendig!
+        double[] difference = minus(proj.get(ix).toArray(), proj.get(iy).toArray());
         product = product + (pij[row][entry]-qij[row][entry])*qij[row][entry]*z*difference[entry];
         gradient[row][entry] = 4.0 * product;
         entry++;
@@ -294,11 +294,11 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
   }
   
   protected static <O> double[] plus(double[] array, double[] array2) {
-    double [] diff = new double[array.length];
+    double [] sum = new double[array.length];
     for(int i = 0;i<array.length;i++){
-      diff[i] = array[i]+array2[i];
+      sum[i] = array[i]+array2[i];
     }
-    return diff;
+    return sum;
   }
   
   protected static <O> double[] mal(double v, double [] vec){
