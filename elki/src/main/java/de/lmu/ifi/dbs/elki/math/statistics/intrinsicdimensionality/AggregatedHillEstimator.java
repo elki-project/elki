@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,17 +35,15 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Tail-Index Estimates in Small Samples<br />
  * Journal of Business & Economic Statistics
  * </p>
- *
- * TODO: possible to improve numerical precision via log1p?
- *
+ * 
  * @author Jonathan von Brünken
  * @author Erich Schubert
  * @since 0.7.0
  */
 @Reference(authors = "R. Huisman and K. G. Koedijk and C. J. M. Kool and F. Palm", //
-title = "Tail-Index Estimates in Small Samples", //
-booktitle = "Journal of Business & Economic Statistics", //
-url = "http://dx.doi.org/10.1198/073500101316970421")
+    title = "Tail-Index Estimates in Small Samples", //
+    booktitle = "Journal of Business & Economic Statistics", //
+    url = "http://dx.doi.org/10.1198/073500101316970421")
 public class AggregatedHillEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
@@ -53,23 +51,33 @@ public class AggregatedHillEstimator extends AbstractIntrinsicDimensionalityEsti
   public static final AggregatedHillEstimator STATIC = new AggregatedHillEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    if(len < 2) {
-      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
-    }
-    double hsum = 0.;
-    double sum = Math.log(adapter.getDouble(data, 0));
-    for(int i = 1; i < len; i++) {
+  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
+    double hsum = 0., sum = 0.;
+    int i = 0, valid = 0;
+    // First nonzero:
+    while(i < end) {
       // The next observation:
-      final double v = adapter.getDouble(data, i);
+      final double v = adapter.getDouble(data, i++);
+      if(v > 0) {
+        sum = Math.log(v);
+        valid++;
+        break;
+      }
+    }
+    while(i < end) {
+      // The next observation:
+      final double v = adapter.getDouble(data, i++);
       assert (v > 0);
       final double logv = Math.log(v);
       // Aggregate hill estimations:
-      hsum += (sum / i - logv);
+      hsum += sum / valid++ - logv;
       // Update sum for next hill.
       sum += logv;
     }
-    return -len / hsum;
+    if(valid < 1) {
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
+    }
+    return -valid / hsum;
   }
 
   /**

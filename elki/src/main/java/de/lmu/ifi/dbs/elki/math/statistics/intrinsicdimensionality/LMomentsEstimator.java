@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -42,17 +42,18 @@ public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator 
   public static final LMomentsEstimator STATIC = new LMomentsEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
+  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
+    final int begin = countLeadingZeros(data, adapter, end);
+    final int len = end - begin;
     if(len < 2) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
     if(len == 2) { // Fallback to MoM
-      double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
+      double v1 = adapter.getDouble(data, begin) / adapter.getDouble(data, begin + 1);
       return v1 / (1 - v1);
     }
-    final int k = len - 1;
-    final double w = adapter.getDouble(data, k);
-    double[] lmom = ProbabilityWeightedMoments.samLMR(data, new ReverseAdapter<>(adapter, len), 2);
+    final double w = adapter.getDouble(data, end - 1);
+    double[] lmom = ProbabilityWeightedMoments.samLMR(data, new ReverseAdapter<>(adapter, begin, end), 2);
     if(lmom[1] == 0) { // Fallback to first moment only.
       // TODO: is this the right thing to do? When does this happen?
       return -.5 * (lmom[0] * 2) / w * (len + .5) * len;
@@ -69,64 +70,66 @@ public class LMomentsEstimator extends AbstractIntrinsicDimensionalityEstimator 
    */
   private static class ReverseAdapter<A> implements NumberArrayAdapter<Double, A> {
     /**
-     * Last element
+     * Size and last element.
      */
-    private int s;
+    private int size, last;
 
     /**
      * Adapter class.
      */
-    private NumberArrayAdapter<?, A> inner;
+    private NumberArrayAdapter<?, ? super A> inner;
 
     /**
      * Constructor.
      *
      * @param inner Inner adapter
-     * @param size Size of array.
+     * @param begin Begin
+     * @param end End of the array
      */
-    public ReverseAdapter(NumberArrayAdapter<?, A> inner, int size) {
+    public ReverseAdapter(NumberArrayAdapter<?, ? super A> inner, int begin, int end) {
       this.inner = inner;
-      this.s = size - 1;
+      this.size = end - begin;
+      this.last = end - 1; // Inclusive
     }
 
     @Override
     public int size(A array) {
-      return s + 1;
+      return size;
     }
 
     @Override
     public Double get(A array, int off) throws IndexOutOfBoundsException {
-      return inner.getDouble(array, s - off);
+      return inner.getDouble(array, last - off);
     }
 
     @Override
     public double getDouble(A array, int off) throws IndexOutOfBoundsException {
-      return inner.getDouble(array, s - off);
+      return inner.getDouble(array, last - off);
     }
 
     @Override
     public float getFloat(A array, int off) throws IndexOutOfBoundsException {
-      return inner.getFloat(array, s - off);
+      return inner.getFloat(array, last - off);
     }
 
     @Override
     public int getInteger(A array, int off) throws IndexOutOfBoundsException {
-      return inner.getInteger(array, s - off);
+      return inner.getInteger(array, last - off);
     }
 
     @Override
     public short getShort(A array, int off) throws IndexOutOfBoundsException {
-      return inner.getShort(array, s - off);
+      return inner.getShort(array, last - off);
     }
 
     @Override
     public long getLong(A array, int off) throws IndexOutOfBoundsException {
-      return inner.getLong(array, s - off);
+      return inner.getLong(array, last - off);
     }
 
     @Override
     public byte getByte(A array, int off) throws IndexOutOfBoundsException {
-      return inner.getByte(array, s - off);
+      return inner.getByte(array, last - off);
     }
   }
 

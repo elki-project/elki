@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -43,10 +43,10 @@ public class EnsembleEstimator extends AbstractIntrinsicDimensionalityEstimator 
   public static final EnsembleEstimator STATIC = new EnsembleEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    double mom = MOMEstimator.STATIC.estimate(data, adapter, len);
-    double mle = HillEstimator.STATIC.estimate(data, adapter, len);
-    double rve = RVEstimator.STATIC.estimate(data, adapter, len);
+  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
+    double mom = MOMEstimator.STATIC.estimate(data, adapter, end);
+    double mle = HillEstimator.STATIC.estimate(data, adapter, end);
+    double rve = RVEstimator.STATIC.estimate(data, adapter, end);
     return (mom < mle) //
     ? (mle < rve) ? mle : //
     // A2) mom,rve < mle

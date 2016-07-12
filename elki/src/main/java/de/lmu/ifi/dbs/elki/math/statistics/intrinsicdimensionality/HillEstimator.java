@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -42,9 +42,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.7.0
  */
 @Reference(authors = "B. M. Hill", //
-title = "A simple general approach to inference about the tail of a distribution", //
-booktitle = "The annals of statistics 3(5)", //
-url = "http://dx.doi.org/10.1214/aos/1176343247")
+    title = "A simple general approach to inference about the tail of a distribution", //
+    booktitle = "The annals of statistics 3(5)", //
+    url = "http://dx.doi.org/10.1214/aos/1176343247")
 public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
@@ -52,23 +52,27 @@ public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
   public static final HillEstimator STATIC = new HillEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    if(len < 2) {
-      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
-    }
-    final int k = len - 1;
-    final double w = adapter.getDouble(data, k);
+  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
+    final int last = end - 1;
+    final double w = adapter.getDouble(data, last);
     if(w <= 0.) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
     final double halfw = 0.5 * w;
     double sum = 0.;
-    for(int i = 0; i < k; ++i) {
+    int valid = 0;
+    for(int i = 0; i < last; ++i) {
       final double v = adapter.getDouble(data, i);
-      assert (v > 0.);
+      if(!(v > 0.)) {
+        continue;
+      }
       sum += v < halfw ? Math.log(v / w) : Math.log1p((v - w) / w);
+      ++valid;
     }
-    return -k / sum;
+    if(valid < 1) {
+      throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
+    }
+    return -valid / sum;
   }
 
   /**

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -54,28 +54,30 @@ public class PWM2Estimator extends AbstractIntrinsicDimensionalityEstimator {
   public static final PWM2Estimator STATIC = new PWM2Estimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    if(len < 2) {
+  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
+    final int begin = countLeadingZeros(data, adapter, end);
+    if(end - begin <= 3) {
+      if(end - begin == 2) { // Fallback to MoM
+        double v1 = adapter.getDouble(data, begin) / adapter.getDouble(data, begin + 1);
+        return v1 / (1 - v1);
+      }
+      if(end - begin == 3) { // Fallback to first moment only
+        double v1 = adapter.getDouble(data, begin + 1) * .5 / adapter.getDouble(data, begin + 2);
+        return v1 / (1 - 2 * v1);
+      }
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
-    if(len == 2) { // Fallback to MoM
-      double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
-      return v1 / (1 - v1);
-    }
-    if(len == 3) { // Fallback to first moment only
-      double v1 = adapter.getDouble(data, 1) * .5 / adapter.getDouble(data, 2);
-      return v1 / (1 - 2 * v1);
-    }
-    final int num = len - 1; // Except for last
+    final int last = end - 1; // Except for last
     // Estimate second PWM (k=2)
     // In the following, we pretend we had TWO more data points!
     double v2 = 0.;
-    for(int i = 0; i < num; i++) {
-      v2 += adapter.getDouble(data, i) * (i + 2) * (i + 1);
+    int valid = 0;
+    for(int j = begin; j < last; j++, valid++) {
+      v2 += adapter.getDouble(data, j) * (valid + 2) * (valid + 1);
     }
     // All scaling factors collected for performance reasons
-    final double w = adapter.getDouble(data, num);
-    v2 /= (num + 2) * w * (num + 1) * num;
+    final double w = adapter.getDouble(data, last);
+    v2 /= (valid + 2) * w * (valid + 1) * valid;
     return v2 / (1 - 3 * v2);
   }
 

@@ -1,10 +1,16 @@
 package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
+import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +30,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  */
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
@@ -34,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  */
 public abstract class AbstractIntrinsicDimensionalityEstimator implements IntrinsicDimensionalityEstimator {
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter) {
+  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter) {
     return estimate(data, adapter, adapter.size(data));
   }
 
@@ -46,5 +53,47 @@ public abstract class AbstractIntrinsicDimensionalityEstimator implements Intrin
   @Override
   public double estimate(double[] distances, int size) {
     return estimate(distances, ArrayLikeUtil.DOUBLEARRAYADAPTER, size);
+  }
+
+  @Override
+  public double estimate(KNNQuery<?> knnq, DBIDRef cur, int k) {
+    double[] buf = new double[k];
+    int p = 0;
+    for(DoubleDBIDListIter it = knnq.getKNNForDBID(cur, k).iter(); it.valid() && p < k; it.advance()) {
+      if(it.doubleValue() == 0. || DBIDUtil.equal(cur, it)) {
+        continue;
+      }
+      buf[p++] = it.doubleValue();
+    }
+    return estimate(buf, ArrayLikeUtil.DOUBLEARRAYADAPTER, p);
+  }
+
+  @Override
+  public double estimate(RangeQuery<?> rnq, DBIDRef cur, double range) {
+    DoubleArray buf = new DoubleArray();
+    int p = 0;
+    for(DoubleDBIDListIter it = rnq.getRangeForDBID(cur, range).iter(); it.valid(); it.advance()) {
+      if(it.doubleValue() == 0. || DBIDUtil.equal(cur, it)) {
+        continue;
+      }
+      buf.add(it.doubleValue());
+      p++;
+    }
+    return estimate(buf, buf, p);
+  }
+
+  /**
+   * @param data Data array
+   * @param adapter Adapter class
+   * @param end Length
+   * @return Number of leading zero distances.
+   */
+  protected static <A> int countLeadingZeros(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
+    for(int begin = 0; begin < end; ++begin) {
+      if(adapter.getDouble(data, begin) > 0) {
+        return begin;
+      }
+    }
+    return end;
   }
 }

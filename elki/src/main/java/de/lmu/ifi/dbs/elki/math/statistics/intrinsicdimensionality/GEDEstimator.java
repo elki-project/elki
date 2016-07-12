@@ -1,10 +1,12 @@
 package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
+import java.util.Arrays;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -42,39 +44,63 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.7.0
  */
 @Reference(authors = "M. E. Houle, H. Kashima, M. Nett", //
-title = "Generalized expansion dimension", //
-booktitle = "12th International Conference on Data Mining Workshops (ICDMW)", //
-url = "http://dx.doi.org/10.1109/ICDMW.2012.94")
+    title = "Generalized expansion dimension", //
+    booktitle = "12th International Conference on Data Mining Workshops (ICDMW)", //
+    url = "http://dx.doi.org/10.1109/ICDMW.2012.94")
 public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
    */
   public static final GEDEstimator STATIC = new GEDEstimator();
 
+  /**
+   * Cached logs of integers.
+   */
+  double[] ilogs = new double[] { 0. };
+
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    if(len < 2) {
+  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
+    final int begin = countLeadingZeros(data, adapter, end);
+    if(end - begin < 2) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
-    final int end = len - 1;
-    double[] meds = new double[end << 1];
+    final int last = end - begin - 1;
+    double[] meds = new double[last];
+    if(last >= ilogs.length) { // Unsynchronized check
+      precomputeLogs(last + 1); // Synchronized resize
+    }
     // We only consider pairs with k < i, to avoid redundant computations.
-    for(int k = 0; k < end; k++) {
-      final double logdk = Math.log(adapter.getDouble(data, k));
-      double log1pk = Math.log1p(k);
+    for(int k = 0; k < last; k++) {
+      final double logdk = Math.log(adapter.getDouble(data, begin + k));
+      double log1pk = ilogs[k];
       int p = k; // k values are already occupied!
       // We only consider pairs with k < i, to avoid redundant computations.
-      for(int i = k + 1; i < len; i++) {
-        final double logdi = Math.log(adapter.getDouble(data, i));
+      for(int i = k + 1; i <= last; i++) {
+        final double logdi = Math.log(adapter.getDouble(data, begin + i));
         if(logdk == logdi) { // Would yield a division by 0.
           continue;
         }
-        final double dim = (log1pk - Math.log1p(i)) / (logdk - logdi);
-        meds[p++] = dim;
+        meds[p++] = (log1pk - ilogs[i]) / (logdk - logdi);
       }
       meds[k] = QuickSelect.median(meds, k, p);
     }
-    return QuickSelect.median(meds, 0, end);
+    return QuickSelect.median(meds, 0, last);
+  }
+
+  /**
+   * Grow the log[i] cache.
+   * 
+   * @param len Required size
+   */
+  private synchronized void precomputeLogs(int len) {
+    if(len <= ilogs.length) {
+      return; // Probably done by another thread.
+    }
+    double[] logs = Arrays.copyOf(ilogs, len);
+    for(int i = ilogs.length; i < len; i++) {
+      logs[i] = Math.log(1 + i);
+    }
+    this.ilogs = logs;
   }
 
   /**

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,9 +31,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
@@ -48,7 +45,6 @@ import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.MOMEstimator;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -109,42 +105,12 @@ public class IntrinsicDimensionalityOutlier<O> extends AbstractDistanceBasedAlgo
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("kNN distance for objects", relation.size(), LOG) : null;
 
-    double[] buf = new double[k + 10];
     DoubleMinMax minmax = new DoubleMinMax();
     WritableDoubleDataStore id_score = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC);
-    // compute distance to the k nearest neighbor.
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      // distance to the kth nearest neighbor
-      // (assuming the query point is always included, with distance 0)
-      KNNList knns = knnQuery.getKNNForDBID(iditer, k + 1);
-      // Try to handle duplicates (TODO: incremental kNN API)
-      while(knns.getKNNDistance() == 0.) {
-        int k2 = knns.size() + k;
-        if(k2 >= relation.size()) {
-          throw new AbortException("Too many duplicates!");
-        }
-        knns = knnQuery.getKNNForDBID(iditer, k2);
-        // Did not get the requested amount of neighbors (preprocessed?)
-        if(knns.size() < k2) {
-          break;
-        }
-      }
-
-      // Ensure our buffer is large enough
-      if(buf.length < knns.size()) {
-        buf = new double[knns.size()];
-      }
-      // Copy data into buffer (to remove 0 distances)
-      int p = 0;
-      for(DoubleDBIDListIter it = knns.iter(); it.valid(); it.advance()) {
-        if(it.doubleValue() == 0. || DBIDUtil.equal(iditer, it)) {
-          continue;
-        }
-        buf[p++] = it.doubleValue();
-      }
       double id = 0.;
       try {
-        id = (p > 1) ? estimator.estimate(buf, p) : 0.;
+        id = estimator.estimate(knnQuery, iditer, k + 1);
       }
       catch(ArithmeticException e) {
         id = 0.;

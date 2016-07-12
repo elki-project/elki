@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -51,24 +51,26 @@ public class PWMEstimator extends AbstractIntrinsicDimensionalityEstimator {
   public static final PWMEstimator STATIC = new PWMEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    if(len < 2) {
+  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
+    final int begin = countLeadingZeros(data, adapter, end);
+    if(end - begin < 2) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
-    if(len == 2) { // Fallback to MoM
-      double v1 = adapter.getDouble(data, 0) / adapter.getDouble(data, 1);
+    if(end - begin == 2) { // Fallback to MoM
+      double v1 = adapter.getDouble(data, begin) / adapter.getDouble(data, begin + 1);
       return v1 / (1 - v1);
     }
-    final int num = len - 1; // Except for last
-    // Estimate first PWM using data points 0..(num-1):
+    final int last = end - 1; // Except for last
+    // Estimate first PWM using data points 0..(last-1):
     // In the following, we pretend we had one additional data point at -1!
     double v1 = 0.;
-    for(int i = 0; i < num; i++) {
-      v1 += adapter.getDouble(data, i) * (i + 1);
+    int valid = 0;
+    for(int j = begin; j < last; j++) {
+      v1 += adapter.getDouble(data, j) * ++valid;
     }
     // All scaling factors collected for performance reasons:
-    final double w = adapter.getDouble(data, num);
-    v1 /= (num + 1) * w * (num);
+    final double w = adapter.getDouble(data, last);
+    v1 /= (valid + 1) * w * valid;
     return v1 / (1 - 2 * v1);
   }
 

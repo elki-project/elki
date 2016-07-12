@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,8 +30,6 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -107,29 +105,13 @@ public class EstimateIntrinsicDimensionality<O> extends AbstractDistanceBasedAlg
     DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O> knnq = database.getKNNQuery(dq, kk);
 
-    double[] idim = new double[ssize], kdists = new double[ssize];
+    double[] idim = new double[ssize];
     int samples = 0;
     for(DBIDIter iter = sampleids.iter(); iter.valid(); iter.advance()) {
-      KNNList knns = knnq.getKNNForDBID(iter, kk);
-      DoubleDBIDListIter it = knns.iter();
-      // Skip zeros.
-      while(it.valid() && it.doubleValue() == 0.) {
-        it.advance();
-      }
-      if(!it.valid()) {
-        continue;
-      }
-      double[] vals = new double[knns.size() - it.getOffset()];
-      for(int i = 0; it.valid(); it.advance(), ++i) {
-        vals[i] = it.doubleValue();
-      }
-      kdists[samples] = vals[vals.length - 1];
-      idim[samples] = estimator.estimate(vals);
+      idim[samples] = estimator.estimate(knnq, iter, kk);
       ++samples;
     }
     double id = (samples > 1) ? QuickSelect.median(idim, 0, samples) : -1;
-    double kdist = (samples > 1) ? QuickSelect.median(kdists, 0, samples) : 0.;
-    LOG.statistics(new DoubleStatistic(EstimateIntrinsicDimensionality.class.getName() + ".k-distance", kdist));
     LOG.statistics(new DoubleStatistic(EstimateIntrinsicDimensionality.class.getName() + ".intrinsic-dimensionality", id));
     return null;
   }

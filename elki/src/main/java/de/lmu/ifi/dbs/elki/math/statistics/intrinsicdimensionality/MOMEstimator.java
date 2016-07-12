@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -45,9 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.7.0
  */
 @Reference(authors = "L. Amsaleg and O. Chelly and T. Furon and S. Girard and M. E. Houle and K. Kawarabayashi and M. Nett", //
-title = "Estimating Local Intrinsic Dimensionality", //
-booktitle = "Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining 2015", //
-url = "http://dx.doi.org/10.1145/2783258.2783405")
+    title = "Estimating Local Intrinsic Dimensionality", //
+    booktitle = "Proc. SIGKDD International Conference on Knowledge Discovery and Data Mining 2015", //
+    url = "http://dx.doi.org/10.1145/2783258.2783405")
 public class MOMEstimator extends AbstractIntrinsicDimensionalityEstimator {
   /**
    * Static instance.
@@ -55,16 +55,21 @@ public class MOMEstimator extends AbstractIntrinsicDimensionalityEstimator {
   public static final MOMEstimator STATIC = new MOMEstimator();
 
   @Override
-  public <A> double estimate(A data, NumberArrayAdapter<?, A> adapter, final int len) {
-    if(len < 2) {
+  public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter, final int end) {
+    final int last = end - 1;
+    double v1 = 0.;
+    int valid = 0;
+    for(int i = 0; i < last; i++) {
+      final double v = adapter.getDouble(data, i);
+      if(v > 0) {
+        v1 += v;
+        ++valid;
+      }
+    }
+    if(valid <= 1) {
       throw new ArithmeticException("ID estimates require at least 2 non-zero distances");
     }
-    double v1 = 0.;
-    final int num = len - 1;
-    for(int i = 0; i < num; i++) {
-      v1 += adapter.getDouble(data, i);
-    }
-    v1 /= num * adapter.getDouble(data, num);
+    v1 /= valid * adapter.getDouble(data, last);
     return v1 / (1 - v1);
   }
 

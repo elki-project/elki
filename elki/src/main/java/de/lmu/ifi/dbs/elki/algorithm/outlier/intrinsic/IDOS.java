@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.ALIDEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -76,9 +76,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  */
 @Reference(authors = "Jonathan von Brünken, Michael E. Houle, Arthur Zimek", //
-title = "Intrinsic Dimensional Outlier Detection in High-Dimensional Data", //
-booktitle = "NII Technical Report (NII-2015-003E)", //
-url = "http://www.nii.ac.jp/TechReports/15-003E.html")
+    title = "Intrinsic Dimensional Outlier Detection in High-Dimensional Data", //
+    booktitle = "NII Technical Report (NII-2015-003E)", //
+    url = "http://www.nii.ac.jp/TechReports/15-003E.html")
 public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -157,22 +157,10 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
   protected DoubleDataStore computeIDs(DBIDs ids, KNNQuery<O> knnQ) {
     WritableDoubleDataStore intDims = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP);
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Intrinsic dimensionality", ids.size(), LOG) : null;
-    double[] dists = new double[k_c];
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-      KNNList nn = knnQ.getKNNForDBID(iter, k_c + 1);
-      int pos = 0;
-      for(DoubleDBIDListIter neighbor = nn.iter(); neighbor.valid(); neighbor.advance()) {
-        final double ndist = neighbor.doubleValue();
-        if(ndist > 0.) { // Estimators don't expect zero values.
-          dists[pos++] = ndist;
-        }
-        if(pos >= k_c) { // Always stop after at most k_c elements.
-          break;
-        }
-      }
       double id = 0.;
       try {
-        id = (pos > 1) ? estimator.estimate(dists, pos) : 0.;
+        id = estimator.estimate(knnQ, iter, k_c + 1);
       }
       catch(ArithmeticException e) {
         id = 0; // Too many duplicates, etc.
@@ -275,19 +263,19 @@ public class IDOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      ObjectParameter<IntrinsicDimensionalityEstimator> estP = new ObjectParameter<>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, HillEstimator.class);
+      ObjectParameter<IntrinsicDimensionalityEstimator> estP = new ObjectParameter<>(ESTIMATOR_ID, IntrinsicDimensionalityEstimator.class, ALIDEstimator.class);
       if(config.grab(estP)) {
         estimator = estP.instantiateClass(config);
       }
 
       IntParameter pKc = new IntParameter(KC_ID) //
-      .addConstraint(new GreaterEqualConstraint(5));
+          .addConstraint(new GreaterEqualConstraint(5));
       if(config.grab(pKc)) {
         k_c = pKc.getValue();
       }
 
       IntParameter pKr = new IntParameter(KR_ID) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_INT);
       if(config.grab(pKr)) {
         k_r = pKr.getValue();
       }
