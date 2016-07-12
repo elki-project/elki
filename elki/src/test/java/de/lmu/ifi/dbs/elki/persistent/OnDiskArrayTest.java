@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,9 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -40,34 +38,6 @@ import org.junit.Test;
  */
 // TODO: also test with a static sample file.
 public class OnDiskArrayTest {
-  File file = new File("OnDiskArrayTestFile.test.dat");
-
-  /**
-   * Check that we don't overwrite any file.
-   *
-   * @throws Exception on errors.
-   */
-  @Before
-  public void safetyCheck() {
-    if(file.exists()) {
-      Assert.fail("Could not run test - test file already exists.");
-    }
-  }
-
-  /**
-   * Clean up afterwards
-   *
-   * @throws Exception on errors.
-   */
-  @After
-  public void cleanup() {
-    if(file != null && file.exists()) {
-      if(!file.delete()) {
-        Assert.fail("Error cleaning up: can't remove test file.");
-      }
-    }
-  }
-
   /**
    * Test the OnDiskArray class.
    *
@@ -75,6 +45,9 @@ public class OnDiskArrayTest {
    */
   @Test
   public void dotestOnDiskArray() throws IOException {
+    File file = File.createTempFile("ELKIUnitTest", null);
+    file.deleteOnExit();
+    
     final int extraheadersize = 2;
     final int recsize = 3;
     int numrec = 4;
@@ -116,5 +89,8 @@ public class OnDiskArrayTest {
     roarray.getRecordBuffer(3).get(buf);
     Assert.assertArrayEquals("Record 3 doesn't match.", record1, buf);
     roarray.close();
+
+    file.delete(); // Note: probably fails on Windows.
+    // We cannot reliably delete mmaped files on Windows, apparently.
   }
 }

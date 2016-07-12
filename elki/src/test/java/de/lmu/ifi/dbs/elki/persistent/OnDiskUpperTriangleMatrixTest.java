@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.persistent;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,9 +26,7 @@ package de.lmu.ifi.dbs.elki.persistent;
 import java.io.File;
 import java.io.IOException;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -36,38 +34,9 @@ import org.junit.Test;
  *
  * @author Erich Schubert
  * @since 0.2
- *
  */
 // TODO: also test with a static sample file.
 public class OnDiskUpperTriangleMatrixTest {
-  static File file = new File("UpperTriangleTestFile.test.dat");
-
-  /**
-   * Check that we don't overwrite any file.
-   *
-   * @throws Exception on errors.
-   */
-  @Before
-  public void safetyCheck() {
-    if(file.exists()) {
-      Assert.fail("Could not run test - test file already exists.");
-    }
-  }
-
-  /**
-   * Clean up afterwards
-   *
-   * @throws Exception on errors.
-   */
-  @After
-  public void cleanup() {
-    if(file != null && file.exists()) {
-      if(!file.delete()) {
-        Assert.fail("Error cleaning up: can't remove test file.");
-      }
-    }
-  }
-
   /**
    * Test the ondisk triangle matrix
    *
@@ -75,6 +44,9 @@ public class OnDiskUpperTriangleMatrixTest {
    */
   @Test
   public void testUpperTriangleMatrix() throws IOException {
+    File file = File.createTempFile("ELKIUnitTest", null);
+    file.deleteOnExit();
+
     final int extraheadersize = 2;
     final int recsize = 3;
     int matsize = 2;
@@ -117,5 +89,8 @@ public class OnDiskUpperTriangleMatrixTest {
     roarray.getRecordBuffer(2, 2).get(buf);
     Assert.assertArrayEquals("Record 2,2 doesn't match.", record1, buf);
     roarray.close();
+
+    file.delete(); // Note: probably fails on Windows.
+    // We cannot reliably delete mmaped files on Windows, apparently.
   }
 }
