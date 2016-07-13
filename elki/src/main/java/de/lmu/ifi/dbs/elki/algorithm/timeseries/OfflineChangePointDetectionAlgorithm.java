@@ -3,7 +3,6 @@ package de.lmu.ifi.dbs.elki.algorithm.timeseries;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -23,11 +22,11 @@ import java.util.*;
 
 public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<ChangePointDetectionResult> {
 
-    private int confidence, bootstrap_steps;
+    private int confidence, bootstrapSteps;
 
-    public OfflineChangePointDetectionAlgorithm(int confidence, int bootstrap_steps) {
+    public OfflineChangePointDetectionAlgorithm(int confidence, int bootstrapSteps) {
         this.confidence = confidence;
-        this.bootstrap_steps = bootstrap_steps;
+        this.bootstrapSteps = bootstrapSteps;
     }
 
     public ChangePointDetectionResult run(Database database, Relation<DoubleVector> relation, Relation<LabelList> labellist) {
@@ -37,34 +36,34 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
         for(DBIDIter realtion_iter = relation.getDBIDs().iter(); realtion_iter.valid(); realtion_iter.advance()) {
 
             result.add(new ChangePoints(
-                    multiple_changepoints_with_confidence(relation.get(realtion_iter).getValues(), confidence, bootstrap_steps)));
+                    multipleChangepointsWithConfidence(relation.get(realtion_iter).getValues(), confidence, bootstrapSteps)));
         }
 
         return new ChangePointDetectionResult("Change Point List", "changepoints", result, labellist);
     }
 
-    private double[] likelihood_ratio_change_in_mean(double[] values){
+    private double[] likelihoodRatioChangeInMean(double[] values){
         double[] result = new double[values.length];
 
         // vector containing means for all different vector lengths, last index contains mean over all elements
-        double[] means_left = new double[values.length];
-        Mean current_mean_left = new Mean();
-        for(int i = 0; i < means_left.length; i++){
-            current_mean_left.put(values[i]);
-            means_left[i] = current_mean_left.getMean();
+        double[] meansLeft = new double[values.length];
+        Mean currentMeanLeft = new Mean();
+        for(int i = 0; i < meansLeft.length; i++){
+            currentMeanLeft.put(values[i]);
+            meansLeft[i] = currentMeanLeft.getMean();
         }
         // first index contains mean over all elements coming from the other side
-        double[] means_right = new double[values.length];
-        Mean current_mean_right = new Mean();
-        for(int i = means_right.length-1; i >= 0; i--){
-            current_mean_right.put(values[i]);
-            means_right[i] = current_mean_right.getMean();
+        double[] meansRight = new double[values.length];
+        Mean currentMeanRight = new Mean();
+        for(int i = meansRight.length-1; i >= 0; i--){
+            currentMeanRight.put(values[i]);
+            meansRight[i] = currentMeanRight.getMean();
         }
 
-        result[0] = -(VMath.sum_elements(VMath.square(VMath.minus(values, means_right[0]))));
+        result[0] = -(VMath.sumElements(VMath.square(VMath.minus(values, meansRight[0]))));
         for(int i = 1; i < values.length; i++){
-            result[i] = -(  (VMath.sum_elements(VMath.square(VMath.minus(Arrays.copyOfRange(values, 0, i), means_left[i-1]))))
-                        +   (VMath.sum_elements(VMath.square(VMath.minus(Arrays.copyOfRange(values, i, values.length), means_right[i]))))
+            result[i] = -(  (VMath.squareSum(VMath.minus(Arrays.copyOfRange(values, 0, i), meansLeft[i-1])))
+                        +   (VMath.squareSum(VMath.minus(Arrays.copyOfRange(values, i, values.length), meansRight[i])))
                         );
         }
 
@@ -72,89 +71,89 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
     }
 
     // DOES NOT WORK - REASON NOT YET INVESTIGATED
-    private double[] likelihood_ratio_change_in_mean_optimised(double[] values){
+    private double[] likelihoodRatioChangeInMeanOptimised(double[] values){
         double[] result = new double[values.length];
 
         // vector containing means for all different vector lengths, last index contains mean over all elements
-        double[] means_left = new double[values.length];
-        Mean current_mean_left = new Mean();
-        for(int i = 0; i < means_left.length; i++){
-            current_mean_left.put(values[i]);
-            means_left[i] = current_mean_left.getMean();
+        double[] meansLeft = new double[values.length];
+        Mean currentMeanLeft = new Mean();
+        for(int i = 0; i < meansLeft.length; i++){
+            currentMeanLeft.put(values[i]);
+            meansLeft[i] = currentMeanLeft.getMean();
         }
         // first index contains mean over all elements coming from the other side
-        double[] means_right = new double[values.length];
-        Mean current_mean_right = new Mean();
-        for(int i = means_right.length-1; i >= 0; i--){
-            current_mean_right.put(values[i]);
-            means_right[i] = current_mean_right.getMean();
+        double[] meansRight = new double[values.length];
+        Mean currentMeanRight = new Mean();
+        for(int i = meansRight.length-1; i >= 0; i--){
+            currentMeanRight.put(values[i]);
+            meansRight[i] = currentMeanRight.getMean();
         }
 
         result[0]=0;
-        double tmp_mean_dif;
+        double tmpMeanDif;
         for(int i = 1; i < values.length; i++) {
-            tmp_mean_dif = means_left[i-1] - means_right[i];
-            result[i]= -i*(values.length - i)*tmp_mean_dif*tmp_mean_dif;
+            tmpMeanDif = meansLeft[i-1] - meansRight[i];
+            result[i]= -i*(values.length - i)*tmpMeanDif*tmpMeanDif;
         }
 
         return result;
 
     }
 
-    private List<ChangePoint> multiple_changepoints_with_confidence(double[] values, int confidence, int bootstrap_steps){
+    private List<ChangePoint> multipleChangepointsWithConfidence(double[] values, int confidence, int bootstrapSteps){
         List<ChangePoint> result = new ArrayList<>();
-        result = multiple_changepoints_with_confidence(result, values, confidence, bootstrap_steps, 0);
+        result = multipleChangepointsWithConfidence(result, values, confidence, bootstrapSteps, 0);
         return result;
     }
 
-    private List<ChangePoint> multiple_changepoints_with_confidence(List<ChangePoint> result, double[] values, int confidence, int bootstrap_steps, int tmp_arrary_start_index){
-        double tmp_conf = confidence_level(values, bootstrap_steps);
-        int tmp_max_pos = tmp_arrary_start_index + get_maximum_index(likelihood_ratio_change_in_mean(values)); // return the detected changepoint
+    private List<ChangePoint> multipleChangepointsWithConfidence(List<ChangePoint> result, double[] values, int confidence, int bootstrapSteps, int tmpArraryStartIndex){
+        double tmpConf = confidenceLevel(values, bootstrapSteps);
+        int tmpMaxPos = tmpArraryStartIndex + getMaximumIndex(likelihoodRatioChangeInMean(values)); // return the detected changepoint
 
-        if(!(tmp_conf < confidence || values.length <=3 || (tmp_max_pos - tmp_arrary_start_index + 1 == values.length))){ // cannot split up arrays of size 3, that would make every element a change poin
-            multiple_changepoints_with_confidence(result
-                                                    , Arrays.copyOfRange(values, 0, tmp_max_pos - tmp_arrary_start_index)
+        if(!(tmpConf < confidence || values.length <=3 || (tmpMaxPos - tmpArraryStartIndex + 1 == values.length))){ // cannot split up arrays of size 3, that would make every element a change poin
+            multipleChangepointsWithConfidence(result
+                                                    , Arrays.copyOfRange(values, 0, tmpMaxPos - tmpArraryStartIndex)
                                                     , confidence
-                                                    , bootstrap_steps
-                                                    , tmp_arrary_start_index);
-            multiple_changepoints_with_confidence(result
-                                                    , Arrays.copyOfRange(values, tmp_max_pos - tmp_arrary_start_index + 1, values.length)
+                                                    , bootstrapSteps
+                                                    , tmpArraryStartIndex);
+            multipleChangepointsWithConfidence(result
+                                                    , Arrays.copyOfRange(values, tmpMaxPos - tmpArraryStartIndex + 1, values.length)
                                                     , confidence
-                                                    , bootstrap_steps
-                                                    , tmp_max_pos);
-            result.add(new ChangePoint(tmp_max_pos, tmp_conf));
+                                                    , bootstrapSteps
+                                                    , tmpMaxPos);
+            result.add(new ChangePoint(tmpMaxPos, tmpConf));
         }
 
         return result;
     }
 
     //TRY OUT RESULT HANDLING
-    private ChangePoint single_changepoint_with_confidence(double[] values, int confidence, int bootstrap_steps){
-        double conf = confidence_level(values, bootstrap_steps);
-        double index = get_maximum_index(likelihood_ratio_change_in_mean(values));
+    private ChangePoint singleChangepointWithConfidence(double[] values, int bootstrapSteps){
+        double conf = confidenceLevel(values, bootstrapSteps);
+        double index = getMaximumIndex(likelihoodRatioChangeInMean(values));
         return new ChangePoint(index, conf);
     }
 
 
-    private double confidence_level(double[] values, int steps){
-        double estimator = get_bootstrap_estimator(likelihood_ratio_change_in_mean(values));
+    private double confidenceLevel(double[] values, int steps){
+        double estimator = getBootstrapEstimator(likelihoodRatioChangeInMean(values));
         int x = 0;
         for(int i=0; i < steps; i++){
-            double[] tmp_values = shuffle_vector(values);
-            double tmp_estimator = get_bootstrap_estimator(likelihood_ratio_change_in_mean(tmp_values));
-            if (tmp_estimator < estimator){
+            double[] tmpValues = shuffleVector(values);
+            double tmpEstimator = getBootstrapEstimator(likelihoodRatioChangeInMean(tmpValues));
+            if (tmpEstimator < estimator){
                 x += 1;
             }
         }
         return 100 * ((double)x/(double)steps);
     }
 
-    private double get_bootstrap_estimator(double[] values){
-        return get_maximum(values)-get_minimum(values);
+    private double getBootstrapEstimator(double[] values){
+        return getMaximum(values)- getMinimum(values);
     }
 
     // move to VMath??
-    private double[] shuffle_vector(double[] values)
+    private double[] shuffleVector(double[] values)
     {
         double[] result= VMath.copy(values);
         Random rnd = new Random();
@@ -170,7 +169,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
     }
 
     // move to VMath??
-    private int get_maximum_index(double[] values){
+    private int getMaximumIndex(double[] values){
         int result = 0;
         for (int i = 0; i < values.length; i++){
             if ((values[i] >= values[result])){
@@ -181,7 +180,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
     }
 
     // move to VMath??
-    private double get_maximum(double[] values){
+    private double getMaximum(double[] values){
         double result = values[0];
         for(double value : values){
             if(value > result){
@@ -192,7 +191,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
     }
 
     // move to VMath??
-    private double get_minimum(double[] values){
+    private double getMinimum(double[] values){
         double result = values[0];
         for(double value : values){
             if(value < result){
