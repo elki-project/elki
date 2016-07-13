@@ -75,7 +75,7 @@
 							<executable>java</executable>
 							<arguments>
 								<argument>-cp</argument>
-								<argument>${project.build.directory}/dependency/*:${project.build.directory}/classes</argument>
+								<argument>${project.build.directory}/dependency/*${path.separator}${project.build.directory}/classes</argument>
 								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentParameters</argument>
 								<argument>${project.build.directory}/apidocs/parameters-byclass-vis.html</argument>
 								<argument>${project.build.directory}/apidocs/parameters-byopt-vis.html</argument>
@@ -93,7 +93,7 @@
 							<executable>java</executable>
 							<arguments>
 								<argument>-cp</argument>
-								<argument>${project.build.directory}/dependency/*:${project.build.directory}/classes</argument>
+								<argument>${project.build.directory}/dependency/*${path.separator}${project.build.directory}/classes</argument>
 								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentReferences</argument>
 								<argument>${project.build.directory}/apidocs/references-vis.html</argument>
 								<argument>${project.build.directory}/apidocs/references-vis.trac</argument>

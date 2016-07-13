@@ -136,7 +136,7 @@
 								<!-- This is a hack, because these applications will currently ignore 
 									jars, so we need the folders on the classpath, too -->
 								<argument>-cp</argument>
-								<argument>${project.build.directory}/dependency/*:${elki.projdir}/elki-docutil/target/classes:${elki.projdir}/elki/target/classes:${elki.projdir}/addons/batikvis/target/classes:${elki.projdir}/addons/libsvm/target/classes</argument>
+								<argument>${project.build.directory}/dependency/*${path.separator}${elki.projdir}/elki-docutil/target/classes${path.separator}${elki.projdir}/elki/target/classes${path.separator}${elki.projdir}/addons/batikvis/target/classes${path.separator}${elki.projdir}/addons/libsvm/target/classes</argument>
 								<!-- Generate algorithm parameter documentations -->
 								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentParameters</argument>
 								<argument>${project.build.directory}/apidocs/parameters-byclass.html</argument>
@@ -158,7 +158,7 @@
 								<!-- This is a hack, because these applications will currently ignore 
 									jars, so we need the folders on the classpath, too -->
 								<argument>-cp</argument>
-								<argument>${project.build.directory}/dependency/*:${elki.projdir}/elki-docutil/target/classes:${elki.projdir}/elki/target/classes:${elki.projdir}/addons/batikvis/target/classes:${elki.projdir}/addons/libsvm/target/classes</argument>
+								<argument>${project.build.directory}/dependency/*${path.separator}${elki.projdir}/elki-docutil/target/classes${path.separator}${elki.projdir}/elki/target/classes${path.separator}${elki.projdir}/addons/batikvis/target/classes${path.separator}${elki.projdir}/addons/libsvm/target/classes</argument>
 								<!-- Generate literature reference documentations -->
 								<argument>de.lmu.ifi.dbs.elki.application.internal.DocumentReferences</argument>
 								<argument>${project.build.directory}/apidocs/references.html</argument>
