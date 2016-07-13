@@ -48,6 +48,9 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
  * @apiviz.has KNNQuery
  */
 public final class RStarTreeUtil {
+  
+  private RStarTreeUtil() {}
+  
   /**
    * Get an RTree range query, using an optimized double implementation when
    * possible.

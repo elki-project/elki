@@ -61,6 +61,9 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
  * @apiviz.has RKNNQuery
  */
 public final class QueryUtil {
+  
+  private QueryUtil() {}
+  
   /**
    * Get a distance query for a given distance function, automatically choosing
    * a relation.

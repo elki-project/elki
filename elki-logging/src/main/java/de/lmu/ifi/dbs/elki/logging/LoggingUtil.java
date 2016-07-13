@@ -40,6 +40,9 @@ import java.util.logging.Logger;
  * @apiviz.uses ELKILogRecord oneway - - «create»
  */
 public final class LoggingUtil {
+    
+    private LoggingUtil() {}
+    
   /**
    * Expensive logging function that is convenient, but should only be used in
    * rare conditions.

@@ -35,6 +35,9 @@ package de.lmu.ifi.dbs.elki.utilities.documentation;
  * @apiviz.uses de.lmu.ifi.dbs.elki.utilities.documentation.Reference
  */
 public final class DocumentationUtil {
+  
+  private DocumentationUtil() {}
+  
   /**
    * Get a useful title from a class, either by reading the
    * "title" annotation, or by using the class name.

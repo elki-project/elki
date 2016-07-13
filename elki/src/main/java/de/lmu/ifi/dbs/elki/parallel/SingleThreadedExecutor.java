@@ -42,6 +42,9 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
  * @apiviz.has SingleThreadedRunner
  */
 public class SingleThreadedExecutor {
+  
+  private SingleThreadedExecutor() {}
+  
   /**
    * Run a task on a single thread.
    * 

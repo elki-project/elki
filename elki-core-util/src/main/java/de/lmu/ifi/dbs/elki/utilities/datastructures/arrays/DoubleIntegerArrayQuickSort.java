@@ -31,6 +31,9 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arrays;
  * @since 0.5.5
  */
 public class DoubleIntegerArrayQuickSort {
+  
+  private DoubleIntegerArrayQuickSort() {}
+  
   /**
    * Threshold for using insertion sort.
    */

@@ -45,6 +45,9 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
  * @apiviz.uses Projection2D
  */
 public class SVGHyperCube {
+  
+  private SVGHyperCube() {}
+  
   /**
    * Wireframe hypercube.
    *

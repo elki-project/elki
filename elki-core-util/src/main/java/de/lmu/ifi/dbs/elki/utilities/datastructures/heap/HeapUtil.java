@@ -32,6 +32,9 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  * @author Erich Schubert
  */
 public final class HeapUtil {
+  
+  private HeapUtil() {}
+  
   /**
    * Find the next power of 2.
    *

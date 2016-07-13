@@ -43,6 +43,9 @@ import org.w3c.dom.Element;
  * @since 0.2
  */
 public final class HTMLUtil {
+  
+  private HTMLUtil() {}
+  
   /**
    * HTML namespace
    */

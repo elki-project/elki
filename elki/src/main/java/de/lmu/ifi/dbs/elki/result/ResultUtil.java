@@ -47,6 +47,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
  * @apiviz.uses Result oneway - - filters
  */
 public class ResultUtil {
+  
+  private ResultUtil() {}
+  
   /**
    * Collect all Annotation results from a Result
    *

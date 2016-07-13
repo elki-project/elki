@@ -50,6 +50,9 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
  * @apiviz.uses ParallelCore
  */
 public class ParallelExecutor {
+  
+  private ParallelExecutor() {}
+  
   /**
    * Run a task on all available CPUs.
    *

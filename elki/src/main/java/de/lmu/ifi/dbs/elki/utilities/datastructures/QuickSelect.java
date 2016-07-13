@@ -48,6 +48,9 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
  * @apiviz.uses Adapter
  */
 public class QuickSelect {
+  
+  private QuickSelect() {}
+  
   /**
    * For small arrays, use a simpler method:
    */

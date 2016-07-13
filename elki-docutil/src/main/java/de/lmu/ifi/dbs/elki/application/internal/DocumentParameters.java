@@ -82,6 +82,9 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * @apiviz.uses Parameter
  */
 public class DocumentParameters {
+  
+  private DocumentParameters() {}
+  
   private static final Logging LOG = Logging.getLogger(DocumentParameters.class);
 
   private static final String HEADER_PARAMETER_FOR = "Parameter for: ";

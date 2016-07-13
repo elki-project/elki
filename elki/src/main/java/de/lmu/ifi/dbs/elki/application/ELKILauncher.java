@@ -39,6 +39,9 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
  * @apiviz.uses AbstractApplication
  */
 public class ELKILauncher {
+  
+  private ELKILauncher() {}
+  
   /**
    * Application to run by default.
    */

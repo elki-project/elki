@@ -43,6 +43,9 @@ import java.util.Locale;
  * @since 0.2
  */
 public final class FormatUtil {
+  
+  private FormatUtil() {}
+  
   /**
    * Dynamic number formatter, but with language constraint.
    */

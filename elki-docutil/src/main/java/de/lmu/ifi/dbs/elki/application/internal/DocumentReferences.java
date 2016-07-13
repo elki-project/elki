@@ -64,6 +64,9 @@ import de.lmu.ifi.dbs.elki.utilities.xml.HTMLUtil;
  * @apiviz.uses Reference
  */
 public class DocumentReferences {
+  
+  private DocumentReferences() {}
+  
   private static final String CSSFILE = "stylesheet.css";
 
   private static final String MODIFICATION_WARNING = "WARNING: THIS DOCUMENT IS AUTOMATICALLY GENERATED. MODIFICATIONS MAY GET LOST.";

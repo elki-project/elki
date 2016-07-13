@@ -40,6 +40,9 @@ import java.util.Arrays;
  * @since 0.5.0
  */
 public final class BitsUtil {
+  
+  private BitsUtil() {}
+  
   /**
    * Shift factor for a long: 2^6 == 64 == Long.SIZE
    */

@@ -38,6 +38,9 @@ import javax.swing.tree.TreeNode;
  * @apiviz.has TreeNode
  */
 public class ClassTree {
+    
+  private ClassTree() {}
+    
   /**
    * Build the class tree for a given set of choices.
    *

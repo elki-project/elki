@@ -40,6 +40,9 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * @apiviz.composedOf de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory
  */
 public final class DataStoreUtil {
+  
+  private DataStoreUtil() {}
+  
   /**
    * Make a new storage, to associate the given ids with an object of class
    * dataclass.

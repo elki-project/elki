@@ -32,6 +32,9 @@ import org.w3c.dom.Element;
  * @since 0.5.0
  */
 public class SVGEffects {
+  
+  private SVGEffects() {}
+  
   /**
    * ID for the drop shadow effect
    */
