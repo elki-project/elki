@@ -225,13 +225,11 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
         protected void makeOptions(Parameterization config) {
             super.makeOptions(config);
             IntParameter confidence_parameter = new IntParameter(CONFIDENCE_ID) //
-                    .setOptional(false) //
                     .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
             if(config.grab(confidence_parameter)) {
                 confidence = confidence_parameter.getValue();
             }
             IntParameter bootstrap_steps_parameter = new IntParameter(BOOTSTRAP_ID) //
-                    .setOptional(false) //
                     .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
             if(config.grab(bootstrap_steps_parameter)) {
                 bootstrap_steps = bootstrap_steps_parameter.getValue();
