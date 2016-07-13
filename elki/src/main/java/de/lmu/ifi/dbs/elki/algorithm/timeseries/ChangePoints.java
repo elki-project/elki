@@ -1,19 +1,19 @@
 package de.lmu.ifi.dbs.elki.algorithm.timeseries;
 
+import de.lmu.ifi.dbs.elki.data.LabelList;
+
 import java.util.List;
 
 public class ChangePoints {
 
     List<ChangePoint> points;
-    String label;
 
-    public ChangePoints(List<ChangePoint> points, String label){
+    public ChangePoints(List<ChangePoint> points){
         this.points = points;
-        this.label = label;
     }
 
-    public StringBuilder appendTo(StringBuilder buf) {
-        buf.append(label).append(": ");
+    public StringBuilder appendTo(StringBuilder buf, LabelList labels) {
+        buf.append(labels.toString()).append(": ");
         for (ChangePoint pnt : points) {
             pnt.appendTo(buf);
             buf.append(",");

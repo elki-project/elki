@@ -3,6 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.timeseries;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -29,22 +30,17 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
         this.bootstrap_steps = bootstrap_steps;
     }
 
-    public ChangePointDetectionResult run(Database database) {
-        Relation<DoubleVector> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-        Relation<LabelList> labellist = database.getRelation(TypeUtil.LABELLIST);
+    public ChangePointDetectionResult run(Database database, Relation<DoubleVector> relation, Relation<LabelList> labellist) {
 
         List<ChangePoints> result = new ArrayList<>();
 
-        for(DBIDIter realtion_iter = relation.getDBIDs().iter(), label_iter = labellist.getDBIDs().iter()
-            ; realtion_iter.valid()
-            ; realtion_iter.advance(), label_iter.advance()) {
+        for(DBIDIter realtion_iter = relation.getDBIDs().iter(); realtion_iter.valid(); realtion_iter.advance()) {
 
             result.add(new ChangePoints(
-                    multiple_changepoints_with_confidence(relation.get(realtion_iter).getValues(), confidence, bootstrap_steps)
-                    , labellist.get(label_iter).toString()));
+                    multiple_changepoints_with_confidence(relation.get(realtion_iter).getValues(), confidence, bootstrap_steps)));
         }
 
-        return new ChangePointDetectionResult("Change Point List", "changepoints", result);
+        return new ChangePointDetectionResult("Change Point List", "changepoints", result, labellist);
     }
 
     private double[] likelihood_ratio_change_in_mean(double[] values){
@@ -133,10 +129,10 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
     }
 
     //TRY OUT RESULT HANDLING
-    private ChangePoint single_changepoint_with_confidence(String label, double[] values, int confidence, int bootstrap_steps){
+    private ChangePoint single_changepoint_with_confidence(double[] values, int confidence, int bootstrap_steps){
         double conf = confidence_level(values, bootstrap_steps);
         double index = get_maximum_index(likelihood_ratio_change_in_mean(values));
-        return new ChangePoint(index, conf, label);
+        return new ChangePoint(index, conf);
     }
 
 
@@ -208,7 +204,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
 
     @Override
     public TypeInformation[] getInputTypeRestriction() {
-        return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
+        return TypeUtil.array(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH, TypeUtil.LABELLIST);
     }
 
     @Override
