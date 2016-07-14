@@ -56,7 +56,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
   static double perplexity;
   static int learning_rate;
   static double momentum;
-  private int dim = 2;
+  private static final int dim = 2;
   private static int size;
   private static final Logging LOG = Logging.getLogger(tSNE.class);
   
@@ -91,12 +91,16 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     
     double [][] qij = new double[size][size];
     double [][] gradient = new double [size][dim];
-    double z = compute_qij_distance_sum(squared_distances);
+    double [][] squared_distances_qij = new double[size][size];
+    fillDistacneMatrix(squared_distances_qij, proj, ix, iy);
+    double z = compute_qij_distance_sum(squared_distances_qij);
     double[][] solution_2_steps_ago = new double[size][dim];
     for(int i = 0;i<iteration;i++){
-      compute_qij(squared_distances,qij);
+      compute_qij(squared_distances_qij,qij,z);
       compute_gradient(pij, qij, gradient, proj, ix, iy,z);
       update_solution(proj, ix,  gradient,i,solution_2_steps_ago);
+      fillDistacneMatrix(squared_distances_qij, proj, ix, iy);
+      z = compute_qij_distance_sum(squared_distances_qij);
     }
     
 //    // Beim >Result: it.seek(off)
@@ -111,6 +115,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     return new MaterializedRelation<>("tSNE", "t-SNE", otype, proj, ids);
   }
   
+
 
 
 
@@ -214,11 +219,10 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     }
   }
   
-  protected static <O> void compute_qij(double[][] squared_distances, double[][] qij) {
-    double sum = compute_qij_distance_sum(squared_distances);
+  protected static <O> void compute_qij(double[][] squared_distances, double[][] qij, double z) {
     for(int i = 0;i<qij.length;i++){
       for(int j = 0; j<i;j++ ){
-        double s = (1/(1+squared_distances[i][j]))/(sum);
+        double s = (1/(1+squared_distances[i][j]))/(z);
         qij[i][j] = s;
         qij[j][i] = s;
       }
@@ -238,44 +242,76 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
   
   //Im Gradienten-Array stehen die Vektoren zeilenweise
   protected static <O> void compute_gradient(double[][] pij, double[][] qij, double[][] gradient, WritableDataStore<DoubleVector> proj, DBIDArrayIter ix, DBIDArrayIter iy, double z) {
-    for(ix.seek(0);ix.valid();ix.advance()){
-      int row = 0;
-      double product = 0.0;
-      for(iy.seek(0);iy.valid();iy.advance()){
-        int entry = 0;
-       // if(ix.getOffset()!=iy.getOffset()){ notwendig!
-        double[] difference = minus(proj.get(ix).toArray(), proj.get(iy).toArray());
-        product = product + (pij[row][entry]-qij[row][entry])*qij[row][entry]*z*difference[entry];
-        gradient[row][entry] = 4.0 * product;
+    int point = 0;
+    for(ix.seek(0);ix.valid();ix.advance()){ // über alle Punkte
+      int entry = 0;
+      double [] help = new double[dim];
+      for(iy.seek(0);iy.valid();iy.advance()){ //für jeden Punkt
+        if(ix.getOffset() != iy.getOffset()){
+          double[] differnce = minus(proj.get(ix).toArray(), proj.get(iy).toArray());
+          for(int i =0;i<dim;i++){
+            help[i] = help[i]+(pij[point][entry]-qij[point][entry])*qij[point][entry]*z*differnce[i];
+          }
+        }
         entry++;
       }
-      row++;
+      for(int i = 0;i<dim;i++){ // gradienten füllen
+        gradient[point][i] = help[i]*4;
+      }
+      point++;
     }
+    
+    
+
+//    for(ix.seek(0);ix.valid();ix.advance()){
+//      int row = 0;
+//      double product = 0.0;
+//      for(iy.seek(0);iy.valid();iy.advance()){
+//        int entry = 0;
+//        if(ix.getOffset()!=iy.getOffset()){ 
+//        double[] difference = minus(proj.get(ix).toArray(), proj.get(iy).toArray());
+//        product = product + (pij[row][entry]-qij[row][entry])*qij[row][entry]*z*difference[entry];
+//        gradient[row][entry] = 4.0 * product;
+//        entry++;
+//        }
+//      }
+//      row++;
+//    }
   }
   
   protected static <O> void update_solution(WritableDataStore<DoubleVector> proj, DBIDArrayIter ix, double[][] gradient, int i, double[][] solution_2_steps_ago) {
     int pos = 0;
     if(i==0){
       for(ix.seek(0);ix.valid();ix.advance()){
-        solution_2_steps_ago[pos] = proj.get(ix).toArray().clone();
-        double [] solution = proj.get(ix).toArray().clone();
-        double [] new_solution = plus(solution,mal(learning_rate, gradient[pos])).clone();
+        solution_2_steps_ago [pos] = proj.get(ix).toArray();
+        double soultion[] = plus(solution_2_steps_ago[pos],mal(learning_rate, gradient[pos]));
         proj.delete(ix);
-        proj.put(ix, new DoubleVector(new_solution));
+        proj.put(ix, new DoubleVector(soultion));
         pos++;
+//        solution_2_steps_ago[pos] = proj.get(ix).toArray();
+//        double [] solution = proj.get(ix).toArray();
+//        double [] new_solution = plus(solution,mal(learning_rate, gradient[pos])).clone();
+//        proj.delete(ix);
+//        proj.put(ix, new DoubleVector(new_solution));
       }
     }
     
     else{
       for(ix.seek(0);ix.valid();ix.advance()){
-        solution_2_steps_ago[pos] = proj.get(ix).toArray().clone();
-        double [] solution = proj.get(ix).toArray().clone();
-        double [] new_solution = plus(solution,mal(learning_rate, gradient[pos])).clone();
-        double [] difference = minus(proj.get(ix).toArray(), solution_2_steps_ago[pos]);
-        new_solution = plus(new_solution, mal(momentum, difference)).clone();
+        double [] zwischenspeicher = proj.get(ix).toArray();
+        double [] solution = plus(plus(zwischenspeicher, mal(learning_rate, gradient[pos])), mal(momentum, minus(zwischenspeicher, solution_2_steps_ago[pos])));
+        solution_2_steps_ago[pos] = zwischenspeicher.clone();
         proj.delete(ix);
-        proj.put(ix, new DoubleVector(new_solution));
+        proj.put(ix, new DoubleVector(solution));
         pos++;
+//        solution_2_steps_ago[pos] = proj.get(ix).toArray().clone();
+//        double [] solution = proj.get(ix).toArray();
+//        double [] new_solution = plus(solution,mal(learning_rate, gradient[pos])).clone();
+//        double [] difference = minus(proj.get(ix).toArray(), solution_2_steps_ago[pos]);
+//        new_solution = plus(new_solution, mal(momentum, difference)).clone();
+//        proj.delete(ix);
+//        proj.put(ix, new DoubleVector(new_solution));
+//        pos++;
       }
     }
   }
@@ -307,6 +343,30 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
       m[i] = v * vec[i];
     }
     return m;
+  }
+  
+  private void fillDistacneMatrix(double[][] squared_distances_qij, WritableDataStore<DoubleVector> proj, DBIDArrayIter ix, DBIDArrayIter iy) {
+    int pos = 0;
+    for(ix.seek(0);ix.valid();ix.advance()){
+      int entry = 0;
+      for(iy.seek(0);iy.valid();iy.advance()){
+        if(ix.getOffset() > iy.getOffset()){
+          double dist = distance(proj.get(ix).toArray(), proj.get(iy).toArray());
+          squared_distances_qij[pos][entry] = dist;
+          squared_distances_qij[entry][pos] = dist;
+        }
+        entry++;
+      }
+      pos++;
+    }
+  }
+  
+  protected static <O> double distance(double[] d1, double [] d2){
+    double d = 0.0;
+    for(int i = 0;i<d1.length;i++){
+      d = d + Math.pow((d1[i] - d2[i]),2);
+    }
+    return d;
   }
 
   @Override
