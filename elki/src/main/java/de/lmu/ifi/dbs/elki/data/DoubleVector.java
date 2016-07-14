@@ -106,15 +106,6 @@ public class DoubleVector extends AbstractNumberVector {
     return (long) values[dimension];
   }
 
-  /**
-   * Get a copy of the raw double[] array.
-   *
-   * @return copy of values array.
-   */
-  public double[] getValues() {
-    return values.clone();
-  }
-
   @Override
   public double[] toArray() {
     return values.clone();
