@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -154,19 +153,6 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     @Override
     public String getShortName() {
       return "precision-at-k";
-    }
-
-    @Override
-    public void writeToText(TextWriterStream out, String label) {
-      out.commentPrint(labelx);
-      out.commentPrint(" ");
-      out.commentPrint(labely);
-      out.flush();
-      for(int pos = 0; pos < data.size(); pos += 2) {
-        out.inlinePrint((int) data.get(pos));
-        out.inlinePrint(data.get(pos + 1));
-        out.flush();
-      }
     }
   }
 

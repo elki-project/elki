@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,7 +30,12 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  *
  * @apiviz.exclude
  */
-class DoubleArrayAdapter implements NumberArrayAdapter<Double, double[]> {
+public class DoubleArrayAdapter implements NumberArrayAdapter<Double, double[]> {
+  /**
+   * Static instance.
+   */
+  public static DoubleArrayAdapter STATIC = new DoubleArrayAdapter();
+
   /**
    * Constructor.
    * 
@@ -79,5 +84,5 @@ class DoubleArrayAdapter implements NumberArrayAdapter<Double, double[]> {
   @Override
   public byte getByte(double[] array, int off) throws IndexOutOfBoundsException {
     return (byte) array[off];
-  }    
+  }
 }

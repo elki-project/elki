@@ -160,6 +160,18 @@
 
 		<dependency>
 			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki-core-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki-core-math</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
 			<artifactId>elki-core-util</artifactId>
 			<version>${project.version}</version>
 		</dependency>

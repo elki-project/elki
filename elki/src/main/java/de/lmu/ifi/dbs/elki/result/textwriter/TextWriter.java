@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
+import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
@@ -66,6 +67,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectArray;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterPair;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterXYCurve;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
@@ -121,6 +123,7 @@ public class TextWriter {
     writers.insertHandler(LabelList.class, trivialwriter);
     writers.insertHandler(DBID.class, trivialwriter);
     writers.insertHandler(GeneratorSingleCluster.class, ignorewriter);
+    writers.insertHandler(XYCurve.class, new TextWriterXYCurve());
     // Objects that have an own writeToText method.
     writers.insertHandler(TextWriteable.class, new TextWriterTextWriteable());
   }

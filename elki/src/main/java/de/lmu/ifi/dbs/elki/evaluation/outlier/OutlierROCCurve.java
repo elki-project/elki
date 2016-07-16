@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -43,7 +43,9 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterXYCurve;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -154,7 +156,7 @@ public class OutlierROCCurve implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class ROCResult extends XYCurve {
+  public static class ROCResult extends XYCurve implements TextWriteable {
     /**
      * AUC value
      */
@@ -192,7 +194,7 @@ public class OutlierROCCurve implements Evaluator {
     public void writeToText(TextWriterStream out, String label) {
       out.commentPrintLn(ROCAUC_LABEL + ": " + auc);
       out.flush();
-      super.writeToText(out, label);
+      new TextWriterXYCurve().write(out, label, this);
     }
   }
 

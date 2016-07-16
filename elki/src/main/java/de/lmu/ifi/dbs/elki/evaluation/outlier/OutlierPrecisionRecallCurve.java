@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -41,7 +41,9 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterXYCurve;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -83,7 +85,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // Prepare
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
-    if (positiveids.size() == 0) {
+    if(positiveids.size() == 0) {
       LOG.warning("Computing a P/R curve failed - no objects matched.");
       return;
     }
@@ -91,7 +93,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
-    for (OutlierResult o : oresults) {
+    for(OutlierResult o : oresults) {
       DBIDs sorted = o.getOrdering().order(o.getOrdering().getDBIDs());
       XYCurve curve = computePrecisionResult(o.getScores().size(), positiveids, sorted.iter(), o.getScores());
       db.getHierarchy().add(o, curve);
@@ -101,7 +103,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
 
     // FIXME: find appropriate place to add the derived result
     // otherwise apply an ordering to the database IDs.
-    for (OrderingResult or : orderings) {
+    for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
       XYCurve curve = computePrecisionResult(or.getDBIDs().size(), positiveids, sorted.iter(), null);
       db.getHierarchy().add(or, curve);
@@ -114,7 +116,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     XYCurve curve = new PRCurve(postot + 2, postot);
 
     double prevscore = Double.NaN;
-    for (; iter.valid(); iter.advance()) {
+    for(; iter.valid(); iter.advance()) {
       // Previous precision rate - y axis
       final double curprec = ((double) poscnt) / total;
       // Previous recall rate - x axis
@@ -122,18 +124,18 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
 
       // Analyze next point
       // positive or negative match?
-      if (ids.contains(iter)) {
+      if(ids.contains(iter)) {
         poscnt += 1;
       }
       total += 1;
       // First iteration ends here
-      if (total == 1) {
+      if(total == 1) {
         continue;
       }
       // defer calculation for ties
-      if (scores != null) {
+      if(scores != null) {
         double curscore = scores.doubleValue(iter);
-        if (Double.compare(prevscore, curscore) == 0) {
+        if(Double.compare(prevscore, curscore) == 0) {
           continue;
         }
         prevscore = curscore;
@@ -151,7 +153,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class PRCurve extends XYCurve {
+  public static class PRCurve extends XYCurve implements TextWriteable {
     /**
      * AUC value for PR curve
      */
@@ -194,7 +196,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
      * @return AUC value
      */
     public double getAUC() {
-      if (Double.isNaN(auc)) {
+      if(Double.isNaN(auc)) {
         double max = 1 - 1. / positive;
         auc = areaUnderCurve(this) / max;
       }
@@ -205,7 +207,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     public void writeToText(TextWriterStream out, String label) {
       out.commentPrintLn(PRAUC_LABEL + ": " + getAUC());
       out.flush();
-      super.writeToText(out, label);
+      new TextWriterXYCurve().write(out, label, this);
     }
   }
 
@@ -225,13 +227,14 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
      * </p>
      */
     public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("precision.positive", "Class label for the 'positive' class.");
+
     protected Pattern positiveClassName = null;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       PatternParameter positiveClassNameP = new PatternParameter(POSITIVE_CLASS_NAME_ID);
-      if (config.grab(positiveClassNameP)) {
+      if(config.grab(positiveClassNameP)) {
         positiveClassName = positiveClassNameP.getValue();
       }
     }

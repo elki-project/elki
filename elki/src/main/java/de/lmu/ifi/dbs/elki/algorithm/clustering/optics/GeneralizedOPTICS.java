@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -38,10 +38,10 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.QuickSelectDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 
 /**
  * A trivial generalization of OPTICS that is not restricted to numerical
@@ -149,7 +149,7 @@ public abstract class GeneralizedOPTICS<O, R extends ClusterOrder> extends Abstr
 
         while(!candidates.isEmpty()) {
           int last = candidates.size() - 1;
-          QuickSelect.quickSelect(candidates, this, last);
+          QuickSelectDBIDs.quickSelect(candidates, this, last);
           candidates.assignVar(last, cur);
           candidates.remove(last);
           processedIDs.add(cur);

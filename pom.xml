@@ -24,6 +24,8 @@
 
 	<modules>
 		<module>elki-logging</module>
+		<module>elki-core-api</module>
+		<module>elki-core-math</module>
 		<module>elki-core-util</module>
 		<module>elki-core-dbids</module>
 		<module>elki-core-dbids-int</module>
@@ -54,6 +56,23 @@
 
 	<build>
 		<plugins>
+			<!-- Copy dependencies: -->
+			<plugin>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${outputDir}</outputDirectory>
+							<excludeArtifactIds>junit:*,org.hamcrest:*</excludeArtifactIds>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<!-- compilation -->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -93,23 +112,6 @@
 						<index>true</index>
 					</archive>
 				</configuration>
-			</plugin>
-			<!-- Dependencies -->
-			<plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-dependencies</id>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>copy-dependencies</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${outputDir}</outputDirectory>
-							<excludeArtifactIds>junit:*,org.hamcrest:*</excludeArtifactIds>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<!-- Source code packaging -->
 			<plugin>
