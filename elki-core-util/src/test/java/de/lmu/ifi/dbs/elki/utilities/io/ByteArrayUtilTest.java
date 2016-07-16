@@ -1,4 +1,4 @@
-package de.lmu.ifi.dbs.elki.persistent;
+package de.lmu.ifi.dbs.elki.utilities.io;
 
 /*
  This file is part of ELKI:
@@ -28,8 +28,6 @@ import java.nio.ByteBuffer;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
 /**
  * Test some of the varint functions.
