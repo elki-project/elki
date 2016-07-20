@@ -23,14 +23,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Random;
-
 import org.junit.Test;
-
-import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaChoiWetteEstimator;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 
 /**
  * Unit test for the Gamma distribution in ELKI.
@@ -127,28 +120,5 @@ public class GammaDistributionTest extends AbstractDistributionTest {
     checkQuantile(new GammaDistribution(.1, 20), "quant_gnur_01_20", 1e-14);
     checkQuantile(new GammaDistribution(.1, 4.), "quant_gnur_01_4", 1e-13);
     checkQuantile(new GammaDistribution(.1, 1.), "quant_gnur_01_1", 1e-13);
-  }
-
-  @Test
-  public void testRandomAndEstimation() {
-    GammaDistribution g = new GammaDistribution(1.2345, 0.12345, new Random(0));
-    double[] data = new double[10000];
-    for(int i = 0; i < data.length; i++) {
-      data[i] = g.nextRandom();
-    }
-    GammaDistribution g2 = GammaChoiWetteEstimator.STATIC.estimate(data, DoubleArrayAdapter.STATIC);
-    assertEquals("k does not match.", g.getK(), g2.getK(), 1E-2);
-    assertEquals("theta does not match.", g.getTheta(), g2.getTheta(), 1E-5);
-  }
-
-  @Test
-  public void extremeValues() {
-    // TODO: tested values
-    GammaDistribution dist = new GammaDistribution(1.1987906546993674E12, 1.1987905236089673E12);
-    assertEquals(0.0, dist.cdf(Double.MIN_VALUE), 1e-50);
-    // FIXME: NEITHER OF THESE VALUE IS NOT VERIFIED.
-    // THIS IS SOLELY A REGRESSION TEST.
-    // assertEquals(0.45430463189141745, dist.cdf(1.0), 1e-15);
-    assertEquals(3.6330826914761E-4, dist.cdf(1.0), 1e-15);
   }
 }

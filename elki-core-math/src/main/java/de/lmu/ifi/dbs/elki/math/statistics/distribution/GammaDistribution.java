@@ -282,8 +282,8 @@ public class GammaDistribution extends AbstractDistribution {
   /**
    * Compute the regular Gamma function.
    * 
-   * Note: for numerical reasons, it is preferrable to use {@link #logGamma}
-   * when possible! In particular, this method just computes
+   * Note: for numerical reasons, it is preferable to use {@link #logGamma} when
+   * possible! In particular, this method just computes
    * {@code Math.exp(logGamma(x))} anyway.
    * 
    * Try to postpone the {@code Math.exp} call to preserve numeric range!
@@ -629,7 +629,9 @@ public class GammaDistribution extends AbstractDistribution {
    * @param g log(nu)
    * @return Probit for chi squared
    */
-  @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi^2$ distribution", authors = "D.J. Best, D. E. Roberts", booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
+  @Reference(title = "Algorithm AS 91: The percentage points of the $\\chi^2$ distribution", //
+      authors = "D.J. Best, D. E. Roberts", //
+      booktitle = "Journal of the Royal Statistical Society. Series C (Applied Statistics)")
   protected static double chisquaredProbitApproximation(final double p, double nu, double g) {
     final double EPS1 = 1e-2; // Approximation quality
     // Sanity checks
@@ -875,7 +877,9 @@ public class GammaDistribution extends AbstractDistribution {
    * @param x Position
    * @return digamma value
    */
-  @Reference(authors = "J. M. Bernando", title = "Algorithm AS 103: Psi (Digamma) Function", booktitle = "Statistical Algorithms")
+  @Reference(authors = "J. M. Bernando", //
+      title = "Algorithm AS 103: Psi (Digamma) Function", //
+      booktitle = "Statistical Algorithms")
   public static double digamma(double x) {
     if(!(x > 0)) {
       return Double.NaN;
