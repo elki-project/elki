@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.bundle;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,7 +29,6 @@ import java.nio.channels.FileChannel.MapMode;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformationSerializer;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -145,7 +144,7 @@ public class BundleReader implements BundleStreamSource {
         @SuppressWarnings("unchecked")
         SimpleTypeInformation<? extends Object> type = (SimpleTypeInformation<? extends Object>) TypeInformationSerializer.STATIC.fromByteBuffer(buffer);
         sers[i] = type.getSerializer();
-        if(i == 0 && TypeUtil.DBID.isAssignableFromType(type)) {
+        if(i == 0 && DBID.class.isAssignableFrom(type.getRestrictionClass())) {
           hasids = true;
         }
         else {

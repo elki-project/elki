@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.type;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,7 +26,6 @@ package de.lmu.ifi.dbs.elki.data.type;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.ClassInstantiationException;
@@ -233,15 +232,14 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       try {
         // Factory type!
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        NumberVector.Factory<DoubleVector> factory = (NumberVector.Factory<DoubleVector>) ClassGenericsUtil.instantiate(NumberVector.Factory.class, typename);
+        NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ClassGenericsUtil.instantiate(NumberVector.Factory.class, typename);
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         label = ("".equals(label)) ? null : label;
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        ByteBufferSerializer<DoubleVector> serializer = (ByteBufferSerializer<DoubleVector>) Class.forName(sername).newInstance();
+        ByteBufferSerializer<NumberVector> serializer = (ByteBufferSerializer<NumberVector>) Class.forName(sername).newInstance();
         int mindim = ByteArrayUtil.readSignedVarint(buffer);
         int maxdim = ByteArrayUtil.readSignedVarint(buffer);
-        // FIXME: should/must provide a factory now!
-        return new VectorTypeInformation<>(factory, serializer, mindim, maxdim);
+        return new VectorTypeInformation<NumberVector>(factory, serializer, mindim, maxdim);
       } catch (ClassInstantiationException e) {
         throw new UnsupportedOperationException("Cannot deserialize - cannot instantiate factory: "+e, e);
       } catch (ClassNotFoundException e) {
@@ -321,13 +319,13 @@ public class TypeInformationSerializer implements ByteBufferSerializer<TypeInfor
       try {
         // Factory type!
         String typename = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        NumberVector.Factory<DoubleVector> factory = (NumberVector.Factory<DoubleVector>) ClassGenericsUtil.instantiate(NumberVector.Factory.class, typename);
+        NumberVector.Factory<NumberVector> factory = (NumberVector.Factory<NumberVector>) ClassGenericsUtil.instantiate(NumberVector.Factory.class, typename);
         // Relation label
         String label = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
         label = ("".equals(label)) ? null : label;
         // Serialization class
         String sername = ByteArrayUtil.STRING_SERIALIZER.fromByteBuffer(buffer);
-        ByteBufferSerializer<DoubleVector> serializer = (ByteBufferSerializer<DoubleVector>) Class.forName(sername).newInstance();
+        ByteBufferSerializer<NumberVector> serializer = (ByteBufferSerializer<NumberVector>) Class.forName(sername).newInstance();
         // Dimensionalities
         int mindim = ByteArrayUtil.readSignedVarint(buffer);
         int maxdim = ByteArrayUtil.readSignedVarint(buffer);

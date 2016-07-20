@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.bundle;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,8 +29,8 @@ import java.nio.channels.WritableByteChannel;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformationSerializer;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -175,8 +175,8 @@ public class BundleWriter {
     // For compatibility with earlier versions, treat DBIDs as extra type
     if(source.hasDBIDs()) {
       buffer.putInt(1 + nummeta);
-      ByteBufferSerializer<?> ser = TypeUtil.DBID.getSerializer();
-      TypeInformationSerializer.STATIC.toByteBuffer(buffer, TypeUtil.DBID);
+      ByteBufferSerializer<DBID> ser = DBIDFactory.FACTORY.getDBIDSerializer();
+      TypeInformationSerializer.STATIC.toByteBuffer(buffer, new SimpleTypeInformation<>(DBID.class, ser));
       serializers[0] = ser;
     }
     else {
