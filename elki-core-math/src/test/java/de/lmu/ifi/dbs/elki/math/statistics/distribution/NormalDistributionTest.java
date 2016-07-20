@@ -69,13 +69,12 @@ public class NormalDistributionTest extends AbstractDistributionTest {
 
   @Test
   public void testQuantile() {
-    // TODO: improve our implementation, to get more significant digits!
     load("norm.ascii.gz");
-    checkQuantile(new NormalDistribution(0., 1.), "quant_scipy_0_1", 1e-8);
-    checkQuantile(new NormalDistribution(1., 3.), "quant_scipy_1_3", 1e-9);
-    checkQuantile(new NormalDistribution(.1, .1), "quant_scipy_01_01", 1e-9);
-    checkQuantile(new NormalDistribution(0., 1.), "quant_gnur_0_1", 1e-8);
-    checkQuantile(new NormalDistribution(1., 3.), "quant_gnur_1_3", 1e-9);
-    checkQuantile(new NormalDistribution(.1, .1), "quant_gnur_01_01", 1e-9);
+    checkQuantile(new NormalDistribution(0., 1.), "quant_scipy_0_1", 1e-15);
+    checkQuantile(new NormalDistribution(1., 3.), "quant_scipy_1_3", 1e-15);
+    checkQuantile(new NormalDistribution(.1, .1), "quant_scipy_01_01", 1e-15);
+    checkQuantile(new NormalDistribution(0., 1.), "quant_gnur_0_1", 1e-15);
+    checkQuantile(new NormalDistribution(1., 3.), "quant_gnur_1_3", 1e-15);
+    checkQuantile(new NormalDistribution(.1, .1), "quant_gnur_01_01", 1e-15);
   }
 }

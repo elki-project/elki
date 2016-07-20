@@ -70,11 +70,11 @@ public class LogNormalDistributionTest extends AbstractDistributionTest {
   @Test
   public void testQuantile() {
     load("lognorm.ascii.gz");
-    checkQuantile(new LogNormalDistribution(0., 1., 0), "quant_gnur_0_1", 1e-8);
-    checkQuantile(new LogNormalDistribution(1., 3., 0), "quant_gnur_1_3", 1e-8);
-    checkQuantile(new LogNormalDistribution(.1, .1, 0), "quant_gnur_01_01", 1e-9);
-    checkQuantile(new LogNormalDistribution(0., 1., 0), "quant_scipy_0_1", 1e-8);
-    checkQuantile(new LogNormalDistribution(1., 3., 0), "quant_scipy_1_3", 1e-8);
-    checkQuantile(new LogNormalDistribution(.1, .1, 0), "quant_scipy_01_01", 1e-9);
+    checkQuantile(new LogNormalDistribution(0., 1., 0), "quant_gnur_0_1", 1e-15);
+    checkQuantile(new LogNormalDistribution(1., 3., 0), "quant_gnur_1_3", 1e-14);
+    checkQuantile(new LogNormalDistribution(.1, .1, 0), "quant_gnur_01_01", 1e-15);
+    checkQuantile(new LogNormalDistribution(0., 1., 0), "quant_scipy_0_1", 1e-15);
+    checkQuantile(new LogNormalDistribution(1., 3., 0), "quant_scipy_1_3", 1e-14);
+    checkQuantile(new LogNormalDistribution(.1, .1, 0), "quant_scipy_01_01", 1e-15);
   }
 }

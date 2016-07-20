@@ -27,6 +27,7 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
@@ -41,48 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Alias({ "GaussianDistribution", "normal", "gauss" })
 public class NormalDistribution extends AbstractDistribution {
   /**
-   * Coefficients for erf approximation.
-   * 
-   * Loosely based on http://www.netlib.org/specfun/erf
-   */
-  static final double[] ERFAPP_A = { 1.85777706184603153e-1, 3.16112374387056560e+0, 1.13864154151050156E+2, 3.77485237685302021e+2, 3.20937758913846947e+3 };
-
-  /**
-   * Coefficients for erf approximation.
-   * 
-   * Loosely based on http://www.netlib.org/specfun/erf
-   */
-  static final double[] ERFAPP_B = { 1.00000000000000000e00, 2.36012909523441209e01, 2.44024637934444173e02, 1.28261652607737228e03, 2.84423683343917062e03 };
-
-  /**
-   * Coefficients for erf approximation.
-   * 
-   * Loosely based on http://www.netlib.org/specfun/erf
-   */
-  static final double[] ERFAPP_C = { 2.15311535474403846e-8, 5.64188496988670089e-1, 8.88314979438837594e00, 6.61191906371416295e01, 2.98635138197400131e02, 8.81952221241769090e02, 1.71204761263407058e03, 2.05107837782607147e03, 1.23033935479799725E03 };
-
-  /**
-   * Coefficients for erf approximation.
-   * 
-   * Loosely based on http://www.netlib.org/specfun/erf
-   */
-  static final double[] ERFAPP_D = { 1.00000000000000000e00, 1.57449261107098347e01, 1.17693950891312499e02, 5.37181101862009858e02, 1.62138957456669019e03, 3.29079923573345963e03, 4.36261909014324716e03, 3.43936767414372164e03, 1.23033935480374942e03 };
-
-  /**
-   * Coefficients for erf approximation.
-   * 
-   * Loosely based on http://www.netlib.org/specfun/erf
-   */
-  static final double[] ERFAPP_P = { 1.63153871373020978e-2, 3.05326634961232344e-1, 3.60344899949804439e-1, 1.25781726111229246e-1, 1.60837851487422766e-2, 6.58749161529837803e-4 };
-
-  /**
-   * Coefficients for erf approximation.
-   * 
-   * Loosely based on http://www.netlib.org/specfun/erf
-   */
-  static final double[] ERFAPP_Q = { 1.00000000000000000e00, 2.56852019228982242e00, 1.87295284992346047e00, 5.27905102951428412e-1, 6.05183413124413191e-2, 2.33520497626869185e-3 };
-
-  /**
    * Treshold for switching nethods for erfinv approximation
    */
   static final double P_LOW = 0.02425D;
@@ -91,26 +50,6 @@ public class NormalDistribution extends AbstractDistribution {
    * Treshold for switching nethods for erfinv approximation
    */
   static final double P_HIGH = 1.0D - P_LOW;
-
-  /**
-   * Coefficients for erfinv approximation, rational version
-   */
-  static final double[] ERFINV_A = { -3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00 };
-
-  /**
-   * Coefficients for erfinv approximation, rational version
-   */
-  static final double[] ERFINV_B = { -5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01 };
-
-  /**
-   * Coefficients for erfinv approximation, rational version
-   */
-  static final double[] ERFINV_C = { -7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00 };
-
-  /**
-   * Coefficients for erfinv approximation, rational version
-   */
-  static final double[] ERFINV_D = { 7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00 };
 
   /**
    * CDFINV(0.75)
@@ -216,12 +155,18 @@ public class NormalDistribution extends AbstractDistribution {
    * Complementary error function for Gaussian distributions = Normal
    * distributions.
    * 
-   * Numerical approximation using taylor series. Implementation loosely based
-   * on http://www.netlib.org/specfun/erf
+   * Based on:<br />
+   * Takuya Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html<br />
+   * Copyright (C) 1996 Takuya OOURA (email: ooura@mmm.t.u-tokyo.ac.jp).<br />
+   * "You may use, copy, modify this code for any purpose and without fee."
    * 
    * @param x parameter value
    * @return erfc(x)
    */
+  @Reference(authors = "T. Ooura", //
+      title = "Gamma / Error Functions", //
+      booktitle = "Online", //
+      url = "http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html")
   public static double erfc(double x) {
     if(Double.isNaN(x)) {
       return Double.NaN;
@@ -229,61 +174,213 @@ public class NormalDistribution extends AbstractDistribution {
     if(Double.isInfinite(x)) {
       return (x < 0.0) ? 2 : 0;
     }
-
-    double result = Double.NaN;
-    double absx = Math.abs(x);
-    // First approximation interval
-    if(absx < 0.46875) {
-      double z = x * x;
-      result = 1 - x * ((((ERFAPP_A[0] * z + ERFAPP_A[1]) * z + ERFAPP_A[2]) * z + ERFAPP_A[3]) * z + ERFAPP_A[4]) / ((((ERFAPP_B[0] * z + ERFAPP_B[1]) * z + ERFAPP_B[2]) * z + ERFAPP_B[3]) * z + ERFAPP_B[4]);
-    }
-    // Second approximation interval
-    else if(absx < 4.0) {
-      double z = absx;
-      result = ((((((((ERFAPP_C[0] * z + ERFAPP_C[1]) * z + ERFAPP_C[2]) * z + ERFAPP_C[3]) * z + ERFAPP_C[4]) * z + ERFAPP_C[5]) * z + ERFAPP_C[6]) * z + ERFAPP_C[7]) * z + ERFAPP_C[8]) / ((((((((ERFAPP_D[0] * z + ERFAPP_D[1]) * z + ERFAPP_D[2]) * z + ERFAPP_D[3]) * z + ERFAPP_D[4]) * z + ERFAPP_D[5]) * z + ERFAPP_D[6]) * z + ERFAPP_D[7]) * z + ERFAPP_D[8]);
-      double rounded = Math.round(result * 16.0) / 16.0;
-      double del = (absx - rounded) * (absx + rounded);
-      result = Math.exp(-rounded * rounded) * Math.exp(-del) * result;
-      if(x < 0.0) {
-        result = 2.0 - result;
-      }
-    }
-    // Third approximation interval
-    else {
-      double z = 1.0 / (absx * absx);
-      result = z * (((((ERFAPP_P[0] * z + ERFAPP_P[1]) * z + ERFAPP_P[2]) * z + ERFAPP_P[3]) * z + ERFAPP_P[4]) * z + ERFAPP_P[5]) / (((((ERFAPP_Q[0] * z + ERFAPP_Q[1]) * z + ERFAPP_Q[2]) * z + ERFAPP_Q[3]) * z + ERFAPP_Q[4]) * z + ERFAPP_Q[5]);
-      result = (MathUtil.ONE_BY_SQRTPI - result) / absx;
-      double rounded = Math.round(result * 16.0) / 16.0;
-      double del = (absx - rounded) * (absx + rounded);
-      result = Math.exp(-rounded * rounded) * Math.exp(-del) * result;
-      if(x < 0.0) {
-        result = 2.0 - result;
-      }
-    }
-    return result;
+    final double t = 3.97886080735226 / (Math.abs(x) + 3.97886080735226);
+    final double u = t - 0.5;
+    double y = (((//
+    ((((((0.00127109764952614092 * u //
+        + 1.19314022838340944e-4) * u //
+        - 0.003963850973605135) * u //
+        - 8.70779635317295828e-4) * u //
+        + 0.00773672528313526668) * u //
+        + 0.00383335126264887303) * u //
+        - 0.0127223813782122755) * u //
+        - 0.0133823644533460069) * u //
+        + 0.0161315329733252248) * u //
+        + 0.0390976845588484035) * u //
+        + 0.00249367200053503304;
+    y = ((((((((((((y * u //
+        - 0.0838864557023001992) * u //
+        - 0.119463959964325415) * u //
+        + 0.0166207924969367356) * u //
+        + 0.357524274449531043) * u //
+        + 0.805276408752910567) * u //
+        + 1.18902982909273333) * u //
+        + 1.37040217682338167) * u //
+        + 1.31314653831023098) * u //
+        + 1.07925515155856677) * u //
+        + 0.774368199119538609) * u //
+        + 0.490165080585318424) * u //
+        + 0.275374741597376782) //
+        * t * Math.exp(-x * x);
+    return x < 0 ? 2 - y : y;
   }
 
   /**
+   * Takuya Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html
+   */
+  private static final double[] ERF_COEFF1 = { //
+      5.958930743e-11, -1.13739022964e-9, //
+      1.466005199839e-8, -1.635035446196e-7, //
+      1.6461004480962e-6, -1.492559551950604e-5, //
+      1.2055331122299265e-4, -8.548326981129666e-4, //
+      0.00522397762482322257, -0.0268661706450773342, //
+      0.11283791670954881569, -0.37612638903183748117, //
+      1.12837916709551257377, //
+      2.372510631e-11, -4.5493253732e-10, //
+      5.90362766598e-9, -6.642090827576e-8, //
+      6.7595634268133e-7, -6.21188515924e-6, //
+      5.10388300970969e-5, -3.7015410692956173e-4, //
+      0.00233307631218880978, -0.0125498847718219221, //
+      0.05657061146827041994, -0.2137966477645600658, //
+      0.84270079294971486929, //
+      9.49905026e-12, -1.8310229805e-10, //
+      2.39463074e-9, -2.721444369609e-8, //
+      2.8045522331686e-7, -2.61830022482897e-6, //
+      2.195455056768781e-5, -1.6358986921372656e-4, //
+      0.00107052153564110318, -0.00608284718113590151, //
+      0.02986978465246258244, -0.13055593046562267625, //
+      0.67493323603965504676, //
+      3.82722073e-12, -7.421598602e-11, //
+      9.793057408e-10, -1.126008898854e-8, //
+      1.1775134830784e-7, -1.1199275838265e-6, //
+      9.62023443095201e-6, -7.404402135070773e-5, //
+      5.0689993654144881e-4, -0.00307553051439272889, //
+      0.01668977892553165586, -0.08548534594781312114, //
+      0.56909076642393639985, //
+      1.55296588e-12, -3.032205868e-11, //
+      4.0424830707e-10, -4.71135111493e-9, //
+      5.011915876293e-8, -4.8722516178974e-7, //
+      4.30683284629395e-6, -3.445026145385764e-5, //
+      2.4879276133931664e-4, -0.00162940941748079288, //
+      0.00988786373932350462, -0.05962426839442303805, //
+      0.49766113250947636708 };
+
+  /**
+   * Takuya Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html
+   */
+  private static final double[] ERF_COEFF2 = { //
+      -2.9734388465e-10, 2.69776334046e-9, //
+      -6.40788827665e-9, -1.6678201321e-8, //
+      -2.1854388148686e-7, 2.66246030457984e-6, //
+      1.612722157047886e-5, -2.5616361025506629e-4, //
+      1.5380842432375365e-4, 0.00815533022524927908, //
+      -0.01402283663896319337, -0.19746892495383021487, //
+      0.71511720328842845913, //
+      -1.951073787e-11, -3.2302692214e-10, //
+      5.22461866919e-9, 3.42940918551e-9, //
+      -3.5772874310272e-7, 1.9999935792654e-7, //
+      2.687044575042908e-5, -1.1843240273775776e-4, //
+      -8.0991728956032271e-4, 0.00661062970502241174, //
+      0.00909530922354827295, -0.2016007277849101314, //
+      0.51169696718727644908, //
+      3.147682272e-11, -4.8465972408e-10, //
+      6.3675740242e-10, 3.377623323271e-8, //
+      -1.5451139637086e-7, -2.03340624738438e-6, //
+      1.947204525295057e-5, 2.854147231653228e-5, //
+      -0.00101565063152200272, 0.00271187003520095655, //
+      0.02328095035422810727, -0.16725021123116877197, //
+      0.32490054966649436974, //
+      2.31936337e-11, -6.303206648e-11, //
+      -2.64888267434e-9, 2.050708040581e-8, //
+      1.1371857327578e-7, -2.11211337219663e-6, //
+      3.68797328322935e-6, 9.823686253424796e-5, //
+      -6.5860243990455368e-4, -7.5285814895230877e-4, //
+      0.02585434424202960464, -0.11637092784486193258, //
+      0.18267336775296612024, //
+      -3.67789363e-12, 2.0876046746e-10, //
+      -1.93319027226e-9, -4.35953392472e-9, //
+      1.8006992266137e-7, -7.8441223763969e-7, //
+      -6.75407647949153e-6, 8.428418334440096e-5, //
+      -1.7604388937031815e-4, -0.0023972961143507161, //
+      0.0206412902387602297, -0.06905562880005864105, //
+      0.09084526782065478489 };
+
+  /**
    * Error function for Gaussian distributions = Normal distributions.
-   * 
-   * Numerical approximation using taylor series. Implementation loosely based
-   * on http://www.netlib.org/specfun/erf
    * 
    * @param x parameter value
    * @return erf(x)
    */
   public static double erf(double x) {
-    return 1 - erfc(x);
+    final double w = x < 0 ? -x : x;
+    double y;
+    if(w < 2.2) {
+      double t = w * w;
+      int k = (int) t;
+      t -= k;
+      k *= 13;
+      y = ((((((((((((ERF_COEFF1[k] * t + ERF_COEFF1[k + 1]) * t + //
+          ERF_COEFF1[k + 2]) * t + ERF_COEFF1[k + 3]) * t + ERF_COEFF1[k + 4]) * t + //
+          ERF_COEFF1[k + 5]) * t + ERF_COEFF1[k + 6]) * t + ERF_COEFF1[k + 7]) * t + //
+          ERF_COEFF1[k + 8]) * t + ERF_COEFF1[k + 9]) * t + ERF_COEFF1[k + 10]) * t + //
+          ERF_COEFF1[k + 11]) * t + ERF_COEFF1[k + 12]) * w;
+    }
+    else if(w < 6.9) {
+      int k = (int) w;
+      double t = w - k;
+      k = 13 * (k - 2);
+      y = (((((((((((ERF_COEFF2[k] * t + ERF_COEFF2[k + 1]) * t + //
+          ERF_COEFF2[k + 2]) * t + ERF_COEFF2[k + 3]) * t + ERF_COEFF2[k + 4]) * t + //
+          ERF_COEFF2[k + 5]) * t + ERF_COEFF2[k + 6]) * t + ERF_COEFF2[k + 7]) * t + //
+          ERF_COEFF2[k + 8]) * t + ERF_COEFF2[k + 9]) * t + ERF_COEFF2[k + 10]) * t + //
+          ERF_COEFF2[k + 11]) * t + ERF_COEFF2[k + 12];
+      y *= y;
+      y *= y;
+      y *= y;
+      y = 1 - y * y;
+    }
+    else {
+      y = 1;
+    }
+    return x < 0 ? -y : y;
   }
 
   /**
    * Inverse error function.
    * 
+   * Based on:<br />
+   * Takuya Ooura, http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html<br />
+   * Copyright (C) 1996 Takuya OOURA (email: ooura@mmm.t.u-tokyo.ac.jp).<br />
+   * "You may use, copy, modify this code for any purpose and without fee."
+   * 
    * @param x parameter value
-   * @return erfinv(x)
+   * @return erfcinv(x)
    */
-  public static double erfinv(double x) {
-    return standardNormalQuantile(0.5 * (x + 1)) * MathUtil.SQRTHALF;
+  @Reference(authors = "T. Ooura", //
+      title = "Gamma / Error Functions", //
+      booktitle = "Online", //
+      url = "http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html")
+  public static double erfcinv(double y) {
+    final double z = (y > 1) ? 2 - y : y;
+    final double w = 0.916461398268964 - Math.log(z);
+    double u = Math.sqrt(w);
+    double s = (Math.log(u) + 0.488826640273108) / w;
+    double t = 1 / (u + 0.231729200323405);
+    double x = u * (1 - s * (s * 0.124610454613712 + 0.5)) //
+        - ((((-0.0728846765585675 * t //
+            + 0.269999308670029) * t //
+            + 0.150689047360223) * t //
+            + 0.116065025341614) * t //
+            + 0.499999303439796) * t;
+    t = 3.97886080735226 / (x + 3.97886080735226);
+    u = t - 0.5;
+    s = (((((((((0.00112648096188977922 * u //
+        + 1.05739299623423047e-4) * u //
+        - 0.00351287146129100025) * u //
+        - 7.71708358954120939e-4) * u //
+        + 0.00685649426074558612) * u //
+        + 0.00339721910367775861) * u //
+        - 0.011274916933250487) * u //
+        - 0.0118598117047771104) * u //
+        + 0.0142961988697898018) * u //
+        + 0.0346494207789099922) * u //
+        + 0.00220995927012179067;
+    s = ((((((((((((s * u //
+        - 0.0743424357241784861) * u //
+        - 0.105872177941595488) * u //
+        + 0.0147297938331485121) * u //
+        + 0.316847638520135944) * u //
+        + 0.713657635868730364) * u //
+        + 1.05375024970847138) * u //
+        + 1.21448730779995237) * u //
+        + 1.16374581931560831) * u //
+        + 0.956464974744799006) * u //
+        + 0.686265948274097816) * u //
+        + 0.434397492331430115) * u //
+        + 0.244044510593190935) //
+        * t - z * Math.exp(x * x - 0.120782237635245222);
+    x += s * (x * s + 1);
+    return (y > 1) ? -x : x;
   }
 
   /**
@@ -317,7 +414,7 @@ public class NormalDistribution extends AbstractDistribution {
    */
   public static double logpdf(double x, double mu, double sigma) {
     x = (x - mu) / sigma;
-    return MathUtil.LOG_ONE_BY_SQRTTWOPI - Math.log(sigma) -.5 * x * x;
+    return MathUtil.LOG_ONE_BY_SQRTTWOPI - Math.log(sigma) - .5 * x * x;
   }
 
   /**
@@ -351,24 +448,66 @@ public class NormalDistribution extends AbstractDistribution {
   /**
    * Cumulative probability density function (CDF) of a normal distribution.
    * 
+   * Reference:
+   * <p>
+   * G. Marsaglia<br />
+   * Evaluating the Normal Distribution<br />
+   * Journal of Statistical Software 11(4)
+   * </p>
+   *
    * @param x value to evaluate CDF at
    * @param mu Mean value
    * @param sigma Standard deviation.
    * @return The CDF of the given normal distribution at x.
    */
+  @Reference(authors = "G. Marsaglia", //
+      title = "Evaluating the Normal Distribution", //
+      booktitle = "Journal of Statistical Software 11(4)", //
+      url = "https://www.jstatsoft.org/article/view/v011i04/v11i04.pdf")
   public static double cdf(double x, double mu, double sigma) {
     x = (x - mu) / sigma;
-    return .5 + .5 * erf(x * MathUtil.SQRTHALF);
+    if(x >= 8.22) {
+      return 1.;
+    }
+    if(x <= -8.22) {
+      return 0.;
+    }
+    double s = x, t = 0, b = x, q = x * x, i = 1;
+    while(s != t) {
+      s = (t = s) + (b *= q / (i += 2));
+    }
+    return .5 + s * Math.exp(-.5 * q - .91893853320467274178);
   }
 
   /**
    * Cumulative probability density function (CDF) of a normal distribution.
    * 
+   * Reference:
+   * <p>
+   * G. Marsaglia<br />
+   * Evaluating the Normal Distribution<br />
+   * Journal of Statistical Software 11(4)
+   * </p>
+   * 
    * @param x value to evaluate CDF at
    * @return The CDF of the given normal distribution at x.
    */
+  @Reference(authors = "G. Marsaglia", //
+      title = "Evaluating the Normal Distribution", //
+      booktitle = "Journal of Statistical Software 11(4)", //
+      url = "https://www.jstatsoft.org/article/view/v011i04/v11i04.pdf")
   public static double standardNormalCDF(double x) {
-    return .5 + .5 * erf(x * MathUtil.SQRTHALF);
+    if(x >= 8.22) {
+      return 1.;
+    }
+    if(x <= -8.22) {
+      return 0.;
+    }
+    double s = x, t = 0, b = x, q = x * x, i = 1;
+    while(s != t) {
+      s = (t = s) + (b *= q / (i += 2));
+    }
+    return .5 + s * Math.exp(-.5 * q - .91893853320467274178);
   }
 
   /**
@@ -387,44 +526,14 @@ public class NormalDistribution extends AbstractDistribution {
   /**
    * Approximate the inverse error function for normal distributions.
    * 
-   * Largely based on:
-   * <p>
-   * http://www.math.uio.no/~jacklam/notes/invnorm/index.html <br>
-   * by Peter John Acklam
-   * </p>
-   * 
-   * FIXME: precision of this seems to be rather low, compared to our other
-   * functions. Only about 8-9 digits agree with SciPy/GNU R.
-   * 
    * @param d Quantile. Must be in [0:1], obviously.
    * @return Inverse erf.
    */
   public static double standardNormalQuantile(double d) {
-    if(d == 0) {
-      return Double.NEGATIVE_INFINITY;
-    }
-    else if(d == 1) {
-      return Double.POSITIVE_INFINITY;
-    }
-    else if(Double.isNaN(d) || d < 0 || d > 1) {
-      return Double.NaN;
-    }
-    else if(d < P_LOW) {
-      // Rational approximation for lower region:
-      double q = Math.sqrt(-2 * Math.log(d));
-      return (((((ERFINV_C[0] * q + ERFINV_C[1]) * q + ERFINV_C[2]) * q + ERFINV_C[3]) * q + ERFINV_C[4]) * q + ERFINV_C[5]) / ((((ERFINV_D[0] * q + ERFINV_D[1]) * q + ERFINV_D[2]) * q + ERFINV_D[3]) * q + 1);
-    }
-    else if(P_HIGH < d) {
-      // Rational approximation for upper region:
-      double q = Math.sqrt(-2 * Math.log(1 - d));
-      return -(((((ERFINV_C[0] * q + ERFINV_C[1]) * q + ERFINV_C[2]) * q + ERFINV_C[3]) * q + ERFINV_C[4]) * q + ERFINV_C[5]) / ((((ERFINV_D[0] * q + ERFINV_D[1]) * q + ERFINV_D[2]) * q + ERFINV_D[3]) * q + 1);
-    }
-    else {
-      // Rational approximation for central region:
-      double q = d - 0.5D;
-      double r = q * q;
-      return (((((ERFINV_A[0] * r + ERFINV_A[1]) * r + ERFINV_A[2]) * r + ERFINV_A[3]) * r + ERFINV_A[4]) * r + ERFINV_A[5]) * q / (((((ERFINV_B[0] * r + ERFINV_B[1]) * r + ERFINV_B[2]) * r + ERFINV_B[3]) * r + ERFINV_B[4]) * r + 1);
-    }
+    return (d == 0) ? Double.NEGATIVE_INFINITY : //
+        (d == 1) ? Double.POSITIVE_INFINITY : //
+            (Double.isNaN(d) || d < 0 || d > 1) ? Double.NaN //
+                : MathUtil.SQRT2 * -erfcinv(2 * d);
   }
 
   /**
