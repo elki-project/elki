@@ -84,7 +84,7 @@ public class AndersonDarlingTestTest {
   public void testAndersonDarlingTestNoncentral() {
     for(int i = 0; i < noncentral.length; i++) {
       double A2nc = AndersonDarlingTest.A2Noncentral(noncentral[i]);
-      assertEquals("A2 does not match for " + i, scipy_noncentral[i], A2nc, 1e-14);
+      assertEquals("A2 does not match for " + i, scipy_noncentral[i], A2nc, 1e-13);
     }
   }
 

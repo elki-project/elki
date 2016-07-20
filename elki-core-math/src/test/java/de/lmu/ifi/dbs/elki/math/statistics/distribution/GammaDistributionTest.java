@@ -105,8 +105,8 @@ public class GammaDistributionTest extends AbstractDistributionTest {
     load("gamma.ascii.gz");
     checkQuantile(new GammaDistribution(1., 1.), "quant_scipy_1_1", 1e-14);
     checkQuantile(new GammaDistribution(2., 1.), "quant_scipy_2_1", 1e-13);
-    checkQuantile(new GammaDistribution(4., 1.), "quant_scipy_4_1", 1e-13);
-    checkQuantile(new GammaDistribution(4., 10), "quant_scipy_4_10", 1e-13);
+    checkQuantile(new GammaDistribution(4., 1.), "quant_scipy_4_1", 1e-14);
+    checkQuantile(new GammaDistribution(4., 10), "quant_scipy_4_10", 1e-14);
     checkQuantile(new GammaDistribution(.1, 10), "quant_scipy_01_10", 1e-13);
     checkQuantile(new GammaDistribution(.1, 20), "quant_scipy_01_20", 1e-14);
     checkQuantile(new GammaDistribution(.1, 4.), "quant_scipy_01_4", 1e-13);
@@ -114,8 +114,8 @@ public class GammaDistributionTest extends AbstractDistributionTest {
 
     checkQuantile(new GammaDistribution(1., 1.), "quant_gnur_1_1", 1e-14);
     checkQuantile(new GammaDistribution(2., 1.), "quant_gnur_2_1", 1e-13);
-    checkQuantile(new GammaDistribution(4., 1.), "quant_gnur_4_1", 1e-13);
-    checkQuantile(new GammaDistribution(4., 10), "quant_gnur_4_10", 1e-13);
+    checkQuantile(new GammaDistribution(4., 1.), "quant_gnur_4_1", 1e-14);
+    checkQuantile(new GammaDistribution(4., 10), "quant_gnur_4_10", 1e-14);
     checkQuantile(new GammaDistribution(.1, 10), "quant_gnur_01_10", 1e-13);
     checkQuantile(new GammaDistribution(.1, 20), "quant_gnur_01_20", 1e-14);
     checkQuantile(new GammaDistribution(.1, 4.), "quant_gnur_01_4", 1e-13);

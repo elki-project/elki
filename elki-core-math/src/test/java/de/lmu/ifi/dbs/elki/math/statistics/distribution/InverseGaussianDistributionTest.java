@@ -62,7 +62,7 @@ public class InverseGaussianDistributionTest extends AbstractDistributionTest {
   public void testCDF() {
     load("invgauss.ascii.gz");
     checkCDF(new InverseGaussianDistribution(1., 1.), "cdf_gnur_1_1", 1e-14);
-    checkCDF(new InverseGaussianDistribution(.5, 1.), "cdf_gnur_05_1", 1e-14);
+    checkCDF(new InverseGaussianDistribution(.5, 1.), "cdf_gnur_05_1", 1e-13);
     checkCDF(new InverseGaussianDistribution(1., .5), "cdf_gnur_1_05", 1e-14);
 
     checkCDF(new InverseGaussianDistribution(1., 1.), "cdf_scipy_1_1", 1e-13);
