@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.optics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -161,20 +161,15 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
       DBIDArrayIter tmp = co.iter();
 
       for(OPTICSXi.SteepArea area : areas) {
+        boolean down = area instanceof OPTICSXi.SteepDownArea;
         final int st = area.getStartIndex();
-        final int en = area.getEndIndex();
-        // Note: make sure we are using doubles!
-        final double x1 = (st + .25);
-        final double x2 = (en + .75);
+        final int en = area.getEndIndex() + 1;
+        final double x1 = st + (down ? 1. : .5);
+        final double x2 = en + (down ? .5 : 0.);
         final double y1 = opticsplot.scaleToPixel(co.getReachability(tmp.seek(st)));
-        final double y2 = opticsplot.scaleToPixel(co.getReachability(tmp.seek(en)));
+        final double y2 = opticsplot.scaleToPixel(en < co.size() ? co.getReachability(tmp.seek(en)) : Double.POSITIVE_INFINITY);
         Element e = svgp.svgLine(x1 * xscale, y1 * yscale, x2 * xscale, y2 * yscale);
-        if(area instanceof OPTICSXi.SteepDownArea) {
-          SVGUtil.addCSSClass(e, CSS_STEEP_DOWN);
-        }
-        else {
-          SVGUtil.addCSSClass(e, CSS_STEEP_UP);
-        }
+        SVGUtil.addCSSClass(e, down ? CSS_STEEP_DOWN : CSS_STEEP_UP);
         layer.appendChild(e);
       }
     }

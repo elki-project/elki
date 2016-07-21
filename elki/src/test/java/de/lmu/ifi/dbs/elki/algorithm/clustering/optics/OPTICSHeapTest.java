@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -64,7 +64,7 @@ public class OPTICSHeapTest extends AbstractSimpleAlgorithmTest {
     // run OPTICS on database
     Clustering<?> clustering = opticsxi.run(db);
 
-    testFMeasure(db, clustering, 0.877117490049);
-    testClusterSizes(clustering, new int[] { 109, 121, 209, 271 });
+    testFMeasure(db, clustering, 0.8819664);
+    testClusterSizes(clustering, new int[] { 108, 120, 209, 273 });
   }
 }
