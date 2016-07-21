@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,10 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.database.AbstractDatabase;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.covertree.CoverTree;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -42,6 +45,29 @@ public class DBOutlierDetectionTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testDBOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
+
+    // Parameterization
+    ListParameterization params = new ListParameterization();
+    params.addParameter(DBOutlierDetection.Parameterizer.D_ID, 0.175);
+    params.addParameter(DBOutlierDetection.Parameterizer.P_ID, 0.98);
+
+    // setup Algorithm
+    DBOutlierDetection<DoubleVector> dbOutlierDetection = ClassGenericsUtil.parameterizeOrAbort(DBOutlierDetection.class, params);
+    testParameterizationOk(params);
+
+    // run DBOutlierDetection on database
+    OutlierResult result = dbOutlierDetection.run(db);
+
+    testSingleScore(result, 1025, 0.0);
+    testAUC(db, "Noise", result, 0.97487179);
+  }
+
+  @Test
+  public void testDBOutlierDetectionIndex() {
+    ListParameterization iparams = new ListParameterization();
+    iparams.addParameter(AbstractDatabase.Parameterizer.INDEX_ID, CoverTree.Factory.class);
+    iparams.addParameter(CoverTree.Factory.Parameterizer.DISTANCE_FUNCTION_ID, EuclideanDistanceFunction.class);
+    Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025, iparams, null);
 
     // Parameterization
     ListParameterization params = new ListParameterization();

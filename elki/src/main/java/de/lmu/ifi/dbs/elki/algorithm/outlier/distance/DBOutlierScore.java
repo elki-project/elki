@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -64,9 +65,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 @Description("Generalization of the original DB-Outlier approach to a ranking method, "//
     + "by turning the fraction parameter into the output value.")
 @Reference(prefix = "Generalization of a method proposed in", //
-authors = "E.M. Knorr, R. T. Ng", //
-title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
-booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
+    authors = "E.M. Knorr, R. T. Ng", //
+    title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
+    booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierScore" })
 public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
   /**
@@ -91,12 +92,15 @@ public class DBOutlierScore<O> extends AbstractDBOutlier<O> {
     final double size = distFunc.getRelation().size();
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(distFunc.getRelation().getDBIDs(), DataStoreFactory.HINT_STATIC);
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("DBOutlier scores", distFunc.getRelation().size(), LOG) : null;
     // TODO: use bulk when implemented.
     for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
       // compute percentage of neighbors in the given neighborhood with size d
-      double n = (rangeQuery.getRangeForDBID(iditer, d).size()) / size;
+      double n = rangeQuery.getRangeForDBID(iditer, d).size() / size;
       scores.putDouble(iditer, 1.0 - n);
+      LOG.incrementProcessed(prog);
     }
+    LOG.ensureCompleted(prog);
     return scores;
   }
 

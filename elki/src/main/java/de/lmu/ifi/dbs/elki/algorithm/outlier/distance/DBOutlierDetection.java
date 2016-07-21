@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,10 +29,12 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
+import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -42,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 
@@ -71,8 +74,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 @Title("DBOD: Distance Based Outlier Detection")
 @Description("If the D-neighborhood of an object contains only very few objects (less than (1-p) percent of the data) this object is flagged as an outlier")
 @Reference(authors = "E.M. Knorr, R. T. Ng", //
-title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
-booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
+    title = "Algorithms for Mining Distance-Based Outliers in Large Datasets", //
+    booktitle = "Procs Int. Conf. on Very Large Databases (VLDB'98), New York, USA, 1998")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierDetection" })
 public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
   /**
@@ -98,61 +101,51 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
   }
 
   @Override
-  protected DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, double neighborhoodSize) {
+  protected DoubleDataStore computeOutlierScores(Database database, Relation<O> relation, double d) {
     DistanceQuery<O> distFunc = database.getDistanceQuery(relation, getDistanceFunction());
+    // Prefer kNN query if available, as this will usually stop earlier.
     KNNQuery<O> knnQuery = database.getKNNQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY);
+    RangeQuery<O> rangeQuery = knnQuery == null ? database.getRangeQuery(distFunc, DatabaseQuery.HINT_OPTIMIZED_ONLY, d) : null;
 
     // maximum number of objects in the D-neighborhood of an outlier
-    int m = (int) ((distFunc.getRelation().size()) * (1 - p));
+    int m = (int) Math.floor((distFunc.getRelation().size()) * (1 - p));
 
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(distFunc.getRelation().getDBIDs(), DataStoreFactory.HINT_STATIC);
-    if(LOG.isVerbose()) {
-      LOG.verbose("computing outlier flag");
-    }
 
-    FiniteProgress progressOFlags = LOG.isVerbose() ? new FiniteProgress("DBOutlier for objects", distFunc.getRelation().size(), LOG) : null;
-    int counter = 0;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("DBOutlier detection", distFunc.getRelation().size(), LOG) : null;
     // if index exists, kNN query. if the distance to the mth nearest neighbor
     // is more than d -> object is outlier
     if(knnQuery != null) {
-      for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-        counter++;
-        final KNNList knns = knnQuery.getKNNForDBID(iditer, m);
-        if(LOG.isDebugging()) {
-          LOG.debugFine("distance to mth nearest neighbour" + knns.toString());
-        }
-        if(knns.get(Math.min(m, knns.size()) - 1).doubleValue() <= neighborhoodSize) {
-          // flag as outlier
-          scores.putDouble(iditer, 1.0);
-        }
-        else {
-          // flag as no outlier
-          scores.putDouble(iditer, 0.0);
-        }
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        KNNList knns = knnQuery.getKNNForDBID(iditer, m);
+        scores.putDouble(iditer, (knns.getKNNDistance() > d) ? 1. : 0.);
+        LOG.incrementProcessed(prog);
       }
-      if(progressOFlags != null) {
-        progressOFlags.setProcessed(counter, LOG);
+    }
+    else if(rangeQuery != null) {
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+        DoubleDBIDList neighbors = rangeQuery.getRangeForDBID(iditer, d);
+        scores.putDouble(iditer, (neighbors.size() < m) ? 1. : 0.);
+        LOG.incrementProcessed(prog);
       }
     }
     else {
-      // range query for each object. stop if m objects are found
-      for(DBIDIter iditer = distFunc.getRelation().iterDBIDs(); iditer.valid(); iditer.advance()) {
-        counter++;
+      // Linear scan neighbors for each object, but stop early.
+      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
         int count = 0;
-        for(DBIDIter iterator = distFunc.getRelation().iterDBIDs(); iterator.valid() && count < m; iterator.advance()) {
+        for(DBIDIter iterator = relation.iterDBIDs(); iterator.valid(); iterator.advance()) {
           double currentDistance = distFunc.distance(iditer, iterator);
-          if(currentDistance <= neighborhoodSize) {
-            count++;
+          if(currentDistance <= d) {
+            if(++count >= m) {
+              break;
+            }
           }
         }
         scores.putDouble(iditer, (count < m) ? 1.0 : 0);
-      }
-
-      if(progressOFlags != null) {
-        progressOFlags.setProcessed(counter, LOG);
+        LOG.incrementProcessed(prog);
       }
     }
-    LOG.ensureCompleted(progressOFlags);
+    LOG.ensureCompleted(prog);
     return scores;
   }
 
@@ -183,7 +176,9 @@ public class DBOutlierDetection<O> extends AbstractDBOutlier<O> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      final DoubleParameter pP = new DoubleParameter(P_ID);
+      final DoubleParameter pP = new DoubleParameter(P_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       if(config.grab(pP)) {
         p = pP.getValue();
       }
