@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.random;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -47,8 +47,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.7.0
  */
 @Reference(authors = "S. Vigna", //
-title = "An experimental exploration of Marsaglia's xorshift generators, scrambled", //
-booktitle = "", url = "http://vigna.di.unimi.it/ftp/papers/xorshift.pdf")
+    title = "An experimental exploration of Marsaglia's xorshift generators, scrambled", //
+    booktitle = "", url = "http://vigna.di.unimi.it/ftp/papers/xorshift.pdf")
 public class XorShift64NonThreadsafeRandom extends Random {
   /**
    * Serial version number.
@@ -92,5 +92,40 @@ public class XorShift64NonThreadsafeRandom extends Random {
   @Override
   protected int next(int bits) {
     return (int) (nextLong() >>> (64 - bits));
+  }
+
+  /**
+   * Returns a pseudorandom, uniformly distributed {@code int} value between 0
+   * (inclusive) and the specified value (exclusive), drawn from this random
+   * number generator's sequence. The general contract of {@code nextInt} is
+   * that one {@code int} value in the specified range is pseudorandomly
+   * generated and returned. All {@code n} possible {@code int} values are
+   * produced with (approximately) equal probability.
+   * 
+   * In contrast to the Java version, we use an approach that tries to avoid
+   * divisions for performance discussed in:
+   * <p>
+   * D. Lemire<br />
+   * Fast random shuffling<br />
+   * http://lemire.me/blog/2016/06/30/fast-random-shuffling/
+   * </p>
+   */
+  @Reference(authors = "D. Lemire", //
+      title = "Fast random shuffling", //
+      booktitle = "Daniel Lemire's blog", //
+      url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/")
+  @Override
+  public int nextInt(int n) {
+    long ret = (nextLong() >>> 32) * n;
+    int leftover = (int) ret & 0x7FFFFFFF;
+    // Rejection sampling
+    if(leftover < n) {
+      // With Java 8, we could use Integer.remainderUnsigned
+      final long threshold = (-n & 0xFFFFFFFFL) % n;
+      while(leftover < threshold) {
+        leftover = (int) (ret = (nextLong() >>> 32) * n) & 0x7FFFFFFF;
+      }
+    }
+    return (int) (ret >>> 32);
   }
 }

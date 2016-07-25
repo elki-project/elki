@@ -24,6 +24,8 @@ package de.lmu.ifi.dbs.elki.utilities.random;
  */
 import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * Drop-in replacement for {@link java.util.Random}, but not using atomic long
  * seeds. This implementation is <em>no longer thread-safe</em> (but faster)!
@@ -73,5 +75,47 @@ public class FastNonThreadsafeRandom extends Random {
     // Linear Congruential Generator:
     seed = (seed * multiplier + addend) & mask;
     return (int) (seed >>> (48 - bits));
+  }
+
+  /**
+   * Returns a pseudorandom, uniformly distributed {@code int} value between 0
+   * (inclusive) and the specified value (exclusive), drawn from this random
+   * number generator's sequence. The general contract of {@code nextInt} is
+   * that one {@code int} value in the specified range is pseudorandomly
+   * generated and returned. All {@code n} possible {@code int} values are
+   * produced with (approximately) equal probability.
+   * 
+   * In contrast to the Java version, we use an approach that tries to avoid
+   * divisions for performance. We will have a slightly worse distribution in
+   * this fast version (see the XorShift generators for higher quality with
+   * rejection sampling) discussed in:
+   * <p>
+   * D. Lemire<br />
+   * Fast random shuffling<br />
+   * http://lemire.me/blog/2016/06/30/fast-random-shuffling/
+   * </p>
+   */
+  @Reference(authors = "D. Lemire", //
+      title = "Fast random shuffling", //
+      booktitle = "Daniel Lemire's blog", //
+      url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/")
+  @Override
+  public int nextInt(int n) {
+    if((n & -n) == n) { // i.e., n is a power of 2
+      return (int) ((n * (long) next(31)) >>> 31);
+    }
+    seed = (seed * multiplier + addend) & mask;
+    long ret = (seed >>> 16) * n;
+    // Rejection sampling
+    int leftover = (int) ret & 0x7FFFFFFF;
+    if(leftover < n) {
+      // With Java 8, we could use Integer.remainderUnsigned
+      final long threshold = (-n & 0xFFFFFFFFL) % n;
+      while(leftover < threshold) {
+        seed = (seed * multiplier + addend) & mask;
+        leftover = (int) (ret = (seed >>> 16) * n) & 0x7FFFFFFF;
+      }
+    }
+    return (int) (ret >>> 32);
   }
 }
