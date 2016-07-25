@@ -63,7 +63,7 @@ public final class ArrayLikeUtil {
   /**
    * Use a number vector in the array API.
    */
-  public static final NumberVectorAdapter NUMBERVECTORADAPTER = new NumberVectorAdapter();
+  public static final NumberVectorAdapter NUMBERVECTORADAPTER = NumberVectorAdapter.STATIC;
 
   /**
    * Adapter for matrixes, reinterpreted as flat arrays.

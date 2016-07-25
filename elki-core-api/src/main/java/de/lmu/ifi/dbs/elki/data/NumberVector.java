@@ -24,6 +24,8 @@ package de.lmu.ifi.dbs.elki.data;
  */
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 
 /**
@@ -37,6 +39,26 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  * @apiviz.exclude de.lmu.ifi.dbs.elki.(datasource.filter|data.projection).*
  */
 public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
+  /**
+   * Number vectors of <em>variable</em> length.
+   */
+  public static final VectorTypeInformation<NumberVector> VARIABLE_LENGTH = VectorTypeInformation.typeRequest(NumberVector.class);
+
+  /**
+   * Input type for algorithms that require number vector fields.
+   */
+  public static final VectorFieldTypeInformation<NumberVector> FIELD = VectorFieldTypeInformation.typeRequest(NumberVector.class);
+
+  /**
+   * Type request for two-dimensional number vectors
+   */
+  public static final VectorFieldTypeInformation<NumberVector> FIELD_1D = VectorFieldTypeInformation.typeRequest(NumberVector.class, 1, 1);
+
+  /**
+   * Type request for two-dimensional number vectors
+   */
+  public static final VectorFieldTypeInformation<NumberVector> FIELD_2D = VectorFieldTypeInformation.typeRequest(NumberVector.class, 2, 2);
+
   @Deprecated
   @Override
   Number getValue(int dimension);

@@ -1,5 +1,8 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -32,6 +35,16 @@ import gnu.trove.map.TIntDoubleMap;
  * @since 0.4.0
  */
 public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Number> {
+  /**
+   * Input data type: Sparse vectors with variable length.
+   */
+  public static final VectorTypeInformation<SparseNumberVector> VARIABLE_LENGTH = VectorTypeInformation.typeRequest(SparseNumberVector.class);
+
+  /**
+   * Input data type: Sparse vector field.
+   */
+  public static final VectorFieldTypeInformation<SparseNumberVector> FIELD = VectorFieldTypeInformation.typeRequest(SparseNumberVector.class);
+
   /**
    * Iterator over non-zero features only, <em>ascendingly</em>.
    * 

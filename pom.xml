@@ -27,8 +27,13 @@
 		<module>elki-core-api</module>
 		<module>elki-core-math</module>
 		<module>elki-core-util</module>
+		<module>elki-core-data</module>
+		<module>elki-core-distance</module>
 		<module>elki-core-dbids</module>
 		<module>elki-core-dbids-int</module>
+		<module>elki-persistent</module>
+		<module>elki-index</module>
+		<module>elki-index-rtree</module>
 		<module>elki-gui-minigui</module>
 		<module>elki</module>
 		<!-- this will eventually become non-default compile time only -->

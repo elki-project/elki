@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.data;
 
+import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -35,6 +37,11 @@ import de.lmu.ifi.dbs.elki.utilities.io.ByteBufferSerializer;
  * @since 0.2
  */
 public interface FeatureVector<D> {
+  /**
+   * Input type: Any feature vector type.
+   */
+  public static final VectorTypeInformation<FeatureVector<?>> TYPE = VectorTypeInformation.typeRequest(FeatureVector.class);
+
   /**
    * The dimensionality of the vector space where of this FeatureVector of V is
    * an element.

@@ -166,6 +166,18 @@
 
 		<dependency>
 			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki-core-data</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki-core-distance</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
 			<artifactId>elki-core-math</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -187,6 +199,24 @@
 			<artifactId>elki-core-dbids-int</artifactId>
 			<version>${project.version}</version>
 			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki-persistent</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki-index</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki-index-rtree</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 
 		<dependency>

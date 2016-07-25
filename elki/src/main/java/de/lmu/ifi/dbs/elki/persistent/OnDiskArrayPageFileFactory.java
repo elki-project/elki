@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
  * 
  * @param <P> Page type
  */
-public class OnDiskArrayPageFileFactory<P extends ExternalizablePage> extends AbstractPageFileFactory<P> {
+public class OnDiskArrayPageFileFactory<P extends Page> extends AbstractPageFileFactory<P> {
   /**
    * File name.
    */
@@ -71,7 +71,7 @@ public class OnDiskArrayPageFileFactory<P extends ExternalizablePage> extends Ab
    * 
    * @author Erich Schubert
    */
-  public static class Parameterizer extends AbstractPageFileFactory.Parameterizer<ExternalizablePage> {
+  public static class Parameterizer extends AbstractPageFileFactory.Parameterizer<Page> {
     /**
      * File name.
      */
@@ -95,7 +95,7 @@ public class OnDiskArrayPageFileFactory<P extends ExternalizablePage> extends Ab
     }
 
     @Override
-    protected OnDiskArrayPageFileFactory<ExternalizablePage> makeInstance() {
+    protected OnDiskArrayPageFileFactory<Page> makeInstance() {
       return new OnDiskArrayPageFileFactory<>(pageSize, fileName);
     }
   }
