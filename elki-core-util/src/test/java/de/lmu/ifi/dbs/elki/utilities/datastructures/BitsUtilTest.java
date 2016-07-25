@@ -90,36 +90,36 @@ public class BitsUtilTest {
     final int cnt = 100;
     long[] rnds = new long[cnt];
     long[][] bits = new long[cnt][];
-    for (int i = 0; i < cnt; i++) {
+    for(int i = 0; i < cnt; i++) {
       rnds[i] = Math.abs(r.nextLong());
       bits[i] = BitsUtil.make(Long.SIZE, rnds[i]);
     }
 
-    for (int i = 0; i < cnt; i++) {
-      for (int j = 0; j < cnt; j++) {
+    for(int i = 0; i < cnt; i++) {
+      for(int j = 0; j < cnt; j++) {
         assertEquals(compare(rnds[i], rnds[j]), BitsUtil.compare(bits[i], bits[j]));
       }
     }
 
-    for (int i = 0; i < cnt; i++) {
+    for(int i = 0; i < cnt; i++) {
       long[] btmp = BitsUtil.copy(bits[i], 64 + r.nextInt(500));
       assertEquals(BitsUtil.compare(btmp, bits[i]), 0);
-      for (int j = 0; j < cnt; j++) {
+      for(int j = 0; j < cnt; j++) {
         assertEquals(compare(rnds[i], rnds[j]), BitsUtil.compare(btmp, bits[j]));
       }
     }
 
-    for (int i = 0; i < cnt; i++) {
+    for(int i = 0; i < cnt; i++) {
       long[] btmp = BitsUtil.truncateI(BitsUtil.copy(bits[i]), 47);
-      for (int j = 0; j < cnt; j++) {
+      for(int j = 0; j < cnt; j++) {
         assertEquals(compare(rnds[i] & ((1 << 48) - 1), rnds[j]), BitsUtil.compare(btmp, bits[j]));
       }
     }
 
-    for (int i = 0; i < cnt; i++) {
+    for(int i = 0; i < cnt; i++) {
       long[] btmp = BitsUtil.cycleRightI(BitsUtil.copy(bits[i]), 13, Long.SIZE - 32);
       long ltmp = BitsUtil.cycleRightC(rnds[i], 13, Long.SIZE - 32);
-      for (int j = 0; j < cnt; j++) {
+      for(int j = 0; j < cnt; j++) {
         assertEquals(compare(ltmp, rnds[j]), BitsUtil.compare(btmp, bits[j]));
       }
     }
@@ -140,7 +140,7 @@ public class BitsUtilTest {
   public void testAgainstBitSet() {
     BitSet bitset = new BitSet();
     long[] bituti = BitsUtil.zero(Long.SIZE);
-    for (int i = 0; i >= 0;) {
+    for(int i = 0; i >= 0;) {
       assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
       i = bitset.nextSetBit(i + 1);
     }
@@ -150,7 +150,7 @@ public class BitsUtilTest {
 
     bitset.set(4);
     BitsUtil.setI(bituti, 4);
-    for (int i = 0; i >= 0;) {
+    for(int i = 0; i >= 0;) {
       assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
       i = bitset.nextSetBit(i + 1);
     }
@@ -160,7 +160,7 @@ public class BitsUtilTest {
 
     bitset.set(15);
     BitsUtil.setI(bituti, 15);
-    for (int i = 0; i >= 0;) {
+    for(int i = 0; i >= 0;) {
       assertEquals("Bit strings do not agree.", bitset.nextSetBit(i), BitsUtil.nextSetBit(bituti, i));
       i = bitset.nextSetBit(i + 1);
     }
@@ -199,7 +199,7 @@ public class BitsUtilTest {
     int[] testi = new int[] { 0x7, 0x12345678, 0x23456789, 0x45678900, 0x89000000, 0xFFFF0000 };
     int[] truli = new int[] { 29, 3, 2, 1, 0, 0 };
     int[] truti = new int[] { 0, 3, 0, 8, 24, 16 };
-    for (int i = 0; i < testi.length; i++) {
+    for(int i = 0; i < testi.length; i++) {
       assertEquals("Leading zeros don't agree for " + BitsUtil.toString(testi[i]), truli[i], BitsUtil.numberOfLeadingZeros(testi[i]));
       assertEquals("Trailing zeros don't agree for " + BitsUtil.toString(testi[i]), truti[i], BitsUtil.numberOfTrailingZeros(testi[i]));
     }
@@ -207,9 +207,29 @@ public class BitsUtilTest {
     long[] testl = new long[] { 0x7L, 0x12345678L, 0x23456789L, 0x45678900L, 0x89000000L, 0x1FFFF0000L, 0x123456789ABCDEFL, 0x0011001188008800L };
     int[] trull = new int[] { 61, 35, 34, 33, 32, 31, 7, 11 };
     int[] trutl = new int[] { 0, 3, 0, 8, 24, 16, 0, 11 };
-    for (int i = 0; i < testl.length; i++) {
+    for(int i = 0; i < testl.length; i++) {
       assertEquals("Leading zeros don't agree for " + BitsUtil.toString(testl[i]), trull[i], BitsUtil.numberOfLeadingZeros(testl[i]));
       assertEquals("Trailing zeros don't agree for " + BitsUtil.toString(testl[i]), trutl[i], BitsUtil.numberOfTrailingZeros(testl[i]));
+    }
+  }
+
+  @Test
+  public void testCardinality() {
+    long[] ones = BitsUtil.ones(128);
+    assertEquals("Ones not correct", 2, ones.length);
+    assertEquals("Ones not correct", -1L, ones[0]);
+    assertEquals("Ones not correct", -1L, ones[1]);
+    assertEquals("Cardinality not correct.", 128, BitsUtil.cardinality(ones));
+  }
+
+  @Test
+  public void testRandomBitset() {
+    for(int card : new int[] { 0, 1, 7, 13, 63, 110, 126, 128 }) {
+      for(long seed = 0; seed < 5; seed++) {
+        long[] set = BitsUtil.random(card, 128, new Random(seed));
+        assertEquals("Bitset too large", 2, set.length);
+        assertEquals("Wrong cardinality", card, BitsUtil.cardinality(set));
+      }
     }
   }
 }

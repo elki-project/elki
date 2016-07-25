@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
-import de.lmu.ifi.dbs.elki.utilities.Util;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -105,7 +105,7 @@ public class NumberVectorRandomFeatureSelectionFilter<V extends NumberVector> ex
    */
   void initializeRandomAttributes(SimpleTypeInformation<V> in) {
     int d = ((VectorFieldTypeInformation<V>) in).getDimensionality();
-    selectedAttributes = Util.randomBitSet(k, d, rnd.getSingleThreadedRandom());
+    selectedAttributes = BitsUtil.random(k, d, rnd.getSingleThreadedRandom());
   }
 
   /**

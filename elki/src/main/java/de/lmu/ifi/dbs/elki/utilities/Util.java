@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,20 +23,12 @@ package de.lmu.ifi.dbs.elki.utilities;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Comparator;
-import java.util.Random;
-
-import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
-
 /**
  * This class collects various static helper methods.
  * 
  * For helper methods related to special application fields see other utilities
  * classes.
  * 
- * @see de.lmu.ifi.dbs.elki.utilities
- * 
- * @author Arthur Zimek
  * @author Erich Schubert
  * @since 0.2
  */
@@ -47,63 +39,10 @@ public final class Util {
   private static final long HASHPRIME = 2654435761L;
 
   /**
-   * Detect Java 7.
-   */
-  public static final boolean IS_JAVA7 = System.getProperty("java.version").startsWith("1.7.");
-
-  /**
-   * Detect Oracle Java.
-   */
-  public static final boolean IS_ORACLE_JAVA = System.getProperty("java.vm.vendor").startsWith("Oracle");
-
-  /**
    * Fake constructor: do not instantiate.
    */
   private Util() {
     // Do not instantiate.
-  }
-
-  /**
-   * Creates a new BitSet of fixed cardinality with randomly set bits.
-   * 
-   * @param cardinality the cardinality of the BitSet to create
-   * @param capacity the capacity of the BitSet to create - the randomly
-   *        generated indices of the bits set to true will be uniformly
-   *        distributed between 0 (inclusive) and capacity (exclusive)
-   * @param random a Random Object to create the sequence of indices set to true
-   *        - the same number occurring twice or more is ignored but the already
-   *        selected bit remains true
-   * @return a new BitSet with randomly set bits
-   */
-  public static long[] randomBitSet(int cardinality, int capacity, Random random) {
-    assert (cardinality >= 0) : "Cannot set a negative number of bits!";
-    assert (cardinality < capacity) : "Cannot set " + cardinality + " of " + capacity + " bits!";
-    // FIXME: Avoid recomputing the cardinality.
-    if(cardinality < capacity >>> 1) {
-      long[] bitset = BitsUtil.zero(capacity);
-      while(BitsUtil.cardinality(bitset) < cardinality) {
-        BitsUtil.setI(bitset, random.nextInt(capacity));
-      }
-      return bitset;
-    }
-    else {
-      long[] bitset = BitsUtil.ones(capacity);
-      while(BitsUtil.cardinality(bitset) > cardinality) {
-        BitsUtil.clearI(bitset, random.nextInt(capacity));
-      }
-      return bitset;
-    }
-  }
-
-  /**
-   * Mix multiple hashcodes into one.
-   * 
-   * @param hash Single Hashcodes to "mix"
-   * @return Original hash code
-   */
-  @Deprecated
-  public static int mixHashCodes(int hash) {
-    return hash;
   }
 
   /**
@@ -145,37 +84,5 @@ public final class Util {
       result = result * HASHPRIME + hash[i];
     }
     return (int) result;
-  }
-
-  /**
-   * Static instance.
-   */
-  private static final Comparator<?> FORWARD = new ForwardComparator();
-
-  /**
-   * Regular comparator. See {@link java.util.Collections#reverseOrder()} for a
-   * reverse comparator.
-   * 
-   * @author Erich Schubert
-   * 
-   * @apiviz.exclude
-   */
-  private static final class ForwardComparator implements Comparator<Comparable<Object>> {
-    @Override
-    public int compare(Comparable<Object> o1, Comparable<Object> o2) {
-      return o1.compareTo(o2);
-    }
-  }
-
-  /**
-   * Compare two objects, forward. See
-   * {@link java.util.Collections#reverseOrder()} for a reverse comparator.
-   * 
-   * @param <T> Object type
-   * @return Forward comparator
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> Comparator<T> forwardOrder() {
-    return (Comparator<T>) FORWARD;
   }
 }

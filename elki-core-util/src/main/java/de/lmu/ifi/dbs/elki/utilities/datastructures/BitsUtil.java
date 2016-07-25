@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,9 +23,10 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import gnu.trove.strategy.HashingStrategy;
-
 import java.util.Arrays;
+import java.util.Random;
+
+import gnu.trove.strategy.HashingStrategy;
 
 /**
  * Utilities for bit operations.
@@ -59,9 +60,9 @@ public final class BitsUtil {
 
   /** Precomputed powers of 5 for pow5, pow10 on the bit representation. */
   private static final int[] POW5_INT = { //
-  1, 5, 25, 125, 625,//
-  3125, 15625, 78125, 390625, 1953125,//
-  9765625, 48828125, 244140625, 1220703125 };
+      1, 5, 25, 125, 625, //
+      3125, 15625, 78125, 390625, 1953125, //
+      9765625, 48828125, 244140625, 1220703125 };
 
   /**
    * Hashing strategy to use with Trove.
@@ -118,8 +119,45 @@ public final class BitsUtil {
     final int fillWords = bits >>> LONG_LOG2_SIZE;
     final int fillBits = bits & LONG_LOG2_MASK;
     Arrays.fill(v, 0, fillWords, LONG_ALL_BITS);
-    v[v.length - 1] = (1L << fillBits) - 1;
+    if(fillWords < v.length) {
+      v[v.length - 1] = (1L << fillBits) - 1;
+    }
     return v;
+  }
+
+  /**
+   * Creates a new BitSet of fixed cardinality with randomly set bits.
+   * 
+   * @param card the cardinality of the BitSet to create
+   * @param capacity the capacity of the BitSet to create - the randomly
+   *        generated indices of the bits set to true will be uniformly
+   *        distributed between 0 (inclusive) and capacity (exclusive)
+   * @param random a Random Object to create the sequence of indices set to true
+   *        - the same number occurring twice or more is ignored but the already
+   *        selected bit remains true
+   * @return a new BitSet with randomly set bits
+   */
+  public static long[] random(int card, int capacity, Random random) {
+    if(card < 0 || card > capacity) {
+      throw new IllegalArgumentException("Cannot set " + card + " out of " + capacity + " bits.");
+    }
+    // FIXME: Avoid recomputing the cardinality.
+    if(card < capacity >>> 1) {
+      long[] bitset = BitsUtil.zero(capacity);
+      for(int todo = card; todo > 0; //
+          todo = (todo == 1) ? (card - cardinality(bitset)) : (todo - 1)) {
+        setI(bitset, random.nextInt(capacity));
+      }
+      return bitset;
+    }
+    else {
+      long[] bitset = BitsUtil.ones(capacity);
+      for(int todo = capacity - card; todo > 0; //
+          todo = (todo == 1) ? (cardinality(bitset) - card) : (todo - 1)) {
+        clearI(bitset, random.nextInt(capacity));
+      }
+      return bitset;
+    }
   }
 
   /**
@@ -1716,7 +1754,7 @@ public final class BitsUtil {
     }
     // Normal number.
     long bits = (shift > 0) ? (m >> shift) + ((m >> (shift - 1)) & 1) : // Rounding.
-    m << -shift;
+        m << -shift;
     if(((bits >> 52) != 1) && (++exp >= 0x7FF)) {
       return Double.POSITIVE_INFINITY;
     }
@@ -1795,7 +1833,7 @@ public final class BitsUtil {
       int shift = 31 - magnitude(x3); // -1..30
       pow2 -= shift;
       long mantissa = (shift < 0) ? (x3 << 31) | (x2 >>> 1) : // x3 is 32 bits.
-      (((x3 << 32) | x2) << shift) | (x1 >>> (32 - shift));
+          (((x3 << 32) | x2) << shift) | (x1 >>> (32 - shift));
       return lpow2(mantissa, pow2);
     }
     else { // n < 0
