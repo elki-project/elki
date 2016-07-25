@@ -102,7 +102,7 @@ public class DoubleIntegerArrayQuickSortTest {
     }
   }
 
-  @Test(timeout = 500)
+  @Test(timeout = 1000)
   public void testTies() {
     int size = 1000000;
     int[] idx = new int[size];
@@ -112,7 +112,7 @@ public class DoubleIntegerArrayQuickSortTest {
     DoubleIntegerArrayQuickSort.sort(data, idx, size);
   }
 
-  @Test(timeout = 500)
+  @Test(timeout = 1000)
   public void testSorted() {
     int size = 1000000;
     int[] idx = new int[size];
