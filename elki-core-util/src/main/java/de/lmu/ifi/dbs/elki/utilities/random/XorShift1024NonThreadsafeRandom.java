@@ -110,6 +110,16 @@ public class XorShift1024NonThreadsafeRandom extends Random {
   }
   
   /**
+   * Inverse of 53 bit.
+   */
+  private static final double INV53 = 1. / (1L << 53);
+
+  @Override
+  public double nextDouble() {
+    return (((long) (next(26)) << 27) + next(27)) * INV53;
+  }
+
+  /**
    * Returns a pseudorandom, uniformly distributed {@code int} value between 0
    * (inclusive) and the specified value (exclusive), drawn from this random
    * number generator's sequence. The general contract of {@code nextInt} is
@@ -131,16 +141,6 @@ public class XorShift1024NonThreadsafeRandom extends Random {
       url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/")
   @Override
   public int nextInt(int n) {
-    long ret = (nextLong() >>> 32) * n;
-    int leftover = (int) ret & 0x7FFFFFF;
-    // Rejection sampling
-    if(leftover < n) {
-      // With Java 8, we could use Integer.remainderUnsigned
-      final long threshold = (-n & 0xFFFFFFFFL) % n;
-      while(leftover < threshold) {
-        leftover = (int) (ret = (nextLong() >>> 32) * n) & 0x7FFFFFF;
-      }
-    }
-    return (int) (ret >>> 32);
+    return (int) (((nextLong() >>> 32) * n) >>> 32);
   }
 }

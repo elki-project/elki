@@ -78,6 +78,16 @@ public class FastNonThreadsafeRandom extends Random {
   }
 
   /**
+   * Inverse of 53 bit.
+   */
+  private static final double INV53 = 1. / (1L << 53);
+
+  @Override
+  public double nextDouble() {
+    return (((long) (next(26)) << 27) + next(27)) * INV53;
+  }
+
+  /**
    * Returns a pseudorandom, uniformly distributed {@code int} value between 0
    * (inclusive) and the specified value (exclusive), drawn from this random
    * number generator's sequence. The general contract of {@code nextInt} is
@@ -105,15 +115,48 @@ public class FastNonThreadsafeRandom extends Random {
       return (int) ((n * (long) next(31)) >>> 31);
     }
     seed = (seed * multiplier + addend) & mask;
+    return (int) (((seed >>> 16) * n) >>> 32);
+  }
+
+  /**
+   * Returns a pseudorandom, uniformly distributed {@code int} value between 0
+   * (inclusive) and the specified value (exclusive), drawn from this random
+   * number generator's sequence. The general contract of {@code nextInt} is
+   * that one {@code int} value in the specified range is pseudorandomly
+   * generated and returned. All {@code n} possible {@code int} values are
+   * produced with (approximately) equal probability.
+   * 
+   * In contrast to the Java version, we use an approach that tries to avoid
+   * divisions for performance. In this method, we also employ rejection
+   * sampling (for marginal improvement) as discussed in:
+   * <p>
+   * D. Lemire<br />
+   * Fast random shuffling<br />
+   * http://lemire.me/blog/2016/06/30/fast-random-shuffling/
+   * </p>
+   * 
+   * In our experiments, the difference was negligible, as the rejections are
+   * quite rare events at least for our use case.
+   */
+  @Reference(authors = "D. Lemire", //
+      title = "Fast random shuffling", //
+      booktitle = "Daniel Lemire's blog", //
+      url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/")
+  public int nextIntRefined(int n) {
+    /*
+     * if((n & -n) == n) { // i.e., n is a power of 2 return (int) ((n * (long)
+     * next(31)) >>> 31); }
+     */
+    seed = (seed * multiplier + addend) & mask;
     long ret = (seed >>> 16) * n;
     // Rejection sampling
-    int leftover = (int) ret & 0x7FFFFFFF;
+    int leftover = (int) (ret & 0x7FFFFFFFL);
     if(leftover < n) {
       // With Java 8, we could use Integer.remainderUnsigned
       final long threshold = (-n & 0xFFFFFFFFL) % n;
       while(leftover < threshold) {
         seed = (seed * multiplier + addend) & mask;
-        leftover = (int) (ret = (seed >>> 16) * n) & 0x7FFFFFFF;
+        leftover = (int) ((ret = (seed >>> 16) * n) & 0x7FFFFFFFL);
       }
     }
     return (int) (ret >>> 32);
