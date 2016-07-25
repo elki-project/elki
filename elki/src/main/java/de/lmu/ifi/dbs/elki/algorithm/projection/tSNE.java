@@ -1,30 +1,4 @@
 package de.lmu.ifi.dbs.elki.algorithm.projection;
-
-
-import java.util.Random;
-
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -48,383 +22,341 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.Arrays;
+import java.util.Random;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVector>> {
-  
-  int iteration;
-  static double perplexity;
-  static int learning_rate;
-  static double momentum;
-  private static final int dim = 2;
-  private static int size;
+  private static final double MIN_PIJ = 1e-12, MIN_QIJ = 1e-12;
+
+  private static final double EARLY_EXAGGERATION = 4.;
+
+  int maxIterations;
+
+  double perplexity;
+
+  int learningRate;
+
+  double initialMomentum = 0.5, finalMomentum = 0.8;
+
+  private final int dim = 2;
+
+  // private final int alpha = 1;
   private static final Logging LOG = Logging.getLogger(tSNE.class);
-  
-  public tSNE(DistanceFunction<? super O> distanceFunction, double [][] points, 
-                double momentum, int learning_rate, int iteration, double perplexity) {
+
+  private static final double MIN_GAIN = 0.01;
+
+  protected tSNE(DistanceFunction<? super O> distanceFunction, double momentum, int learning_rate, int iteration, double perplexity) {
     super(distanceFunction);
-    this.iteration = iteration;
+    this.maxIterations = iteration;
     this.perplexity = perplexity;
-    this.learning_rate = learning_rate;
-    this.momentum = momentum;
-    
+    this.learningRate = learning_rate;
+    this.finalMomentum = momentum;
+
   }
-  
-  public Relation<DoubleVector> run(Relation<O> relation){
+
+  public Relation<DoubleVector> run(Relation<O> relation) {
     DistanceQuery<O> dq = relation.getDistanceQuery(getDistanceFunction());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
+    final int size = ids.size();
+
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
-    size = ids.size();
-    double [] [] pij = new double [size] [size];
-    double [][] squared_distances = new double[size][size];
-    initialize_pijs(pij, dq, ix, iy, squared_distances);
-    symmetrize(pij);
-    
-    WritableDataStore<DoubleVector> proj = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_SORTED, DoubleVector.class);
-    VectorFieldTypeInformation<DoubleVector> otype = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
-    Random r = new Random();
-    for(ix.seek(0);ix.valid();ix.advance()){ //oder 10^-4?
-      double [] v = new double[]{r.nextGaussian()*1e-2, r.nextGaussian()*1e-2};
-      DoubleVector dv = new DoubleVector(v);
-      proj.put(ix, dv);
+    double[][] pij;
+    { // Compute desired affinities.
+      double[][] dist = buildDistanceMatrix(size, dq, ix, iy);
+      pij = computePij(dist, Math.log(perplexity));
+      dist = null; // No longer needed.
     }
-    
-    double [][] qij = new double[size][size];
-    double [][] gradient = new double [size][dim];
-    double [][] squared_distances_qij = new double[size][size];
-    fillDistacneMatrix(squared_distances_qij, proj, ix, iy);
-    double z = compute_qij_distance_sum(squared_distances_qij);
-    double[][] solution_2_steps_ago = new double[size][dim];
-    for(int i = 0;i<iteration;i++){
-      compute_qij(squared_distances_qij,qij,z);
-      compute_gradient(pij, qij, gradient, proj, ix, iy,z);
-      update_solution(proj, ix,  gradient,i,solution_2_steps_ago);
-      fillDistacneMatrix(squared_distances_qij, proj, ix, iy);
-      z = compute_qij_distance_sum(squared_distances_qij);
-    }
-    
-//    // Beim >Result: it.seek(off)
-//    for (ix.seek(0); ix.valid(); ix.advance()){
-//      
-////      // Proizierten Vektor berechnen
-////      double[] darray = new double[]{Math.random(), Math.random()};
-////      DoubleVector dv = DoubleVector.copy(darray /* TODO */);
-////      proj.put(ix, dv);
-//    }
-    
-    return new MaterializedRelation<>("tSNE", "t-SNE", otype, proj, ids);
-  }
-  
 
-
-
-
-  //protected und <O>,Wozu bei Agnes static ??
-  protected static <O> void initialize_pijs(double[][] pij, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, double[][] squared_distances) {
-    double log2_perp = Math.log(perplexity)/Math.log(2.0);
-    double error = 1e-5;
-    double difference;
-    computeDistances(squared_distances, dq, ix,iy);
-    for(ix.seek(0);ix.valid();ix.advance()){
-      int pos = 0;
-      int tries = 0;
-      double squaredSigma = 1.0;
-      computePij(squaredSigma, squared_distances, pij,pos);
-      double h = computeH(pij,pos);
-      difference = h -log2_perp;
-      double last = 0.0;
-      while(tries<50 && Math.abs(difference) > error){
-        double help = squaredSigma;
-        if(difference > 0){
-          squaredSigma = (squaredSigma +last)/2.0;
-        }
-        else{
-          squaredSigma = squaredSigma * 2.0;
-        }
-        last = help;
-        computePij(squaredSigma, squared_distances, pij,pos);
-        h = computeH(pij, pos);
-        difference = h - log2_perp; //je größer sigma, desto größer perplexity?
-        tries++;
-      }
-      pos++;
-    }
-  }
-  
-
-
-  protected static <O> double computeH(double[][] pij, int point) {
-    double h = 0.0;
-    for(int j = 0;j<pij.length;j++){
-      h = pij[point][j] * Math.log(pij[point][j]) / Math.log(2);
-    }
-    return -h;
-  }
-
-  protected static <O> void computeDistances(double[][] squared_distances, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy) {
-    int pos_1 = 0;
-    for(ix.seek(0);ix.valid();ix.advance()){
-      int pos_2 = 0;
-      for(iy.seek(0);iy.getOffset()<ix.getOffset();iy.advance()){ //double default 0.0
-        double dist = dq.distance(ix, iy);
-        dist = dist*dist;
-        squared_distances[pos_1][pos_2] = dist;
-        squared_distances[pos_2][pos_1] = dist;
-        pos_2++;
-      }
-      pos_1++;
-    }
-  }
-  
-  //schreibt pi|j'S zeilenweise in die nicht symmetrische Matrix
-  protected static <O> void computePij(double squaredSigma, double[][] squared_distances, double[][] pij, int point) {
-    double sum = computeDistanceSum(squared_distances, point, squaredSigma);
-    for(int i = 0;i<size;i++){
-      if(i == point)
-         pij[point][i] = 0.0;
-      else
-        pij[point][i] = Math.exp(-squared_distances[point][i]/(2*squaredSigma))/sum;
-    }
-  }
-  
-//  private static int[] getIndicesForSpecificPoint(double[] triangle, int i) {
-//    ArrayList<Integer> indices = new ArrayList<>();
-//    int start = triangleSize(i);
-//    for(int j = 0;j<=i-1 ;j++) //waagrechte Einträge
-//      indices.add(start+j);
-//    
-//    return null;
-//  }
-
-  //Berechnet Nenner der pijs, Call by value/call by refernce mit iy?
-  protected static <O> double computeDistanceSum(double [][] squaredDistanceMatrix, int row, double squaredSigma){
-    double sum = 0.0;
-    for(int j = 0; j < squaredDistanceMatrix.length; j++) {
-      if(row!=j)
-        sum = sum + Math.exp(-squaredDistanceMatrix[row][j]/(2*squaredSigma));
-    }
-    return sum;
-  }
-
-  //Überschreibt pi|j Matrix mit symmetrischer pij Matrix
-  protected static <O> void symmetrize(double[][] pij) {
-    for(int i = 0;i<pij.length;i++){
-      for(int j = 0;j<i;j++){
-        double p = pij[i][j];
-        double q = pij[j][i];
-        double n = (p+q)/(2.0*size);
-        pij[i][j] = n;
-        pij[j][i] = n;
+    // Create initial solution.
+    double[][] sol = new double[size][dim];
+    Random r = new Random(); // TODO: Use a RandomParameter.
+    for(int i = 0; i < size; i++) {
+      for(int j = 0; j < dim; j++) {
+        sol[i][j] = r.nextGaussian();
       }
     }
-  }
-  
-  protected static <O> void compute_qij(double[][] squared_distances, double[][] qij, double z) {
-    for(int i = 0;i<qij.length;i++){
-      for(int j = 0; j<i;j++ ){
-        double s = (1/(1+squared_distances[i][j]))/(z);
-        qij[i][j] = s;
-        qij[j][i] = s;
-      }
+
+    double[][] qij = new double[size][size];
+    double[][] grad = new double[size][dim]; // Gradient
+    double[][] mov = new double[size][dim]; // Momentum
+    double[][] gains = new double[size][dim]; // Adaptive learning rate
+    for(int i = 0; i < size; i++) {
+      Arrays.fill(gains[i], 1.); // Initial learning rate
     }
-  }
-  
-  protected static <O> double compute_qij_distance_sum(double[][] squared_distances) {
-    double sum = 0.0;
-    for(int i = 0;i<squared_distances.length;i++){
-      for(int j = 0;j<i;j++){
-          sum = sum + 1/(1+squared_distances[i][j]);
-          sum = sum + 1/(1+squared_distances[j][i]); //wegen Symmetrie
-      }
-    }
-    return sum;
-  }
-  
-  //Im Gradienten-Array stehen die Vektoren zeilenweise
-  protected static <O> void compute_gradient(double[][] pij, double[][] qij, double[][] gradient, WritableDataStore<DoubleVector> proj, DBIDArrayIter ix, DBIDArrayIter iy, double z) {
-    int point = 0;
-    for(ix.seek(0);ix.valid();ix.advance()){ // über alle Punkte
-      int entry = 0;
-      double [] help = new double[dim];
-      for(iy.seek(0);iy.valid();iy.advance()){ //für jeden Punkt
-        if(ix.getOffset() != iy.getOffset()){
-          double[] differnce = minus(proj.get(ix).toArray(), proj.get(iy).toArray());
-          for(int i =0;i<dim;i++){
-            help[i] = help[i]+(pij[point][entry]-qij[point][entry])*qij[point][entry]*z*differnce[i];
+    for(int it = 0; it < maxIterations; it++) {
+      double qij_sum = computeQij(qij, sol);
+      computeGradient(pij, qij, qij_sum, sol, grad);
+      updateSolution(sol, grad, mov, gains, it);
+      if(it == 100) { // Remove EARLY_EXAGGERATION effect:
+        for(int i = 0; i < size; i++) {
+          double[] row_i = pij[i];
+          for(int j = 0; j < size; j++) {
+            row_i[j] /= EARLY_EXAGGERATION; //Warum beeinflust das pij?
           }
         }
-        entry++;
       }
-      for(int i = 0;i<dim;i++){ // gradienten füllen
-        gradient[point][i] = help[i]*4;
-      }
-      point++;
     }
-    
-    
 
-//    for(ix.seek(0);ix.valid();ix.advance()){
-//      int row = 0;
-//      double product = 0.0;
-//      for(iy.seek(0);iy.valid();iy.advance()){
-//        int entry = 0;
-//        if(ix.getOffset()!=iy.getOffset()){ 
-//        double[] difference = minus(proj.get(ix).toArray(), proj.get(iy).toArray());
-//        product = product + (pij[row][entry]-qij[row][entry])*qij[row][entry]*z*difference[entry];
-//        gradient[row][entry] = 4.0 * product;
-//        entry++;
-//        }
-//      }
-//      row++;
-//    }
-  }
-  
-  protected static <O> void update_solution(WritableDataStore<DoubleVector> proj, DBIDArrayIter ix, double[][] gradient, int i, double[][] solution_2_steps_ago) {
-    int pos = 0;
-    if(i==0){
-      for(ix.seek(0);ix.valid();ix.advance()){
-        solution_2_steps_ago [pos] = proj.get(ix).toArray();
-        double soultion[] = plus(solution_2_steps_ago[pos],mal(learning_rate, gradient[pos]));
-        proj.delete(ix);
-        proj.put(ix, new DoubleVector(soultion));
-        pos++;
-//        solution_2_steps_ago[pos] = proj.get(ix).toArray();
-//        double [] solution = proj.get(ix).toArray();
-//        double [] new_solution = plus(solution,mal(learning_rate, gradient[pos])).clone();
-//        proj.delete(ix);
-//        proj.put(ix, new DoubleVector(new_solution));
-      }
+    // Transform into output data format.
+    WritableDataStore<DoubleVector> proj = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_SORTED, DoubleVector.class);
+    VectorFieldTypeInformation<DoubleVector> otype = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
+    for(ix.seek(0); ix.valid(); ix.advance()) {
+      proj.put(ix, new DoubleVector(sol[ix.getOffset()]));
     }
-    
-    else{
-      for(ix.seek(0);ix.valid();ix.advance()){
-        double [] zwischenspeicher = proj.get(ix).toArray();
-        double [] solution = plus(plus(zwischenspeicher, mal(learning_rate, gradient[pos])), mal(momentum, minus(zwischenspeicher, solution_2_steps_ago[pos])));
-        solution_2_steps_ago[pos] = zwischenspeicher.clone();
-        proj.delete(ix);
-        proj.put(ix, new DoubleVector(solution));
-        pos++;
-//        solution_2_steps_ago[pos] = proj.get(ix).toArray().clone();
-//        double [] solution = proj.get(ix).toArray();
-//        double [] new_solution = plus(solution,mal(learning_rate, gradient[pos])).clone();
-//        double [] difference = minus(proj.get(ix).toArray(), solution_2_steps_ago[pos]);
-//        new_solution = plus(new_solution, mal(momentum, difference)).clone();
-//        proj.delete(ix);
-//        proj.put(ix, new DoubleVector(new_solution));
-//        pos++;
-      }
-    }
+    return new MaterializedRelation<>("tSNE", "t-SNE", otype, proj, ids);
   }
-  
-  
-//  protected static int triangleSize(int size) { //Ohne Diagonalen
-//    return (size*(size-1))>>>1;
-//  }
 
-  protected static <O> double[] minus(double[] array, double[] array2) {
-    double [] diff = new double[array.length];
-    for(int i = 0;i<array.length;i++){
-      diff[i] = array[i]-array2[i];
+  private static double[][] buildDistanceMatrix(int size, DistanceQuery<?> dq, DBIDArrayIter ix, DBIDArrayIter iy) {
+    double[][] dmat = new double[size][size];
+    final boolean square = !SquaredEuclideanDistanceFunction.class.isInstance(dq.getDistanceFunction());
+    for(ix.seek(0); ix.valid(); ix.advance()) {
+      for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
+        double dist = dq.distance(ix, iy);
+        dist = square ? (dist * dist) : dist;
+        dmat[ix.getOffset()][iy.getOffset()] = dist;
+        dmat[iy.getOffset()][ix.getOffset()] = dist;
+      }
     }
-    return diff;
+    return dmat;
   }
-  
-  protected static <O> double[] plus(double[] array, double[] array2) {
-    double [] sum = new double[array.length];
-    for(int i = 0;i<array.length;i++){
-      sum[i] = array[i]+array2[i];
+
+  private double[][] computePij(double[][] dist, double logPerp) {
+    double[][] pij = new double[dist.length][dist.length];
+    double ssum = 0.;
+    for(int i = 0; i < pij.length; i++) {
+      ssum += computePi(i, dist[i], pij[i], logPerp);
+    }
+    if(LOG.isVeryVerbose()) {
+      LOG.veryverbose("Average Sigma: " + (ssum / pij.length));
+    }
+    // Scale pij to have the desired sum EARLY_EXAGGERATION
+    double sum = 0.;
+    for(int i = 1; i < pij.length; i++) {
+      double[] row = pij[i];
+      for(int j = 0; j < i; j++) {
+        sum += (row[j] += pij[j][i]);
+      }
+    }
+    // Scaling taken from original tSNE code:
+    final double scale = EARLY_EXAGGERATION / (2. * sum);
+    for(int i = 1; i < pij.length; i++) {
+      double[] row = pij[i];
+      for(int j = 0; j < i; j++) {
+        row[j] = pij[j][i] = Math.max(row[j] * scale, MIN_PIJ);
+      }
+    }
+    return pij;
+  }
+
+  /**
+   * Compute row pij[i], using binary search on the kernel bandwidth sigma to
+   * obtain the desired perplexity.
+   *
+   * @param i Current point
+   * @param dist_i Distance matrix row pij[i]
+   * @param pij_i Output row
+   * @param logPerp Desired perplexity
+   * @return Sigma value
+   */
+  private static double computePi(int i, double[] dist_i, double[] pij_i, double logPerp) {
+    final double error = 1e-5;
+    double beta = 1; // beta = 1. / (2*sigma*sigma)
+    double diff = computeH(dist_i, pij_i, i, -beta) - logPerp;
+    double betaMin = 0., betaMax = Double.POSITIVE_INFINITY;
+    for(int tries = 0; tries < 50 && Math.abs(diff) > error; ++tries) {
+      if(diff > 0) { //Sigma immer kleiner 1? Warum keine Verdoppelung?
+        betaMin = beta;
+        beta += Double.isInfinite(betaMax) ? beta : ((betaMax - beta) * .5);
+      }
+      else {
+        betaMax = beta;
+        beta = .5 * (beta + betaMin);
+      }
+      diff = computeH(dist_i, pij_i, i, -beta) - logPerp;
+    }
+    return Math.sqrt(.5 / beta); //Warum auch Wurzel aus 0.5?
+  }
+
+  /**
+   * 
+   * @param dist_i Distance matrix row (input)
+   * @param pij_i Row pij[i]
+   * @param i Current point i
+   * @param mbeta {@code -1. / (2 * sigma * sigma)}
+   * @return Observed perplexity
+   */
+  private static double computeH(double[] dist_i, double[] pij_i, final int i, double mbeta) {
+    double sumP = 0.;
+    // Skip point "i", break loop in two:
+    for(int j = 0; j < i; j++) {
+      sumP += (pij_i[j] = Math.exp(dist_i[j] * mbeta));
+    }
+    for(int j = i + 1; j < dist_i.length; j++) {
+      sumP += (pij_i[j] = Math.exp(dist_i[j] * mbeta));
+    }
+    assert (sumP > 0.);
+    // Scale output array:
+    final double s = 1. / sumP;
+    double sum = 0.;
+    // While we could skip pi[i], it should be 0 anyway.
+    for(int j = 0; j < dist_i.length; j++) {
+      sum += dist_i[j] * (pij_i[j] *= s);
+    }
+    return Math.log(sumP) - mbeta * sum; //Welche Formel wird hier verwendet?
+  }
+
+  private double computeQij(double[][] qij, double[][] solution) {
+    double qij_sum = 0;
+    for(int i = 1; i < qij.length; i++) {
+      final double[] qij_i = qij[i];
+      final double[] vi = solution[i];
+      for(int j = 0; j < i; j++) {
+        qij_sum += qij_i[j] = qij[j][i] = 1. / (1. + sqDist(vi, solution[j]));
+      }
+    }
+    qij_sum *= 2; // Symmetry
+    if(LOG.isVeryVerbose()) {
+      LOG.veryverbose("Qij sum prior to normalization: " + qij_sum);
+    }
+    return qij_sum;
+  }
+
+  /**
+   * Squared distance, in projection space.
+   * 
+   * @param v1 First vector
+   * @param v2 Second vector
+   * @return Squared distance
+   */
+  private static double sqDist(double[] v1, double[] v2) {
+    double sum = 0;
+    for(int i = 0; i < v1.length; i++) {
+      final double diff = v1[i] - v2[i];
+      sum += diff * diff;
     }
     return sum;
   }
-  
-  protected static <O> double[] mal(double v, double [] vec){
-    double [] m = new double[vec.length];
-    for(int i = 0; i < m.length; i++) {
-      m[i] = v * vec[i];
-    }
-    return m;
-  }
-  
-  private void fillDistacneMatrix(double[][] squared_distances_qij, WritableDataStore<DoubleVector> proj, DBIDArrayIter ix, DBIDArrayIter iy) {
-    int pos = 0;
-    for(ix.seek(0);ix.valid();ix.advance()){
-      int entry = 0;
-      for(iy.seek(0);iy.valid();iy.advance()){
-        if(ix.getOffset() > iy.getOffset()){
-          double dist = distance(proj.get(ix).toArray(), proj.get(iy).toArray());
-          squared_distances_qij[pos][entry] = dist;
-          squared_distances_qij[entry][pos] = dist;
+
+  private void computeGradient(double[][] pij, double[][] qij, double qij_sum, double[][] sol, double[][] grad) {
+    for(int i = 0; i < pij.length; i++) {
+      double[] grad_i = grad[i];
+      Arrays.fill(grad_i, 0.);
+      for(int j = 0; j < pij.length; j++) {
+        if(i == j) {
+          continue;
         }
-        entry++;
+        // Qij after scaling!
+        final double q = Math.max(qij[i][j] / qij_sum, MIN_QIJ);
+        double a = (pij[i][j] - q) * qij[i][j]; //Warum am Ende qij statt q?
+        for(int k = 0; k < dim; k++) {
+          double[] sol_i = sol[i];
+          grad_i[k] += a * (sol_i[k] - sol[j][k]);
+        }
       }
-      pos++;
     }
   }
-  
-  protected static <O> double distance(double[] d1, double [] d2){
-    double d = 0.0;
-    for(int i = 0;i<d1.length;i++){
-      d = d + Math.pow((d1[i] - d2[i]),2);
+
+  private void updateSolution(double[][] sol, double[][] gradient, double[][] mov, double[][] gains, int it) {
+    double mom = (it < 20 && initialMomentum < finalMomentum) ? initialMomentum : finalMomentum;
+    for(int i = 0; i < sol.length; i++) {
+      double[] sol_i = sol[i], grad_i = gradient[i];
+      double[] mov_i = mov[i], gain_i = gains[i];
+      for(int k = 0; k < dim; k++) { //was passiert hier?
+        // Adjust learning rate:
+        gain_i[k] = MathUtil.max(((grad_i[k] > 0) != (mov_i[k] > 0)) ? (gain_i[k] + 0.2) : (gain_i[k] * 0.8), MIN_GAIN);
+        mov_i[k] *= mom; // Dampening the previous momentum
+        mov_i[k] -= learningRate * grad_i[k] * gain_i[k]; // Learn
+        sol_i[k] += mov_i[k];
+      }
     }
-    return d;
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
     return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
   }
-  
-  
 
   @Override
   protected Logging getLogger() {
     return LOG;
   }
-  
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O>{
-    
+
+  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
+
     double momentum;
+
     double perplexity;
+
     int learning_rate;
+
     int iteration;
-    double [][] points; 
+
     public static final OptionID MOMENTUM_ID = new OptionID("tSNE.momentum", "The value for the momentum");
+
     public static final OptionID LEARNING_RATE_ID = new OptionID("tSNE.learning_rate", "");
+
     public static final OptionID ITERATION_ID = new OptionID("tSNE.iteration", "");
+
     public static final OptionID PERPLEXITY_ID = new OptionID("tSNE.perplexity", "");
-    
+
     @Override
-    protected void makeOptions(Parameterization config) { 
-      //super.makeOptions(config);
-      ObjectParameter<DistanceFunction<O>> distanceFunctionP = makeParameterDistanceFunction(SquaredEuclideanDistanceFunction.class, DistanceFunction.class);
-      if(config.grab(distanceFunctionP)){
+    protected void makeOptions(Parameterization config) {
+      // super.makeOptions(config);
+      ObjectParameter<DistanceFunction<O>> distanceFunctionP = makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
-      
-      DoubleParameter p_momentum = new DoubleParameter(MOMENTUM_ID).setDefaultValue(0.8);
-      if(config.grab(p_momentum)){
+
+      DoubleParameter p_momentum = new DoubleParameter(MOMENTUM_ID)//
+          .setDefaultValue(0.8);
+      if(config.grab(p_momentum)) {
         momentum = p_momentum.getValue();
       }
-      
-      DoubleParameter p_perplexity = new DoubleParameter(PERPLEXITY_ID).setDefaultValue(40.0);
+
+      DoubleParameter p_perplexity = new DoubleParameter(PERPLEXITY_ID)//
+          .setDefaultValue(40.0);
       if(config.grab(p_perplexity))
         perplexity = p_perplexity.getValue();
-      
-      IntParameter p_learning_rate = new IntParameter(LEARNING_RATE_ID).setDefaultValue(100);
+
+      IntParameter p_learning_rate = new IntParameter(LEARNING_RATE_ID)//
+          .setDefaultValue(100);
       if(config.grab(p_learning_rate))
         learning_rate = p_learning_rate.getValue();
-      
-      IntParameter p_iteration = new IntParameter(ITERATION_ID).setDefaultValue(100);
+
+      IntParameter p_iteration = new IntParameter(ITERATION_ID)//
+          .setDefaultValue(300);
       if(config.grab(p_iteration))
         iteration = p_iteration.getValue();
-      
+
     }
-    
+
     @Override
     protected tSNE<O> makeInstance() {
-      return new tSNE<>(distanceFunction, points, momentum, learning_rate, iteration, perplexity);
+      return new tSNE<>(distanceFunction, momentum, learning_rate, iteration, perplexity);
     }
-    
   }
-
 }
