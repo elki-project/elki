@@ -96,7 +96,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     Random r = new Random(); // TODO: Use a RandomParameter.
     for(int i = 0; i < size; i++) {
       for(int j = 0; j < dim; j++) {
-        sol[i][j] = r.nextGaussian();
+        sol[i][j] = r.nextGaussian(); //vllt noch andere Varianz
       }
     }
 
@@ -115,7 +115,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
         for(int i = 0; i < size; i++) {
           double[] row_i = pij[i];
           for(int j = 0; j < size; j++) {
-            row_i[j] /= EARLY_EXAGGERATION; //Warum beeinflust das pij?
+            row_i[j] /= EARLY_EXAGGERATION; 
           }
         }
       }
@@ -188,7 +188,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     double diff = computeH(dist_i, pij_i, i, -beta) - logPerp;
     double betaMin = 0., betaMax = Double.POSITIVE_INFINITY;
     for(int tries = 0; tries < 50 && Math.abs(diff) > error; ++tries) {
-      if(diff > 0) { //Sigma immer kleiner 1? Warum keine Verdoppelung?
+      if(diff > 0) { 
         betaMin = beta;
         beta += Double.isInfinite(betaMax) ? beta : ((betaMax - beta) * .5);
       }
@@ -198,7 +198,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
       }
       diff = computeH(dist_i, pij_i, i, -beta) - logPerp;
     }
-    return Math.sqrt(.5 / beta); //Warum auch Wurzel aus 0.5?
+    return Math.sqrt(.5 / beta); //Wert egal, wird nicht mehr weiterverwendet
   }
 
   /**
@@ -226,7 +226,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     for(int j = 0; j < dist_i.length; j++) {
       sum += dist_i[j] * (pij_i[j] *= s);
     }
-    return Math.log(sumP) - mbeta * sum; //Welche Formel wird hier verwendet?
+    return Math.log(sumP) - mbeta * sum; //Logarithmusregeln
   }
 
   private double computeQij(double[][] qij, double[][] solution) {
@@ -271,7 +271,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
         }
         // Qij after scaling!
         final double q = Math.max(qij[i][j] / qij_sum, MIN_QIJ);
-        double a = (pij[i][j] - q) * qij[i][j]; //Warum am Ende qij statt q?
+        double a = (pij[i][j] - q) * qij[i][j]; //Formel aus altem Paper
         for(int k = 0; k < dim; k++) {
           double[] sol_i = sol[i];
           grad_i[k] += a * (sol_i[k] - sol[j][k]);
@@ -285,7 +285,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     for(int i = 0; i < sol.length; i++) {
       double[] sol_i = sol[i], grad_i = gradient[i];
       double[] mov_i = mov[i], gain_i = gains[i];
-      for(int k = 0; k < dim; k++) { //was passiert hier?
+      for(int k = 0; k < dim; k++) { 
         // Adjust learning rate:
         gain_i[k] = MathUtil.max(((grad_i[k] > 0) != (mov_i[k] > 0)) ? (gain_i[k] + 0.2) : (gain_i[k] * 0.8), MIN_GAIN);
         mov_i[k] *= mom; // Dampening the previous momentum
