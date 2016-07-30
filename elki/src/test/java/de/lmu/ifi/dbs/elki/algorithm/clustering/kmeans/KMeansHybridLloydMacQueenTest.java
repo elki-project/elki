@@ -54,7 +54,7 @@ public class KMeansHybridLloydMacQueenTest extends AbstractSimpleAlgorithmTest {
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 2);
+    params.addParameter(KMeans.SEED_ID, 7);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansHybridLloydMacQueen.class, params);
     testParameterizationOk(params);
 

@@ -50,7 +50,7 @@ public class KMeansBatchedLloydTest extends AbstractSimpleAlgorithmTest {
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 2);
+    params.addParameter(KMeans.SEED_ID, 7);
     params.addParameter(KMeansBatchedLloyd.Parameterizer.BLOCKS_ID, 10);
     params.addParameter(KMeansBatchedLloyd.Parameterizer.RANDOM_ID, 0);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansBatchedLloyd.class, params);

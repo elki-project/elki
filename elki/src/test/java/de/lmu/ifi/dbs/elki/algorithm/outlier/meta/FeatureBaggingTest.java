@@ -56,8 +56,8 @@ public class FeatureBaggingTest extends AbstractSimpleAlgorithmTest {
     // run AggarwalYuEvolutionary on database
     OutlierResult result = fb.run(db);
 
-    testSingleScore(result, 1293, 11.8295414);
-    testAUC(db, "Noise", result, 0.9066106);
+    testAUC(db, "Noise", result, 0.94758434);
+    testSingleScore(result, 1293, 12.816102);
   }
 
   @Test
@@ -78,7 +78,7 @@ public class FeatureBaggingTest extends AbstractSimpleAlgorithmTest {
     // run AggarwalYuEvolutionary on database
     OutlierResult result = fb.run(db);
 
-    testSingleScore(result, 1293, 1.321709879);
-    testAUC(db, "Noise", result, 0.884212);
+    testAUC(db, "Noise", result, 0.92470588);
+    testSingleScore(result, 1293, 1.2047264);
   }
 }

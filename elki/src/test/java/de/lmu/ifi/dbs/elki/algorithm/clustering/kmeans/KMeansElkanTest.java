@@ -50,7 +50,7 @@ public class KMeansElkanTest extends AbstractSimpleAlgorithmTest {
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 2);
+    params.addParameter(KMeans.SEED_ID, 7);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansElkan.class, params);
     testParameterizationOk(params);
 

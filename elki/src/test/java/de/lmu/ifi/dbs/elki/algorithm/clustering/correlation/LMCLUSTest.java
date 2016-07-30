@@ -52,14 +52,14 @@ public class LMCLUSTest extends AbstractSimpleAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(LMCLUS.Parameterizer.MINSIZE_ID, 100);
     params.addParameter(LMCLUS.Parameterizer.THRESHOLD_ID, 10);
-    params.addParameter(LMCLUS.Parameterizer.RANDOM_ID, 0);
+    params.addParameter(LMCLUS.Parameterizer.RANDOM_ID, 2);
 
     LMCLUS lmclus = ClassGenericsUtil.parameterizeOrAbort(LMCLUS.class, params);
     testParameterizationOk(params);
 
     Clustering<Model> result = lmclus.run(db);
-    testFMeasure(db, result, 0.483841911);
-    testClusterSizes(result, new int[] { 40, 560 });
+    testFMeasure(db, result, 0.49033868);
+    testClusterSizes(result, new int[] { 23, 577 });
   }
 
   /**
@@ -80,7 +80,7 @@ public class LMCLUSTest extends AbstractSimpleAlgorithmTest {
     testParameterizationOk(params);
 
     Clustering<Model> result = lmclus.run(db);
-    testClusterSizes(result, new int[] { 201, 449 });
-    testFMeasure(db, result, 0.669966145);
+    testClusterSizes(result, new int[] { 200, 201, 249 });
+    testFMeasure(db, result, 0.921865);
   }
 }

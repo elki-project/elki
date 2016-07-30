@@ -105,7 +105,7 @@ public class RandomFactory {
    * @return Random generator
    */
   public Random getSingleThreadedRandom() {
-    return new FastNonThreadsafeRandom(seed++);
+    return new Xoroshiro128NonThreadsafeRandom(seed++);
   }
 
   @Override

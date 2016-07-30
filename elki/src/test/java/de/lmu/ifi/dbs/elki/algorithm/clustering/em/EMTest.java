@@ -60,8 +60,8 @@ public class EMTest extends AbstractSimpleAlgorithmTest {
 
     // run EM on database
     Clustering<?> result = em.run(db);
-    testFMeasure(db, result, 0.780036);
-    testClusterSizes(result, new int[] { 2, 5, 27, 171, 200, 305 });
+    testFMeasure(db, result, 0.969408);
+    testClusterSizes(result, new int[] { 3, 6, 91, 98, 200, 312 });
   }
 
   /**
@@ -94,7 +94,7 @@ public class EMTest extends AbstractSimpleAlgorithmTest {
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.SEED_ID, 0);
+    params.addParameter(KMeans.SEED_ID, 1);
     params.addParameter(EM.Parameterizer.K_ID, 6);
     params.addParameter(EM.Parameterizer.INIT_ID, SphericalGaussianModelFactory.class);
     EM<DoubleVector, ?> em = ClassGenericsUtil.parameterizeOrAbort(EM.class, params);
@@ -102,7 +102,7 @@ public class EMTest extends AbstractSimpleAlgorithmTest {
 
     // run EM on database
     Clustering<?> result = em.run(db);
-    testFMeasure(db, result, 0.514850);
-    testClusterSizes(result, new int[] { 0, 6, 53, 69, 191, 391 });
+    testFMeasure(db, result, 0.518248);
+    testClusterSizes(result, new int[] { 0, 0, 1, 99, 235, 375 });
   }
 }

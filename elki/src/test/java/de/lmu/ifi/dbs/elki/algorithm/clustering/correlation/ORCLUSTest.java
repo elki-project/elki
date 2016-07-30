@@ -67,8 +67,8 @@ public class ORCLUSTest extends AbstractSimpleAlgorithmTest {
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
 
-    testFMeasure(db, result, 0.6355307);
-    testClusterSizes(result, new int[] { 22, 25, 403 });
+    testFMeasure(db, result, 0.6276831);
+    testClusterSizes(result, new int[] { 28, 31, 391 });
   }
 
   /**
@@ -92,7 +92,7 @@ public class ORCLUSTest extends AbstractSimpleAlgorithmTest {
 
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
-    testFMeasure(db, result, 0.8687866);
-    testClusterSizes(result, new int[] { 170, 200, 231 });
+    testFMeasure(db, result, 0.900396);
+    testClusterSizes(result, new int[] { 188, 200, 213 });
   }
 }

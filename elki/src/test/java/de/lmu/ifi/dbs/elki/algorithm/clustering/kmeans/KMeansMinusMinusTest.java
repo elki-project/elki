@@ -46,7 +46,7 @@ public class KMeansMinusMinusTest extends AbstractSimpleAlgorithmTest {
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 2);
+    params.addParameter(KMeans.SEED_ID, 7);
     params.addParameter(KMeansMinusMinus.Parameterizer.RATE_ID, 0.);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMinusMinus.class, params);
     testParameterizationOk(params);
@@ -64,15 +64,15 @@ public class KMeansMinusMinusTest extends AbstractSimpleAlgorithmTest {
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 2);
+    params.addParameter(KMeans.SEED_ID, 7);
     params.addParameter(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMinusMinus.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);
-    testFMeasure(db, result, 0.99602);
-    testClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
+    testFMeasure(db, result, 0.998);
+    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
 
 
@@ -83,7 +83,7 @@ public class KMeansMinusMinusTest extends AbstractSimpleAlgorithmTest {
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 2);
+    params.addParameter(KMeans.SEED_ID, 7);
     params.addParameter(KMeansMinusMinus.Parameterizer.RATE_ID, 0.1);
     params.addFlag(KMeansMinusMinus.Parameterizer.NOISE_FLAG_ID);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(KMeansMinusMinus.class, params);
@@ -91,7 +91,7 @@ public class KMeansMinusMinusTest extends AbstractSimpleAlgorithmTest {
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);
-    testFMeasure(db, result, 0.924529);
-    testClusterSizes(result, new int[] { 100, 117, 183, 200, 200, 200 });
+    testFMeasure(db, result, 0.92674);
+    testClusterSizes(result, new int[] { 100, 115, 185, 200, 200, 200 });
   }
 }

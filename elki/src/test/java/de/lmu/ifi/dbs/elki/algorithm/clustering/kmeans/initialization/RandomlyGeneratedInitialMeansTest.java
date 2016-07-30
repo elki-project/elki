@@ -56,14 +56,14 @@ public class RandomlyGeneratedInitialMeansTest extends AbstractSimpleAlgorithmTe
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 3);
+    params.addParameter(KMeans.SEED_ID, 0);
     params.addParameter(KMeans.INIT_ID, RandomlyGeneratedInitialMeans.class);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(SingleAssignmentKMeans.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);
-    testFMeasure(db, result, 0.7597720973);
-    testClusterSizes(result, new int[] { 66, 200, 200, 245, 289 });
+    testFMeasure(db, result, 0.74344789);
+    testClusterSizes(result, new int[] { 1, 145, 208, 246, 400 });
   }
 }

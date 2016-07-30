@@ -40,12 +40,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public class ALOCITest extends AbstractSimpleAlgorithmTest {
   @Test
-  public void testLOCI() {
+  public void testALOCI() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(ALOCI.Parameterizer.SEED_ID, 0);
+    params.addParameter(ALOCI.Parameterizer.SEED_ID, 2);
     params.addParameter(ALOCI.Parameterizer.GRIDS_ID, 3);
 
     // setup Algorithm
@@ -55,7 +55,7 @@ public class ALOCITest extends AbstractSimpleAlgorithmTest {
     // run LOCI on database
     OutlierResult result = aloci.run(db);
 
-    testAUC(db, "Noise", result, 0.77011111);
-    testSingleScore(result, 146, 1.1242238186577);
+    testAUC(db, "Noise", result, 0.7622222);
+    testSingleScore(result, 146, 1.1305337);
   }
 }

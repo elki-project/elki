@@ -49,7 +49,7 @@ public class SilhouetteOutlierDetectionTest extends AbstractSimpleAlgorithmTest 
     ListParameterization params = new ListParameterization();
     params.addParameter(SilhouetteOutlierDetection.Parameterizer.CLUSTERING_ID, KMeansHamerly.class);
     params.addParameter(KMeans.K_ID, 10);
-    params.addParameter(KMeans.SEED_ID, 0);
+    params.addParameter(KMeans.SEED_ID, 7);
 
     // setup Algorithm
     SilhouetteOutlierDetection<DoubleVector> silout = ClassGenericsUtil.parameterizeOrAbort(SilhouetteOutlierDetection.class, params);
@@ -57,7 +57,7 @@ public class SilhouetteOutlierDetectionTest extends AbstractSimpleAlgorithmTest 
 
     OutlierResult result = silout.run(db);
 
-    testAUC(db, "Noise", result, 0.71993333);
-    testSingleScore(result, 416, 0.47335776);
+    testAUC(db, "Noise", result, 0.69553333);
+    testSingleScore(result, 416, 0.48453988);
   }
 }

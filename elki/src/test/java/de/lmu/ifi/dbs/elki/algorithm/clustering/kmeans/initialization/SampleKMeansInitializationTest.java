@@ -57,17 +57,17 @@ public class SampleKMeansInitializationTest extends AbstractSimpleAlgorithmTest 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 3);
+    params.addParameter(KMeans.SEED_ID, 8);
     params.addParameter(KMeans.INIT_ID, SampleKMeansInitialization.class);
     params.addParameter(SampleKMeansInitialization.Parameterizer.KMEANS_ID, KMeansHamerly.class);
-    params.addParameter(KMeans.SEED_ID, 3);
+    params.addParameter(KMeans.SEED_ID, 8);
     params.addParameter(SampleKMeansInitialization.Parameterizer.SAMPLE_ID, 100);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(SingleAssignmentKMeans.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);
-    testFMeasure(db, result, 0.780753320);
-    testClusterSizes(result, new int[] { 75, 125, 200, 205, 395 });
+    testFMeasure(db, result, 0.99601);
+    testClusterSizes(result, new int[] { 199, 199, 200, 201, 201 });
   }
 }

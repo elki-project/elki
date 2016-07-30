@@ -59,7 +59,7 @@ public class PROCLUSTest extends AbstractSimpleAlgorithmTest {
     params.addParameter(PROCLUS.Parameterizer.L_ID, 1);
     params.addParameter(PROCLUS.Parameterizer.K_ID, 4);
     // NOTE: PROCLUS quality heavily depends on random...
-    params.addParameter(PROCLUS.Parameterizer.SEED_ID, 0);
+    params.addParameter(PROCLUS.Parameterizer.SEED_ID, 2);
 
     // setup algorithm
     PROCLUS<DoubleVector> proclus = ClassGenericsUtil.parameterizeOrAbort(PROCLUS.class, params);
@@ -68,8 +68,8 @@ public class PROCLUSTest extends AbstractSimpleAlgorithmTest {
     // run PROCLUS on database
     Clustering<?> result = proclus.run(db);
 
-    testFMeasure(db, result, 0.75156834);
-    testClusterSizes(result, new int[] { 41, 95, 200, 264 });
+    testFMeasure(db, result, 0.871024);
+    testClusterSizes(result, new int[] { 19, 45, 201, 335 });
   }
 
   /**
@@ -87,13 +87,13 @@ public class PROCLUSTest extends AbstractSimpleAlgorithmTest {
     params.addParameter(PROCLUS.Parameterizer.L_ID, 2);
     params.addParameter(PROCLUS.Parameterizer.K_ID, 3);
     // NOTE: PROCLUS quality heavily depends on random...
-    params.addParameter(PROCLUS.Parameterizer.SEED_ID, 1);
+    params.addParameter(PROCLUS.Parameterizer.SEED_ID, 3);
     PROCLUS<DoubleVector> proclus = ClassGenericsUtil.parameterizeOrAbort(PROCLUS.class, params);
     testParameterizationOk(params);
 
     // run PROCLUS on database
     Clustering<?> result = proclus.run(db);
-    testFMeasure(db, result, 0.95856963);
-    testClusterSizes(result, new int[] { 151, 286, 413 });
+    testFMeasure(db, result, 0.9526877);
+    testClusterSizes(result, new int[] { 150, 291, 409 });
   }
 }

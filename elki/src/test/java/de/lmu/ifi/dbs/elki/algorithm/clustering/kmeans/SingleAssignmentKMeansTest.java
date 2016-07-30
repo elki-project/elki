@@ -53,14 +53,14 @@ public class SingleAssignmentKMeansTest extends AbstractSimpleAlgorithmTest {
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(KMeans.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 3);
+    params.addParameter(KMeans.SEED_ID, 7);
     AbstractKMeans<DoubleVector, ?> kmeans = ClassGenericsUtil.parameterizeOrAbort(SingleAssignmentKMeans.class, params);
     testParameterizationOk(params);
 
     // run KMeans on database
     Clustering<?> result = kmeans.run(db);
     // Unsurprisingly, these results are much worse than normal k-means
-    testFMeasure(db, result, 0.7936860577);
-    testClusterSizes(result, new int[] { 52, 151, 200, 201, 396 });
+    testFMeasure(db, result, 0.702733122);
+    testClusterSizes(result, new int[] { 64, 95, 202, 306, 333 });
   }
 }

@@ -102,7 +102,7 @@ public class COPTest extends AbstractSimpleAlgorithmTest {
 
     OutlierResult result = cop.run(db);
 
-    testAUC(db, "Noise", result, 0.89383333);
-    testSingleScore(result, 416, 0.37358079);
+    testAUC(db, "Noise", result, 0.89526);
+    testSingleScore(result, 416, 0.382879);
   }
 }

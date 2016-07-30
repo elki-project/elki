@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.lsh.hashfamilies;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.lsh.hashfunctions.LocalitySensitiveHashFunction;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Unit test for random hyperplane / cosine distance.
@@ -48,25 +47,21 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 public class CosineHashFunctionFamilyTest extends AbstractSimpleAlgorithmTest {
   @Test
   public void testHashFunctionOneProjection() {
-    // test with {1,1,-1,1,-1}
-    int numberOfProjections = 1;
-    LocalitySensitiveHashFunction<? super NumberVector> hashFunction = createCosineHashFunction(numberOfProjections);
-    assertEquals(1, hashFunction.hashObject(DoubleVector.wrap(new double[] { 1, 1, 1, 1, 1 })));
+    LocalitySensitiveHashFunction<? super NumberVector> hashFunction = createCosineHashFunction(1);
+    assertEquals(0, hashFunction.hashObject(DoubleVector.wrap(new double[] { 1, 1, 1, 1, 1 })));
     assertEquals(0, hashFunction.hashObject(DoubleVector.wrap(new double[] { 1, 1, 3, 1, 1 })));
   }
 
   @Test
   public void testHashFunctionTwoProjections() {
-    // test with {1,1,-1,1,-1}
-    int numberOfProjections = 2;
-    LocalitySensitiveHashFunction<? super NumberVector> hashFunction = createCosineHashFunction(numberOfProjections);
-    assertEquals(2, hashFunction.hashObject(DoubleVector.wrap(new double[] { 1, 1, 1, 1, 1 })));
-    assertEquals(2, hashFunction.hashObject(DoubleVector.wrap(new double[] { 1, 1, 1, 1, 3 })));
+    LocalitySensitiveHashFunction<? super NumberVector> hashFunction = createCosineHashFunction(2);
+    assertEquals(0, hashFunction.hashObject(DoubleVector.wrap(new double[] { 1, 1, 1, 1, 1 })));
+    assertEquals(1, hashFunction.hashObject(DoubleVector.wrap(new double[] { 1, 1, 1, 1, 3 })));
   }
 
   private LocalitySensitiveHashFunction<? super NumberVector> createCosineHashFunction(int numberOfProjections) {
     ListParameterization params = new ListParameterization();
-    params.addParameter(CosineHashFunctionFamily.Parameterizer.RANDOM_ID, RandomFactory.get(3L));
+    params.addParameter(CosineHashFunctionFamily.Parameterizer.RANDOM_ID, 0L);
     params.addParameter(CosineHashFunctionFamily.Parameterizer.NUMPROJ_ID, numberOfProjections);
     CosineHashFunctionFamily cosineFamily = ClassGenericsUtil.parameterizeOrAbort(CosineHashFunctionFamily.class, params);
     LocalitySensitiveHashFunction<? super NumberVector> hashFunction = cosineFamily.generateHashFunctions(mockRelation(5), numberOfProjections).get(0);

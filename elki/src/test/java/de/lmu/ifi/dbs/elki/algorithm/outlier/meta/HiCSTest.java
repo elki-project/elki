@@ -82,7 +82,7 @@ public class HiCSTest extends AbstractSimpleAlgorithmTest {
     // run HiCS on database
     OutlierResult result = fb.run(db);
 
-    testAUC(db, "Noise", result, 0.6255238);
-    testSingleScore(result, 1293, 2.542272);
+    testAUC(db, "Noise", result, 0.867159);
+    testSingleScore(result, 1293, 4.7877822);
   }
 }

@@ -57,7 +57,7 @@ public class KMeansOutlierDetectionTest extends AbstractSimpleAlgorithmTest {
 
     OutlierResult result = silout.run(db);
 
-    testAUC(db, "Noise", result, 0.86166666);
-    testSingleScore(result, 416, 0.01025466);
+    testAUC(db, "Noise", result, 0.80386666);
+    testSingleScore(result, 416, 0.01551616);
   }
 }

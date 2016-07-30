@@ -64,7 +64,7 @@ public class CLARATest extends AbstractSimpleAlgorithmTest {
 
     // run KMedians on database
     Clustering<MedoidModel> result = kmedians.run(db);
-    testFMeasure(db, result, 0.9960200);
-    testClusterSizes(result, new int[] { 198, 200, 200, 200, 202 });
+    testFMeasure(db, result, 0.998005);
+    testClusterSizes(result, new int[] { 199, 200, 200, 200, 201 });
   }
 }
