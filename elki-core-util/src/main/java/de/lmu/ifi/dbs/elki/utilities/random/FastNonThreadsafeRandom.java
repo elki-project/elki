@@ -30,6 +30,11 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * Drop-in replacement for {@link java.util.Random}, but not using atomic long
  * seeds. This implementation is <em>no longer thread-safe</em> (but faster)!
  * 
+ * It is still the same Linear Congruential Generator (LCG), with a cycle length
+ * of 2^48, of which we only use 32 bits at a time. Given the same seed, it is
+ * expected to produce the exact same random sequence as Java's
+ * {@link java.util.Random}.
+ * 
  * @author Erich Schubert
  * @since 0.6.0
  */
@@ -77,15 +82,20 @@ public class FastNonThreadsafeRandom extends Random {
     return (int) (seed >>> (48 - bits));
   }
 
-  /**
-   * Inverse of 53 bit.
-   */
-  private static final double INV53 = 1. / (1L << 53);
+  @Override
+  public int nextInt() {
+    // Linear Congruential Generator:
+    seed = (seed * multiplier + addend) & mask;
+    return (int) (seed >>> 16);
+  }
 
   @Override
   public double nextDouble() {
-    return (((long) (next(26)) << 27) + next(27)) * INV53;
+    return (((long) (next(26)) << 27) + next(27)) * 0x1.0p-53;
   }
+
+  /** Exception message for non-positive bounds */
+  protected static final String BADBOUND = "bound must be positive";
 
   /**
    * Returns a pseudorandom, uniformly distributed {@code int} value between 0
@@ -111,8 +121,8 @@ public class FastNonThreadsafeRandom extends Random {
       url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/")
   @Override
   public int nextInt(int n) {
-    if((n & -n) == n) { // i.e., n is a power of 2
-      return (int) ((n * (long) next(31)) >>> 31);
+    if(n <= 0) {
+      throw new IllegalArgumentException(BADBOUND);
     }
     seed = (seed * multiplier + addend) & mask;
     return (int) (((seed >>> 16) * n) >>> 32);
@@ -143,10 +153,9 @@ public class FastNonThreadsafeRandom extends Random {
       booktitle = "Daniel Lemire's blog", //
       url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/")
   public int nextIntRefined(int n) {
-    /*
-     * if((n & -n) == n) { // i.e., n is a power of 2 return (int) ((n * (long)
-     * next(31)) >>> 31); }
-     */
+    if(n <= 0) {
+      throw new IllegalArgumentException(BADBOUND);
+    }
     seed = (seed * multiplier + addend) & mask;
     long ret = (seed >>> 16) * n;
     // Rejection sampling

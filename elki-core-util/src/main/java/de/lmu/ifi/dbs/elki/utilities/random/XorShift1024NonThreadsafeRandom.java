@@ -108,16 +108,19 @@ public class XorShift1024NonThreadsafeRandom extends Random {
   protected int next(int bits) {
     return (int) (nextLong() >>> (64 - bits));
   }
-  
-  /**
-   * Inverse of 53 bit.
-   */
-  private static final double INV53 = 1. / (1L << 53);
+
+  @Override
+  public int nextInt() {
+    return (int) (nextLong() >>> 32);
+  }
 
   @Override
   public double nextDouble() {
-    return (((long) (next(26)) << 27) + next(27)) * INV53;
+    return ((long) nextLong() >>> 11) * 0x1.0p-53;
   }
+
+  /** Exception message for non-positive bounds */
+  protected static final String BADBOUND = "bound must be positive";
 
   /**
    * Returns a pseudorandom, uniformly distributed {@code int} value between 0
@@ -141,6 +144,9 @@ public class XorShift1024NonThreadsafeRandom extends Random {
       url = "http://lemire.me/blog/2016/06/30/fast-random-shuffling/")
   @Override
   public int nextInt(int n) {
+    if(n <= 0) {
+      throw new IllegalArgumentException(BADBOUND);
+    }
     return (int) (((nextLong() >>> 32) * n) >>> 32);
   }
 }
