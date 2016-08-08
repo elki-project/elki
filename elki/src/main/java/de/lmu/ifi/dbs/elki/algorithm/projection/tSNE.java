@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm.projection;
  */
 
 import java.util.Arrays;
-import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -48,6 +47,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
+import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVector>> {
   private static final double MIN_PIJ = 1e-12, MIN_QIJ = 1e-12;
@@ -61,28 +62,32 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
   int learningRate;
 
   double initialMomentum = 0.5, finalMomentum = 0.8;
+  
+  RandomFactory rand_f;
 
   private final int dim = 2;
+  
+  private double max;
 
   // private final int alpha = 1;
   private static final Logging LOG = Logging.getLogger(tSNE.class);
 
   private static final double MIN_GAIN = 0.01;
 
-  protected tSNE(DistanceFunction<? super O> distanceFunction, double momentum, int learning_rate, int iteration, double perplexity) {
+  protected tSNE(DistanceFunction<? super O> distanceFunction, double momentum, int learning_rate, int iteration, double perplexity, RandomFactory rand_f) {
     super(distanceFunction);
     this.maxIterations = iteration;
     this.perplexity = perplexity;
     this.learningRate = learning_rate;
     this.finalMomentum = momentum;
-
+    this.rand_f = rand_f;
   }
 
   public Relation<DoubleVector> run(Relation<O> relation) {
     DistanceQuery<O> dq = relation.getDistanceQuery(getDistanceFunction());
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     final int size = ids.size();
-
+    System.out.println(size);
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     double[][] pij;
     { // Compute desired affinities.
@@ -93,10 +98,9 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
 
     // Create initial solution.
     double[][] sol = new double[size][dim];
-    Random r = new Random(); // TODO: Use a RandomParameter.
     for(int i = 0; i < size; i++) {
       for(int j = 0; j < dim; j++) {
-        sol[i][j] = r.nextGaussian(); //vllt noch andere Varianz
+        sol[i][j] = rand_f.getRandom().nextGaussian()*1e-2;
       }
     }
 
@@ -115,7 +119,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
         for(int i = 0; i < size; i++) {
           double[] row_i = pij[i];
           for(int j = 0; j < size; j++) {
-            row_i[j] /= EARLY_EXAGGERATION; 
+            row_i[j] /= EARLY_EXAGGERATION;
           }
         }
       }
@@ -130,17 +134,32 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     return new MaterializedRelation<>("tSNE", "t-SNE", otype, proj, ids);
   }
 
-  private static double[][] buildDistanceMatrix(int size, DistanceQuery<?> dq, DBIDArrayIter ix, DBIDArrayIter iy) {
+  private  double[][] buildDistanceMatrix(int size, DistanceQuery<?> dq, DBIDArrayIter ix, DBIDArrayIter iy) {
     double[][] dmat = new double[size][size];
+    max = Double.NEGATIVE_INFINITY;
+//    double min = Double.POSITIVE_INFINITY;
     final boolean square = !SquaredEuclideanDistanceFunction.class.isInstance(dq.getDistanceFunction());
     for(ix.seek(0); ix.valid(); ix.advance()) {
       for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
         double dist = dq.distance(ix, iy);
         dist = square ? (dist * dist) : dist;
+//        System.out.println(dist);
+        if(dist > max)
+          max = dist;
+//        else if(dist < min)
+//          min = dist;
         dmat[ix.getOffset()][iy.getOffset()] = dist;
         dmat[iy.getOffset()][ix.getOffset()] = dist;
       }
     }
+//    this.max = max;
+//    double norm = max;
+//    for(int i = 0; i< dmat.length;i++)
+//      for(int j = 0; j<i;j++){
+//        double val = (dmat[i][j] )/norm;
+//        dmat[i][j] = val;
+//        dmat[j][i] = val;
+//      }
     return dmat;
   }
 
@@ -156,10 +175,13 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     // Scale pij to have the desired sum EARLY_EXAGGERATION
     double sum = 0.;
     for(int i = 1; i < pij.length; i++) {
-      double[] row = pij[i];
-      for(int j = 0; j < i; j++) {
-        sum += (row[j] += pij[j][i]);
-      }
+      for(int j = 0; j < i; j++) { // Nur über halbe Matrix!
+        pij[i][j] += pij[j][i]; // Symmetrie herstellen
+
+        sum += pij[j][i]; // Matrix-Summe berechnen
+
+     }
+
     }
     // Scaling taken from original tSNE code:
     final double scale = EARLY_EXAGGERATION / (2. * sum);
@@ -182,13 +204,13 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    * @param logPerp Desired perplexity
    * @return Sigma value
    */
-  private static double computePi(int i, double[] dist_i, double[] pij_i, double logPerp) {
+  private  double computePi(int i, double[] dist_i, double[] pij_i, double logPerp) {
     final double error = 1e-5;
-    double beta = 1; // beta = 1. / (2*sigma*sigma)
-    double diff = computeH(dist_i, pij_i, i, -beta) - logPerp;
+    double beta = 1./max; // beta = 1. / (2*sigma*sigma), war 1
+    double diff = computeH(dist_i, pij_i, i, -beta) - logPerp; 
     double betaMin = 0., betaMax = Double.POSITIVE_INFINITY;
     for(int tries = 0; tries < 50 && Math.abs(diff) > error; ++tries) {
-      if(diff > 0) { 
+      if(diff > 0) {
         betaMin = beta;
         beta += Double.isInfinite(betaMax) ? beta : ((betaMax - beta) * .5);
       }
@@ -198,7 +220,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
       }
       diff = computeH(dist_i, pij_i, i, -beta) - logPerp;
     }
-    return Math.sqrt(.5 / beta); //Wert egal, wird nicht mehr weiterverwendet
+    return Math.sqrt(.5 / beta); // stimmt schon
   }
 
   /**
@@ -226,7 +248,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     for(int j = 0; j < dist_i.length; j++) {
       sum += dist_i[j] * (pij_i[j] *= s);
     }
-    return Math.log(sumP) - mbeta * sum; //Logarithmusregeln
+    return Math.log(sumP) - mbeta * sum;
   }
 
   private double computeQij(double[][] qij, double[][] solution) {
@@ -271,7 +293,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
         }
         // Qij after scaling!
         final double q = Math.max(qij[i][j] / qij_sum, MIN_QIJ);
-        double a = (pij[i][j] - q) * qij[i][j]; //Formel aus altem Paper
+        double a = (pij[i][j] - q) * qij[i][j];
         for(int k = 0; k < dim; k++) {
           double[] sol_i = sol[i];
           grad_i[k] += a * (sol_i[k] - sol[j][k]);
@@ -285,7 +307,7 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     for(int i = 0; i < sol.length; i++) {
       double[] sol_i = sol[i], grad_i = gradient[i];
       double[] mov_i = mov[i], gain_i = gains[i];
-      for(int k = 0; k < dim; k++) { 
+      for(int k = 0; k < dim; k++) {
         // Adjust learning rate:
         gain_i[k] = MathUtil.max(((grad_i[k] > 0) != (mov_i[k] > 0)) ? (gain_i[k] + 0.2) : (gain_i[k] * 0.8), MIN_GAIN);
         mov_i[k] *= mom; // Dampening the previous momentum
@@ -314,6 +336,8 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     int learning_rate;
 
     int iteration;
+    
+    RandomFactory rand_f;
 
     public static final OptionID MOMENTUM_ID = new OptionID("tSNE.momentum", "The value for the momentum");
 
@@ -322,6 +346,8 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     public static final OptionID ITERATION_ID = new OptionID("tSNE.iteration", "");
 
     public static final OptionID PERPLEXITY_ID = new OptionID("tSNE.perplexity", "");
+    
+    public static final OptionID RANDOM_ID = new OptionID("tSNE.seed","");
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -351,12 +377,16 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
           .setDefaultValue(300);
       if(config.grab(p_iteration))
         iteration = p_iteration.getValue();
+      
+      RandomParameter p_rand = new RandomParameter(RANDOM_ID);
+      if(config.grab(p_rand))
+        rand_f = p_rand.getValue();
 
     }
 
     @Override
     protected tSNE<O> makeInstance() {
-      return new tSNE<>(distanceFunction, momentum, learning_rate, iteration, perplexity);
+      return new tSNE<>(distanceFunction, momentum, learning_rate, iteration, perplexity, rand_f);
     }
   }
 }
