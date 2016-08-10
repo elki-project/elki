@@ -28,14 +28,18 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
+import de.lmu.ifi.dbs.elki.data.type.CombinedTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
@@ -55,7 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * Reference:
  * <p>
- * Davoud Moulavi,Pablo A. Jaskowiak, Ricardo JGB Campello, Arthur Zimek, Jörg
+ * Davoud Moulavi, Pablo A. Jaskowiak, Ricardo JGB Campello, Arthur Zimek, Jörg
  * Sander<br />
  * D. Moulavi et al.<br />
  * Density-Based Clustering Validation<br />
@@ -66,7 +70,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
-@Reference(authors = "Davoud Moulavi,Pablo A. Jaskowiak, Ricardo JGB Campello, Arthur Zimek, Jörg Sander", //
+@Reference(authors = "Davoud Moulavi, Pablo A. Jaskowiak, Ricardo JGB Campello, Arthur Zimek, Jörg Sander", //
     title = "Density-Based Clustering Validation", //
     booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM)", //
     url = "http://dx.doi.org/10.1137/1.9781611973440.96")
@@ -74,14 +78,14 @@ public class EvaluateDBCV<O> implements Evaluator {
   /**
    * Distance function to use.
    */
-  private PrimitiveDistanceFunction<? super O> distanceFunction;
+  private DistanceFunction<? super O> distanceFunction;
 
   /**
    * Constructor.
    *
    * @param distance Distance function
    */
-  public EvaluateDBCV(PrimitiveDistanceFunction<? super O> distance) {
+  public EvaluateDBCV(DistanceFunction<? super O> distance) {
     super();
     this.distanceFunction = distance;
   }
@@ -95,16 +99,19 @@ public class EvaluateDBCV<O> implements Evaluator {
    *
    * @return dbcv DBCV-index
    */
-  public double evaluateClustering(Database db, Relation<? extends O> rel, Clustering<?> cl) {
+  public double evaluateClustering(Database db, Relation<O> rel, Clustering<?> cl) {
+    final DistanceQuery<O> dq = rel.getDistanceQuery(distanceFunction);
+
     List<? extends Cluster<?>> clusters = cl.getAllClusters();
     final int numc = clusters.size();
 
-    // FIXME: What if we do not have a vector field?
+    // DBCV needs a "dimensionality".
     @SuppressWarnings("unchecked")
     final Relation<? extends SpatialComparable> vrel = (Relation<? extends SpatialComparable>) rel;
     final int dim = RelationUtil.dimensionality(vrel);
 
     // precompute all core distances
+    ArrayDBIDs[] cids = new ArrayDBIDs[numc];
     double[][] coreDists = new double[numc][];
     for(int c = 0; c < numc; c++) {
       Cluster<?> cluster = clusters.get(c);
@@ -113,25 +120,27 @@ public class EvaluateDBCV<O> implements Evaluator {
         coreDists[c] = null;
         continue;
       }
-      // FIXME: this does not guarantee it is the same sequence as before!
-      ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
-      double[] clusterCoreDists = new double[ids.size()];
+      // Store for use below:
+      ArrayDBIDs ids = cids[c] = DBIDUtil.ensureArray(cluster.getIDs());
+      double[] clusterCoreDists = coreDists[c] = new double[ids.size()];
       for(DBIDArrayIter it = ids.iter(), it2 = ids.iter(); it.valid(); it.advance()) {
-        O currentVector = rel.get(it);
         double currentCoreDist = 0;
+        int neighbors = 0;
         for(it2.seek(0); it2.valid(); it2.advance()) {
           if(DBIDUtil.equal(it, it2)) {
             continue;
           }
-          // TODO: we can reduce the number of distance computations by 2
-          // easily.
-          // FIXME: division by 0.
-          currentCoreDist += MathUtil.powi((1. / distanceFunction.distance(currentVector, rel.get(it2))), dim);
+          double dist = dq.distance(it, it2);
+          // Unfortunately, the DBCV definition has a division by zero.
+          // We ignore such objects.
+          if(dist > 0) {
+            currentCoreDist += MathUtil.powi(1. / dist, dim);
+            ++neighbors;
+          }
         }
-        currentCoreDist = Math.pow((currentCoreDist / (cluster.size() - 1)), -1. / dim);
-        clusterCoreDists[it.getOffset()] = currentCoreDist;
+        // Average, and undo power.
+        clusterCoreDists[it.getOffset()] = Math.pow(currentCoreDist / neighbors, -1. / dim);
       }
-      coreDists[c] = clusterCoreDists;
     }
 
     // compute density sparseness of all clusters
@@ -147,17 +156,15 @@ public class EvaluateDBCV<O> implements Evaluator {
         continue;
       }
       double[] clusterCoreDists = coreDists[c];
-      // FIXME: this does not guarantee it is the same sequence as before!
-      ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
+      ArrayDBIDs ids = cids[c];
       double dscMax = 0; // Density Sparseness of the Cluster
       double[][] distances = new double[cluster.size()][cluster.size()];
 
       // create mutability distance matrix for Minimum Spanning Tree
       for(DBIDArrayIter it = ids.iter(), it2 = ids.iter(); it.valid(); it.advance()) {
-        O currentVector = rel.get(it);
         double currentCoreDist = clusterCoreDists[it.getOffset()];
         for(it2.seek(it.getOffset() + 1); it2.valid(); it2.advance()) {
-          double mutualReachDist = MathUtil.max(currentCoreDist, clusterCoreDists[it2.getOffset()], distanceFunction.distance(currentVector, rel.get(it2)));
+          double mutualReachDist = MathUtil.max(currentCoreDist, clusterCoreDists[it2.getOffset()], dq.distance(it, it2));
           distances[it.getOffset()][it2.getOffset()] = mutualReachDist;
           distances[it2.getOffset()][it.getOffset()] = mutualReachDist;
         }
@@ -202,21 +209,17 @@ public class EvaluateDBCV<O> implements Evaluator {
         continue;
       }
       double currentDscMax = clusterDscMax[c];
-      double dspcMin = Double.POSITIVE_INFINITY; // minimal Density Separation
-                                                 // of the Cluster
-      // FIXME: this does not guarantee it is the same sequence as before!
-      ArrayDBIDs ids = DBIDUtil.ensureArray(cluster.getIDs());
-
       double[] clusterCoreDists = coreDists[c];
       int[] currentDegree = clusterDegrees[c];
 
-      for(DBIDArrayIter it = ids.iter(); it.valid(); it.advance()) {
+      // minimal Density Separation of the Cluster
+      double dspcMin = Double.POSITIVE_INFINITY;
+      for(DBIDArrayIter it = cids[c].iter(); it.valid(); it.advance()) {
         // We again ignore external nodes, if the cluster has any internal
         // nodes.
         if(currentDegree[it.getOffset()] < 2 && internalEdges[c]) {
           continue;
         }
-        O currentVector = rel.get(it);
         double currentCoreDist = clusterCoreDists[it.getOffset()];
         for(int oc = 0; oc < numc; oc++) {
           Cluster<?> ocluster = clusters.get(oc);
@@ -225,22 +228,18 @@ public class EvaluateDBCV<O> implements Evaluator {
           }
           int[] oDegree = clusterDegrees[oc];
           double[] oclusterCoreDists = coreDists[oc];
-          // FIXME: this does not guarantee it is the same sequence as before!
-          ArrayDBIDs oids = DBIDUtil.ensureArray(ocluster.getIDs());
-          for(DBIDArrayIter it2 = oids.iter(); it2.valid(); it2.advance()) {
+          for(DBIDArrayIter it2 = cids[oc].iter(); it2.valid(); it2.advance()) {
             if(oDegree[it2.getOffset()] < 2 && internalEdges[oc]) {
               continue;
             }
-            double mutualReachDist = MathUtil.max(currentCoreDist, oclusterCoreDists[it2.getOffset()], distanceFunction.distance(currentVector, rel.get(it2)));
-            if(mutualReachDist < dspcMin) {
-              dspcMin = mutualReachDist;
-            }
+            double mutualReachDist = MathUtil.max(currentCoreDist, oclusterCoreDists[it2.getOffset()], dq.distance(it, it2));
+            dspcMin = mutualReachDist < dspcMin ? mutualReachDist : dspcMin;
           }
         }
       }
 
       // compute DBCV
-      double vc = (dspcMin - currentDscMax) / Math.max(dspcMin, currentDscMax);
+      double vc = (dspcMin - currentDscMax) / MathUtil.max(dspcMin, currentDscMax);
       double weight = cluster.size() / (double) rel.size();
       dbcv += weight * vc;
     }
@@ -259,10 +258,13 @@ public class EvaluateDBCV<O> implements Evaluator {
       return;
     }
     Database db = ResultUtil.findDatabase(hier);
-    Relation<? extends O> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
+    TypeInformation typ = new CombinedTypeInformation(this.distanceFunction.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
+    Relation<O> rel = db.getRelation(typ);
 
-    for(Clustering<?> cl : crs) {
-      evaluateClustering(db, rel, cl);
+    if(rel != null) {
+      for(Clustering<?> cl : crs) {
+        evaluateClustering(db, rel, cl);
+      }
     }
   }
 
@@ -282,13 +284,11 @@ public class EvaluateDBCV<O> implements Evaluator {
     /**
      * Distance function to use.
      */
-    private PrimitiveDistanceFunction<? super O> distance;
+    private DistanceFunction<? super O> distance;
 
     @Override
     protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-
-      ObjectParameter<PrimitiveDistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, PrimitiveDistanceFunction.class, SquaredEuclideanDistanceFunction.class);
+      ObjectParameter<DistanceFunction<? super O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class, EuclideanDistanceFunction.class);
       if(config.grab(distanceFunctionP)) {
         distance = distanceFunctionP.instantiateClass(config);
       }

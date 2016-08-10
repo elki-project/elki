@@ -10,6 +10,7 @@ de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateConcordantPairs
 de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateVarianceRatioCriteria
 de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluatePBMIndex
 de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateCIndex
+de.lmu.ifi.dbs.elki.evaluation.clustering.internal.EvaluateDBCV
 de.lmu.ifi.dbs.elki.evaluation.clustering.pairsegments.ClusterPairSegmentAnalysis
 de.lmu.ifi.dbs.elki.evaluation.clustering.extractor.ExtractFlatClusteringFromHierarchyEvaluator
 de.lmu.ifi.dbs.elki.evaluation.clustering.extractor.SimplifiedHierarchyExtractionEvaluator
