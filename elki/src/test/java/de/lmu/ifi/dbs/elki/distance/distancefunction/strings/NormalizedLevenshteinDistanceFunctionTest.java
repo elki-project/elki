@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.strings;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -37,29 +37,37 @@ public class NormalizedLevenshteinDistanceFunctionTest {
    * Some test strings, from the Wikipedia article.
    */
   final String[][] TESTS = { //
-  { "kitten", "sitting" }, //
-  { "Saturday", "Sunday" }, //
-  { "tier", "tor" }, //
-  { "abcz", "zabc" }, //
-  { "zabc", "abcz" }, //
+      { "kitten", "sitting" }, //
+      { "Saturday", "Sunday" }, //
+      { "tier", "tor" }, //
+      { "abcz", "zabc" }, //
+      { "zabc", "abcz" }, //
   };
 
   /**
    * The associated scores.
    */
   final double[] SCORES = { //
-  3. / 6.5, // kitten <-> sitting
-  3. / 7., // Saturday <-> Sunday
-  2. / 3.5, // tier <-> tor
-  2. / 4., // abcz <-> zabc
-  2. / 4., // zabc <-> abcz
+      3. / 6.5, // kitten <-> sitting
+      3. / 7., // Saturday <-> Sunday
+      2. / 3.5, // tier <-> tor
+      2. / 4., // abcz <-> zabc
+      2. / 4., // zabc <-> abcz
   };
 
   @Test
   public void testStringLevenshtein() {
     NormalizedLevenshteinDistanceFunction f = NormalizedLevenshteinDistanceFunction.STATIC_SENSITIVE;
-    for (int i = 0; i < TESTS.length; i++) {
+    for(int i = 0; i < TESTS.length; i++) {
       assertEquals("Distance does not agree: " + TESTS[i][0] + " <-> " + TESTS[i][1], SCORES[i], f.distance(TESTS[i][0], TESTS[i][1]), 1E-10);
     }
+  }
+
+  @Test
+  public void testTriangleInequalityCounterexample() {
+    NormalizedLevenshteinDistanceFunction f = NormalizedLevenshteinDistanceFunction.STATIC_SENSITIVE;
+    assertEquals("Distance ab - bc", 1., f.distance("ab", "bc"), 0.);
+    assertEquals("Distance ab - abc", .4, f.distance("ab", "abc"), 0.);
+    assertEquals("Distance abc - bc", .4, f.distance("abc", "bc"), 0.);
   }
 }

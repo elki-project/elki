@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.strings;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -37,28 +37,30 @@ public class LevenshteinDistanceFunctionTest {
    * Some test strings, from the Wikipedia article.
    */
   final String[][] TESTS = { //
-  { "kitten", "sitting" }, //
-  { "Saturday", "Sunday" }, //
-  { "tier", "tor" }, //
-  { "abcz", "zabc" }, //
-  { "zabc", "abcz" }, //
+      { "kitten", "sitting" }, //
+      { "Saturday", "Sunday" }, //
+      { "tier", "tor" }, //
+      { "abcz", "zabc" }, //
+      { "zabc", "abcz" }, //
+      { "BananaXApple", "Banana_Apple" }, //
   };
 
   /**
    * The associated scores.
    */
   final int[] SCORES = { //
-  3, // kitten <-> sitting
-  3, // Saturday <-> Sunday
-  2, // Tier <-> Tor
-  2, // abcz <-> zabc
-  2, // zabc <-> abcz
+      3, // kitten <-> sitting
+      3, // Saturday <-> Sunday
+      2, // Tier <-> Tor
+      2, // abcz <-> zabc
+      2, // zabc <-> abcz
+      1, // Banana?Apple
   };
 
   @Test
   public void testStringLevenshtein() {
     LevenshteinDistanceFunction f = LevenshteinDistanceFunction.STATIC_SENSITIVE;
-    for (int i = 0; i < TESTS.length; i++) {
+    for(int i = 0; i < TESTS.length; i++) {
       assertEquals("Distance does not agree: " + TESTS[i][0] + " <-> " + TESTS[i][1], SCORES[i], (int) f.distance(TESTS[i][0], TESTS[i][1]));
     }
   }

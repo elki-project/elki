@@ -41,6 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * TODO: add case insensitive flag.
  * 
+ * TODO: add an API that can stop early at a maximum distance
+ * 
  * @author Felix Stahlberg
  * @author Erich Schubert
  * @since 0.6.0
@@ -48,7 +50,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.uses String
  */
 @Description("Levenshtein distance.")
-@Reference(authors = "V. I. Levenshtein", title = "Binary codes capable of correcting deletions, insertions and reversals.", booktitle = "Soviet physics doklady. Vol. 10. 1966.")
+@Reference(authors = "V. I. Levenshtein", //
+    title = "Binary codes capable of correcting deletions, insertions and reversals.", //
+    booktitle = "Soviet physics doklady. Vol. 10. 1966.")
 public class LevenshteinDistanceFunction extends AbstractPrimitiveDistanceFunction<String> {
   /**
    * Static instance, case sensitive.
@@ -70,9 +74,6 @@ public class LevenshteinDistanceFunction extends AbstractPrimitiveDistanceFuncti
 
   @Override
   public double distance(String o1, String o2) {
-    if(o1.equals(o2)) {
-      return 0.;
-    }
     return levenshteinDistance(o1, o2);
   }
 
@@ -84,37 +85,110 @@ public class LevenshteinDistanceFunction extends AbstractPrimitiveDistanceFuncti
    * @return Levenshtein distance
    */
   public static int levenshteinDistance(String o1, String o2) {
-    // Let o2 be the shorter one:
-    if(o1.length() < o2.length()) {
+    // Let o1 be the shorter one:
+    if(o1.length() > o2.length()) {
       return levenshteinDistance(o2, o1);
     }
     final int l1 = o1.length(), l2 = o2.length();
-    // Use two buffers:
-    int[] curr = new int[l2 + 1], prev = new int[l2 + 1];
-    // Initial row
-    for(int j = 0; j <= l2; j++) {
-      curr[j] = j;
+    // Exploit that Java caches the hash code of strings:
+    if(l1 == l2 && o1.hashCode() == o2.hashCode() && o1.equals(o2)) {
+      return 0;
     }
-    for(int i = 0; i < l1; i++) {
-      // Swap curr and prev:
-      int[] tmp = curr;
-      curr = prev;
-      prev = tmp;
-      // Compute next row:
-      curr[0] = i + 1;
-      for(int j = 0; j < l2; j++) {
-        // TODO: allow case insensitive comparisons?
-        final int cost = (o1.charAt(i) == o2.charAt(j)) ? 0 : 1;
-        curr[j + 1] = Math.min(prev[j + 1] + 1, Math.min(curr[j] + 1, prev[j] + cost));
+    // Determine prefix and postfix lengths:
+    final int prefix = prefixLen(o1, o2);
+    if(prefix == l1 || prefix == l2) {
+      return Math.abs(l1 - l2);
+    }
+    final int postfix = postfixLen(o1, o2, prefix);
+    return // Prefix and postfix are a complete object:
+    (prefix + postfix == l1 || prefix + postfix == l2) ? Math.abs(l1 - l2) : //
+    // Exactly one char difference optimization:
+        (l1 == l2 && prefix + postfix + 1 == l1) ? 1 : //
+        // Default case, compute
+            levenshteinDistance(o1, o2, prefix, postfix);
+  }
+
+  /**
+   * Compute the length of the prefix.
+   * 
+   * @param o1 First string
+   * @param o2 Second string
+   * @return Prefix length
+   */
+  private static int prefixLen(String o1, String o2) {
+    final int l1 = o1.length(), l2 = o2.length(), l = l1 < l2 ? l1 : l2;
+    int prefix = 0;
+    while(prefix < l && (o1.charAt(prefix) == o2.charAt(prefix))) {
+      prefix++;
+    }
+    return prefix;
+  }
+
+  /**
+   * Compute the postfix length.
+   * 
+   * @param o1 First object
+   * @param o2 Second object
+   * @param prefix Known prefix length
+   * @return Postfix length
+   */
+  private static int postfixLen(String o1, String o2, int prefix) {
+    int postfix = 0;
+    int p1 = o1.length(), p2 = o2.length();
+    while(p1 > prefix && p2 > prefix && (o1.charAt(--p1) == o2.charAt(--p2))) {
+      ++postfix;
+    }
+    return postfix;
+  }
+
+  /**
+   * Compute the Levenshtein distance, except for prefix and postfix.
+   * 
+   * @param o1 First object
+   * @param o2 Second object
+   * @param prefix Prefix length
+   * @param postfix Postfix length
+   * @return Levenshtein distance
+   */
+  public static int levenshteinDistance(String o1, String o2, int prefix, int postfix) {
+    final int l1 = o1.length(), l2 = o2.length();
+    // Buffer, interleaved. Even and odd values are our rows.
+    int[] buf = new int[(l2 + 1 - (prefix + postfix)) << 1];
+    // Initial "row", on even positions
+    for(int j = 0; j < buf.length; j += 2) {
+      buf[j] = j >> 1;
+    }
+    int inter = 1; // Interleaving offset
+    for(int i = prefix, e1 = l1 - postfix; i < e1; i++, inter ^= 1) {
+      final char chr = o1.charAt(i);
+      buf[inter] = i + 1 - prefix; // First entry
+      for(int c = 2 + inter, p = 3 - inter, j = prefix; c < buf.length; c += 2, p += 2) {
+        buf[c] = min(buf[p] + 1, buf[c - 2] + 1, buf[p - 2] + ((chr == o2.charAt(j++)) ? 0 : 1));
       }
     }
-    final int cost = curr[o2.length()];
-    return cost;
+    return buf[buf.length - 2 + (inter ^ 1)];
+  }
+
+  /**
+   * Three-way integer minimum.
+   * 
+   * @param a First value
+   * @param b Second value
+   * @param c Third value.
+   * @return Minimum
+   */
+  private static int min(int a, int b, int c) {
+    return a <= b ? (a <= c ? a : c) : (b <= c ? b : c);
   }
 
   @Override
   public SimpleTypeInformation<? super String> getInputTypeRestriction() {
     return TYPE;
+  }
+
+  @Override
+  public boolean isMetric() {
+    return true;
   }
 
   /**

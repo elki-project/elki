@@ -32,6 +32,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 /**
  * Levenshtein distance on strings, normalized by string length.
  * 
+ * Note: this is no longer a metric, the triange inequality is violated.
+ * Example: d("ab","bc")=1, d("ab", "abc")+d("abc","bc")=0.4+0.4=0.8
+ * 
  * Reference:
  * <p>
  * V. I. Levenshtein<br>
@@ -48,7 +51,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @apiviz.uses String
  */
 @Description("Levenshtein distance, normalized by average string length.")
-@Reference(authors = "V. I. Levenshtein", title = "Binary codes capable of correcting deletions, insertions and reversals.", booktitle = "Soviet physics doklady. Vol. 10. 1966.")
+@Reference(authors = "V. I. Levenshtein", //
+    title = "Binary codes capable of correcting deletions, insertions and reversals.", //
+    booktitle = "Soviet physics doklady. Vol. 10. 1966.")
 public class NormalizedLevenshteinDistanceFunction extends AbstractPrimitiveDistanceFunction<String> {
   /**
    * Static instance, case sensitive.
