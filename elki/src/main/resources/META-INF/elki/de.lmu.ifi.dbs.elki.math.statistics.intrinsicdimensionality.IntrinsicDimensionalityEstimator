@@ -7,4 +7,5 @@ de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.LMomentsEstimator
 de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.GEDEstimator
 de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.PWM2Estimator
+de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.ALIDEstimator
 de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.EnsembleEstimator
