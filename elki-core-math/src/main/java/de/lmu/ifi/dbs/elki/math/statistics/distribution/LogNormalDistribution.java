@@ -104,6 +104,33 @@ public class LogNormalDistribution extends AbstractDistribution {
     this(logmean, logstddev, shift, (Random) null);
   }
 
+  /**
+   * Get the log mean value.
+   *
+   * @return logmean
+   */
+  public double getLogMean() {
+    return logmean;
+  }
+
+  /**
+   * Get the log standard deviation.
+   *
+   * @return log standard deviation
+   */
+  public double getLogStddev() {
+    return logstddev;
+  }
+
+  /**
+   * Get the distribution shift.
+   * 
+   * @return Shift
+   */
+  public double getShift() {
+    return shift;
+  }
+
   @Override
   public double pdf(double val) {
     return pdf(val - shift, logmean, logstddev);

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -46,7 +46,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has GeneralizedExtremeValueDistribution
  */
-@Reference(authors = "J.R.M. Hosking, J. R. Wallis, and E. F. Wood", title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", booktitle = "Technometrics 27.3", url = "http://dx.doi.org/10.1080/00401706.1985.10488049")
+@Reference(authors = "J.R.M. Hosking, J. R. Wallis, and E. F. Wood", //
+    title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", //
+    booktitle = "Technometrics 27.3", //
+    url = "http://dx.doi.org/10.1080/00401706.1985.10488049")
 public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<GeneralizedExtremeValueDistribution> {
   /**
    * Static instance.
@@ -57,19 +60,19 @@ public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<Ge
    * Constants for fast rational approximations.
    */
   private static final double //
-      A0 = 0.28377530, //
+  A0 = 0.28377530, //
       A1 = -1.21096399, //
       A2 = -2.50728214, //
       A3 = -1.13455566, //
       A4 = -0.07138022;
 
   private static final double //
-      B1 = 2.06189696, //
+  B1 = 2.06189696, //
       B2 = 1.31912239, //
       B3 = 0.25077104;
 
   private static final double //
-      C1 = 1.59921491, //
+  C1 = 1.59921491, //
       C2 = -0.48832213, //
       C3 = 0.01573152, //
       D1 = -0.64363929, //
@@ -93,41 +96,42 @@ public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<Ge
   @Override
   public GeneralizedExtremeValueDistribution estimateFromLMoments(double[] xmom) {
     double t3 = xmom[2];
-    if (Math.abs(t3) < 1e-50 || (t3 >= 1.)) {
+    if(Math.abs(t3) < 1e-50 || (t3 >= 1.)) {
       throw new ArithmeticException("Invalid moment estimation.");
     }
     // Approximation for t3 between 0 and 1:
     double g;
-    if (t3 > 0.) {
+    if(t3 > 0.) {
       double z = 1. - t3;
       g = (-1. + z * (C1 + z * (C2 + z * C3))) / (1. + z * (D1 + z * D2));
       // g: Almost zero?
-      if (Math.abs(g) < 1e-50) {
+      if(Math.abs(g) < 1e-50) {
         double k = 0;
         double sigma = xmom[1] * MathUtil.ONE_BY_LOG2;
         double mu = xmom[0] - Math.E * sigma;
         return new GeneralizedExtremeValueDistribution(mu, sigma, k);
       }
-    } else {
+    }
+    else {
       // Approximation for t3 between -.8 and 0L:
       g = (A0 + t3 * (A1 + t3 * (A2 + t3 * (A3 + t3 * A4)))) / (1. + t3 * (B1 + t3 * (B2 + t3 * B3)));
-      if (t3 < -.8) {
+      if(t3 < -.8) {
         // Newton-Raphson iteration for t3 < -.8
-        if (t3 <= -.97) {
+        if(t3 <= -.97) {
           g = 1. - Math.log1p(t3) * MathUtil.ONE_BY_LOG2;
         }
         double t0 = .5 * (t3 + 3.);
-        for (int it = 1;; it++) {
+        for(int it = 1;; it++) {
           double x2 = Math.pow(2., -g), xx2 = 1. - x2;
           double x3 = Math.pow(3., -g), xx3 = 1. - x3;
           double t = xx3 / xx2;
           double deriv = (xx2 * x3 * MathUtil.LOG3 - xx3 * x2 * MathUtil.LOG2) / (xx2 * x2);
           double oldg = g;
           g -= (t - t0) / deriv;
-          if (Math.abs(g - oldg) < 1e-20 * g) {
+          if(Math.abs(g - oldg) < 1e-20 * g) {
             break;
           }
-          if (it >= MAXIT) {
+          if(it >= MAXIT) {
             throw new ArithmeticException("Newton-Raphson did not converge.");
           }
         }

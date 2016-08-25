@@ -113,6 +113,33 @@ public class WeibullDistribution extends AbstractDistribution {
     this.theta = theta;
   }
 
+  /**
+   * Get the shape k parameter.
+   *
+   * @return shape k
+   */
+  public double getK() {
+    return k;
+  }
+
+  /**
+   * Get the scale lambda parameter.
+   *
+   * @return scale lambda
+   */
+  public double getLambda() {
+    return lambda;
+  }
+
+  /**
+   * Get the shift theta parameter.
+   *
+   * @return shift theta
+   */
+  public double getTheta() {
+    return theta;
+  }
+  
   @Override
   public double pdf(double x) {
     return pdf(x, k, lambda, theta);

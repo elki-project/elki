@@ -80,6 +80,24 @@ public class LogisticDistribution extends AbstractDistribution {
     this.scale = scale;
   }
 
+  /**
+   * Get the location aparameter.
+   * 
+   * @return location
+   */
+  public double getLocation() {
+    return location;
+  }
+
+  /**
+   * Get the scale parameter.
+   *
+   * @return scale
+   */
+  public double getScale() {
+    return scale;
+  }
+
   @Override
   public double pdf(double val) {
     return pdf(val, location, scale);
