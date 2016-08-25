@@ -89,6 +89,33 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
     this.k = k;
   }
 
+  /**
+   * Get location.
+   * 
+   * @return Location
+   */
+  public double getMu() {
+    return mu;
+  }
+
+  /**
+   * Get sigma.
+   * 
+   * @return Sigma
+   */
+  public double getSigma() {
+    return sigma;
+  }
+  
+  /**
+   * Get the k parameter.
+   * 
+   * @return k
+   */
+  public double getK() {
+    return k;
+  }
+
   @Override
   public double pdf(double x) {
     return pdf(x, mu, sigma, k);

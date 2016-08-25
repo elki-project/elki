@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -45,7 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has GumbelDistribution
  */
-@Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
+@Reference(authors = "J.R.M. Hosking", //
+    title = "Fortran routines for use with the method of L-moments Version 3.03", //
+    booktitle = "IBM Research Technical Report")
 public class GumbelLMMEstimator extends AbstractLMMEstimator<GumbelDistribution> {
   /**
    * Static instance.
@@ -67,7 +69,8 @@ public class GumbelLMMEstimator extends AbstractLMMEstimator<GumbelDistribution>
   @Override
   public GumbelDistribution estimateFromLMoments(double[] xmom) {
     double scale = xmom[1] * MathUtil.ONE_BY_LOG2;
-    return new GumbelDistribution(xmom[0] - Math.E * scale, scale);
+    // TODO: Apparently we use a different parameterization?
+    return new GumbelDistribution(xmom[0] - scale / Math.E, scale);
   }
 
   @Override

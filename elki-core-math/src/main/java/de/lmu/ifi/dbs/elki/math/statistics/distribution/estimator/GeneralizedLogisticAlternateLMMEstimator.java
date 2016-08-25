@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -43,7 +43,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has GeneralizedLogisticAlternateDistribution
  */
-@Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
+@Reference(authors = "J.R.M. Hosking", //
+    title = "Fortran routines for use with the method of L-moments Version 3.03", //
+    booktitle = "IBM Research Technical Report")
 public class GeneralizedLogisticAlternateLMMEstimator extends AbstractLMMEstimator<GeneralizedLogisticAlternateDistribution> {
   /**
    * Static instance.
@@ -65,10 +67,10 @@ public class GeneralizedLogisticAlternateLMMEstimator extends AbstractLMMEstimat
   @Override
   public GeneralizedLogisticAlternateDistribution estimateFromLMoments(double[] xmom) {
     double shape = -xmom[2];
-    if (!(shape >= -1 && shape <= 1)) {
+    if(!(shape >= -1 && shape <= 1)) {
       throw new ArithmeticException("Invalid moment estimation.");
     }
-    if (Math.abs(shape) < 1e-6) {
+    if(Math.abs(shape) < 1e-6) {
       // Effectively zero, so non-generalized.
       return new GeneralizedLogisticAlternateDistribution(xmom[0], xmom[1], 0.);
     }

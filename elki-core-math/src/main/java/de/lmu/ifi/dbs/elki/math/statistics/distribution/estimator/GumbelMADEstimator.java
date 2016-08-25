@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -42,7 +42,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has GumbelDistribution - - estimates
  */
-@Reference(title = "Applied Robust Statistics", authors = "D. J. Olive", booktitle = "Applied Robust Statistics", url="http://lagrange.math.siu.edu/Olive/preprints.htm")
+@Reference(title = "Applied Robust Statistics", //
+    authors = "D. J. Olive", //
+    booktitle = "Applied Robust Statistics", //
+    url = "http://lagrange.math.siu.edu/Olive/preprints.htm")
 public class GumbelMADEstimator extends AbstractMADEstimator<GumbelDistribution> {
   /**
    * Static instance.
@@ -59,7 +62,7 @@ public class GumbelMADEstimator extends AbstractMADEstimator<GumbelDistribution>
   @Override
   public GumbelDistribution estimateFromMedianMAD(double median, double mad) {
     // TODO: Work around degenerate cases?
-    return new GumbelDistribution(median + 0.4778 * mad, 1.3037 * mad);
+    return new GumbelDistribution(median - 0.4778 * mad, 1.3037 * mad);
   }
 
   @Override

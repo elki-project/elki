@@ -97,6 +97,33 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
   }
 
   /**
+   * Scale parameter
+   * 
+   * @return Scale
+   */
+  public double getScale() {
+    return scale;
+  }
+
+  /**
+   * Shape parameter
+   * 
+   * @return Shape
+   */
+  public double getShape() {
+    return shape;
+  }
+
+  /**
+   * Location parameter
+   * 
+   * @return Location
+   */
+  public double getLocation() {
+    return location;
+  }
+
+  /**
    * Probability density function.
    * 
    * @param val Value

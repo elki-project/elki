@@ -102,6 +102,24 @@ public class ExponentialDistribution extends AbstractDistribution {
     this.location = location;
   }
 
+  /**
+   * Get rate parameter.
+   *
+   * @return Rate
+   */
+  public double getRate() {
+    return rate;
+  }
+
+  /**
+   * Get the location parameter.
+   * 
+   * @return Location
+   */
+  public double getLocation() {
+    return location;
+  }
+
   @Override
   public double pdf(double val) {
     if(val < location) {
@@ -189,9 +207,9 @@ public class ExponentialDistribution extends AbstractDistribution {
    * <code>-log(uniform)</code>.
    * 
    * TODO: there are variants that do not rely on the log method and are faster.
-   * We need to implement and evaluate these. For details: see
-   * "Computer methods for sampling from the exponential and normal distributions"
-   * J. H. Ahrens, U. Dieter, https://dl.acm.org/citation.cfm?id=361593
+   * We need to implement and evaluate these. For details: see "Computer methods
+   * for sampling from the exponential and normal distributions" J. H. Ahrens,
+   * U. Dieter, https://dl.acm.org/citation.cfm?id=361593
    */
   @Override
   public double nextRandom() {

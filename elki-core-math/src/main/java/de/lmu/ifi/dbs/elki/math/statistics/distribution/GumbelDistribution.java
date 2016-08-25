@@ -83,6 +83,24 @@ public class GumbelDistribution extends AbstractDistribution {
   }
 
   /**
+   * Get the location
+   * 
+   * @return Mu
+   */
+  public double getMu() {
+    return mu;
+  }
+
+  /**
+   * Get the shape
+   * 
+   * @return Beta
+   */
+  public double getBeta() {
+    return beta;
+  }
+
+  /**
    * PDF of Gumbel distribution
    * 
    * @param x Value

@@ -94,6 +94,24 @@ public class InverseGaussianDistribution extends AbstractDistribution {
     this(mean, shape, (Random) null);
   }
 
+  /**
+   * Mean parameter.
+   * 
+   * @return Mean
+   */
+  public double getMean() {
+    return mean;
+  }
+
+  /**
+   * Shape parameter.
+   * 
+   * @return Shape
+   */
+  public double getShape() {
+    return shape;
+  }
+
   @Override
   public double pdf(double val) {
     return pdf(val, mean, shape);

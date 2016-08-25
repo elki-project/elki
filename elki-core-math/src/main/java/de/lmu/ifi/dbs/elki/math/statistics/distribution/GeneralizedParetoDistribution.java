@@ -84,6 +84,33 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
   }
 
   /**
+   * Location parameter
+   * 
+   * @return Location
+   */
+  public double getMu() {
+    return mu;
+  }
+
+  /**
+   * Scale parameter
+   * 
+   * @return Sigma
+   */
+  public double getSigma() {
+    return sigma;
+  }
+
+  /**
+   * Shape parameter
+   * 
+   * @return xi
+   */
+  public double getXi() {
+    return xi;
+  }
+
+  /**
    * PDF of GPD distribution
    * 
    * @param x Value

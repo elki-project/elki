@@ -38,13 +38,16 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * IBM Research.
  * </p>
  * 
+ * FIXME: Improve estimation of location parameter? Allow disabling?
  * 
  * @author Erich Schubert
  * @since 0.6.0
  * 
  * @apiviz.has ExponentialDistribution
  */
-@Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
+@Reference(authors = "J.R.M. Hosking", //
+    title = "Fortran routines for use with the method of L-moments Version 3.03", //
+    booktitle = "IBM Research Technical Report")
 public class ExponentialLMMEstimator extends AbstractLMMEstimator<ExponentialDistribution> {
   /**
    * Static instance.
@@ -66,7 +69,7 @@ public class ExponentialLMMEstimator extends AbstractLMMEstimator<ExponentialDis
   @Override
   public ExponentialDistribution estimateFromLMoments(double[] xmom) {
     double scale = 2. * xmom[1];
-    if (!(scale > 0.)) {
+    if(!(scale > 0.)) {
       throw new ArithmeticException("Data with non-positive scale cannot be exponential distributed.");
     }
     return new ExponentialDistribution(1. / scale, xmom[0] - scale);

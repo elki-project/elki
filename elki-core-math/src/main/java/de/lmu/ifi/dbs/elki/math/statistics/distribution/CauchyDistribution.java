@@ -83,6 +83,24 @@ public class CauchyDistribution extends AbstractDistribution {
     this.shape = shape;
   }
 
+  /**
+   * Get the location parameter.
+   * 
+   * @return Location
+   */
+  public double getLocation() {
+    return location;
+  }
+
+  /**
+   * Return the shape parameter.
+   * 
+   * @return Shape
+   */
+  public double getShape() {
+    return shape;
+  }
+
   @Override
   public double pdf(double x) {
     return pdf(x, location, shape);

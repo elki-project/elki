@@ -104,6 +104,24 @@ public class LaplaceDistribution extends AbstractDistribution {
     this.location = location;
   }
 
+  /**
+   * Get the rate parameter.
+   * 
+   * @return Rate parameter
+   */
+  public double getRate() {
+    return rate;
+  }
+
+  /**
+   * Get the location parameter.
+   * 
+   * @return Location
+   */
+  public double getLocation() {
+    return location;
+  }
+
   @Override
   public double pdf(double val) {
     return .5 * rate * Math.exp(-rate * Math.abs(val - location));
