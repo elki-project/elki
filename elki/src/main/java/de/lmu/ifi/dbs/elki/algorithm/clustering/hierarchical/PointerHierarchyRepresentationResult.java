@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 
 /**
@@ -55,6 +56,11 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
  * @since 0.6.0
  */
 public class PointerHierarchyRepresentationResult extends BasicResult {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(PointerHierarchyRepresentationResult.class);
+
   /**
    * The DBIDs in this result.
    */
@@ -137,18 +143,14 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
       }
       siz.increment(v1, siz.intValue(it));
     }
-    // Assertion only holds for exact e.g. single linkage
-    //assert (siz.intValue(it.seek(last)) == ids.size());
     WritableIntegerDataStore pos = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB, -1);
     WritableIntegerDataStore ins = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
     int defins = 0;
     // Place elements based on their successor
     for(it.seek(last); it.valid(); it.retract()) {
-      int size = siz.intValue(it);
+      final int size = siz.intValue(it);
       parent.assignVar(it, v1); // v1 = parent
-      final int ipos = ins.intValue(v1);
-      // Assertion only holds for exact e.g. single linkage
-      // assert (ipos >= 0);
+      final int ipos = ins.intValue(v1); // Position of parent
       if(ipos < 0 || DBIDUtil.equal(it, v1)) {
         // Root: use interval [defins; defins + size]
         ins.putInt(it, defins);
@@ -185,6 +187,7 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
     DBIDVar v1 = DBIDUtil.newVar(), prev = DBIDUtil.newVar();
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       if(!seen.add(it)) {
+        LOG.warning("Cycle detected in pointer representation. This is not allowed!");
         continue;
       }
       order.add(it);
