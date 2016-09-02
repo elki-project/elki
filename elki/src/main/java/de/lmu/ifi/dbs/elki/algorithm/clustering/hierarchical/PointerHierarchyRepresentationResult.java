@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 
 /**
@@ -56,11 +55,6 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
  * @since 0.6.0
  */
 public class PointerHierarchyRepresentationResult extends BasicResult {
-  /**
-   * Class logger.
-   */
-  private static final Logging LOG = Logging.getLogger(PointerHierarchyRepresentationResult.class);
-
   /**
    * The DBIDs in this result.
    */
@@ -176,7 +170,7 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
    * @return Sorted order
    */
   public static ArrayDBIDs topologicalSort(DBIDs oids, DBIDDataStore parent, DoubleDataStore parentDistance) {
-    // We used to simply use this:
+    // We used to simply sort by merging distance
     // But for e.g. Median Linkage, this would lead to problems, as links are
     // not necessarily performed in ascending order anymore!
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(oids);
@@ -187,9 +181,9 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
     DBIDVar v1 = DBIDUtil.newVar(), prev = DBIDUtil.newVar();
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       if(!seen.add(it)) {
-        LOG.warning("Cycle detected in pointer representation. This is not allowed!");
         continue;
       }
+      final int begin = order.size();
       order.add(it);
       prev.set(it); // Copy
       while(!DBIDUtil.equal(prev, parent.assignVar(prev, v1))) {
@@ -199,8 +193,12 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
         order.add(v1);
         prev.set(v1); // Copy
       }
+      // Reverse the inserted path:
+      for(int i = begin, j = order.size() - 1; i < j; i++, j--) {
+        order.swap(i, j);
+      }
     }
-    // Reverse the array:
+    // Reverse everything
     for(int i = 0, j = size - 1; i < j; i++, j--) {
       order.swap(i, j);
     }
