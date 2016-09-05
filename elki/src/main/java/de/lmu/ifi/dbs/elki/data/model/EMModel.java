@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,8 +23,8 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
  * Cluster model of an EM cluster, providing a mean and a full covariance
@@ -37,7 +37,7 @@ public class EMModel extends MeanModel {
   /**
    * Cluster covariance matrix
    */
-  private Matrix covarianceMatrix;
+  private double[][] covarianceMatrix;
 
   /**
    * Constructor.
@@ -45,7 +45,7 @@ public class EMModel extends MeanModel {
    * @param mean Mean vector
    * @param covarianceMatrix Covariance matrix
    */
-  public EMModel(double[] mean, Matrix covarianceMatrix) {
+  public EMModel(double[] mean, double[][] covarianceMatrix) {
     super(mean);
     this.covarianceMatrix = covarianceMatrix;
   }
@@ -53,20 +53,20 @@ public class EMModel extends MeanModel {
   @Override
   public void writeToText(TextWriterStream out, String label) {
     super.writeToText(out, label);
-    out.commentPrintLn("Covariance Matrix: " + this.covarianceMatrix.toString());
+    out.commentPrintLn("Covariance Matrix: " + FormatUtil.format(covarianceMatrix));
   }
 
   /**
    * @return covariance matrix
    */
-  public Matrix getCovarianceMatrix() {
+  public double[][] getCovarianceMatrix() {
     return covarianceMatrix;
   }
 
   /**
    * @param covarianceMatrix covariance matrix
    */
-  public void setCovarianceMatrix(Matrix covarianceMatrix) {
+  public void setCovarianceMatrix(double[][] covarianceMatrix) {
     this.covarianceMatrix = covarianceMatrix;
   }
 }

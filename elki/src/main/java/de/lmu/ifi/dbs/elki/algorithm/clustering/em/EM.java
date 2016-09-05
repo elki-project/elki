@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -82,9 +82,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("EM-Clustering: Clustering by Expectation Maximization")
 @Description("Cluster data via Gaussian mixture modeling and the EM algorithm")
 @Reference(authors = "A. P. Dempster, N. M. Laird, D. B. Rubin", //
-title = "Maximum Likelihood from Incomplete Data via the EM algorithm", //
-booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", //
-url = "http://www.jstor.org/stable/2984875")
+    title = "Maximum Likelihood from Incomplete Data via the EM algorithm", //
+    booktitle = "Journal of the Royal Statistical Society, Series B, 39(1), 1977, pp. 1-31", //
+    url = "http://www.jstor.org/stable/2984875")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.clustering.EM")
 public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlgorithm<Clustering<M>> implements ClusteringAlgorithm<Clustering<M>> {
   /**
@@ -351,14 +351,14 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
      * E(M) - E(M') < em.delta, must be a double equal to or greater than 0.
      */
     public static final OptionID DELTA_ID = new OptionID("em.delta", //
-    "The termination criterion for maximization of E(M): " + //
-    "E(M) - E(M') < em.delta");
+        "The termination criterion for maximization of E(M): " + //
+            "E(M) - E(M') < em.delta");
 
     /**
      * Parameter to specify the EM cluster models to use.
      */
     public static final OptionID INIT_ID = new OptionID("em.model", //
-    "Model factory.");
+        "Model factory.");
 
     /**
      * Number of clusters.
@@ -395,14 +395,14 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       }
 
       DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 1e-7)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(deltaP)) {
         delta = deltaP.getValue();
       }
 
       IntParameter maxiterP = new IntParameter(KMeans.MAXITER_ID)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
-      .setOptional(true);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT) //
+          .setOptional(true);
       if(config.grab(maxiterP)) {
         maxiter = maxiterP.getValue();
       }

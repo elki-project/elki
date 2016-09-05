@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -80,7 +80,7 @@ public class LUDecomposition implements java.io.Serializable {
    * @param A Rectangular matrix
    */
   public LUDecomposition(Matrix A) {
-    this(A.getArrayCopy(), A.getRowDimensionality(), A.getColumnDimensionality());
+    this(A.getArrayRef(), A.getRowDimensionality(), A.getColumnDimensionality());
   }
 
   /**
@@ -91,6 +91,7 @@ public class LUDecomposition implements java.io.Serializable {
    * @param n column dimensionality
    */
   public LUDecomposition(double[][] LU, int m, int n) {
+    LU = VMath.copy(LU);
     this.LU = LU;
     this.m = m;
     this.n = n;

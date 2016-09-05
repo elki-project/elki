@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -53,7 +53,7 @@ public class EMTest extends AbstractSimpleAlgorithmTest {
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.SEED_ID, 0);
+    params.addParameter(KMeans.SEED_ID, 1);
     params.addParameter(EM.Parameterizer.K_ID, 6);
     EM<DoubleVector, ?> em = ClassGenericsUtil.parameterizeOrAbort(EM.class, params);
     testParameterizationOk(params);
@@ -94,7 +94,7 @@ public class EMTest extends AbstractSimpleAlgorithmTest {
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(KMeans.SEED_ID, 1);
+    params.addParameter(KMeans.SEED_ID, 0);
     params.addParameter(EM.Parameterizer.K_ID, 6);
     params.addParameter(EM.Parameterizer.INIT_ID, SphericalGaussianModelFactory.class);
     EM<DoubleVector, ?> em = ClassGenericsUtil.parameterizeOrAbort(EM.class, params);
@@ -102,7 +102,7 @@ public class EMTest extends AbstractSimpleAlgorithmTest {
 
     // run EM on database
     Clustering<?> result = em.run(db);
-    testFMeasure(db, result, 0.518248);
-    testClusterSizes(result, new int[] { 0, 0, 1, 99, 235, 375 });
+    testFMeasure(db, result, 0.552095);
+    testClusterSizes(result, new int[] { 9, 15, 23, 44, 284, 335 });
   }
 }

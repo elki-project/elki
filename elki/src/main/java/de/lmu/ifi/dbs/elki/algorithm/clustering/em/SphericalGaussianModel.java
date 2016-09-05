@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,11 +22,13 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.identity;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
  * Simple spherical Gaussian cluster.
@@ -184,6 +186,6 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean, Matrix.identity(nmea.length, nmea.length).timesEquals(variance));
+    return new EMModel(mean, timesEquals(identity(nmea.length, nmea.length), variance));
   }
 }

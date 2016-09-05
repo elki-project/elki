@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.diagonal;
+
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -195,6 +198,6 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public EMModel finalizeCluster() {
-    return new EMModel(mean, Matrix.diagonal(variances));
+    return new EMModel(mean, diagonal(variances));
   }
 }

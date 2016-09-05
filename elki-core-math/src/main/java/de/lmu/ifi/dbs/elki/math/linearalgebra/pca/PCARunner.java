@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -96,6 +96,18 @@ public class PCARunner {
    * @return PCA result
    */
   public PCAResult processCovarMatrix(Matrix covarMatrix) {
+    // TODO: add support for a different implementation to do EVD?
+    EigenvalueDecomposition evd = new EigenvalueDecomposition(covarMatrix);
+    return processEVD(evd);
+  }
+
+  /**
+   * Process an existing covariance Matrix.
+   * 
+   * @param covarMatrix the matrix used for performing pca
+   * @return PCA result
+   */
+  public PCAResult processCovarMatrix(double[][] covarMatrix) {
     // TODO: add support for a different implementation to do EVD?
     EigenvalueDecomposition evd = new EigenvalueDecomposition(covarMatrix);
     return processEVD(evd);

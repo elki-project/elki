@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,7 +22,10 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.identity;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
@@ -31,7 +34,6 @@ import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
@@ -54,7 +56,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   /**
    * Covariance matrix, and inverse.
    */
-  Matrix covariance, invCovMatr;
+  double[][] covariance, invCovMatr;
 
   /**
    * Temporary storage, to avoid reallocations.
@@ -78,7 +80,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @param mean Initial mean
    */
   public MultivariateGaussianModel(double weight, double[] mean) {
-    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length));
+    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length), new double[mean.length][mean.length]);
   }
 
   /**
@@ -89,20 +91,32 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @param norm Normalization factor.
    */
   public MultivariateGaussianModel(double weight, double[] mean, double norm) {
+    this(weight, mean, norm, new double[mean.length][mean.length]);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param weight Cluster weight
+   * @param mean Initial mean
+   * @param norm Normalization factor.
+   * @param covariance Covariance matrix.
+   */
+  public MultivariateGaussianModel(double weight, double[] mean, double norm, double[][] covariance) {
     this.weight = weight;
     final int dim = mean.length;
     this.mean = mean;
     this.norm = norm;
     this.normDistrFactor = 1. / Math.sqrt(norm); // assume det=1
     this.nmea = new double[dim];
-    this.covariance = new Matrix(dim, dim);
+    this.covariance = covariance;
     this.wsum = 0.;
   }
 
   @Override
   public void beginEStep() {
     if(covariance == null) {
-      covariance = new Matrix(mean.length, mean.length);
+      covariance = new double[mean.length][mean.length];
       return;
     }
     wsum = 0.;
@@ -119,17 +133,16 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
       nmea[i] = mean[i] + rval;
     }
     // Update covariance matrix
-    final double[][] elements = covariance.getArrayRef();
     for(int i = 0; i < mean.length; i++) {
       for(int j = i; j < mean.length; j++) {
         // We DO want to use the new mean once and the old mean once!
         // It does not matter which one is which.
         double vi = vec.doubleValue(i);
         double delta = (vi - nmea[i]) * (vec.doubleValue(j) - mean[j]) * wei;
-        elements[i][j] = elements[i][j] + delta;
+        covariance[i][j] = covariance[i][j] + delta;
         // Optimize via symmetry
         if(i != j) {
-          elements[j][i] = elements[j][i] + delta;
+          covariance[j][i] = covariance[j][i] + delta;
         }
       }
     }
@@ -143,14 +156,16 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
     final int dim = mean.length;
     // TODO: improve handling of degenerated cases?
     if(wsum > Double.MIN_NORMAL) {
-      covariance.timesEquals(1. / wsum);
+      timesEquals(covariance, 1. / wsum);
     }
-    LUDecomposition lu = new LUDecomposition(covariance);
+    LUDecomposition lu = new LUDecomposition(covariance, dim, dim);
     double det = lu.det();
     if(!(det > 0.)) {
       // Add a small value to the diagonal
-      covariance.plusDiagonalEquals(Matrix.SINGULARITY_CHEAT);
-      lu = new LUDecomposition(covariance); // Should no longer be zero now.
+      for(int i = 0; i < dim; i++) {
+        covariance[i][i] += 1e-9; // TODO: don't use a magic number here.
+      }
+      lu = new LUDecomposition(covariance, dim, dim);
       det = lu.det();
       if(!(det > 0.)) {
         LOG.warning("Singularity cheat did not resolve zero determinant.");
@@ -160,7 +175,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
       }
     }
     normDistrFactor = 1. / Math.sqrt(norm * det);
-    invCovMatr = lu.solve(Matrix.identity(dim, dim));
+    invCovMatr = lu.solve(identity(dim, dim));
   }
 
   /**
@@ -174,7 +189,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
       return VMath.mahalanobisDistance(invCovMatr, vec, mean);
     }
     double sqsum = 0.;
-    for (int i = 0; i < vec.length; i++) {
+    for(int i = 0; i < vec.length; i++) {
       double d = vec[i] - mean[i];
       sqsum += d * d;
     }

@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
- * Factory for EM with multivariate gaussian models (with covariance; also known
+ * Factory for EM with multivariate Gaussian models (with covariance; also known
  * as Gaussian Mixture Modeling, GMM).
  *
  * These models have individual covariance matrixes, so this corresponds to the
@@ -52,7 +52,7 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
   /**
    * Constructor.
    *
-   * @param initializer Class for choosing the inital seeds.
+   * @param initializer Class for choosing the initial seeds.
    */
   public MultivariateGaussianModelFactory(KMeansInitialization<V> initializer) {
     super(initializer);
