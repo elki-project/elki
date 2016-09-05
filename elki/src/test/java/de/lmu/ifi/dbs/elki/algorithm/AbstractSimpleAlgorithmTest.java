@@ -22,30 +22,37 @@ package de.lmu.ifi.dbs.elki.algorithm;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.zip.GZIPInputStream;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
+import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.AbstractDatabase;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.InputStreamDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
+import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -100,26 +107,49 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @return Database
    */
   protected <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params, Class<?>[] filters) {
-    assertTrue("Test data set not found: " + filename, (new File(filename)).exists());
-    params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, filename);
-
-    List<Class<?>> filterlist = new ArrayList<>();
-    filterlist.add(FixedDBIDsFilter.class);
-    if(filters != null) {
-      for(Class<?> filter : filters) {
-        filterlist.add(filter);
+    // Allow loading test data from resources.
+    try (InputStream is = open(filename)) {
+      // Instantiate filters manually. TODO: redesign
+      List<ObjectFilter> filterlist = new ArrayList<>();
+      filterlist.add(new FixedDBIDsFilter(1));
+      if(filters != null) {
+        for(Class<?> filtercls : filters) {
+          ObjectFilter filter = ClassGenericsUtil.parameterizeOrAbort(filtercls, params);
+          filterlist.add(filter);
+        }
       }
+      // Setup parser and data loading
+      NumberVectorLabelParser<DoubleVector> parser = new NumberVectorLabelParser<>(DoubleVector.FACTORY);
+      InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, filterlist, parser);
+
+      // We want to allow the use of indexes via "params"
+      params.addParameter(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, dbc);
+      Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
+
+      testParameterizationOk(params);
+
+      db.initialize();
+      Relation<?> rel = db.getRelation(TypeUtil.ANY);
+      assertEquals("Database size does not match.", expectedSize, rel.size());
+      return db;
     }
-    params.addParameter(FileBasedDatabaseConnection.Parameterizer.FILTERS_ID, filterlist);
-    params.addParameter(FixedDBIDsFilter.Parameterizer.IDSTART_ID, 1);
-    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
+    catch(IOException e) {
+      fail("Test data " + filename + " not found.");
+      return null; // Not reached.
+    }
+  }
 
-    testParameterizationOk(params);
-
-    db.initialize();
-    Relation<?> rel = db.getRelation(TypeUtil.ANY);
-    assertEquals("Database size does not match.", expectedSize, rel.size());
-    return db;
+  /**
+   * Open a resource input stream. Use gzip if the name ends with .gz.
+   * (Autodetection currently does not work on resource streams.)
+   * 
+   * @param filename resource name
+   * @return Input stream
+   * @throws IOException
+   */
+  private InputStream open(String filename) throws IOException {
+    InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(filename);
+    return filename.endsWith(".gz") ? new GZIPInputStream(is) : is;
   }
 
   /**
