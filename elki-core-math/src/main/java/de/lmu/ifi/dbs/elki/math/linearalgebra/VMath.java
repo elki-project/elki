@@ -716,6 +716,17 @@ public final class VMath {
   }
 
   /**
+   * Reset the Matrix to 0.
+   * 
+   * @param v1 Matrix
+   */
+  public static final void clear(final double[][] v1) {
+    for (double[] row : v1) {
+      Arrays.fill(row, 0.0);
+    }
+  }
+
+  /**
    * Rotate vector by 90 degrees.
    * 
    * @param v1 first vector
