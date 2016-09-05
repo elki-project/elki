@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.datasource.filter.typeconversions.ClassLabelFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -124,7 +123,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
       }
 
       try {
-        Matrix proj = computeProjectionMatrix(vectorcolumn, classcolumn, dim);
+        double[][] proj = computeProjectionMatrix(vectorcolumn, classcolumn, dim);
         for(int i = 0; i < dataLength; i++) {
           double[] pv = times(proj, vectorcolumn.get(i).toArray());
           vectorcolumn.set(i, factory.newNumberVector(pv));
@@ -172,7 +171,7 @@ public abstract class AbstractSupervisedProjectionVectorFilter<V extends NumberV
    * @param dim Dimensionality Dimensionality
    * @return Projection matrix
    */
-  protected abstract Matrix computeProjectionMatrix(List<V> vectorcolumn, List<? extends ClassLabel> classcolumn, int dim);
+  protected abstract double[][] computeProjectionMatrix(List<V> vectorcolumn, List<? extends ClassLabel> classcolumn, int dim);
 
   /**
    * Partition the bundle based on the class label.

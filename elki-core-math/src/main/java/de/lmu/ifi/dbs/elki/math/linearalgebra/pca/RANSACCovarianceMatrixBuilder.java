@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -78,8 +77,8 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @since 0.5.5
  */
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
-title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
-booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
+    title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
+    booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)")
 public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuilder {
   /**
    * Number of iterations to perform
@@ -103,9 +102,12 @@ public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuild
     this.rnd = rnd;
   }
 
-  @Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", authors = "M.A. Fischler, R.C. Bolles", booktitle = "Communications of the ACM, Vol. 24 Issue 6", url = "http://dx.doi.org/10.1145/358669.358692")
+  @Reference(title = "Random sample consensus: a paradigm for model fitting with applications to image analysis and automated cartography", //
+      authors = "M.A. Fischler, R.C. Bolles", //
+      booktitle = "Communications of the ACM, Vol. 24 Issue 6", //
+      url = "http://dx.doi.org/10.1145/358669.358692")
   @Override
-  public Matrix processIds(DBIDs ids, Relation<? extends NumberVector> relation) {
+  public double[][] processIds(DBIDs ids, Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
 
     DBIDs best = DBIDUtil.EMPTYDBIDS;
@@ -116,7 +118,7 @@ public class RANSACCovarianceMatrixBuilder extends AbstractCovarianceMatrixBuild
       DBIDs sample = DBIDUtil.randomSample(ids, dim + 1, random);
       CovarianceMatrix cv = CovarianceMatrix.make(relation, sample);
       double[] centroid = cv.getMeanVector();
-      Matrix p = cv.destroyToSampleMatrix().inverse();
+      double[][] p = inverse(cv.destroyToSampleMatrix());
 
       ModifiableDBIDs support = DBIDUtil.newHashSet();
       for(DBIDIter id = ids.iter(); id.valid(); id.advance()) {

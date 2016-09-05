@@ -1,13 +1,10 @@
 package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
 
-import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +22,8 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
 
 /**
  * Class representing a similarity matrix between dimensions.
@@ -118,7 +117,7 @@ public abstract class DimensionSimilarityMatrix {
    */
   private int index(int x, int y) {
     assert (x != y);
-    if (x > y) {
+    if(x > y) {
       return index(y, x);
     }
     return ((y * (y - 1)) >> 1) + x;
@@ -129,15 +128,13 @@ public abstract class DimensionSimilarityMatrix {
    * 
    * @return New matrix
    */
-  public Matrix copyToFullMatrix() {
+  public double[][] copyToFullMatrix() {
     final int dim = size();
-    Matrix m = new Matrix(dim, dim);
-    double[][] ref = m.getArrayRef();
+    double[][] m = new double[dim][dim];
     int i = 0;
-    for (int y = 1; y < dim; y++) {
-      for (int x = 0; x < y; x++) {
-        ref[x][y] = sim[i];
-        ref[y][x] = sim[i];
+    for(int y = 1; y < dim; y++) {
+      for(int x = 0; x < y; x++) {
+        m[x][y] = m[y][x] = sim[i];
         ++i;
       }
     }
@@ -148,9 +145,9 @@ public abstract class DimensionSimilarityMatrix {
   public String toString() {
     StringBuffer buf = new StringBuffer();
     final int d = size();
-    for (int x = 1; x < d; x++) {
-      for (int y = 0; y < x; y++) {
-        if (y > 0) {
+    for(int x = 1; x < d; x++) {
+      for(int y = 0; y < x; y++) {
+        if(y > 0) {
           buf.append(' ');
         }
         buf.append(get(x, y));

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
  * Interface for computing covariance matrixes on a data set.
@@ -42,7 +41,7 @@ public interface CovarianceMatrixBuilder {
    * @param database the database used
    * @return Covariance Matrix
    */
-  Matrix processDatabase(Relation<? extends NumberVector> database);
+  double[][] processDatabase(Relation<? extends NumberVector> database);
 
   /**
    * Compute Covariance Matrix for a collection of database IDs.
@@ -51,7 +50,7 @@ public interface CovarianceMatrixBuilder {
    * @param database the database used
    * @return Covariance Matrix
    */
-  Matrix processIds(DBIDs ids, Relation<? extends NumberVector> database);
+  double[][] processIds(DBIDs ids, Relation<? extends NumberVector> database);
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection.
@@ -63,7 +62,7 @@ public interface CovarianceMatrixBuilder {
    * @param k the number of entries to process
    * @return Covariance Matrix
    */
-  Matrix processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database, int k);
+  double[][] processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database, int k);
 
   /**
    * Compute Covariance Matrix for a QueryResult Collection.
@@ -74,5 +73,5 @@ public interface CovarianceMatrixBuilder {
    * @param database the database used
    * @return Covariance Matrix
    */
-  Matrix processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database);
+  double[][] processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database);
 }

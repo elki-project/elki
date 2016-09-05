@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -40,7 +41,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.SignificantEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -103,7 +103,7 @@ public class AutotuningPCA extends PCARunner {
    */
   private static class Cand {
     /** Candidate matrix */
-    Matrix m;
+    double[][] m;
 
     /** Score */
     double explain;
@@ -118,7 +118,7 @@ public class AutotuningPCA extends PCARunner {
      * @param explain Explains core
      * @param dim Dimensionality
      */
-    Cand(Matrix m, double explain, int dim) {
+    Cand(double[][] m, double explain, int dim) {
       this.m = m;
       this.explain = explain;
       this.dim = dim;
@@ -130,7 +130,7 @@ public class AutotuningPCA extends PCARunner {
     assertSortedByDistance(results);
     final int dim = RelationUtil.dimensionality(database);
 
-    List<Matrix> best = new LinkedList<>();
+    List<double[][]> best = new ArrayList<>(dim);
     for(int i = 0; i < dim; i++) {
       best.add(null);
     }
@@ -150,7 +150,7 @@ public class AutotuningPCA extends PCARunner {
     // TODO: add smoothing options, handle border cases better.
     for(int k = startk; k < results.size(); k++) {
       // sorted eigenpairs, eigenvectors, eigenvalues
-      Matrix covMat = covarianceMatrixBuilder.processQueryResults(results, database);
+      double[][] covMat = covarianceMatrixBuilder.processQueryResults(results, database);
       EigenvalueDecomposition evd = new EigenvalueDecomposition(covMat);
       SortedEigenPairs eigenPairs = new SortedEigenPairs(evd, false);
       int filteredEigenPairs = filter.filter(eigenPairs.eigenValues());
@@ -199,7 +199,7 @@ public class AutotuningPCA extends PCARunner {
         if(bestk[i] == results.size() - smooth - 1) {
           continue;
         }
-        Matrix covMat = best.get(i);
+        double[][] covMat = best.get(i);
 
         // We stop at the lowest dimension that did the job for us.
         // System.err.println("Auto-k: "+bestk[i]+" dim: "+(i+1));

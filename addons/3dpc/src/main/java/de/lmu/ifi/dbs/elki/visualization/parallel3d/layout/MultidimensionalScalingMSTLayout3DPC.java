@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,7 +28,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SingularValueDecomposition;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
@@ -110,19 +109,18 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
     }
     mean /= (dim * dim);
     // Build double centered matrix:
-    Matrix d = new Matrix(dim, dim);
+    double[][] d = new double[dim][dim];
     for (int i = 0; i < dim; i++) {
-      d.set(i, i, -2 * means[i] + mean);
+      d[i][i] = -2 * means[i] + mean;
       for (int j = i + 1; j < dim; j++) {
         double v = max - Math.abs(mat.get(i, j));
         v = -.5 * Math.sqrt(v) - means[i] - means[j] + mean;
-        d.set(i, j, v);
-        d.set(j, i, v);
+        d[i][j] = d[j][i] = v;
       }
     }
 
     SingularValueDecomposition svd = new SingularValueDecomposition(d);
-    Matrix u = svd.getU();
+    double[][] u = svd.getU();
     double[] lambda = svd.getSingularValues();
     lambda[0] = Math.sqrt(Math.abs(lambda[0]));
     lambda[1] = Math.sqrt(Math.abs(lambda[1]));
@@ -133,8 +131,8 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
     double maxabs = 0;
     for (int i = 0; i < dim; i++) {
       Node n = (Node) l.getNode(i);
-      n.x = u.get(i, 0) * lambda[0];
-      n.y = u.get(i, 1) * lambda[1];
+      n.x = u[i][0] * lambda[0];
+      n.y = u[i][1] * lambda[1];
       double v = n.x * n.x + n.y * n.y;
       if (v > maxabs) {
         maxabs = v;

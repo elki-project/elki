@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
  * Simpler model for a single Gaussian cluster, without covariances.
@@ -40,6 +39,11 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  * @since 0.7.0
  */
 public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
+  /**
+   * Constant to avoid singular matrixes.
+   */
+  private static final double SINGULARITY_CHEAT = 1E-9;
+
   /**
    * Class logger.
    */
@@ -133,7 +137,7 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
       double det = 1.;
       for(int i = 0; i < variances.length; i++) {
         double v = variances[i];
-        v = v > 0 ? v * s : Matrix.SINGULARITY_CHEAT;
+        v = v > 0 ? v * s : SINGULARITY_CHEAT;
         variances[i] = v;
         det *= v;
       }

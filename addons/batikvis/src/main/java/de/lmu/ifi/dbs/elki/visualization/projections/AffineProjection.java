@@ -192,7 +192,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
     double y = 0.0;
     double s = 0.0;
 
-    final double[][] matrix = proj.getTransformation().getArrayRef();
+    final double[][] matrix = proj.getTransformation();
     final double[] colx = matrix[0];
     final double[] coly = matrix[1];
     final double[] cols = matrix[vr.length];
@@ -228,7 +228,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
     double x = 0.0;
     double y = 0.0;
 
-    final double[][] matrix = proj.getTransformation().getArrayRef();
+    final double[][] matrix = proj.getTransformation();
     final double[] colx = matrix[0];
     final double[] coly = matrix[1];
     assert (colx.length == coly.length);

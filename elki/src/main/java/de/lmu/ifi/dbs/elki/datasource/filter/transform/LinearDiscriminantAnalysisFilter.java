@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,6 +23,11 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.inverse;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transpose;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +38,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -58,7 +62,10 @@ import gnu.trove.list.TIntList;
  * @param <V> Vector type
  */
 @Alias("lda")
-@Reference(authors = "R. A. Fisher", title = "The use of multiple measurements in taxonomic problems", booktitle = "Annals of eugenics 7.2 (1936)", url = "http://dx.doi.org/10.1111/j.1469-1809.1936.tb02137.x")
+@Reference(authors = "R. A. Fisher", //
+    title = "The use of multiple measurements in taxonomic problems", //
+    booktitle = "Annals of eugenics 7.2 (1936)", //
+    url = "http://dx.doi.org/10.1111/j.1469-1809.1936.tb02137.x")
 public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends AbstractSupervisedProjectionVectorFilter<V> {
   /**
    * Class logger.
@@ -75,14 +82,14 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
   }
 
   @Override
-  protected Matrix computeProjectionMatrix(List<V> vectorcolumn, List<? extends ClassLabel> classcolumn, int dim) {
+  protected double[][] computeProjectionMatrix(List<V> vectorcolumn, List<? extends ClassLabel> classcolumn, int dim) {
     Map<ClassLabel, TIntList> classes = partition(classcolumn);
     // Fix indexing of classes:
     List<ClassLabel> keys = new ArrayList<>(classes.keySet());
     // Compute centroids:
     List<Centroid> centroids = computeCentroids(dim, vectorcolumn, keys, classes);
 
-    final Matrix sigmaB, sigmaI;
+    final double[][] sigmaB, sigmaI;
     // Between classes covariance:
     {
       CovarianceMatrix covmake = new CovarianceMatrix(dim);
@@ -100,19 +107,21 @@ public class LinearDiscriminantAnalysisFilter<V extends NumberVector> extends Ab
         // TODO: different weighting strategies? Sampling?
         // Note: GNU Trove iterator, not ELKI style!
         for(TIntIterator it = classes.get(keys.get(i)).iterator(); it.hasNext();) {
-          covmake.put(VMath.minusEquals(vectorcolumn.get(it.next()).toArray(), c));
+          covmake.put(minusEquals(vectorcolumn.get(it.next()).toArray(), c));
         }
       }
       sigmaI = covmake.destroyToSampleMatrix();
-      if(sigmaI.det() == 0) {
-        sigmaI.cheatToAvoidSingularity(1e-10);
+      if(new LUDecomposition(sigmaI).det() == 0) {
+        for(int i = 0; i < dim; i++) {
+          sigmaI[i][i] += 1e-10;
+        }
       }
     }
 
-    Matrix sol = sigmaI.inverse().times(sigmaB);
+    double[][] sol = times(inverse(sigmaI), sigmaB);
     EigenvalueDecomposition decomp = new EigenvalueDecomposition(sol);
     SortedEigenPairs sorted = new SortedEigenPairs(decomp, false);
-    return sorted.eigenVectors(tdim).transpose();
+    return transpose(sorted.eigenVectors(tdim));
   }
 
   /**

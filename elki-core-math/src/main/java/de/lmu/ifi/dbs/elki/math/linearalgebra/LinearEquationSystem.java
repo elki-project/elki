@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -45,6 +45,11 @@ public class LinearEquationSystem {
    * Logger.
    */
   private static final Logging LOG = Logging.getLogger(LinearEquationSystem.class);
+
+  /**
+   * A small number to handle numbers near 0 as 0.
+   */
+  private static final double DELTA = 1E-3;
 
   /**
    * Indicates trivial pivot search strategy.
@@ -114,24 +119,24 @@ public class LinearEquationSystem {
    * @param b the right hand side of the linear equation system
    */
   public LinearEquationSystem(double[][] a, double[] b) {
-    if (a == null) {
+    if(a == null) {
       throw new IllegalArgumentException("Coefficient array is null!");
     }
-    if (b == null) {
+    if(b == null) {
       throw new IllegalArgumentException("Right hand side is null!");
     }
-    if (a.length != b.length) {
+    if(a.length != b.length) {
       throw new IllegalArgumentException("Coefficient matrix and right hand side " + "differ in row dimensionality!");
     }
 
     coeff = a;
     rhs = b;
     row = new int[coeff.length];
-    for (int i = 0; i < coeff.length; i++) {
+    for(int i = 0; i < coeff.length; i++) {
       row[i] = i;
     }
     col = new int[coeff[0].length];
-    for (int j = 0; j < coeff[0].length; j++) {
+    for(int j = 0; j < coeff[0].length; j++) {
       col[j] = j;
     }
     rank = 0;
@@ -152,19 +157,19 @@ public class LinearEquationSystem {
    *        column[i]
    */
   public LinearEquationSystem(double[][] a, double[] b, int[] rowPermutations, int[] columnPermutations) {
-    if (a == null) {
+    if(a == null) {
       throw new IllegalArgumentException("Coefficient array is null!");
     }
-    if (b == null) {
+    if(b == null) {
       throw new IllegalArgumentException("Right hand side is null!");
     }
-    if (a.length != b.length) {
+    if(a.length != b.length) {
       throw new IllegalArgumentException("Coefficient matrix and right hand side " + "differ in row dimensionality!");
     }
-    if (rowPermutations.length != a.length) {
+    if(rowPermutations.length != a.length) {
       throw new IllegalArgumentException("Coefficient matrix and row permutation array " + "differ in row dimensionality!");
     }
-    if (columnPermutations.length != a[0].length) {
+    if(columnPermutations.length != a[0].length) {
       throw new IllegalArgumentException("Coefficient matrix and column permutation array " + "differ in column dimensionality!");
     }
 
@@ -226,9 +231,9 @@ public class LinearEquationSystem {
   }
 
   /**
-   * Solves this linear equation system by total pivot search.
-   * "Total pivot search" takes as pivot element the element in the current
-   * column having the biggest value. If we have: <br>
+   * Solves this linear equation system by total pivot search. "Total pivot
+   * search" takes as pivot element the element in the current column having the
+   * biggest value. If we have: <br>
    * <code>
    * ( a_11 &nbsp;&nbsp;&nbsp;&nbsp; ... &nbsp;&nbsp;&nbsp;&nbsp; a_1n      ) <br>
    * (  0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  ...   &nbsp;&nbsp;&nbsp;&nbsp; a_2n      ) <br>
@@ -242,9 +247,9 @@ public class LinearEquationSystem {
   }
 
   /**
-   * Solves this linear equation system by trivial pivot search.
-   * "Trivial pivot search" takes as pivot element the next element in the
-   * current column beeing non zero.
+   * Solves this linear equation system by trivial pivot search. "Trivial pivot
+   * search" takes as pivot element the next element in the current column
+   * beeing non zero.
    */
   public void solveByTrivialPivotSearch() {
     solve(TRIVAL_PIVOT_SEARCH);
@@ -284,7 +289,7 @@ public class LinearEquationSystem {
    * @return a string representation of this equation system
    */
   public String equationsToString(String prefix, NumberFormat nf) {
-    if ((coeff == null) || (rhs == null) || (row == null) || (col == null)) {
+    if((coeff == null) || (rhs == null) || (row == null) || (col == null)) {
       throw new NullPointerException();
     }
 
@@ -293,17 +298,18 @@ public class LinearEquationSystem {
 
     StringBuilder buffer = new StringBuilder();
     buffer.append(prefix).append('\n').append(prefix);
-    for (int i = 0; i < coeff.length; i++) {
-      for (int j = 0; j < coeff[row[0]].length; j++) {
+    for(int i = 0; i < coeff.length; i++) {
+      for(int j = 0; j < coeff[row[0]].length; j++) {
         format(nf, buffer, coeff[row[i]][col[j]], coeffDigits[col[j]]);
         buffer.append(" * x_").append(col[j]);
       }
       buffer.append(" =");
       format(nf, buffer, rhs[row[i]], rhsDigits);
 
-      if (i < coeff.length - 1) {
+      if(i < coeff.length - 1) {
         buffer.append('\n').append(prefix);
-      } else {
+      }
+      else {
         buffer.append('\n').append(prefix);
       }
     }
@@ -338,7 +344,7 @@ public class LinearEquationSystem {
    * @return a string representation of the solution of this equation system
    */
   public String solutionToString(int fractionDigits) {
-    if (!isSolvable()) {
+    if(!isSolvable()) {
       throw new IllegalStateException("System is not solvable!");
     }
 
@@ -356,15 +362,16 @@ public class LinearEquationSystem {
     int x0Digits = maxIntegerDigits(x_0);
     int[] uDigits = maxIntegerDigits(u);
     StringBuilder buffer = new StringBuilder();
-    for (int i = 0; i < x_0.length; i++) {
+    for(int i = 0; i < x_0.length; i++) {
       double value = x_0[i];
       format(nf, buffer, value, x0Digits);
-      for (int j = 0; j < u[0].length; j++) {
-        if (i == row) {
+      for(int j = 0; j < u[0].length; j++) {
+        if(i == row) {
           buffer.append("  +  a_").append(j).append(" * ");
-        } else {
+        }
+        else {
           buffer.append("          ");
-          for (int d = 0; d < paramsDigits; d++) {
+          for(int d = 0; d < paramsDigits; d++) {
             buffer.append(' ');
           }
         }
@@ -393,7 +400,7 @@ public class LinearEquationSystem {
     // main loop, transformation to reduced row echelon form
     boolean exitLoop = false;
 
-    while (!exitLoop) {
+    while(!exitLoop) {
       k++;
 
       // pivot search for entry in remaining matrix
@@ -405,7 +412,7 @@ public class LinearEquationSystem {
       IntIntPair pivotPos = new IntIntPair(0, 0);
       IntIntPair currPos = new IntIntPair(k, k);
 
-      switch(method) {
+      switch(method){
       case TRIVAL_PIVOT_SEARCH:
         pivotPos = nonZeroPivotSearch(k);
         break;
@@ -417,7 +424,7 @@ public class LinearEquationSystem {
       pivotCol = pivotPos.second;
       pivot = coeff[this.row[pivotRow]][col[pivotCol]];
 
-      if (LOG.isDebugging()) {
+      if(LOG.isDebugging()) {
         StringBuilder msg = new StringBuilder();
         msg.append("equations ").append(equationsToString(4));
         msg.append("  *** pivot at (").append(pivotRow).append(',').append(pivotCol).append(") = ").append(pivot).append('\n');
@@ -431,13 +438,13 @@ public class LinearEquationSystem {
       // test conditions for exiting loop
       // after this iteration
       // reasons are: Math.abs(pivot) == 0
-      if ((Math.abs(pivot) <= Matrix.DELTA)) {
+      if((Math.abs(pivot) <= DELTA)) {
         exitLoop = true;
       }
 
       // pivoting only if Math.abs(pivot) > 0
       // and k <= m - 1
-      if ((Math.abs(pivot) > Matrix.DELTA)) {
+      if((Math.abs(pivot) > DELTA)) {
         rank++;
         pivotOperation(k);
       }
@@ -446,10 +453,10 @@ public class LinearEquationSystem {
       // after this iteration
       // reasons are: k == rows-1 : no more rows
       // k == cols-1 : no more columns
-      if (k == rows - 1 || k == cols - 1) {
+      if(k == rows - 1 || k == cols - 1) {
         exitLoop = true;
       }
-    }// end while
+    } // end while
 
     reducedRowEchelonForm = true;
   }
@@ -465,22 +472,22 @@ public class LinearEquationSystem {
     double max = 0;
     int i, j, pivotRow = k, pivotCol = k;
     double absValue;
-    for (i = k; i < coeff.length; i++) {
-      for (j = k; j < coeff[0].length; j++) {
+    for(i = k; i < coeff.length; i++) {
+      for(j = k; j < coeff[0].length; j++) {
         // compute absolute value of
         // current entry in absValue
         absValue = Math.abs(coeff[row[i]][col[j]]);
 
         // compare absValue with value max
         // found so far
-        if (max < absValue) {
+        if(max < absValue) {
           // remember new value and position
           max = absValue;
           pivotRow = i;
           pivotCol = j;
-        }// end if
-      }// end for j
-    }// end for k
+        } // end if
+      } // end for j
+    } // end for k
     return new IntIntPair(pivotRow, pivotCol);
   }
 
@@ -494,18 +501,18 @@ public class LinearEquationSystem {
 
     int i, j;
     double absValue;
-    for (i = k; i < coeff.length; i++) {
-      for (j = k; j < coeff[0].length; j++) {
+    for(i = k; i < coeff.length; i++) {
+      for(j = k; j < coeff[0].length; j++) {
         // compute absolute value of
         // current entry in absValue
         absValue = Math.abs(coeff[row[i]][col[j]]);
 
         // check if absValue is non-zero
-        if (absValue > 0) { // found a pivot element
+        if(absValue > 0) { // found a pivot element
           return new IntIntPair(i, j);
-        }// end if
-      }// end for j
-    }// end for k
+        } // end if
+      } // end for j
+    } // end for k
     return new IntIntPair(k, k);
   }
 
@@ -539,20 +546,20 @@ public class LinearEquationSystem {
 
     // pivot row: set pivot to 1
     coeff[row[k]][col[k]] = 1;
-    for (int i = k + 1; i < coeff[k].length; i++) {
+    for(int i = k + 1; i < coeff[k].length; i++) {
       coeff[row[k]][col[i]] /= pivot;
     }
     rhs[row[k]] /= pivot;
 
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder();
       msg.append("set pivot element to 1 ").append(equationsToString(4));
       LOG.debugFine(msg.toString());
     }
 
     // for (int i = k + 1; i < coeff.length; i++) {
-    for (int i = 0; i < coeff.length; i++) {
-      if (i == k) {
+    for(int i = 0; i < coeff.length; i++) {
+      if(i == k) {
         continue;
       }
 
@@ -563,15 +570,15 @@ public class LinearEquationSystem {
       coeff[row[i]][col[k]] = 0;
 
       // modify entries a[i,j], i > k fixed, j = k+1...n-1
-      for (int j = k + 1; j < coeff[0].length; j++) {
+      for(int j = k + 1; j < coeff[0].length; j++) {
         coeff[row[i]][col[j]] = coeff[row[i]][col[j]] - coeff[row[k]][col[j]] * q;
-      }// end for j
+      } // end for j
 
       // modify right-hand-side
       rhs[row[i]] = rhs[row[i]] - rhs[row[k]] * q;
-    }// end for k
+    } // end for k
 
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       StringBuilder msg = new StringBuilder();
       msg.append("after pivot operation ").append(equationsToString(4));
       LOG.debugFine(msg.toString());
@@ -585,17 +592,17 @@ public class LinearEquationSystem {
    */
   private void solve(int method) throws NullPointerException {
     // solution exists
-    if (solved) {
+    if(solved) {
       return;
     }
 
     // bring in reduced row echelon form
-    if (!reducedRowEchelonForm) {
+    if(!reducedRowEchelonForm) {
       reducedRowEchelonForm(method);
     }
 
-    if (!isSolvable(method)) {
-      if (LOG.isDebugging()) {
+    if(!isSolvable(method)) {
+      if(LOG.isDebugging()) {
         LOG.debugFine("Equation system is not solvable!");
       }
       return;
@@ -605,9 +612,9 @@ public class LinearEquationSystem {
     int cols = coeff[0].length;
     TIntArrayList boundIndices = new TIntArrayList();
     x_0 = new double[cols];
-    for (int i = 0; i < coeff.length; i++) {
-      for (int j = i; j < coeff[row[i]].length; j++) {
-        if (coeff[row[i]][col[j]] == 1) {
+    for(int i = 0; i < coeff.length; i++) {
+      for(int j = i; j < coeff[row[i]].length; j++) {
+        if(coeff[row[i]][col[j]] == 1) {
           x_0[col[i]] = rhs[row[i]];
           boundIndices.add(col[i]);
           break;
@@ -615,15 +622,15 @@ public class LinearEquationSystem {
       }
     }
     TIntArrayList freeIndices = new TIntArrayList();
-    for (int i = 0; i < coeff[0].length; i++) {
-      if (boundIndices.contains(i)) {
+    for(int i = 0; i < coeff[0].length; i++) {
+      if(boundIndices.contains(i)) {
         continue;
       }
       freeIndices.add(i);
     }
 
     StringBuilder msg = new StringBuilder();
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\nSpecial solution x_0 = [").append(FormatUtil.format(x_0, ",", FormatUtil.NF4)).append(']');
       msg.append("\nbound Indices ").append(boundIndices);
       msg.append("\nfree Indices ").append(freeIndices);
@@ -635,11 +642,12 @@ public class LinearEquationSystem {
     int boundIndex = 0;
     u = new double[cols][freeIndices.size()];
 
-    for (int j = 0; j < u[0].length; j++) {
-      for (int i = 0; i < u.length; i++) {
-        if (freeIndex < freeIndices.size() && i == freeIndices.get(freeIndex)) {
+    for(int j = 0; j < u[0].length; j++) {
+      for(int i = 0; i < u.length; i++) {
+        if(freeIndex < freeIndices.size() && i == freeIndices.get(freeIndex)) {
           u[i][j] = 1;
-        } else if (boundIndex < boundIndices.size() && i == boundIndices.get(boundIndex)) {
+        }
+        else if(boundIndex < boundIndices.size() && i == boundIndices.get(boundIndex)) {
           u[i][j] = -coeff[row[boundIndex]][freeIndices.get(freeIndex)];
           boundIndex++;
         }
@@ -649,9 +657,9 @@ public class LinearEquationSystem {
 
     }
 
-    if (LOG.isDebugging()) {
+    if(LOG.isDebugging()) {
       msg.append("\nU");
-      for (double[] anU : u) {
+      for(double[] anU : u) {
         msg.append('\n').append(FormatUtil.format(anU, ",", FormatUtil.NF4));
       }
       LOG.debugFine(msg.toString());
@@ -667,17 +675,17 @@ public class LinearEquationSystem {
    * @return true if linear system in solvable
    */
   private boolean isSolvable(int method) throws NullPointerException {
-    if (solved) {
+    if(solved) {
       return solvable;
     }
 
-    if (!reducedRowEchelonForm) {
+    if(!reducedRowEchelonForm) {
       reducedRowEchelonForm(method);
     }
 
     // test if rank(coeff) == rank(coeff|rhs)
-    for (int i = rank; i < rhs.length; i++) {
-      if (Math.abs(rhs[row[i]]) > Matrix.DELTA) {
+    for(int i = rank; i < rhs.length; i++) {
+      if(Math.abs(rhs[row[i]]) > DELTA) {
         solvable = false;
         return false; // not solvable
       }
@@ -695,8 +703,8 @@ public class LinearEquationSystem {
    */
   private int[] maxIntegerDigits(double[][] values) {
     int[] digits = new int[values[0].length];
-    for (int j = 0; j < values[0].length; j++) {
-      for (double[] value : values) {
+    for(int j = 0; j < values[0].length; j++) {
+      for(double[] value : values) {
         digits[j] = Math.max(digits[j], integerDigits(value[j]));
       }
     }
@@ -711,7 +719,7 @@ public class LinearEquationSystem {
    */
   private int maxIntegerDigits(double[] values) {
     int digits = 0;
-    for (double value : values) {
+    for(double value : values) {
       digits = Math.max(digits, integerDigits(value));
     }
     return digits;
@@ -725,7 +733,7 @@ public class LinearEquationSystem {
    */
   private int integerDigits(double d) {
     double value = Math.abs(d);
-    if (value < 10) {
+    if(value < 10) {
       return 1;
     }
     return (int) Math.log10(value) + 1;
@@ -742,13 +750,14 @@ public class LinearEquationSystem {
    * @param maxIntegerDigits the maximum number of integer digits
    */
   private void format(NumberFormat nf, StringBuilder buffer, double value, int maxIntegerDigits) {
-    if (value >= 0) {
+    if(value >= 0) {
       buffer.append(" + ");
-    } else {
+    }
+    else {
       buffer.append(" - ");
     }
     int digits = maxIntegerDigits - integerDigits(value);
-    for (int d = 0; d < digits; d++) {
+    for(int d = 0; d < digits; d++) {
       buffer.append(' ');
     }
     buffer.append(nf.format(Math.abs(value)));

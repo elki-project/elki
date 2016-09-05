@@ -28,7 +28,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
  * Helper class which encapsulates an array of eigenpairs (i.e. an array of
@@ -64,12 +64,12 @@ public class SortedEigenPairs {
    */
   public SortedEigenPairs(EigenvalueDecomposition evd, final boolean ascending) {
     double[] eigenvalues = evd.getRealEigenvalues();
-    Matrix eigenvectors = evd.getV();
+    double[][] eigenvectors = evd.getV();
 
     this.eigenPairs = new EigenPair[eigenvalues.length];
     for(int i = 0; i < eigenvalues.length; i++) {
-      double e = java.lang.Math.abs(eigenvalues[i]);
-      double[] v = eigenvectors.getCol(i);
+      double e = Math.abs(eigenvalues[i]);
+      double[] v = VMath.getCol(eigenvectors, i);
       eigenPairs[i] = new EigenPair(v, e);
     }
 
@@ -133,11 +133,11 @@ public class SortedEigenPairs {
    * 
    * @return the sorted eigenvectors
    */
-  public Matrix eigenVectors() {
-    Matrix eigenVectors = new Matrix(eigenPairs.length, eigenPairs.length);
+  public double[][] eigenVectors() {
+    double[][] eigenVectors = new double[eigenPairs.length][eigenPairs.length];
     for(int i = 0; i < eigenPairs.length; i++) {
       EigenPair eigenPair = eigenPairs[i];
-      eigenVectors.setCol(i, eigenPair.getEigenvector());
+      VMath.setCol(eigenVectors, i, eigenPair.getEigenvector());
     }
     return eigenVectors;
   }
@@ -148,11 +148,11 @@ public class SortedEigenPairs {
    * @param n the number of eigenvectors (columns) to be returned
    * @return the first <code>n</code> sorted eigenvectors
    */
-  public Matrix eigenVectors(int n) {
-    Matrix eigenVectors = new Matrix(eigenPairs.length, n);
+  public double[][] eigenVectors(int n) {
+    double[][] eigenVectors = new double[eigenPairs.length][n];
     for(int i = 0; i < n; i++) {
       EigenPair eigenPair = eigenPairs[i];
-      eigenVectors.setCol(i, eigenPair.getEigenvector());
+      VMath.setCol(eigenVectors, i, eigenPair.getEigenvector());
     }
     return eigenVectors;
   }
@@ -163,11 +163,11 @@ public class SortedEigenPairs {
    * @param n the number of eigenvectors (columns) to be returned
    * @return the last <code>n</code> sorted eigenvectors
    */
-  public Matrix reverseEigenVectors(int n) {
-    Matrix eigenVectors = new Matrix(eigenPairs.length, n);
+  public double[][] reverseEigenVectors(int n) {
+    double[][] eigenVectors = new double[eigenPairs.length][n];
     for(int i = 0; i < n; i++) {
       EigenPair eigenPair = eigenPairs[eigenPairs.length - 1 - i];
-      eigenVectors.setCol(i, eigenPair.getEigenvector());
+      VMath.setCol(eigenVectors, i, eigenPair.getEigenvector());
     }
     return eigenVectors;
   }

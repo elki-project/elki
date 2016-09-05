@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
@@ -45,7 +47,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -133,7 +134,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
 
     // construct the relation Matrix of the ec-graph
-    Matrix E = new Matrix(ids.size(), ids.size());
+    double[][] E = new double[ids.size()][ids.size()];
     KNNHeap heap = DBIDUtil.newHeap(k);
     {
       int i = 0;
@@ -159,7 +160,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
             // Therefore we diverge from the article here.
             e = exp / distance;
           }
-          E.set(j, i, e);
+          E[j][i] = e;
         }
         // Convert kNN Heap into DBID array
         ModifiableDBIDs nids = DBIDUtil.newArray(heap.size());
@@ -173,32 +174,32 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
     // Sum based normalization - don't use E.normalizeColumns()
     // Which normalized to Euclidean length 1.0!
     // Also do the -c multiplication in this process.
-    for(int i = 0; i < E.getColumnDimensionality(); i++) {
+    for(int i = 0; i < E[0].length; i++) {
       double sum = 0.0;
-      for(int j = 0; j < E.getRowDimensionality(); j++) {
-        sum += E.get(j, i);
+      for(int j = 0; j < E.length; j++) {
+        sum += E[j][i];
       }
       if(sum == 0) {
         sum = 1.0;
       }
-      for(int j = 0; j < E.getRowDimensionality(); j++) {
-        E.set(j, i, -c * E.get(j, i) / sum);
+      for(int j = 0; j < E.length; j++) {
+        E[j][i] = -c * E[j][i] / sum;
       }
     }
     // Add identity matrix. The diagonal should still be 0s, so this is trivial.
-    assert (E.getRowDimensionality() == E.getColumnDimensionality());
-    for(int col = 0; col < E.getColumnDimensionality(); col++) {
-      assert (E.get(col, col) == 0.0);
-      E.set(col, col, 1.0);
+    assert (E.length == E[0].length);
+    for(int col = 0; col < E[0].length; col++) {
+      assert (E[col][col] == 0.0);
+      E[col][col] = 1.0;
     }
-    E = E.inverse().timesEquals(1 - c);
+    E = timesEquals(inverse(E), 1 - c);
 
     // Split the matrix into columns
     {
       int i = 0;
       for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
         // Note: matrix times ith unit vector = ith column
-        double[] sim = E.getCol(i);
+        double[] sim = getCol(E, i);
         similarityVectors.put(id, sim);
       }
     }

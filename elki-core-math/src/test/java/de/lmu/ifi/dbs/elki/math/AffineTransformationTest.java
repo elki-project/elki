@@ -23,9 +23,7 @@ package de.lmu.ifi.dbs.elki.math;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.euclideanLength;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -33,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
  * JUnit Test for the class {@link AffineTransformation}
@@ -51,8 +49,8 @@ public class AffineTransformationTest {
     int testdim = 5;
     AffineTransformation t = new AffineTransformation(testdim);
     assertTrue(t.getDimensionality() == testdim);
-    Matrix tm = t.getTransformation();
-    assertEquals("initial transformation matrix should be unity", tm, Matrix.unitMatrix(testdim + 1));
+    double[][] tm = t.getTransformation();
+    assertTrue("initial transformation matrix should be unity", VMath.almostEquals(tm, unitMatrix(testdim + 1)));
 
     // test application to a vector
     double[] dv = new double[testdim];
@@ -74,8 +72,8 @@ public class AffineTransformationTest {
     int testdim = 5;
     AffineTransformation t = new AffineTransformation(testdim);
     assertTrue(t.getDimensionality() == testdim);
-    Matrix tm = t.getTransformation();
-    assertEquals("initial transformation matrix should be unity", tm, Matrix.unitMatrix(testdim + 1));
+    double[][] tm = t.getTransformation();
+    assertTrue("initial transformation matrix should be unity", VMath.almostEquals(tm, unitMatrix(testdim + 1)));
 
     // translation vector
     double[] tv = new double[testdim];
@@ -84,13 +82,13 @@ public class AffineTransformationTest {
     }
     t.addTranslation(tv);
 
-    Matrix tm2 = t.getTransformation();
+    double[][] tm2 = t.getTransformation();
     // Manually do the same changes to the matrix tm
     for(int i = 0; i < testdim; i++) {
-      tm.set(i, testdim, i + testdim);
+      tm[i][testdim] = i + testdim;
     }
     // Compare the results
-    assertEquals("Translation wasn't added correctly to matrix.", tm, tm2);
+    assertTrue("Translation wasn't added correctly to matrix.", VMath.almostEquals(tm, tm2));
 
     // test application to a vector
     double[] v1 = new double[testdim];
@@ -135,8 +133,8 @@ public class AffineTransformationTest {
     double angle = Math.toRadians(360 / 3);
     AffineTransformation t = new AffineTransformation(testdim);
     assertTrue(t.getDimensionality() == testdim);
-    Matrix tm = t.getTransformation();
-    assertEquals("initial transformation matrix should be unity", tm, Matrix.unitMatrix(testdim + 1));
+    double[][] tm = t.getTransformation();
+    assertTrue("initial transformation matrix should be unity", VMath.almostEquals(tm, unitMatrix(testdim + 1)));
 
     // rotation matrix
     double[][] rm = new double[testdim][testdim];
@@ -148,18 +146,18 @@ public class AffineTransformationTest {
     rm[axis1][axis2] = -Math.sin(angle);
     rm[axis2][axis1] = +Math.sin(angle);
     rm[axis2][axis2] = +Math.cos(angle);
-    t.addMatrix(new Matrix(rm));
-    Matrix tm2 = t.getTransformation();
+    t.addMatrix(rm);
+    double[][] tm2 = t.getTransformation();
 
     // We know that we didn't do any translations and tm is the unity matrix
     // so we can manually do the rotation on it, too.
-    tm.set(axis1, axis1, +Math.cos(angle));
-    tm.set(axis1, axis2, -Math.sin(angle));
-    tm.set(axis2, axis1, +Math.sin(angle));
-    tm.set(axis2, axis2, +Math.cos(angle));
+    tm[axis1][axis1] = +Math.cos(angle);
+    tm[axis1][axis2] = -Math.sin(angle);
+    tm[axis2][axis1] = +Math.sin(angle);
+    tm[axis2][axis2] = +Math.cos(angle);
 
     // Compare the results
-    assertEquals("Rotation wasn't added correctly to matrix.", tm, tm2);
+    assertTrue("Rotation wasn't added correctly to matrix.", VMath.almostEquals(tm, tm2));
 
     // test application to a vector
     double[] v1 = new double[testdim];

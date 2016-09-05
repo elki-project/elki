@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,8 +22,9 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.inverse;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -45,7 +46,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -91,12 +92,6 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
    * The logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(GaussianUniformMixture.class);
-
-  /**
-   * Small value to increment diagonally of a matrix in order to avoid
-   * singularity before building the inverse.
-   */
-  private static final double SINGULARITY_CHEAT = 1E-9;
 
   /**
    * Holds the cutoff value.
@@ -209,12 +204,12 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     }
     CovarianceMatrix builder = CovarianceMatrix.make(relation, objids);
     double[] mean = builder.getMeanVector();
-    Matrix covarianceMatrix = builder.destroyToSampleMatrix();
+    double[][] covarianceMatrix = builder.destroyToSampleMatrix();
 
     // test singulaere matrix
-    Matrix covInv = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
+    double[][] covInv = inverse(covarianceMatrix);
 
-    double covarianceDet = covarianceMatrix.det();
+    double covarianceDet = new LUDecomposition(covarianceMatrix).det();
     double fakt = 1.0 / Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * covarianceDet);
     // for each object compute probability and sum
     double prob = 0;

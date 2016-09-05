@@ -158,14 +158,14 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
     if(wsum > Double.MIN_NORMAL) {
       timesEquals(covariance, 1. / wsum);
     }
-    LUDecomposition lu = new LUDecomposition(covariance, dim, dim);
+    LUDecomposition lu = new LUDecomposition(covariance);
     double det = lu.det();
     if(!(det > 0.)) {
       // Add a small value to the diagonal
       for(int i = 0; i < dim; i++) {
         covariance[i][i] += 1e-9; // TODO: don't use a magic number here.
       }
-      lu = new LUDecomposition(covariance, dim, dim);
+      lu = new LUDecomposition(covariance);
       det = lu.det();
       if(!(det > 0.)) {
         LOG.warning("Singularity cheat did not resolve zero determinant.");

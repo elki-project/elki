@@ -879,16 +879,6 @@ public class EigenvalueDecomposition {
    *
    * @param Arg Square matrix
    */
-
-  public EigenvalueDecomposition(Matrix Arg) {
-    this(Arg.getArrayRef());
-  }
-
-  /**
-   * Check for symmetry, then construct the eigenvalue decomposition
-   *
-   * @param Arg Square matrix
-   */
   public EigenvalueDecomposition(double[][] A) {
     n = A.length;
     V = new double[n][n];
@@ -947,8 +937,8 @@ public class EigenvalueDecomposition {
    *
    * @return V
    */
-  public Matrix getV() {
-    return new Matrix(V);
+  public double[][] getV() {
+    return V;
   }
 
   /**
@@ -974,9 +964,8 @@ public class EigenvalueDecomposition {
    *
    * @return D
    */
-  public Matrix getD() {
-    Matrix X = new Matrix(n, n);
-    double[][] D = X.getArrayRef();
+  public double[][] getD() {
+    double[][] D = new double[n][n];
     for(int i = 0; i < n; i++) {
       for(int j = 0; j < n; j++) {
         D[i][j] = 0.0;
@@ -989,6 +978,6 @@ public class EigenvalueDecomposition {
         D[i][i - 1] = e[i];
       }
     }
-    return X;
+    return D;
   }
 }

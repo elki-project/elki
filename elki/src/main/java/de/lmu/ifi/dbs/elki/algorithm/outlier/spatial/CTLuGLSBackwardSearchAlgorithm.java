@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -48,8 +50,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -176,9 +176,9 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     ids.sort();
 
     // init F,X,Z
-    Matrix X = new Matrix(ids.size(), 6);
-    Matrix F = new Matrix(ids.size(), ids.size());
-    Matrix Y = new Matrix(ids.size(), dimy);
+    double[][] X = new double[ids.size()][6];
+    double[][] F = new double[ids.size()][ids.size()];
+    double[][] Y = new double[ids.size()][dimy];
 
     {
       int i = 0;
@@ -188,19 +188,19 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
           V vec = relationx.get(id);
           double la = vec.doubleValue(0);
           double lo = vec.doubleValue(1);
-          X.set(i, 0, 1.0);
-          X.set(i, 1, la);
-          X.set(i, 2, lo);
-          X.set(i, 3, la * lo);
-          X.set(i, 4, la * la);
-          X.set(i, 5, lo * lo);
+          X[i][0] = 1.0;
+          X[i][1] = la;
+          X[i][2] = lo;
+          X[i][3] = la * lo;
+          X[i][4] = la * la;
+          X[i][5] = lo * lo;
         }
 
         {
           final NumberVector vecy = relationy.get(id);
           for(int d = 0; d < dimy; d++) {
             double idy = vecy.doubleValue(d);
-            Y.set(i, d, idy);
+            Y[i][d] = idy;
           }
         }
 
@@ -215,36 +215,36 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
             neighborhood.add(neighbor);
           }
           // Weight object itself positively.
-          F.set(i, i, 1.0);
+          F[i][i] = 1.0;
           final int nweight = -1 / neighborhood.size();
           // We need to find the index positions of the neighbors,
           // unfortunately.
           for(DBIDIter iter = neighborhood.iter(); iter.valid(); iter.advance()) {
             int pos = ids.binarySearch(iter);
             assert (pos >= 0);
-            F.set(pos, i, nweight);
+            F[pos][i] = nweight;
           }
         }
       }
     }
     // Estimate the parameter beta
     // Common term that we can save recomputing.
-    Matrix common = X.transposeTimesTranspose(F).times(F);
-    Matrix b = common.times(X).inverse().times(common.times(Y));
+    double[][] common = times(transposeTimesTranspose(X, F), F);
+    double[][] b = times(inverse(times(common, X)), times(common, Y));
     // Estimate sigma_0 and sigma:
     // sigma_sum_square = sigma_0*sigma_0 + sigma*sigma
-    Matrix sigmaMat = F.times(X.times(b).minus(F.times(Y)));
-    final double sigma_sum_square = sigmaMat.normF() / (relationx.size() - 6 - 1);
+    double[][] sigmaMat = times(F, minusEquals(times(X, b), times(F, Y)));
+    final double sigma_sum_square = normF(sigmaMat) / (relationx.size() - 6 - 1);
     final double norm = 1 / Math.sqrt(sigma_sum_square);
 
     // calculate the absolute values of standard residuals
-    Matrix E = F.times(Y.minus(X.times(b))).timesEquals(norm);
+    double[][] E = timesEquals(times(F, minus(Y, times(X, b))), norm);
 
     DBIDVar worstid = DBIDUtil.newVar();
     double worstscore = Double.NEGATIVE_INFINITY;
     int i = 0;
     for(DBIDIter id = ids.iter(); id.valid(); id.advance(), i++) {
-      double err = VMath.squareSum(E.getRow(i));
+      double err = squareSum(getRow(E, i));
       // double err = Math.abs(E.get(i, 0));
       if(err > worstscore) {
         worstscore = err;

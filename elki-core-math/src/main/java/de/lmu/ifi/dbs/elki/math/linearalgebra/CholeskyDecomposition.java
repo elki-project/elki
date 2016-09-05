@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -71,12 +71,10 @@ public class CholeskyDecomposition implements java.io.Serializable {
    * @param Arg Square, symmetric matrix.
    * 
    */
-  public CholeskyDecomposition(Matrix Arg) {
-    // Initialize.
-    double[][] A = Arg.getArrayRef();
-    n = Arg.getRowDimensionality();
+  public CholeskyDecomposition(double[][] A) {
+    n = A.length;
     L = new double[n][n];
-    isspd = (Arg.getColumnDimensionality() == n);
+    isspd = (A[0].length == n);
     // Main loop.
     for(int j = 0; j < n; j++) {
       double[] Lrowj = L[j];
@@ -118,8 +116,8 @@ public class CholeskyDecomposition implements java.io.Serializable {
    * 
    * @return L
    */
-  public Matrix getL() {
-    return new Matrix(L);
+  public double[][] getL() {
+    return L;
   }
 
   /**
@@ -130,8 +128,8 @@ public class CholeskyDecomposition implements java.io.Serializable {
    * @exception IllegalArgumentException Matrix row dimensions must agree.
    * @exception RuntimeException Matrix is not symmetric positive definite.
    */
-  public Matrix solve(Matrix B) {
-    if(B.getRowDimensionality() != n) {
+  public double[][] solve(double[][] B) {
+    if(B.length != n) {
       throw new IllegalArgumentException("Matrix row dimensions must agree.");
     }
     if(!isspd) {
@@ -139,8 +137,8 @@ public class CholeskyDecomposition implements java.io.Serializable {
     }
 
     // Copy right hand side.
-    double[][] X = B.getArrayCopy();
-    int nx = B.getColumnDimensionality();
+    double[][] X = VMath.copy(B);
+    int nx = B[0].length;
 
     // Solve L*Y = B;
     for(int k = 0; k < n; k++) {
@@ -165,6 +163,6 @@ public class CholeskyDecomposition implements java.io.Serializable {
         }
       }
     }
-    return new Matrix(X);
+    return X;
   }
 }

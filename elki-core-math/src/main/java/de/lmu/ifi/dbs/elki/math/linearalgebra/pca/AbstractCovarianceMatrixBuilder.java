@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
  * Abstract class with the task of computing a Covariance matrix to be used in PCA.
@@ -41,15 +40,15 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
  */
 public abstract class AbstractCovarianceMatrixBuilder implements CovarianceMatrixBuilder {
   @Override
-  public Matrix processDatabase(Relation<? extends NumberVector> database) {
+  public double[][] processDatabase(Relation<? extends NumberVector> database) {
     return processIds(database.getDBIDs(), database);
   }
 
   @Override
-  public abstract Matrix processIds(DBIDs ids, Relation<? extends NumberVector> database);
+  public abstract double[][] processIds(DBIDs ids, Relation<? extends NumberVector> database);
 
   @Override
-  public Matrix processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database, int k) {
+  public double[][] processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database, int k) {
     ModifiableDBIDs ids = DBIDUtil.newArray(k);
     int have = 0;
     for(DBIDIter it = results.iter(); it.valid() && have < k; it.advance(), have++) {
@@ -59,7 +58,7 @@ public abstract class AbstractCovarianceMatrixBuilder implements CovarianceMatri
   }
 
   @Override
-  public final Matrix processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database) {
+  public final double[][] processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database) {
     return processQueryResults(results, database, results.size());
   }
 }

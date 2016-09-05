@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.geometry;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.math.geometry;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -63,16 +62,6 @@ public class PrimsMinimumSpanningTree {
    */
   public static int[] processDense(double[][] mat) {
     return processDense(mat, ARRAY2D_ADAPTER);
-  }
-
-  /**
-   * Process a k x k distance matrix.
-   * 
-   * @param mat Distance matrix
-   * @return list of node number pairs representing the edges
-   */
-  public static int[] processDense(Matrix mat) {
-    return processDense(mat.getArrayRef(), ARRAY2D_ADAPTER);
   }
 
   /**

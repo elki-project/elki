@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,7 +25,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -74,15 +73,15 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
    * @param quantb B bins
    * @return Weight matrix
    */
-  public static Matrix computeWeightMatrix(final int quanth, final int quants, final int quantb) {
+  public static double[][] computeWeightMatrix(final int quanth, final int quants, final int quantb) {
     final int dim = quanth * quants * quantb;
     assert (dim > 0);
-    final Matrix m = new Matrix(dim, dim);
+    final double[][] m = new double[dim][dim];
     for(int x = 0; x < dim; x++) {
       final int hx = x / (quantb * quants);
       final int sx = (x / quantb) % quants;
       final int bx = x % quantb;
-      for(int y = 0; y < dim; y++) {
+      for(int y = x; y < dim; y++) {
         final int hy = y / (quantb * quants);
         final int sy = (y / quantb) % quants;
         final int by = y % quantb;
@@ -97,7 +96,7 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
         final double sin = shx * (sx + .5) / quants - shy * (sy + .5) / quants;
         final double db = (bx - by) / (double) quantb;
         final double val = 1. - Math.sqrt((db * db + sin * sin + cos * cos) / 5);
-        m.set(x, y, val);
+        m[x][y] = m[y][x] = val;
       }
     }
     return m;
@@ -135,8 +134,8 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntListParameter param = new IntListParameter(BPP_ID) //
-      .addConstraint(new ListSizeConstraint(3)) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT_LIST);
+          .addConstraint(new ListSizeConstraint(3)) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT_LIST);
       if(config.grab(param)) {
         int[] quant = param.getValue();
         assert (quant.length == 3);

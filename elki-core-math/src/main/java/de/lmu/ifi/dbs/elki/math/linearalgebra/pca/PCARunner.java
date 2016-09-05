@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -87,18 +86,6 @@ public class PCARunner {
    */
   public PCAResult processQueryResult(DoubleDBIDList results, Relation<? extends NumberVector> database) {
     return processCovarMatrix(covarianceMatrixBuilder.processQueryResults(results, database));
-  }
-
-  /**
-   * Process an existing covariance Matrix.
-   * 
-   * @param covarMatrix the matrix used for performing pca
-   * @return PCA result
-   */
-  public PCAResult processCovarMatrix(Matrix covarMatrix) {
-    // TODO: add support for a different implementation to do EVD?
-    EigenvalueDecomposition evd = new EigenvalueDecomposition(covarMatrix);
-    return processEVD(evd);
   }
 
   /**

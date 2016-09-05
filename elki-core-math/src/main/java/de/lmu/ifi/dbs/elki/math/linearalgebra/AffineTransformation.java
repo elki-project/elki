@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.Arrays;
 
@@ -50,12 +52,12 @@ public class AffineTransformation {
   /**
    * The transformation matrix of dim+1 x dim+1 for homogeneous coordinates
    */
-  private Matrix trans;
+  private double[][] trans;
 
   /**
    * the inverse transformation
    */
-  private Matrix inv = null;
+  private double[][] inv = null;
 
   /**
    * Constructor for an identity transformation.
@@ -65,7 +67,7 @@ public class AffineTransformation {
   public AffineTransformation(int dim) {
     super();
     this.dim = dim;
-    this.trans = Matrix.unitMatrix(dim + 1);
+    this.trans = unitMatrix(dim + 1);
   }
 
   /**
@@ -75,7 +77,7 @@ public class AffineTransformation {
    * @param trans transformation matrix
    * @param inv inverse matrix
    */
-  public AffineTransformation(int dim, Matrix trans, Matrix inv) {
+  public AffineTransformation(int dim, double[][] trans, double[][] inv) {
     super();
     this.dim = dim;
     this.trans = trans;
@@ -96,11 +98,11 @@ public class AffineTransformation {
    * @return new transformation to do the requested reordering
    */
   public static AffineTransformation reorderAxesTransformation(int dim, int[] axes) {
-    Matrix m = Matrix.zeroMatrix(dim + 1);
+    double[][] m = zeroMatrix(dim + 1);
     // insert ones appropriately:
     for(int i = 0; i < axes.length; i++) {
       assert (0 < axes[i] && axes[i] <= dim);
-      m.set(i, axes[i] - 1, 1.0);
+      m[i][axes[i] - 1] = 1.0;
     }
     int useddim = 1;
     for(int i = axes.length; i < dim + 1; i++) {
@@ -118,7 +120,7 @@ public class AffineTransformation {
           }
         }
       }
-      m.set(i, useddim - 1, 1.0);
+      m[i][useddim - 1] = 1.0;
       useddim++;
     }
     assert (useddim - 2 == dim);
@@ -158,11 +160,11 @@ public class AffineTransformation {
     // reset inverse transformation - needs recomputation.
     inv = null;
 
-    Matrix homTrans = Matrix.unitMatrix(dim + 1);
+    double[][] homTrans = unitMatrix(dim + 1);
     for(int i = 0; i < dim; i++) {
-      homTrans.set(i, dim, v[i]);
+      homTrans[i][dim] = v[i];
     }
-    trans = homTrans.times(trans);
+    trans = times(homTrans, trans);
   }
 
   /**
@@ -173,9 +175,9 @@ public class AffineTransformation {
    *
    * @param m matrix (should be invertible)
    */
-  public void addMatrix(Matrix m) {
-    assert (m.getRowDimensionality() == dim);
-    assert (m.getColumnDimensionality() == dim);
+  public void addMatrix(double[][] m) {
+    assert (m.length == dim);
+    assert (m[0].length == dim);
 
     // reset inverse transformation - needs recomputation.
     inv = null;
@@ -184,13 +186,13 @@ public class AffineTransformation {
     double[][] ht = new double[dim + 1][dim + 1];
     for(int i = 0; i < dim; i++) {
       for(int j = 0; j < dim; j++) {
-        ht[i][j] = m.get(i, j);
+        ht[i][j] = m[i][j];
       }
     }
     // the other cells default to identity matrix
     ht[dim][dim] = 1.0;
     // Multiply from left.
-    trans = new Matrix(ht).times(trans);
+    trans = times(ht, trans);
   }
 
   /**
@@ -223,7 +225,7 @@ public class AffineTransformation {
     ht[axis2][axis1] = +s;
     ht[axis2][axis2] = +c;
     // Multiply from left
-    trans = new Matrix(ht).times(trans);
+    trans = times(ht, trans);
   }
 
   /**
@@ -238,11 +240,11 @@ public class AffineTransformation {
 
     // Formal:
     // Matrix homTrans = Matrix.unitMatrix(dim + 1);
-    // homTrans.set(axis - 1, axis - 1, -1);
+    // homTrans[axis - 1][axis - 1] = -1;
     // trans = homTrans.times(trans);
     // Faster:
     for(int i = 0; i <= dim; i++) {
-      trans.set(axis - 1, i, -trans.get(axis - 1, i));
+      trans[axis - 1][i] = -trans[axis - 1][i];
     }
   }
 
@@ -257,11 +259,11 @@ public class AffineTransformation {
     // Note: last ROW is not included.
     for(int i = 0; i < dim; i++) {
       for(int j = 0; j <= dim; j++) {
-        trans.set(i, j, trans.get(i, j) * scale);
+        trans[i][j] = trans[i][j] * scale;
       }
     }
     // As long as relative vectors aren't used, this would also work:
-    // trans.set(dim, dim, trans.get(dim, dim) / scale);
+    // trans[dim][dim] = trans[dim][dim] / scale;
   }
 
   /**
@@ -269,7 +271,7 @@ public class AffineTransformation {
    *
    * @return copy of the transformation matrix
    */
-  public Matrix getTransformation() {
+  public double[][] getTransformation() {
     return trans;
   }
 
@@ -278,7 +280,7 @@ public class AffineTransformation {
    *
    * @return a copy of the inverse transformation matrix
    */
-  public Matrix getInverse() {
+  public double[][] getInverse() {
     if(inv == null) {
       updateInverse();
     }
@@ -289,7 +291,7 @@ public class AffineTransformation {
    * Compute the inverse transformation matrix
    */
   private void updateInverse() {
-    inv = trans.inverse();
+    inv = inverse(trans);
   }
 
   /**
@@ -358,7 +360,7 @@ public class AffineTransformation {
    * @return transformed vector of dimensionality dim
    */
   public double[] apply(double[] v) {
-    return unhomogeneVector(VMath.times(trans.elements, homogeneVector(v)));
+    return unhomogeneVector(times(trans, homogeneVector(v)));
   }
 
   /**
@@ -371,7 +373,7 @@ public class AffineTransformation {
     if(inv == null) {
       updateInverse();
     }
-    return unhomogeneVector(VMath.times(inv.elements, homogeneVector(v)));
+    return unhomogeneVector(times(inv, homogeneVector(v)));
   }
 
   /**
@@ -381,7 +383,7 @@ public class AffineTransformation {
    * @return transformed vector of dimensionality dim
    */
   public double[] applyRelative(double[] v) {
-    return unhomogeneRelativeVector(VMath.times(trans.elements, homogeneRelativeVector(v)));
+    return unhomogeneRelativeVector(times(trans, homogeneRelativeVector(v)));
   }
 
   /**
@@ -394,6 +396,6 @@ public class AffineTransformation {
     if(inv == null) {
       updateInverse();
     }
-    return unhomogeneRelativeVector(VMath.times(inv.elements, homogeneRelativeVector(v)));
+    return unhomogeneRelativeVector(times(inv, homogeneRelativeVector(v)));
   }
 }

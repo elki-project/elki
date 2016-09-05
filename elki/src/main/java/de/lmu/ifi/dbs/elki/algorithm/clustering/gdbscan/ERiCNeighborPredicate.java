@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.getCol;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.mahalanobisDistance;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.squareSum;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
@@ -50,7 +51,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
@@ -265,10 +265,10 @@ public class ERiCNeighborPredicate<V extends NumberVector> implements NeighborPr
      *         up the same space
      */
     protected boolean approximatelyLinearDependent(PCAFilteredResult pca1, PCAFilteredResult pca2) {
-      Matrix m1_czech = pca1.dissimilarityMatrix();
-      Matrix v2_strong = pca2.adapatedStrongEigenvectors();
-      for(int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
-        double[] v2_i = v2_strong.getCol(i);
+      double[][] m1_czech = pca1.dissimilarityMatrix();
+      double[][] v2_strong = pca2.adapatedStrongEigenvectors();
+      for(int i = 0; i < v2_strong[0].length; i++) {
+        double[] v2_i = getCol(v2_strong, i);
         // check, if distance of v2_i to the space of pca_1 > delta
         // (i.e., if v2_i spans up a new dimension)
         double distsq = squareSum(v2_i) - transposeTimesTimes(v2_i, m1_czech, v2_i);

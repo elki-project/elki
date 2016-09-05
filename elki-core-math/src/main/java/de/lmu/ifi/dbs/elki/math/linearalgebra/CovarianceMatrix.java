@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
 
 import java.util.Arrays;
 
@@ -269,12 +270,11 @@ public class CovarianceMatrix {
    * 
    * @return New matrix
    */
-  public Matrix makeSampleMatrix() {
+  public double[][] makeSampleMatrix() {
     if(wsum <= 1.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
-    Matrix mat = new Matrix(elements);
-    return mat.times(1. / (wsum - 1.));
+    return times(elements, 1. / (wsum - 1.));
   }
 
   /**
@@ -287,12 +287,11 @@ public class CovarianceMatrix {
    * 
    * @return New matrix
    */
-  public Matrix makeNaiveMatrix() {
+  public double[][] makeNaiveMatrix() {
     if(wsum <= 0.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
-    Matrix mat = new Matrix(elements);
-    return mat.times(1. / wsum);
+    return times(elements, 1. / wsum);
   }
 
   /**
@@ -305,13 +304,11 @@ public class CovarianceMatrix {
    * 
    * @return New matrix
    */
-  public Matrix destroyToSampleMatrix() {
+  public double[][] destroyToSampleMatrix() {
     if(wsum <= 1.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
-    Matrix mat = new Matrix(elements).timesEquals(1. / (wsum - 1.));
-    this.elements = null;
-    return mat;
+    return times(elements, 1. / (wsum - 1.));
   }
 
   /**
@@ -324,13 +321,11 @@ public class CovarianceMatrix {
    * 
    * @return New matrix
    */
-  public Matrix destroyToNaiveMatrix() {
+  public double[][] destroyToNaiveMatrix() {
     if(wsum <= 0.) {
       throw new IllegalStateException(ERR_TOO_LITTLE_WEIGHT);
     }
-    Matrix mat = new Matrix(elements).timesEquals(1. / wsum);
-    this.elements = null;
-    return mat;
+    return times(elements, 1. / wsum);
   }
 
   /**
@@ -350,22 +345,6 @@ public class CovarianceMatrix {
       elements = new double[mean.length][mean.length];
     }
     wsum = 0.;
-  }
-
-  /**
-   * Static Constructor.
-   * 
-   * @param mat Matrix to use the columns of
-   * @return Covariance matrix
-   */
-  public static CovarianceMatrix make(Matrix mat) {
-    CovarianceMatrix c = new CovarianceMatrix(mat.getRowDimensionality());
-    int n = mat.getColumnDimensionality();
-    for(int i = 0; i < n; i++) {
-      // TODO: avoid constructing the vector objects?
-      c.put(mat.getCol(i));
-    }
-    return c;
   }
 
   /**

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SingularValueDecomposition;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -119,23 +118,22 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
       bundle.appendColumn(new VectorFieldTypeInformation<>(factory, tdim), castColumn);
 
       // Compute distance matrix.
-      Matrix mat = new Matrix(computeDistanceMatrix(castColumn, size));
-      doubleCenterSymmetric(mat.getArrayRef());
+      double[][] mat = computeDistanceMatrix(castColumn, size);
+      doubleCenterSymmetric(mat);
       // Find eigenvectors.
       {
         SingularValueDecomposition svd = new SingularValueDecomposition(mat);
-        Matrix u = svd.getU();
+        double[][] u = svd.getU();
         double[] lambda = svd.getSingularValues();
         for(int i = 0; i < tdim; i++) {
           lambda[i] = Math.sqrt(Math.abs(lambda[i]));
         }
 
         double[] buf = new double[tdim];
-        double[][] uraw = u.getArrayRef();
         for(int i = 0; i < size; i++) {
-          double[] raw = uraw[i];
+          double[] row = u[i];
           for(int x = 0; x < buf.length; x++) {
-            buf[x] = lambda[x] * raw[x];
+            buf[x] = lambda[x] * row[x];
           }
           column.set(i, factory.newNumberVector(buf));
         }
