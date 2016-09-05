@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.clear;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.diagonal;
 
 import java.util.Arrays;
@@ -40,14 +41,14 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  */
 public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
   /**
-   * Constant to avoid singular matrixes.
-   */
-  private static final double SINGULARITY_CHEAT = 1E-9;
-
-  /**
    * Class logger.
    */
   private static Logging LOG = Logging.getLogger(DiagonalGaussianModel.class);
+
+  /**
+   * Constant to avoid singular matrixes.
+   */
+  private static final double SINGULARITY_CHEAT = 1E-9;
 
   /**
    * Mean vector.
@@ -81,7 +82,7 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
    * @param mean Initial mean
    */
   public DiagonalGaussianModel(double weight, double[] mean) {
-    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length));
+    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length), null);
   }
 
   /**
@@ -92,20 +93,36 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
    * @param norm Normalization factor.
    */
   public DiagonalGaussianModel(double weight, double[] mean, double norm) {
+    this(weight, mean, norm, null);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param weight Cluster weight
+   * @param mean Initial mean
+   * @param norm Normalization factor.
+   */
+  public DiagonalGaussianModel(double weight, double[] mean, double norm, double[] variances) {
     this.weight = weight;
     final int dim = mean.length;
     this.mean = mean;
     this.norm = norm;
     this.normDistrFactor = 1. / Math.sqrt(norm); // assume det=1
     this.nmea = new double[dim];
-    this.variances = new double[dim];
-    Arrays.fill(variances, 1.);
+    if(variances == null) {
+      variances = new double[dim];
+      Arrays.fill(variances, 1.);
+    }
+    this.variances = variances;
     this.wsum = 0.;
   }
 
   @Override
   public void beginEStep() {
     wsum = 0.;
+    clear(mean);
+    clear(variances);
   }
 
   @Override
@@ -155,21 +172,6 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
    * @param vec Vector
    * @return Mahalanobis distance
    */
-  public double mahalanobisDistance(double[] vec) {
-    double agg = 0.;
-    for(int i = 0; i < variances.length; i++) {
-      double diff = vec[i] - mean[i];
-      agg += diff / variances[i] * diff;
-    }
-    return agg;
-  }
-
-  /**
-   * Compute the Mahalanobis distance from the centroid for a given vector.
-   * 
-   * @param vec Vector
-   * @return Mahalanobis distance
-   */
   public double mahalanobisDistance(NumberVector vec) {
     double agg = 0.;
     for(int i = 0; i < variances.length; i++) {
@@ -181,10 +183,10 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public double estimateDensity(NumberVector vec) {
-    double power = mahalanobisDistance(vec) * .5;
-    double prob = normDistrFactor * Math.exp(-power);
+    double power = mahalanobisDistance(vec);
+    double prob = normDistrFactor * Math.exp(-.5 * power);
     if(!(prob >= 0.)) {
-      LOG.warning("Invalid probability: " + prob + " power: " + power + " factor: " + normDistrFactor);
+      LOG.warning("Invalid probability: " + prob + " power: " + (-.5 * power) + " factor: " + normDistrFactor);
       prob = 0.;
     }
     return prob * weight;

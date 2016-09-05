@@ -74,7 +74,7 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
    * @param mean Initial mean
    */
   public SphericalGaussianModel(double weight, double[] mean) {
-    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length));
+    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length), 1.);
   }
 
   /**
@@ -85,18 +85,30 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
    * @param norm Normalization factor.
    */
   public SphericalGaussianModel(double weight, double[] mean, double norm) {
+    this(weight, mean, norm, 1.);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param weight Cluster weight
+   * @param mean Initial mean
+   * @param norm Normalization factor.
+   */
+  public SphericalGaussianModel(double weight, double[] mean, double norm, double var) {
     this.weight = weight;
     this.mean = mean;
     this.norm = norm;
     this.normDistrFactor = 1. / Math.sqrt(norm); // assume det=1
     this.nmea = new double[mean.length];
-    this.variance = 1.;
+    this.variance = var;
     this.wsum = 0.;
   }
 
   @Override
   public void beginEStep() {
     wsum = 0.;
+    variance = 0.;
   }
 
   @Override

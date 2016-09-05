@@ -23,11 +23,9 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.clear;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.identity;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
@@ -47,6 +45,11 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * Class logger.
    */
   private static Logging LOG = Logging.getLogger(MultivariateGaussianModel.class);
+
+  /**
+   * Small value to add to the diagonal to avoid singularities.
+   */
+  private static final double SINGULARITY_CHEAT = 1e-9;
 
   /**
    * Mean vector.
@@ -107,19 +110,23 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
     final int dim = mean.length;
     this.mean = mean;
     this.norm = norm;
-    this.normDistrFactor = 1. / Math.sqrt(norm); // assume det=1
+    this.normDistrFactor = 1. / Math.sqrt(norm);
     this.nmea = new double[dim];
+    if(covariance == null) {
+      covariance = new double[mean.length][mean.length];
+    }
     this.covariance = covariance;
+    if(covariance != null) {
+      robustInvert();
+    }
     this.wsum = 0.;
   }
 
   @Override
   public void beginEStep() {
-    if(covariance == null) {
-      covariance = new double[mean.length][mean.length];
-      return;
-    }
     wsum = 0.;
+    clear(mean);
+    clear(covariance);
   }
 
   @Override
@@ -153,24 +160,29 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public void finalizeEStep() {
-    final int dim = mean.length;
-    // TODO: improve handling of degenerated cases?
     if(wsum > Double.MIN_NORMAL) {
       timesEquals(covariance, 1. / wsum);
     }
+    robustInvert();
+  }
+
+  /**
+   * Robust computation of the inverse covariance matrix.
+   */
+  private void robustInvert() {
+    // TODO: further improve handling of degenerated cases?
+    final int dim = mean.length;
     LUDecomposition lu = new LUDecomposition(covariance);
     double det = lu.det();
     if(!(det > 0.)) {
       // Add a small value to the diagonal
       for(int i = 0; i < dim; i++) {
-        covariance[i][i] += 1e-9; // TODO: don't use a magic number here.
+        covariance[i][i] += SINGULARITY_CHEAT;
       }
       lu = new LUDecomposition(covariance);
       det = lu.det();
       if(!(det > 0.)) {
         LOG.warning("Singularity cheat did not resolve zero determinant.");
-        // assert (det > 0) : "Singularity cheat did not resolve zero
-        // determinant.";
         det = 1.;
       }
     }
@@ -178,44 +190,28 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
     invCovMatr = lu.solve(identity(dim, dim));
   }
 
-  /**
-   * Compute the Mahalanobis distance from the centroid for a given vector.
-   * 
-   * @param vec Vector
-   * @return Mahalanobis distance
-   */
-  public double mahalanobisDistance(double[] vec) {
-    if(invCovMatr != null) {
-      return VMath.mahalanobisDistance(invCovMatr, vec, mean);
+  @Override
+  public double estimateDensity(NumberVector vec) {
+    double power = mahalanobisDistance(vec);
+    double prob = normDistrFactor * Math.exp(-.5 * power);
+    if(!(prob >= 0.)) {
+      LOG.warning("Invalid probability: " + prob + " power: " + -.5 * power + " factor: " + normDistrFactor);
+      prob = 0.;
     }
-    double sqsum = 0.;
-    for(int i = 0; i < vec.length; i++) {
-      double d = vec[i] - mean[i];
-      sqsum += d * d;
-    }
-    return sqsum;
+    return prob * weight;
   }
 
   /**
-   * Compute the Mahalanobis distance from the centroid for a given vector.
+   * Compute the Mahalanobis distance of a vector.
+   * 
+   * Note: used from
+   * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.P3C}!
    * 
    * @param vec Vector
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(NumberVector vec) {
-    double[] difference = minusEquals(vec.toArray(), mean);
-    return (invCovMatr != null) ? transposeTimesTimes(difference, invCovMatr, difference) : transposeTimes(difference, difference);
-  }
-
-  @Override
-  public double estimateDensity(NumberVector vec) {
-    double power = mahalanobisDistance(vec) * .5;
-    double prob = normDistrFactor * Math.exp(-power);
-    if(!(prob >= 0.)) {
-      LOG.warning("Invalid probability: " + prob + " power: " + power + " factor: " + normDistrFactor);
-      prob = 0.;
-    }
-    return prob * weight;
+    return VMath.mahalanobisDistance(invCovMatr, vec.toArray(), mean);
   }
 
   @Override
