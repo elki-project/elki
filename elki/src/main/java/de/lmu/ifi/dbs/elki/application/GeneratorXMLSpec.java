@@ -181,7 +181,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
         }
         if(cursclus.getTransformation() != null && cursclus.getTransformation().getTransformation() != null) {
           outStream.append("## Affine transformation matrix:").append(LINE_SEPARATOR);
-          outStream.append(FormatUtil.format(cursclus.getTransformation().getTransformation().getArrayRef(), "## ")).append(LINE_SEPARATOR);
+          outStream.append(FormatUtil.format(cursclus.getTransformation().getTransformation(), "## ")).append(LINE_SEPARATOR);
         }
         outStream.append("## Discards: " + cursclus.getDiscarded() + " Retries left: " + cursclus.getRetries()).append(LINE_SEPARATOR);
         double corf = /* cursclus.overweight */(double) (cursclus.getSize() + cursclus.getDiscarded()) / cursclus.getSize() / globdens;

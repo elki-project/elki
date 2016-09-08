@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -33,9 +33,11 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
- * Factory for EM with multivariate gaussian models (with covariance; also known
+ * Factory for EM with multivariate Gaussian models (with covariance; also known
  * as Gaussian Mixture Modeling, GMM).
  *
  * These models have individual covariance matrixes, so this corresponds to the
@@ -52,7 +54,7 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
   /**
    * Constructor.
    *
-   * @param initializer Class for choosing the inital seeds.
+   * @param initializer Class for choosing the initial seeds.
    */
   public MultivariateGaussianModelFactory(KMeansInitialization<V> initializer) {
     super(initializer);
@@ -64,9 +66,13 @@ public class MultivariateGaussianModelFactory<V extends NumberVector> extends Ab
     assert (initialMeans.length == k);
     final int dimensionality = initialMeans[0].length;
     final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
+    // Compute the global covariance matrix for better starting conditions:
+    double[][] covmat = CovarianceMatrix.make(relation).destroyToSampleMatrix();
+    VMath.times(covmat, 1. / k);
+
     List<MultivariateGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {
-      models.add(new MultivariateGaussianModel(1. / k, nv, norm));
+      models.add(new MultivariateGaussianModel(1. / k, nv, norm, VMath.copy(covmat)));
     }
     return models;
   }

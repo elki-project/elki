@@ -48,7 +48,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPair;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
@@ -213,7 +212,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
           svgp.addCSSClassOrLogError(cls);
         }
 
-        Matrix covmat = model.getCovarianceMatrix();
+        double[][] covmat = model.getCovarianceMatrix();
         double[] centroid = model.getMean();
         double[] cent = proj.fastProjectDataToRenderSpace(centroid);
 

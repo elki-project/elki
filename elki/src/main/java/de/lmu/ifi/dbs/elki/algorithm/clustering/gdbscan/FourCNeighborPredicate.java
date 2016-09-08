@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
@@ -45,7 +46,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
@@ -156,7 +156,7 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
     SortedEigenPairs epairs = pca.processIds(neighbors, relation).getEigenPairs();
     int cordim = filter.filter(epairs.eigenValues());
     PCAFilteredResult pcares = new PCAFilteredResult(epairs, cordim, settings.kappa, 1.);
-    Matrix m_hat = pcares.similarityMatrix();
+    double[][] m_hat = pcares.similarityMatrix();
 
     double[] obj = relation.get(id).toArray();
 

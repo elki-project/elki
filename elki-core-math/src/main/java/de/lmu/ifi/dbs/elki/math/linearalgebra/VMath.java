@@ -25,6 +25,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import java.util.Arrays;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /**
  * Class providing basic vector mathematics, for low-level vectors stored as
  * {@code double[]}. While this is less nice syntactically, it reduces memory
@@ -495,17 +497,6 @@ public final class VMath {
   }
 
   /**
-   * Matrix multiplication: v1 * m2
-   * 
-   * @param v1 vector
-   * @param m2 other matrix
-   * @return Matrix product, v1 * m2
-   */
-  public static final double[][] times(final double[] v1, final Matrix m2) {
-    return times(v1, m2.getArrayRef());
-  }
-
-  /**
    * Linear algebraic matrix multiplication, v1<sup>T</sup> * m2
    * 
    * @param v1 vector
@@ -524,17 +515,6 @@ public final class VMath {
       re[0][j] = s;
     }
     return re;
-  }
-
-  /**
-   * Linear algebraic matrix multiplication, v1<sup>T</sup> * m2
-   * 
-   * @param v1 vector
-   * @param m2 other matrix
-   * @return Matrix product, v1<sup>T</sup> * m2
-   */
-  public static final double[][] transposeTimes(final double[] v1, final Matrix m2) {
-    return transposeTimes(v1, m2.getArrayRef());
   }
 
   /**
@@ -570,17 +550,6 @@ public final class VMath {
       }
     }
     return re;
-  }
-
-  /**
-   * Linear algebraic matrix multiplication, v1 * m2^T
-   * 
-   * @param v1 vector
-   * @param m2 other matrix
-   * @return Matrix product, v1 * m2^T
-   */
-  public static final double[][] timesTranspose(final double[] v1, final Matrix m2) {
-    return timesTranspose(v1, m2.getArrayRef());
   }
 
   /**
@@ -717,17 +686,6 @@ public final class VMath {
   }
 
   /**
-   * Projects this row vector into the subspace formed by the specified matrix
-   * v.
-   * 
-   * @param m2 the subspace matrix
-   * @return the projection of p into the subspace formed by v
-   */
-  public static final double[] project(final double[] v1, final Matrix m2) {
-    return project(v1, m2.getArrayRef());
-  }
-
-  /**
    * Compute the hash code for the vector
    * 
    * @param v1 elements
@@ -755,6 +713,17 @@ public final class VMath {
    */
   public static final void clear(final double[] v1) {
     Arrays.fill(v1, 0.0);
+  }
+
+  /**
+   * Reset the Matrix to 0.
+   * 
+   * @param v1 Matrix
+   */
+  public static final void clear(final double[][] v1) {
+    for (double[] row : v1) {
+      Arrays.fill(row, 0.0);
+    }
   }
 
   /**
@@ -1304,17 +1273,6 @@ public final class VMath {
   }
 
   /**
-   * Linear algebraic matrix multiplication, m1 * v2
-   * 
-   * @param m1 Input matrix
-   * @param v2 a vector
-   * @return Matrix product, m1 * v2
-   */
-  public static final double[] times(final Matrix m1, final double[] v2) {
-    return times(m1.getArrayRef(), v2);
-  }
-
-  /**
    * Linear algebraic matrix multiplication, m1<sup>T</sup> * v2
    * 
    * @param m1 Input matrix
@@ -1334,17 +1292,6 @@ public final class VMath {
       re[i] = s;
     }
     return re;
-  }
-
-  /**
-   * Linear algebraic matrix multiplication, m1<sup>T</sup> * v2
-   * 
-   * @param m1 Input matrix
-   * @param v2 another matrix
-   * @return Matrix product, m1<sup>T</sup> * v2
-   */
-  public static final double[] transposeTimes(final Matrix m1, final double[] v2) {
-    return transposeTimes(m1.getArrayRef(), v2);
   }
 
   /**
@@ -1397,18 +1344,6 @@ public final class VMath {
       sum += s * c[j];
     }
     return sum;
-  }
-
-  /**
-   * Linear algebraic matrix multiplication, a<sup>T</sup> * B * c
-   * 
-   * @param a vector on the left
-   * @param B matrix
-   * @param c vector on the right
-   * @return Matrix product, a<sup>T</sup> * B * c
-   */
-  public static double transposeTimesTimes(final double[] a, final Matrix B, final double[] c) {
-    return transposeTimesTimes(a, B.getArrayRef(), c);
   }
 
   /**
@@ -1488,18 +1423,6 @@ public final class VMath {
       sum += s * (a[j] - c[j]);
     }
     return sum;
-  }
-
-  /**
-   * Linear algebraic matrix multiplication, (a-c)<sup>T</sup> * B * (a-c)
-   * 
-   * @param B matrix
-   * @param a First vector
-   * @param c Center vector
-   * @return Matrix product, (a-c)<sup>T</sup> * B * (a-c)
-   */
-  public static double mahalanobisDistance(final Matrix B, final double[] a, final double[] c) {
-    return mahalanobisDistance(B.getArrayRef(), a, c);
   }
 
   /**
@@ -1592,6 +1515,43 @@ public final class VMath {
 
     normalizeColumns(v);
     return v;
+  }
+
+  /**
+   * Solve A*X = B
+   *
+   * @param B right hand side
+   * @return solution if A is square, least squares solution otherwise
+   */
+  public static double[][] solve(double[][] A, double[][] B) {
+    final int rows = A.length, cols = A[0].length;
+    return (rows == cols ? (new LUDecomposition(A, rows, cols)).solve(B) : (new QRDecomposition(A, rows, cols)).solve(B));
+  }
+
+  /**
+   * Matrix inverse or pseudoinverse
+   *
+   * @return inverse(A) if A is square, pseudoinverse otherwise.
+   */
+  public static double[][] inverse(double[][] elements) {
+    return solve(elements, identity(elements.length, elements.length));
+  }
+  
+  /**
+   * Frobenius norm
+   *
+   * @param elements Matrix
+   * @return sqrt of sum of squares of all elements.
+   */
+  public static double normF(double[][] elements) {
+    double f = 0;
+    for(int i = 0; i < elements.length; i++) {
+      double[] row = elements[i];
+      for(int j = 0; j < row.length; j++) {
+        f = MathUtil.fastHypot(f, row[j]);
+      }
+    }
+    return f;
   }
 
   /**

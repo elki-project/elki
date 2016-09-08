@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,12 +27,12 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 
 /**
  * Eigenvalues and eigenvectors of a real matrix.
- * <P>
+ * <p>
  * If A is symmetric, then A = V*D*V' where the eigenvalue matrix D is diagonal
  * and the eigenvector matrix V is orthogonal. I.e. A =
  * V.times(D.timesTranspose(V)) and V.timesTranspose(V) equals the identity
  * matrix.
- * <P>
+ * <p>
  * If A is not symmetric, then the eigenvalue matrix D is block diagonal with
  * the real eigenvalues in 1-by-1 blocks and any complex eigenvalues, lambda +
  * i*mu, in 2-by-2 blocks, [lambda, mu; -mu, lambda]. The columns of V represent
@@ -53,42 +53,42 @@ public class EigenvalueDecomposition {
 
   /**
    * Row and column dimension (square matrix).
-   * 
+   *
    * @serial matrix dimension.
    */
   private int n;
 
   /**
    * Symmetry flag.
-   * 
+   *
    * @serial internal symmetry flag.
    */
   private boolean issymmetric;
 
   /**
    * Arrays for internal storage of eigenvalues.
-   * 
+   *
    * @serial internal storage of eigenvalues.
    */
   private double[] d, e;
 
   /**
    * Array for internal storage of eigenvectors.
-   * 
+   *
    * @serial internal storage of eigenvectors.
    */
   private double[][] V;
 
   /**
    * Array for internal storage of nonsymmetric Hessenberg form.
-   * 
+   *
    * @serial internal storage of nonsymmetric Hessenberg form.
    */
   private double[][] H;
 
   /**
    * Working storage for nonsymmetric algorithm.
-   * 
+   *
    * @serial working storage for nonsymmetric algorithm.
    */
   private double[] ort;
@@ -876,13 +876,11 @@ public class EigenvalueDecomposition {
 
   /**
    * Check for symmetry, then construct the eigenvalue decomposition
-   * 
+   *
    * @param Arg Square matrix
    */
-
-  public EigenvalueDecomposition(Matrix Arg) {
-    double[][] A = Arg.getArrayRef();
-    n = Arg.getColumnDimensionality();
+  public EigenvalueDecomposition(double[][] A) {
+    n = A.length;
     V = new double[n][n];
     d = new double[n];
     e = new double[n];
@@ -936,16 +934,16 @@ public class EigenvalueDecomposition {
 
   /**
    * Return the eigenvector matrix
-   * 
+   *
    * @return V
    */
-  public Matrix getV() {
-    return new Matrix(V);
+  public double[][] getV() {
+    return V;
   }
 
   /**
    * Return the real parts of the eigenvalues
-   * 
+   *
    * @return real(diag(D))
    */
   public double[] getRealEigenvalues() {
@@ -954,7 +952,7 @@ public class EigenvalueDecomposition {
 
   /**
    * Return the imaginary parts of the eigenvalues
-   * 
+   *
    * @return imag(diag(D))
    */
   public double[] getImagEigenvalues() {
@@ -963,12 +961,11 @@ public class EigenvalueDecomposition {
 
   /**
    * Return the block diagonal eigenvalue matrix
-   * 
+   *
    * @return D
    */
-  public Matrix getD() {
-    Matrix X = new Matrix(n, n);
-    double[][] D = X.getArrayRef();
+  public double[][] getD() {
+    double[][] D = new double[n][n];
     for(int i = 0; i < n; i++) {
       for(int j = 0; j < n; j++) {
         D[i][j] = 0.0;
@@ -981,6 +978,6 @@ public class EigenvalueDecomposition {
         D[i][i - 1] = e[i];
       }
     }
-    return X;
+    return D;
   }
 }

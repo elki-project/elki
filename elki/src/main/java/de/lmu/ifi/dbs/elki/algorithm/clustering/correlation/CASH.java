@@ -22,7 +22,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
+
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -65,7 +66,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunct
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.StandardCovarianceMatrixBuilder;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
@@ -109,9 +109,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("CASH: Robust clustering in arbitrarily oriented subspaces")
 @Description("Subspace clustering algorithm based on the Hough transform.")
 @Reference(authors = "E. Achtert, C. Böhm, J. David, P. Kröger, A. Zimek", //
-title = "Robust clustering in arbitraily oriented subspaces", //
-booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", //
-url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
+    title = "Robust clustering in arbitraily oriented subspaces", //
+    booktitle = "Proc. 8th SIAM Int. Conf. on Data Mining (SDM'08), Atlanta, GA, 2008", //
+    url = "http://www.siam.org/proceedings/datamining/2008/dm08_69_AchtertBoehmDavidKroegerZimek.pdf")
 public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
@@ -287,7 +287,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       ModifiableDBIDs clusterIDs = DBIDUtil.newHashSet();
       if(dim > minDim + 1) {
         ModifiableDBIDs ids;
-        Matrix basis_dim_minus_1;
+        double[][] basis_dim_minus_1;
         if(adjust) {
           ids = DBIDUtil.newHashSet();
           basis_dim_minus_1 = runDerivator(relation, dim, interval, ids);
@@ -470,7 +470,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @return a dim-1 dimensional database where the objects are projected into
    *         the specified subspace
    */
-  private MaterializedRelation<ParameterizationFunction> buildDB(int dim, Matrix basis, DBIDs ids, Relation<ParameterizationFunction> relation) {
+  private MaterializedRelation<ParameterizationFunction> buildDB(int dim, double[][] basis, DBIDs ids, Relation<ParameterizationFunction> relation) {
     ProxyDatabase proxy = new ProxyDatabase(ids);
     SimpleTypeInformation<ParameterizationFunction> type = new SimpleTypeInformation<>(ParameterizationFunction.class);
     WritableDataStore<ParameterizationFunction> prep = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT, ParameterizationFunction.class);
@@ -497,7 +497,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @param f the parameterization function to be projected
    * @return the projected parameterization function
    */
-  private ParameterizationFunction project(Matrix basis, ParameterizationFunction f) {
+  private ParameterizationFunction project(double[][] basis, ParameterizationFunction f) {
     // Matrix m = new Matrix(new
     // double[][]{f.getPointCoordinates()}).times(basis);
     double[] m = transposeTimes(basis, f.getColumnVector());
@@ -511,14 +511,45 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @param alpha the alpha values
    * @return a basis defining a subspace described by the specified alpha values
    */
-  private Matrix determineBasis(double[] alpha) {
-    double[] nn = new double[alpha.length + 1];
+  private double[][] determineBasis(double[] alpha) {
+    final int dim = alpha.length;
+    // Primary vector:
+    double[] nn = new double[dim + 1];
     for(int i = 0; i < nn.length; i++) {
-      double alpha_i = i == alpha.length ? 0 : alpha[i];
-      nn[i] = sinusProduct(0, i, alpha) * StrictMath.cos(alpha_i);
+        double alpha_i = i == alpha.length ? 0 : alpha[i];
+        nn[i] = sinusProduct(0, i, alpha) * StrictMath.cos(alpha_i);
     }
-    Matrix n = new Matrix(nn, alpha.length + 1);
-    return n.completeToOrthonormalBasis();
+    timesEquals(nn, 1. / euclideanLength(nn)); // Normalize
+    // Find orthogonal system, in transposed form:
+    double[][] basis = new double[dim][];
+    int found = 0;
+    for(int i = 0; i < nn.length && found < dim; i++) {
+      // ith unit vector.
+      final double[] e_i = new double[nn.length];
+      e_i[i] = 1.0;
+      minusTimesEquals(e_i, nn, scalarProduct(e_i, nn));
+      double len = euclideanLength(e_i);
+      // Make orthogonal to earlier (normal) basis vectors:
+      for(int j = 0; j < found; j++) {
+        if (len < 1e-9) { // Disappeared, probably linear dependent
+          break;
+        }
+        minusTimesEquals(e_i, basis[j], scalarProduct(e_i, basis[j]));
+        len = euclideanLength(e_i);
+      }
+      if(len < 1e-9) {
+        continue;
+      }
+      timesEquals(e_i, 1. / len); // Normalize
+      basis[found++] = e_i;
+    }
+    if (found < dim) {
+      // Likely some numerical instability, should not happen.
+      for (int i = found; i < dim; i++) {
+        basis[i] = new double[nn.length]; // Append zero vectors
+      }
+    }
+    return transpose(basis);
   }
 
   /**
@@ -658,7 +689,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
    * @param ids an empty set to assign the ids
    * @return a basis of the found subspace
    */
-  private Matrix runDerivator(Relation<ParameterizationFunction> relation, int dim, CASHInterval interval, ModifiableDBIDs ids) {
+  private double[][] runDerivator(Relation<ParameterizationFunction> relation, int dim, CASHInterval interval, ModifiableDBIDs ids) {
     Database derivatorDB = buildDerivatorDB(relation, interval);
 
     PCARunner pca = new PCARunner(new StandardCovarianceMatrixBuilder());
@@ -667,7 +698,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
 
     CorrelationAnalysisSolution<DoubleVector> model = derivator.run(derivatorDB);
 
-    Matrix weightMatrix = model.getSimilarityMatrix();
+    double[][] weightMatrix = model.getSimilarityMatrix();
     DoubleVector centroid = DoubleVector.wrap(model.getCentroid());
     DistanceQuery<DoubleVector> df = QueryUtil.getDistanceQuery(derivatorDB, new MatrixWeightedDistanceFunction(weightMatrix));
     double eps = .25;
@@ -682,8 +713,8 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       }
     }
 
-    Matrix basis = model.getStrongEigenvectors();
-    return basis.getMatrix(0, basis.getRowDimensionality() - 1, 0, dim - 2);
+    double[][] basis = model.getStrongEigenvectors();
+    return getMatrix(basis, 0, basis.length - 1, 0, dim - 2);
   }
 
   /**

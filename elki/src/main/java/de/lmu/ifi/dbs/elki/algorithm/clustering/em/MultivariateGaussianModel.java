@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,16 +22,16 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
+
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.clear;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.identity;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
@@ -47,6 +47,11 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   private static Logging LOG = Logging.getLogger(MultivariateGaussianModel.class);
 
   /**
+   * Small value to add to the diagonal to avoid singularities.
+   */
+  private static final double SINGULARITY_CHEAT = 1e-9;
+
+  /**
    * Mean vector.
    */
   double[] mean;
@@ -54,7 +59,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
   /**
    * Covariance matrix, and inverse.
    */
-  Matrix covariance, invCovMatr;
+  double[][] covariance, invCovMatr;
 
   /**
    * Temporary storage, to avoid reallocations.
@@ -78,7 +83,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @param mean Initial mean
    */
   public MultivariateGaussianModel(double weight, double[] mean) {
-    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length));
+    this(weight, mean, MathUtil.powi(MathUtil.TWOPI, mean.length), new double[mean.length][mean.length]);
   }
 
   /**
@@ -89,23 +94,39 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
    * @param norm Normalization factor.
    */
   public MultivariateGaussianModel(double weight, double[] mean, double norm) {
+    this(weight, mean, norm, new double[mean.length][mean.length]);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param weight Cluster weight
+   * @param mean Initial mean
+   * @param norm Normalization factor.
+   * @param covariance Covariance matrix.
+   */
+  public MultivariateGaussianModel(double weight, double[] mean, double norm, double[][] covariance) {
     this.weight = weight;
     final int dim = mean.length;
     this.mean = mean;
     this.norm = norm;
-    this.normDistrFactor = 1. / Math.sqrt(norm); // assume det=1
+    this.normDistrFactor = 1. / Math.sqrt(norm);
     this.nmea = new double[dim];
-    this.covariance = new Matrix(dim, dim);
+    if(covariance == null) {
+      covariance = new double[mean.length][mean.length];
+    }
+    this.covariance = covariance;
+    if(covariance != null) {
+      robustInvert();
+    }
     this.wsum = 0.;
   }
 
   @Override
   public void beginEStep() {
-    if(covariance == null) {
-      covariance = new Matrix(mean.length, mean.length);
-      return;
-    }
     wsum = 0.;
+    clear(mean);
+    clear(covariance);
   }
 
   @Override
@@ -119,17 +140,16 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
       nmea[i] = mean[i] + rval;
     }
     // Update covariance matrix
-    final double[][] elements = covariance.getArrayRef();
     for(int i = 0; i < mean.length; i++) {
       for(int j = i; j < mean.length; j++) {
         // We DO want to use the new mean once and the old mean once!
         // It does not matter which one is which.
         double vi = vec.doubleValue(i);
         double delta = (vi - nmea[i]) * (vec.doubleValue(j) - mean[j]) * wei;
-        elements[i][j] = elements[i][j] + delta;
+        covariance[i][j] = covariance[i][j] + delta;
         // Optimize via symmetry
         if(i != j) {
-          elements[j][i] = elements[j][i] + delta;
+          covariance[j][i] = covariance[j][i] + delta;
         }
       }
     }
@@ -140,67 +160,58 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
 
   @Override
   public void finalizeEStep() {
-    final int dim = mean.length;
-    // TODO: improve handling of degenerated cases?
     if(wsum > Double.MIN_NORMAL) {
-      covariance.timesEquals(1. / wsum);
+      timesEquals(covariance, 1. / wsum);
     }
+    robustInvert();
+  }
+
+  /**
+   * Robust computation of the inverse covariance matrix.
+   */
+  private void robustInvert() {
+    // TODO: further improve handling of degenerated cases?
+    final int dim = mean.length;
     LUDecomposition lu = new LUDecomposition(covariance);
     double det = lu.det();
     if(!(det > 0.)) {
       // Add a small value to the diagonal
-      covariance.plusDiagonalEquals(Matrix.SINGULARITY_CHEAT);
-      lu = new LUDecomposition(covariance); // Should no longer be zero now.
+      for(int i = 0; i < dim; i++) {
+        covariance[i][i] += SINGULARITY_CHEAT;
+      }
+      lu = new LUDecomposition(covariance);
       det = lu.det();
       if(!(det > 0.)) {
         LOG.warning("Singularity cheat did not resolve zero determinant.");
-        // assert (det > 0) : "Singularity cheat did not resolve zero
-        // determinant.";
         det = 1.;
       }
     }
     normDistrFactor = 1. / Math.sqrt(norm * det);
-    invCovMatr = lu.solve(Matrix.identity(dim, dim));
+    invCovMatr = lu.solve(identity(dim, dim));
+  }
+
+  @Override
+  public double estimateDensity(NumberVector vec) {
+    double power = mahalanobisDistance(vec);
+    double prob = normDistrFactor * Math.exp(-.5 * power);
+    if(!(prob >= 0.)) {
+      LOG.warning("Invalid probability: " + prob + " power: " + -.5 * power + " factor: " + normDistrFactor);
+      prob = 0.;
+    }
+    return prob * weight;
   }
 
   /**
-   * Compute the Mahalanobis distance from the centroid for a given vector.
+   * Compute the Mahalanobis distance of a vector.
    * 
-   * @param vec Vector
-   * @return Mahalanobis distance
-   */
-  public double mahalanobisDistance(double[] vec) {
-    if(invCovMatr != null) {
-      return VMath.mahalanobisDistance(invCovMatr, vec, mean);
-    }
-    double sqsum = 0.;
-    for (int i = 0; i < vec.length; i++) {
-      double d = vec[i] - mean[i];
-      sqsum += d * d;
-    }
-    return sqsum;
-  }
-
-  /**
-   * Compute the Mahalanobis distance from the centroid for a given vector.
+   * Note: used from
+   * {@link de.lmu.ifi.dbs.elki.algorithm.clustering.subspace.P3C}!
    * 
    * @param vec Vector
    * @return Mahalanobis distance
    */
   public double mahalanobisDistance(NumberVector vec) {
-    double[] difference = minusEquals(vec.toArray(), mean);
-    return (invCovMatr != null) ? transposeTimesTimes(difference, invCovMatr, difference) : transposeTimes(difference, difference);
-  }
-
-  @Override
-  public double estimateDensity(NumberVector vec) {
-    double power = mahalanobisDistance(vec) * .5;
-    double prob = normDistrFactor * Math.exp(-power);
-    if(!(prob >= 0.)) {
-      LOG.warning("Invalid probability: " + prob + " power: " + power + " factor: " + normDistrFactor);
-      prob = 0.;
-    }
-    return prob * weight;
+    return VMath.mahalanobisDistance(invCovMatr, vec.toArray(), mean);
   }
 
   @Override

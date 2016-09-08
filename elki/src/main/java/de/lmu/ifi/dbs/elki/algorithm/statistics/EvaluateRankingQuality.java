@@ -52,7 +52,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.MeanVarianceStaticHistogram;
@@ -122,7 +121,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
 
     // Compute cluster averages and covariance matrix
     HashMap<Cluster<?>, double[]> averages = new HashMap<>(split.size());
-    HashMap<Cluster<?>, Matrix> covmats = new HashMap<>(split.size());
+    HashMap<Cluster<?>, double[][]> covmats = new HashMap<>(split.size());
     for(Cluster<?> clus : split) {
       CovarianceMatrix covmat = CovarianceMatrix.make(relation, clus.getIDs());
       averages.put(clus, covmat.getMeanVector());
@@ -140,7 +139,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
     for(Cluster<?> clus : split) {
       ModifiableDoubleDBIDList cmem = DBIDUtil.newDistanceDBIDList(clus.size());
       double[] av = averages.get(clus);
-      Matrix covm = covmats.get(clus);
+      double[][] covm = covmats.get(clus);
 
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
         double d = mahalanobisDistance(covm, relation.get(iter).toArray(), av);

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,7 +23,10 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
 
 import java.util.Arrays;
 
@@ -52,7 +55,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ChiSquaredDistribution;
@@ -256,7 +258,7 @@ public class COP<V extends NumberVector> extends AbstractDistanceBasedAlgorithm<
       double[] relative = minusEquals(relation.get(id).toArray(), centroid);
 
       PCAResult pcares = pca.processIds(nids, relation);
-      Matrix evecs = pcares.getEigenvectors();
+      double[][] evecs = pcares.getEigenvectors();
       double[] projected = transposeTimes(evecs, relative);
       double[] evs = pcares.getEigenvalues();
 

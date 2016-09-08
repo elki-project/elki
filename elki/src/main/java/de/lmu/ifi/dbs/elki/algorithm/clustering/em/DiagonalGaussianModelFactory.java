@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.em;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,8 +31,11 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
  * Factory for EM with multivariate gaussian models using diagonal matrixes.
@@ -63,9 +66,12 @@ public class DiagonalGaussianModelFactory<V extends NumberVector> extends Abstra
     assert (initialMeans.length == k);
     final int dimensionality = initialMeans[0].length;
     final double norm = MathUtil.powi(MathUtil.TWOPI, dimensionality);
+    double[] variances = RelationUtil.variances(relation, Centroid.make(relation, relation.getDBIDs()), relation.getDBIDs());
+    VMath.times(variances, 1. / k);
+
     List<DiagonalGaussianModel> models = new ArrayList<>(k);
     for(double[] nv : initialMeans) {
-      models.add(new DiagonalGaussianModel(1. / k, nv, norm));
+      models.add(new DiagonalGaussianModel(1. / k, nv, norm, variances.clone()));
     }
     return models;
   }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
  * Result class for Principal Component Analysis with some convenience methods
@@ -48,7 +46,7 @@ public class PCAResult {
   /**
    * The eigenvectors in decreasing order to their corresponding eigenvalues.
    */
-  private Matrix eigenvectors;
+  private double[][] eigenvectors;
 
   /**
    * Build a PCA result object.
@@ -58,7 +56,7 @@ public class PCAResult {
    * @param eigenPairs Eigenpairs
    */
 
-  public PCAResult(double[] eigenvalues, Matrix eigenvectors, SortedEigenPairs eigenPairs) {
+  public PCAResult(double[] eigenvalues, double[][] eigenvectors, SortedEigenPairs eigenPairs) {
     super();
     this.eigenPairs = eigenPairs;
     this.eigenvalues = eigenvalues;
@@ -85,7 +83,7 @@ public class PCAResult {
    * 
    * @return the matrix of eigenvectors
    */
-  public final Matrix getEigenvectors() {
+  public final double[][] getEigenvectors() {
     return eigenvectors;
   }
 

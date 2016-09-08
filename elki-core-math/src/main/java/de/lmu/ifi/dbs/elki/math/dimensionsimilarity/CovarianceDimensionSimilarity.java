@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.dimensionsimilarity;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -52,7 +52,7 @@ public class CovarianceDimensionSimilarity implements DimensionSimilarity<Number
     final int dim = matrix.size();
     // FIXME: Use only necessary dimensions!
     CovarianceMatrix covmat = CovarianceMatrix.make(relation, subset);
-    double[][] mat = covmat.destroyToSampleMatrix().getArrayRef();
+    double[][] mat = covmat.destroyToSampleMatrix();
     // Transform diagonal to 1 / stddev
     for (int i = 0; i < mat.length; i++) {
       mat[i][i] = 1. / Math.sqrt(mat[i][i]);

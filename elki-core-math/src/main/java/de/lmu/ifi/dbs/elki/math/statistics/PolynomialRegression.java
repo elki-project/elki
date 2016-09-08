@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  */
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
  * A polynomial fit is a specific type of multiple regression. The simple
@@ -62,13 +61,13 @@ public class PolynomialRegression extends MultipleLinearRegression {
     this.p = p;
   }
 
-  private static Matrix xMatrix(double[] x, int p) {
+  private static double[][] xMatrix(double[] x, int p) {
     int n = x.length;
 
-    Matrix result = new Matrix(n, p + 1);
+    double[][] result = new double[n][p + 1];
     for(int i = 0; i < n; i++) {
       for(int j = 0; j < p + 1; j++) {
-        result.set(i, j, MathUtil.powi(x[i], j));
+        result[i][j] = MathUtil.powi(x[i], j);
       }
     }
     return result;

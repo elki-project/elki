@@ -71,21 +71,12 @@ public class SingularValueDecomposition {
   private int m, n;
 
   /**
-   * Construct the singular value decomposition
-   * 
-   * @param Arg Rectangular matrix
-   */
-  public SingularValueDecomposition(Matrix Arg) {
-    this(Arg.getArrayRef());
-  }
-
-  /**
    * Constructor.
    *
    * @param Arg Rectangular input matrix
    */
   public SingularValueDecomposition(double[][] Arg) {
-    double[][] A = new Matrix(Arg).getArrayCopy();
+    double[][] A = VMath.copy(Arg);
     this.m = A.length;
     this.n = A[0].length;
     // Derived from LINPACK code.
@@ -487,8 +478,8 @@ public class SingularValueDecomposition {
    * 
    * @return U
    */
-  public Matrix getU() {
-    return new Matrix(U);
+  public double[][] getU() {
+    return U;
   }
 
   /**
@@ -496,8 +487,8 @@ public class SingularValueDecomposition {
    * 
    * @return V
    */
-  public Matrix getV() {
-    return new Matrix(V);
+  public double[][] getV() {
+    return V;
   }
 
   /**
@@ -514,16 +505,15 @@ public class SingularValueDecomposition {
    * 
    * @return S
    */
-  public Matrix getS() {
-    Matrix X = new Matrix(n, n);
-    double[][] S = X.getArrayRef();
+  public double[][] getS() {
+    double[][] S = new double[n][n];
     for(int i = 0; i < n; i++) {
       for(int j = 0; j < n; j++) {
         S[i][j] = 0.0;
       }
       S[i][i] = this.s[i];
     }
-    return X;
+    return S;
   }
 
   /**

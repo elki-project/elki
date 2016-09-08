@@ -78,8 +78,8 @@ public class QRDecomposition implements java.io.Serializable {
    * 
    * @param A Rectangular matrix
    */
-  public QRDecomposition(Matrix A) {
-    this(A.getArrayRef(), A.getRowDimensionality(), A.getColumnDimensionality());
+  public QRDecomposition(double[][] A) {
+    this(A, A.length, A[0].length);
   }
 
   /**
@@ -90,7 +90,7 @@ public class QRDecomposition implements java.io.Serializable {
    * @param n column dimensionality
    */
   public QRDecomposition(double[][] A, int m, int n) {
-    this.QR = new Matrix(A).getArrayCopy();
+    this.QR = VMath.copy(A);
     this.m = QR.length;
     this.n = QR[0].length;
     Rdiag = new double[n];
@@ -152,20 +152,12 @@ public class QRDecomposition implements java.io.Serializable {
    * 
    * @return Lower trapezoidal matrix whose columns define the reflections
    */
-  public Matrix getH() {
-    Matrix X = new Matrix(m, n);
-    double[][] H = X.getArrayRef();
+  public double[][] getH() {
+    double[][] H = new double[m][n];
     for(int i = 0; i < m; i++) {
-      for(int j = 0; j < n; j++) {
-        if(i >= j) {
-          H[i][j] = QR[i][j];
-        }
-        else {
-          H[i][j] = 0.0;
-        }
-      }
+      System.arraycopy(QR[i], i, H[i], i, n - i);
     }
-    return X;
+    return H;
   }
 
   /**
@@ -173,23 +165,13 @@ public class QRDecomposition implements java.io.Serializable {
    * 
    * @return R
    */
-  public Matrix getR() {
-    Matrix X = new Matrix(n, n);
-    double[][] R = X.getArrayRef();
+  public double[][] getR() {
+    double[][] R = new double[n][n];
     for(int i = 0; i < n; i++) {
-      for(int j = 0; j < n; j++) {
-        if(i < j) {
-          R[i][j] = QR[i][j];
-        }
-        else if(i == j) {
-          R[i][j] = Rdiag[i];
-        }
-        else {
-          R[i][j] = 0.0;
-        }
-      }
+      System.arraycopy(QR[i], 0, R[i], 0, i);
+      R[i][i] = Rdiag[i];
     }
-    return X;
+    return R;
   }
 
   /**
@@ -197,9 +179,8 @@ public class QRDecomposition implements java.io.Serializable {
    * 
    * @return Q
    */
-  public Matrix getQ() {
-    Matrix X = new Matrix(m, n);
-    double[][] Q = X.getArrayRef();
+  public double[][] getQ() {
+    double[][] Q = new double[m][n];
     for(int k = n - 1; k >= 0; k--) {
       for(int i = 0; i < m; i++) {
         Q[i][k] = 0.0;
@@ -218,31 +199,7 @@ public class QRDecomposition implements java.io.Serializable {
         }
       }
     }
-    return X;
-  }
-
-  /**
-   * Least squares solution of A*X = B
-   * 
-   * @param B A Matrix with as many rows as A and any number of columns.
-   * @return X that minimizes the two norm of Q*R*X-B.
-   * @exception IllegalArgumentException Matrix row dimensions must agree.
-   * @exception RuntimeException Matrix is rank deficient.
-   */
-  public Matrix solve(Matrix B) {
-    if(B.getRowDimensionality() != m) {
-      throw new IllegalArgumentException("Matrix row dimensions must agree.");
-    }
-    if(!this.isFullRank()) {
-      throw new RuntimeException("Matrix is rank deficient.");
-    }
-
-    // Copy right hand side
-    int nx = B.getColumnDimensionality();
-    Matrix X = B.copy();
-
-    solveInplace(X.getArrayRef(), nx);
-    return X.getMatrix(0, n - 1, 0, nx - 1);
+    return Q;
   }
 
   /**
@@ -264,10 +221,10 @@ public class QRDecomposition implements java.io.Serializable {
     }
 
     // Copy right hand side
-    Matrix X = new Matrix(B).copy();
+    double[][] X = VMath.copy(B);
 
-    solveInplace(X.getArrayRef(), cols);
-    return X.getMatrix(0, n - 1, 0, cols - 1).getArrayRef();
+    solveInplace(X, cols);
+    return VMath.getMatrix(X, 0, n - 1, 0, cols - 1);
   }
 
   private void solveInplace(double[][] X, int nx) {

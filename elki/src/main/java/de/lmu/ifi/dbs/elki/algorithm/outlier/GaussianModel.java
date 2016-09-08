@@ -1,28 +1,30 @@
 package de.lmu.ifi.dbs.elki.algorithm.outlier;
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2015
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
+ Copyright (C) 2016
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
 
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
 
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.inverse;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -40,7 +42,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -53,8 +55,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
- * Outlier have smallest GMOD_PROB: the outlier scores is the
- * <em>probability density</em> of the assumed distribution.
+ * Outlier have smallest GMOD_PROB: the outlier scores is the <em>probability
+ * density</em> of the assumed distribution.
  * 
  * @author Lisa Reichert
  * @since 0.3
@@ -73,12 +75,6 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
    * OptionID for inversion flag.
    */
   public static final OptionID INVERT_ID = new OptionID("gaussod.invert", "Invert the value range to [0:1], with 1 being outliers instead of 0.");
-
-  /**
-   * Small value to increment diagonally of a matrix in order to avoid
-   * singularity before building the inverse.
-   */
-  private static final double SINGULARITY_CHEAT = 1E-9;
 
   /**
    * Invert the result
@@ -110,12 +106,13 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
     CovarianceMatrix temp = CovarianceMatrix.make(relation);
     double[] mean = temp.getMeanVector(relation).toArray();
     // debugFine(mean.toString());
-    Matrix covarianceMatrix = temp.destroyToNaiveMatrix();
+    double[][] covarianceMatrix = temp.destroyToNaiveMatrix();
     // debugFine(covarianceMatrix.toString());
-    Matrix covarianceTransposed = covarianceMatrix.cheatToAvoidSingularity(SINGULARITY_CHEAT).inverse();
+    double[][] covarianceTransposed = inverse(covarianceMatrix);
 
     // Normalization factors for Gaussian PDF
-    final double fakt = (1.0 / (Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * covarianceMatrix.det())));
+    double det = new LUDecomposition(covarianceMatrix).det();
+    final double fakt = (1.0 / (Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * det)));
 
     // for each object compute Mahalanobis distance
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {

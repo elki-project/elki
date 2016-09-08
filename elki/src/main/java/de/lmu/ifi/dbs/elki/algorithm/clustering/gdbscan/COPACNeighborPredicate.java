@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.COPAC;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -49,7 +50,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistance
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -150,7 +150,7 @@ public class COPACNeighborPredicate<V extends NumberVector> implements NeighborP
     int pdim = settings.filter.filter(epairs.eigenValues());
     PCAFilteredResult pcares = new PCAFilteredResult(epairs, pdim, 1., 0.);
 
-    Matrix mat = pcares.similarityMatrix();
+    double[][] mat = pcares.similarityMatrix();
 
     double[] vecP = relation.get(id).toArray();
 

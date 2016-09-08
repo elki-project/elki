@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,9 +24,11 @@ package de.lmu.ifi.dbs.elki.data.model;
  */
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.euclideanLength;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.getCol;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.project;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setCol;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
 
@@ -41,7 +43,6 @@ import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesExc
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
@@ -81,17 +82,17 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
   /**
    * The weak eigenvectors of the hyperplane induced by the correlation.
    */
-  private final Matrix weakEigenvectors;
+  private final double[][] weakEigenvectors;
 
   /**
    * The strong eigenvectors of the hyperplane induced by the correlation.
    */
-  private final Matrix strongEigenvectors;
+  private final double[][] strongEigenvectors;
 
   /**
    * The similarity matrix of the pca.
    */
-  private final Matrix similarityMatrix;
+  private final double[][] similarityMatrix;
 
   /**
    * The centroid if the objects belonging to the hyperplane induced by the
@@ -115,7 +116,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @param centroid the centroid if the objects belonging to the hyperplane
    *        induced by the correlation
    */
-  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, double[] centroid) {
+  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, double[][] strongEigenvectors, double[][] weakEigenvectors, double[][] similarityMatrix, double[] centroid) {
     this(solution, db, strongEigenvectors, weakEigenvectors, similarityMatrix, centroid, NumberFormat.getInstance(Locale.US));
   }
 
@@ -136,9 +137,9 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    *        induced by the correlation
    * @param nf the number format for output accuracy
    */
-  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, Matrix strongEigenvectors, Matrix weakEigenvectors, Matrix similarityMatrix, double[] centroid, NumberFormat nf) {
+  public CorrelationAnalysisSolution(LinearEquationSystem solution, Relation<V> db, double[][] strongEigenvectors, double[][] weakEigenvectors, double[][] similarityMatrix, double[] centroid, NumberFormat nf) {
     this.linearEquationSystem = solution;
-    this.correlationDimensionality = strongEigenvectors.getColumnDimensionality();
+    this.correlationDimensionality = strongEigenvectors[0].length;
     this.strongEigenvectors = strongEigenvectors;
     this.weakEigenvectors = weakEigenvectors;
     this.similarityMatrix = similarityMatrix;
@@ -229,13 +230,13 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * @param p a vector in the space underlying this solution
    * @return the data projections
    */
-  public Matrix dataProjections(V p) {
+  public double[][] dataProjections(V p) {
     double[] centered = minusEquals(p.toArray(), centroid);
-    Matrix sum = new Matrix(p.getDimensionality(), strongEigenvectors.getColumnDimensionality());
-    for(int i = 0; i < strongEigenvectors.getColumnDimensionality(); i++) {
-      double[] v_i = strongEigenvectors.getCol(i);
+    double[][] sum = new double[p.getDimensionality()][strongEigenvectors[0].length];
+    for(int i = 0; i < strongEigenvectors[0].length; i++) {
+      double[] v_i = getCol(strongEigenvectors, i);
       timesEquals(v_i, transposeTimes(centered, v_i));
-      sum.setCol(i, v_i);
+      setCol(sum, i, v_i);
     }
     return sum;
   }
@@ -265,7 +266,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * 
    * @return the strong eigenvectors
    */
-  public Matrix getStrongEigenvectors() {
+  public double[][] getStrongEigenvectors() {
     return strongEigenvectors;
   }
 
@@ -274,7 +275,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * 
    * @return the weak eigenvectors
    */
-  public Matrix getWeakEigenvectors() {
+  public double[][] getWeakEigenvectors() {
     return weakEigenvectors;
   }
 
@@ -283,7 +284,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
    * 
    * @return the similarity matrix of the pca
    */
-  public Matrix getSimilarityMatrix() {
+  public double[][] getSimilarityMatrix() {
     return similarityMatrix;
   }
 

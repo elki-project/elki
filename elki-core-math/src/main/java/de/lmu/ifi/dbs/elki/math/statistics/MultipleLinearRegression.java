@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,10 +23,12 @@ package de.lmu.ifi.dbs.elki.math.statistics;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.inverse;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesTranspose;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 
 /**
@@ -56,7 +58,7 @@ public class MultipleLinearRegression {
    * The (n x p+1)-matrix holding the x-values, where the i-th row has the form
    * (1 x1i ... x1p).
    */
-  private final Matrix x;
+  private final double[][] x;
 
   /**
    * The (p+1 x 1) - double[] holding the estimated b-values (b0, b1, ...,
@@ -77,7 +79,7 @@ public class MultipleLinearRegression {
   /**
    * Holds the matrix (x'x)^-1.
    */
-  private final Matrix xx_inverse;
+  private final double[][] xx_inverse;
 
   /**
    * The sum of square residuals
@@ -97,9 +99,9 @@ public class MultipleLinearRegression {
    * @param x the (n x p+1)-matrix holding the explanatory values, where the
    *        i-th row has the form (1 x1i ... x1p).
    */
-  public MultipleLinearRegression(double[] y, Matrix x) {
-    if(y.length <= x.getColumnDimensionality()) {
-      throw new IllegalArgumentException("Number of observed data has to be greater than " + "number of regressors: " + y.length + " > " + x.getColumnDimensionality());
+  public MultipleLinearRegression(double[] y, double[][] x) {
+    if(y.length <= x[0].length) {
+      throw new IllegalArgumentException("Number of observed data has to be greater than " + "number of regressors: " + y.length + " > " + x[0].length);
     }
 
     this.y = y;
@@ -112,8 +114,8 @@ public class MultipleLinearRegression {
     y_mean = sum / y.length;
 
     // estimate b, e
-    xx_inverse = x.transposeTimes(x).inverse();
-    b = times(xx_inverse.timesTranspose(x), y);
+    xx_inverse = inverse(transposeTimes(x, x));
+    b = times(timesTranspose(xx_inverse, x), y);
     // b = new double[](x.solve(y).getColumnPackedCopy());
     e = minus(y, times(x, b));
 
@@ -133,7 +135,7 @@ public class MultipleLinearRegression {
     sst = sum;
 
     // variance
-    variance = ssr / (y.length - x.getColumnDimensionality() - 1);
+    variance = ssr / (y.length - x[0].length - 1);
   }
 
   /**
@@ -144,7 +146,7 @@ public class MultipleLinearRegression {
   @Override
   public String toString() {
     StringBuilder msg = new StringBuilder();
-    msg.append("x = ").append(FormatUtil.format(x.getArrayRef(), 9, 4, "[", "]\n", ", "));
+    msg.append("x = ").append(FormatUtil.format(x, 9, 4, "[", "]\n", ", "));
     msg.append("\ny = ").append(FormatUtil.format(y, 9, 4));
     msg.append("\nb = ").append(FormatUtil.format(b, 9, 4));
     msg.append("\ne = ").append(FormatUtil.format(e, 9, 4));
@@ -203,7 +205,7 @@ public class MultipleLinearRegression {
    * @param x the matrix for which y is estimated
    * @return the estimation of y
    */
-  public double estimateY(Matrix x) {
+  public double estimateY(double[][] x) {
     return times(x, b)[0];
   }
 

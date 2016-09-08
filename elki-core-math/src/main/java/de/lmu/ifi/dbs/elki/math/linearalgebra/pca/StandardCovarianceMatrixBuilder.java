@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 
 /**
  * Class for building a "traditional" covariance matrix.
@@ -46,7 +45,7 @@ public class StandardCovarianceMatrixBuilder extends AbstractCovarianceMatrixBui
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processDatabase(Relation<? extends NumberVector> database) {
+  public double[][] processDatabase(Relation<? extends NumberVector> database) {
     return CovarianceMatrix.make(database).destroyToNaiveMatrix();
   }
 
@@ -58,7 +57,7 @@ public class StandardCovarianceMatrixBuilder extends AbstractCovarianceMatrixBui
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processIds(DBIDs ids, Relation<? extends NumberVector> database) {
+  public double[][] processIds(DBIDs ids, Relation<? extends NumberVector> database) {
     return CovarianceMatrix.make(database, ids).destroyToNaiveMatrix();
   }
 }

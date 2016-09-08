@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,7 +24,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
  */
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -69,17 +68,17 @@ public class RGBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
    * @param bpp bins per plane
    * @return Weight matrix
    */
-  public static Matrix computeWeightMatrix(int bpp) {
+  public static double[][] computeWeightMatrix(int bpp) {
     final int dim = bpp * bpp * bpp;
 
-    final Matrix m = new Matrix(dim, dim);
+    final double[][] m = new double[dim][dim];
     // maximum occurring distance in manhattan between bins:
     final double max = 3. * (bpp - 1.);
     for(int x = 0; x < dim; x++) {
       final int rx = (x / bpp) / bpp;
       final int gx = (x / bpp) % bpp;
       final int bx = x % bpp;
-      for(int y = 0; y < dim; y++) {
+      for(int y = x; y < dim; y++) {
         final int ry = (y / bpp) / bpp;
         final int gy = (y / bpp) % bpp;
         final int by = y % bpp;
@@ -89,7 +88,7 @@ public class RGBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
         final double db = Math.abs(bx - by);
 
         final double val = 1 - (dr + dg + db) / max;
-        m.set(x, y, val);
+        m[x][y] = m[y][x] = val;
       }
     }
     return m;

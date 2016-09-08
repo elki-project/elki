@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,7 +22,11 @@ package de.lmu.ifi.dbs.elki.algorithm;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setCol;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setMatrix;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transpose;
 
 import java.text.NumberFormat;
 import java.util.Locale;
@@ -42,7 +46,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
@@ -81,9 +84,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 @Title("Dependency Derivator: Deriving numerical inter-dependencies on data")
 @Description("Derives an equality-system describing dependencies between attributes in a correlation-cluster")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, A. Zimek", //
-title = "Deriving Quantitative Dependencies for Correlation Clusters", //
-booktitle = "Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.", //
-url = "http://dx.doi.org/10.1145/1150402.1150408")
+    title = "Deriving Quantitative Dependencies for Correlation Clusters", //
+    booktitle = "Proc. 12th Int. Conf. on Knowledge Discovery and Data Mining (KDD '06), Philadelphia, PA 2006.", //
+    url = "http://dx.doi.org/10.1145/1150402.1150408")
 public class DependencyDerivator<V extends NumberVector> extends AbstractNumberVectorDistanceBasedAlgorithm<V, CorrelationAnalysisSolution<V>> {
   /**
    * The logger for this class.
@@ -158,7 +161,7 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
       else {
         DistanceQuery<V> distanceQuery = database.getDistanceQuery(relation, getDistanceFunction());
         KNNList queryResults = database.getKNNQuery(distanceQuery, this.sampleSize)//
-        .getKNNForObject(centroidDV, this.sampleSize);
+            .getKNNForObject(centroidDV, this.sampleSize);
         ids = DBIDUtil.newHashSet(queryResults);
       }
     }
@@ -201,23 +204,23 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
 
     // Matrix weakEigenvectors =
     // pca.getEigenvectors().times(pca.selectionMatrixOfWeakEigenvectors());
-    Matrix weakEigenvectors = pcares.getWeakEigenvectors();
+    double[][] weakEigenvectors = pcares.getWeakEigenvectors();
     // Matrix strongEigenvectors =
     // pca.getEigenvectors().times(pca.selectionMatrixOfStrongEigenvectors());
-    Matrix strongEigenvectors = pcares.getStrongEigenvectors();
+    double[][] strongEigenvectors = pcares.getStrongEigenvectors();
 
     // TODO: what if we don't have any weak eigenvectors?
-    if(weakEigenvectors.getColumnDimensionality() == 0) {
+    if(weakEigenvectors[0].length == 0) {
       sol = new CorrelationAnalysisSolution<>(null, relation, strongEigenvectors, weakEigenvectors, pcares.similarityMatrix(), centroid);
     }
     else {
-      Matrix transposedWeakEigenvectors = weakEigenvectors.transpose();
+      double[][] transposedWeakEigenvectors = transpose(weakEigenvectors);
       if(LOG.isDebugging()) {
         StringBuilder log = new StringBuilder();
         log.append("Strong Eigenvectors:\n");
-        FormatUtil.formatTo(log, pcares.getStrongEigenvectors().getArrayRef(), " [", "]\n", ", ", nf).append('\n');
+        FormatUtil.formatTo(log, pcares.getStrongEigenvectors(), " [", "]\n", ", ", nf).append('\n');
         log.append("Transposed weak Eigenvectors:\n");
-        FormatUtil.formatTo(log, transposedWeakEigenvectors.getArrayRef(), " [", "]\n", ", ", nf).append('\n');
+        FormatUtil.formatTo(log, transposedWeakEigenvectors, " [", "]\n", ", ", nf).append('\n');
         log.append("Eigenvalues:\n");
         log.append(FormatUtil.format(pcares.getEigenvalues(), ", ", nf));
         LOG.debugFine(log.toString());
@@ -231,18 +234,17 @@ public class DependencyDerivator<V extends NumberVector> extends AbstractNumberV
         LOG.debugFine(log.toString());
       }
 
-      // +1 == + B.getColumnDimensionality()
-      Matrix gaussJordan = new Matrix(transposedWeakEigenvectors.getRowDimensionality(), transposedWeakEigenvectors.getColumnDimensionality() + 1);
-      gaussJordan.setMatrix(0, transposedWeakEigenvectors.getRowDimensionality() - 1, 0, transposedWeakEigenvectors.getColumnDimensionality() - 1, transposedWeakEigenvectors);
-      gaussJordan.setCol(transposedWeakEigenvectors.getColumnDimensionality(), b);
+      // +1 == + B[0].length
+      double[][] gaussJordan = new double[transposedWeakEigenvectors.length][transposedWeakEigenvectors[0].length + 1];
+      setMatrix(gaussJordan, 0, transposedWeakEigenvectors.length - 1, 0, transposedWeakEigenvectors[0].length - 1, transposedWeakEigenvectors);
+      setCol(gaussJordan, transposedWeakEigenvectors[0].length, b);
 
       if(LOG.isDebuggingFiner()) {
-        LOG.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan.getArrayRef(), " [", "]\n", ", ", nf));
+        LOG.debugFiner("Gauss-Jordan-Elimination of " + FormatUtil.format(gaussJordan, " [", "]\n", ", ", nf));
       }
 
-      double[][] a = new double[transposedWeakEigenvectors.getRowDimensionality()][transposedWeakEigenvectors.getColumnDimensionality()];
-      double[][] we = transposedWeakEigenvectors.getArrayRef();
-      System.arraycopy(we, 0, a, 0, transposedWeakEigenvectors.getRowDimensionality());
+      double[][] a = new double[transposedWeakEigenvectors.length][transposedWeakEigenvectors[0].length];
+      System.arraycopy(transposedWeakEigenvectors, 0, a, 0, transposedWeakEigenvectors.length);
 
       LinearEquationSystem lq = new LinearEquationSystem(a, b);
       lq.solveByTotalPivotSearch();

@@ -44,7 +44,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDFactory;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 
 /**
@@ -223,7 +222,7 @@ public final class TypeUtil {
   /**
    * Matrix type.
    */
-  public static final SimpleTypeInformation<Matrix> MATRIX = new SimpleTypeInformation<>(Matrix.class);
+  public static final SimpleTypeInformation<double[][]> MATRIX = new SimpleTypeInformation<>(double[][].class);
 
   /**
    * Cluster model type.

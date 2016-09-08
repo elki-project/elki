@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.ConstantWeight;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions.WeightFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -103,7 +102,7 @@ public class WeightedCovarianceMatrixBuilder extends AbstractCovarianceMatrixBui
    * @return Covariance matrix
    */
   @Override
-  public Matrix processIds(DBIDs ids, Relation<? extends NumberVector> relation) {
+  public double[][] processIds(DBIDs ids, Relation<? extends NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     final CovarianceMatrix cmat = new CovarianceMatrix(dim);
     final Centroid centroid = Centroid.make(relation, ids);
@@ -147,7 +146,7 @@ public class WeightedCovarianceMatrixBuilder extends AbstractCovarianceMatrixBui
    * @return Covariance Matrix
    */
   @Override
-  public Matrix processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database, int k) {
+  public double[][] processQueryResults(DoubleDBIDList results, Relation<? extends NumberVector> database, int k) {
     final int dim = RelationUtil.dimensionality(database);
     final CovarianceMatrix cmat = new CovarianceMatrix(dim);
 

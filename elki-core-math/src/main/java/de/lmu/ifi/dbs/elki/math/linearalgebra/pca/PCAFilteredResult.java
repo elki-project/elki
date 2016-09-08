@@ -1,6 +1,29 @@
 package de.lmu.ifi.dbs.elki.math.linearalgebra.pca;
 
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
+/*
+ This file is part of ELKI:
+ Environment for Developing KDD-Applications Supported by Index-Structures
+
+ Copyright (C) 2016
+ Ludwig-Maximilians-Universität München
+ Lehr- und Forschungseinheit für Datenbanksysteme
+ ELKI Development Team
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Affero General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Affero General Public License for more details.
+
+ You should have received a copy of the GNU Affero General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 /**
  * Result class for a filtered PCA. This differs from regular PCA by having the
@@ -22,7 +45,7 @@ public class PCAFilteredResult extends PCAResult {
   /**
    * The strong eigenvectors to their corresponding filtered eigenvalues.
    */
-  private Matrix strongEigenvectors;
+  private double[][] strongEigenvectors;
 
   /**
    * The weak eigenvalues.
@@ -32,7 +55,7 @@ public class PCAFilteredResult extends PCAResult {
   /**
    * The weak eigenvectors to their corresponding filtered eigenvalues.
    */
-  private Matrix weakEigenvectors;
+  private double[][] weakEigenvectors;
 
   /**
    * The amount of Variance explained by strong Eigenvalues
@@ -42,27 +65,27 @@ public class PCAFilteredResult extends PCAResult {
   /**
    * The selection matrix of the weak eigenvectors.
    */
-  private Matrix e_hat;
+  private double[][] e_hat;
 
   /**
    * The selection matrix of the strong eigenvectors.
    */
-  private Matrix e_czech;
+  private double[][] e_czech;
 
   /**
    * The similarity matrix.
    */
-  private Matrix m_hat;
+  private double[][] m_hat;
 
   /**
    * The dissimilarity matrix.
    */
-  private Matrix m_czech;
+  private double[][] m_czech;
 
   /**
    * The diagonal matrix of adapted strong eigenvalues: eigenvectors * e_czech.
    */
-  private Matrix adapatedStrongEigenvectors = null;
+  private double[][] adapatedStrongEigenvectors = null;
 
   /**
    * Construct a result object for the filtered PCA result.
@@ -82,22 +105,22 @@ public class PCAFilteredResult extends PCAResult {
     double sumWeakEigenvalues = 0;
     {// strong eigenpairs
       strongEigenvalues = new double[numstrong];
-      strongEigenvectors = new Matrix(dim, numstrong);
+      strongEigenvectors = new double[dim][numstrong];
       for (int i = 0; i < numstrong; i++) {
         EigenPair eigenPair = eigenPairs.getEigenPair(i);
         strongEigenvalues[i] = eigenPair.getEigenvalue();
-        strongEigenvectors.setCol(i, eigenPair.getEigenvector());
+        setCol(strongEigenvectors, i, eigenPair.getEigenvector());
         sumStrongEigenvalues += strongEigenvalues[i];
       }
     }
 
     {// weak eigenpairs
       weakEigenvalues = new double[dim - numstrong];
-      weakEigenvectors = new Matrix(dim, dim - numstrong);
+      weakEigenvectors = new double[dim][dim - numstrong];
       for (int i = numstrong, j = 0; i < dim; i++, j++) {
         EigenPair eigenPair = eigenPairs.getEigenPair(i);
         weakEigenvalues[j] = eigenPair.getEigenvalue();
-        weakEigenvectors.setCol(j, eigenPair.getEigenvector());
+        setCol(weakEigenvectors, j, eigenPair.getEigenvector());
         sumWeakEigenvalues += weakEigenvalues[j];
       }
     }
@@ -105,22 +128,22 @@ public class PCAFilteredResult extends PCAResult {
     int localdim = strongEigenvalues.length;
 
     // selection Matrix for weak and strong EVs
-    e_hat = new Matrix(dim, dim);
-    e_czech = new Matrix(dim, dim);
+    e_hat = new double[dim][dim];
+    e_czech = new double[dim][dim];
     for(int d = 0; d < dim; d++) {
       if(d < localdim) {
-        e_czech.set(d, d, big);
-        e_hat.set(d, d, small);
+        e_czech[d][d]=big;
+        e_hat[d][d]=small;
       }
       else {
-        e_czech.set(d, d, small);
-        e_hat.set(d, d, big);
+        e_czech[d][d] = small;
+        e_hat[d][d] = big;
       }
     }
 
-    Matrix V = getEigenvectors();
-    m_hat = V.times(e_hat).timesTranspose(V);
-    m_czech = V.times(e_czech).timesTranspose(V);
+    double[][] V = getEigenvectors();
+    m_hat = timesTranspose(times(V, e_hat), V);
+    m_czech = timesTranspose(times(V, e_czech), V);
   }
 
   /**
@@ -129,7 +152,7 @@ public class PCAFilteredResult extends PCAResult {
    * 
    * @return the matrix of eigenvectors
    */
-  public final Matrix getStrongEigenvectors() {
+  public final double[][] getStrongEigenvectors() {
     return strongEigenvectors;
   }
 
@@ -149,7 +172,7 @@ public class PCAFilteredResult extends PCAResult {
    * 
    * @return the matrix of eigenvectors
    */
-  public final Matrix getWeakEigenvectors() {
+  public final double[][] getWeakEigenvectors() {
     return weakEigenvectors;
   }
 
@@ -187,7 +210,7 @@ public class PCAFilteredResult extends PCAResult {
    * 
    * @return the selection matrix of the weak eigenvectors E_hat
    */
-  public Matrix selectionMatrixOfWeakEigenvectors() {
+  public double[][] selectionMatrixOfWeakEigenvectors() {
     return e_hat;
   }
 
@@ -197,7 +220,7 @@ public class PCAFilteredResult extends PCAResult {
    * 
    * @return the selection matrix of the weak eigenvectors E_czech
    */
-  public Matrix selectionMatrixOfStrongEigenvectors() {
+  public double[][] selectionMatrixOfStrongEigenvectors() {
     return e_czech;
   }
 
@@ -206,7 +229,7 @@ public class PCAFilteredResult extends PCAResult {
    * 
    * @return the similarity matrix M_hat
    */
-  public Matrix similarityMatrix() {
+  public double[][] similarityMatrix() {
     return m_hat;
   }
 
@@ -215,7 +238,7 @@ public class PCAFilteredResult extends PCAResult {
    * 
    * @return the dissimilarity matrix M_hat
    */
-  public Matrix dissimilarityMatrix() {
+  public double[][] dissimilarityMatrix() {
     return m_czech;
   }
 
@@ -224,10 +247,10 @@ public class PCAFilteredResult extends PCAResult {
    * 
    * @return the adapted strong eigenvectors
    */
-  public Matrix adapatedStrongEigenvectors() {
+  public double[][] adapatedStrongEigenvectors() {
     if(adapatedStrongEigenvectors == null) {
-      final Matrix ev = getEigenvectors();
-      adapatedStrongEigenvectors = ev.times(e_czech).times(Matrix.identity(ev.getRowDimensionality(), strongEigenvalues.length));
+      final double[][] ev = getEigenvectors();
+      adapatedStrongEigenvectors = times(times(ev, e_czech), identity(ev.length, strongEigenvalues.length));
     }
     return adapatedStrongEigenvectors;
   }

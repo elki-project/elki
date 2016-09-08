@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,18 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.copy;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.getCol;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.normalize;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.setCol;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.squareSum;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesTranspose;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimesTimes;
 
 import java.util.Comparator;
 
@@ -47,8 +59,6 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.FilteredLocalPCAIndex;
 import de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAFilteredResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -211,7 +221,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     @Override
     protected CorrelationClusterOrder buildResult() {
       return new CorrelationClusterOrder("HiCO Cluster Order", "hico-cluster-order", //
-      clusterOrder, reachability, predecessor, correlationValue);
+          clusterOrder, reachability, predecessor, correlationValue);
     }
 
     @Override
@@ -269,9 +279,10 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
     @Override
     public int compare(DBIDRef o1, DBIDRef o2) {
-      int c1 = correlationValue.intValue(o1), c2 = correlationValue.intValue(o2);
+      int c1 = correlationValue.intValue(o1),
+          c2 = correlationValue.intValue(o2);
       return (c1 < c2) ? -1 : (c1 > c2) ? +1 : //
-      super.compare(o1, o2);
+          super.compare(o1, o2);
     }
 
     /**
@@ -286,7 +297,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       public int compare(DBIDRef o1, DBIDRef o2) {
         int c1 = tmpCorrelation.intValue(o1), c2 = tmpCorrelation.intValue(o2);
         return (c1 < c2) ? -1 : (c1 > c2) ? +1 : //
-        Double.compare(tmpDistance.doubleValue(o1), tmpDistance.doubleValue(o2));
+            Double.compare(tmpDistance.doubleValue(o1), tmpDistance.doubleValue(o2));
       }
     }
 
@@ -308,22 +319,24 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    */
   public int correlationDistance(PCAFilteredResult pca1, PCAFilteredResult pca2, int dimensionality) {
     // TODO nur in eine Richtung?
+
+    // TODO: Do we need to clone/copy all these?
     // pca of rv1
-    Matrix v1 = pca1.getEigenvectors().copy();
-    Matrix v1_strong = pca1.adapatedStrongEigenvectors().copy();
-    Matrix e1_czech = pca1.selectionMatrixOfStrongEigenvectors().copy();
+    double[][] v1 = copy(pca1.getEigenvectors());
+    double[][] v1_strong = copy(pca1.adapatedStrongEigenvectors());
+    double[][] e1_czech = copy(pca1.selectionMatrixOfStrongEigenvectors());
     int lambda1 = pca1.getCorrelationDimension();
 
     // pca of rv2
-    Matrix v2 = pca2.getEigenvectors().copy();
-    Matrix v2_strong = pca2.adapatedStrongEigenvectors().copy();
-    Matrix e2_czech = pca2.selectionMatrixOfStrongEigenvectors().copy();
+    double[][] v2 = copy(pca2.getEigenvectors());
+    double[][] v2_strong = copy(pca2.adapatedStrongEigenvectors());
+    double[][] e2_czech = copy(pca2.selectionMatrixOfStrongEigenvectors());
     int lambda2 = pca2.getCorrelationDimension();
 
     // for all strong eigenvectors of rv2
-    Matrix m1_czech = pca1.dissimilarityMatrix();
-    for(int i = 0; i < v2_strong.getColumnDimensionality(); i++) {
-      double[] v2_i = v2_strong.getCol(i);
+    double[][] m1_czech = pca1.dissimilarityMatrix();
+    for(int i = 0; i < v2_strong[0].length; i++) {
+      double[] v2_i = getCol(v2_strong, i);
       // check, if distance of v2_i to the space of rv1 > delta
       // (i.e., if v2_i spans up a new dimension)
       double dist = Math.sqrt(squareSum(v2_i) - transposeTimesTimes(v2_i, m1_czech, v2_i));
@@ -332,14 +345,14 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       // and compute m1_czech new, increase lambda1
       if(lambda1 < dimensionality && dist > delta) {
         adjust(v1, e1_czech, v2_i, lambda1++);
-        m1_czech = v1.times(e1_czech).timesTranspose(v1);
+        m1_czech = timesTranspose(times(v1, e1_czech), v1);
       }
     }
 
     // for all strong eigenvectors of rv1
-    Matrix m2_czech = pca2.dissimilarityMatrix();
-    for(int i = 0; i < v1_strong.getColumnDimensionality(); i++) {
-      double[] v1_i = v1_strong.getCol(i);
+    double[][] m2_czech = pca2.dissimilarityMatrix();
+    for(int i = 0; i < v1_strong[0].length; i++) {
+      double[] v1_i = getCol(v1_strong, i);
       // check, if distance of v1_i to the space of rv2 > delta
       // (i.e., if v1_i spans up a new dimension)
       double dist = Math.sqrt(squareSum(v1_i) - transposeTimesTimes(v1_i, m2_czech, v1_i));
@@ -348,7 +361,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       // and compute m2_czech new , increase lambda2
       if(lambda2 < dimensionality && dist > delta) {
         adjust(v2, e2_czech, v1_i, lambda2++);
-        m2_czech = v2.times(e2_czech).timesTranspose(v2);
+        m2_czech = timesTranspose(times(v2, e2_czech), v2);
       }
     }
 
@@ -377,22 +390,21 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * @param vector the vector to be inserted
    * @param corrDim the column at which the vector should be inserted
    */
-  private void adjust(Matrix v, Matrix e_czech, double[] vector, int corrDim) {
-    int dim = v.getRowDimensionality();
+  private void adjust(double[][] v, double[][] e_czech, double[] vector, int corrDim) {
+    final int dim = v.length;
 
-    // set e_czech[corrDim][corrDim] := 1
-    e_czech.set(corrDim, corrDim, 1);
+    e_czech[corrDim][corrDim] = 1;
 
     // normalize v
     double[] v_i = vector.clone();
     double[] sum = new double[dim];
     for(int k = 0; k < corrDim; k++) {
-      double[] v_k = v.getCol(k);
+      double[] v_k = getCol(v, k);
       plusTimesEquals(sum, v_k, transposeTimes(v_i, v_k));
     }
     minusEquals(v_i, sum);
     normalize(v_i);
-    v.setCol(corrDim, v_i);
+    setCol(v, corrDim, v_i);
   }
 
   @Override

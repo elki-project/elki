@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.clustering;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -48,7 +48,7 @@ public class EMOutlierTest extends AbstractSimpleAlgorithmTest {
     // Parameterization
     ListParameterization params = new ListParameterization();
     params.addParameter(EM.Parameterizer.K_ID, 5);
-    params.addParameter(KMeans.SEED_ID, 0);
+    params.addParameter(KMeans.SEED_ID, 2);
 
     // setup Algorithm
     EMOutlier<DoubleVector> silout = ClassGenericsUtil.parameterizeOrAbort(EMOutlier.class, params);
@@ -56,7 +56,7 @@ public class EMOutlierTest extends AbstractSimpleAlgorithmTest {
 
     OutlierResult result = silout.run(db);
 
-    testAUC(db, "Noise", result, 0.54073333);
-    testSingleScore(result, 416, 0.00240242);
+    testAUC(db, "Noise", result, 0.534466);
+    testSingleScore(result, 416, 1.8997442e-5);
   }
 }

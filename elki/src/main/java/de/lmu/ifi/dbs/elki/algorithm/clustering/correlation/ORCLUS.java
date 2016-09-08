@@ -22,9 +22,11 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.identity;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusEquals;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.transposeTimes;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.unitMatrix;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -53,7 +55,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.Matrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCAResult;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -260,7 +261,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
    * @param dim the dimensionality of the subspace
    * @return matrix defining the basis of the subspace for the specified cluster
    */
-  private Matrix findBasis(Relation<V> database, ORCLUSCluster cluster, int dim) {
+  private double[][] findBasis(Relation<V> database, ORCLUSCluster cluster, int dim) {
     PCAResult pcares = pca.processIds(cluster.objectIDs, database);
     return pcares.getEigenPairs().reverseEigenVectors(dim);
   }
@@ -385,7 +386,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     }
     else {
       c.centroid = timesEquals(plusEquals(c1.centroid, c2.centroid), .5);
-      c.basis = Matrix.identity(c1.basis.getRowDimensionality(), dim);
+      c.basis = identity(c1.basis.length, dim);
     }
     return c;
   }
@@ -426,7 +427,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     /**
      * The matrix defining the subspace of this cluster.
      */
-    Matrix basis;
+    double[][] basis;
 
     /**
      * The centroid of this cluster.
@@ -449,7 +450,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
      */
     ORCLUSCluster(double[] o, DBIDRef id) {
       this.centroid = o;
-      this.basis = Matrix.unitMatrix(o.length);
+      this.basis = unitMatrix(o.length);
       this.objectIDs.add(id);
     }
   }
