@@ -246,4 +246,35 @@ public final class DataStoreUtil {
       return c != 0 ? c : DBIDUtil.compare(id1, id2);
     }
   }
+  
+  /**
+   * Sort objects by a integer relation
+   *
+   * @author Erich Schubert
+   * @author Julian Erhard
+   *
+   * @apiviz.exclude
+   */
+  public static class DescendingByIntegerDataStore implements Comparator<DBIDRef> {
+    /**
+     * Scores to use for sorting.
+     */
+    private final IntegerDataStore scores;
+
+    /**
+     * Constructor.
+     *
+     * @param scores Scores for sorting
+     */
+    public DescendingByIntegerDataStore(IntegerDataStore scores) {
+      super();
+      this.scores = scores;
+    }
+
+    @Override
+    public int compare(DBIDRef id1, DBIDRef id2) {
+      int c = Double.compare(scores.intValue(id2), scores.intValue(id1));
+      return c != 0 ? c : DBIDUtil.compare(id1, id2);
+    }
+  }
 }
