@@ -79,7 +79,7 @@ public class ExtractFlatClusteringFromHierarchyEvaluator implements Evaluator {
       DBIDDataStore pi = pointerresult.getParentStore();
       DoubleDataStore lambda = pointerresult.getParentDistanceStore();
 
-      Clustering<DendrogramModel> result = inner.extractClusters(ids, pi, lambda);
+      Clustering<DendrogramModel> result = inner.extractClusters(ids, pi, lambda, false);
       pointerresult.addChildResult(result);
     }
   }

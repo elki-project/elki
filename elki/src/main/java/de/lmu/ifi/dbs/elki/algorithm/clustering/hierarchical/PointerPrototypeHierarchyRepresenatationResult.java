@@ -44,7 +44,7 @@ public class PointerPrototypeHierarchyRepresenatationResult extends PointerHiera
   }
   
   /**
-   * @return the prototype
+   * @return the set of prototypes
    */
   public DBIDDataStore getPrototype() {
     return prototype;

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.PrototypeDendrogramModel;
 import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -175,6 +176,17 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
               continue;
             }
             NumberVector v = rel.get(medoid);
+            if(v == null) {
+              continue;
+            }
+            mean = proj.fastProjectDataToRenderSpace(v);
+          }
+          else if(model instanceof PrototypeDendrogramModel) {
+            DBID prototype = ((PrototypeDendrogramModel) model).getPrototype();
+            if(prototype == null) {
+              continue;
+            }
+            NumberVector v = rel.get(prototype);
             if(v == null) {
               continue;
             }
