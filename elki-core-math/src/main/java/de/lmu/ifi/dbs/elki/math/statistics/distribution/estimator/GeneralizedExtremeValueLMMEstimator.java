@@ -59,24 +59,29 @@ public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<Ge
   /**
    * Constants for fast rational approximations.
    */
-  private static final double //
+  protected static final double //
   A0 = 0.28377530, //
       A1 = -1.21096399, //
       A2 = -2.50728214, //
       A3 = -1.13455566, //
       A4 = -0.07138022;
 
-  private static final double //
+  protected static final double //
   B1 = 2.06189696, //
       B2 = 1.31912239, //
       B3 = 0.25077104;
 
-  private static final double //
+  protected static final double //
   C1 = 1.59921491, //
       C2 = -0.48832213, //
       C3 = 0.01573152, //
       D1 = -0.64363929, //
       D2 = 0.08985247;
+
+  /**
+   * Euler-Mascheroni constant.
+   */
+  protected static final double EU = 0.57721566490153286;
 
   /** Maximum number of iterations. */
   static int MAXIT = 20;
@@ -108,7 +113,7 @@ public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<Ge
       if(Math.abs(g) < 1e-50) {
         double k = 0;
         double sigma = xmom[1] * MathUtil.ONE_BY_LOG2;
-        double mu = xmom[0] - Math.E * sigma;
+        double mu = xmom[0] - EU * sigma;
         return new GeneralizedExtremeValueDistribution(mu, sigma, k);
       }
     }
@@ -125,7 +130,7 @@ public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<Ge
           double x2 = Math.pow(2., -g), xx2 = 1. - x2;
           double x3 = Math.pow(3., -g), xx3 = 1. - x3;
           double t = xx3 / xx2;
-          double deriv = (xx2 * x3 * MathUtil.LOG3 - xx3 * x2 * MathUtil.LOG2) / (xx2 * x2);
+          double deriv = (xx2 * x3 * MathUtil.LOG3 - xx3 * x2 * MathUtil.LOG2) / (xx2 * xx2);
           double oldg = g;
           g -= (t - t0) / deriv;
           if(Math.abs(g - oldg) < 1e-20 * g) {
