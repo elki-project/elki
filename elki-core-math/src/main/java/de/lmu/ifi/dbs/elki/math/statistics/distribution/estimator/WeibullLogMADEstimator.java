@@ -59,10 +59,10 @@ public class WeibullLogMADEstimator extends AbstractLogMADEstimator<WeibullDistr
 
   @Override
   public WeibullDistribution estimateFromLogMedianMAD(double median, double mad, double shift) {
-    double isigma = 1.30370 / mad;
-    double lambda = Math.exp(isigma * median - MathUtil.LOGLOG2);
+    double k = 1. / (1.30370 * mad);
+    double lambda = Math.exp(median - MathUtil.LOGLOG2 / k);
 
-    return new WeibullDistribution(isigma, lambda);
+    return new WeibullDistribution(k, lambda);
   }
 
   @Override

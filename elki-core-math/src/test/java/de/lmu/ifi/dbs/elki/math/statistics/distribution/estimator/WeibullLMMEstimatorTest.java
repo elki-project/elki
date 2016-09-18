@@ -42,35 +42,36 @@ public class WeibullLMMEstimatorTest extends AbstractDistributionEstimatorTest {
     WeibullDistribution dist;
     data = this.data.get("random_01_1");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("k", dist.getK(), 0.1, Double.NaN);
-    assertStat("lambda", dist.getLambda(), 1., Double.NaN);
+    assertStat("k", dist.getK(), 0.1, 0.09454063929803297); // Pretty large
+                                                            // error.
+    assertStat("lambda", dist.getLambda(), 1., 1200.6518885193914);
     data = this.data.get("random_01_4");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("k", dist.getK(), 0.1, Double.NaN);
-    assertStat("lambda", dist.getLambda(), 4., Double.NaN);
+    assertStat("k", dist.getK(), 0.1, 0.017892872573341767);
+    assertStat("lambda", dist.getLambda(), 4., -0.572620960388186);
     data = this.data.get("random_01_10");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("k", dist.getK(), 0.1, Double.NaN);
-    assertStat("lambda", dist.getLambda(), 10., Double.NaN);
+    assertStat("k", dist.getK(), 0.1, 0.015515482254432902);
+    assertStat("lambda", dist.getLambda(), 10., 30.54011957136276);
     data = this.data.get("random_01_20");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("k", dist.getK(), 0.1, Double.NaN);
-    assertStat("lambda", dist.getLambda(), 20., Double.NaN);
+    assertStat("k", dist.getK(), 0.1, 0.05028759358784987);
+    assertStat("lambda", dist.getLambda(), 20., 364.1538008873809);
     data = this.data.get("random_1_1");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("k", dist.getK(), 1., Double.NaN);
-    assertStat("lambda", dist.getLambda(), 1., Double.NaN);
+    assertStat("k", dist.getK(), 1., 0.3174145503264614);
+    assertStat("lambda", dist.getLambda(), 1., 0.1373923548546876);
     data = this.data.get("random_2_1");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("k", dist.getK(), 2., Double.NaN);
-    assertStat("lambda", dist.getLambda(), 1., Double.NaN);
+    assertStat("k", dist.getK(), 2., -0.24025439963457784);
+    assertStat("lambda", dist.getLambda(), 1., -0.09621573512109494);
     data = this.data.get("random_4_1");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("k", dist.getK(), 4., Double.NaN);
-    assertStat("lambda", dist.getLambda(), 1., Double.NaN);
+    assertStat("k", dist.getK(), 4., 1.1101681921910798);
+    assertStat("lambda", dist.getLambda(), 1., 0.22152376290215847);
     data = this.data.get("random_4_10");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("k", dist.getK(), 4., Double.NaN);
-    assertStat("lambda", dist.getLambda(), 10., Double.NaN);
+    assertStat("k", dist.getK(), 4., -0.24710131145373015);
+    assertStat("lambda", dist.getLambda(), 10., 0.19194686181006482);
   }
 }
