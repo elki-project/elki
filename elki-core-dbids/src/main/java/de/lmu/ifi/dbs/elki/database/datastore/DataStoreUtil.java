@@ -273,8 +273,7 @@ public final class DataStoreUtil {
 
     @Override
     public int compare(DBIDRef id1, DBIDRef id2) {
-      int c = Double.compare(scores.intValue(id2), scores.intValue(id1));
-      return c != 0 ? c : DBIDUtil.compare(id1, id2);
+      return Double.compare(scores.intValue(id2), scores.intValue(id1));
     }
   }
 }

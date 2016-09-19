@@ -24,11 +24,15 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
 public class PointerPrototypeHierarchyRepresenatationResult extends PointerHierarchyRepresentationResult {
 
-  private DBIDDataStore prototype;
+  private DBIDDataStore prototypes;
 
   /**
    * Constructor.
@@ -38,16 +42,51 @@ public class PointerPrototypeHierarchyRepresenatationResult extends PointerHiera
    * @param parentDistance
    * @param prototype
    */
-  public PointerPrototypeHierarchyRepresenatationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, DBIDDataStore prototype) {
+  public PointerPrototypeHierarchyRepresenatationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, DBIDDataStore prototypes) {
     super(ids, parent, parentDistance);
-    this.prototype = prototype;
+    this.prototypes = prototypes;
   }
-  
+
   /**
    * @return the set of prototypes
    */
-  public DBIDDataStore getPrototype() {
-    return prototype;
+  public DBIDDataStore getPrototypes() {
+    return prototypes;
+  }
+
+  /**
+   * Extract the prototype of a given cluster. When the argument is not a valid
+   * cluster of this Pointer Hierarchy, the return value is unspecified.
+   * 
+   * @param cluster A valid cluster of this Pointer Hierarchy
+   * @return The prototype of the cluster
+   */
+  public DBID getPrototypeByCluster(DBIDs cluster) {
+    if(cluster.isEmpty()) {
+      throw new IllegalArgumentException("Argument set of DBIDs is empty.");
+    }
+    else if(cluster.size() >= 2) {
+      // The prototype is stored at the same ID that has the
+      // first (smallest) ID of the cluster as a parent.
+      DBIDVar var = DBIDUtil.newVar();
+      DBID firstID = DBIDUtil.deref(cluster.iter());
+
+      // The entry in pi for the first ID contains a DBID of a different
+      // cluster.
+      // Hence, skip this one by advancing.
+      DBIDIter i = cluster.iter().advance();
+      for(; i.valid(); i.advance()) {
+        parent.assignVar(i, var);
+        if(DBIDUtil.equal(firstID, var)) {
+          break;
+        }
+      }
+      return prototypes.get(i);
+    }
+    else {
+      // Set the only point in the cluster as prototype.
+      return DBIDUtil.deref(cluster.iter());
+    }
   }
 
 }

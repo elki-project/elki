@@ -173,37 +173,18 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
     result.addChildResult(pointerresult);
 
     if(prototyped) {
-      DBIDDataStore prototypes = ((PointerPrototypeHierarchyRepresenatationResult) pointerresult).getPrototype();
+      PointerPrototypeHierarchyRepresenatationResult prototypePointerResult = (PointerPrototypeHierarchyRepresenatationResult) pointerresult;
+      DBIDDataStore prototypes = prototypePointerResult.getPrototypes();
       DBIDs cluster;
+      DBID prot;
       
       // Set the prototype for each cluster
       for(de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter<Cluster<DendrogramModel>> iter = result.iterToplevelClusters(); iter.valid(); iter.advance()) {
         PrototypeDendrogramModel model = (PrototypeDendrogramModel) iter.get().getModel();        
         
         cluster = iter.get().getIDs();
-        
-
-        if(cluster.size() >= 2){
-          // The prototype is stored at the same ID that has the 
-          // first (smallest) ID of the cluster as a parent.       
-          DBIDVar var = DBIDUtil.newVar();
-          DBID parent = DBIDUtil.deref(cluster.iter());
-          
-          // The entry in pi for the first ID contains a DBID of a different cluster. 
-          // Hence, skip this one by advancing.
-          DBIDIter i = cluster.iter().advance();
-          for(; i.valid(); i.advance()){
-            pi.assignVar(i, var);
-            
-            if(DBIDUtil.equal(parent, var)){
-              model.setPrototype(prototypes.get(i));
-              break;
-            }
-          }
-        } else {
-          // Set the only point in the cluster as prototype.
-          model.setPrototype(DBIDUtil.deref(cluster.iter()));
-        }
+        prot = prototypePointerResult.getPrototypeByCluster(cluster);
+        model.setPrototype(prot);
       }
     }
     return result;
