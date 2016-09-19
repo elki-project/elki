@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -173,13 +174,36 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
 
     if(prototyped) {
       DBIDDataStore prototypes = ((PointerPrototypeHierarchyRepresenatationResult) pointerresult).getPrototype();
-      DBIDVar var = null;
-
+      DBIDs cluster;
+      
+      // Set the prototype for each cluster
       for(de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter<Cluster<DendrogramModel>> iter = result.iterToplevelClusters(); iter.valid(); iter.advance()) {
-        PrototypeDendrogramModel model = (PrototypeDendrogramModel) iter.get().getModel();
-        // The prototype is saved at the place of the _second_ smallest element
-        // Therefore, we have to advance by one.
-        model.setPrototype(prototypes.get(iter.get().getIDs().iter().advance()));
+        PrototypeDendrogramModel model = (PrototypeDendrogramModel) iter.get().getModel();        
+        
+        cluster = iter.get().getIDs();
+        
+
+        if(cluster.size() >= 2){
+          // The prototype is stored at the same ID that has the 
+          // first (smallest) ID of the cluster as a parent.       
+          DBIDVar var = DBIDUtil.newVar();
+          DBID parent = DBIDUtil.deref(cluster.iter());
+          
+          // The entry in pi for the first ID contains a DBID of a different cluster. 
+          // Hence, skip this one by advancing.
+          DBIDIter i = cluster.iter().advance();
+          for(; i.valid(); i.advance()){
+            pi.assignVar(i, var);
+            
+            if(DBIDUtil.equal(parent, var)){
+              model.setPrototype(prototypes.get(i));
+              break;
+            }
+          }
+        } else {
+          // Set the only point in the cluster as prototype.
+          model.setPrototype(DBIDUtil.deref(cluster.iter()));
+        }
       }
     }
     return result;
