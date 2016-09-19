@@ -96,6 +96,9 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
       dist = null; // No longer needed.
     }
 
+    for(int i = 0; i< pij.length;i++)
+      System.out.println(i + " :"+pij[0][i]);
+    
     // Create initial solution.
     double[][] sol = new double[size][dim];
     for(int i = 0; i < size; i++) {
@@ -178,13 +181,12 @@ public class tSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
       for(int j = 0; j < i; j++) { // Nur über halbe Matrix!
         pij[i][j] += pij[j][i]; // Symmetrie herstellen
 
-        sum += pij[j][i]; // Matrix-Summe berechnen
+        sum += pij[j][i]; // Matrix-Summe berechnen //war pij[j][i]
 
      }
-
     }
     // Scaling taken from original tSNE code:
-    final double scale = EARLY_EXAGGERATION / (2. * sum);
+    final double scale = EARLY_EXAGGERATION / (2. * sum); 
     for(int i = 1; i < pij.length; i++) {
       double[] row = pij[i];
       for(int j = 0; j < i; j++) {
