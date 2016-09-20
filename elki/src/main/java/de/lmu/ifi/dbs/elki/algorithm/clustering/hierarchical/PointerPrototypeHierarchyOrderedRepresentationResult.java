@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 
-public class PointerPrototypeHierarchyOrderedRepresenatationResult extends PointerPrototypeHierarchyRepresenatationResult {
+public class PointerPrototypeHierarchyOrderedRepresentationResult extends PointerPrototypeHierarchyRepresenatationResult {
   
   private IntegerDataStore mergeOrder;
   
@@ -49,7 +49,7 @@ public class PointerPrototypeHierarchyOrderedRepresenatationResult extends Point
    * @param parentDistance
    * @param prototype
    */
-  public PointerPrototypeHierarchyOrderedRepresenatationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, IntegerDataStore mergeOrder, DBIDDataStore prototype) {
+  public PointerPrototypeHierarchyOrderedRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, IntegerDataStore mergeOrder, DBIDDataStore prototype) {
     super(ids, parent, parentDistance, prototype);
     this.mergeOrder = mergeOrder;
   }

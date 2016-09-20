@@ -63,7 +63,7 @@ public class PointerPrototypeHierarchyRepresenatationResult extends PointerHiera
    */
   public DBID getPrototypeByCluster(DBIDs cluster) {
     if(cluster.isEmpty()) {
-      throw new IllegalArgumentException("Argument set of DBIDs is empty.");
+      return null;
     }
     else if(cluster.size() >= 2) {
       // The prototype is stored at the same ID that has the
