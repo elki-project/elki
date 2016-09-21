@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.InverseGaussia
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LMMDistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceLMMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LaplaceMADEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaLogMOMEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogLogisticMADEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogMADDistributionEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogMOMDistributionEstimator;
@@ -168,6 +169,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     lmmests.add(UniformLMMEstimator.STATIC);
     logmomests = new ArrayList<>(2);
     logmomests.add(LogNormalLogMOMEstimator.STATIC);
+    logmomests.add(LogGammaLogMOMEstimator.STATIC);
     logmadests = new ArrayList<>(3);
     logmadests.add(LogNormalLogMADEstimator.STATIC);
     logmadests.add(WeibullLogMADEstimator.STATIC);
