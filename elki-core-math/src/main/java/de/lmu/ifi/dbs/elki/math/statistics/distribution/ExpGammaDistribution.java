@@ -25,24 +25,25 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution;
 
 import java.util.Random;
 
-import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * Alternate Log-Gamma Distribution, with random generation and density
- * functions.
- * 
- * This distribution can be outlined as Y=log X with X Gamma distributed.
- * 
- * Note: this matches the loggamma of SciPy.
+ * Exp-Gamma Distribution, with random generation and density functions.
+ *
+ * This distribution can be outlined as Y ~ log[Gamma] distributed, or
+ * equivalently exp(Y) ~ Gamma.
+ *
+ * Note: this matches the loggamma of SciPy, whereas Wolfram calls this the
+ * Exponential Gamma Distribution "at times confused with the
+ * LogGammaDistribution".
  * 
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class LogGammaAlternateDistribution extends AbstractDistribution {
+public class ExpGammaDistribution extends AbstractDistribution {
   /**
    * Alpha == k.
    */
@@ -66,7 +67,7 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @param random Random generator
    */
-  public LogGammaAlternateDistribution(double k, double theta, double shift, Random random) {
+  public ExpGammaDistribution(double k, double theta, double shift, Random random) {
     super(random);
     if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
       throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
@@ -85,7 +86,7 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @param random Random generator
    */
-  public LogGammaAlternateDistribution(double k, double theta, double shift, RandomFactory random) {
+  public ExpGammaDistribution(double k, double theta, double shift, RandomFactory random) {
     super(random);
     if(!(k > 0.0) || !(theta > 0.0)) { // Note: also tests for NaNs!
       throw new IllegalArgumentException("Invalid parameters for Gamma distribution: " + k + " " + theta);
@@ -103,7 +104,7 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
    * @param shift Location offset
    */
-  public LogGammaAlternateDistribution(double k, double theta, double shift) {
+  public ExpGammaDistribution(double k, double theta, double shift) {
     this(k, theta, shift, (Random) null);
   }
 
@@ -139,7 +140,7 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
    */
   @Override
   public String toString() {
-    return "LogGammaAlternateDistribution(k=" + k + ", theta=" + theta + ", shift=" + shift + ")";
+    return "ExpGammaDistribution(k=" + k + ", theta=" + theta + ", shift=" + shift + ")";
   }
 
   /**
@@ -189,7 +190,7 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
   }
 
   /**
-   * LogGamma distribution PDF (with 0.0 for x &lt; 0)
+   * ExpGamma distribution PDF (with 0.0 for x &lt; 0)
    * 
    * @param x query value
    * @param k Alpha
@@ -206,7 +207,7 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
   }
 
   /**
-   * LogGamma distribution logPDF
+   * ExpGamma distribution logPDF
    * 
    * @param x query value
    * @param k Alpha
@@ -223,18 +224,16 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
   }
 
   /**
-   * @deprecated Not yet implemented!
-   * Compute probit (inverse cdf) for LogGamma distributions.
+   * Compute probit (inverse cdf) for ExpGamma distributions.
    * 
    * @param p Probability
    * @param k k, alpha aka. "shape" parameter
    * @param theta Theta = 1.0/Beta aka. "scaling" parameter
-   * @return Probit for Gamma distribution
+   * @param shift Shift parameter
+   * @return Probit for ExpGamma distribution
    */
-  @Deprecated
   public static double quantile(double p, double k, double theta, double shift) {
-    // TODO: needs inverse incomplete gamma function.
-    throw new NotImplementedException();
+    return Math.log(GammaDistribution.quantile(p, k, theta)) + shift;
   }
 
   /**
@@ -248,7 +247,7 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
     /**
      * Shifting offset parameter.
      */
-    public static final OptionID SHIFT_ID = new OptionID("distribution.loggamma.shift", "Shift offset parameter.");
+    public static final OptionID SHIFT_ID = new OptionID("distribution.expgamma.shift", "Shift offset parameter.");
 
     /** Parameters. */
     double k, theta, shift;
@@ -274,8 +273,8 @@ public class LogGammaAlternateDistribution extends AbstractDistribution {
     }
 
     @Override
-    protected LogGammaAlternateDistribution makeInstance() {
-      return new LogGammaAlternateDistribution(k, theta, shift, rnd);
+    protected ExpGammaDistribution makeInstance() {
+      return new ExpGammaDistribution(k, theta, shift, rnd);
     }
   }
 }
