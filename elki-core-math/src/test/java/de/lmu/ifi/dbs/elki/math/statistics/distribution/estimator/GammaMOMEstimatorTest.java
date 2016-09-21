@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 
 /**
- * Regression test the estimation for the GammaMOM distribution.
+ * Regression test the estimation for the Gamma distribution.
  * 
  * @author Erich Schubert
  */

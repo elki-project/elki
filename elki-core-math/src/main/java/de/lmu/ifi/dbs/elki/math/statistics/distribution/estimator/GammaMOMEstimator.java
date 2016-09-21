@@ -44,7 +44,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has GammaDistribution - - estimates
  */
-@Reference(authors = "G. Casella, R. L. Berger", title = "Statistical inference. Vol. 70", booktitle = "Statistical inference. Vol. 70")
+@Reference(authors = "G. Casella, R. L. Berger", //
+    title = "Statistical inference. Vol. 70", //
+    booktitle = "Statistical inference. Vol. 70")
 public class GammaMOMEstimator extends AbstractMeanVarianceEstimator<GammaDistribution> {
   /**
    * Static estimation using just the mean and variance.
@@ -62,12 +64,12 @@ public class GammaMOMEstimator extends AbstractMeanVarianceEstimator<GammaDistri
   public GammaDistribution estimateFromMeanVariance(MeanVariance mv) {
     final double mu = mv.getMean();
     final double var = mv.getSampleVariance();
-    if (mu < Double.MIN_NORMAL || var < Double.MIN_NORMAL) {
+    if(mu < Double.MIN_NORMAL || var < Double.MIN_NORMAL) {
       throw new ArithmeticException("Cannot estimate Gamma parameters on a distribution with zero mean or variance: " + mv.toString());
     }
     final double theta = mu / var;
     final double k = mu * theta;
-    if (!(k > 0.) || !(theta > 0.)) {
+    if(!(k > 0.) || !(theta > 0.)) {
       throw new ArithmeticException("Gamma estimation produced non-positive parameter values: k=" + k + " theta=" + theta);
     }
     return new GammaDistribution(k, theta);
