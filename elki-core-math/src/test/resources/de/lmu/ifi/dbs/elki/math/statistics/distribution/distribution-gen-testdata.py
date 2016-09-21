@@ -3,7 +3,7 @@ import scipy.stats, numpy, subprocess, math, sys, gzip, re
 
 #
 # R requirements:
-# install.packges(c("statmod", "emg", "chi", "evir", "lmomco"))
+# install.packages(c("statmod", "emg", "chi", "evir", "lmomco", "gumbel"))
 #
 
 # Random variate samples
@@ -85,7 +85,7 @@ dfs = [
 	("gumbel", "01_20", scipy.stats.gumbel_r(.1,scale=20), "lmomco(x, vec2par(c(.1, 20, 0), type=\"gev\") %s)", 66),
 	("gumbel", "01_4", scipy.stats.gumbel_r(.1,scale=4), "lmomco(x, vec2par(c(.1, 4, 0), type=\"gev\") %s)", 67),
 	("gumbel", "01_1", scipy.stats.gumbel_r(.1,scale=1), "lmomco(x, vec2par(c(.1, 1, 0), type=\"gev\") %s)", 68),
-	("gev", "08_02_1", scipy.stats.genextreme(1,loc=.8,scale=.2), "lmomco(x, vec2par(c(.8, .2, 1), type=\"gev\") %s)", 69),
+	("gev", "08_02_1", scipy.stats.genextreme(.8,loc=.2,scale=1), "lmomco(x, vec2par(c(.2, 1, .8), type=\"gev\") %s)", 69),
 	("gev", "1_05_1", scipy.stats.genextreme(1,loc=.5,scale=1), "lmomco(x, vec2par(c(.5, 1, 1), type=\"gev\") %s)", 70),
 	("gev", "1_05_05", scipy.stats.genextreme(1,loc=.5,scale=.5), "lmomco(x, vec2par(c(.5, .5, 1), type=\"gev\") %s)", 71),
 	("gev", "2_05_05", scipy.stats.genextreme(2,loc=.5,scale=.5), "lmomco(x, vec2par(c(.5, .5, 2), type=\"gev\") %s)", 72),

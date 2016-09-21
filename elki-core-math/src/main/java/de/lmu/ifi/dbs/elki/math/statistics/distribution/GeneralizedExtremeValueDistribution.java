@@ -36,8 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * This is a generalization of the Frechnet, Gumbel and (reversed) Weibull
  * distributions.
  * 
- * Implementation notice: apparently (see unit tests), our definition differs
- * from the scipy definition by having the negative shape.
+ * Implementation notice: In ELKI 0.8.0, the sign of the shape was negated.
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -106,7 +105,7 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
   public double getSigma() {
     return sigma;
   }
-  
+
   /**
    * Get the k parameter.
    * 
@@ -136,11 +135,13 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
     }
     x = (x - mu) / sigma;
     if(k > 0 || k < 0) {
-      if(k * x < -1) {
+      if(k * x > 1) {
         return 0.;
       }
-      final double tx = Math.pow(1 + k * x, -1. / k);
-      return Math.pow(tx, k + 1) * Math.exp(-tx) / sigma;
+      double t = Math.log(1 - k * x);
+      return t == Double.NEGATIVE_INFINITY ? 1. / sigma //
+          : t == Double.POSITIVE_INFINITY ? 0. //
+              : Math.exp((1 - k) * t / k - Math.exp(t / k)) / sigma;
     }
     else { // Gumbel case:
       return Math.exp(-x - Math.exp(-x)) / sigma;
@@ -167,11 +168,13 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
     }
     x = (x - mu) / sigma;
     if(k > 0 || k < 0) {
-      if(k * x < -1) {
+      if(k * x > 1) {
         return Double.NEGATIVE_INFINITY;
       }
-      final double tx = Math.pow(1 + k * x, -1. / k);
-      return (k == -1 ? 0 : Math.log(tx) * (k + 1)) - tx - Math.log(sigma);
+      double t = Math.log(1 - k * x);
+      return t == Double.NEGATIVE_INFINITY ? -Math.log(sigma) //
+          : t == Double.POSITIVE_INFINITY ? Double.NEGATIVE_INFINITY //
+              : (1 - k) * t / k - Math.exp(t / k) - Math.log(sigma);
     }
     else { // Gumbel case:
       return -x - Math.exp(-x) - Math.log(sigma);
@@ -195,10 +198,10 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
   public static double cdf(double val, double mu, double sigma, double k) {
     final double x = (val - mu) / sigma;
     if(k > 0 || k < 0) {
-      if(k * x <= -1) {
-        return (k > 0) ? 0 : 1;
+      if(k * x > 1) {
+        return k > 0 ? 1 : 0;
       }
-      return Math.exp(-Math.pow(1 + k * x, -1. / k));
+      return Math.exp(-Math.exp(Math.log(1 - k * x) / k));
     }
     else { // Gumbel case:
       return Math.exp(-Math.exp(-x));
@@ -223,11 +226,11 @@ public class GeneralizedExtremeValueDistribution extends AbstractDistribution {
     if(val < 0.0 || val > 1.0) {
       return Double.NaN;
     }
-    if(k > 0) {
-      return mu + sigma * Math.max((Math.pow(-Math.log(val), -k) - 1.) / k, -1. / k);
+    if(k < 0) {
+      return mu + sigma * Math.max((1. - Math.pow(-Math.log(val), k)) / k, 1. / k);
     }
-    else if(k < 0) {
-      return mu + sigma * Math.min((Math.pow(-Math.log(val), -k) - 1.) / k, -1. / k);
+    else if(k > 0) {
+      return mu + sigma * Math.min((1. - Math.pow(-Math.log(val), k)) / k, 1. / k);
     }
     else { // Gumbel
       return mu + sigma * Math.log(1. / Math.log(1. / val));

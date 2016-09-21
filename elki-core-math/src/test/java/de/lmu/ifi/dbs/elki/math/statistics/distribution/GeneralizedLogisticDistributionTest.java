@@ -70,7 +70,7 @@ public class GeneralizedLogisticDistributionTest extends AbstractDistributionTes
   @Test
   public void testQuantile() {
     load("logistic.ascii.gz");
-    checkQuantile(new GeneralizedLogisticDistribution(.5, 1., 1.), "quant_scipy_05", 1e-15);
+    checkQuantile(new GeneralizedLogisticDistribution(.5, 1., 1.), "quant_scipy_05", 1e-13);
     checkQuantile(new GeneralizedLogisticDistribution(.5, 1., 1.), "quant_gnur_05", 1e-13);
     load("glogistic.ascii.gz");
     checkQuantile(new GeneralizedLogisticDistribution(1., 1., 1.), "quant_scipy_1_1", 1e-15);

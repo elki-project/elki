@@ -57,20 +57,22 @@ public class GeneralizedExtremeValueDistributionTest extends AbstractDistributio
     checkPDF(new GeneralizedExtremeValueDistribution(.1, 20., 0.), "pdf_gnur_01_20", 1e-15);
     // Regular:
     load("gev.ascii.gz");
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, 1, -1.), "pdf_scipy_1_05_1", 1e-15);
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, -1.), "pdf_scipy_1_05_05", 1e-15);
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "pdf_scipy_2_05_05", 1e-15);
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "pdf_scipy_4_05_05", 1e-15);
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, 1, 1.), "pdf_scipy_M1_05_1", 1e-15);
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "pdf_scipy_M1_05_05", 1e-15);
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "pdf_scipy_M2_05_05", 1e-15);
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "pdf_scipy_M4_05_05", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.2, 1, .8), "pdf_scipy_08_02_1", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, 1, 1.), "pdf_scipy_1_05_1", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "pdf_scipy_1_05_05", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "pdf_scipy_2_05_05", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "pdf_scipy_4_05_05", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, 1, -1.), "pdf_scipy_M1_05_1", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, -1.), "pdf_scipy_M1_05_05", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "pdf_scipy_M2_05_05", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "pdf_scipy_M4_05_05", 1e-15);
 
     // SciPy (like us) and GnuR differ at the end of the definition area.
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, 1, -1.), "pdf_gnur_1_05_1", 1.);
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, -1.), "pdf_gnur_1_05_05", 2.);
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "pdf_gnur_2_05_05", 1e-15);
-    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "pdf_gnur_4_05_05", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.2, 1, .8), "pdf_gnur_08_02_1", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, 1, 1.), "pdf_gnur_1_05_1", 1.);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "pdf_gnur_1_05_05", 2.);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "pdf_gnur_2_05_05", 1e-15);
+    checkPDF(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "pdf_gnur_4_05_05", 1e-15);
     // GnuR also does not allow negative shape.
   }
 
@@ -91,10 +93,11 @@ public class GeneralizedExtremeValueDistributionTest extends AbstractDistributio
 
     // Regular:
     load("gev.ascii.gz");
-    checkLogPDF(new GeneralizedExtremeValueDistribution(.5, 1, -1.), "logpdf_scipy_1_05_1", 1e-15);
-    checkLogPDF(new GeneralizedExtremeValueDistribution(.5, .5, -1.), "logpdf_scipy_1_05_05", 1e-15);
-    checkLogPDF(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "logpdf_scipy_2_05_05", 1e-15);
-    checkLogPDF(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "logpdf_scipy_4_05_05", 1e-15);
+    checkLogPDF(new GeneralizedExtremeValueDistribution(.2, 1, .8), "logpdf_scipy_08_02_1", 1e-15);
+    checkLogPDF(new GeneralizedExtremeValueDistribution(.5, 1, 1.), "logpdf_scipy_1_05_1", 1e-15);
+    checkLogPDF(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "logpdf_scipy_1_05_05", 1e-15);
+    checkLogPDF(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "logpdf_scipy_2_05_05", 1e-15);
+    checkLogPDF(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "logpdf_scipy_4_05_05", 1e-15);
   }
 
   @Test
@@ -120,19 +123,21 @@ public class GeneralizedExtremeValueDistributionTest extends AbstractDistributio
     checkCDF(new GeneralizedExtremeValueDistribution(.1, 20., 0.), "cdf_gnur_01_20", 1e-15);
     // Regular:
     load("gev.ascii.gz");
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, 1., -1.), "cdf_scipy_1_05_1", 1e-15);
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, -1.), "cdf_scipy_1_05_05", 1e-15);
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "cdf_scipy_2_05_05", 1e-15);
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "cdf_scipy_4_05_05", 1e-15);
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, 1., 1.), "cdf_scipy_M1_05_1", 1e-15);
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "cdf_scipy_M1_05_05", 1e-15);
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "cdf_scipy_M2_05_05", 1e-15);
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "cdf_scipy_M4_05_05", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.2, 1., .8), "cdf_scipy_08_02_1", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, 1., 1.), "cdf_scipy_1_05_1", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "cdf_scipy_1_05_05", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "cdf_scipy_2_05_05", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "cdf_scipy_4_05_05", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, 1., -1.), "cdf_scipy_M1_05_1", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, -1.), "cdf_scipy_M1_05_05", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "cdf_scipy_M2_05_05", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "cdf_scipy_M4_05_05", 1e-15);
 
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, 1., -1.), "cdf_gnur_1_05_1", 1e-15);
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, -1.), "cdf_gnur_1_05_05", 1e-15);
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "cdf_gnur_2_05_05", 1e-15);
-    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "cdf_gnur_4_05_05", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.2, 1., .8), "cdf_gnur_08_02_1", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, 1., 1.), "cdf_gnur_1_05_1", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "cdf_gnur_1_05_05", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "cdf_gnur_2_05_05", 1e-15);
+    checkCDF(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "cdf_gnur_4_05_05", 1e-15);
   }
 
   @Test
@@ -150,18 +155,20 @@ public class GeneralizedExtremeValueDistributionTest extends AbstractDistributio
 
     // Regular:
     load("gev.ascii.gz");
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, 1., -1.), "quant_scipy_1_05_1", 1e-13);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -1.), "quant_scipy_1_05_05", 1e-13);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "quant_scipy_2_05_05", 1e-13);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "quant_scipy_4_05_05", 1e-13);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, 1., 1.), "quant_scipy_M1_05_1", 1e-15);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "quant_scipy_M1_05_05", 1e-15);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "quant_scipy_M2_05_05", 1e-14);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "quant_scipy_M4_05_05", 1e-14);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.2, 1., .8), "quant_scipy_08_02_1", 1e-13);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, 1., 1.), "quant_scipy_1_05_1", 1e-13);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "quant_scipy_1_05_05", 1e-13);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "quant_scipy_2_05_05", 1e-13);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "quant_scipy_4_05_05", 1e-13);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, 1., -1.), "quant_scipy_M1_05_1", 1e-15);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -1.), "quant_scipy_M1_05_05", 1e-15);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "quant_scipy_M2_05_05", 1e-14);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "quant_scipy_M4_05_05", 1e-14);
 
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, 1., -1.), "quant_gnur_1_05_1", 1e-13);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -1.), "quant_gnur_1_05_05", 1e-13);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "quant_gnur_2_05_05", 1e-13);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "quant_gnur_4_05_05", 1e-13);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.2, 1., .8), "quant_gnur_08_02_1", 1e-13);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, 1., 1.), "quant_gnur_1_05_1", 1e-13);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 1.), "quant_gnur_1_05_05", 1e-13);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 2.), "quant_gnur_2_05_05", 1e-13);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "quant_gnur_4_05_05", 1e-13);
   }
 }

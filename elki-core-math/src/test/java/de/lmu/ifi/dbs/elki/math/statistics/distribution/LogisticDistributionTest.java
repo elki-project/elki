@@ -64,8 +64,8 @@ public class LogisticDistributionTest extends AbstractDistributionTest {
   @Test
   public void testQuantile() {
     load("logistic.ascii.gz");
-    checkQuantile(new LogisticDistribution(.1, 1.), "quant_scipy_01", 1e-13);
-    checkQuantile(new LogisticDistribution(.5, 1.), "quant_scipy_05", 1e-13);
+    checkQuantile(new LogisticDistribution(.1, 1.), "quant_scipy_01", 1e-15);
+    checkQuantile(new LogisticDistribution(.5, 1.), "quant_scipy_05", 1e-15);
     checkQuantile(new LogisticDistribution(.1, 1.), "quant_gnur_01", 1e-15);
     checkQuantile(new LogisticDistribution(.5, 1.), "quant_gnur_05", 1e-15);
   }

@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 
-import static org.junit.Assert.fail;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -42,9 +40,8 @@ public class GeneralizedParetoLMMEstimatorTest extends AbstractDistributionEstim
     load("gpd.ascii.gz");
     double[] data = this.data.get("random_01_05_01");
     GeneralizedParetoDistribution dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("mu", dist.getMu(), 0.1, -0.19465696594915963);
-    assertStat("sigma", dist.getSigma(), 0.5, 0.09234727159645928);
+    assertStat("mu", dist.getMu(), 0.1, 0.009242125289449316);
+    assertStat("sigma", dist.getSigma(), 0.5, -0.06531958035222124);
     assertStat("xi", dist.getXi(), 0.1, 0.12674078147717688);
-    fail("Pretty large estimation errors!");
   }
 }

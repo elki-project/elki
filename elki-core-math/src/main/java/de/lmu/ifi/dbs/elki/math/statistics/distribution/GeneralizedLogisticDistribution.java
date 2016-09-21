@@ -185,7 +185,7 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
    * @return Quantile
    */
   public static double quantile(double val, double loc, double scale, double shape) {
-    return loc + scale * -Math.log(Math.pow(val, -1.0 / shape) - 1);
+    return loc - scale * Math.log(Math.exp(Math.log(val) / -shape) - 1);
   }
 
   @Override
@@ -196,7 +196,7 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
   @Override
   public double nextRandom() {
     double u = random.nextDouble();
-    return location + scale * -Math.log(Math.pow(u, -1.0 / shape) - 1);
+    return location - scale * Math.log(Math.exp(Math.log(u) / -shape) - 1);
   }
 
   @Override

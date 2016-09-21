@@ -72,10 +72,10 @@ public class GeneralizedParetoLMMEstimator extends AbstractLMMEstimator<Generali
     if(Math.abs(t3) >= 1.) {
       throw new ArithmeticException("Invalid moment estimation.");
     }
-    double xi = (1. - 3. * t3) / (1. + t3);
-    double sigma = 1. / ((1 + xi) * (2 + xi) + xmom[1]);
-    double mu = xmom[0] - sigma / (1 + xi);
-    return new GeneralizedParetoDistribution(mu, sigma, -xi);
+    double kappa = (1. - 3. * t3) / (1. + t3);
+    double sigma = (1 + kappa) * (2 + kappa) * xmom[1];
+    double mu = xmom[0] - sigma / (1 + kappa);
+    return new GeneralizedParetoDistribution(mu, sigma, -kappa);
   }
 
   @Override

@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 
-import static org.junit.Assert.fail;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -45,45 +43,49 @@ public class GeneralizedExtremeValueLMMEstimatorTest extends AbstractDistributio
     double[] data;
     data = this.data.get("random_08_02_1");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("mu", dist.getMu(), 0.8, -0.015832241641324907);
-    assertStat("sigma", dist.getSigma(), 0.2, -0.0074716868396216);
-    assertStat("k", dist.getK(), 1., -0.02674999917978249);
+    assertStat("k", dist.getK(), 0.8, -0.03040821352889378);
+    assertStat("mu", dist.getMu(), 0.2, -0.0887929566709296);
+    assertStat("sigma", dist.getSigma(), 1., -0.05744869446017087);
     data = this.data.get("random_1_05_05");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("mu", dist.getMu(), 1., -0.46111804410408275);
+    assertStat("k", dist.getK(), 1., -0.14332843228278025);
+    assertStat("mu", dist.getMu(), 0.5, 0.03888195589591725);
     assertStat("sigma", dist.getSigma(), 0.5, -0.06223758137044988);
-    assertStat("k", dist.getK(), 0.5, 0.35667156771721975);
     data = this.data.get("random_1_05_1");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("mu", dist.getMu(), 1., -0.6265249770638237);
-    assertStat("sigma", dist.getSigma(), 0.5, 0.5675322107980647);
     assertStat("k", dist.getK(), 1., -0.14699673138315983);
+    assertStat("mu", dist.getMu(), 0.5, -0.12652497706382376);
+    assertStat("sigma", dist.getSigma(), 1.0, 0.0675322107980647);
     data = this.data.get("random_2_05_05");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("mu", dist.getMu(), 2., -1.577986483610687);
+    assertStat("k", dist.getK(), 2., -0.5871260215689651);
+    assertStat("mu", dist.getMu(), 0.5, -0.07798648361068694);
     assertStat("sigma", dist.getSigma(), 0.5, -0.0029579371226723383);
-    assertStat("k", dist.getK(), 0.5, 0.9128739784310349);
-    // Does not converge: data = this.data.get("random_4_05_05");
+    data = this.data.get("random_4_05_05");
+    dist = est.estimate(data, DoubleArrayAdapter.STATIC);
+    assertStat("k", dist.getK(), 4, -0.32202142548151347);
+    assertStat("mu", dist.getMu(), 0.5, -0.018803097923999257);
+    assertStat("sigma", dist.getSigma(), 0.5, 0.05765617905862008);
+    // Note: for negative k, the estimation is really bad?
     data = this.data.get("random_M1_05_05");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("mu", dist.getMu(), -1., 1.5371604227242566);
+    assertStat("k", dist.getK(), -1, 0.0884217494239612);
+    assertStat("mu", dist.getMu(), 0.5, 0.03716042272425657);
     assertStat("sigma", dist.getSigma(), 0.5, 0.0952958451808682);
-    assertStat("k", dist.getK(), 0.5, -1.4115782505760388);
     data = this.data.get("random_M1_05_1");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("mu", dist.getMu(), -1., 1.5113228711274882);
-    assertStat("sigma", dist.getSigma(), 0.5, 0.5721466018174253);
-    assertStat("k", dist.getK(), 1., -1.5925064089988842);
+    assertStat("k", dist.getK(), -1., 0.4074935910011158);
+    assertStat("mu", dist.getMu(), 0.5, 0.011322871127488199);
+    assertStat("sigma", dist.getSigma(), 1.0, 0.07214660181742527);
     data = this.data.get("random_M2_05_05");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("mu", dist.getMu(), -2., 3.133211041532377);
+    assertStat("k", dist.getK(), -2, 1.0037265433180718);
+    assertStat("mu", dist.getMu(), 0.5, 0.6332110415323768);
     assertStat("sigma", dist.getSigma(), 0.5, 2.9163648075831836);
-    assertStat("k", dist.getK(), 0.5, -1.4962734566819282);
     data = this.data.get("random_M4_05_05");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("mu", dist.getMu(), -4., 47.107935547828674);
+    assertStat("k", dist.getK(), -4, 3.0000007718540083);
+    assertStat("mu", dist.getMu(), 0.5, 42.607935547828674);
     assertStat("sigma", dist.getSigma(), 0.5, 274.7233375224945);
-    assertStat("k", dist.getK(), 0.5, -1.4999992281459917);
-    fail("Results are not very good. Double-check");
   }
 }
