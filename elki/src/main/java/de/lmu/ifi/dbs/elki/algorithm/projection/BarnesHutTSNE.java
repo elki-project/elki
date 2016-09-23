@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
@@ -87,6 +88,16 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
   private static final Logging LOG = Logging.getLogger(BarnesHutTSNE.class);
 
   /**
+   * Threshold for optimizing perplexity.
+   */
+  final static protected double PERPLEXITY_ERROR = 1e-4;
+
+  /**
+   * Maximum number of iterations when optimizing perplexity.
+   */
+  final static protected int PERPLEXITY_MAXITER = 25;
+
+  /**
    * Capacity of the generated quadtree.
    */
   protected static final int QUADTREE_CAPACITY = 10;
@@ -117,6 +128,9 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     final int numberOfNeighbours = (int) Math.ceil(3 * perplexity);
     DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O> knnq = database.getKNNQuery(dq, numberOfNeighbours + 1);
+    if(knnq instanceof LinearScanQuery) {
+      LOG.warning("To accelerate Barnes-Hut tSNE, please use an index.");
+    }
     DBIDs rids = relation.getDBIDs();
     if(!(rids instanceof DBIDRange)) {
       throw new AbortException("Distance matrixes are currently only supported for DBID ranges (as used by static databases) for performance reasons (Patches welcome).");
@@ -246,19 +260,19 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
    * @param pij_i Output row
    */
   protected static void computeSigma(int i, DoubleArray pij_row, double perplexity, double log_perp, double[] pij_i) {
-    final double error = 1e-5;
     double max = pij_row.get((int) Math.ceil(perplexity)) / Math.E;
     double beta = 1 / max; // beta = 1. / (2*sigma*sigma)
     double diff = computeH(pij_row, pij_i, -beta) - log_perp;
-    double betaMin = 0., betaMax = Double.POSITIVE_INFINITY;
-    for(int tries = 0; tries < 50 && Math.abs(diff) > error; ++tries) {
+    double betaMin = Double.NEGATIVE_INFINITY;
+    double betaMax = Double.POSITIVE_INFINITY;
+    for(int tries = 0; tries < PERPLEXITY_MAXITER && Math.abs(diff) > PERPLEXITY_ERROR; ++tries) {
       if(diff > 0) {
         betaMin = beta;
-        beta += Double.isInfinite(betaMax) ? beta : ((betaMax - beta) * .5);
+        beta += (betaMax == Double.POSITIVE_INFINITY) ? beta : ((betaMax - beta) * .5);
       }
       else {
         betaMax = beta;
-        beta = .5 * (beta + betaMin);
+        beta -= (betaMin == Double.NEGATIVE_INFINITY) ? beta : ((beta - betaMin) * .5);
       }
       diff = computeH(pij_row, pij_i, -beta) - log_perp;
     }

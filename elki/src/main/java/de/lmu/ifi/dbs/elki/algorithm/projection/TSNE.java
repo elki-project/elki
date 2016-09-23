@@ -304,17 +304,18 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    */
   protected static void computePi(int i, double[] dist_i, double[] pij_i, double perplexity, double logPerp) {
     // Relation to paper: beta == 1. / (2*sigma*sigma)
-    double beta = estimateBeta(dist_i, perplexity);
+    double beta = estimateInitialBeta(dist_i, perplexity);
     double diff = computeH(i, dist_i, pij_i, -beta) - logPerp;
-    double betaMin = 0., betaMax = Double.POSITIVE_INFINITY;
+    double betaMin = Double.NEGATIVE_INFINITY;
+    double betaMax = Double.POSITIVE_INFINITY;
     for(int tries = 0; tries < PERPLEXITY_MAXITER && Math.abs(diff) > PERPLEXITY_ERROR; ++tries) {
       if(diff > 0) {
         betaMin = beta;
-        beta += Double.isInfinite(betaMax) ? beta : ((betaMax - beta) * .5);
+        beta += (betaMax == Double.POSITIVE_INFINITY) ? beta : ((betaMax - beta) * .5);
       }
       else {
         betaMax = beta;
-        beta = .5 * (beta + betaMin);
+        beta -= (betaMin == Double.NEGATIVE_INFINITY) ? beta : ((beta - betaMin) * .5);
       }
       diff = computeH(i, dist_i, pij_i, -beta) - logPerp;
     }
@@ -331,7 +332,7 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    * @param perplexity Desired perplexity
    * @return Estimated beta.
    */
-  protected static double estimateBeta(double[] dist_i, double perplexity) {
+  protected static double estimateInitialBeta(double[] dist_i, double perplexity) {
     double sum = 0.;
     for(double d : dist_i) {
       sum += d < Double.POSITIVE_INFINITY ? d : 0.;
@@ -675,4 +676,3 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     }
   }
 }
-
