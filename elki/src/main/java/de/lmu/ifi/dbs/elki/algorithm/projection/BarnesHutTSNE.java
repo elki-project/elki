@@ -98,9 +98,16 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
   final static protected int PERPLEXITY_MAXITER = 25;
 
   /**
+   * Early exaggeration factor.
+   * 
+   * Barnes-Hut tSNE implementation used 12.
+   */
+  protected static final double EARLY_EXAGGERATION = 12.;
+
+  /**
    * Capacity of the generated quadtree.
    */
-  protected static final int QUADTREE_CAPACITY = 10;
+  protected static final int QUADTREE_CAPACITY = 4;
 
   /**
    * (Squared) approximation quality threshold.
@@ -202,7 +209,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
         sum += pij_i[j];
       }
     }
-    final double scale = EARLY_EXAGGERATION / (2. * sum);
+    final double scale = EARLY_EXAGGERATION / sum;
     for(int i = 0; i < pij.length; i++) {
       final double[] pij_i = pij[i];
       for(int offi = 0; offi < pij_i.length; offi++) {
@@ -338,14 +345,14 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     for(int i = 0; i < size; i++) {
       Arrays.fill(meta[i], 2 * dim, 3 * dim, 1.); // Initial learning rate
     }
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Iterative Optimization", maxIterations, LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Iterative Optimization", iterations, LOG) : null;
     Duration timer = LOG.isStatistics() ? LOG.newDuration(TSNE.class.getName() + ".runtime.optimization").begin() : null;
     // Optimize
-    for(int i = 0; i < maxIterations; i++) {
+    for(int i = 0; i < iterations; i++) {
       computeGradient(pij, indices, sol, meta);
       updateSolution(sol, meta, i);
       if(i == EARLY_EXAGGERATION_ITERATIONS) {
-        removeEarlyExaggeration(pij);
+        removeEarlyExaggeration(pij, EARLY_EXAGGERATION);
       }
       LOG.incrementProcessed(prog);
     }
@@ -394,8 +401,6 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     final double[] center = node.center;
     double dist = sqDist(sol_i, center);
     // Barnes-Hut approximation:
-    // TODO: van der Maaten actually uses the maximum edge length, not the
-    // diagonal. What is correct / better?
     if(node.weight == 1 || node.squareSize / dist < sqtheta) {
       double u = 1. / (1. + dist);
       double z = node.weight * u;
@@ -686,25 +691,22 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     }
 
     /**
-     * Compute the diagonal of a bounding box.
+     * Compute the square size of a bounding box.
+     * 
+     * Note that van der Maaten writes "diagonal", while his source code uses
+     * the maximum edge length. Barnes and Hut used the cell edge size of a
+     * square quad tree.
      * 
      * @param minmax Bounding box
-     * @return Diagonal length
+     * @return squared cell size
      */
     private static double computeSquareSize(double[] minmax) {
-      double sum = 0.;
+      double max = 0;
       for(int d = 0; d < minmax.length; d += 2) {
         double width = minmax[d + 1] - minmax[d];
-        sum += width * width;
+        max = width > max ? width : max;
       }
-      return sum; // Math.sqrt(sum);
-      /*
-       * // Van der Maaten uses the maximum edge length!
-       * 
-       * double max = 0; for(int d = 0; d < minmax.length; d += 2) { double
-       * width = minmax[d + 1] - minmax[d]; max = width > max ? width : max; }
-       * return max * max;
-       */
+      return max * max;
     }
 
     @Override
@@ -738,8 +740,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
       super.makeOptions(config);
       DoubleParameter tethaP = new DoubleParameter(THETA_ID) //
           .setDefaultValue(0.5) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(tethaP)) {
         theta = tethaP.getValue();
       }
@@ -747,7 +748,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
 
     @Override
     protected BarnesHutTSNE<O> makeInstance() {
-      return new BarnesHutTSNE<>(distanceFunction, dim, perplexity, finalMomentum, learningRate, maxIterations, random, keep, theta);
+      return new BarnesHutTSNE<>(distanceFunction, dim, perplexity, finalMomentum, learningRate, iterations, random, keep, theta);
     }
   }
 }
