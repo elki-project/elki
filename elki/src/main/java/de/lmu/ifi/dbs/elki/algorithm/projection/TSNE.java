@@ -101,18 +101,20 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
 
   /**
    * Early exaggeration factor.
+   * 
+   * Barnes-Hut tSNE implementation used 12.
    */
   protected static final double EARLY_EXAGGERATION = 4.;
 
   /**
    * Number of iterations to apply early exaggeration.
    */
-  protected static final int EARLY_EXAGGERATION_ITERATIONS = 100;
+  protected static final int EARLY_EXAGGERATION_ITERATIONS = 50;
 
   /**
    * Scale of the initial solution.
    */
-  protected static final double INITIAL_SOLUTION_SCALE = 1e-2;
+  protected static final double INITIAL_SOLUTION_SCALE = 1e-4;
 
   /**
    * Minimum gain in learning rate.
@@ -140,9 +142,14 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
   protected double initialMomentum, finalMomentum;
 
   /**
-   * Maximum number of iterations.
+   * Iteration when to switch momentum.
    */
-  protected int maxIterations;
+  protected int momentumSwitch = 250;
+
+  /**
+   * Number of iterations.
+   */
+  protected int iterations;
 
   /**
    * Random generator
@@ -163,7 +170,7 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    * @param random Random generator
    */
   public TSNE(DistanceFunction<? super O> distanceFunction, int dim, double perplexity, RandomFactory random) {
-    this(distanceFunction, dim, perplexity, 0.8, 100, 300, random, true);
+    this(distanceFunction, dim, perplexity, 0.8, 200, 1000, random, true);
   }
 
   /**
@@ -174,18 +181,19 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    * @param perplexity Desired perplexity
    * @param finalMomentum Final momentum
    * @param learningRate Learning rate
-   * @param maxIterations Maximum number of iterations
+   * @param iterations Number of iterations
    * @param random Random generator
    * @param keep Keep the original data (or remove it)
    */
-  public TSNE(DistanceFunction<? super O> distanceFunction, int dim, double perplexity, double finalMomentum, double learningRate, int maxIterations, RandomFactory random, boolean keep) {
+  public TSNE(DistanceFunction<? super O> distanceFunction, int dim, double perplexity, double finalMomentum, double learningRate, int iterations, RandomFactory random, boolean keep) {
     super(distanceFunction);
     this.dim = dim;
     this.perplexity = perplexity;
-    this.maxIterations = maxIterations;
+    this.iterations = iterations;
     this.learningRate = learningRate;
     this.initialMomentum = finalMomentum >= 0.6 ? 0.5 : (0.5 * finalMomentum);
     this.finalMomentum = finalMomentum;
+    this.momentumSwitch = iterations / 4;
     this.random = random;
     this.keep = keep;
   }
@@ -408,15 +416,15 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     // Affinity matrix in projected space
     double[][] qij = new double[size][size];
 
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Iterative Optimization", maxIterations, LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Iterative Optimization", iterations, LOG) : null;
     Duration timer = LOG.isStatistics() ? LOG.newDuration(TSNE.class.getName() + ".runtime.optimization").begin() : null;
     // Optimize
-    for(int it = 0; it < maxIterations; it++) {
+    for(int it = 0; it < iterations; it++) {
       double qij_sum = computeQij(qij, sol);
       computeGradient(pij, qij, qij_sum, sol, meta);
       updateSolution(sol, meta, it);
       if(it == EARLY_EXAGGERATION_ITERATIONS) {
-        removeEarlyExaggeration(pij);
+        removeEarlyExaggeration(pij, EARLY_EXAGGERATION);
       }
       LOG.incrementProcessed(prog);
     }
@@ -499,7 +507,7 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    * @param it Iteration number, to choose momentum factor.
    */
   protected void updateSolution(double[][] sol, double[][] meta, int it) {
-    final double mom = (it < 20 && initialMomentum < finalMomentum) ? initialMomentum : finalMomentum;
+    final double mom = (it < momentumSwitch && initialMomentum < finalMomentum) ? initialMomentum : finalMomentum;
     for(int i = 0; i < sol.length; i++) {
       final double[] sol_i = sol[i], meta_i = meta[i];
       for(int k = 0; k < dim; k++) {
@@ -519,12 +527,13 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    * 
    * @param pij Affinity Matrix
    */
-  protected static void removeEarlyExaggeration(double[][] pij) {
+  protected static void removeEarlyExaggeration(double[][] pij, double factor) {
+    double inv = 1. / factor;
     final int size = pij.length;
     for(int i = 0; i < size; i++) {
       double[] row_i = pij[i];
       for(int j = 0; j < row_i.length; j++) {
-        row_i[j] /= EARLY_EXAGGERATION;
+        row_i[j] *= inv;
       }
     }
   }
@@ -570,9 +579,9 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     public static final OptionID LEARNING_RATE_ID = new OptionID("tsne.learningrate", "Learning rate of the method.");
 
     /**
-     * Maximum number of iterations to allow.
+     * Number of iterations to execute.
      */
-    public static final OptionID MAX_ITER_ID = new OptionID("tsne.maxiter", "Maximum number of iterations to perform.");
+    public static final OptionID ITER_ID = new OptionID("tsne.iter", "Number of iterations to perform.");
 
     /**
      * Random generator seed.
@@ -605,9 +614,9 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     protected double finalMomentum;
 
     /**
-     * Maximum number of iterations.
+     * Number of iterations.
      */
-    protected int maxIterations;
+    protected int iterations;
 
     /**
      * Random generator
@@ -645,18 +654,19 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
         finalMomentum = momentumP.doubleValue();
       }
 
+      // Note that original tSNE defaulted to 100, Barnes-Hut variant to 200.
       DoubleParameter learningRateP = new DoubleParameter(LEARNING_RATE_ID)//
-          .setDefaultValue(100.) //
+          .setDefaultValue(200.) //
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(learningRateP)) {
         learningRate = learningRateP.doubleValue();
       }
 
-      IntParameter maxiterP = new IntParameter(MAX_ITER_ID)//
-          .setDefaultValue(300)//
+      IntParameter maxiterP = new IntParameter(ITER_ID)//
+          .setDefaultValue(1000)//
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(maxiterP)) {
-        maxIterations = maxiterP.intValue();
+        iterations = maxiterP.intValue();
       }
 
       RandomParameter randP = new RandomParameter(RANDOM_ID);
@@ -672,7 +682,7 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
 
     @Override
     protected TSNE<O> makeInstance() {
-      return new TSNE<>(distanceFunction, dim, perplexity, finalMomentum, learningRate, maxIterations, random, keep);
+      return new TSNE<>(distanceFunction, dim, perplexity, finalMomentum, learningRate, iterations, random, keep);
     }
   }
 }
