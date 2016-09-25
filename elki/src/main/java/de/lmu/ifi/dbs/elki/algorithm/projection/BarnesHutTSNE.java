@@ -47,8 +47,8 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * tSNE using Barnes-Hut-Approximation.
  * 
  * For larger data sets, use an index to make finding the nearest neighbors
- * faster.
+ * faster, e.g. cover tree or k-d-tree.
  * 
  * Reference:
  * <p>
@@ -72,6 +72,9 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Accelerating t-SNE using Tree-Based Algorithms<br />
  * Journal of Machine Learning Research 15
  * </p>
+ * 
+ * TODO: this implementation currently differs in one major point: we do not
+ * symmetrize the sparse pij matrix.
  * 
  * @author Erich Schubert
  *
@@ -89,25 +92,22 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
 
   /**
    * Threshold for optimizing perplexity.
+   * 
+   * We deliberately allow more error than with "slow" tSNE.
    */
   final static protected double PERPLEXITY_ERROR = 1e-4;
 
   /**
    * Maximum number of iterations when optimizing perplexity.
+   * 
+   * We deliberately allow more error than with "slow" tSNE.
    */
   final static protected int PERPLEXITY_MAXITER = 25;
 
   /**
-   * Early exaggeration factor.
-   * 
-   * Barnes-Hut tSNE implementation used 12.
+   * Minimum resolution of quadtree.
    */
-  protected static final double EARLY_EXAGGERATION = 12.;
-
-  /**
-   * Capacity of the generated quadtree.
-   */
-  protected static final int QUADTREE_CAPACITY = 4;
+  private static final double QUADTREE_MIN_RESOLUION = 1e-10;
 
   /**
    * (Squared) approximation quality threshold.
@@ -127,7 +127,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
    * @param keep Keep the original data (or remove it)
    */
   public BarnesHutTSNE(DistanceFunction<? super O> distanceFunction, int dim, double perplexity, double finalMomentum, double learningRate, int maxIterations, RandomFactory random, boolean keep, double theta) {
-    super(distanceFunction, dim, perplexity, finalMomentum, learningRate, maxIterations, random, keep);
+    super(distanceFunction, dim, perplexity, finalMomentum, learningRate * 4, maxIterations, random, keep);
     this.sqtheta = theta * theta;
   }
 
@@ -135,7 +135,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     final int numberOfNeighbours = (int) Math.ceil(3 * perplexity);
     DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
     KNNQuery<O> knnq = database.getKNNQuery(dq, numberOfNeighbours + 1);
-    if(knnq instanceof LinearScanQuery) {
+    if(knnq instanceof LinearScanQuery && numberOfNeighbours * numberOfNeighbours < relation.size()) {
       LOG.warning("To accelerate Barnes-Hut tSNE, please use an index.");
     }
     DBIDs rids = relation.getDBIDs();
@@ -151,18 +151,20 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     int[][] indices = new int[size][];
     final boolean square = !SquaredEuclideanDistanceFunction.class.isInstance(dq.getDistanceFunction());
     computePij(ids, ix, knnq, square, numberOfNeighbours, perplexity, pij, indices);
+    // Remove the original (unprojected) data unless told otherwise.
+    if(!keep) {
+      removePreviousRelation(relation);
+    }
 
     double[][] solution = randomInitialSolution(size, dim, random.getSingleThreadedRandom());
+    projectedDistances = 0L;
     optimizetSNE(pij, indices, solution);
+    LOG.statistics(new LongStatistic(getClass().getName() + ".projected-distances", projectedDistances));
 
     WritableDataStore<DoubleVector> proj = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_SORTED, DoubleVector.class);
     VectorFieldTypeInformation<DoubleVector> otype = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
     for(ix.seek(0); ix.valid(); ix.advance()) {
-      proj.put(ix, new DoubleVector(solution[ix.getOffset()]));
-    }
-    // Remove the original (unprojected) data unless told otherwise.
-    if(!keep) {
-      ResultUtil.removeRecursive(relation.getHierarchy(), relation);
+      proj.put(ix, DoubleVector.wrap(solution[ix.getOffset()]));
     }
     return new MaterializedRelation<>("tSNE", "t-SNE", otype, proj, ids);
   }
@@ -180,13 +182,13 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
    * @param indices Output of indexes
    */
   protected void computePij(DBIDRange ids, DBIDArrayIter ix, KNNQuery<O> knnq, boolean square, int numberOfNeighbours, double perplexity, double[][] pij, int[][] indices) {
+    Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.neighborspijmatrix").begin() : null;
     final double logPerp = Math.log(perplexity);
     // Scratch arrays, resizable
     DoubleArray dists = new DoubleArray(numberOfNeighbours + 10);
     IntegerArray inds = new IntegerArray(numberOfNeighbours + 10);
     // Compute nearest-neighbor sparse affinity matrix
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Finding neighbors and optimizing perplexity", ids.size(), LOG) : null;
-    Duration timer = LOG.isStatistics() ? LOG.newDuration(TSNE.class.getName() + ".runtime.pijmatrix").begin() : null;
     for(ix.seek(0); ix.valid(); ix.advance()) {
       dists.clear();
       inds.clear();
@@ -198,9 +200,6 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    if(timer != null) {
-      LOG.statistics(timer.end());
-    }
     // Sum of the sparse affinity matrix:
     double sum = 0.;
     for(int i = 0; i < pij.length; i++) {
@@ -209,7 +208,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
         sum += pij_i[j];
       }
     }
-    final double scale = EARLY_EXAGGERATION / sum;
+    final double scale = EARLY_EXAGGERATION / (2 * sum);
     for(int i = 0; i < pij.length; i++) {
       final double[] pij_i = pij[i];
       for(int offi = 0; offi < pij_i.length; offi++) {
@@ -225,9 +224,14 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
           }
         }
         else { // Not found
+          // TODO: the original code produces a symmetric matrix
+          // And it will now not sum to EARLY_EXAGGERATION anymore.
           pij_i[offi] = MathUtil.max(pij_i[offi] * scale, MIN_PIJ);
         }
       }
+    }
+    if(timer != null) {
+      LOG.statistics(timer.end());
     }
   }
 
@@ -270,7 +274,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     double max = pij_row.get((int) Math.ceil(perplexity)) / Math.E;
     double beta = 1 / max; // beta = 1. / (2*sigma*sigma)
     double diff = computeH(pij_row, pij_i, -beta) - log_perp;
-    double betaMin = Double.NEGATIVE_INFINITY;
+    double betaMin = 0.;
     double betaMax = Double.POSITIVE_INFINITY;
     for(int tries = 0; tries < PERPLEXITY_MAXITER && Math.abs(diff) > PERPLEXITY_ERROR; ++tries) {
       if(diff > 0) {
@@ -279,7 +283,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
       }
       else {
         betaMax = beta;
-        beta -= (betaMin == Double.NEGATIVE_INFINITY) ? beta : ((beta - betaMin) * .5);
+        beta -= (beta - betaMin) * .5;
       }
       diff = computeH(pij_row, pij_i, -beta) - log_perp;
     }
@@ -339,14 +343,19 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
    */
   protected void optimizetSNE(double[][] pij, int[][] indices, double[][] sol) {
     final int size = pij.length;
+    if(size * 3L * dim > 0x7FFF_FFFAL) {
+      throw new AbortException("Memory exceeds Java array size limit.");
+    }
     // Meta information on each point; joined for memory locality.
     // Gradient, Momentum, and learning rate
-    double[][] meta = new double[size][3 * dim];
-    for(int i = 0; i < size; i++) {
-      Arrays.fill(meta[i], 2 * dim, 3 * dim, 1.); // Initial learning rate
+    // For performance, we use a flat memory layout!
+    double[] meta = new double[size * 3 * dim];
+    final int dim3 = dim * 3;
+    for(int off = 2 * dim; off < meta.length; off += dim3) {
+      Arrays.fill(meta, off, off + dim, 1.); // Initial learning rate
     }
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Iterative Optimization", iterations, LOG) : null;
-    Duration timer = LOG.isStatistics() ? LOG.newDuration(TSNE.class.getName() + ".runtime.optimization").begin() : null;
+    Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.optimization").begin() : null;
     // Optimize
     for(int i = 0; i < iterations; i++) {
       computeGradient(pij, indices, sol, meta);
@@ -362,28 +371,32 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     }
   }
 
-  private void computeGradient(double[][] pij, int[][] indices, double[][] solution, double[][] grad) {
-    double[][] attr = new double[solution.length][dim];
-    double[][] rep = new double[solution.length][dim];
-
-    computeAttractiveForces(attr, pij, indices, solution);
-
-    QuadTree tree = QuadTree.build(dim, solution, QUADTREE_CAPACITY);
-    double z = 0.;
-    for(int i = 0; i < solution.length; i++) {
-      z -= computeRepulsiveForces(rep[i], solution[i], tree);
+  private void computeGradient(double[][] pij, int[][] indices, double[][] solution, double[] grad) {
+    final int dim3 = 3 * dim;
+    // Reset gradient / forces
+    for(int off = 0; off < grad.length; off += dim3) {
+      Arrays.fill(grad, off, off + dim, 0.);
     }
-    z -= solution.length;
-    for(int i = 0; i < grad.length; i++) {
+    // Compute repulsive forces first:
+    QuadTree tree = QuadTree.build(dim, solution);
+    double z = 0.;
+    for(int i = 0, off = 0; i < solution.length; i++, off += dim3) {
+      z -= computeRepulsiveForces(grad, off, solution[i], tree);
+    }
+    // Normalize repulsive forces:
+    double s = 1 / z; // Scaling factor
+    for(int off = 0; off < grad.length; off += dim3) {
       for(int j = 0; j < dim; j++) {
-        rep[i][j] /= z;
-        grad[i][j] = (attr[i][j] + rep[i][j]) * 4.;
+        grad[off + j] *= s;
       }
     }
+    // Compute attractive forces second
+    computeAttractiveForces(grad, pij, indices, solution);
   }
 
-  private void computeAttractiveForces(double[][] attr, double[][] pij, int[][] indices, double[][] sol) {
-    for(int i = 0; i < attr.length; i++) {
+  private void computeAttractiveForces(double[] attr, double[][] pij, int[][] indices, double[][] sol) {
+    final int dim3 = 3 * dim;
+    for(int i = 0, off = 0; off < attr.length; i++, off += dim3) {
       final double[] pij_i = pij[i], sol_i = sol[i];
       final int[] ind_i = indices[i];
       for(int offj = 0; offj < ind_i.length; offj++) {
@@ -391,13 +404,22 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
         final double pij_ij = pij_i[offj];
         final double a = pij_ij / (1. + sqDist(sol_i, sol_j));
         for(int k = 0; k < dim; k++) {
-          attr[i][k] += a * (sol_i[k] - sol_j[k]);
+          attr[off + k] += a * (sol_i[k] - sol_j[k]);
         }
       }
     }
   }
 
-  private double computeRepulsiveForces(double[] rep_i, double[] sol_i, QuadTree node) {
+  /**
+   * Compute the repulsive forces for a single point
+   * 
+   * @param rep_i Repulsive forces array
+   * @param off Point offset
+   * @param sol_i Solution vector
+   * @param node Quad tree
+   * @return force strength
+   */
+  private double computeRepulsiveForces(double[] rep_i, int off, double[] sol_i, QuadTree node) {
     final double[] center = node.center;
     double dist = sqDist(sol_i, center);
     // Barnes-Hut approximation:
@@ -406,26 +428,30 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
       double z = node.weight * u;
       double a = z * u;
       for(int k = 0; k < dim; k++) {
-        // TODO: van der Maaten avoids computing this difference twice (also in
-        // sqDist) - we should also use this optimization.
-        rep_i[k] += a * (sol_i[k] - center[k]);
+        // TODO: van der Maaten avoids computing this difference twice (also
+        // done in sqDist) - we should also use this optimization.
+        rep_i[off + k] += a * (sol_i[k] - center[k]);
       }
       return z;
     }
     double z = 0.;
     // Aggregate points in this node:
-    for(double[] point : node.points) {
-      double pdist = sqDist(sol_i, point);
-      double pz = 1. / (1. + pdist);
-      double a = pz * pz;
-      for(int k = 0; k < dim; k++) {
-        rep_i[k] += a * (sol_i[k] - point[k]);
+    if(node.points != null) {
+      for(double[] point : node.points) {
+        double pdist = sqDist(sol_i, point);
+        double pz = 1. / (1. + pdist);
+        double a = pz * pz;
+        for(int k = 0; k < dim; k++) {
+          rep_i[off + k] += a * (sol_i[k] - point[k]);
+        }
+        z += pz;
       }
-      z += pz;
     }
     // Recurse into subtrees:
-    for(QuadTree child : node.children) {
-      z += computeRepulsiveForces(rep_i, sol_i, child);
+    if(node.children != null) {
+      for(QuadTree child : node.children) {
+        z += computeRepulsiveForces(rep_i, off, sol_i, child);
+      }
     }
     return z;
   }
@@ -449,21 +475,6 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
    * @author Erich Schubert
    */
   protected static class QuadTree {
-    /**
-     * Empty constant for non-leaf nodes.
-     */
-    private static final double[][] NO_POINTS = new double[0][]; // Empty
-
-    /**
-     * Empty constant for leaf nodes.
-     */
-    private static final QuadTree[] NO_CHILDREN = new QuadTree[0]; // Empty
-
-    /**
-     * Minimum resolution of quadtree.
-     */
-    private static final double MIN_RESOLUION = 1e-10;
-
     /**
      * Center of mass (NOT center of bounding box)
      */
@@ -511,11 +522,10 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
      * 
      * @param dim Dimensionality
      * @param data Data set (will be modified!)
-     * @param capacity Node capacity
      * @return Quad tree
      */
-    public static QuadTree build(int dim, double[][] data, int capacity) {
-      return build(dim, data.clone(), 0, data.length, capacity);
+    public static QuadTree build(int dim, double[][] data) {
+      return build(dim, data.clone(), 0, data.length);
     }
 
     /**
@@ -525,28 +535,25 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
      * @param data Input data (WILL BE MODIFIED)
      * @param begin Subset begin
      * @param end Subset end
-     * @param capacity Node capacity
      * @return Subtree
      */
-    private static QuadTree build(int dim, double[][] data, int begin, int end, int capacity) {
+    private static QuadTree build(int dim, double[][] data, int begin, int end) {
       double[] minmax = computeExtend(dim, data, begin, end);
       double squareSize = computeSquareSize(minmax);
       double[] mid = computeCenterofMass(dim, data, begin, end);
       // Leaf:
       final int size = end - begin;
-      if(size < capacity || squareSize <= MIN_RESOLUION) {
-        if(begin > 0 || end < data.length) {
-          data = Arrays.copyOfRange(data, begin, end);
-        }
-        return new QuadTree(data, NO_CHILDREN, mid, size, squareSize);
+      if(squareSize <= QUADTREE_MIN_RESOLUION) {
+        data = Arrays.copyOfRange(data, begin, end);
+        return new QuadTree(data, null, mid, size, squareSize);
       }
 
       ArrayList<double[]> singletons = new ArrayList<>();
       ArrayList<QuadTree> children = new ArrayList<>();
-      splitRecursively(data, begin, end, 0, dim, minmax, singletons, children, capacity);
+      splitRecursively(data, begin, end, 0, dim, minmax, singletons, children);
 
-      double[][] sing = singletons.size() > 0 ? singletons.toArray(new double[singletons.size()][]) : NO_POINTS;
-      QuadTree[] chil = children.size() > 0 ? children.toArray(new QuadTree[children.size()]) : NO_CHILDREN;
+      double[][] sing = singletons.size() > 0 ? singletons.toArray(new double[singletons.size()][]) : null;
+      QuadTree[] chil = children.size() > 0 ? children.toArray(new QuadTree[children.size()]) : null;
       return new QuadTree(sing, chil, mid, size, squareSize);
     }
 
@@ -561,14 +568,13 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
      * @param minmax Bounding box
      * @param singletons Output for singletons
      * @param children Output for child nodes
-     * @param capacity Node capacity
      */
-    private static void splitRecursively(double[][] data, int begin, int end, int initdim, int dims, double[] minmax, ArrayList<double[]> singletons, ArrayList<QuadTree> children, int capacity) {
+    private static void splitRecursively(double[][] data, int begin, int end, int initdim, int dims, double[] minmax, ArrayList<double[]> singletons, ArrayList<QuadTree> children) {
       final int len = end - begin;
-      if(len == 1) {
-        singletons.add(data[begin]);
-      }
-      if(len < 1) {
+      if(len <= 1) {
+        if(len == 1) {
+          singletons.add(data[begin]);
+        }
         return;
       }
       double mid = Double.NaN;
@@ -584,12 +590,12 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
         ++cur; // Try next dimension
         // All remaining dimensions were constant?
         if(cur == dims) {
+          LOG.warning("Should not be reached", new Throwable());
           assert (initdim != 0) : "All dimensions constant?";
           LOG.warning("Unexpected all-constant split.");
-          if(begin > 0 || end < data.length) {
-            data = Arrays.copyOfRange(data, begin, end);
-          }
-          children.add(new QuadTree(data, null, data[0].clone(), data.length, 0.));
+          double[] center = computeCenterofMass(dims, data, begin, end);
+          data = Arrays.copyOfRange(data, begin, end);
+          children.add(new QuadTree(data, null, center, len, 0.));
           return;
         }
       }
@@ -618,19 +624,19 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
       // Recursion into next dimension:
       if(cur < dims) {
         if(begin < l) {
-          splitRecursively(data, begin, l, cur, dims, minmax, singletons, children, capacity);
+          splitRecursively(data, begin, l, cur, dims, minmax, singletons, children);
         }
         if(l < end) {
-          splitRecursively(data, l, end, cur, dims, minmax, singletons, children, capacity);
+          splitRecursively(data, l, end, cur, dims, minmax, singletons, children);
         }
         return;
       }
       // Recurse into next depth:
       if(begin < l) {
-        children.add(build(dims, data, begin, l, capacity));
+        children.add(build(dims, data, begin, l));
       }
       if(l < end) {
-        children.add(build(dims, data, l, end, capacity));
+        children.add(build(dims, data, l, end));
       }
     }
 
@@ -704,9 +710,11 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
       double max = 0;
       for(int d = 0; d < minmax.length; d += 2) {
         double width = minmax[d + 1] - minmax[d];
-        max = width > max ? width : max;
+        // Diagonal would be:
+        max += width * width;
+        // max = width > max ? width : max;
       }
-      return max * max;
+      return max; // * max; // squared
     }
 
     @Override

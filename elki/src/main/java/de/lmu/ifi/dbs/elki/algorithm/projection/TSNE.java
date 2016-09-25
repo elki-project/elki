@@ -38,12 +38,17 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
+import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -120,6 +125,11 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    * Minimum gain in learning rate.
    */
   protected static final double MIN_GAIN = 0.01;
+
+  /**
+   * Number of distance computations performed in projected space.
+   */
+  protected long projectedDistances;
 
   /**
    * Perplexity.
@@ -206,26 +216,50 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     double[][] pij;
     { // Compute desired affinities.
       double[][] dist = buildDistanceMatrix(size, dq, ix, iy);
+      // Remove the original (unprojected) data unless told otherwise.
+      if(!keep) {
+        removePreviousRelation(relation);
+      }
       pij = computePij(dist, perplexity);
       dist = null; // No longer needed.
     }
 
     // Create initial solution.
     double[][] sol = randomInitialSolution(size, dim, random.getSingleThreadedRandom());
+    projectedDistances = 0L;
     optimizetSNE(pij, sol);
+    LOG.statistics(new LongStatistic(getClass().getName() + ".projected-distances", projectedDistances));
 
     // Transform into output data format.
     WritableDataStore<DoubleVector> proj = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_SORTED, DoubleVector.class);
     VectorFieldTypeInformation<DoubleVector> otype = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
     for(ix.seek(0); ix.valid(); ix.advance()) {
-      proj.put(ix, new DoubleVector(sol[ix.getOffset()]));
+      proj.put(ix, DoubleVector.wrap(sol[ix.getOffset()]));
     }
 
-    // Remove the original (unprojected) data unless told otherwise.
-    if(!keep) {
-      ResultUtil.removeRecursive(relation.getHierarchy(), relation);
-    }
     return new MaterializedRelation<>("tSNE", "t-SNE", otype, proj, ids);
+  }
+
+  /**
+   * Remove the previous relation.
+   *
+   * Manually also log index statistics, as we may be removing indexes.
+   *
+   * @param relation Relation to remove
+   */
+  protected void removePreviousRelation(Relation<O> relation) {
+    boolean first = true;
+    for(Iter<Result> it = relation.getHierarchy().iterDescendants(relation); it.valid(); it.advance()) {
+      if(!(it.get() instanceof Index)) {
+        continue;
+      }
+      if(first) {
+        LOG.statistics("Index statistics when removing initial data relation.");
+        first = false;
+      }
+      ((Index) it.get()).logStatistics();
+    }
+    ResultUtil.removeRecursive(relation.getHierarchy(), relation);
   }
 
   /**
@@ -240,7 +274,7 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
   protected static double[][] buildDistanceMatrix(int size, DistanceQuery<?> dq, DBIDArrayIter ix, DBIDArrayIter iy) {
     double[][] dmat = new double[size][size];
     final boolean square = !SquaredEuclideanDistanceFunction.class.isInstance(dq.getDistanceFunction());
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix.", (size * (size - 1)) >>> 1, LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix", (size * (size - 1)) >>> 1, LOG) : null;
     Duration timer = LOG.isStatistics() ? LOG.newDuration(TSNE.class.getName() + ".runtime.distancematrix").begin() : null;
     for(ix.seek(0); ix.valid(); ix.advance()) {
       double[] dmat_x = dmat[ix.getOffset()];
@@ -314,7 +348,7 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
     // Relation to paper: beta == 1. / (2*sigma*sigma)
     double beta = estimateInitialBeta(dist_i, perplexity);
     double diff = computeH(i, dist_i, pij_i, -beta) - logPerp;
-    double betaMin = Double.NEGATIVE_INFINITY;
+    double betaMin = 0.;
     double betaMax = Double.POSITIVE_INFINITY;
     for(int tries = 0; tries < PERPLEXITY_MAXITER && Math.abs(diff) > PERPLEXITY_ERROR; ++tries) {
       if(diff > 0) {
@@ -323,7 +357,7 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
       }
       else {
         betaMax = beta;
-        beta -= (betaMin == Double.NEGATIVE_INFINITY) ? beta : ((beta - betaMin) * .5);
+        beta -= (beta - betaMin) * .5;
       }
       diff = computeH(i, dist_i, pij_i, -beta) - logPerp;
     }
@@ -407,17 +441,22 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    */
   protected void optimizetSNE(double[][] pij, double[][] sol) {
     final int size = pij.length;
+    if(size * 3L * dim > 0x7FFF_FFFAL) {
+      throw new AbortException("Memory exceeds Java array size limit.");
+    }
     // Meta information on each point; joined for memory locality.
     // Gradient, Momentum, and learning rate
-    double[][] meta = new double[size][3 * dim];
-    for(int i = 0; i < size; i++) {
-      Arrays.fill(meta[i], 2 * dim, 3 * dim, 1.); // Initial learning rate
+    // For performance, we use a flat memory layout!
+    double[] meta = new double[size * 3 * dim];
+    final int dim3 = dim * 3;
+    for(int off = 2 * dim; off < meta.length; off += dim3) {
+      Arrays.fill(meta, off, off + dim, 1.); // Initial learning rate
     }
     // Affinity matrix in projected space
     double[][] qij = new double[size][size];
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Iterative Optimization", iterations, LOG) : null;
-    Duration timer = LOG.isStatistics() ? LOG.newDuration(TSNE.class.getName() + ".runtime.optimization").begin() : null;
+    Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.optimization").begin() : null;
     // Optimize
     for(int it = 0; it < iterations; it++) {
       double qij_sum = computeQij(qij, sol);
@@ -441,7 +480,7 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    * @param solution Solution matrix (input)
    * @return qij sum
    */
-  protected static double computeQij(double[][] qij, double[][] solution) {
+  protected double computeQij(double[][] qij, double[][] solution) {
     double qij_sum = 0;
     for(int i = 1; i < qij.length; i++) {
       final double[] qij_i = qij[i], vi = solution[i];
@@ -459,13 +498,14 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    * @param v2 Second vector
    * @return Squared distance
    */
-  protected static double sqDist(double[] v1, double[] v2) {
+  protected double sqDist(double[] v1, double[] v2) {
     assert (v1.length == v2.length) : "Lengths do not agree: " + v1.length + " " + v2.length;
     double sum = 0;
     for(int i = 0; i < v1.length; i++) {
       final double diff = v1[i] - v2[i];
       sum += diff * diff;
     }
+    ++projectedDistances;
     return sum;
   }
 
@@ -478,11 +518,11 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    * @param sol Current solution coordinates
    * @param meta Point metadata
    */
-  protected void computeGradient(double[][] pij, double[][] qij, double qij_sum, double[][] sol, double[][] meta) {
-    for(int i = 0; i < pij.length; i++) {
-      final double[] sol_i = sol[i], meta_i = meta[i];
-      final double[] pij_i = pij[i], qij_i = qij[i];
-      Arrays.fill(meta_i, 0, dim, 0.); // Clear gradient only
+  protected void computeGradient(double[][] pij, double[][] qij, double qij_sum, double[][] sol, double[] meta) {
+    final int dim3 = dim * 3;
+    for(int i = 0, off = 0; i < pij.length; i++, off += dim3) {
+      final double[] sol_i = sol[i], pij_i = pij[i], qij_i = qij[i];
+      Arrays.fill(meta, off, off + dim, 0.); // Clear gradient only
       for(int j = 0; j < pij.length; j++) {
         if(i == j) {
           continue;
@@ -493,7 +533,7 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
         final double q = MathUtil.max(qij_ij / qij_sum, MIN_QIJ);
         double a = (pij_i[j] - q) * qij_ij;
         for(int k = 0; k < dim; k++) {
-          meta_i[k] += a * (sol_i[k] - sol_j[k]);
+          meta[off + k] += a * (sol_i[k] - sol_j[k]);
         }
       }
     }
@@ -506,18 +546,19 @@ public class TSNE<O> extends AbstractDistanceBasedAlgorithm<O, Relation<DoubleVe
    * @param meta Metadata array (gradient, momentum, learning rate)
    * @param it Iteration number, to choose momentum factor.
    */
-  protected void updateSolution(double[][] sol, double[][] meta, int it) {
+  protected void updateSolution(double[][] sol, double[] meta, int it) {
     final double mom = (it < momentumSwitch && initialMomentum < finalMomentum) ? initialMomentum : finalMomentum;
-    for(int i = 0; i < sol.length; i++) {
-      final double[] sol_i = sol[i], meta_i = meta[i];
+    final int dim3 = dim * 3;
+    for(int i = 0, off = 0; i < sol.length; i++, off += dim3) {
+      final double[] sol_i = sol[i];
       for(int k = 0; k < dim; k++) {
         // Indexes in meta array
-        final int gradk = k, movk = gradk + dim, gaink = movk + dim;
+        final int gradk = off + k, movk = gradk + dim, gaink = movk + dim;
         // Adjust learning rate:
-        meta_i[gaink] = MathUtil.max(((meta_i[gradk] > 0) != (meta_i[movk] > 0)) ? (meta_i[gaink] + 0.2) : (meta_i[gaink] * 0.8), MIN_GAIN);
-        meta_i[movk] *= mom; // Dampening the previous momentum
-        meta_i[movk] -= learningRate * meta_i[gradk] * meta_i[gaink]; // Learn
-        sol_i[k] += meta_i[movk];
+        meta[gaink] = MathUtil.max(((meta[gradk] > 0) != (meta[movk] > 0)) ? (meta[gaink] + 0.2) : (meta[gaink] * 0.8), MIN_GAIN);
+        meta[movk] *= mom; // Dampening the previous momentum
+        meta[movk] -= learningRate * meta[gradk] * meta[gaink]; // Learn
+        sol_i[k] += meta[movk];
       }
     }
   }
