@@ -30,8 +30,9 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.FourC;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.PreDeConNeighborPredicate.PreDeConModel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.QueryUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -73,9 +74,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  * @param <V> the type of NumberVector handled by this Algorithm
  */
 @Reference(authors = "C. Böhm, K. Kailing, P. Kröger, A. Zimek", //
-title = "Computing Clusters of Correlation Connected Objects", //
-booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", //
-url = "http://dx.doi.org/10.1145/1007568.1007620")
+    title = "Computing Clusters of Correlation Connected Objects", //
+    booktitle = "Proc. ACM SIGMOD Int. Conf. on Management of Data, Paris, France, 2004, 455-466", //
+    url = "http://dx.doi.org/10.1145/1007568.1007620")
 public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRangeQueryNeighborPredicate<V, PreDeConModel, PreDeConModel> {
   /**
    * The logger for this class.
@@ -115,11 +116,10 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
     this.filter = new LimitEigenPairFilter(settings.delta, settings.absolute);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public Instance instantiate(Database database) {
-    DistanceQuery<V> dq = QueryUtil.getDistanceQuery(database, distFunc);
-    Relation<V> relation = (Relation<V>) dq.getRelation();
+    Relation<V> relation = database.getRelation(getInputTypeRestriction());
+    DistanceQuery<V> dq = database.getDistanceQuery(relation, distFunc);
     RangeQuery<V> rq = database.getRangeQuery(dq);
     mvSize.reset();
     mvSize2.reset();
@@ -183,6 +183,11 @@ public class FourCNeighborPredicate<V extends NumberVector> extends AbstractRang
   @Override
   Logging getLogger() {
     return LOG;
+  }
+
+  @Override
+  public TypeInformation getInputTypeRestriction() {
+    return TypeUtil.NUMBER_VECTOR_FIELD;
   }
 
   @Override
