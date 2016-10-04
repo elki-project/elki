@@ -49,7 +49,17 @@ public abstract class AbstractProgress implements Progress {
   /**
    * For logging rate control.
    */
-  private long lastLogged = Long.MIN_VALUE;
+  private long lastLogged = 0;
+
+  /**
+   * Last logged value.
+   */
+  private int lastValue = 0;
+
+  /**
+   * Last rate.
+   */
+  protected double ratems = Double.NaN;
 
   /**
    * Default constructor.
@@ -141,13 +151,18 @@ public abstract class AbstractProgress implements Progress {
    * @return true when logging is sensible
    */
   protected boolean testLoggingRate() {
-    if(isComplete() || getProcessed() < 10) {
-      return true;
-    }
-    final long now = System.nanoTime();
-    if(lastLogged > now - 1E8) {
+    final int processed = getProcessed();
+    final long now = System.currentTimeMillis();
+    final long age = now - lastLogged;
+    if(!isComplete() && processed > 10 && age < 1E2) {
       return false;
     }
+    if(lastValue > 0) {
+      int increment = processed - lastValue;
+      double newrate = increment / (double) age;
+      ratems = ratems != ratems ? newrate : (.9 * ratems + .1 * newrate);
+    }
+    lastValue = processed;
     lastLogged = now;
     return true;
   }
