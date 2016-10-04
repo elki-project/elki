@@ -22,8 +22,6 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
 import de.lmu.ifi.dbs.elki.database.datastore.memory.MapStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDMIter;
@@ -124,9 +122,8 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
 
     final int items = (int) Math.round(rho*k);
     
-    //TODO passt so?
-    KNNHeap dummyHeap = DBIDUtil.newHeap(k);
-    //TODO c später löschen, aber wird im Source-Code auf- oder abgerundet bei rho?
+//    KNNHeap dummyHeap = DBIDUtil.newHeap(k);
+    //TODO wird im Source-Code auf- oder abgerundet bei rho?
     //S(K * S_), dann resize von S.. (S_ ist dabei rho)
     MapStore<HashSetModifiableDBIDs> sampleNewHash = new MapStore<HashSetModifiableDBIDs>();
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -135,10 +132,20 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       sampleNewHash.put(iditer, DBIDUtil.newHashSet(sample));
       flag.put(iditer,DBIDUtil.newHashSet());
       newReverseNeighbors.put(iditer, DBIDUtil.newHashSet(sample2));
-//      // initialize store
+      // initialize store
 //      store.put(iditer, dummyHeap);
+//    if (useInitialNeighbors){
+//      for (DBIDIter siter = sample.iter(); siter.valid(); siter.advance()){
+//        int add = add(iditer,siter,distanceQuery.distance(iditer, siter));
+//        if (add > 0){
+//          HashSetModifiableDBIDs iditernew = flag.get(iditer);
+//          iditernew.add(siter);
+//          flag.put(iditer,iditernew);
+//        }
+//      }
+//    }
     }
-    
+
     int size = relation.size();
     int counter = k * size;
     
@@ -154,8 +161,6 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         HashSetModifiableDBIDs newNeighbors = flag.get(iditer);
         HashSetModifiableDBIDs oldNeighbors = DBIDUtil.newHashSet();
         KNNHeap heap = store.get(iditer);
-        //TODO hier statt null-Abfrage wegen Initialisierung oben size-Abfrage?? --> KOSTET MEHR
-//        if (heap.size() > 0){
         if (heap != null){
           for (DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()){
             if (!newNeighbors.contains(heapiter)){
@@ -180,7 +185,8 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
           oldRev = oldReverseNeighbors.get(iditer);
           oldRev = DBIDUtil.newHashSet(DBIDUtil.randomSample(oldRev, Math.min(items, oldRev.size()), rnd));
         }
-        //TODO heap wegen Laufzeit wiederverwenden ??? --> dann concurrent?
+        //TODO heap wegen Laufzeit wiederverwenden
+//        System.out.println(sampleNew.size()+"\t"+newRev.size()+"\t"+oldNeighbors.size()+"\t"+oldRev.size());
         //3 loops
         //nn_new
           //nn_new
@@ -220,6 +226,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         //nn_new
           //rnn_old
           //rnn_new
+        //TODO hier Concurrent Modification
         for(DBIDIter sniter2 = sampleNew.iter(); sniter2.valid(); sniter2.advance()) {
           for(DBIDIter niter2 = oldRev.iter(); niter2.valid(); niter2.advance()){
             if (DBIDUtil.compare(sniter2, niter2)!=0){
@@ -246,12 +253,13 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         }
       }
       counter_all+=counter;
-      if (LOG.isStatistics()){
-        LOG.statistics(new StringStatistic("Distance computations in this iteration", Integer.toString(counter)));
-        LOG.statistics(new DoubleStatistic("Scan rate in this iteration", counter_all/(size*(size-1.0)/2.0)));
+      if (LOG.isVerbose()){
+//        LOG.verbose("Distance computations in this iteration" + counter);
+        LOG.verbose("Scan rate in this iteration" + counter_all/(size*(size-1.0)/2.0));
       }
       
       t=0;
+      //TODO find an efficient way to view only "real" new neighbors
       sampleNewHash = sampleNew(flag, items);      
       
       //calculate reverse neighbors separately for old and new
@@ -260,8 +268,8 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       reverse(sampleNewHash);      
       
       rate = (double) t / (double) (k*size);
-      if (LOG.isStatistics()){
-        LOG.statistics(new DoubleStatistic("Update rate in this iteration", rate));
+      if (LOG.isVerbose()){
+        LOG.verbose("Update rate in this iteration" + rate);
       }
       if (rate < delta) break;
     }
@@ -274,6 +282,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     LOG.setCompleted(progress);
     final long end = System.currentTimeMillis();
     if(LOG.isStatistics()) {
+      LOG.statistics(new DoubleStatistic("Scan rate in this iteration", counter_all/(size*(size-1.0)/2.0)));
       LOG.statistics(new LongStatistic(this.getClass().getCanonicalName() + ".construction-time.ms", end - starttime));
     }
   }
