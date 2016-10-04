@@ -68,7 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <V> the type of NumberVector used
  */
 @Alias({ "de.lmu.ifi.dbs.elki.parser.NumberVectorLabelParser", //
-"de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser" })
+    "de.lmu.ifi.dbs.elki.parser.RealVectorLabelParser" })
 public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStreamingParser {
   /**
    * Logging class.
@@ -220,6 +220,9 @@ public class NumberVectorLabelParser<V extends NumberVector> extends AbstractStr
           }
           return Event.NEXT_OBJECT;
         }
+      }
+      if(maxdim == 0) {
+        throw new AbortException("No numeric data was read. Verify the column separator; for textual data use other parsers.");
       }
       return Event.END_OF_STREAM;
     }
