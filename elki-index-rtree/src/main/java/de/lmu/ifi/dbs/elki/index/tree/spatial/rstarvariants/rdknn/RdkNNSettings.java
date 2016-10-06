@@ -31,10 +31,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
  * 
  * @author Erich Schubert
  * @since 0.4.0
- * 
- * @param <O> Object type
  */
-public class RdkNNSettings<O extends NumberVector> extends RTreeSettings {
+public class RdkNNSettings extends RTreeSettings {
   /**
    * Parameter k.
    */
@@ -43,7 +41,7 @@ public class RdkNNSettings<O extends NumberVector> extends RTreeSettings {
   /**
    * The distance function.
    */
-  SpatialPrimitiveDistanceFunction<? super O> distanceFunction;
+  SpatialPrimitiveDistanceFunction<NumberVector> distanceFunction;
 
   /**
    * Constructor.
@@ -51,7 +49,7 @@ public class RdkNNSettings<O extends NumberVector> extends RTreeSettings {
    * @param k_max Maximum k to support
    * @param distanceFunction Distance function
    */
-  public RdkNNSettings(int k_max, SpatialPrimitiveDistanceFunction<? super O> distanceFunction) {
+  public RdkNNSettings(int k_max, SpatialPrimitiveDistanceFunction<NumberVector> distanceFunction) {
     super();
     this.k_max = k_max;
     this.distanceFunction = distanceFunction;

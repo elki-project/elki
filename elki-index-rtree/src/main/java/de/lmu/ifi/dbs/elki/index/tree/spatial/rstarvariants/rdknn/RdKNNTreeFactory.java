@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @param <O> Object type
  */
-public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RdKNNNode, RdKNNEntry, RdKNNTree<O>, RdkNNSettings<O>> {
+public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeFactory<O, RdKNNNode, RdKNNEntry, RdKNNTree<O>, RdkNNSettings> {
   /**
    * Parameter for k
    */
@@ -70,7 +70,7 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
    * @param pageFileFactory Data storage
    * @param settings Settings class
    */
-  public RdKNNTreeFactory(PageFileFactory<?> pageFileFactory, RdkNNSettings<O> settings) {
+  public RdKNNTreeFactory(PageFileFactory<?> pageFileFactory, RdkNNSettings settings) {
     super(pageFileFactory, settings);
   }
 
@@ -92,7 +92,7 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
    *
    * @apiviz.exclude
    */
-  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RdkNNSettings<O>> {
+  public static class Parameterizer<O extends NumberVector> extends AbstractRStarTreeFactory.Parameterizer<O, RdkNNSettings> {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
@@ -102,7 +102,7 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
         settings.k_max = k_maxP.intValue();
       }
 
-      ObjectParameter<SpatialPrimitiveDistanceFunction<O>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
+      ObjectParameter<SpatialPrimitiveDistanceFunction<NumberVector>> distanceFunctionP = new ObjectParameter<>(DISTANCE_FUNCTION_ID, SpatialPrimitiveDistanceFunction.class, DEFAULT_DISTANCE_FUNCTION);
       if(config.grab(distanceFunctionP)) {
         settings.distanceFunction = distanceFunctionP.instantiateClass(config);
       }
@@ -114,8 +114,8 @@ public class RdKNNTreeFactory<O extends NumberVector> extends AbstractRStarTreeF
     }
 
     @Override
-    protected RdkNNSettings<O> createSettings() {
-      return new RdkNNSettings<O>(1, EuclideanDistanceFunction.STATIC);
+    protected RdkNNSettings createSettings() {
+      return new RdkNNSettings(1, EuclideanDistanceFunction.STATIC);
     }
   }
 }

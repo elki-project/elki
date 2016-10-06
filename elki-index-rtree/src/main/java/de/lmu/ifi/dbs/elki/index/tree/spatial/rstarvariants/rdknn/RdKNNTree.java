@@ -83,7 +83,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * @param <O> Object type
  */
 // FIXME: currently does not yet return RKNNQuery objects!
-public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNode, RdKNNEntry, RdkNNSettings<O>> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
+public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNode, RdKNNEntry, RdkNNSettings> implements RangeIndex<O>, KNNIndex<O>, RKNNIndex<O>, DynamicIndex {
   /**
    * The logger for this class.
    */
@@ -111,7 +111,7 @@ public class RdKNNTree<O extends NumberVector> extends NonFlatRStarTree<RdKNNNod
    * @param pagefile Data storage
    * @param settings Tree settings
    */
-  public RdKNNTree(Relation<O> relation, PageFile<RdKNNNode> pagefile, RdkNNSettings<O> settings) {
+  public RdKNNTree(Relation<O> relation, PageFile<RdKNNNode> pagefile, RdkNNSettings settings) {
     super(pagefile, settings);
     this.relation = relation;
     this.distanceQuery = settings.distanceFunction.instantiate(relation);
