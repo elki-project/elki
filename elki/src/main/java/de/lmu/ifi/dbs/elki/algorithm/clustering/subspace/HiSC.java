@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -41,7 +41,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.IndexBasedDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -77,10 +76,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Finding Hierarchies of Subspace Clusters")
 @Description("Algorithm for detecting hierarchies of subspace clusters.")
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek",//
-title = "Finding Hierarchies of Subspace Clusters", //
-booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06), Berlin, Germany, 2006", //
-url = "http://www.dbs.ifi.lmu.de/Publikationen/Papers/PKDD06-HiSC.pdf")
+@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", //
+    title = "Finding Hierarchies of Subspace Clusters", //
+    booktitle = "Proc. 10th Europ. Conf. on Principles and Practice of Knowledge Discovery in Databases (PKDD'06), Berlin, Germany, 2006", //
+    url = "http://www.dbs.ifi.lmu.de/Publikationen/Papers/PKDD06-HiSC.pdf")
 public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, CorrelationClusterOrder> {
   /**
    * The logger for this class.
@@ -90,7 +89,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
   /**
    * Factory to produce
    */
-  private IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector>> indexfactory;
+  private HiSCPreferenceVectorIndex.Factory<V> indexfactory;
 
   /**
    * Holds the maximum diversion allowed.
@@ -102,7 +101,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
    * 
    * @param indexfactory HiSC index factory
    */
-  public HiSC(IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector>> indexfactory, double epsilon) {
+  public HiSC(HiSCPreferenceVectorIndex.Factory<V> indexfactory, double epsilon) {
     super();
     this.indexfactory = indexfactory;
     this.alpha = epsilon;
@@ -124,7 +123,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     /**
      * Instantiated index.
      */
-    private HiSCPreferenceVectorIndex<NumberVector> index;
+    private HiSCPreferenceVectorIndex<V> index;
 
     /**
      * Cluster order.
@@ -170,7 +169,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     @Override
     protected CorrelationClusterOrder buildResult() {
       return new CorrelationClusterOrder("HiCO Cluster Order", "hico-cluster-order", //
-      clusterOrder, reachability, predecessor, correlationValue);
+          clusterOrder, reachability, predecessor, correlationValue);
     }
 
     @Override
@@ -242,9 +241,10 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
     @Override
     public int compare(DBIDRef o1, DBIDRef o2) {
-      int c1 = correlationValue.intValue(o1), c2 = correlationValue.intValue(o2);
+      int c1 = correlationValue.intValue(o1),
+          c2 = correlationValue.intValue(o2);
       return (c1 < c2) ? -1 : (c1 > c2) ? +1 : //
-      super.compare(o1, o2);
+          super.compare(o1, o2);
     }
 
     @Override
@@ -311,7 +311,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
     /**
      * Factory to produce the index.
      */
-    private IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector>> indexfactory;
+    private HiSCPreferenceVectorIndex.Factory<V> indexfactory;
 
     /**
      * Alpha parameter.
@@ -337,7 +337,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
 
       ChainedParameterization chain = new ChainedParameterization(opticsParameters, config);
       chain.errorsTo(config);
-      final Class<? extends IndexFactory<V, HiSCPreferenceVectorIndex<NumberVector>>> cls = ClassGenericsUtil.uglyCrossCast(HiSCPreferenceVectorIndex.Factory.class, IndexFactory.class);
+      final Class<HiSCPreferenceVectorIndex.Factory<V>> cls = ClassGenericsUtil.uglyCastIntoSubclass(HiSCPreferenceVectorIndex.Factory.class);
       indexfactory = chain.tryInstantiate(cls);
     }
 
