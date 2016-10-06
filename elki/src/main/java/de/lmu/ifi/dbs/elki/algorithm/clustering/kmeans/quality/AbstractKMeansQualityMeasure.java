@@ -68,9 +68,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.7.0
  */
 @Reference(authors = "D. Pelleg, A. Moore", //
-title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
-booktitle = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
-url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
+    title = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
+    booktitle = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
+    url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
 public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> implements KMeansQualityMeasure<O> {
   /**
    * Compute the number of points in a given set of clusters (which may be
@@ -129,9 +129,9 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
    * @return Log Likelihood.
    */
   @Reference(authors = "D. Pelleg, A. Moore", //
-  booktitle = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
-  title = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
-  url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
+      booktitle = "X-means: Extending K-means with Efficient Estimation on the Number of Clusters", //
+      title = "Proceedings of the 17th International Conference on Machine Learning (ICML 2000)", //
+      url = "http://www.pelleg.org/shared/hp/download/xmeans.ps")
   public static <V extends NumberVector> double logLikelihood(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // dimensionality of data points
@@ -154,6 +154,11 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
       Cluster<? extends MeanModel> cluster = it.next();
       n += n_i[i] = cluster.size();
       d += d_i[i] = varianceOfCluster(cluster, distanceFunction, relation);
+    }
+
+    // No remaining variance, if every point is on its own:
+    if(n <= m) {
+      return Double.NEGATIVE_INFINITY;
     }
 
     // Total variance (corrected for bias)
@@ -185,9 +190,9 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
    * @return Log Likelihood.
    */
   @Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
-  title = "Knee Point Detection on Bayesian Information Criterion", //
-  booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
-  url = "http://dx.doi.org/10.1109/ICTAI.2008.154")
+      title = "Knee Point Detection on Bayesian Information Criterion", //
+      booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
+      url = "http://dx.doi.org/10.1109/ICTAI.2008.154")
   public static <V extends NumberVector> double logLikelihoodAlternate(Relation<V> relation, Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction) {
     List<? extends Cluster<? extends MeanModel>> clusters = clustering.getAllClusters();
     // dimensionality of data points
