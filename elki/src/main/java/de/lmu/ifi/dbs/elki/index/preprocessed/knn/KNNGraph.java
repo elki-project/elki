@@ -122,7 +122,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
 
     final int items = (int) Math.round(rho*k);
     
-//    KNNHeap dummyHeap = DBIDUtil.newHeap(k);
+    KNNHeap dummyHeap = DBIDUtil.newHeap(k);
     //TODO wird im Source-Code auf- oder abgerundet bei rho?
     //S(K * S_), dann resize von S.. (S_ ist dabei rho)
     MapStore<HashSetModifiableDBIDs> sampleNewHash = new MapStore<HashSetModifiableDBIDs>();
@@ -133,7 +133,6 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       flag.put(iditer,DBIDUtil.newHashSet());
       newReverseNeighbors.put(iditer, DBIDUtil.newHashSet(sample2));
       // initialize store
-//      store.put(iditer, dummyHeap);
 //    if (useInitialNeighbors){
 //      for (DBIDIter siter = sample.iter(); siter.valid(); siter.advance()){
 //        int add = add(iditer,siter,distanceQuery.distance(iditer, siter));
@@ -255,7 +254,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       counter_all+=counter;
       if (LOG.isVerbose()){
 //        LOG.verbose("Distance computations in this iteration" + counter);
-        LOG.verbose("Scan rate in this iteration" + counter_all/(size*(size-1.0)/2.0));
+        LOG.verbose("Scan rate in this iteration: " + counter_all/(size*(size-1.0)/2.0));
       }
       
       t=0;
@@ -269,20 +268,25 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       
       rate = (double) t / (double) (k*size);
       if (LOG.isVerbose()){
-        LOG.verbose("Update rate in this iteration" + rate);
+        LOG.verbose("Update rate in this iteration: " + rate);
       }
       if (rate < delta) break;
     }
     //convert store to storage
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       KNNHeap heap = store.get(iditer);
-      KNNList list = heap.toKNNList();
+      KNNList list;
+      if (heap != null){
+        list = heap.toKNNList();
+      }
+      else{
+        list = dummyHeap.toKNNList();
+      }
       storage.put(iditer, list);
     }
     LOG.setCompleted(progress);
     final long end = System.currentTimeMillis();
     if(LOG.isStatistics()) {
-      LOG.statistics(new DoubleStatistic("Scan rate in this iteration", counter_all/(size*(size-1.0)/2.0)));
       LOG.statistics(new LongStatistic(this.getClass().getCanonicalName() + ".construction-time.ms", end - starttime));
     }
   }
