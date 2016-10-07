@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
@@ -107,12 +108,13 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
    * @param prots
    */
   private void nnChainCore(int size, double[] distances, ArrayModifiableDBIDs prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters) {
-    LinkedList<Integer> chain = new LinkedList<>();
+    IntegerArray chain = new IntegerArray(size);
     int a = -1;
     int b = -1;
     int c, x, y;
     double minDist = Double.POSITIVE_INFINITY;
     double dist;
+    int lastIndex;
     
     for(int k=0; k < size-1; k++) {
       if(chain.size() <= 3) {
@@ -128,7 +130,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
         }
         
         chain.clear();
-        chain.addFirst(a);
+        chain.add(a);
         
         for(ix.seek(0); ix.valid(); ix.advance()) {
           if(lambda.doubleValue(ix) == Double.POSITIVE_INFINITY) {
@@ -143,13 +145,12 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
         }
       }
       else {
-
-        a = chain.get(3);
+        
+        lastIndex = chain.size-1;
+        a = chain.get(lastIndex - 3);
         // Get the point that has been retained during the last merge.
-        b = (chain.get(2)<chain.get(1))? chain.get(2) : chain.get(1);
-        chain.pop();
-        chain.pop();
-        chain.pop();
+        b = (chain.get(lastIndex - 2)<chain.get(lastIndex - 1))? chain.get(lastIndex - 2) : chain.get(lastIndex -1);
+        chain.remove(lastIndex-2, 3);
       }
       do {
         c = b;
@@ -167,9 +168,9 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
         b = a;
         a = c;
         
-        chain.addFirst(a);
+        chain.add(a);
       }
-      while(!(chain.size() >= 3 && a == chain.get(2)));
+      while(!(chain.size() >= 3 && a == chain.get(chain.size -1 -2)));
 
       if(a < b) {
         x = b;
