@@ -108,7 +108,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
    * @param prots
    */
   private void nnChainCore(int size, double[] distances, ArrayModifiableDBIDs prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters) {
-    IntegerArray chain = new IntegerArray(size);
+    IntegerArray chain = new IntegerArray(size+1); // The maximum chain size = number of ids + 1
     int a = -1;
     int b = -1;
     int c, x, y;
