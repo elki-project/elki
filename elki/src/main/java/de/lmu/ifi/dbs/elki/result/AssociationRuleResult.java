@@ -1,12 +1,9 @@
 package de.lmu.ifi.dbs.elki.result;
-
-import java.util.LinkedHashMap;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,50 +24,54 @@ import java.util.LinkedHashMap;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.Itemset;
+import de.lmu.ifi.dbs.elki.algorithm.associationrulemining.AssociationRule;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
- * Result class for Apriori Algorithm.
+ * Result class for association rule mining
  * 
- * @author Erich Schubert
- * @since 0.2
+ * @author Frederic Sautter
+ *
  */
-public class FrequentItemsetsResult extends BasicResult implements TextWriteable {
+public class AssociationRuleResult extends BasicResult implements TextWriteable {
+  
   /**
-   * The supports of all frequent itemsets.
+   * Association rules together with the interestingness measure.
    */
-  private List<Itemset> itemsets;
-
+  private List<AssociationRule> rules;
+  
   /**
    * Metadata of the data relation, for item labels.
    */
   private VectorFieldTypeInformation<BitVector> meta;
-
+  
+  
   /**
+   * 
    * Constructor.
-   * 
-   * @param name The long name (for pretty printing)
-   * @param shortname the short name (for filenames etc.)
-   * @param itemsets Frequent itemsets
-   * @param meta Metadata
+   *
+   * @param name
+   * @param shortname
    */
-  public FrequentItemsetsResult(String name, String shortname, List<Itemset> itemsets, VectorFieldTypeInformation<BitVector> meta) {
+  public AssociationRuleResult(String name, String shortname, List<AssociationRule> rules, VectorFieldTypeInformation<BitVector> meta) {
     super(name, shortname);
-    this.itemsets = itemsets;
+    this.rules = rules;
     this.meta = meta;
+    // TODO Auto-generated constructor stub
   }
-
+  
+  
+  
   /**
-   * Returns the frequent item sets.
+   * Returns the rules.
    * 
-   * @return the frequent item sets.
+   * @return the rules.
    */
-  public List<Itemset> getItemsets() {
-    return itemsets;
+  public List<AssociationRule> getRules() {
+    return rules;
   }
   
   /**
@@ -81,27 +82,14 @@ public class FrequentItemsetsResult extends BasicResult implements TextWriteable
   public VectorFieldTypeInformation<BitVector> getMeta() {
     return this.meta;
   }
-  
-  /**
-   * Returns a HashMap representation of itemsets in reverse order.
-   * 
-   * @return the frequent item sets.
-   */
-  public LinkedHashMap<Itemset, Itemset> getRevHashMapRep() {
-    LinkedHashMap<Itemset, Itemset> map = new LinkedHashMap<Itemset, Itemset>();
-    for(int i = this.itemsets.size() - 1; i >= 0; i--) {
-      Itemset newItemset =this.itemsets.get(i).copy(); 
-      map.put(newItemset, newItemset);
-      this.itemsets.remove(i);
-    }
-    return map;
-  }
 
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    for(Itemset itemset : itemsets) {
-      out.inlinePrintNoQuotes(itemset.appendTo(new StringBuilder(), meta));
+    // TODO Auto-generated method stub
+    for(AssociationRule rule : rules) {
+      out.inlinePrintNoQuotes(rule.appendTo(new StringBuilder(), meta));
       out.flush();
     }
   }
+
 }

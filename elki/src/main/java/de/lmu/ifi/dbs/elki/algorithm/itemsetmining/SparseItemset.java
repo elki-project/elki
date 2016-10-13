@@ -74,6 +74,10 @@ public class SparseItemset extends Itemset {
     }
     this.indices = (ii.item < ij.item) ? new int[] { ii.item, ij.item } : new int[] { ij.item, ii.item };
   }
+  
+  public SparseItemset copy() {
+    return new SparseItemset(this.indices.clone(), this.support);
+  }
 
   @Override
   public int length() {
@@ -98,6 +102,10 @@ public class SparseItemset extends Itemset {
     }
     return bits;
   }
+  
+  public int[] toSparseRep() {
+    return this.indices;
+  }
 
   @Override
   public int hashCode() {
@@ -112,6 +120,12 @@ public class SparseItemset extends Itemset {
     if(obj == null) {
       return false;
     }
+    if (obj instanceof SparseItemset) {
+      return this.equalsSparseItemset((SparseItemset) obj);
+    }
+    if (obj instanceof OneItemset && this.indices.length == 1) {
+      return this.indices[0] == ((OneItemset) obj).item;
+    }
     if(!(obj instanceof Itemset) || ((Itemset) obj).length() != 1) {
       return false;
     }
@@ -120,6 +134,10 @@ public class SparseItemset extends Itemset {
       return false;
     }
     return Arrays.equals(indices, ((SparseItemset) obj).indices);
+  }
+  
+  public boolean equalsSparseItemset(SparseItemset itemset) {
+    return Arrays.equals(this.indices, itemset.indices);
   }
 
   @Override

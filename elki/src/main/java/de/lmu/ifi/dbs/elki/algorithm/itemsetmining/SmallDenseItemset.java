@@ -54,6 +54,12 @@ public class SmallDenseItemset extends Itemset {
     this.items = items;
     this.length = length;
   }
+  
+  public SmallDenseItemset copy() {
+    SmallDenseItemset itemset = new SmallDenseItemset(this.items, this.length);
+    itemset.support = this.getSupport();
+    return itemset;
+  }
 
   @Override
   public int length() {
@@ -68,6 +74,10 @@ public class SmallDenseItemset extends Itemset {
   @Override
   public long[] getItems() {
     return new long[] { items };
+  }
+  
+  public int[] toSparseRep() {
+    return new int[0];
   }
 
   @Override
@@ -91,6 +101,10 @@ public class SmallDenseItemset extends Itemset {
       return false;
     }
     return items == ((SmallDenseItemset) obj).items;
+  }
+  
+  public boolean equalsSparseItemset(SparseItemset itemset) {
+    return false;
   }
 
   @Override
