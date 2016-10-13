@@ -51,6 +51,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresenatationResult> implements HierarchicalClusteringAlgorithm {
 
   private static final Logging LOG = Logging.getLogger(MiniMaxNNChain.class);
+
   private FiniteProgress progress;
 
   public MiniMaxNNChain(DistanceFunction<? super O> distanceFunction) {
@@ -78,7 +79,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
     TIntObjectHashMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
     final Logging log = getLogger();
 
-    progress = log.isVerbose() ? new FiniteProgress("Running MiniMaxNNChain", size - 1, log) : null;
+    progress = log.isVerbose() ? new FiniteProgress("Running MiniMaxNNChainCovertree", size - 1, log) : null;
 
     double[] dists = new double[AGNES.triangleSize(size)];
     ArrayModifiableDBIDs prots = DBIDUtil.newArray(AGNES.triangleSize(size));
@@ -93,7 +94,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
     MiniMax.initializeMatrices(dists, prots, dq, ix, iy);
 
     nnChainCore(size, dists, prots, dq, ix, iy, pi, lambda, prototypes, clusters);
-    
+
     LOG.ensureCompleted(progress);
 
     return new PointerPrototypeHierarchyRepresenatationResult(ids, pi, lambda, prototypes);
@@ -108,30 +109,32 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
    * @param prots
    */
   private void nnChainCore(int size, double[] distances, ArrayModifiableDBIDs prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters) {
-    IntegerArray chain = new IntegerArray(size+1); // The maximum chain size = number of ids + 1
+    IntegerArray chain = new IntegerArray(size + 1); // The maximum chain size =
+                                                     // number of ids + 1
     int a = -1;
     int b = -1;
     int c, x, y;
     double minDist = Double.POSITIVE_INFINITY;
     double dist;
     int lastIndex;
-    
-    for(int k=0; k < size-1; k++) {
+
+    for(int k = 0; k < size - 1; k++) {
       if(chain.size() <= 3) {
-       
-        
-        // Accessing two arbitrary not yet merged elements could be optimized to work in O(1) like in Müllner; 
-        // however this usually does not have a huge impact (empirically just about 1/5000 of total performance) 
+
+        // Accessing two arbitrary not yet merged elements could be optimized to
+        // work in O(1) like in Müllner;
+        // however this usually does not have a huge impact (empirically just
+        // about 1/5000 of total performance)
         for(ix.seek(0); ix.valid(); ix.advance()) {
           if(lambda.doubleValue(ix) == Double.POSITIVE_INFINITY) {
             a = ix.getOffset();
             break;
           }
         }
-        
+
         chain.clear();
         chain.add(a);
-        
+
         for(ix.seek(0); ix.valid(); ix.advance()) {
           if(lambda.doubleValue(ix) == Double.POSITIVE_INFINITY) {
             b = ix.getOffset();
@@ -145,18 +148,18 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
         }
       }
       else {
-        
-        lastIndex = chain.size-1;
+
+        lastIndex = chain.size - 1;
         a = chain.get(lastIndex - 3);
         // Get the point that has been retained during the last merge.
-        b = (chain.get(lastIndex - 2)<chain.get(lastIndex - 1))? chain.get(lastIndex - 2) : chain.get(lastIndex -1);
-        chain.remove(lastIndex-2, 3);
+        b = (chain.get(lastIndex - 2) < chain.get(lastIndex - 1)) ? chain.get(lastIndex - 2) : chain.get(lastIndex - 1);
+        chain.remove(lastIndex - 2, 3);
       }
       do {
         c = b;
         minDist = getDistance(distances, b, a);
         for(int i = 0; i < size; i++) {
-          if(i != a && lambda.doubleValue(ix.seek(i))==Double.POSITIVE_INFINITY) {
+          if(i != a && lambda.doubleValue(ix.seek(i)) == Double.POSITIVE_INFINITY) {
             dist = getDistance(distances, i, a);
             if(dist < minDist) {
               minDist = dist;
@@ -167,10 +170,10 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
 
         b = a;
         a = c;
-        
+
         chain.add(a);
       }
-      while(!(chain.size() >= 3 && a == chain.get(chain.size -1 -2)));
+      while(!(chain.size() >= 3 && a == chain.get(chain.size - 1 - 2)));
 
       if(a < b) {
         x = b;
