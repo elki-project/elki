@@ -1,0 +1,11 @@
+de.lmu.ifi.dbs.elki.math.statistics.dependence.CorrelationDependenceMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.SpearmanCorrelationDependenceMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.DistanceCorrelationDependenceMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.MutualInformationEquiwidthDependenceMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.JensenShannonEquiwidthDependenceMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.HoeffdingsDDependenceMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.MCEDependenceMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.SlopeDependenceMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.SlopeInversionDependenceMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.HSMDependenceMeasure
+de.lmu.ifi.dbs.elki.math.statistics.dependence.SURFINGDependenceMeasure
