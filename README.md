@@ -70,21 +70,23 @@ Our primary "support" medium is this *community* mailing list. We appreciate if 
 
 ## Building ELKI
 
-ELKI is built using [Maven](https://maven.apache.org/):
+ELKI is built using [Maven](https://maven.apache.org/) and Python:
+
+    mvn -P svg,svm,uncertain,tutorial,bundle package
+
+or simply (on Linux and probably Mac OSX):
+
+    sh util/compile.sh
+
+will produce an executable `jar` file named `elki-bundle-<VERSION>.jar`.
+
+You can also build a modular version using
 
     mvn package
 
-will produce an executable `jar` file named `elki/target/elki-<VERSION>.jar`.
+The jar files are located in `*/target` and `addons/*/target`.
+Required dependencies can be found in the folder `dependency` next to each `jar` file.
 
-To build the SVG based visualization add-on, use
-
-    mvn -P svg package
-
-which produces an executable `jar` file named `addons/batikvis/target/elki-batik-visualization-<VERSION>.jar`
-
-Required dependencies can be found in the folder `dependency` next to the `jar` file.
-
-To build a *standalone jar*, use the `bundle` profile (requires Python for cleaning up the license documentation).
 When using IntelliJ, it seems that the best strategy is to run within the
 bundle project, as IntelliJ then manages to set up the classpath correctly
 (feel free to discuss and suggest better solutions for IntelliJ or NetBeans
