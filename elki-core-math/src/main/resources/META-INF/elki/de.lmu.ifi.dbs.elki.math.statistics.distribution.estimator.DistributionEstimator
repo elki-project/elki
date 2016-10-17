@@ -5,7 +5,6 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.NormalLMMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaMOMEstimator
-de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaChoiWetteEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GammaLMMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLogMOMEstimator
@@ -14,9 +13,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalLMMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogNormalBilkovaLMMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.SkewGNormalLMMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaLogMOMEstimator
-de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaLogMADEstimator
-de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaChoiWetteEstimator
-de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogGammaAlternateExpMADEstimator
+de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.ExpGammaExpMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformEnhancedMinMaxEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMinMaxEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.UniformMADEstimator
@@ -34,7 +31,6 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.LogLogisticMADEstimat
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedLogisticAlternateLMMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedExtremeValueLMMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GeneralizedParetoLMMEstimator
-de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMOMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLogMADEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.WeibullLMMEstimator
 de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator.GumbelMADEstimator

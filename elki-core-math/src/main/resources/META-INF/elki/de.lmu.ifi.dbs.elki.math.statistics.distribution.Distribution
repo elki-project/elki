@@ -14,7 +14,7 @@ de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedLogisticAlternateDis
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution lognormal
 de.lmu.ifi.dbs.elki.math.statistics.distribution.SkewGeneralizedNormalDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.LogGammaDistribution
-de.lmu.ifi.dbs.elki.math.statistics.distribution.LogGammaAlternateDistribution
+de.lmu.ifi.dbs.elki.math.statistics.distribution.ExpGammaDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.PoissonDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.StudentsTDistribution
 de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution
