@@ -150,21 +150,21 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
     merge(size, distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, x, y);
   }
 
-  /**
-   * Merges two clusters given by x, y, their points with smallest IDs,
+  /** Merges two clusters given by x, y, their points with smallest IDs,
    * and y to keep
    * 
-   * @param size
-   * @param distances
-   * @param prots
-   * @param ix
-   * @param iy
-   * @param pi
-   * @param lambda
-   * @param prototypes
-   * @param dq
-   * @param x
-   * @param y
+   * @param size number of ids in the data set
+   * @param distances distance matrix
+   * @param prots calculated prototypes
+   * @param ix iterator to reuse
+   * @param iy iterator to reuse
+   * @param pi parent data structure
+   * @param lambda distance to parent data structure
+   * @param prototypes prototype data store
+   * @param clusters the clusters
+   * @param dq  distance query of the data set
+   * @param x first cluster to merge
+   * @param y second cluster to merge
    */
   protected static <O> void merge(int size, double[] distances, ArrayModifiableDBIDs prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int x, int y) {
     int offset = AGNES.triangleSize(Math.max(x, y)) + Math.min(y, x);
@@ -202,20 +202,20 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
     updateMatrices(size, distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, y);
   }
 
-  /**
-   * Update the entries of the matrices that contain a distance to c, the newly
+  /** Update the entries of the matrices that contain a distance to c, the newly
    * merged cluster.
    * 
-   * @param size
-   * @param distances
-   * @param prots
-   * @param ix
-   * @param iy
-   * @param pi
-   * @param lambda
-   * @param prototypes
-   * @param dq
-   * @param y
+   * @param size number of ids in the data set
+   * @param distances distance matrix
+   * @param prots calculated prototypes
+   * @param ix iterator to reuse
+   * @param iy iterator to reuse
+   * @param pi parent data structure
+   * @param lambda distance to parent data structure
+   * @param prototypes prototype data store
+   * @param clusters the clusters
+   * @param dq  distance query of the data set
+   * @param c the cluster to update distances to
    */
   protected static <O> void updateMatrices(int size, double[] distances, ArrayModifiableDBIDs prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int c) {
 
@@ -249,9 +249,20 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
     }
   }
 
-  /**
-   * x > y must hold! ix must be at x and iy at y
-   ** 
+  /** Update entry at x,y for distance matrix distances
+   * 
+   * @param distances distance matrix
+   * @param prots calculated prototypes
+   * @param ix  iterator to reuse
+   * @param iy  iterator to reuse
+   * @param pi  parent data structure
+   * @param lambda  distance to parent data structure
+   * @param prototypes  prototypes store data strucutre
+   * @param clusters  the clusters
+   * @param dq  distancequery on the data set
+   * @param x index of cluster, x > y
+   * @param y index of cluster, y < x
+   * @param dimensions number of dimensions
    */
   protected static <O> void updateEntry(double[] distances, ArrayModifiableDBIDs prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int x, int y) {
     double minDist;
@@ -261,7 +272,6 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
     assert( x > y);
 
     // Dummy initialization for the compiler
-    // TODO: Rework so that this is not needed
     DBID prototype = DBIDUtil.generateSingleDBID();
     ModifiableDBIDs cx;
     ModifiableDBIDs cy;
@@ -356,20 +366,20 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
   
   /**
    * Return distance and prototype
-   * @param distances
-   * @param prots
-   * @param ix
-   * @param iy
-   * @param pi
-   * @param lambda
-   * @param prototypes
-   * @param clusters
-   * @param dq
-   * @param x
-   * @param y
-   * @return
+   * @param distances distance matrix
+   * @param prots calculated prototypes
+   * @param ix  iterator to reuse
+   * @param iy  iterator to reuse
+   * @param pi  parent data structure
+   * @param lambda  distance to parent data structure
+   * @param prototypes  prototypes store data strucutre
+   * @param clusters  the clusters
+   * @param dq  distancequery on the data set
+   * @param x index of cluster, x > y
+   * @param y index of cluster, y < x
+   * @param dimensions number of dimensions
    */
-  public static <O> Pair<Double, DBID> getDistance(ArrayModifiableDBIDs prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int x, int y) {
+  public static <O> Pair<Double, DBID> getDistance(ArrayModifiableDBIDs prots, DBIDArrayIter ix, DBIDArrayIter iy, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int x, int y) {
     double minDist;
     double maxDist;
     double dist;
@@ -377,7 +387,6 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
     assert( x > y);
 
     // Dummy initialization for the compiler
-    // TODO: Rework so that this is not needed
     DBID prototype = DBIDUtil.generateSingleDBID();
     ModifiableDBIDs cx;
     ModifiableDBIDs cy;
@@ -406,9 +415,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
 
       // Maximum distance of i to all elements in cx
       for(DBIDIter j = cy.iter(); j.valid(); j.advance()) {
-//        System.out.println("i, j:");
-//        System.out.println(DBIDUtil.asInteger(i));
-//        System.out.println(DBIDUtil.asInteger(j));
+
         dist = dq.distance(i, j);
         if(dist > maxDist) {
           maxDist = dist;

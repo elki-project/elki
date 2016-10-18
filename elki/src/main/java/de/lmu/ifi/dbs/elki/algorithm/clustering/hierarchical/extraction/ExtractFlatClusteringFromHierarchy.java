@@ -174,7 +174,6 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
 
     if(prototyped) {
       PointerPrototypeHierarchyRepresenatationResult prototypePointerResult = (PointerPrototypeHierarchyRepresenatationResult) pointerresult;
-      DBIDDataStore prototypes = prototypePointerResult.getPrototypes();
       DBIDs cluster;
       DBID prot;
       
@@ -184,6 +183,8 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
         
         cluster = iter.get().getIDs();
         prot = prototypePointerResult.getPrototypeByCluster(cluster);
+        iter.get().getNameAutomatic();
+        System.out.println(prot + " name: " + iter.get().getNameAutomatic());
         model.setPrototype(prot);
       }
     }

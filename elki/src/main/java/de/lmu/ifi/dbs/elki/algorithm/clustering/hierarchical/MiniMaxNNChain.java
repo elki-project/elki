@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.LinkedList;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -100,13 +99,19 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
     return new PointerPrototypeHierarchyRepresenatationResult(ids, pi, lambda, prototypes);
   }
 
-  /**
-   * Uses NNChain as in
-   * "Modern hierarchical, agglomerative clustering algorithms" Daniel Müllner
+  /** Uses NNChain as in
+   * "Modern hierarchical, agglomerative clustering algorithms"  by Daniel Müllner
    * 
-   * @param size
-   * @param distances
-   * @param prots
+   * @param size  number of ids in the data set
+   * @param distances distance matrix
+   * @param prots computed prototypes
+   * @param dq  distance query of the data set
+   * @param ix  iterator to reuse
+   * @param iy  another iterator to reuse
+   * @param pi  parent data store
+   * @param lambda distance to parent data store
+   * @param prototypes  prototypes data store
+   * @param clusters current clusters
    */
   private void nnChainCore(int size, double[] distances, ArrayModifiableDBIDs prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters) {
     IntegerArray chain = new IntegerArray(size + 1); // The maximum chain size =
