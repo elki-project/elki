@@ -110,7 +110,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
         double tmpConf = confidenceLevel(values, bootstrapSteps);
         int tmpMaxPos = tmpArraryStartIndex + getMaximumIndex(likelihoodRatioChangeInMean(values)); // return the detected changepoint
 
-        if(!(tmpConf < confidence || values.length <=3 || (tmpMaxPos - tmpArraryStartIndex + 1 == values.length))){ // cannot split up arrays of size 3, that would make every element a change poin
+        if(!(tmpConf < confidence || values.length <=3 || (tmpMaxPos - tmpArraryStartIndex + 1 == values.length))){ // cannot split up arrays of size 3, that would make every element a change point
             multipleChangepointsWithConfidence(result
                                                     , Arrays.copyOfRange(values, 0, tmpMaxPos - tmpArraryStartIndex)
                                                     , confidence
