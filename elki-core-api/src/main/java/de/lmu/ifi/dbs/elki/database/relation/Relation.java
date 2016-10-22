@@ -1,10 +1,9 @@
 package de.lmu.ifi.dbs.elki.database.relation;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +21,8 @@ package de.lmu.ifi.dbs.elki.database.relation;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.function.BiConsumer;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -96,6 +97,17 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * @return Size
    */
   int size();
+
+  /**
+   * Execute a function for each ID.
+   *
+   * @param action Action to execute
+   */
+  default void forEach(BiConsumer<? super DBIDRef, ? super O> action) {
+    for(DBIDIter it = iterDBIDs(); it.valid(); it.advance()) {
+      action.accept(it, get(it));
+    }
+  }
 
   /**
    * Get the distance query for a particular distance function.

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -79,4 +79,31 @@ public interface DoubleDBIDList extends DBIDs {
 
   @Override
   DoubleDBIDListIter iter();
+
+  /**
+   * Execute a function for each ID.
+   *
+   * @param action Action to execute
+   */
+  default void forEachDouble(Consumer action) {
+    for(DoubleDBIDListIter it = iter(); it.valid(); it.advance()) {
+      action.accept(it, it.doubleValue());
+    }
+  }
+
+  /**
+   * Consumer for (DBIDRef, double) pairs.
+   * 
+   * @author Erich Schubert
+   */
+  @FunctionalInterface
+  interface Consumer {
+    /**
+     * Act on each value.
+     *
+     * @param idref DBID reference
+     * @param val value
+     */
+    void accept(DBIDRef idref, double val);
+  }
 }

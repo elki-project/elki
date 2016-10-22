@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.database.relation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.database.relation;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 
 /**
@@ -61,4 +62,31 @@ public interface DoubleRelation extends ModifiableRelation<Double> {
   @Deprecated
   @Override
   public void insert(DBIDRef id, Double val);
+
+  /**
+   * Execute a function for each ID.
+   *
+   * @param action Action to execute
+   */
+  default void forEachDouble(Consumer action) {
+    for(DBIDIter it = iterDBIDs(); it.valid(); it.advance()) {
+      action.accept(it, doubleValue(it));
+    }
+  }
+
+  /**
+   * Consumer for (DBIDRef, double) pairs.
+   * 
+   * @author Erich Schubert
+   */
+  @FunctionalInterface
+  interface Consumer {
+    /**
+     * Act on each value.
+     *
+     * @param idref DBID reference
+     * @param val value
+     */
+    void accept(DBIDRef idref, double val);
+  }
 }

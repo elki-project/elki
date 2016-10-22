@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.function.Consumer;
 
 /**
  * Interface for a collection of database references (IDs).
@@ -50,14 +51,14 @@ public interface DBIDs {
    * 
    * @return iterator
    */
-  public DBIDIter iter();
+  DBIDIter iter();
 
   /**
    * Retrieve the collection / data size.
    * 
    * @return collection size
    */
-  public int size();
+  int size();
 
   /**
    * Test whether an ID is contained.
@@ -65,12 +66,23 @@ public interface DBIDs {
    * @param o object to test
    * @return true when contained
    */
-  public boolean contains(DBIDRef o);
+  boolean contains(DBIDRef o);
 
   /**
    * Test for an empty DBID collection.
    * 
    * @return true when empty.
    */
-  public boolean isEmpty();
+  boolean isEmpty();
+
+  /**
+   * Execute a function for each ID.
+   *
+   * @param action Action to execute
+   */
+  default void forEach(Consumer<? super DBIDRef> action) {
+    for (DBIDIter it = iter(); it.valid(); it.advance()) {
+      action.accept(it);
+    }
+  }
 }
