@@ -93,9 +93,8 @@ public class DoubleMinMax {
    */
   public void put(double[] data) {
     final int l = data.length;
-    int i = 0;
-    while(i < l) {
-      final double val = data[l];
+    for (int i = 0; i < l; i++) {
+      final double val = data[i];
       min = val < min ? val : min;
       max = val > max ? val : max;
     }
