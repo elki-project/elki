@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.query.knn;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -46,6 +46,11 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @param <O> Data object type
  */
 public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
+  /**
+   * Class logger
+   */
+  private static final Logging LOG = Logging.getLogger(PreprocessorKNNQuery.class);
+
   /**
    * The data to use for this query
    */
@@ -76,39 +81,26 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
   @Override
   public KNNList getKNNForDBID(DBIDRef id, int k) {
     if(!warned && k > preprocessor.getK()) {
-      LoggingUtil.warning("Requested more neighbors than preprocessed: requested " + k + " preprocessed " + preprocessor.getK(), new Throwable());
+      getLogger().warning("Requested more neighbors than preprocessed: requested " + k + " preprocessed " + preprocessor.getK(), new Throwable());
       warned = true;
     }
-    if(k < preprocessor.getK()) {
-      KNNList dr = preprocessor.get(id);
-      int subk = k;
-      DoubleDBIDListIter it = dr.iter();
-      final double kdist = it.seek(subk - 1).doubleValue();
-      for(it.advance(); it.valid() && kdist < it.doubleValue() && subk < k; it.advance()) {
-        subk++;
-      }
-      return subk < dr.size() ? DBIDUtil.subList(dr, subk) : dr;
+    KNNList dr = preprocessor.get(id);
+    if(k < preprocessor.getK() && k < dr.size()) {
+      return getSublist(dr, k);
     }
-    return preprocessor.get(id);
+    return dr;
   }
 
   @Override
   public List<KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
     if(!warned && k > preprocessor.getK()) {
-      LoggingUtil.warning("Requested more neighbors than preprocessed: requested " + k + " preprocessed " + preprocessor.getK(), new Throwable());
+      getLogger().warning("Requested more neighbors than preprocessed: requested " + k + " preprocessed " + preprocessor.getK(), new Throwable());
       warned = true;
     }
     if(k < preprocessor.getK()) {
       List<KNNList> result = new ArrayList<>(ids.size());
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
-        KNNList dr = preprocessor.get(iter);
-        int subk = k;
-        DoubleDBIDListIter it = dr.iter();
-        final double kdist = it.seek(subk - 1).doubleValue();
-        for(it.advance(); it.valid() && kdist < it.doubleValue() && subk < k; it.advance()) {
-          subk++;
-        }
-        result.add(subk < dr.size() ? DBIDUtil.subList(dr, subk) : dr);
+        result.add(getSublist(preprocessor.get(iter), k));
       }
       return result;
     }
@@ -117,6 +109,28 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
       result.add(preprocessor.get(iter));
     }
     return result;
+  }
+
+  /**
+   * Subset a knn list for a smaller k.
+   * 
+   * @param knn k nearest neighbor list
+   * @param k New k
+   * @return Sublist
+   */
+  protected static KNNList getSublist(KNNList knn, int k) {
+    DoubleDBIDListIter it = knn.iter();
+    // k-distance for the new k.
+    final double kdist = it.seek(k - 1).doubleValue();
+    if(kdist >= knn.getKNNDistance()) {
+      return knn;
+    }
+    // Find ties:
+    int subk = k;
+    for(it.advance(); it.valid() && kdist < it.doubleValue() && subk < k; it.advance()) {
+      subk++;
+    }
+    return subk < knn.size() ? DBIDUtil.subList(knn, subk) : knn;
   }
 
   @Override
@@ -131,5 +145,14 @@ public class PreprocessorKNNQuery<O> implements KNNQuery<O> {
    */
   public AbstractMaterializeKNNPreprocessor<O> getPreprocessor() {
     return preprocessor;
+  }
+
+  /**
+   * Get the class logger. Override when subclassing!
+   * 
+   * @return Class logger.
+   */
+  protected Logging getLogger() {
+    return LOG;
   }
 }
