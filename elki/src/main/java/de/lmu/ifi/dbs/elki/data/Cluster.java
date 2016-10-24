@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -290,16 +290,24 @@ public class Cluster<M extends Model> implements TextWriteable {
       if(o1 == o2) {
         return 0;
       }
+      if (o1 == null) {
+        return +1;
+      }
+      if (o2 == null) {
+        return -1;
+      }
       // sort by label if possible
-      if(o1 != null && o1.name != null && o2 != null && o2.name != null) {
-        int lblresult = o1.name.compareTo(o2.getName());
+      if(o1.name != o2.name) {
+        if (o1.name == null) {
+          return +1;
+        }
+        if (o2.name == null) {
+          return -1;
+        }
+        int lblresult = o1.name.compareTo(o2.name);
         if(lblresult != 0) {
           return lblresult;
         }
-      }
-      int hashresult = o1.hashCode() - o2.hashCode();
-      if(hashresult != 0) {
-        return hashresult;
       }
       return 0;
     }
