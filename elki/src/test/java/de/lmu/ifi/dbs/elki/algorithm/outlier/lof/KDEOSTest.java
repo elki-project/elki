@@ -58,7 +58,7 @@ public class KDEOSTest extends AbstractSimpleAlgorithmTest {
     // run LOF on database
     OutlierResult result = kdeos.run(db);
 
-    testAUC(db, "Noise", result, 0.7983529411764);
-    testSingleScore(result, 1293, 0.8788346606616);
+    testAUC(db, "Noise", result, 0.804918767);
+    testSingleScore(result, 1293, 0.88750800246);
   }
 }

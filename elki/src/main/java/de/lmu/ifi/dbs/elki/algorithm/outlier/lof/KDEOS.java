@@ -277,7 +277,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult>im
 
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double[] dens = densities.get(iter);
-      KNNList neighbors = knnq.getKNNForDBID(iter, kmax);
+      KNNList neighbors = knnq.getKNNForDBID(iter, kmax + 1);
       if(scratch[0].length < neighbors.size()) {
         // Resize scratch. Add some extra margin again.
         scratch = new double[knum][neighbors.size() + 5];
