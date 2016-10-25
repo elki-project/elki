@@ -72,10 +72,10 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
     }
 
     /**
-     * Executes multiple change point detection for every given time series
+     * Executes multiple change point detection for given relation
      *
      * @param relation the relation to process
-     * @param labellist label for the distinct time series
+     * @param labellist labels of distinct time series
      * @return list with all the detected change point for every time series
      */
     public ChangePointDetectionResult run(Relation<DoubleVector> relation, Relation<LabelList> labellist) {
@@ -164,48 +164,6 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
 
         return result;
     }
-
-    /*
-    PROBABALY REMOVE
-    // DOES NOT WORK - REASON NOT YET INVESTIGATED
-    private double[] likelihoodRatioChangeInMeanOptimised(double[] values){
-        double[] result = new double[values.length];
-
-        // vector containing means for all different vector lengths, last index contains mean over all elements
-        double[] meansLeft = new double[values.length];
-        Mean currentMeanLeft = new Mean();
-        for(int i = 0; i < meansLeft.length; i++){
-            currentMeanLeft.put(values[i]);
-            meansLeft[i] = currentMeanLeft.getMean();
-        }
-        // first index contains mean over all elements coming from the other side
-        double[] meansRight = new double[values.length];
-        Mean currentMeanRight = new Mean();
-        for(int i = meansRight.length-1; i >= 0; i--){
-            currentMeanRight.put(values[i]);
-            meansRight[i] = currentMeanRight.getMean();
-        }
-
-        result[0]=0;
-        double tmpMeanDif;
-        for(int i = 1; i < values.length; i++) {
-            tmpMeanDif = meansLeft[i-1] - meansRight[i];
-            result[i]= -i*(values.length - i)*tmpMeanDif*tmpMeanDif;
-        }
-
-        return result;
-
-    }
-
-
-    //TRY OUT RESULT HANDLING
-    private ChangePoint singleChangepointWithConfidence(double[] values, int bootstrapSteps){
-        double conf = confidenceLevel(values, bootstrapSteps);
-        double index = getMaximumIndex(likelihoodRatioChangeInMean(values));
-        return new ChangePoint(index, conf);
-    }
-
-    */
 
     /**
      * Calculates the confidence for the most probable change point of the given timer series.
