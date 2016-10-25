@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.affinitypropagation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -75,7 +75,6 @@ public class DistanceBasedInitializationWithMedian<O> implements AffinityPropaga
     DistanceQuery<O> dq = db.getDistanceQuery(relation, distance);
     double[][] mat = new double[size][size];
     double[] flat = new double[(size * (size - 1)) >> 1];
-    // TODO: optimize for double valued primitive distances.
     DBIDArrayIter i1 = ids.iter(), i2 = ids.iter();
     for(int i = 0, j = 0; i < size; i++, i1.advance()) {
       double[] mati = mat[i];

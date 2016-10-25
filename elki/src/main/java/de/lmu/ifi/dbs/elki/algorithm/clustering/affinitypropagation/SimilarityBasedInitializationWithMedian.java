@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.affinitypropagation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -74,7 +74,6 @@ public class SimilarityBasedInitializationWithMedian<O> implements AffinityPropa
     SimilarityQuery<O> sq = db.getSimilarityQuery(relation, similarity);
     double[][] mat = new double[size][size];
     double[] flat = new double[(size * (size - 1)) >> 1];
-    // TODO: optimize for double valued primitive distances.
     DBIDArrayIter i1 = ids.iter(), i2 = ids.iter();
     // Compute self-similarities first, for centering:
     for (int i = 0; i < size; i++, i1.advance()) {
