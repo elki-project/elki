@@ -154,13 +154,13 @@ public abstract class AbstractProgress implements Progress {
     final int processed = getProcessed();
     final long now = System.currentTimeMillis();
     final long age = now - lastLogged;
-    if(!isComplete() && processed > 10 && age < 1E2) {
+    if(!isComplete() && processed > 10 && age < 5E2) {
       return false;
     }
     if(lastValue > 0) {
       int increment = processed - lastValue;
       double newrate = increment / (double) age;
-      ratems = ratems != ratems ? newrate : (.9 * ratems + .1 * newrate);
+      ratems = ratems != ratems ? newrate : (.95 * ratems + .05 * newrate);
     }
     lastValue = processed;
     lastLogged = now;
