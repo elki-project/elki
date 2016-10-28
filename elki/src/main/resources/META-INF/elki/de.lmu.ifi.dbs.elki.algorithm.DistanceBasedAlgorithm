@@ -63,8 +63,6 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuGLSBackwardSearchAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuRandomWalkEC
 de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IDOS
 de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IntrinsicDimensionalityOutlier
-de.lmu.ifi.dbs.elki.algorithm.projection.BarnesHutTSNE
-de.lmu.ifi.dbs.elki.algorithm.projection.TSNE
 de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceQuantileSampler
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses

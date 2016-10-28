@@ -31,26 +31,13 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
-import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
-import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
@@ -72,10 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * Accelerating t-SNE using Tree-Based Algorithms<br />
  * Journal of Machine Learning Research 15
  * </p>
- * 
- * TODO: this implementation currently differs in one major point: we do not
- * symmetrize the sparse pij matrix.
- * 
+ *
  * @author Erich Schubert
  *
  * @param <O> Object type
@@ -119,219 +103,34 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
    *
    * @param distanceFunction Distance function
    * @param dim Output dimensionality
-   * @param perplexity Desired perplexity
    * @param finalMomentum Final momentum
    * @param learningRate Learning rate
    * @param maxIterations Maximum number of iterations
    * @param random Random generator
    * @param keep Keep the original data (or remove it)
    */
-  public BarnesHutTSNE(DistanceFunction<? super O> distanceFunction, int dim, double perplexity, double finalMomentum, double learningRate, int maxIterations, RandomFactory random, boolean keep, double theta) {
-    super(distanceFunction, dim, perplexity, finalMomentum, learningRate * 4, maxIterations, random, keep);
+  public BarnesHutTSNE(AffinityMatrixBuilder<? super O> affinity, int dim, double finalMomentum, double learningRate, int maxIterations, RandomFactory random, boolean keep, double theta) {
+    super(affinity, dim, finalMomentum, learningRate * 4, maxIterations, random, keep);
     this.sqtheta = theta * theta;
   }
 
   public Relation<DoubleVector> run(Database database, Relation<O> relation) {
-    final int numberOfNeighbours = (int) Math.ceil(3 * perplexity);
-    DistanceQuery<O> dq = database.getDistanceQuery(relation, getDistanceFunction());
-    KNNQuery<O> knnq = database.getKNNQuery(dq, numberOfNeighbours + 1);
-    if(knnq instanceof LinearScanQuery && numberOfNeighbours * numberOfNeighbours < relation.size()) {
-      LOG.warning("To accelerate Barnes-Hut tSNE, please use an index.");
-    }
-    DBIDs rids = relation.getDBIDs();
-    if(!(rids instanceof DBIDRange)) {
-      throw new AbortException("Distance matrixes are currently only supported for DBID ranges (as used by static databases) for performance reasons (Patches welcome).");
-    }
-    DBIDRange ids = (DBIDRange) rids;
-    final int size = ids.size();
-    DBIDArrayIter ix = ids.iter();
+    AffinityMatrix neighbors = affinity.computeAffinityMatrix(relation, EARLY_EXAGGERATION);
+    double[][] solution = randomInitialSolution(neighbors.size(), dim, random.getSingleThreadedRandom());
+    projectedDistances.setLong(0L);
+    optimizetSNE(neighbors, solution);
+    LOG.statistics(projectedDistances);
 
-    // Sparse affinity graph
-    double[][] pij = new double[size][];
-    int[][] indices = new int[size][];
-    final boolean square = !SquaredEuclideanDistanceFunction.class.isInstance(dq.getDistanceFunction());
-    computePij(ids, ix, knnq, square, numberOfNeighbours, perplexity, pij, indices);
-    // Remove the original (unprojected) data unless told otherwise.
-    if(!keep) {
-      removePreviousRelation(relation);
-    }
+    // Remove the original (unprojected) data unless configured otherwise.
+    removePreviousRelation(relation);
 
-    double[][] solution = randomInitialSolution(size, dim, random.getSingleThreadedRandom());
-    projectedDistances = 0L;
-    optimizetSNE(pij, indices, solution);
-    LOG.statistics(new LongStatistic(getClass().getName() + ".projected-distances", projectedDistances));
-
+    DBIDs ids = relation.getDBIDs();
     WritableDataStore<DoubleVector> proj = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_SORTED, DoubleVector.class);
     VectorFieldTypeInformation<DoubleVector> otype = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
-    for(ix.seek(0); ix.valid(); ix.advance()) {
-      proj.put(ix, DoubleVector.wrap(solution[ix.getOffset()]));
+    for(DBIDArrayIter it = neighbors.iterDBIDs(); it.valid(); it.advance()) {
+      proj.put(it, DoubleVector.wrap(solution[it.getOffset()]));
     }
     return new MaterializedRelation<>("tSNE", "t-SNE", otype, proj, ids);
-  }
-
-  /**
-   * Compute the sparse pij using the nearest neighbors only.
-   * 
-   * @param ids ID range
-   * @param ix Iterator
-   * @param knnq kNN query
-   * @param square Use squared distances
-   * @param numberOfNeighbours Number of neighbors to get
-   * @param perplexity Desired perplexity
-   * @param pij Output of distances
-   * @param indices Output of indexes
-   */
-  protected void computePij(DBIDRange ids, DBIDArrayIter ix, KNNQuery<O> knnq, boolean square, int numberOfNeighbours, double perplexity, double[][] pij, int[][] indices) {
-    Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.neighborspijmatrix").begin() : null;
-    final double logPerp = Math.log(perplexity);
-    // Scratch arrays, resizable
-    DoubleArray dists = new DoubleArray(numberOfNeighbours + 10);
-    IntegerArray inds = new IntegerArray(numberOfNeighbours + 10);
-    // Compute nearest-neighbor sparse affinity matrix
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Finding neighbors and optimizing perplexity", ids.size(), LOG) : null;
-    for(ix.seek(0); ix.valid(); ix.advance()) {
-      dists.clear();
-      inds.clear();
-      KNNList neighbours = knnq.getKNNForDBID(ix, numberOfNeighbours + 1);
-      convertNeighbors(ids, ix, square, neighbours, dists, inds);
-      computeSigma(ix.getOffset(), dists, perplexity, logPerp, //
-          pij[ix.getOffset()] = new double[dists.size()]);
-      indices[ix.getOffset()] = inds.toArray();
-      LOG.incrementProcessed(prog);
-    }
-    LOG.ensureCompleted(prog);
-    // Sum of the sparse affinity matrix:
-    double sum = 0.;
-    for(int i = 0; i < pij.length; i++) {
-      final double[] pij_i = pij[i];
-      for(int j = 0; j < pij_i.length; j++) {
-        sum += pij_i[j];
-      }
-    }
-    final double scale = EARLY_EXAGGERATION / (2 * sum);
-    for(int i = 0; i < pij.length; i++) {
-      final double[] pij_i = pij[i];
-      for(int offi = 0; offi < pij_i.length; offi++) {
-        int j = indices[i][offi];
-        assert (i != j);
-        int offj = containsIndex(indices[j], i);
-        if(offj >= 0) { // Found
-          assert (indices[j][offj] == i);
-          // Exploit symmetry:
-          if(i < j) {
-            final double val = pij_i[offi] + pij[j][offj]; // Symmetrize
-            pij_i[offi] = pij[j][offj] = MathUtil.max(val * scale, MIN_PIJ);
-          }
-        }
-        else { // Not found
-          // TODO: the original code produces a symmetric matrix
-          // And it will now not sum to EARLY_EXAGGERATION anymore.
-          pij_i[offi] = MathUtil.max(pij_i[offi] * scale, MIN_PIJ);
-        }
-      }
-    }
-    if(timer != null) {
-      LOG.statistics(timer.end());
-    }
-  }
-
-  /**
-   * Load a neighbor query result into a double and and integer array, also
-   * removing the query point. This is necessary, because we have to modify the
-   * distances.
-   * 
-   * TODO: sort by index, not distance
-   *
-   * @param ids Indexes
-   * @param ix Current Object
-   * @param square Use squared distances
-   * @param neighbours Neighbor list
-   * @param dist Output distance array
-   * @param ind Output index array
-   */
-  protected void convertNeighbors(DBIDRange ids, DBIDRef ix, boolean square, KNNList neighbours, DoubleArray dist, IntegerArray ind) {
-    for(DoubleDBIDListIter iter = neighbours.iter(); iter.valid(); iter.advance()) {
-      if(DBIDUtil.equal(iter, ix)) {
-        continue; // Skip query point
-      }
-      double d = iter.doubleValue();
-      dist.add(square ? (d * d) : d);
-      ind.add(ids.getOffset(iter));
-    }
-  }
-
-  /**
-   * Compute row pij[i], using binary search on the kernel bandwidth sigma to
-   * obtain the desired perplexity.
-   *
-   * @param i Current point
-   * @param dist_i Distance matrix row pij[i]
-   * @param perplexity Desired perplexity
-   * @param logPerp Log of desired perplexity
-   * @param pij_i Output row
-   */
-  protected static void computeSigma(int i, DoubleArray pij_row, double perplexity, double log_perp, double[] pij_i) {
-    double max = pij_row.get((int) Math.ceil(perplexity)) / Math.E;
-    double beta = 1 / max; // beta = 1. / (2*sigma*sigma)
-    double diff = computeH(pij_row, pij_i, -beta) - log_perp;
-    double betaMin = 0.;
-    double betaMax = Double.POSITIVE_INFINITY;
-    for(int tries = 0; tries < PERPLEXITY_MAXITER && Math.abs(diff) > PERPLEXITY_ERROR; ++tries) {
-      if(diff > 0) {
-        betaMin = beta;
-        beta += (betaMax == Double.POSITIVE_INFINITY) ? beta : ((betaMax - beta) * .5);
-      }
-      else {
-        betaMax = beta;
-        beta -= (beta - betaMin) * .5;
-      }
-      diff = computeH(pij_row, pij_i, -beta) - log_perp;
-    }
-  }
-
-  /**
-   * Compute H (observed perplexity) for row i, and the row pij_i.
-   * 
-   * @param dist_i Distances to neighbors
-   * @param pij_i Row pij[i] (output)
-   * @param mbeta {@code -1. / (2 * sigma * sigma)}
-   * @return Observed perplexity
-   */
-  protected static double computeH(DoubleArray dist_i, double[] pij_row, double mbeta) {
-    final int len = dist_i.size();
-    assert (pij_row.length == len);
-    double sumP = 0.;
-    for(int j = 0; j < len; j++) {
-      sumP += (pij_row[j] = Math.exp(dist_i.get(j) * mbeta));
-    }
-    if(!(sumP > 0)) {
-      // All pij are zero. Bad news.
-      return Double.NEGATIVE_INFINITY;
-    }
-    final double s = 1. / sumP; // Scaling factor
-    double sum = 0.;
-    // While we could skip pi[i], it should be 0 anyway.
-    for(int j = 0; j < len; j++) {
-      sum += dist_i.get(j) * (pij_row[j] *= s);
-    }
-    return Math.log(sumP) - mbeta * sum;
-  }
-
-  /**
-   * Check if the index array contains {@code i}.
-   * 
-   * TODO: sort arrays, use binary search!
-   * 
-   * @param i Index to search
-   * @return Position of index i, or {@code -1} if not found.
-   */
-  protected static int containsIndex(int[] is, int i) {
-    for(int j = 0; j < is.length; j++) {
-      if(i == is[j]) {
-        return j;
-      }
-    }
-    return -1;
   }
 
   /**
@@ -341,8 +140,8 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
    * @param indices Index array of affinity matrix
    * @param sol Solution output array (preinitialized)
    */
-  protected void optimizetSNE(double[][] pij, int[][] indices, double[][] sol) {
-    final int size = pij.length;
+  protected void optimizetSNE(AffinityMatrix pij, double[][] sol) {
+    final int size = pij.size();
     if(size * 3L * dim > 0x7FFF_FFFAL) {
       throw new AbortException("Memory exceeds Java array size limit.");
     }
@@ -358,10 +157,11 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.optimization").begin() : null;
     // Optimize
     for(int i = 0; i < iterations; i++) {
-      computeGradient(pij, indices, sol, meta);
+      computeGradient(pij, sol, meta);
       updateSolution(sol, meta, i);
+      // Undo early exaggeration
       if(i == EARLY_EXAGGERATION_ITERATIONS) {
-        removeEarlyExaggeration(pij, EARLY_EXAGGERATION);
+        pij.scale(1. / EARLY_EXAGGERATION);
       }
       LOG.incrementProcessed(prog);
     }
@@ -371,7 +171,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
     }
   }
 
-  private void computeGradient(double[][] pij, int[][] indices, double[][] solution, double[] grad) {
+  private void computeGradient(AffinityMatrix pij, double[][] solution, double[] grad) {
     final int dim3 = 3 * dim;
     // Reset gradient / forces
     for(int off = 0; off < grad.length; off += dim3) {
@@ -391,17 +191,16 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
       }
     }
     // Compute attractive forces second
-    computeAttractiveForces(grad, pij, indices, solution);
+    computeAttractiveForces(grad, pij, solution);
   }
 
-  private void computeAttractiveForces(double[] attr, double[][] pij, int[][] indices, double[][] sol) {
+  private void computeAttractiveForces(double[] attr, AffinityMatrix pij, double[][] sol) {
     final int dim3 = 3 * dim;
     for(int i = 0, off = 0; off < attr.length; i++, off += dim3) {
-      final double[] pij_i = pij[i], sol_i = sol[i];
-      final int[] ind_i = indices[i];
-      for(int offj = 0; offj < ind_i.length; offj++) {
-        final double[] sol_j = sol[ind_i[offj]];
-        final double pij_ij = pij_i[offj];
+      final double[] sol_i = sol[i];
+      for(int offj = pij.iter(i); pij.iterValid(i, offj); offj = pij.iterAdvance(i, offj)) {
+        final double[] sol_j = sol[pij.iterDim(i, offj)];
+        final double pij_ij = pij.iterValue(i, offj);
         final double a = pij_ij / (1. + sqDist(sol_i, sol_j));
         for(int k = 0; k < dim; k++) {
           attr[off + k] += a * (sol_i[k] - sol_j[k]);
@@ -458,7 +257,7 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(getDistanceFunction().getInputTypeRestriction());
+    return TypeUtil.array(affinity.getInputTypeRestriction());
   }
 
   @Override
@@ -753,10 +552,15 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
         theta = tethaP.getValue();
       }
     }
+    
+    @Override
+    protected Class<?> getDefaultAffinity() {
+      return NearestNeighborAffinityMatrixBuilder.class;
+    }
 
     @Override
     protected BarnesHutTSNE<O> makeInstance() {
-      return new BarnesHutTSNE<>(distanceFunction, dim, perplexity, finalMomentum, learningRate, iterations, random, keep, theta);
+      return new BarnesHutTSNE<>(affinity, dim, finalMomentum, learningRate, iterations, random, keep, theta);
     }
   }
 }
