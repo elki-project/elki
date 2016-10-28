@@ -305,7 +305,7 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
 
     @Override
     public double doubleValue() {
-      return it.valid() ? it.getValue() : kdist;
+      return it.valid() ? it.getKey() : kdist;
     }
 
     @Override
