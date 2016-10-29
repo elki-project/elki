@@ -55,12 +55,12 @@ public abstract class AbstractAssociationRuleAlgorithm extends AbstractAlgorithm
   /**
    * Parameter for minimum interestingness measure.
    */
-  protected double minmeasure = Double.MAX_VALUE ;
+  protected double minmeasure = Double.MIN_VALUE ;
   
   /**
    * Parameter for maximum interestingness measure.
    */
-  protected double maxmeasure = Double.MIN_VALUE;
+  protected double maxmeasure = Double.MAX_VALUE;
   
   
   /**
@@ -87,7 +87,7 @@ public abstract class AbstractAssociationRuleAlgorithm extends AbstractAlgorithm
    * @param minmeasure Minimum threshold for interestingness measure
    */
   public AbstractAssociationRuleAlgorithm(AbstractFrequentItemsetAlgorithm frequentItemAlgo, AbstractInterestingnessMeasure interestMeasure, double minmeasure) {
-    this(frequentItemAlgo, interestMeasure, minmeasure, Double.MIN_VALUE);
+    this(frequentItemAlgo, interestMeasure, minmeasure, Double.MAX_VALUE);
   }
   
   
@@ -132,12 +132,12 @@ public abstract class AbstractAssociationRuleAlgorithm extends AbstractAlgorithm
     /**
      * Parameter for minimum interestingness measure.
      */
-    protected double minmeasure;
+    protected double minmeasure = Double.MIN_VALUE;
     
     /**
      * Parameter for maximum interestingness measure.
      */
-    protected double maxmeasure;
+    protected double maxmeasure = Double.MAX_VALUE;
     
     
     @Override
