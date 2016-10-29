@@ -110,7 +110,7 @@ public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm 
       // stops if OneItemsets are reached
       if (itemsetSparse.length > 1) {
         List<Itemset> subsets = new ArrayList<Itemset>();
-        boolean[] pruning = new boolean[((int) Math.pow(2, itemsetSparse.length)) - 2];
+        boolean[] pruning = new boolean[(1 << itemsetSparse.length) - 2];
         calcSubsets(itemsetSparse, subsets, pruning, frequentItems);
       
         // Iterate through subsets
@@ -147,7 +147,7 @@ public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm 
    * @param map HashMap where the itemsets are stored
    */
   private static void calcSubsets(int[] itemset, List<Itemset> subsets, boolean[] pruning, HashMap<Itemset, Itemset> map) {
-    long creator = (long) Math.pow(2, itemset.length) - 2;
+    long creator = (1 << itemset.length) - 2;
     int index = 0;
     while(creator > 0) {
       int[] subset = bitToSparse(creator, itemset);
@@ -191,7 +191,7 @@ public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm 
    */
   private static void prune(Itemset superset, boolean[] pruning, List<Itemset> subsets) {
     int[] itemset = superset.toSparseRep();
-    long creator = (long) Math.pow(2, itemset.length) - 2;
+    long creator = (1 << itemset.length) - 2;
     int index;
     while(creator > 0) {
       index = subsets.indexOf(new SparseItemset(bitToSparse(creator, itemset)));
