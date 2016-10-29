@@ -150,10 +150,11 @@ public class AssociationRule implements Comparable<AssociationRule> {
    * @return String buffer for chaining.
    */
   public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta){
-    buf.append(this.getAntecedent().appendTo(new StringBuilder(), meta));
+    this.getAntecedent().appendTo(buf, meta);
     buf.append(" --> ");
-    buf.append(this.consequent.appendTo(new StringBuilder(), meta));
-    buf.append(" : " + this.measure);
+    this.consequent.appendTo(buf, meta);
+    buf.append(" : ");
+    buf.append(this.measure);
     return buf;
   }
 
