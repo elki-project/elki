@@ -643,9 +643,29 @@ public final class MathUtil {
    * @return log(1-exp(x))
    */
   public static double log1mexp(double x) {
-    return (x > -LOG2) ? Math.log(-Math.expm1(x)) : Math.log1p(-Math.exp(x));
+    return (x > -LOG2) ? Math.log(-Math.expm1(x)) : Math.log1p(-exp(x));
   }
 
+  /**
+   * Thresholds for computing the exponential function.
+   */
+  private static final double LOG_MIN_NORMAL = Math.log(Double.MIN_NORMAL),
+      LOG_MAX = Math.log(Double.MAX_VALUE);
+
+  /**
+   * Faster Math.exp, with a simple range check for effectively-zero and
+   * effectively infinite values.
+   * 
+   * Between -708.3964185322641 and 709.782712893384 we compute Math.exp,
+   * outside we return 0 or infinity.
+   * 
+   * @param d Value
+   * @return Math.exp(d)
+   */
+  public static double exp(double d) {
+    return d >= LOG_MIN_NORMAL ? d <= LOG_MAX ? Math.exp(d) : Double.POSITIVE_INFINITY : 0.;
+  }
+  
   /**
    * Fast loop for computing {@code Math.pow(x, p)} for p >= 0 integer.
    *
