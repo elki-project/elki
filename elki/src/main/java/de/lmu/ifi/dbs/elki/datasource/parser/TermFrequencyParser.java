@@ -99,8 +99,19 @@ public class TermFrequencyParser<V extends SparseNumberVector> extends NumberVec
    * Constructor.
    * 
    * @param normalize Normalize
+   * @param factory Vector type
+   */
+  public TermFrequencyParser(boolean normalize, SparseNumberVector.Factory<V> factory) {
+    this(normalize, CSVReaderFormat.DEFAULT_FORMAT, null, factory);
+  }
+
+  /**
+   * Constructor.
+   * 
+   * @param normalize Normalize
    * @param format Input format
    * @param labelIndices Indices to use as labels
+   * @param factory Vector type
    */
   public TermFrequencyParser(boolean normalize, CSVReaderFormat format, long[] labelIndices, SparseNumberVector.Factory<V> factory) {
     super(format, labelIndices, factory);
