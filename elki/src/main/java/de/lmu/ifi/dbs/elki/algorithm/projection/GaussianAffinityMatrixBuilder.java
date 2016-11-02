@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.algorithm.projection;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
@@ -45,7 +46,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
- * Compute the affinity matrix for SNE and tSNE.
+ * Compute the affinity matrix for SNE and tSNE using a Gaussian distribution
+ * with a constant sigma.
  * 
  * Reference:
  * <p>
@@ -62,21 +64,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
     title = "Stochastic Neighbor Embedding", //
     booktitle = "Advances in Neural Information Processing Systems 15", //
     url = "http://papers.nips.cc/paper/2276-stochastic-neighbor-embedding.pdf")
-public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBuilder<O> {
+public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O> {
   /**
    * Class logger.
    */
-  private static final Logging LOG = Logging.getLogger(PerplexityAffinityMatrixBuilder.class);
-
-  /**
-   * Threshold for optimizing perplexity.
-   */
-  final static protected double PERPLEXITY_ERROR = 1e-5;
-
-  /**
-   * Maximum number of iterations when optimizing perplexity.
-   */
-  final static protected int PERPLEXITY_MAXITER = 50;
+  private static final Logging LOG = Logging.getLogger(GaussianAffinityMatrixBuilder.class);
 
   /**
    * Minimum value for pij entries (even when duplicate)
@@ -89,20 +81,20 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
   protected DistanceFunction<? super O> distanceFunction;
 
   /**
-   * Perplexity.
+   * Kernel bandwidth sigma.
    */
-  protected double perplexity;
+  protected double sigma;
 
   /**
    * Constructor.
    *
    * @param distanceFunction Distance function
-   * @param perplexity Perplexity
+   * @param sigma Gaussian kernel bandwidth
    */
-  public PerplexityAffinityMatrixBuilder(DistanceFunction<? super O> distanceFunction, double perplexity) {
-    super(distanceFunction, Double.NaN);
+  public GaussianAffinityMatrixBuilder(DistanceFunction<? super O> distanceFunction, double sigma) {
+    super();
     this.distanceFunction = distanceFunction;
-    this.perplexity = perplexity;
+    this.sigma = sigma;
   }
 
   @Override
@@ -111,36 +103,70 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     // Compute desired affinities.
     double[][] dist = buildDistanceMatrix(ids, dq);
-    return new DenseAffinityMatrix(computePij(dist, perplexity, initialScale), ids);
+    return new DenseAffinityMatrix(computePij(dist, sigma, initialScale), ids);
+  }
+
+  /**
+   * Build a distance matrix of squared distances.
+   * 
+   * @param size Data set size
+   * @param dq Distance query
+   * @param ix Data iterator
+   * @param iy Data iterator
+   * @return Distance matrix
+   */
+  protected double[][] buildDistanceMatrix(ArrayDBIDs ids, DistanceQuery<?> dq) {
+    final int size = ids.size();
+    double[][] dmat = new double[size][size];
+    final boolean square = !SquaredEuclideanDistanceFunction.class.isInstance(dq.getDistanceFunction());
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix", (size * (size - 1)) >>> 1, LOG) : null;
+    Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.distancematrix").begin() : null;
+    DBIDArrayIter ix = ids.iter(), iy = ids.iter();
+    for(ix.seek(0); ix.valid(); ix.advance()) {
+      double[] dmat_x = dmat[ix.getOffset()];
+      for(iy.seek(ix.getOffset() + 1); iy.valid(); iy.advance()) {
+        final double dist = dq.distance(ix, iy);
+        dmat[iy.getOffset()][ix.getOffset()] = dmat_x[iy.getOffset()] = square ? (dist * dist) : dist;
+      }
+      if(prog != null) {
+        int row = ix.getOffset() + 1;
+        prog.setProcessed(row * size - ((row * (row + 1)) >>> 1), LOG);
+      }
+    }
+    LOG.ensureCompleted(prog);
+    if(timer != null) {
+      LOG.statistics(timer.end());
+    }
+    return dmat;
   }
 
   /**
    * Compute the pij from the distance matrix.
    * 
    * @param dist Distance matrix.
-   * @param perplexity Desired perplexity
+   * @param sigma Kernel bandwidth sigma
    * @param initialScale Initial scale
    * @return Affinity matrix pij
    */
-  protected static double[][] computePij(double[][] dist, double perplexity, double initialScale) {
+  protected static double[][] computePij(double[][] dist, double sigma, double initialScale) {
     final int size = dist.length;
-    final double logPerp = Math.log(perplexity);
+    final double msigmasq = -.5 / (sigma * sigma);
     double[][] pij = new double[size][size];
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Optimizing perplexities", size, LOG) : null;
-    Duration timer = LOG.isStatistics() ? LOG.newDuration(PerplexityAffinityMatrixBuilder.class.getName() + ".runtime.pijmatrix").begin() : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing affinities", size, LOG) : null;
+    Duration timer = LOG.isStatistics() ? LOG.newDuration(GaussianAffinityMatrixBuilder.class.getName() + ".runtime.pijmatrix").begin() : null;
     MeanVariance mv = LOG.isStatistics() ? new MeanVariance() : null;
     for(int i = 0; i < size; i++) {
-      double beta = computePi(i, dist[i], pij[i], perplexity, logPerp);
+      double logP = computeH(i, dist[i], pij[i], msigmasq);
       if(mv != null) {
-        mv.put(beta > 0 ? Math.sqrt(.5 / beta) : 0.); // Sigma
+        mv.put(Math.exp(logP));
       }
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
     if(LOG.isStatistics()) { // timer != null, mv != null
       LOG.statistics(timer.end());
-      LOG.statistics(new DoubleStatistic(PerplexityAffinityMatrixBuilder.class.getName() + ".sigma.average", mv.getMean()));
-      LOG.statistics(new DoubleStatistic(PerplexityAffinityMatrixBuilder.class.getName() + ".sigma.stddev", mv.getSampleStddev()));
+      LOG.statistics(new DoubleStatistic(GaussianAffinityMatrixBuilder.class.getName() + ".perplexity.average", mv.getMean()));
+      LOG.statistics(new DoubleStatistic(GaussianAffinityMatrixBuilder.class.getName() + ".perplexity.stddev", mv.getSampleStddev()));
     }
     // Scale pij to have the desired sum EARLY_EXAGGERATION
     double sum = 0.;
@@ -162,55 +188,34 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
   }
 
   /**
-   * Compute row pij[i], using binary search on the kernel bandwidth sigma to
-   * obtain the desired perplexity.
-   *
-   * @param i Current point
-   * @param dist_i Distance matrix row pij[i]
-   * @param pij_i Output row
-   * @param perplexity Desired perplexity
-   * @param logPerp Log of desired perplexity
-   * @return Beta
-   */
-  protected static double computePi(int i, double[] dist_i, double[] pij_i, double perplexity, double logPerp) {
-    // Relation to paper: beta == 1. / (2*sigma*sigma)
-    double beta = estimateInitialBeta(dist_i, perplexity);
-    double diff = computeH(i, dist_i, pij_i, -beta) - logPerp;
-    double betaMin = 0.;
-    double betaMax = Double.POSITIVE_INFINITY;
-    for(int tries = 0; tries < PERPLEXITY_MAXITER && Math.abs(diff) > PERPLEXITY_ERROR; ++tries) {
-      if(diff > 0) {
-        betaMin = beta;
-        beta += (betaMax == Double.POSITIVE_INFINITY) ? beta : ((betaMax - beta) * .5);
-      }
-      else {
-        betaMax = beta;
-        beta -= (beta - betaMin) * .5;
-      }
-      diff = computeH(i, dist_i, pij_i, -beta) - logPerp;
-    }
-    return beta;
-  }
-
-  /**
-   * Estimate beta from the distances in a row.
+   * Compute H (observed perplexity) for row i, and the row pij_i.
    * 
-   * This lacks a mathematical argument, but is a handcrafted heuristic to avoid
-   * numerical problems. The average distance is usually too large, so we scale
-   * the average distance by 2*N/perplexity. Then estimate beta as 1/x.
-   *
-   * @param dist_i Distances
-   * @param perplexity Desired perplexity
-   * @return Estimated beta.
+   * @param i Current point i (entry i will be ignored)
+   * @param dist_i Distance matrix row (input)
+   * @param pij_i Row pij[i] (output)
+   * @param mbeta {@code -1. / (2 * sigma * sigma)}
+   * @return Observed perplexity
    */
-  protected static double estimateInitialBeta(double[] dist_i, double perplexity) {
-    double sum = 0.;
-    for(double d : dist_i) {
-      sum += d < Double.POSITIVE_INFINITY ? d : 0.;
+  protected static double computeH(final int i, double[] dist_i, double[] pij_i, double mbeta) {
+    double sumP = 0.;
+    // Skip point "i", break loop in two:
+    for(int j = 0; j < i; j++) {
+      sumP += (pij_i[j] = MathUtil.exp(dist_i[j] * mbeta));
     }
-    // TODO: fail gracefully if all distances are zero.
-    assert (sum > 0. && sum < Double.POSITIVE_INFINITY);
-    return .5 / sum * perplexity * (dist_i.length - 1.);
+    for(int j = i + 1; j < dist_i.length; j++) {
+      sumP += (pij_i[j] = MathUtil.exp(dist_i[j] * mbeta));
+    }
+    if(!(sumP > 0)) {
+      // All pij are zero. Bad news.
+      return Double.NEGATIVE_INFINITY;
+    }
+    final double s = 1. / sumP; // Scaling factor
+    double sum = 0.;
+    // While we could skip pi[i], it should be 0 anyway.
+    for(int j = 0; j < dist_i.length; j++) {
+      sum += dist_i[j] * (pij_i[j] *= s);
+    }
+    return Math.log(sumP) - mbeta * sum;
   }
 
   /**
@@ -232,14 +237,14 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
    */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     /**
-     * Perplexity parameter, the number of neighbors to preserve.
+     * Sigma parameter, the Gaussian bandwidth
      */
-    public static final OptionID PERPLEXITY_ID = new OptionID("sne.perplexity", "Desired perplexity (approximately the number of neighbors to preserve)");
+    public static final OptionID SIGMA_ID = new OptionID("sne.sigma", "Gaussian kernel standard deviation.");
 
     /**
-     * Perplexity.
+     * Bandwidth.
      */
-    protected double perplexity;
+    protected double sigma;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -248,17 +253,16 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
       if(config.grab(distanceFunctionP)) {
         distanceFunction = distanceFunctionP.instantiateClass(config);
       }
-      DoubleParameter perplexityP = new DoubleParameter(PERPLEXITY_ID)//
-          .setDefaultValue(40.0) //
+      DoubleParameter sigmaP = new DoubleParameter(SIGMA_ID)//
           .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
-      if(config.grab(perplexityP)) {
-        perplexity = perplexityP.doubleValue();
+      if(config.grab(sigmaP)) {
+        sigma = sigmaP.doubleValue();
       }
     }
 
     @Override
-    protected PerplexityAffinityMatrixBuilder<O> makeInstance() {
-      return new PerplexityAffinityMatrixBuilder<>(distanceFunction, perplexity);
+    protected GaussianAffinityMatrixBuilder<O> makeInstance() {
+      return new GaussianAffinityMatrixBuilder<>(distanceFunction, sigma);
     }
   }
 }
