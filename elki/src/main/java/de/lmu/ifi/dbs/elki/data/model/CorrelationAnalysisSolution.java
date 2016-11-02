@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+import net.jafama.FastMath;
 
 /**
  * A solution of correlation analysis is a matrix of equations describing the
@@ -153,7 +154,7 @@ public class CorrelationAnalysisSolution<V extends NumberVector> implements Text
       double distance = distance(db.get(iter).toArray());
       variance += distance * distance;
     }
-    standardDeviation = Math.sqrt(variance / ids.size());
+    standardDeviation = FastMath.sqrt(variance / ids.size());
   }
 
   /**

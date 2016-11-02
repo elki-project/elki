@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.vafile;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.index.vafile;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import net.jafama.FastMath;
 
 /**
  * Lp-Norm distance function for partially computed objects.
@@ -95,7 +96,7 @@ public class VALPNormDistance {
       final int vp = vec.getApproximation(d);
       minDist += getPartialMinDist(d, vp);
     }
-    return Math.pow(minDist, onebyp);
+    return FastMath.pow(minDist, onebyp);
   }
 
   /**
@@ -131,7 +132,7 @@ public class VALPNormDistance {
       final int vp = vec.getApproximation(d);
       maxDist += getPartialMaxDist(d, vp);
     }
-    return Math.pow(maxDist, onebyp);
+    return FastMath.pow(maxDist, onebyp);
   }
 
   /**
@@ -163,7 +164,7 @@ public class VALPNormDistance {
     for(int d = 0; d < dimensions; d++) {
       final double val = query.doubleValue(d);
       for(int i = 0; i < bordercount; i++) {
-        lookup[d][i] = Math.pow(splitPositions[d][i] - val, p);
+        lookup[d][i] = FastMath.pow(splitPositions[d][i] - val, p);
       }
     }
   }

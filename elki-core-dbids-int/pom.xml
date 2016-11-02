@@ -29,19 +29,7 @@
 	<dependencies>
 		<dependency>
 			<groupId>de.lmu.ifi.dbs.elki</groupId>
-			<artifactId>elki-logging</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>de.lmu.ifi.dbs.elki</groupId>
-			<artifactId>elki-core-util</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<dependency>
-			<groupId>de.lmu.ifi.dbs.elki</groupId>
-			<artifactId>elki-core-dbids</artifactId>
+			<artifactId>elki-core-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 

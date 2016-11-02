@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Exponentially modified Gaussian (EMG) distribution (ExGaussian distribution)
@@ -124,7 +125,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
   @Override
   public double nextRandom() {
     double no = mean + random.nextGaussian() * stddev;
-    double ex = -Math.log(random.nextDouble()) / lambda;
+    double ex = -FastMath.log(random.nextDouble()) / lambda;
     return no + ex;
   }
 
@@ -167,7 +168,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
     final double dx = x - mu;
     final double lss = lambda * sigma * sigma;
     final double erfc = NormalDistribution.erfc((lss - dx) / (sigma * MathUtil.SQRT2));
-    return erfc > 0. ? .5 * lambda * Math.exp(lambda * (lss * .5 - dx)) * erfc : 0.;
+    return erfc > 0. ? .5 * lambda * FastMath.exp(lambda * (lss * .5 - dx)) * erfc : 0.;
   }
 
   /**
@@ -183,7 +184,7 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
     final double dx = x - mu;
     final double lss = lambda * sigma * sigma;
     final double erfc = NormalDistribution.erfc((lss - dx) / (sigma * MathUtil.SQRT2));
-    return erfc > 0 ? Math.log(.5 * lambda * erfc) + lambda * (lss * .5 - dx) : Double.NEGATIVE_INFINITY;
+    return erfc > 0 ? FastMath.log(.5 * lambda * erfc) + lambda * (lss * .5 - dx) : Double.NEGATIVE_INFINITY;
   }
 
   /**
@@ -205,8 +206,8 @@ public class ExponentiallyModifiedGaussianDistribution extends AbstractDistribut
     final double u = lambda * (x - mu);
     final double v = lambda * sigma;
     final double v2 = v * v;
-    final double logphi = Math.log(NormalDistribution.cdf(u, v2, v));
-    return NormalDistribution.cdf(u, 0., v) - Math.exp(-u + v2 * .5 + logphi);
+    final double logphi = FastMath.log(NormalDistribution.cdf(u, v2, v));
+    return NormalDistribution.cdf(u, 0., v) - FastMath.exp(-u + v2 * .5 + logphi);
   }
 
   /**

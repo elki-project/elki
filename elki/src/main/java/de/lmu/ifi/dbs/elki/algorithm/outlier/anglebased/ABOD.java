@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
@@ -82,9 +83,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 @Title("ABOD: Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
 @Reference(authors = "H.-P. Kriegel, M. Schubert, A. Zimek", //
-title = "Angle-Based Outlier Detection in High-dimensional Data", //
-booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", //
-url = "http://dx.doi.org/10.1145/1401890.1401946")
+    title = "Angle-Based Outlier Detection in High-dimensional Data", //
+    booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", //
+    url = "http://dx.doi.org/10.1145/1401890.1401946")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.ABOD", "abod" })
 public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
@@ -176,7 +177,7 @@ public class ABOD<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
         double simBC = kernelMatrix.getSimilarity(pB, pC);
         double numerator = simBC - simAB - simAC + simAA;
         double div = 1. / (sqdAB * sqdAC);
-        s.put(numerator * div, Math.sqrt(div));
+        s.put(numerator * div, FastMath.sqrt(div));
       }
     }
     // Sample variance probably would be better here, but the ABOD publication

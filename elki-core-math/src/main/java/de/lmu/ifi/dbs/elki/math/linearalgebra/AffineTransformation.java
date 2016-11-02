@@ -28,6 +28,7 @@ import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.FastMath;
 
 /**
  * Affine transformations implemented using homogeneous coordinates.
@@ -219,7 +220,7 @@ public class AffineTransformation {
       ht[i][i] = 1.0;
     }
     // insert rotation values
-    double c = Math.cos(angle), s = MathUtil.cosToSin(angle, c);
+    double c = FastMath.cos(angle), s = MathUtil.cosToSin(angle, c);
     ht[axis1][axis1] = +c;
     ht[axis1][axis2] = -s;
     ht[axis2][axis1] = +s;

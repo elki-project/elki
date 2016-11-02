@@ -41,7 +41,7 @@ public class ExpGammaDistributionTest extends AbstractDistributionTest {
     load("expgamma.ascii.gz");
     checkPDF(new ExpGammaDistribution(1., 1., 0.), "pdf_scipy_1_1", 1e-15);
     checkPDF(new ExpGammaDistribution(2., 1., 0.), "pdf_scipy_2_1", 1e-15);
-    checkPDF(new ExpGammaDistribution(4., 1., 0.), "pdf_scipy_4_1", 1e-15);
+    checkPDF(new ExpGammaDistribution(4., 1., 0.), "pdf_scipy_4_1", 1e-14);
     checkPDF(new ExpGammaDistribution(4., 10, 0.), "pdf_scipy_4_10", 1e-15);
     checkPDF(new ExpGammaDistribution(.1, 10, 0.), "pdf_scipy_01_10", 1e-15);
     checkPDF(new ExpGammaDistribution(.1, 20, 0.), "pdf_scipy_01_20", 1e-15);

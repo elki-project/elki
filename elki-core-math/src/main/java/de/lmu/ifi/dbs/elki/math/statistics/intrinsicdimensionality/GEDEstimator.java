@@ -1,7 +1,5 @@
 package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 
-import java.util.Arrays;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -24,10 +22,14 @@ import java.util.Arrays;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Generalized Expansion Dimension for estimating the intrinsic dimensionality.
@@ -71,12 +73,12 @@ public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
     }
     // We only consider pairs with k < i, to avoid redundant computations.
     for(int k = 0; k < last; k++) {
-      final double logdk = Math.log(adapter.getDouble(data, begin + k));
+      final double logdk = FastMath.log(adapter.getDouble(data, begin + k));
       double log1pk = ilogs[k];
       int p = k; // k values are already occupied!
       // We only consider pairs with k < i, to avoid redundant computations.
       for(int i = k + 1; i <= last; i++) {
-        final double logdi = Math.log(adapter.getDouble(data, begin + i));
+        final double logdi = FastMath.log(adapter.getDouble(data, begin + i));
         if(logdk == logdi) { // Would yield a division by 0.
           continue;
         }
@@ -98,7 +100,7 @@ public class GEDEstimator extends AbstractIntrinsicDimensionalityEstimator {
     }
     double[] logs = Arrays.copyOf(ilogs, len);
     for(int i = ilogs.length; i < len; i++) {
-      logs[i] = Math.log(1 + i);
+      logs[i] = FastMath.log1p(i);
     }
     this.ilogs = logs;
   }

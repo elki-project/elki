@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.FastMath;
 
 /**
  * Simpler model for a single Gaussian cluster, without covariances.
@@ -108,7 +109,7 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
     final int dim = mean.length;
     this.mean = mean;
     this.norm = norm;
-    this.normDistrFactor = 1. / Math.sqrt(norm); // assume det=1
+    this.normDistrFactor = 1. / FastMath.sqrt(norm); // assume det=1
     this.nmea = new double[dim];
     if(variances == null) {
       variances = new double[dim];
@@ -158,11 +159,11 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
         variances[i] = v;
         det *= v;
       }
-      normDistrFactor = 1. / Math.sqrt(norm * det);
+      normDistrFactor = 1. / FastMath.sqrt(norm * det);
     }
     else {
       // Degenerate
-      normDistrFactor = 1. / Math.sqrt(norm);
+      normDistrFactor = 1. / FastMath.sqrt(norm);
     }
   }
 
@@ -184,7 +185,7 @@ public class DiagonalGaussianModel implements EMClusterModel<EMModel> {
   @Override
   public double estimateDensity(NumberVector vec) {
     double power = mahalanobisDistance(vec);
-    double prob = normDistrFactor * Math.exp(-.5 * power);
+    double prob = normDistrFactor * FastMath.exp(-.5 * power);
     if(!(prob >= 0.)) {
       LOG.warning("Invalid probability: " + prob + " power: " + (-.5 * power) + " factor: " + normDistrFactor);
       prob = 0.;

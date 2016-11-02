@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Gaussian kernel density estimator.
@@ -43,7 +44,7 @@ public final class GaussianKernelDensityFunction implements KernelDensityFunctio
    * Canonical bandwidth: (1./(4*pi))^(1/10)
    */
   @Reference(authors = "J.S. Marron, D. Nolan", title = "Canonical kernels for density estimation", booktitle = "Statistics & Probability Letters, Volume 7, Issue 3", url = "http://dx.doi.org/10.1016/0167-7152(88)90050-8")
-  public static final double CANONICAL_BANDWIDTH = Math.pow(.25 / Math.PI, .1);
+  public static final double CANONICAL_BANDWIDTH = FastMath.pow(.25 / Math.PI, .1);
 
   /**
    * R constant.
@@ -59,7 +60,7 @@ public final class GaussianKernelDensityFunction implements KernelDensityFunctio
 
   @Override
   public double density(double delta) {
-    return MathUtil.ONE_BY_SQRTTWOPI * Math.exp(-.5 * delta * delta);
+    return MathUtil.ONE_BY_SQRTTWOPI * FastMath.exp(-.5 * delta * delta);
   }
 
   @Override

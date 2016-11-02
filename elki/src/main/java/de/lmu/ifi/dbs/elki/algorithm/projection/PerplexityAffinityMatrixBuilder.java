@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Compute the affinity matrix for SNE and tSNE.
@@ -124,7 +125,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
    */
   protected static double[][] computePij(double[][] dist, double perplexity, double initialScale) {
     final int size = dist.length;
-    final double logPerp = Math.log(perplexity);
+    final double logPerp = FastMath.log(perplexity);
     double[][] pij = new double[size][size];
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Optimizing perplexities", size, LOG) : null;
     Duration timer = LOG.isStatistics() ? LOG.newDuration(PerplexityAffinityMatrixBuilder.class.getName() + ".runtime.pijmatrix").begin() : null;
@@ -132,7 +133,7 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
     for(int i = 0; i < size; i++) {
       double beta = computePi(i, dist[i], pij[i], perplexity, logPerp);
       if(mv != null) {
-        mv.put(beta > 0 ? Math.sqrt(.5 / beta) : 0.); // Sigma
+        mv.put(beta > 0 ? FastMath.sqrt(.5 / beta) : 0.); // Sigma
       }
       LOG.incrementProcessed(prog);
     }

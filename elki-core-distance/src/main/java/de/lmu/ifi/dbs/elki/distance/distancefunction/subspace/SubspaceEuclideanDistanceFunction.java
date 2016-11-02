@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
+import net.jafama.FastMath;
 
 /**
  * Euclidean distance function between {@link NumberVector}s only in specified
@@ -65,7 +66,7 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
       final double delta = v1.doubleValue(d) - v2.doubleValue(d);
       sqrDist += delta * delta;
     }
-    return Math.sqrt(sqrDist);
+    return FastMath.sqrt(sqrDist);
   }
 
   @Override
@@ -93,7 +94,7 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
       }
       sqrDist += delta * delta;
     }
-    return Math.sqrt(sqrDist);
+    return FastMath.sqrt(sqrDist);
   }
 
   @Override
@@ -121,7 +122,7 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
       }
       sqrDist += delta * delta;
     }
-    return Math.sqrt(sqrDist);
+    return FastMath.sqrt(sqrDist);
   }
 
   @Override
@@ -131,7 +132,7 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
       final double delta = obj.doubleValue(d);
       sqrDist += delta * delta;
     }
-    return Math.sqrt(sqrDist);
+    return FastMath.sqrt(sqrDist);
   }
 
   /**

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.IntIntPair;
+import net.jafama.FastMath;
 
 /**
  * Abstract base class for the sparse-grid-cell based outlier detection of
@@ -154,7 +155,7 @@ public abstract class AbstractAggarwalYuOutlier<V extends NumberVector> extends 
     // calculate sparsity c
     final double f = 1. / phi;
     final double fK = MathUtil.powi(f, k);
-    final double sC = (setsize - (dbsize * fK)) / Math.sqrt(dbsize * fK * (1 - fK));
+    final double sC = (setsize - (dbsize * fK)) / FastMath.sqrt(dbsize * fK * (1 - fK));
     return sC;
   }
 

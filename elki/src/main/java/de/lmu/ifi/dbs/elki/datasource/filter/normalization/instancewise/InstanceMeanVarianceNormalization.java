@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Normalize vectors such that they have zero mean and unit variance.
@@ -89,7 +90,7 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
       }
       ssum += v * v;
     }
-    final double std = Math.sqrt(ssum) / (raw.length - 1);
+    final double std = FastMath.sqrt(ssum) / (raw.length - 1);
     if(std > 0.) {
       for(int i = 0; i < raw.length; ++i) {
         raw[i] = (raw[i] - mean) / std;
@@ -125,7 +126,7 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
       std[j] += v * v;
     }
     for(int j = 0; j < multiplicity; ++j) {
-      std[j] = std[j] > 0. ? Math.sqrt(std[j]) / (len - 1) : 1;
+      std[j] = std[j] > 0. ? FastMath.sqrt(std[j]) / (len - 1) : 1;
     }
     for(int i = 0, j = 0; i < raw.length; ++i, j = ++j % multiplicity) {
       raw[i] = (raw[i] - mean[j]) / std[j];

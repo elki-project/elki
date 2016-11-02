@@ -43,12 +43,12 @@ public class BetaDistributionTest extends AbstractDistributionTest {
     checkPDF(new BetaDistribution(.1, 1.), "pdf_scipy_01_1", 1e-14);
     checkPDF(new BetaDistribution(.5, 1.), "pdf_scipy_05_1", 1e-14);
     checkPDF(new BetaDistribution(1., 2.), "pdf_scipy_1_2", 1e-15);
-    checkPDF(new BetaDistribution(2., 2.), "pdf_scipy_2_2", 1e-15);
+    checkPDF(new BetaDistribution(2., 2.), "pdf_scipy_2_2", 1e-14);
     checkPDF(new BetaDistribution(4., 2.), "pdf_scipy_4_2", 1e-14);
     checkPDF(new BetaDistribution(.1, 2.), "pdf_scipy_01_2", 1e-15);
     checkPDF(new BetaDistribution(.5, 2.), "pdf_scipy_05_2", 1e-14);
     checkPDF(new BetaDistribution(1., 4.), "pdf_scipy_1_4", 1e-14);
-    checkPDF(new BetaDistribution(2., 4.), "pdf_scipy_2_4", 1e-15);
+    checkPDF(new BetaDistribution(2., 4.), "pdf_scipy_2_4", 1e-14);
     checkPDF(new BetaDistribution(4., 4.), "pdf_scipy_4_4", 1e-14);
     checkPDF(new BetaDistribution(.1, 4.), "pdf_scipy_01_4", 1e-14);
     checkPDF(new BetaDistribution(.5, 4.), "pdf_scipy_05_4", 1e-15);
@@ -69,12 +69,12 @@ public class BetaDistributionTest extends AbstractDistributionTest {
     checkPDF(new BetaDistribution(.1, 1.), "pdf_gnur_01_1", 1e-14);
     checkPDF(new BetaDistribution(.5, 1.), "pdf_gnur_05_1", 1e-14);
     checkPDF(new BetaDistribution(1., 2.), "pdf_gnur_1_2", 1e-15);
-    checkPDF(new BetaDistribution(2., 2.), "pdf_gnur_2_2", 1e-15);
+    checkPDF(new BetaDistribution(2., 2.), "pdf_gnur_2_2", 1e-14);
     checkPDF(new BetaDistribution(4., 2.), "pdf_gnur_4_2", 1e-13);
     checkPDF(new BetaDistribution(.1, 2.), "pdf_gnur_01_2", 1e-15);
     checkPDF(new BetaDistribution(.5, 2.), "pdf_gnur_05_2", 1e-14);
     checkPDF(new BetaDistribution(1., 4.), "pdf_gnur_1_4", 1e-14);
-    checkPDF(new BetaDistribution(2., 4.), "pdf_gnur_2_4", 1e-15);
+    checkPDF(new BetaDistribution(2., 4.), "pdf_gnur_2_4", 1e-14);
     checkPDF(new BetaDistribution(4., 4.), "pdf_gnur_4_4", 1e-14);
     checkPDF(new BetaDistribution(.1, 4.), "pdf_gnur_01_4", 1e-14);
     checkPDF(new BetaDistribution(.5, 4.), "pdf_gnur_05_4", 1e-15);
@@ -150,7 +150,7 @@ public class BetaDistributionTest extends AbstractDistributionTest {
   public void testCDF() {
     load("beta.ascii.gz");
     checkCDF(new BetaDistribution(1., 1.), "cdf_scipy_1_1", 1e-14);
-    checkCDF(new BetaDistribution(2., 1.), "cdf_scipy_2_1", 1e-14);
+    checkCDF(new BetaDistribution(2., 1.), "cdf_scipy_2_1", 1e-15);
     checkCDF(new BetaDistribution(4., 1.), "cdf_scipy_4_1", 1e-14);
     checkCDF(new BetaDistribution(.1, 1.), "cdf_scipy_01_1", 1e-15);
     checkCDF(new BetaDistribution(.5, 1.), "cdf_scipy_05_1", 1e-14);
@@ -250,7 +250,7 @@ public class BetaDistributionTest extends AbstractDistributionTest {
     checkQuantile(new BetaDistribution(1., .1), "quant_gnur_1_01", 1e-14);
     checkQuantile(new BetaDistribution(2., .1), "quant_gnur_2_01", 1e-15);
     checkQuantile(new BetaDistribution(4., .1), "quant_gnur_4_01", 1e-15);
-    checkQuantile(new BetaDistribution(.1, .1), "quant_gnur_01_01", 1e-13);
+    checkQuantile(new BetaDistribution(.1, .1), "quant_gnur_01_01", 1e-14);
     checkQuantile(new BetaDistribution(.5, .1), "quant_gnur_05_01", 1e-14);
     checkQuantile(new BetaDistribution(1., .5), "quant_gnur_1_05", 1e-14);
     checkQuantile(new BetaDistribution(2., .5), "quant_gnur_2_05", 1e-15);

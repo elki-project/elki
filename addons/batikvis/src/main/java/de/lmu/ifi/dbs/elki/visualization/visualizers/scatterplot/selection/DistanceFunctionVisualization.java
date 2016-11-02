@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,15 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.copy;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.euclideanLength;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.scalarProduct;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -44,7 +53,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFun
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -63,6 +71,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
+import net.jafama.FastMath;
 
 /**
  * Factory for visualizers to generate an SVG-Element containing dots as markers
@@ -99,20 +108,20 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewSiblings(context, start, AbstractMaterializeKNNPreprocessor.class, ScatterPlotProjector.class, //
-    new VisualizationTree.Handler2<AbstractMaterializeKNNPreprocessor<?>, ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, AbstractMaterializeKNNPreprocessor<?> kNN, ScatterPlotProjector<?> p) {
-        final Relation<?> rel = p.getRelation();
-        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-          return;
-        }
-        final VisualizationTask task = new VisualizationTask(NAME, context, kNN, rel, DistanceFunctionVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA - 1;
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_SELECTION);
-        context.addVis(kNN, task);
-        context.addVis(p, task);
-      }
-    });
+        new VisualizationTree.Handler2<AbstractMaterializeKNNPreprocessor<?>, ScatterPlotProjector<?>>() {
+          @Override
+          public void process(VisualizerContext context, AbstractMaterializeKNNPreprocessor<?> kNN, ScatterPlotProjector<?> p) {
+            final Relation<?> rel = p.getRelation();
+            if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+              return;
+            }
+            final VisualizationTask task = new VisualizationTask(NAME, context, kNN, rel, DistanceFunctionVisualization.this);
+            task.level = VisualizationTask.LEVEL_DATA - 1;
+            task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_SELECTION);
+            context.addVis(kNN, task);
+            context.addVis(p, task);
+          }
+        });
   }
 
   /**
@@ -169,32 +178,32 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
       double[] p2 = proj.fastProjectRenderToDataSpace(selPoint[0], selPoint[1] + 10);
       double[] pm = mid.toArray();
       // Compute relative vectors
-      VMath.minusEquals(p1, pm);
-      VMath.minusEquals(p2, pm);
+      minusEquals(p1, pm);
+      minusEquals(p2, pm);
       // Scale p1 and p2 to unit length:
-      VMath.timesEquals(p1, 1. / VMath.euclideanLength(p1));
-      VMath.timesEquals(p2, 1. / VMath.euclideanLength(p2));
+      timesEquals(p1, 1. / euclideanLength(p1));
+      timesEquals(p2, 1. / euclideanLength(p2));
       {
-        double test = VMath.scalarProduct(p1, p2);
+        double test = scalarProduct(p1, p2);
         if(Math.abs(test) > 1E-10) {
           LoggingUtil.warning("Projection does not seem to be orthogonal?");
         }
       }
       // Project onto p1, p2:
-      double l1 = VMath.scalarProduct(pm, p1), l2 = VMath.scalarProduct(pm, p2);
+      double l1 = scalarProduct(pm, p1), l2 = scalarProduct(pm, p2);
       // Rotate projection by + and - angle
       // Using sin(-x) = -sin(x) and cos(-x)=cos(x)
-      final double cangle = Math.cos(angle),
+      final double cangle = FastMath.cos(angle),
           sangle = MathUtil.cosToSin(angle, cangle);
       double r11 = +cangle * l1 - sangle * l2, r12 = +sangle * l1 + cangle * l2;
       double r21 = +cangle * l1 + sangle * l2, r22 = -sangle * l1 + cangle * l2;
       // Build rotated vectors - remove projected component, add rotated
       // component:
-      double[] r1 = VMath.copy(pm), r2 = VMath.copy(pm);
-      VMath.plusTimesEquals(r1, p1, -l1 + r11);
-      VMath.plusTimesEquals(r1, p2, -l2 + r12);
-      VMath.plusTimesEquals(r2, p1, -l1 + r21);
-      VMath.plusTimesEquals(r2, p2, -l2 + r22);
+      double[] r1 = copy(pm), r2 = copy(pm);
+      plusTimesEquals(r1, p1, -l1 + r11);
+      plusTimesEquals(r1, p2, -l2 + r12);
+      plusTimesEquals(r2, p1, -l1 + r21);
+      plusTimesEquals(r2, p2, -l2 + r22);
       // Project to render space:
       range1 = proj.fastProjectDataToRenderSpace(r1);
       range2 = proj.fastProjectDataToRenderSpace(r2);
@@ -203,20 +212,20 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
     // Continue lines to viewport.
     {
       CanvasSize viewport = proj.estimateViewport();
-      VMath.minusEquals(range1, pointOfOrigin);
-      VMath.minusEquals(range2, pointOfOrigin);
-      VMath.timesEquals(range1, viewport.continueToMargin(pointOfOrigin, range1));
-      VMath.timesEquals(range2, viewport.continueToMargin(pointOfOrigin, range2));
-      VMath.plusEquals(range1, pointOfOrigin);
-      VMath.plusEquals(range2, pointOfOrigin);
+      minusEquals(range1, pointOfOrigin);
+      minusEquals(range2, pointOfOrigin);
+      timesEquals(range1, viewport.continueToMargin(pointOfOrigin, range1));
+      timesEquals(range2, viewport.continueToMargin(pointOfOrigin, range2));
+      plusEquals(range1, pointOfOrigin);
+      plusEquals(range2, pointOfOrigin);
       // Go backwards into the other direction - the origin might not be in the
       // viewport!
-      double[] start1 = VMath.minus(pointOfOrigin, range1);
-      double[] start2 = VMath.minus(pointOfOrigin, range2);
-      VMath.timesEquals(start1, viewport.continueToMargin(range1, start1));
-      VMath.timesEquals(start2, viewport.continueToMargin(range2, start2));
-      VMath.plusEquals(start1, range1);
-      VMath.plusEquals(start2, range2);
+      double[] start1 = minus(pointOfOrigin, range1);
+      double[] start2 = minus(pointOfOrigin, range2);
+      timesEquals(start1, viewport.continueToMargin(range1, start1));
+      timesEquals(start2, viewport.continueToMargin(range2, start2));
+      plusEquals(start1, range1);
+      plusEquals(start2, range2);
 
       // TODO: add filled variant?
       SVGPath path = new SVGPath();

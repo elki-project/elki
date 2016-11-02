@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
  * @apiviz.uses Matrix - - transforms
  */
 public class SingularValueDecomposition {
-  private static final double EPS = Math.pow(2.0, -52.0);
+  private static final double EPS = 0x1p-52; // = Math.pow(2.0, -52.0);
 
   /**
    * Arrays for internal storage of U and V.

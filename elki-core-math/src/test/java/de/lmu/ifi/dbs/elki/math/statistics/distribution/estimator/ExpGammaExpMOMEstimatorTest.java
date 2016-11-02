@@ -69,7 +69,7 @@ public class ExpGammaExpMOMEstimatorTest extends AbstractDistributionEstimatorTe
     // Wow, this last one is really bad.
     data = this.data.get("random_4_10");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
-    assertStat("k", dist.getK(), 4., 358.05349502266375);
-    assertStat("theta", dist.getTheta(), 10., 308.6026295419224);
+    assertStat("k", dist.getK(), 4., 358.0534950226635);
+    assertStat("theta", dist.getTheta(), 10., 308.6026295419222);
   }
 }

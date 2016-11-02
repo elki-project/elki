@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListSizeConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
+import net.jafama.FastMath;
 
 /**
  * Distance function for HSB color histograms based on a quadratic form and
@@ -47,7 +48,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @author Erich Schubert
  * @since 0.3
  */
-@Reference(authors = "J. R. Smith, S. F. Chang", title = "VisualSEEk: a fully automated content-based image query system", booktitle = "Proceedings of the fourth ACM international conference on Multimedia 1997", url = "http://dx.doi.org/10.1145/244130.244151")
+@Reference(authors = "J. R. Smith, S. F. Chang", //
+    title = "VisualSEEk: a fully automated content-based image query system", //
+    booktitle = "Proceedings of the fourth ACM international conference on Multimedia 1997", //
+    url = "http://dx.doi.org/10.1145/244130.244151")
 public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanceFunction {
   /**
    * Parameter for the kernel dimensionality.
@@ -86,16 +90,16 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
         final int sy = (y / quantb) % quants;
         final int by = y % quantb;
 
-        final double chx = Math.cos((hx + .5) / quanth * MathUtil.TWOPI);
-        final double chy = Math.cos((hy + .5) / quanth * MathUtil.TWOPI);
-        // final double shx = Math.sin((hx + .5) / quanth * MathUtil.TWOPI);
+        final double chx = FastMath.cos((hx + .5) / quanth * MathUtil.TWOPI);
+        final double chy = FastMath.cos((hy + .5) / quanth * MathUtil.TWOPI);
+        // final double shx = FastMath.sin((hx + .5) / quanth * MathUtil.TWOPI);
         final double shx = MathUtil.cosToSin((hx + .5) / quanth * MathUtil.TWOPI, chx);
-        // final double shy = Math.sin((hy + .5) / quanth * MathUtil.TWOPI);
+        // final double shy = FastMath.sin((hy + .5) / quanth * MathUtil.TWOPI);
         final double shy = MathUtil.cosToSin((hy + .5) / quanth * MathUtil.TWOPI, chy);
         final double cos = chx * (sx + .5) / quants - chy * (sy + .5) / quants;
         final double sin = shx * (sx + .5) / quants - shy * (sy + .5) / quants;
         final double db = (bx - by) / (double) quantb;
-        final double val = 1. - Math.sqrt((db * db + sin * sin + cos * cos) / 5);
+        final double val = 1. - FastMath.sqrt((db * db + sin * sin + cos * cos) / 5);
         m[x][y] = m[y][x] = val;
       }
     }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -46,6 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
+import net.jafama.FastMath;
 
 /**
  * MkCopTree is a metrical index structure based on the concepts of the M-Tree
@@ -83,7 +84,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
     // init log k
     log_k = new double[settings.kmax];
     for(int k = 1; k <= settings.kmax; k++) {
-      log_k[k - 1] = Math.log(k);
+      log_k[k - 1] = FastMath.log(k);
     }
   }
 
@@ -379,7 +380,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
 
     for(int i = 0; i < settings.kmax - k_0; i++) {
       double dist = knnDistances.get(i + k_0).doubleValue();
-      log_kDist[i] = Math.log(dist);
+      log_kDist[i] = FastMath.log(dist);
       sum_log_kDist += log_kDist[i];
       sum_log_k_kDist += log_kDist[i] * log_k[i];
     }

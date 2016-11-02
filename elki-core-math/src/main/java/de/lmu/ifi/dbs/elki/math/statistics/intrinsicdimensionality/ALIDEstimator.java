@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * ALID estimator of the intrinsic dimensionality (maximum likelihood estimator
@@ -70,7 +71,7 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
         continue;
       }
       final double v = it.doubleValue();
-      sum += v < halfw ? Math.log(v / w) : Math.log1p((v - w) / w);
+      sum += v < halfw ? FastMath.log(v / w) : FastMath.log1p((v - w) / w);
       ++a;
       final double nw = w - v;
       final double halfnw = 0.5 * nw;
@@ -79,7 +80,7 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
           continue;
         }
         final double v2 = it2.doubleValue();
-        sum += v2 < halfnw ? Math.log(v2 / nw) : Math.log1p((v2 - nw) / nw);
+        sum += v2 < halfnw ? FastMath.log(v2 / nw) : FastMath.log1p((v2 - nw) / nw);
         ++a;
       }
     }
@@ -96,7 +97,7 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
         continue;
       }
       final double v = it.doubleValue();
-      sum += v < halfw ? Math.log(v / range) : Math.log1p((v - range) / range);
+      sum += v < halfw ? FastMath.log(v / range) : FastMath.log1p((v - range) / range);
       ++a;
       final double nw = range - v;
       final double halfnw = 0.5 * nw;
@@ -105,7 +106,7 @@ public class ALIDEstimator implements IntrinsicDimensionalityEstimator {
           continue;
         }
         final double v2 = it2.doubleValue();
-        sum += v2 < halfnw ? Math.log(v2 / nw) : Math.log1p((v2 - nw) / nw);
+        sum += v2 < halfnw ? FastMath.log(v2 / nw) : FastMath.log1p((v2 - nw) / nw);
         ++a;
       }
     }

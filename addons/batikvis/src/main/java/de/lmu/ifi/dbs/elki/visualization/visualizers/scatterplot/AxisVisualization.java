@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import net.jafama.FastMath;
 
 /**
  * Generates a SVG-Element containing axes, including labeling.
@@ -126,7 +127,7 @@ public class AxisVisualization extends AbstractVisFactory {
       }
       diag = proj.fastProjectScaledToRenderSpace(diag);
       // compute angle to diagonal line, used for axis labeling.
-      double diaga = Math.atan2(diag[1] - orig[1], diag[0] - orig[0]);
+      double diaga = FastMath.atan2(diag[1] - orig[1], diag[0] - orig[0]);
 
       double alfontsize = 1.1 * style.getTextSize(StyleLibrary.AXIS_LABEL);
       CSSClass alcls = new CSSClass(AxisVisualization.class, "unmanaged");
@@ -141,7 +142,7 @@ public class AxisVisualization extends AbstractVisFactory {
         // projected endpoint of axis
         double[] ax = proj.fastProjectScaledToRenderSpace(v);
         boolean righthand = false;
-        double axa = Math.atan2(ax[1] - orig[1], ax[0] - orig[0]);
+        double axa = FastMath.atan2(ax[1] - orig[1], ax[0] - orig[0]);
         if(axa > diaga || (diaga > 0 && axa > diaga + Math.PI)) {
           righthand = true;
         }

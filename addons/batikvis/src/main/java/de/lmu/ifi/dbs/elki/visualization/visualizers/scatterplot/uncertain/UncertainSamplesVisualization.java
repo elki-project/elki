@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.uncertain;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
+import net.jafama.FastMath;
 
 /**
  * Visualize uncertain objects by multiple samples.
@@ -162,7 +163,7 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
       final StyleLibrary style = context.getStyleLibrary();
       final StylingPolicy spol = context.getStylingPolicy();
       final double size = style.getSize(StyleLibrary.MARKERPLOT);
-      final double ssize = size / Math.sqrt(samples);
+      final double ssize = size / FastMath.sqrt(samples);
       final MarkerLibrary ml = style.markers();
 
       Random rand = random.getSingleThreadedRandom();
@@ -219,7 +220,7 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
      */
     private void drawDiscete(DiscreteUncertainObject uo, MarkerLibrary ml, int cnum, double size) {
       final int e = uo.getNumberSamples();
-      final double ssize = size * Math.sqrt(e);
+      final double ssize = size * FastMath.sqrt(e);
       for(int i = 0; i < e; i++) {
         final NumberVector s = uo.getSample(i);
         if(s == null) {
@@ -266,7 +267,7 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
      */
     private void drawDiscreteDefault(DiscreteUncertainObject uo, int col, double size) {
       final int e = uo.getNumberSamples();
-      final double ssize = size * Math.sqrt(e);
+      final double ssize = size * FastMath.sqrt(e);
       for(int i = 0; i < e; i++) {
         final NumberVector s = uo.getSample(i);
         if(s == null) {

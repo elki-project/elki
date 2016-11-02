@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.geodesy;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.geodesy;
  */
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.FastMath;
 
 /**
  * Abstract base class for earth models with shared glue code.
@@ -72,7 +73,7 @@ public abstract class AbstractEarthModel implements EarthModel {
     this.f = f;
     this.invf = invf;
     this.esq = f * (2 - f);
-    this.e = Math.sqrt(esq);
+    this.e = FastMath.sqrt(esq);
   }
 
   @Override
@@ -98,20 +99,20 @@ public abstract class AbstractEarthModel implements EarthModel {
   @Override
   public double[] latLngRadToECEF(double lat, double lng) {
     // Sine and cosines:
-    final double clat = Math.cos(lat), slat = MathUtil.cosToSin(lat, clat);
-    final double clng = Math.cos(lng), slng = MathUtil.cosToSin(lng, clng);
+    final double clat = FastMath.cos(lat), slat = MathUtil.cosToSin(lat, clat);
+    final double clng = FastMath.cos(lng), slng = MathUtil.cosToSin(lng, clng);
 
-    final double v = a / Math.sqrt(1 - esq * slat * slat);
+    final double v = a / FastMath.sqrt(1 - esq * slat * slat);
     return new double[] { v * clat * clng, v * clat * slng, (1 - esq) * v * slat };
   }
 
   @Override
   public double[] latLngRadToECEF(double lat, double lng, double h) {
     // Sine and cosines:
-    final double clat = Math.cos(lat), slat = MathUtil.cosToSin(lat, clat);
-    final double clng = Math.cos(lng), slng = MathUtil.cosToSin(lng, clng);
+    final double clat = FastMath.cos(lat), slat = MathUtil.cosToSin(lat, clat);
+    final double clng = FastMath.cos(lng), slng = MathUtil.cosToSin(lng, clng);
 
-    final double v = a / Math.sqrt(1 - esq * slat * slat);
+    final double v = a / FastMath.sqrt(1 - esq * slat * slat);
     return new double[] { (v + h) * clat * clng, (v + h) * clat * slng, ((1 - esq) * v + h) * slat };
   }
 
@@ -122,15 +123,15 @@ public abstract class AbstractEarthModel implements EarthModel {
 
   @Override
   public double ecefToLatRad(double x, double y, double z) {
-    final double p = Math.sqrt(x * x + y * y);
-    double plat = Math.atan2(z, p * (1 - esq));
+    final double p = FastMath.sqrt(x * x + y * y);
+    double plat = FastMath.atan2(z, p * (1 - esq));
 
     // Iteratively improving the lat value
     // TODO: instead of a fixed number of iterations, check for convergence?
     for (int i = 0;; i++) {
-      final double slat = Math.sin(plat);
-      final double v = a / Math.sqrt(1 - esq * slat * slat);
-      final double lat = Math.atan2(z + esq * v * slat, p);
+      final double slat = FastMath.sin(plat);
+      final double v = a / FastMath.sqrt(1 - esq * slat * slat);
+      final double lat = FastMath.atan2(z + esq * v * slat, p);
       if (Math.abs(lat - plat) < PRECISION || i > MAX_ITER) {
         return lat;
       }
@@ -145,7 +146,7 @@ public abstract class AbstractEarthModel implements EarthModel {
 
   @Override
   public double ecefToLngRad(double x, double y) {
-    return Math.atan2(y, x);
+    return FastMath.atan2(y, x);
   }
 
   @Override
@@ -158,19 +159,19 @@ public abstract class AbstractEarthModel implements EarthModel {
 
   @Override
   public double[] ecefToLatLngRadHeight(double x, double y, double z) {
-    double lng = Math.atan2(y, x);
-    final double p = Math.sqrt(x * x + y * y);
-    double plat = Math.atan2(z, p * (1 - esq));
+    double lng = FastMath.atan2(y, x);
+    final double p = FastMath.sqrt(x * x + y * y);
+    double plat = FastMath.atan2(z, p * (1 - esq));
     double h = 0;
 
     // Iteratively improving the lat value
     // TODO: instead of a fixed number of iterations, check for convergence?
     for (int i = 0;; i++) {
-      final double slat = Math.sin(plat);
-      final double v = a / Math.sqrt(1 - esq * slat * slat);
-      double lat = Math.atan2(z + esq * v * slat, p);
+      final double slat = FastMath.sin(plat);
+      final double v = a / FastMath.sqrt(1 - esq * slat * slat);
+      double lat = FastMath.atan2(z + esq * v * slat, p);
       if (Math.abs(lat - plat) < PRECISION || i > MAX_ITER) {
-        h = p / Math.cos(lat) - v;
+        h = p / FastMath.cos(lat) - v;
         return new double[] { lat, lng, h };
       }
       plat = lat;

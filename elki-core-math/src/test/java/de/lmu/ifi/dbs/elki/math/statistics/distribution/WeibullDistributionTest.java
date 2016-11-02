@@ -42,9 +42,9 @@ public class WeibullDistributionTest extends AbstractDistributionTest {
     checkPDF(new WeibullDistribution(4., 1.), "pdf_scipy_4_1", 1e-14);
     checkPDF(new WeibullDistribution(4., 10.), "pdf_scipy_4_10", 1e-14);
     checkPDF(new WeibullDistribution(.1, 1.), "pdf_scipy_01_1", 1e-15);
-    checkPDF(new WeibullDistribution(.1, 4.), "pdf_scipy_01_4", 1e-14);
+    checkPDF(new WeibullDistribution(.1, 4.), "pdf_scipy_01_4", 1e-15);
     checkPDF(new WeibullDistribution(.1, 10.), "pdf_scipy_01_10", 1e-14);
-    checkPDF(new WeibullDistribution(.1, 20.), "pdf_scipy_01_20", 1e-14);
+    checkPDF(new WeibullDistribution(.1, 20.), "pdf_scipy_01_20", 1e-15);
 
     checkPDF(new WeibullDistribution(1., 1.), "pdf_gnur_1_1", 1e-15);
     checkPDF(new WeibullDistribution(2., 1.), "pdf_gnur_2_1", 1e-15);
@@ -52,8 +52,8 @@ public class WeibullDistributionTest extends AbstractDistributionTest {
     checkPDF(new WeibullDistribution(4., 10.), "pdf_gnur_4_10", 1e-15);
     checkPDF(new WeibullDistribution(.1, 1.), "pdf_gnur_01_1", 1e-15);
     checkPDF(new WeibullDistribution(.1, 4.), "pdf_gnur_01_4", 1e-15);
-    checkPDF(new WeibullDistribution(.1, 10.), "pdf_gnur_01_10", 1e-15);
-    checkPDF(new WeibullDistribution(.1, 20.), "pdf_gnur_01_20", 1e-15);
+    checkPDF(new WeibullDistribution(.1, 10.), "pdf_gnur_01_10", 1e-14);
+    checkPDF(new WeibullDistribution(.1, 20.), "pdf_gnur_01_20", 1e-14);
   }
 
   @Test

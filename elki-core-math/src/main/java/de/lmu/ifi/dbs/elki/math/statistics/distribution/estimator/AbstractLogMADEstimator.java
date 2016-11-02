@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import net.jafama.FastMath;
 
 /**
  * Abstract base class for estimators based on the median and MAD.
@@ -55,7 +56,7 @@ public abstract class AbstractLogMADEstimator<D extends Distribution> implements
     double[] x = new double[len];
     for (int i = 0; i < len; i++) {
       final double val = adapter.getDouble(data, i) - min;
-      x[i] = val > 0. ? Math.log(val) : Double.NEGATIVE_INFINITY;
+      x[i] = val > 0. ? FastMath.log(val) : Double.NEGATIVE_INFINITY;
       if (Double.isNaN(x[i])) {
         throw new ArithmeticException("NaN value.");
       }

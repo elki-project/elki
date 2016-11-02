@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Instance of a range query for a particular spatial index.
@@ -53,7 +54,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @apiviz.uses EuclideanDistanceFunction
  * @apiviz.uses SquaredEuclideanDistanceFunction
  */
-@Reference(authors = "J. Kuan, P. Lewis", title = "Fast k nearest neighbour search for R-tree family", booktitle = "Proc. Int. Conf Information, Communications and Signal Processing, ICICS 1997", url = "http://dx.doi.org/10.1109/ICICS.1997.652114")
+@Reference(authors = "J. Kuan, P. Lewis", //
+    title = "Fast k nearest neighbour search for R-tree family", //
+    booktitle = "Proc. Int. Conf Information, Communications and Signal Processing, ICICS 1997", //
+    url = "http://dx.doi.org/10.1109/ICICS.1997.652114")
 public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarTreeRangeQuery<O> {
   /**
    * Squared euclidean distance function.
@@ -92,7 +96,7 @@ public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarT
           double distance = SQUARED.minDist(object, entry);
           tree.statistics.countDistanceCalculation();
           if(distance <= sqepsilon) {
-            result.add(Math.sqrt(distance), entry.getDBID());
+            result.add(FastMath.sqrt(distance), entry.getDBID());
           }
         }
       }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayLikeUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import net.jafama.FastMath;
 
 /**
  * This is a pseudo outlier scoring obtained by only considering the ranks of
@@ -93,10 +94,10 @@ public class LogRankingPseudoOutlierScaling implements OutlierScalingFunction {
     assert (scores != null) : "prepare() was not run prior to using the scaling function.";
     int pos = Arrays.binarySearch(scores, value);
     if(inverted) {
-      return Math.log1p(1. - pos / (scores.length - 1.));
+      return FastMath.log1p(1. - pos / (scores.length - 1.));
     }
     else {
-      return Math.log1p(pos / (scores.length - 1.));
+      return FastMath.log1p(pos / (scores.length - 1.));
     }
   }
 }

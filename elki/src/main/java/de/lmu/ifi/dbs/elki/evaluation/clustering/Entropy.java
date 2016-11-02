@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
  */
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Entropy based measures.
@@ -39,9 +40,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.5.0
  */
 @Reference(authors = "Meilă, M.", //
-title = "Comparing clusterings by the variation of information", //
-booktitle = "Learning theory and kernel machines", //
-url = "http://dx.doi.org/10.1007/978-3-540-45167-9_14")
+    title = "Comparing clusterings by the variation of information", //
+    booktitle = "Learning theory and kernel machines", //
+    url = "http://dx.doi.org/10.1007/978-3-540-45167-9_14")
 public class Entropy {
   /**
    * Entropy in first
@@ -72,7 +73,7 @@ public class Entropy {
       for(int i1 = 0; i1 < table.size1; i1++) {
         if(table.contingency[i1][table.size2] > 0) {
           double probability = norm * table.contingency[i1][table.size2];
-          entropyFirst -= probability * Math.log(probability);
+          entropyFirst -= probability * FastMath.log(probability);
         }
       }
     }
@@ -82,7 +83,7 @@ public class Entropy {
       for(int i2 = 0; i2 < table.size2; i2++) {
         if(table.contingency[table.size1][i2] > 0) {
           double probability = norm * table.contingency[table.size1][i2];
-          entropySecond -= probability * Math.log(probability);
+          entropySecond -= probability * FastMath.log(probability);
         }
       }
     }
@@ -92,7 +93,7 @@ public class Entropy {
         for(int i2 = 0; i2 < table.size2; i2++) {
           if(table.contingency[i1][i2] > 0) {
             double probability = norm * table.contingency[i1][i2];
-            entropyJoint -= probability * Math.log(probability);
+            entropyJoint -= probability * FastMath.log(probability);
           }
         }
       }
@@ -214,7 +215,7 @@ public class Entropy {
     if(entropyFirst() * entropySecond() <= 0) {
       return entropyMutualInformation();
     }
-    return (entropyMutualInformation() / Math.sqrt(entropyFirst() * entropySecond()));
+    return (entropyMutualInformation() / FastMath.sqrt(entropyFirst() * entropySecond()));
   }
 
   /**
@@ -241,9 +242,9 @@ public class Entropy {
    * @return Normalized Variation of information
    */
   @Reference(authors = "Nguyen, X. V. and Epps, J. and Bailey, J.", //
-  title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", //
-  booktitle = "Proc. ICML '09 Proceedings of the 26th Annual International Conference on Machine Learning", //
-  url = "http://dx.doi.org/10.1145/1553374.1553511")
+      title = "Information theoretic measures for clusterings comparison: is a correction for chance necessary?", //
+      booktitle = "Proc. ICML '09 Proceedings of the 26th Annual International Conference on Machine Learning", //
+      url = "http://dx.doi.org/10.1145/1553374.1553511")
   public double normalizedVariationOfInformation() {
     return (1.0 - (entropyMutualInformation() / entropyJoint()));
   }

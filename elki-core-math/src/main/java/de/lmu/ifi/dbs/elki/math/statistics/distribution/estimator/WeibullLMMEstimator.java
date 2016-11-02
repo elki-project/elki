@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Estimate parameters of the Weibull distribution using the method of L-Moments
@@ -107,17 +108,17 @@ public class WeibullLMMEstimator extends AbstractLMMEstimator<WeibullDistributio
       if(t3 < -.8) {
         // Newton-Raphson iteration for t3 < -.8
         if(t3 <= -.97) {
-          g = 1. - Math.log1p(t3) * MathUtil.ONE_BY_LOG2;
+          g = 1. - FastMath.log1p(t3) * MathUtil.ONE_BY_LOG2;
         }
         double t0 = .5 * (t3 + 3.);
         for(int it = 1;; it++) {
-          double x2 = Math.pow(2., -g), xx2 = 1. - x2;
-          double x3 = Math.pow(3., -g), xx3 = 1. - x3;
+          double x2 = FastMath.pow(2., -g), xx2 = 1. - x2;
+          double x3 = FastMath.pow(3., -g), xx3 = 1. - x3;
           double t = xx3 / xx2;
           double deriv = (xx2 * x3 * MathUtil.LOG3 - xx3 * x2 * MathUtil.LOG2) / (xx2 * xx2);
           double oldg = g;
           g -= (t - t0) / deriv;
-          if(Math.abs(g - oldg) < 1e-20 * g) {
+          if(Math.abs(g - oldg) < 1e-14 * g) {
             break;
           }
           if(it >= MAXIT) {
@@ -126,10 +127,10 @@ public class WeibullLMMEstimator extends AbstractLMMEstimator<WeibullDistributio
         }
       }
     }
-    double gam = Math.exp(GammaDistribution.logGamma(1. + g));
+    double gam = FastMath.exp(GammaDistribution.logGamma(1. + g));
     final double mu, sigma, k;
     k = 1. / g;
-    sigma = xmom[1] / (gam * (1. - Math.pow(2., -g)));
+    sigma = xmom[1] / (gam * (1. - FastMath.pow(2., -g)));
     mu = -xmom[0] + sigma * gam;
     return new WeibullDistribution(k, sigma, mu);
   }

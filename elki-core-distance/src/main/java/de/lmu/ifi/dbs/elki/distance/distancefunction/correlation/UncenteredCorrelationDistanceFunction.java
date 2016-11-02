@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.correlation;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Uncentered correlation distance.
@@ -75,7 +76,7 @@ public class UncenteredCorrelationDistanceFunction extends AbstractNumberVectorD
     if(!(sumXX > 0. && sumYY > 0.)) {
       return (sumXX == sumYY) ? 1. : 0.;
     }
-    return sumXY / Math.sqrt(sumXX * sumYY);
+    return sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -101,7 +102,7 @@ public class UncenteredCorrelationDistanceFunction extends AbstractNumberVectorD
     if(!(sumXX > 0. && sumYY > 0.)) {
       return (sumXX == sumYY) ? 1. : 0.;
     }
-    return sumXY / Math.sqrt(sumXX * sumYY);
+    return sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 
   /**

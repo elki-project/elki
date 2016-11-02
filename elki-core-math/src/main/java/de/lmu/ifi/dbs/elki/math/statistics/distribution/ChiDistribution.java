@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Chi distribution.
@@ -85,7 +86,7 @@ public class ChiDistribution extends AbstractDistribution {
 
   @Override
   public double nextRandom() {
-    return Math.sqrt(chisq.nextRandom());
+    return FastMath.sqrt(chisq.nextRandom());
   }
 
   @Override
@@ -105,7 +106,7 @@ public class ChiDistribution extends AbstractDistribution {
       return 0.0;
     }
     final double k = dof * .5;
-    return Math.exp((dof - 1.0) * Math.log(val) + (1 - k) * MathUtil.LOG2 - GammaDistribution.logGamma(k) - val * val / 2.);
+    return FastMath.exp((dof - 1.0) * FastMath.log(val) + (1 - k) * MathUtil.LOG2 - GammaDistribution.logGamma(k) - val * val / 2.);
   }
 
   @Override
@@ -125,7 +126,7 @@ public class ChiDistribution extends AbstractDistribution {
       return Double.NEGATIVE_INFINITY;
     }
     final double k = dof * .5;
-    return (dof - 1.0) * Math.log(val) + (1 - k) * MathUtil.LOG2 - GammaDistribution.logGamma(k) - val * val / 2.;
+    return (dof - 1.0) * FastMath.log(val) + (1 - k) * MathUtil.LOG2 - GammaDistribution.logGamma(k) - val * val / 2.;
   }
 
   @Override

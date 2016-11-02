@@ -26,6 +26,8 @@ package de.lmu.ifi.dbs.elki.math;
 import java.math.BigInteger;
 import java.util.Random;
 
+import net.jafama.FastMath;
+
 /**
  * A collection of math related utility functions.
  *
@@ -132,27 +134,27 @@ public final class MathUtil {
   public static final double LOG10 = Math.log(10.);
 
   /**
-   * Math.log(Math.PI).
+   * log(PI).
    */
   public static final double LOGPI = Math.log(Math.PI);
 
   /**
-   * Math.log(Math.PI) / 2.
+   * log(PI) / 2.
    */
   public static final double LOGPIHALF = LOGPI / 2.;
 
   /**
-   * Math.log(2*Math.PI).
+   * log(2*PI).
    */
   public static final double LOGTWOPI = Math.log(TWOPI);
 
   /**
-   * Math.log(Math.sqrt(2*Math.PI)).
+   * log(sqrt(2*PI)).
    */
   public static final double LOGSQRTTWOPI = Math.log(SQRTTWOPI);
 
   /**
-   * Log(log(2))
+   * log(log(2))
    */
   public static final double LOGLOG2 = Math.log(LOG2);
 
@@ -180,7 +182,7 @@ public final class MathUtil {
    * @return Logarithm base 2.
    */
   public static double log2(double x) {
-    return Math.log(x) * ONE_BY_LOG2;
+    return FastMath.log(x) * ONE_BY_LOG2;
   }
 
   /**
@@ -203,11 +205,11 @@ public final class MathUtil {
     }
     if(a > b) {
       final double r = b / a;
-      return a * Math.sqrt(1 + r * r);
+      return a * FastMath.sqrt(1 + r * r);
     }
     else if(b != 0) {
       final double r = a / b;
-      return b * Math.sqrt(1 + r * r);
+      return b * FastMath.sqrt(1 + r * r);
     }
     else {
       return 0.0;
@@ -243,7 +245,7 @@ public final class MathUtil {
     a = a / m;
     b = b / m;
     c = c / m;
-    return m * Math.sqrt(a * a + b * b + c * c);
+    return m * FastMath.sqrt(a * a + b * b + c * c);
   }
 
   /**
@@ -414,10 +416,10 @@ public final class MathUtil {
   public static double sinToCos(double angle, double sin) {
     // Numerics of the formula below aren't too good.
     if((-1e-5 < sin && sin < 1e-5) || sin > 0.99999 || sin < -0.99999) {
-      return Math.cos(angle);
+      return FastMath.cos(angle);
     }
     angle = normAngle(angle);
-    final double s = Math.sqrt(1 - sin * sin);
+    final double s = FastMath.sqrt(1 - sin * sin);
     return (angle < HALFPI || angle > ONEHALFPI) ? s : -s;
   }
 
@@ -431,10 +433,10 @@ public final class MathUtil {
   public static double cosToSin(double angle, double cos) {
     // Numerics of the formula below aren't too good.
     if((-1e-5 < cos && cos < 1e-5) || cos > 0.99999 || cos < -0.99999) {
-      return Math.sin(angle);
+      return FastMath.sin(angle);
     }
     angle = normAngle(angle);
-    final double s = Math.sqrt(1 - cos * cos);
+    final double s = FastMath.sqrt(1 - cos * cos);
     return (angle < Math.PI) ? s : -s;
   }
 
@@ -637,70 +639,47 @@ public final class MathUtil {
   }
 
   /**
-   * More stable than {@code Math.log(1 - Math.exp(x))}
+   * More stable than {@code FastMath.log(1 - FastMath.exp(x))}
    *
    * @param x Value
    * @return log(1-exp(x))
    */
   public static double log1mexp(double x) {
-    return (x > -LOG2) ? Math.log(-Math.expm1(x)) : Math.log1p(-exp(x));
+    return (x > -LOG2) ? FastMath.log(-FastMath.expm1(x)) : FastMath.log1p(-exp(x));
   }
 
   /**
-   * Thresholds for computing the exponential function.
-   */
-  private static final double LOG_MIN_NORMAL = Math.log(Double.MIN_NORMAL),
-      LOG_MAX = Math.log(Double.MAX_VALUE);
-
-  /**
-   * Faster Math.exp, with a simple range check for effectively-zero and
-   * effectively infinite values.
-   * 
-   * Between -708.3964185322641 and 709.782712893384 we compute Math.exp,
-   * outside we return 0 or infinity.
+   * Delegate to FastMath.exp.
    * 
    * @param d Value
-   * @return Math.exp(d)
+   * @return FastMath.exp(d)
    */
   public static double exp(double d) {
-    return d >= LOG_MIN_NORMAL ? d <= LOG_MAX ? Math.exp(d) : Double.POSITIVE_INFINITY : 0.;
+    return FastMath.exp(d);
   }
   
   /**
-   * Fast loop for computing {@code Math.pow(x, p)} for p >= 0 integer.
+   * Delegate to FastMath.powFast
    *
    * @param x Base
    * @param p Exponent
-   * @return {@code Math.pow(x, p)}
+   * @return {@code FastMath.powFast(x, p)}
    */
   public static double powi(double x, int p) {
-    if(p <= 2) {
-      return Math.pow(x, p);
-    }
-    double tmp = x, ret = (p & 1) == 1 ? x : 1.;
-    while(true) {
-      tmp *= tmp;
-      p >>= 1;
-      if(p == 1) {
-        return ret * tmp;
-      }
-      if((p & 1) != 0) {
-        ret *= tmp;
-      }
-    }
+    return FastMath.powFast(x, p);
   }
 
   /**
-   * Fast loop for computing {@code Math.pow(x, p)} for p >= 0 integer and x
+   * Fast loop for computing {@code pow(x, p)} for p >= 0 integer and x
    * integer.
    *
    * @param x Base
    * @param p Exponent
-   * @return {@code Math.pow(x, p)}
+   * @return {@code pow(x, p)}
    */
   public static int ipowi(int x, int p) {
     if(p <= 2) {
-      return (int) Math.pow(x, p);
+      return (int) FastMath.powFast(x, p);
     }
     int tmp = x, ret = (p & 1) == 1 ? x : 1;
     while(true) {

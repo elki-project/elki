@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.vafile;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -67,6 +67,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
+import net.jafama.FastMath;
 
 /**
  * PartialVAFile. In-memory only implementation.
@@ -93,7 +94,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
  * 
  * @param <V> Vector type
  */
-@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu", title = "Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations", booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06), Wien, Austria, 2006", url = "http://dx.doi.org/10.1109/SSDBM.2006.23")
+@Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Matthias Schubert, Ziyue Zhu", //
+    title = "Efficient Query Processing in Arbitrary Subspaces Using Vector Approximations", //
+    booktitle = "Proc. 18th Int. Conf. on Scientific and Statistical Database Management (SSDBM 06), Wien, Austria, 2006", //
+    url = "http://dx.doi.org/10.1109/SSDBM.2006.23")
 public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
   /**
    * Class logger.
@@ -480,7 +484,7 @@ public class PartialVAFile<V extends NumberVector> extends AbstractRefiningIndex
       stats.incrementIssuedQueries();
       long t = System.nanoTime();
 
-      final double epsilonP = Math.pow(range, p);
+      final double epsilonP = FastMath.pow(range, p);
 
       // generate query approximation and lookup table
       final VectorApproximation queryApprox = calculateFullApproximation(null, query);

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * Non-linear scaling function using a Gamma curve.
@@ -36,11 +37,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @since 0.3
  */
 public class GammaScaling implements StaticScalingFunction {
-  /**
-   * OptionID for the gamma value.
-   */
-  public static final OptionID GAMMA_ID = new OptionID("scaling.gamma", "Gamma value for scaling.");
-
   /**
    * Gamma value.
    */
@@ -64,7 +60,7 @@ public class GammaScaling implements StaticScalingFunction {
 
   @Override
   public double getScaled(double d) {
-    return Math.pow(d, gamma);
+    return FastMath.pow(d, gamma);
   }
 
   @Override
@@ -85,6 +81,11 @@ public class GammaScaling implements StaticScalingFunction {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * OptionID for the gamma value.
+     */
+    public static final OptionID GAMMA_ID = new OptionID("scaling.gamma", "Gamma value for scaling.");
+
     double gamma = 1.0;
 
     @Override

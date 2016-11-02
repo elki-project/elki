@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Gaussian distribution aka normal distribution
@@ -201,7 +202,7 @@ public class NormalDistribution extends AbstractDistribution {
         + 0.774368199119538609) * u //
         + 0.490165080585318424) * u //
         + 0.275374741597376782) //
-        * t * Math.exp(-x * x);
+        * t * FastMath.exp(-x * x);
     return x < 0 ? 2 - y : y;
   }
 
@@ -342,9 +343,9 @@ public class NormalDistribution extends AbstractDistribution {
       url = "http://www.kurims.kyoto-u.ac.jp/~ooura/gamerf.html")
   public static double erfcinv(double y) {
     final double z = (y > 1) ? 2 - y : y;
-    final double w = 0.916461398268964 - Math.log(z);
-    double u = Math.sqrt(w);
-    double s = (Math.log(u) + 0.488826640273108) / w;
+    final double w = 0.916461398268964 - FastMath.log(z);
+    double u = FastMath.sqrt(w);
+    double s = (FastMath.log(u) + 0.488826640273108) / w;
     double t = 1 / (u + 0.231729200323405);
     double x = u * (1 - s * (s * 0.124610454613712 + 0.5)) //
         - ((((-0.0728846765585675 * t //
@@ -378,7 +379,7 @@ public class NormalDistribution extends AbstractDistribution {
         + 0.686265948274097816) * u //
         + 0.434397492331430115) * u //
         + 0.244044510593190935) //
-        * t - z * Math.exp(x * x - 0.120782237635245222);
+        * t - z * FastMath.exp(x * x - 0.120782237635245222);
     x += s * (x * s + 1);
     return (y > 1) ? -x : x;
   }
@@ -397,7 +398,7 @@ public class NormalDistribution extends AbstractDistribution {
    */
   public static double pdf(double x, double mu, double sigma) {
     x = (x - mu) / sigma;
-    return MathUtil.ONE_BY_SQRTTWOPI / sigma * Math.exp(-.5 * x * x);
+    return MathUtil.ONE_BY_SQRTTWOPI / sigma * FastMath.exp(-.5 * x * x);
   }
 
   /**
@@ -414,7 +415,7 @@ public class NormalDistribution extends AbstractDistribution {
    */
   public static double logpdf(double x, double mu, double sigma) {
     x = (x - mu) / sigma;
-    return MathUtil.LOG_ONE_BY_SQRTTWOPI - Math.log(sigma) - .5 * x * x;
+    return MathUtil.LOG_ONE_BY_SQRTTWOPI - FastMath.log(sigma) - .5 * x * x;
   }
 
   /**
@@ -442,7 +443,7 @@ public class NormalDistribution extends AbstractDistribution {
    * @return PDF of the given normal distribution at x.
    */
   public static double standardNormalPDF(double x) {
-    return Math.exp(-.5 * x * x) * MathUtil.ONE_BY_SQRTTWOPI;
+    return FastMath.exp(-.5 * x * x) * MathUtil.ONE_BY_SQRTTWOPI;
   }
 
   /**
@@ -476,7 +477,7 @@ public class NormalDistribution extends AbstractDistribution {
     while(s != t) {
       s = (t = s) + (b *= q / (i += 2));
     }
-    return .5 + s * Math.exp(-.5 * q - .91893853320467274178);
+    return .5 + s * FastMath.exp(-.5 * q - .91893853320467274178);
   }
 
   /**
@@ -507,7 +508,7 @@ public class NormalDistribution extends AbstractDistribution {
     while(s != t) {
       s = (t = s) + (b *= q / (i += 2));
     }
-    return .5 + s * Math.exp(-.5 * q - .91893853320467274178);
+    return .5 + s * FastMath.exp(-.5 * q - .91893853320467274178);
   }
 
   /**

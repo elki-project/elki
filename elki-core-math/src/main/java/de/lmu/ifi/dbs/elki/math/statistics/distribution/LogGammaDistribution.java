@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Log-Gamma Distribution, with random generation and density functions.
@@ -130,7 +131,7 @@ public class LogGammaDistribution extends AbstractDistribution {
 
   @Override
   public double nextRandom() {
-    return Math.exp(GammaDistribution.nextRandom(k, theta, random)) + shift;
+    return FastMath.exp(GammaDistribution.nextRandom(k, theta, random)) + shift;
   }
 
   /**
@@ -170,7 +171,7 @@ public class LogGammaDistribution extends AbstractDistribution {
     if(x <= 0.) {
       return 0.;
     }
-    return GammaDistribution.regularizedGammaP(k, Math.log1p(x) * theta);
+    return GammaDistribution.regularizedGammaP(k, FastMath.log1p(x) * theta);
   }
 
   /**
@@ -186,7 +187,7 @@ public class LogGammaDistribution extends AbstractDistribution {
     if(x <= 0.) {
       return 0.;
     }
-    return GammaDistribution.logregularizedGammaP(k, Math.log1p(x) * theta);
+    return GammaDistribution.logregularizedGammaP(k, FastMath.log1p(x) * theta);
   }
 
   /**
@@ -202,7 +203,7 @@ public class LogGammaDistribution extends AbstractDistribution {
     if(x <= 0.) {
       return 0.;
     }
-    return Math.pow(theta, k) / GammaDistribution.gamma(k) * Math.pow(1+x, -(theta + 1.)) * Math.pow(Math.log1p(x), k - 1.);
+    return FastMath.pow(theta, k) / GammaDistribution.gamma(k) * FastMath.pow(1+x, -(theta + 1.)) * FastMath.pow(FastMath.log1p(x), k - 1.);
   }
 
   /**
@@ -218,8 +219,8 @@ public class LogGammaDistribution extends AbstractDistribution {
     if(x <= 0.) {
       return Double.NEGATIVE_INFINITY;
     }
-    final double log1px = Math.log1p(x);
-    return k * Math.log(theta) - GammaDistribution.logGamma(k) - (theta + 1.) * log1px + (k - 1) * Math.log(log1px);
+    final double log1px = FastMath.log1p(x);
+    return k * FastMath.log(theta) - GammaDistribution.logGamma(k) - (theta + 1.) * log1px + (k - 1) * FastMath.log(log1px);
   }
 
   /**
@@ -232,7 +233,7 @@ public class LogGammaDistribution extends AbstractDistribution {
    * @return Probit for Gamma distribution
    */
   public static double quantile(double p, double k, double theta, double shift) {
-    return Math.exp(GammaDistribution.quantile(p, k, theta)) + shift;
+    return FastMath.exp(GammaDistribution.quantile(p, k, theta)) + shift;
   }
 
   /**

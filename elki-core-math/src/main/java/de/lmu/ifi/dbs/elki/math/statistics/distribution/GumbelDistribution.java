@@ -28,6 +28,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Gumbel distribution, also known as Log-Weibull distribution.
@@ -113,7 +114,7 @@ public class GumbelDistribution extends AbstractDistribution {
     if(x == Double.NEGATIVE_INFINITY) {
       return 0.;
     }
-    return Math.exp(-z - Math.exp(-z)) / beta;
+    return FastMath.exp(-z - FastMath.exp(-z)) / beta;
   }
 
   @Override
@@ -134,7 +135,7 @@ public class GumbelDistribution extends AbstractDistribution {
       return Double.NEGATIVE_INFINITY;
     }
     final double z = (x - mu) / beta;
-    return -z - Math.exp(-z) - Math.log(beta);
+    return -z - FastMath.exp(-z) - FastMath.log(beta);
   }
 
   @Override
@@ -151,7 +152,7 @@ public class GumbelDistribution extends AbstractDistribution {
    * @return CDF at position x.
    */
   public static double cdf(double val, double mu, double beta) {
-    return Math.exp(-Math.exp(-(val - mu) / beta));
+    return FastMath.exp(-FastMath.exp(-(val - mu) / beta));
   }
 
   @Override
@@ -168,7 +169,7 @@ public class GumbelDistribution extends AbstractDistribution {
    * @return Quantile function at position x.
    */
   public static double quantile(double val, double mu, double beta) {
-    return mu + beta * Math.log(1 / Math.log(1 / val));
+    return mu + beta * FastMath.log(1 / FastMath.log(1 / val));
   }
 
   @Override
@@ -178,7 +179,7 @@ public class GumbelDistribution extends AbstractDistribution {
 
   @Override
   public double nextRandom() {
-    return mu + beta * Math.log(1 / Math.log(1 / random.nextDouble()));
+    return mu + beta * FastMath.log(1 / FastMath.log(1 / random.nextDouble()));
   }
 
   @Override

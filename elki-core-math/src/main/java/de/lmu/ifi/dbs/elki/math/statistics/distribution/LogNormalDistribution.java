@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Log-Normal distribution.
@@ -41,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * have a location parameter that shifts the distribution.
  * 
  * Our implementation maps to SciPy's as follows:
- * <tt>scipy.stats.lognorm(logstddev, shift, math.exp(logmean))</tt>
+ * <tt>scipy.stats.lognorm(logstddev, shift, FastMath.exp(logmean))</tt>
  * 
  * @author Erich Schubert
  * @since 0.6.0
@@ -167,8 +168,8 @@ public class LogNormalDistribution extends AbstractDistribution {
     if(x <= 0.) {
       return 0.;
     }
-    final double xrel = (Math.log(x) - mu) / sigma;
-    return 1 / (MathUtil.SQRTTWOPI * sigma * x) * Math.exp(-.5 * xrel * xrel);
+    final double xrel = (FastMath.log(x) - mu) / sigma;
+    return 1 / (MathUtil.SQRTTWOPI * sigma * x) * FastMath.exp(-.5 * xrel * xrel);
   }
 
   /**
@@ -187,8 +188,8 @@ public class LogNormalDistribution extends AbstractDistribution {
     if(x <= 0.) {
       return Double.NEGATIVE_INFINITY;
     }
-    final double xrel = (Math.log(x) - mu) / sigma;
-    return MathUtil.LOG_ONE_BY_SQRTTWOPI - Math.log(sigma * x) - .5 * xrel * xrel;
+    final double xrel = (FastMath.log(x) - mu) / sigma;
+    return MathUtil.LOG_ONE_BY_SQRTTWOPI - FastMath.log(sigma * x) - .5 * xrel * xrel;
   }
 
   /**
@@ -203,7 +204,7 @@ public class LogNormalDistribution extends AbstractDistribution {
     if(x <= 0.) {
       return 0.;
     }
-    return .5 * (1 + NormalDistribution.erf((Math.log(x) - mu) / (MathUtil.SQRT2 * sigma)));
+    return .5 * (1 + NormalDistribution.erf((FastMath.log(x) - mu) / (MathUtil.SQRT2 * sigma)));
   }
 
   /**
@@ -216,12 +217,12 @@ public class LogNormalDistribution extends AbstractDistribution {
    * @return The probit of the given normal distribution at x.
    */
   public static double quantile(double x, double mu, double sigma) {
-    return Math.exp(mu + sigma * NormalDistribution.standardNormalQuantile(x));
+    return FastMath.exp(mu + sigma * NormalDistribution.standardNormalQuantile(x));
   }
 
   @Override
   public double nextRandom() {
-    return Math.exp(logmean + random.nextGaussian() * logstddev) + shift;
+    return FastMath.exp(logmean + random.nextGaussian() * logstddev) + shift;
   }
 
   @Override

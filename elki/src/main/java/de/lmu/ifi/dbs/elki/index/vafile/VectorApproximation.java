@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.vafile;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,6 +27,7 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
+import net.jafama.FastMath;
 
 /**
  * Object in a VA approximation.
@@ -101,6 +102,6 @@ public class VectorApproximation {
   // objekte
   public static int byteOnDisk(int numberOfDimensions, int numberOfPartitions) {
     // (partition*dimension+id) alles in Bit 32bit für 4 byte id
-    return (int) (Math.ceil(numberOfDimensions * ((Math.log(numberOfPartitions) / Math.log(2))) + 32) / ByteArrayUtil.SIZE_DOUBLE);
+    return (int) (Math.ceil(numberOfDimensions * ((FastMath.log(numberOfPartitions) / FastMath.log(2))) + 32) / ByteArrayUtil.SIZE_DOUBLE);
   }
 }

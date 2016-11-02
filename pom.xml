@@ -510,6 +510,12 @@
 				<version>[4.8,)</version>
 				<scope>test</scope>
 			</dependency>
+
+			<dependency>
+				<groupId>net.jafama</groupId>
+				<artifactId>jafama</artifactId>
+				<version>[2.1.0,3)</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 

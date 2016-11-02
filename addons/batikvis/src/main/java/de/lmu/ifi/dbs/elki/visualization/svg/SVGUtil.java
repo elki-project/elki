@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -43,6 +43,7 @@ import org.w3c.dom.svg.SVGPoint;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import net.jafama.FastMath;
 
 /**
  * Utility class for SVG processing.
@@ -670,10 +671,10 @@ public final class SVGUtil {
    * @return SVG element representing this circle segment
    */
   public static Element svgCircleSegment(SVGPlot svgp, double centerx, double centery, double angleStart, double angleDelta, double innerRadius, double outerRadius) {
-    double sin1st = Math.sin(angleStart);
+    double sin1st = FastMath.sin(angleStart);
     double cos1st = MathUtil.sinToCos(angleStart, sin1st);
 
-    double sin2nd = Math.sin(angleStart + angleDelta);
+    double sin2nd = FastMath.sin(angleStart + angleDelta);
     double cos2nd = MathUtil.sinToCos(angleStart + angleDelta, sin2nd);
 
     double inner1stx = centerx + (innerRadius * sin1st);

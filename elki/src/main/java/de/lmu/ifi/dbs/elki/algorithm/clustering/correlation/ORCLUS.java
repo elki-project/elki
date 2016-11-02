@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * ORCLUS: Arbitrarily ORiented projected CLUSter generation.
@@ -150,7 +151,7 @@ public class ORCLUS<V extends NumberVector> extends AbstractProjectedClustering<
     // pick k0 > k points from the database
     List<ORCLUSCluster> clusters = initialSeeds(relation, k_c);
 
-    double beta = Math.exp(-Math.log(dim_c / (double) l) * Math.log(1 / alpha) / Math.log(k_c / (double) k));
+    double beta = FastMath.exp(-FastMath.log(dim_c / (double) l) * FastMath.log(1 / alpha) / FastMath.log(k_c / (double) k));
 
     IndefiniteProgress cprogress = LOG.isVerbose() ? new IndefiniteProgress("Current number of clusters:", LOG) : null;
 

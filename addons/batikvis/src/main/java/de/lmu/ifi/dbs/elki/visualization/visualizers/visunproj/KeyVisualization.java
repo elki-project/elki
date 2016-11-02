@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import net.jafama.FastMath;
 
 import java.util.List;
 
@@ -140,7 +141,7 @@ public class KeyVisualization extends AbstractVisFactory {
     // Maximum width (compared to height) of labels - guess.
     // FIXME: do we really need to do this three-step computation?
     // Number of rows we'd use in a squared layout:
-    final double rows = Math.ceil(Math.pow(numc * maxwidth, height / (width + height)));
+    final double rows = Math.ceil(FastMath.pow(numc * maxwidth, height / (width + height)));
     // Given this number of rows (plus one for header), use this many columns:
     return (int) Math.ceil(numc / (rows + 1));
   }

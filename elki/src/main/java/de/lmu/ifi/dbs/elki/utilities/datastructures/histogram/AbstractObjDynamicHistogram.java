@@ -1,5 +1,6 @@
 package de.lmu.ifi.dbs.elki.utilities.datastructures.histogram;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -81,10 +82,10 @@ public abstract class AbstractObjDynamicHistogram<T> extends AbstractObjStaticHi
     // Compute minimum and maximum
     double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
     for(int i = 0; i < cachefill; i++) {
-      min = Math.min(min, cacheposs[i]);
-      max = Math.max(max, cacheposs[i]);
+      min = MathUtil.min(min, cacheposs[i]);
+      max = MathUtil.max(max, cacheposs[i]);
     }
-    // use the LinearScale magic to round to "likely suiteable" step sizes.
+    // use the LinearScale magic to round to "likely suitable" step sizes.
     // TODO: extract into a reusable function?
     LinearScale scale = new LinearScale(min, max);
     min = scale.getMin();

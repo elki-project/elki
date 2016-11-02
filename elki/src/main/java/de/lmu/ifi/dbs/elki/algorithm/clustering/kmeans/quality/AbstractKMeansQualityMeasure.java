@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunctio
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Base class for evaluating clusterings by information criteria (such as AIC or
@@ -162,18 +163,18 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
     }
 
     // Total variance (corrected for bias)
-    final double v = d / (n - m), logv = Math.log(v);
+    final double v = d / (n - m), logv = FastMath.log(v);
     // log likelihood of this clustering
     double logLikelihood = 0.;
 
     // Aggregate
     for(int i = 0; i < m; i++) {
-      logLikelihood += n_i[i] * Math.log(n_i[i]) // Posterior entropy, Rn log Rn
+      logLikelihood += n_i[i] * FastMath.log(n_i[i]) // Posterior entropy, Rn log Rn
           - n_i[i] * .5 * MathUtil.LOGTWOPI // Rn/2 log2pi
           - n_i[i] * dim * .5 * logv // Rn M/2 log sigma^2
           - (d_i[i] - m) * .5; // (Rn-K)/2
     }
-    logLikelihood -= n * Math.log(n); // Prior entropy, sum_i Rn log R
+    logLikelihood -= n * FastMath.log(n); // Prior entropy, sum_i Rn log R
 
     return logLikelihood;
   }
@@ -220,9 +221,9 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
 
     // Aggregate
     for(int i = 0; i < m; i++) {
-      logLikelihood += n_i[i] * Math.log(n_i[i] / (double) n) // ni log ni/n
+      logLikelihood += n_i[i] * FastMath.log(n_i[i] / (double) n) // ni log ni/n
           - n_i[i] * dim * .5 * MathUtil.LOGTWOPI // ni*d/2 log2pi
-          - n_i[i] * .5 * Math.log(d_i[i]) // ni/2 log sigma_i
+          - n_i[i] * .5 * FastMath.log(d_i[i]) // ni/2 log sigma_i
           - (n_i[i] - m) * .5; // (ni-m)/2
     }
     return logLikelihood;

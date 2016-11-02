@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,6 +28,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Distance correlation.
@@ -84,7 +85,7 @@ public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeas
     }
     double dCovar = computeDCovar(dMatrixA, dMatrixB, len);
     // distance correlation
-    return Math.sqrt(dCovar / Math.sqrt(dVarA * dVarB));
+    return FastMath.sqrt(dCovar / FastMath.sqrt(dVarA * dVarB));
   }
 
   @Override
@@ -107,7 +108,7 @@ public class DistanceCorrelationDependenceMeasure extends AbstractDependenceMeas
           continue;
         }
         double dCovar = computeDCovar(dMatrix[x], dMatrix[y], len);
-        dCor[c++] = Math.sqrt(dCovar / Math.sqrt(dVar[x] * dVar[y]));
+        dCor[c++] = FastMath.sqrt(dCovar / FastMath.sqrt(dVar[x] * dVar[y]));
       }
     }
     return dCor;

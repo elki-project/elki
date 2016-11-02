@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerArrayQuickSort
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arrays.IntegerComparator;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Compute a mutual information based dependence measure using a nested means
@@ -75,7 +76,7 @@ public class MCEDependenceMeasure extends AbstractDependenceMeasure {
     // Check: for 10000 this should give 4, for 150 it gives 1.
     int power = Math.max(1, (int) Math.floor(p * .5));
     int gridsize = 1 << power;
-    double loggrid = Math.log((double) gridsize);
+    double loggrid = FastMath.log((double) gridsize);
 
     ArrayList<int[]> parts1 = buildPartitions(adapter1, data1, len, power);
     ArrayList<int[]> parts2 = buildPartitions(adapter2, data2, len, power);
@@ -240,10 +241,10 @@ public class MCEDependenceMeasure extends AbstractDependenceMeasure {
         double py = mat[j][i] / sumy;
 
         if(px > 0.) {
-          mx[i] -= px * Math.log(px);
+          mx[i] -= px * FastMath.log(px);
         }
         if(py > 0.) {
-          my[i] -= py * Math.log(py);
+          my[i] -= py * FastMath.log(py);
         }
       }
     }

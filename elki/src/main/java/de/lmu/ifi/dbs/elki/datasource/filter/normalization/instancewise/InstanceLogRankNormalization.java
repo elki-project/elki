@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Normalize vectors such that the smallest value of each instance is 0, the
@@ -45,7 +46,7 @@ public class InstanceLogRankNormalization<V extends NumberVector> extends Abstra
   /**
    * Average value use for NaNs
    */
-  private static final double CENTER = Math.log1p(.5) * MathUtil.ONE_BY_LOG2;
+  private static final double CENTER = FastMath.log1p(.5) * MathUtil.ONE_BY_LOG2;
 
   /**
    * Constructor.
@@ -75,7 +76,7 @@ public class InstanceLogRankNormalization<V extends NumberVector> extends Abstra
       while(last < tmp.length && tmp[last] <= v) {
         ++last;
       }
-      raw[i] = Math.log1p((first + last - 1) * scale) * MathUtil.ONE_BY_LOG2;
+      raw[i] = FastMath.log1p((first + last - 1) * scale) * MathUtil.ONE_BY_LOG2;
     }
     return factory.newNumberVector(raw);
   }

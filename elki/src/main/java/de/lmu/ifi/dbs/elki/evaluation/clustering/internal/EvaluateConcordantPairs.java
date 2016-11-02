@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Compute the Gamma Criterion of a data set.
@@ -77,10 +78,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  *
  * @apiviz.composedOf NoiseHandling
  */
-@Reference(authors = "F. B. Baker, and L. J. Hubert",//
-title = "Measuring the Power of Hierarchical Cluster Analysis",//
-booktitle = "Journal of the American Statistical Association, 70(349)",//
-url = "http://dx.doi.org/10.1080/01621459.1975.10480256")
+@Reference(authors = "F. B. Baker, and L. J. Hubert", //
+    title = "Measuring the Power of Hierarchical Cluster Analysis", //
+    booktitle = "Journal of the American Statistical Association, 70(349)", //
+    url = "http://dx.doi.org/10.1080/01621459.1975.10480256")
 public class EvaluateConcordantPairs<O> implements Evaluator {
   /**
    * Logger for debug output.
@@ -275,11 +276,11 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
    * @return Gamma plus statistic
    */
   @Reference(authors = "F. J. Rohlf", title = "Methods of comparing classifications", //
-  booktitle = "Annual Review of Ecology and Systematics", //
-  url = "http://dx.doi.org/10.1146/annurev.es.05.110174.000533")
+      booktitle = "Annual Review of Ecology and Systematics", //
+      url = "http://dx.doi.org/10.1146/annurev.es.05.110174.000533")
   public double computeTau(long c, long d, double m, long wd, long bd) {
     double tie = (wd * (wd - 1) + bd * (bd - 1)) >>> 1;
-    return (c - d) / Math.sqrt((m - tie) * m);
+    return (c - d) / FastMath.sqrt((m - tie) * m);
     // return (4. * c - m) / m;
   }
 

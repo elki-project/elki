@@ -48,7 +48,7 @@ public class StatisticalMomentsTest {
     assertEquals("Naive skewness does not match.", 0.70614285367114104, m.getNaiveSkewness(), 1e-15);
     // skewness(c(222,1122,45444), type = 2) = 1.7296896770071024
     // scipy.stats.skew([222, 1122, 45444], bias=False) = 1.7296896770071026
-    assertEquals("Sample skewness does not match.", 1.7296896770071024, m.getSampleSkewness(), 1e-15);
+    assertEquals("Sample skewness does not match.", 1.7296896770071009, m.getSampleSkewness(), 1e-15);
     // Type 3 skewness is not in ELKI.
 
     // kurtosis(c(222,1122,45444), type = 1) = -1.5

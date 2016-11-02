@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Estimator using the weighted average of multiple hill estimators.
@@ -59,7 +60,7 @@ public class AggregatedHillEstimator extends AbstractIntrinsicDimensionalityEsti
       // The next observation:
       final double v = adapter.getDouble(data, i++);
       if(v > 0) {
-        sum = Math.log(v);
+        sum = FastMath.log(v);
         valid++;
         break;
       }
@@ -68,7 +69,7 @@ public class AggregatedHillEstimator extends AbstractIntrinsicDimensionalityEsti
       // The next observation:
       final double v = adapter.getDouble(data, i++);
       assert (v > 0);
-      final double logv = Math.log(v);
+      final double logv = FastMath.log(v);
       // Aggregate hill estimations:
       hsum += sum / valid++ - logv;
       // Update sum for next hill.

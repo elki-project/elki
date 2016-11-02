@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * Scaling that can map arbitrary positive values to a value in the range of
@@ -74,44 +75,44 @@ public class OutlierSqrtScaling implements OutlierScalingFunction {
   @Override
   public double getScaled(double value) {
     assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    if (value <= min) {
+    if(value <= min) {
       return 0;
     }
-    return Math.min(1, (Math.sqrt(value - min) / factor));
+    return Math.min(1, (FastMath.sqrt(value - min) / factor));
   }
 
   @Override
   public void prepare(OutlierResult or) {
-    if (pmin == null || pmax == null) {
+    if(pmin == null || pmax == null) {
       DoubleMinMax mm = new DoubleMinMax();
       DoubleRelation scores = or.getScores();
-      for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+      for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
         double val = scores.doubleValue(id);
-        if (!Double.isInfinite(val)) {
+        if(!Double.isInfinite(val)) {
           mm.put(val);
         }
       }
       min = (pmin == null) ? mm.getMin() : pmin;
       max = (pmax == null) ? mm.getMax() : pmax;
     }
-    factor = Math.sqrt(max - min);
+    factor = FastMath.sqrt(max - min);
   }
 
   @Override
   public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
-    if (pmin == null || pmax == null) {
+    if(pmin == null || pmax == null) {
       DoubleMinMax mm = new DoubleMinMax();
       final int size = adapter.size(array);
-      for (int i = 0; i < size; i++) {
+      for(int i = 0; i < size; i++) {
         double val = adapter.getDouble(array, i);
-        if (!Double.isInfinite(val)) {
+        if(!Double.isInfinite(val)) {
           mm.put(val);
         }
       }
       min = (pmin == null) ? mm.getMin() : pmin;
       max = (pmax == null) ? mm.getMax() : pmax;
     }
-    factor = Math.sqrt(max - min);
+    factor = FastMath.sqrt(max - min);
   }
 
   @Override
@@ -163,12 +164,12 @@ public class OutlierSqrtScaling implements OutlierScalingFunction {
       super.makeOptions(config);
       DoubleParameter minP = new DoubleParameter(MIN_ID);
       minP.setOptional(true);
-      if (config.grab(minP)) {
+      if(config.grab(minP)) {
         min = minP.getValue();
       }
       DoubleParameter maxP = new DoubleParameter(MAX_ID);
       maxP.setOptional(true);
-      if (config.grab(maxP)) {
+      if(config.grab(maxP)) {
         max = maxP.getValue();
       }
     }

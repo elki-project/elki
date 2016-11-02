@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Chi-Squared distribution (a specialization of the Gamma distribution).
@@ -95,9 +96,9 @@ public class ChiSquaredDistribution extends GammaDistribution {
     }
     final double k = dof * .5;
     if(Math.abs(k - 1.0) < Double.MIN_NORMAL) {
-      return Math.exp(-x * 2.0) * 2.0;
+      return FastMath.exp(-x * 2.0) * 2.0;
     }
-    return Math.exp((k - 1.0) * Math.log(x * 2.0) - x * 2.0 - logGamma(k)) * 2.0;
+    return FastMath.exp((k - 1.0) * FastMath.log(x * 2.0) - x * 2.0 - logGamma(k)) * 2.0;
   }
 
   /**
@@ -117,7 +118,7 @@ public class ChiSquaredDistribution extends GammaDistribution {
     final double k = dof * .5;
     final double twox = x * 2.0;
     return twox == Double.POSITIVE_INFINITY ? Double.NEGATIVE_INFINITY : //
-        (k - 1.0) * Math.log(twox) - twox - logGamma(k) + MathUtil.LOG2;
+        (k - 1.0) * FastMath.log(twox) - twox - logGamma(k) + MathUtil.LOG2;
   }
 
   /**

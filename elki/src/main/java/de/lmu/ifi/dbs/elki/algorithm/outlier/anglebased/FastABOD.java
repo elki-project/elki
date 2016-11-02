@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.GreaterEqualConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import net.jafama.FastMath;
 
 /**
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
@@ -82,9 +83,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("Approximate ABOD: Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
 @Reference(authors = "H.-P. Kriegel, M. Schubert, A. Zimek", //
-title = "Angle-Based Outlier Detection in High-dimensional Data", //
-booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", //
-url = "http://dx.doi.org/10.1145/1401890.1401946")
+    title = "Angle-Based Outlier Detection in High-dimensional Data", //
+    booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", //
+    url = "http://dx.doi.org/10.1145/1401890.1401946")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.FastABOD", "fastabod" })
 public class FastABOD<V extends NumberVector> extends ABOD<V> {
   /**
@@ -165,7 +166,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
           double simBC = kernelMatrix.getSimilarity(iB, iC);
           double numerator = simBC - simAB - simAC + simAA;
           double div = 1. / (sqdAB * sqdAC);
-          s.put(numerator * div, Math.sqrt(div));
+          s.put(numerator * div, FastMath.sqrt(div));
         }
       }
       // Sample variance probably would probably be better, but the ABOD
@@ -213,7 +214,7 @@ public class FastABOD<V extends NumberVector> extends ABOD<V> {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter kP = new IntParameter(K_ID) //
-      .addConstraint(new GreaterEqualConstraint(3));
+          .addConstraint(new GreaterEqualConstraint(3));
       if(config.grab(kP)) {
         k = kP.intValue();
       }

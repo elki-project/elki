@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.geo;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Visualization function for Cross-track distance function
@@ -189,18 +190,18 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
   private int colorMultiply(int col, double reldist, boolean ceil) {
     if (steps > 0) {
       if (!ceil) {
-        reldist = Math.round(reldist * steps) / steps;
+        reldist = FastMath.round(reldist * steps) / steps;
       } else {
-        reldist = Math.ceil(reldist * steps) / steps;
+        reldist = FastMath.ceil(reldist * steps) / steps;
       }
     } else if (steps < 0 && reldist > 0.) {
       double s = reldist * -steps;
-      double off = Math.abs(s - Math.round(s));
+      double off = Math.abs(s - FastMath.round(s));
       double factor = -steps * 1. / 1000; // height;
       if (off < factor) { // Blend with black:
         factor = (off / factor);
         int a = (col >> 24) & 0xFF;
-        a = (int) (a * Math.sqrt(reldist)) & 0xFF;
+        a = (int) (a * FastMath.sqrt(reldist)) & 0xFF;
         a = (int) ((1 - factor) * 0xFF + factor * a);
         int r = (int) (factor * ((col >> 16) & 0xFF));
         int g = (int) (factor * ((col >> 8) & 0xFF));
@@ -209,7 +210,7 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
       }
     }
     int a = (col >> 24) & 0xFF, r = (col >> 16) & 0xFF, g = (col >> 8) & 0xFF, b = (col) & 0xFF;
-    a = (int) (a * Math.sqrt(reldist)) & 0xFF;
+    a = (int) (a * FastMath.sqrt(reldist)) & 0xFF;
     return a << 24 | r << 16 | g << 8 | b;
   }
 

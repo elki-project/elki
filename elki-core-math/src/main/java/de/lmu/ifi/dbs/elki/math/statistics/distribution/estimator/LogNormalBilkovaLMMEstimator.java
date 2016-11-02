@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Alternate estimate the parameters of a log Gamma Distribution, using the
@@ -48,7 +49,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LogNormalDistribution
  */
-@Reference(authors = "D. Bílková", title = "Lognormal distribution and using L-moment method for estimating its parameters", booktitle = "Int. Journal of Mathematical Models and Methods in Applied Sciences (NAUN)", url = "http://www.naun.org/multimedia/NAUN/m3as/17-079.pdf")
+@Reference(authors = "D. Bílková", //
+    title = "Lognormal distribution and using L-moment method for estimating its parameters", //
+    booktitle = "Int. Journal of Mathematical Models and Methods in Applied Sciences (NAUN)", //
+    url = "http://www.naun.org/multimedia/NAUN/m3as/17-079.pdf")
 public class LogNormalBilkovaLMMEstimator extends AbstractLMMEstimator<LogNormalDistribution> {
   /**
    * Static instance.
@@ -74,14 +78,15 @@ public class LogNormalBilkovaLMMEstimator extends AbstractLMMEstimator<LogNormal
 
   @Override
   public LogNormalDistribution estimateFromLMoments(double[] xmom) {
-    if (!(xmom[1] > 0.) || !(Math.abs(xmom[2]) < 1.0) || !(xmom[2] > 0.)) {
+    if(!(xmom[1] > 0.) || !(Math.abs(xmom[2]) < 1.0) || !(xmom[2] > 0.)) {
       throw new ArithmeticException("L-Moments invalid");
     }
-    final double z = SQRT8_3 * NormalDistribution.standardNormalQuantile(.5 * (1. + xmom[2])), z2 = z * z;
+    final double z = SQRT8_3 * NormalDistribution.standardNormalQuantile(.5 * (1. + xmom[2])),
+        z2 = z * z;
     final double sigma = 0.999281 * z - 0.006118 * z * z2 + 0.000127 * z * z2 * z2;
     final double sigmasqhalf = sigma * sigma * .5;
-    final double logmu = Math.log(xmom[1] / NormalDistribution.erf(.5 * sigma)) - sigmasqhalf;
-    return new LogNormalDistribution(logmu, Math.max(sigma, Double.MIN_NORMAL), xmom[0] - Math.exp(logmu + sigmasqhalf));
+    final double logmu = FastMath.log(xmom[1] / NormalDistribution.erf(.5 * sigma)) - sigmasqhalf;
+    return new LogNormalDistribution(logmu, Math.max(sigma, Double.MIN_NORMAL), xmom[0] - FastMath.exp(logmu + sigmasqhalf));
   }
 
   @Override

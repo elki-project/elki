@@ -66,6 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Parameter;
+import net.jafama.FastMath;
 
 /**
  * Algorithm to gather statistics over the distance distribution in the data
@@ -290,11 +291,11 @@ public class DistanceStatisticsWithClasses<O> extends AbstractDistanceBasedAlgor
     int size = relation.size();
     Random rnd = new Random();
     // estimate minimum and maximum.
-    int k = (int) Math.max(25, Math.pow(relation.size(), 0.2));
+    int k = (int) Math.max(25, FastMath.pow(relation.size(), 0.2));
     TreeSet<DoubleDBIDPair> minhotset = new TreeSet<>();
     TreeSet<DoubleDBIDPair> maxhotset = new TreeSet<>(Collections.reverseOrder());
 
-    int randomsize = (int) Math.max(25, Math.pow(relation.size(), 0.2));
+    int randomsize = (int) Math.max(25, FastMath.pow(relation.size(), 0.2));
     double rprob = ((double) randomsize) / size;
     ArrayModifiableDBIDs randomset = DBIDUtil.newArray(randomsize);
 

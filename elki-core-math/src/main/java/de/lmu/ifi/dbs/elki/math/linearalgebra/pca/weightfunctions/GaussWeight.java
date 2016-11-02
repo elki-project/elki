@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import net.jafama.FastMath;
 
 /**
  * Gaussian Weight function, scaled such that the result it 0.1 at distance ==
@@ -44,6 +45,6 @@ public final class GaussWeight implements WeightFunction {
     }
     double relativedistance = distance / max;
     // -2.303 is log(.1) to suit the intended range of 1.0-0.1
-    return java.lang.Math.exp(-2.3025850929940455 * relativedistance * relativedistance);
+    return FastMath.exp(-2.3025850929940455 * relativedistance * relativedistance);
   }
 }

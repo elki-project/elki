@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.tests;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.tests;
 
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Perform Anderson-Darling test for a Gaussian distribution.
@@ -98,13 +99,13 @@ public class AndersonDarlingTest {
     for(; i < j; ++i, --j, i2 += 2, j2 -= 2) {
       final double x = NormalDistribution.standardNormalCDF(sorted[i]);
       final double y = NormalDistribution.standardNormalCDF(sorted[j]);
-      final double diff1 = Math.log(x) + Math.log(1 - y);
-      final double diff2 = Math.log(1 - x) + Math.log(y);
+      final double diff1 = FastMath.log(x) + FastMath.log(1 - y);
+      final double diff2 = FastMath.log(1 - x) + FastMath.log(y);
       A2 += i2 * diff1 + j2 * diff2;
     }
     if(i == j) {
       final double x = NormalDistribution.standardNormalCDF(sorted[i]);
-      A2 += i2 * (Math.log(x) + Math.log(1 - x));
+      A2 += i2 * (FastMath.log(x) + FastMath.log(1 - x));
     }
     A2 /= l;
     A2 += l;
@@ -142,13 +143,13 @@ public class AndersonDarlingTest {
     for(; i < j; ++i, --j, i2 += 2, j2 -= 2) {
       final double x = NormalDistribution.standardNormalCDF((sorted[i] - m) * isigma);
       final double y = NormalDistribution.standardNormalCDF((sorted[j] - m) * isigma);
-      final double diff1 = Math.log(x) + Math.log(1 - y);
-      final double diff2 = Math.log(1 - x) + Math.log(y);
+      final double diff1 = FastMath.log(x) + FastMath.log(1 - y);
+      final double diff2 = FastMath.log(1 - x) + FastMath.log(y);
       A2 += i2 * diff1 + j2 * diff2;
     }
     if(i == j) {
       final double x = NormalDistribution.standardNormalCDF((sorted[i] - m) * isigma);
-      A2 += i2 * (Math.log(x) + Math.log(1 - x));
+      A2 += i2 * (FastMath.log(x) + FastMath.log(1 - x));
     }
     A2 /= l;
     A2 += l;

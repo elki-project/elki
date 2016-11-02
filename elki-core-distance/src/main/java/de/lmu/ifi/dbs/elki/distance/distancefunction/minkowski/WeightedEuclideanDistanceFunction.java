@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
+import net.jafama.FastMath;
 
 /**
  * Weighted Euclidean distance for {@link NumberVector}s.
@@ -120,12 +121,12 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     else if(dim2 > mindim) {
       agg += preNorm(v2, mindim, dim2);
     }
-    return Math.sqrt(agg);
+    return FastMath.sqrt(agg);
   }
 
   @Override
   public double norm(NumberVector v) {
-    return Math.sqrt(preNorm(v, 0, v.getDimensionality()));
+    return FastMath.sqrt(preNorm(v, 0, v.getDimensionality()));
   }
 
   @Override
@@ -147,7 +148,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     if(dim2 > mindim) {
       agg += (v2 != null) ? preNorm(v2, mindim, dim2) : preNormMBR(mbr2, mindim, dim2);
     }
-    return Math.sqrt(agg);
+    return FastMath.sqrt(agg);
   }
 
   @Override

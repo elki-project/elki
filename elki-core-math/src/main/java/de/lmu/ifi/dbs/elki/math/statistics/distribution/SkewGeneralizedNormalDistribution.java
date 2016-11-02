@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Generalized Gaussian distribution by adding a skew term, similar to lognormal
@@ -123,7 +124,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
   public double nextRandom() {
     double y = random.nextGaussian();
     if(Math.abs(skew) > 0.) {
-      y = (1. - Math.exp(-skew * y)) / skew;
+      y = (1. - FastMath.exp(-skew * y)) / skew;
     }
     return mean + stddev * y;
 
@@ -145,9 +146,9 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
   public static double pdf(double x, double mu, double sigma, double skew) {
     x = (x - mu) / sigma;
     if(Math.abs(skew) > 0.) {
-      x = -Math.log(1. - skew * x) / skew;
+      x = -FastMath.log(1. - skew * x) / skew;
     }
-    return MathUtil.SQRTHALF * Math.exp(-.5 * x * x) / sigma / (1 - skew * x);
+    return MathUtil.SQRTHALF * FastMath.exp(-.5 * x * x) / sigma / (1 - skew * x);
   }
 
   /**
@@ -161,9 +162,9 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
   public static double logpdf(double x, double mu, double sigma, double skew) {
     x = (x - mu) / sigma;
     if(Math.abs(skew) > 0.) {
-      x = -Math.log(1. - skew * x) / skew;
+      x = -FastMath.log(1. - skew * x) / skew;
     }
-    return -.5 * x * x - Math.log(MathUtil.SQRTHALF * sigma * (1 - skew * x));
+    return -.5 * x * x - FastMath.log(MathUtil.SQRTHALF * sigma * (1 - skew * x));
   }
 
   /**
@@ -181,7 +182,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
       if(tmp < 1e-15) {
         return (skew < 0.) ? 0. : 1.;
       }
-      x = -Math.log(tmp) / skew;
+      x = -FastMath.log(tmp) / skew;
     }
     return .5 + .5 * NormalDistribution.erf(x * MathUtil.SQRTHALF);
   }
@@ -198,7 +199,7 @@ public class SkewGeneralizedNormalDistribution extends AbstractDistribution {
   public static double quantile(double x, double mu, double sigma, double skew) {
     x = NormalDistribution.standardNormalQuantile(x);
     if(Math.abs(skew) > 0.) {
-      x = (1. - Math.exp(-skew * x)) / skew;
+      x = (1. - FastMath.exp(-skew * x)) / skew;
     }
     return mu + sigma * x;
   }

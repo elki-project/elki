@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Compute the similarity of dimensions using the SURFING score. The parameter k
@@ -99,7 +100,7 @@ public class SURFINGDependenceMeasure extends AbstractDependenceMeasure {
         double dx = ix - jx, dy = iy - jy;
         heap.add(dx * dx + dy * dy); // Squared Euclidean.
       }
-      double kdist = Math.sqrt(heap.peek()); // Euclidean
+      double kdist = FastMath.sqrt(heap.peek()); // Euclidean
       knns[i] = kdist;
       kdistmean += kdist;
     }

@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.fitting;
  */
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.FastMath;
 
 /**
  * Gaussian function for parameter fitting
@@ -86,7 +87,7 @@ public class GaussianFittingFunction implements FittingFunction {
     for (int i = 0; i < params.length; i += 3) {
       // Standardized Gaussian parameter (centered, scaled by stddev)
       double stdpar = (x - params[i]) / params[i + 1];
-      double e = Math.exp(-.5 * stdpar * stdpar);
+      double e = FastMath.exp(-.5 * stdpar * stdpar);
       double localy = params[i + 2] / (params[i + 1] * MathUtil.SQRTTWOPI) * e;
 
       y += localy;

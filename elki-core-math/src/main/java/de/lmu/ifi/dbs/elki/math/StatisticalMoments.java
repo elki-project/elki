@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import net.jafama.FastMath;
 
 /**
  * Track various statistical moments, including mean, variance, skewness and
@@ -180,7 +181,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
   public double getSampleSkewness() {
     assert (n > 2.) : "Cannot compute a reasonable sample skewness with weight <= 2.0!";
     double sigma2 = getSampleVariance();
-    return (m3 * n / (n - 1) / (n - 2)) / Math.pow(sigma2, 1.5);
+    return (m3 * n / (n - 1) / (n - 2)) / FastMath.pow(sigma2, 1.5);
   }
 
   /**
@@ -190,7 +191,7 @@ public class StatisticalMoments extends MeanVarianceMinMax {
    */
   public double getNaiveSkewness() {
     double sigma2 = getNaiveVariance();
-    return (m3 / n) / Math.pow(sigma2, 1.5);
+    return (m3 / n) / FastMath.pow(sigma2, 1.5);
   }
 
   /**

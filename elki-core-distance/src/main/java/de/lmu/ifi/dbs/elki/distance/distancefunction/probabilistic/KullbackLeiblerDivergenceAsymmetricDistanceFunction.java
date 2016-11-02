@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanc
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Kullback-Leibler (asymmetric!) Distance, also known as relative entropy,
@@ -78,7 +79,7 @@ public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends Abstrac
         return Double.POSITIVE_INFINITY;
       }
       if(xd > 0.) {
-        agg += xd * Math.log(xd / yd);
+        agg += xd * FastMath.log(xd / yd);
       }
     }
     return agg;

@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import net.jafama.FastMath;
 
 /**
  * Track the k nearest neighbors, with insertion sort to ensure the correct
@@ -131,7 +132,7 @@ class DoubleIntegerDBIDListKNNHeap extends DoubleIntegerDBIDKNNList implements K
   @Override
   public KNNList toKNNListSqrt() {
     for(int i = 0; i < size; i++) {
-      dists[i] = Math.sqrt(dists[i]);
+      dists[i] = FastMath.sqrt(dists[i]);
     }
     return this;
   }

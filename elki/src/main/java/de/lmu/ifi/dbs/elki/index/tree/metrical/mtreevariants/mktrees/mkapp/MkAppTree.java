@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.Heap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.UpdatableHeap;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
+import net.jafama.FastMath;
 
 /**
  * MkAppTree is a metrical index structure based on the concepts of the M-Tree
@@ -163,7 +164,7 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
           double distance = distance(entry.getRoutingObjectID(), id);
           double minDist = (entry.getCoveringRadius() > distance) ? 0. : distance - entry.getCoveringRadius();
 
-          double approxValue = settings.log ? Math.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
+          double approxValue = settings.log ? FastMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
           if(approxValue < 0) {
             approxValue = 0;
           }
@@ -178,7 +179,7 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
         for(int i = 0; i < node.getNumEntries(); i++) {
           MkAppLeafEntry entry = (MkAppLeafEntry) node.getEntry(i);
           double distance = distance(entry.getRoutingObjectID(), id);
-          double approxValue = settings.log ? StrictMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
+          double approxValue = settings.log ? FastMath.exp(entry.approximatedValueAt(k)) : entry.approximatedValueAt(k);
           if(approxValue < 0) {
             approxValue = 0;
           }
@@ -346,8 +347,8 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
 
     for(int k = 0; k < settings.kmax - k_0; k++) {
       if(settings.log) {
-        x[k] = Math.log(k + k_0);
-        y[k] = Math.log(knnDistances[k + k_0]);
+        x[k] = FastMath.log(k + k_0);
+        y[k] = FastMath.log(knnDistances[k + k_0]);
       }
       else {
         x[k] = k + k_0;

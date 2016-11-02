@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Hellinger kernel / Hellinger distance are used with SIFT vectors, and also
@@ -81,7 +82,7 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = 0.;
     for(int d = 0; d < mindim; d++) {
-      final double v = Math.sqrt(fv1.doubleValue(d)) - Math.sqrt(fv2.doubleValue(d));
+      final double v = FastMath.sqrt(fv1.doubleValue(d)) - FastMath.sqrt(fv2.doubleValue(d));
       agg += v * v;
     }
     for(int d = mindim; d < dim1; d++) {
@@ -90,7 +91,7 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
     for(int d = mindim; d < dim2; d++) {
       agg += Math.abs(fv2.doubleValue(d));
     }
-    return MathUtil.SQRTHALF * Math.sqrt(agg);
+    return MathUtil.SQRTHALF * FastMath.sqrt(agg);
   }
 
   @Override
@@ -100,7 +101,7 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
     final int mindim = (dim1 < dim2) ? dim1 : dim2;
     double agg = 0.;
     for(int d = 0; d < mindim; d++) {
-      agg += Math.sqrt(o1.doubleValue(d) * o2.doubleValue(d));
+      agg += FastMath.sqrt(o1.doubleValue(d) * o2.doubleValue(d));
     }
     return agg;
   }

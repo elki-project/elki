@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.FastMath;
 
 /**
  * Simple spherical Gaussian cluster.
@@ -99,7 +100,7 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
     this.weight = weight;
     this.mean = mean;
     this.norm = norm;
-    this.normDistrFactor = 1. / Math.sqrt(norm); // assume det=1
+    this.normDistrFactor = 1. / FastMath.sqrt(norm); // assume det=1
     this.nmea = new double[mean.length];
     this.variance = var;
     this.wsum = 0.;
@@ -137,11 +138,11 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
   public void finalizeEStep() {
     if(wsum > 0.) {
       variance = variance / (wsum * mean.length);
-      normDistrFactor = 1. / Math.sqrt(norm * variance);
+      normDistrFactor = 1. / FastMath.sqrt(norm * variance);
     }
     else {
       // Degenerate
-      normDistrFactor = 1. / Math.sqrt(norm);
+      normDistrFactor = 1. / FastMath.sqrt(norm);
     }
   }
 
@@ -178,7 +179,7 @@ public class SphericalGaussianModel implements EMClusterModel<EMModel> {
   @Override
   public double estimateDensity(NumberVector vec) {
     double power = mahalanobisDistance(vec) * .5;
-    double prob = normDistrFactor * Math.exp(-power);
+    double prob = normDistrFactor * FastMath.exp(-power);
     if(!(prob >= 0.)) {
       LOG.warning("Invalid probability: " + prob + " power: " + power + " factor: " + normDistrFactor);
       prob = 0.;

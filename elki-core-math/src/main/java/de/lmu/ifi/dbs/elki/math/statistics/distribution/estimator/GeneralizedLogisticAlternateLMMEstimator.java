@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedLogisticAlternateDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Estimate the parameters of a Generalized Logistic Distribution, using the
@@ -74,7 +75,7 @@ public class GeneralizedLogisticAlternateLMMEstimator extends AbstractLMMEstimat
       // Effectively zero, so non-generalized.
       return new GeneralizedLogisticAlternateDistribution(xmom[0], xmom[1], 0.);
     }
-    double tmp = shape * Math.PI / Math.sin(shape * Math.PI);
+    double tmp = shape * Math.PI / FastMath.sin(shape * Math.PI);
     double scale = xmom[1] / tmp;
     double location = xmom[0] - scale * (1. - tmp) / shape;
     return new GeneralizedLogisticAlternateDistribution(location, scale, shape);

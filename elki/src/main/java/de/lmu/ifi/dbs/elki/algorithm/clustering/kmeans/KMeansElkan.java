@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -56,6 +56,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import net.jafama.FastMath;
 
 /**
  * Elkan's fast k-means by exploiting the triangle inequality.
@@ -228,7 +229,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
       DoubleVector mi = DoubleVector.wrap(means[i]);
       for(int j = 0; j < i; j++) {
         double d = distanceFunction.distance(mi, DoubleVector.wrap(means[j]));
-        d = issquared ? Math.sqrt(d) : d;
+        d = issquared ? FastMath.sqrt(d) : d;
         d *= .5;
         cdist[i][j] = d;
         cdist[j][i] = d;
@@ -263,7 +264,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
       int cur = -1;
       for(int j = 0; j < k; j++) {
         double dist = df.distance(fv, DoubleVector.wrap(means[j]));
-        dist = issquared ? Math.sqrt(dist) : dist;
+        dist = issquared ? FastMath.sqrt(dist) : dist;
         l[j] = dist;
         if(dist < best) {
           cur = j;
@@ -321,7 +322,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
         }
         if(recompute_u) { // Need to update bound? #3a
           u = df.distance(fv, DoubleVector.wrap(means[cur]));
-          u = issquared ? Math.sqrt(u) : u;
+          u = issquared ? FastMath.sqrt(u) : u;
           upper.putDouble(it, u);
           recompute_u = false; // Once only
           if(u <= l[j] || u <= cdist[cur][j]) { // #3b
@@ -329,7 +330,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
           }
         }
         double dist = df.distance(fv, DoubleVector.wrap(means[j]));
-        dist = issquared ? Math.sqrt(dist) : dist;
+        dist = issquared ? FastMath.sqrt(dist) : dist;
         l[j] = dist;
         if(dist < u) {
           cur = j;
@@ -373,7 +374,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
     double max = 0.;
     for(int i = 0; i < k; i++) {
       double d = distanceFunction.distance(DoubleVector.wrap(means[i]), DoubleVector.wrap(newmeans[i]));
-      d = issquared ? Math.sqrt(d) : d;
+      d = issquared ? FastMath.sqrt(d) : d;
       dists[i] = d;
       max = (d > max) ? d : max;
     }

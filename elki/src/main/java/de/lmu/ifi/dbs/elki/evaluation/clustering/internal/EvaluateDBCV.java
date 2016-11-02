@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Compute the Density-Based Clustering Validation Index.
@@ -139,7 +140,7 @@ public class EvaluateDBCV<O> implements Evaluator {
           }
         }
         // Average, and undo power.
-        clusterCoreDists[it.getOffset()] = Math.pow(currentCoreDist / neighbors, -1. / dim);
+        clusterCoreDists[it.getOffset()] = FastMath.pow(currentCoreDist / neighbors, -1. / dim);
       }
     }
 

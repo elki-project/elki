@@ -47,7 +47,7 @@ public class GammaDistributionTest extends AbstractDistributionTest {
     checkPDF(new GammaDistribution(.1, 1.), "pdf_scipy_01_1", 1e-15);
 
     checkPDF(new GammaDistribution(1., 1.), "pdf_gnur_1_1", 1e-15);
-    checkPDF(new GammaDistribution(2., 1.), "pdf_gnur_2_1", 1e-16);
+    checkPDF(new GammaDistribution(2., 1.), "pdf_gnur_2_1", 1e-15);
     checkPDF(new GammaDistribution(4., 1.), "pdf_gnur_4_1", 1e-14);
     checkPDF(new GammaDistribution(4., 10), "pdf_gnur_4_10", 1e-14);
     checkPDF(new GammaDistribution(.1, 10), "pdf_gnur_01_10", 1e-15);

@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Linear manifold clustering in high dimensional spaces by stochastic search.
@@ -90,7 +91,10 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * @author Erich Schubert
  * @since 0.5.0
  */
-@Reference(authors = "Robert Haralick, Rave Harpaz", title = "Linear manifold clustering in high dimensional spaces by stochastic search", booktitle = "Pattern Recognition volume 40, Issue 10", url = "http://dx.doi.org/10.1016/j.patcog.2007.01.020")
+@Reference(authors = "Robert Haralick, Rave Harpaz", //
+    title = "Linear manifold clustering in high dimensional spaces by stochastic search", //
+    booktitle = "Pattern Recognition volume 40, Issue 10", //
+    url = "http://dx.doi.org/10.1016/j.patcog.2007.01.020")
 public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * The logger for this class.
@@ -100,7 +104,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
   /**
    * Epsilon
    */
-  private static final double NOT_FROM_ONE_CLUSTER_PROBABILITY = 0.2;
+  private static final double LOG_NOT_FROM_ONE_CLUSTER_PROBABILITY = Math.log(0.2);
 
   /**
    * Histogram resolution
@@ -250,7 +254,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     final double a = squareSum(delta);
     final double b = squareSum(transposeTimes(beta, delta));
 
-    return (a > b) ? Math.sqrt(a - b) : 0.;
+    return (a > b) ? FastMath.sqrt(a - b) : 0.;
   }
 
   /**
@@ -278,7 +282,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     // determine the number of samples needed, to secure that with a specific
     // probability
     // in at least on sample every sampled point is from the same cluster.
-    int samples = (int) Math.min(Math.log(NOT_FROM_ONE_CLUSTER_PROBABILITY) / (Math.log(1 - Math.pow((1.0d / samplingLevel), dimension))), (double) currentids.size());
+    int samples = (int) Math.min(LOG_NOT_FROM_ONE_CLUSTER_PROBABILITY / (FastMath.log1p(-FastMath.powFast(samplingLevel, -dimension))), (double) currentids.size());
     // System.out.println("Number of samples: " + samples);
     int remaining_retries = 100;
     for(int i = 1; i <= samples; i++) {
@@ -419,7 +423,7 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     }
 
     for(int i = 0; i < n; i++) {
-      jt[i] = 1.0 + 2 * (p1[i] * (Math.log(sigma1[i]) - Math.log(p1[i])) + p2[i] * (Math.log(sigma2[i]) - Math.log(p2[i])));
+      jt[i] = 1.0 + 2 * (p1[i] * (FastMath.log(sigma1[i]) - FastMath.log(p1[i])) + p2[i] * (FastMath.log(sigma2[i]) - FastMath.log(p2[i])));
     }
 
     int bestpos = -1;
@@ -564,13 +568,13 @@ public class LMCLUS extends AbstractAlgorithm<Clustering<Model>> {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter maxLMDimP = new IntParameter(MAXDIM_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
-      .setOptional(true);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setOptional(true);
       if(config.grab(maxLMDimP)) {
         maxdim = maxLMDimP.getValue();
       }
       IntParameter minsizeP = new IntParameter(MINSIZE_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minsizeP)) {
         minsize = minsizeP.getValue();
       }

@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Triangular Distance has relatively tight upper and lower bounds to the
@@ -68,12 +69,12 @@ public class TriangularDistanceFunction extends TriangularDiscriminationDistance
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
-    return Math.sqrt(super.distance(v1, v2));
+    return FastMath.sqrt(super.distance(v1, v2));
   }
 
   @Override
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
-    return Math.sqrt(super.minDist(mbr1, mbr2));
+    return FastMath.sqrt(super.minDist(mbr1, mbr2));
   }
 
   @Override

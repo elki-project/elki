@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.spatial;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import net.jafama.FastMath;
 
 /**
  * GLS-Backward Search is a statistical approach to detecting spatial outliers.
@@ -235,7 +236,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
     // sigma_sum_square = sigma_0*sigma_0 + sigma*sigma
     double[][] sigmaMat = times(F, minusEquals(times(X, b), times(F, Y)));
     final double sigma_sum_square = normF(sigmaMat) / (relationx.size() - 6 - 1);
-    final double norm = 1 / Math.sqrt(sigma_sum_square);
+    final double norm = 1 / FastMath.sqrt(sigma_sum_square);
 
     // calculate the absolute values of standard residuals
     double[][] E = timesEquals(times(F, minus(Y, times(X, b))), norm);
@@ -252,7 +253,7 @@ public class CTLuGLSBackwardSearchAlgorithm<V extends NumberVector> extends Abst
       }
     }
 
-    return new Pair<>(worstid, Math.sqrt(worstscore));
+    return new Pair<>(worstid, FastMath.sqrt(worstscore));
   }
 
   @Override

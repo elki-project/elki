@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math;
  */
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import net.jafama.FastMath;
 
 /**
  * Class to incrementally compute pearson correlation.
@@ -110,7 +111,7 @@ public class PearsonCorrelation {
     if(!(sumXX > 0. && sumYY > 0.)) {
       return (sumXX == sumYY) ? 1. : 0.;
     }
-    return sumXY / Math.sqrt(sumXX * sumYY);
+    return sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -188,7 +189,7 @@ public class PearsonCorrelation {
    * @return standard deviation
    */
   public double getNaiveStddevX() {
-    return Math.sqrt(getNaiveVarianceX());
+    return FastMath.sqrt(getNaiveVarianceX());
   }
 
   /**
@@ -197,7 +198,7 @@ public class PearsonCorrelation {
    * @return standard deviation
    */
   public double getSampleStddevX() {
-    return Math.sqrt(getSampleVarianceX());
+    return FastMath.sqrt(getSampleVarianceX());
   }
 
   /**
@@ -229,7 +230,7 @@ public class PearsonCorrelation {
    * @return stddev
    */
   public double getNaiveStddevY() {
-    return Math.sqrt(getNaiveVarianceY());
+    return FastMath.sqrt(getNaiveVarianceY());
   }
 
   /**
@@ -238,7 +239,7 @@ public class PearsonCorrelation {
    * @return stddev
    */
   public double getSampleStddevY() {
-    return Math.sqrt(getSampleVarianceY());
+    return FastMath.sqrt(getSampleVarianceY());
   }
 
   /**
@@ -295,7 +296,7 @@ public class PearsonCorrelation {
     if(!(sumXX > 0. && sumYY > 0.)) {
       return (sumXX == sumYY) ? 1. : 0.;
     }
-    return sumXY / Math.sqrt(sumXX * sumYY);
+    return sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -340,7 +341,7 @@ public class PearsonCorrelation {
     if(!(sumXX > 0. && sumYY > 0.)) {
       return (sumXX == sumYY) ? 1. : 0.;
     }
-    return sumXY / Math.sqrt(sumXX * sumYY);
+    return sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -388,7 +389,7 @@ public class PearsonCorrelation {
     if(!(sumXX > 0. && sumYY > 0.)) {
       return (sumXX == sumYY) ? 1. : 0.;
     }
-    return sumXY / Math.sqrt(sumXX * sumYY);
+    return sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -436,7 +437,7 @@ public class PearsonCorrelation {
     if(!(sumXX > 0. && sumYY > 0.)) {
       return (sumXX == sumYY) ? 1. : 0.;
     }
-    return sumXY / Math.sqrt(sumXX * sumYY);
+    return sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 
   /**
@@ -485,6 +486,6 @@ public class PearsonCorrelation {
     if(!(sumXX > 0. && sumYY > 0.)) {
       return (sumXX == sumYY) ? 1. : 0.;
     }
-    return sumXY / Math.sqrt(sumXX * sumYY);
+    return sumXY / FastMath.sqrt(sumXX * sumYY);
   }
 }

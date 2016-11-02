@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Estimate distribution parameters using the method by Choi and Wette.
@@ -43,7 +44,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has GammaDistribution - - estimates
  */
-@Reference(title = "Maximum likelihood estimation of the parameters of the gamma distribution and their bias", authors = "S. C. Choi, R. Wette", booktitle = "Technometrics", url = "http://www.jstor.org/stable/10.2307/1266892")
+@Reference(title = "Maximum likelihood estimation of the parameters of the gamma distribution and their bias", //
+authors = "S. C. Choi, R. Wette", //
+booktitle = "Technometrics", //
+url = "http://www.jstor.org/stable/10.2307/1266892")
 public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistribution> {
   /**
    * Static estimation, using iterative refinement.
@@ -66,20 +70,20 @@ public class GammaChoiWetteEstimator implements DistributionEstimator<GammaDistr
       if (val <= 0 || Double.isInfinite(val) || Double.isNaN(val)) {
         continue;
       }
-      final double logx = (val > 0) ? Math.log(val) : meanlogx;
+      final double logx = (val > 0) ? FastMath.log(val) : meanlogx;
       final double deltax = val - meanx;
       final double deltalogx = logx - meanlogx;
       meanx += deltax / (i + 1.);
       meanlogx += deltalogx / (i + 1.);
     }
     // Initial approximation
-    final double logmeanx = (meanx > 0) ? Math.log(meanx) : meanlogx;
+    final double logmeanx = (meanx > 0) ? FastMath.log(meanx) : meanlogx;
     final double diff = logmeanx - meanlogx;
-    double k = (3 - diff + Math.sqrt((diff - 3) * (diff - 3) + 24 * diff)) / (12 * diff);
+    double k = (3 - diff + FastMath.sqrt((diff - 3) * (diff - 3) + 24 * diff)) / (12 * diff);
 
     // Refine via newton iteration, based on Choi and Wette equation
     while (true) {
-      double kdelta = (Math.log(k) - GammaDistribution.digamma(k) - diff) / (1 / k - GammaDistribution.trigamma(k));
+      double kdelta = (FastMath.log(k) - GammaDistribution.digamma(k) - diff) / (1 / k - GammaDistribution.trigamma(k));
       if (Math.abs(kdelta) / k < 1E-8 || !(kdelta < Double.POSITIVE_INFINITY)) {
         break;
       }

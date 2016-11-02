@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LUDecomposition;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import net.jafama.FastMath;
 
 /**
  * Model for a single Gaussian cluster.
@@ -110,7 +111,7 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
     final int dim = mean.length;
     this.mean = mean;
     this.norm = norm;
-    this.normDistrFactor = 1. / Math.sqrt(norm);
+    this.normDistrFactor = 1. / FastMath.sqrt(norm);
     this.nmea = new double[dim];
     if(covariance == null) {
       covariance = new double[mean.length][mean.length];
@@ -186,14 +187,14 @@ public class MultivariateGaussianModel implements EMClusterModel<EMModel> {
         det = 1.;
       }
     }
-    normDistrFactor = 1. / Math.sqrt(norm * det);
+    normDistrFactor = 1. / FastMath.sqrt(norm * det);
     invCovMatr = lu.solve(identity(dim, dim));
   }
 
   @Override
   public double estimateDensity(NumberVector vec) {
     double power = mahalanobisDistance(vec);
-    double prob = normDistrFactor * Math.exp(-.5 * power);
+    double prob = normDistrFactor * FastMath.exp(-.5 * power);
     if(!(prob >= 0.)) {
       LOG.warning("Invalid probability: " + prob + " power: " + -.5 * power + " factor: " + normDistrFactor);
       prob = 0.;

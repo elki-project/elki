@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
+import net.jafama.FastMath;
 
 /**
  * Utility class to draw hypercubes, wireframe and filled.
@@ -157,12 +158,12 @@ public class SVGHyperSphere {
 
     final double kappax, kappay;
     if(p > 1.) {
-      final double kappal = Math.pow(0.5, 1. / p);
+      final double kappal = FastMath.pow(0.5, 1. / p);
       kappax = Math.min(1.3, 4. * (2 * kappal - 1) / 3.);
       kappay = 0;
     }
     else if(p < 1.) {
-      final double kappal = 1 - Math.pow(0.5, 1. / p);
+      final double kappal = 1 - FastMath.pow(0.5, 1. / p);
       kappax = 0;
       kappay = Math.min(1.3, 4. * (2 * kappal - 1) / 3.);
     }

@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.covertree;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Abstract base class for cover tree variants.
@@ -104,8 +105,8 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
     this.distanceQuery = distanceFunction.instantiate(relation);
     this.truncate = truncate;
     this.expansion = expansion;
-    this.invLogExpansion = 1. / Math.log(expansion);
-    this.scaleBottom = (int) Math.ceil(Math.log(Double.MIN_NORMAL) * invLogExpansion);
+    this.invLogExpansion = 1. / FastMath.log(expansion);
+    this.scaleBottom = (int) Math.ceil(FastMath.log(Double.MIN_NORMAL) * invLogExpansion);
   }
 
   /**
@@ -115,7 +116,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
    * @return Distance
    */
   protected final double scaleToDist(int s) {
-    return Math.pow(expansion, s);
+    return FastMath.pow(expansion, s);
   }
 
   /**
@@ -125,7 +126,7 @@ public abstract class AbstractCoverTree<O> extends AbstractIndex<O> {
    * @return Scaling bound
    */
   protected final int distToScale(double d) {
-    return (int) Math.ceil(Math.log(d) * invLogExpansion);
+    return (int) Math.ceil(FastMath.log(d) * invLogExpansion);
   }
 
   /**

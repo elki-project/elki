@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Arrange dimensions based on the entropy of the slope spectrum. In contrast to
@@ -129,7 +130,7 @@ public class SlopeInversionDimensionSimilarity extends SlopeDimensionSimilarity 
           for(int l = 0; l < PRECISION; l++) {
             if(as[l] > 0) {
               final double p = as[l] / (double) size;
-              entropy += p * Math.log(p);
+              entropy += p * FastMath.log(p);
             }
           }
         }
@@ -138,7 +139,7 @@ public class SlopeInversionDimensionSimilarity extends SlopeDimensionSimilarity 
           for(int l = 0; l < PRECISION; l++) {
             if(as[l] > 0) {
               final double p = as[l] / (double) size;
-              entropyI += p * Math.log(p);
+              entropyI += p * FastMath.log(p);
             }
           }
         }

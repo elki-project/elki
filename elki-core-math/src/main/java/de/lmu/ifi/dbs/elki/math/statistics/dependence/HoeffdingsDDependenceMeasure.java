@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Calculate Hoeffding's D as a measure of dependence.
@@ -173,7 +174,7 @@ public class HoeffdingsDDependenceMeasure extends AbstractDependenceMeasure {
 
     // Exponential approximation
     if(z < 1.1 || z > 8.5) {
-      double e = Math.exp(0.3885037 - 1.164879 * z);
+      double e = FastMath.exp(0.3885037 - 1.164879 * z);
       return (e > 1) ? 1 : (e < 0) ? 0 : e;
     }
     // Tabular approximation

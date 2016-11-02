@@ -74,6 +74,6 @@ public class AbstractDistributionEstimatorTest {
       System.err.println(this.getClass().getSimpleName() + " " + stat + " " + desired+" "+observed+ " -> " + (observed - desired));
       return;
     }
-    assertEquals(stat + " does not match.", desired + expecterr, observed, 1e-15);
+    assertEquals(stat + " does not match.", desired + expecterr, observed, 1e-13);
   }
 }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * Gaussian radial basis function kernel (RBF Kernel).
@@ -64,7 +65,7 @@ public class RadialBasisFunctionKernelFunction extends AbstractVectorSimilarityF
       final double v = o1.doubleValue(i) - o2.doubleValue(i);
       sim += v * v;
     }
-    return Math.exp(gamma * sim);
+    return FastMath.exp(gamma * sim);
   }
 
   /**

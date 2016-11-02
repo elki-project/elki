@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.parallel3d;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.ClassStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
+import net.jafama.FastMath;
 
 /**
  * Renderer for 3D parallel plots.
@@ -486,10 +487,10 @@ public class Parallel3DRenderer<O extends NumberVector> {
     // While the text will be visible from +Z and +Y is baseline.
     gl.glRotatef(90.f, 1.f, 0.f, 0.f);
     // HalfPI: 180 degree extra rotation, for text orientation.
-    double cos = Math.cos(shared.camera.getRotationZ()), sin = Math.sin(shared.camera.getRotationZ());
+    double cos = FastMath.cos(shared.camera.getRotationZ()), sin = FastMath.sin(shared.camera.getRotationZ());
 
     shared.textrenderer.setColor(0.0f, 0.0f, 0.0f, 1.0f);
-    float defaultscale = .01f / (float) Math.sqrt(shared.dim);
+    float defaultscale = .01f / (float) FastMath.sqrt(shared.dim);
     final float targetwidth = .2f; // TODO: div depth?
     final float minratio = 8.f; // Assume all text is at least this width
     for (int i = 0; i < shared.dim; i++) {

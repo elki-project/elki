@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.scales;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,8 @@ package de.lmu.ifi.dbs.elki.math.scales;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /**
  * Class to handle a linear scale for an axis.
  * 
@@ -38,7 +40,6 @@ import java.util.Locale;
  * @since 0.2
  * 
  */
-
 // TODO: iterator over sensible tics (major/minor)
 // TODO: interface for logarithmic scales
 // TODO: magic to choose appropriate linear/log scales based on data
@@ -90,7 +91,7 @@ public class LinearScale {
       this.delta = 1.0;
     }
     log10res = (int) Math.ceil(Math.log10(this.delta) - ZOOMFACTOR);
-    res = Math.pow(10, log10res);
+    res = MathUtil.powi(10, log10res);
 
     // round min and max according to the resolution counters
     this.min = Math.floor(min / res) * res;
@@ -103,8 +104,6 @@ public class LinearScale {
     if(this.delta <= Double.MIN_NORMAL) {
       this.delta = 1.0;
     }
-
-    // LoggingUtil.warning(min+"~"+this.min+" "+max+"~"+this.max+" % "+this.res+" "+this.delta);
   }
 
   /**
@@ -228,7 +227,7 @@ public class LinearScale {
    * @return relative value on the original scale
    */
   public double getRelativeUnscaled(double val, double smin, double smax) {
-    return getRelativeUnscaled(val) * (smax-smin);
+    return getRelativeUnscaled(val) * (smax - smin);
   }
 
   /**

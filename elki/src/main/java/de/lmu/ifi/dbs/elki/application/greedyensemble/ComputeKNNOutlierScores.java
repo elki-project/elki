@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.application.greedyensemble;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -83,6 +83,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
+import net.jafama.FastMath;
 
 /**
  * Application that runs a series of kNN-based algorithms on a data set, for
@@ -477,7 +478,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       return; // Disabled
     }
     LOG.verbose("Running " + prefix);
-    final int digits = (int) Math.ceil(Math.log10(maxk + 1));
+    final int digits = (int) FastMath.ceil(FastMath.log10(maxk + 1));
     final String format = "%s-%0" + digits + "d";
     for(int k = startk; k <= maxk; k += stepk) {
       Duration time = LOG.newDuration(this.getClass().getCanonicalName() + "." + prefix + ".k" + k + ".runtime").begin();

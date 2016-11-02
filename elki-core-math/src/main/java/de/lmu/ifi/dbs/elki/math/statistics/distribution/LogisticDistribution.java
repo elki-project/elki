@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Logistic distribution.
@@ -113,7 +114,7 @@ public class LogisticDistribution extends AbstractDistribution {
    */
   public static double pdf(double val, double loc, double scale) {
     val = Math.abs((val - loc) / scale);
-    double e = Math.exp(-val);
+    double e = FastMath.exp(-val);
     double f = 1.0 + e;
     return e / (scale * f * f);
   }
@@ -133,8 +134,8 @@ public class LogisticDistribution extends AbstractDistribution {
    */
   public static double logpdf(double val, double loc, double scale) {
     val = Math.abs((val - loc) / scale);
-    double f = 1.0 + Math.exp(-val);
-    return -val - Math.log(scale * f * f);
+    double f = 1.0 + FastMath.exp(-val);
+    return -val - FastMath.log(scale * f * f);
   }
 
   @Override
@@ -152,7 +153,7 @@ public class LogisticDistribution extends AbstractDistribution {
    */
   public static double cdf(double val, double loc, double scale) {
     val = (val - loc) / scale;
-    return 1. / (1. + Math.exp(-val));
+    return 1. / (1. + FastMath.exp(-val));
   }
 
   /**
@@ -168,11 +169,11 @@ public class LogisticDistribution extends AbstractDistribution {
   public static double logcdf(double val, double loc, double scale) {
     val = (val - loc) / scale;
     if (val <= 18.) {
-      return -Math.log1p(Math.exp(-val));
+      return -FastMath.log1p(FastMath.exp(-val));
     } else if (val > 33.3) {
       return val;
     } else {
-      return val - Math.exp(val);
+      return val - FastMath.exp(val);
     }
   }
 
@@ -185,7 +186,7 @@ public class LogisticDistribution extends AbstractDistribution {
    * @return Quantile
    */
   public static double quantile(double val, double loc, double scale) {
-    return loc + scale * Math.log(val / (1. - val));
+    return loc + scale * FastMath.log(val / (1. - val));
   }
 
   /**
@@ -210,7 +211,7 @@ public class LogisticDistribution extends AbstractDistribution {
   @Override
   public double nextRandom() {
     double u = random.nextDouble();
-    return location + scale * Math.log(u / (1. - u));
+    return location + scale * FastMath.log(u / (1. - u));
   }
 
   @Override

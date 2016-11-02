@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Tries to fit a sigmoid to the outlier scores and use it to convert the values
@@ -51,9 +52,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.4.0
  */
 @Reference(authors = "J. Gao, P.-N. Tan", //
-title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", //
-booktitle = "Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.", //
-url = "http://dx.doi.org/10.1109/ICDM.2006.43")
+    title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", //
+    booktitle = "Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.", //
+    url = "http://dx.doi.org/10.1109/ICDM.2006.43")
 public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
   /**
    * The logger for this class.
@@ -225,7 +226,7 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
 
     // Reset, or continue with previous values?
     // a = 0.0;
-    // b = Math.log((prior0 + 1.0) / (prior1 + 1.0));
+    // b = FastMath.log((prior0 + 1.0) / (prior1 + 1.0));
     double fval = 0.0;
     iter.seek(0);
     for(int i = 0; i < ids.size(); i++, iter.advance()) {
@@ -233,10 +234,10 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
       final double fApB = val * a + b;
       final double ti = BitsUtil.get(t, i) ? hiTarget : loTarget;
       if(fApB >= 0) {
-        fval += ti * fApB + Math.log(1 + Math.exp(-fApB));
+        fval += ti * fApB + FastMath.log(1 + FastMath.exp(-fApB));
       }
       else {
-        fval += (ti - 1) * fApB + Math.log(1 + Math.exp(fApB));
+        fval += (ti - 1) * fApB + FastMath.log(1 + FastMath.exp(fApB));
       }
     }
     for(int it = 0; it < maxiter; it++) {
@@ -254,12 +255,12 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
         final double p;
         final double q;
         if(fApB >= 0) {
-          p = Math.exp(-fApB) / (1.0 + Math.exp(-fApB));
-          q = 1.0 / (1.0 + Math.exp(-fApB));
+          p = FastMath.exp(-fApB) / (1.0 + FastMath.exp(-fApB));
+          q = 1.0 / (1.0 + FastMath.exp(-fApB));
         }
         else {
-          p = 1.0 / (1.0 + Math.exp(fApB));
-          q = Math.exp(fApB) / (1.0 + Math.exp(fApB));
+          p = 1.0 / (1.0 + FastMath.exp(fApB));
+          q = FastMath.exp(fApB) / (1.0 + FastMath.exp(fApB));
         }
         final double d2 = p * q;
         h11 += val * val * d2;
@@ -289,10 +290,10 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
           final double fApB = val * newA + newB;
           final double ti = BitsUtil.get(t, i) ? hiTarget : loTarget;
           if(fApB >= 0) {
-            newf += ti * fApB + Math.log(1 + Math.exp(-fApB));
+            newf += ti * fApB + FastMath.log(1 + FastMath.exp(-fApB));
           }
           else {
-            newf += (ti - 1) * fApB + Math.log(1 + Math.exp(fApB));
+            newf += (ti - 1) * fApB + FastMath.log(1 + FastMath.exp(fApB));
           }
         }
         if(newf < fval + 0.0001 * stepsize * gd) {
@@ -349,17 +350,17 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
 
     // Reset, or continue with previous values?
     // a = 0.0;
-    // b = Math.log((prior0 + 1.0) / (prior1 + 1.0));
+    // b = FastMath.log((prior0 + 1.0) / (prior1 + 1.0));
     double fval = 0.0;
     for(int i = 0; i < size; i++) {
       final double val = adapter.getDouble(array, i);
       final double fApB = val * a + b;
       final double ti = BitsUtil.get(t, i) ? hiTarget : loTarget;
       if(fApB >= 0) {
-        fval += ti * fApB + Math.log(1 + Math.exp(-fApB));
+        fval += ti * fApB + FastMath.log(1 + FastMath.exp(-fApB));
       }
       else {
-        fval += (ti - 1) * fApB + Math.log(1 + Math.exp(fApB));
+        fval += (ti - 1) * fApB + FastMath.log(1 + FastMath.exp(fApB));
       }
     }
     for(int it = 0; it < maxiter; it++) {
@@ -376,12 +377,12 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
         final double p;
         final double q;
         if(fApB >= 0) {
-          p = Math.exp(-fApB) / (1.0 + Math.exp(-fApB));
-          q = 1.0 / (1.0 + Math.exp(-fApB));
+          p = FastMath.exp(-fApB) / (1.0 + FastMath.exp(-fApB));
+          q = 1.0 / (1.0 + FastMath.exp(-fApB));
         }
         else {
-          p = 1.0 / (1.0 + Math.exp(fApB));
-          q = Math.exp(fApB) / (1.0 + Math.exp(fApB));
+          p = 1.0 / (1.0 + FastMath.exp(fApB));
+          q = FastMath.exp(fApB) / (1.0 + FastMath.exp(fApB));
         }
         final double d2 = p * q;
         h11 += val * val * d2;
@@ -410,10 +411,10 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
           final double fApB = val * newA + newB;
           final double ti = BitsUtil.get(t, i) ? hiTarget : loTarget;
           if(fApB >= 0) {
-            newf += ti * fApB + Math.log(1 + Math.exp(-fApB));
+            newf += ti * fApB + FastMath.log(1 + FastMath.exp(-fApB));
           }
           else {
-            newf += (ti - 1) * fApB + Math.log(1 + Math.exp(fApB));
+            newf += (ti - 1) * fApB + FastMath.log(1 + FastMath.exp(fApB));
           }
         }
         if(newf < fval + 0.0001 * stepsize * gd) {
@@ -450,6 +451,6 @@ public class SigmoidOutlierScalingFunction implements OutlierScalingFunction {
 
   @Override
   public double getScaled(double value) {
-    return 1.0 / (1 + Math.exp(-Afinal * value - Bfinal));
+    return 1.0 / (1 + FastMath.exp(-Afinal * value - Bfinal));
   }
 }

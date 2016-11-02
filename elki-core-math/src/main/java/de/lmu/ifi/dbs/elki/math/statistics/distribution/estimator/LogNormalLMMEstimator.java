@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Estimate the parameters of a log Normal Distribution, using the methods of
@@ -45,7 +46,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has LogNormalDistribution
  */
-@Reference(authors = "J.R.M. Hosking", title = "Fortran routines for use with the method of L-moments Version 3.03", booktitle = "IBM Research Technical Report")
+@Reference(authors = "J.R.M. Hosking", //
+    title = "Fortran routines for use with the method of L-moments Version 3.03", //
+    booktitle = "IBM Research Technical Report")
 public class LogNormalLMMEstimator extends AbstractLMMEstimator<LogNormalDistribution> {
   /**
    * Static instance.
@@ -54,14 +57,14 @@ public class LogNormalLMMEstimator extends AbstractLMMEstimator<LogNormalDistrib
 
   /** Polynomial approximation */
   private static final double //
-      A0 = 0.20466534e+01, //
+  A0 = 0.20466534e+01, //
       A1 = -0.36544371e+01, //
       A2 = 0.18396733e+01, //
       A3 = -0.20360244;
 
   /** Polynomial approximation */
   private static final double //
-      B1 = -0.20182173e+01, //
+  B1 = -0.20182173e+01, //
       B2 = 0.12420401e+01, //
       B3 = -0.21741801;
 
@@ -81,33 +84,35 @@ public class LogNormalLMMEstimator extends AbstractLMMEstimator<LogNormalDistrib
   public LogNormalDistribution estimateFromLMoments(double[] xmom) {
     // Note: the third condition probably is okay for Generalized Normal, but
     // not for lognormal estimation.
-    if (!(xmom[1] > 0.) || !(Math.abs(xmom[2]) < 1.0) || !(xmom[2] > 0.0)) {
+    if(!(xmom[1] > 0.) || !(Math.abs(xmom[2]) < 1.0) || !(xmom[2] > 0.0)) {
       throw new ArithmeticException("L-Moments invalid");
     }
     // Generalized Normal Distribution estimation:
     double t3 = xmom[2];
     final double location, scale, shape;
-    if (Math.abs(t3) >= .95) {
+    if(Math.abs(t3) >= .95) {
       // Extreme skewness
       location = 0.;
       scale = -1;
       shape = 0.;
-    } else if (Math.abs(t3) < 1e-8) {
+    }
+    else if(Math.abs(t3) < 1e-8) {
       // t3 effectively zero.
       location = xmom[0];
       scale = xmom[1] * MathUtil.SQRTPI;
       shape = 0.;
-    } else {
+    }
+    else {
       final double tt = t3 * t3;
       shape = -t3 * (A0 + tt * (A1 + tt * (A2 + tt * A3))) / (1. + tt * (B1 + tt * (B2 + tt * B3)));
-      final double e = Math.exp(.5 * shape * shape);
+      final double e = FastMath.exp(.5 * shape * shape);
       scale = xmom[1] * shape / (e * NormalDistribution.erf(.5 * shape));
       location = xmom[0] + scale * (e - 1.) / shape;
     }
     // Estimate logNormal from generalized normal:
     final double sigma = -shape;
     final double expmu = scale / sigma;
-    return new LogNormalDistribution(Math.log(expmu), Math.max(sigma, Double.MIN_NORMAL), location - expmu);
+    return new LogNormalDistribution(FastMath.log(expmu), Math.max(sigma, Double.MIN_NORMAL), location - expmu);
   }
 
   @Override

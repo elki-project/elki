@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Jeffrey Divergence Distance for {@link NumberVector}s.
@@ -76,10 +77,10 @@ public class JeffreyDivergenceDistanceFunction extends AbstractSpatialDistanceFu
         continue;
       }
       if(xd > 0.) {
-        agg += xd * Math.log(xd / md);
+        agg += xd * FastMath.log(xd / md);
       }
       if(yd > 0.) {
-        agg += yd * Math.log(yd / md);
+        agg += yd * FastMath.log(yd / md);
       }
     }
     return agg;
@@ -97,10 +98,10 @@ public class JeffreyDivergenceDistanceFunction extends AbstractSpatialDistanceFu
         continue;
       }
       if(min1 > 0.) {
-        agg += min1 * Math.log(min1 / md);
+        agg += min1 * FastMath.log(min1 / md);
       }
       if(min2 > 0.) {
-        agg += min2 * Math.log(min2 / md);
+        agg += min2 * FastMath.log(min2 / md);
       }
     }
     return agg;

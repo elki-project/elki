@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Log-Logistic distribution also known as Fisk distribution.
@@ -96,8 +97,8 @@ public class LogLogisticDistribution extends AbstractDistribution {
       return 0;
     }
     val = Math.abs(val / scale);
-    double f = shape / scale * Math.pow(val, shape - 1.);
-    double d = 1. + Math.pow(val, shape);
+    double f = shape / scale * FastMath.pow(val, shape - 1.);
+    double d = 1. + FastMath.pow(val, shape);
     return f / (d * d);
   }
 
@@ -119,7 +120,7 @@ public class LogLogisticDistribution extends AbstractDistribution {
       return Double.NEGATIVE_INFINITY;
     }
     val = Math.abs(val / scale);
-    return Math.log(shape / scale) + (shape - 1.) * Math.log(val) - 2. * Math.log1p(Math.pow(val, shape));
+    return FastMath.log(shape / scale) + (shape - 1.) * FastMath.log(val) - 2. * FastMath.log1p(FastMath.pow(val, shape));
   }
 
   @Override
@@ -139,7 +140,7 @@ public class LogLogisticDistribution extends AbstractDistribution {
     if(val < 0) {
       return 0;
     }
-    return 1. / (1. + Math.pow(val / scale, -shape));
+    return 1. / (1. + FastMath.pow(val / scale, -shape));
   }
 
   @Override
@@ -156,13 +157,13 @@ public class LogLogisticDistribution extends AbstractDistribution {
    * @return Quantile
    */
   public static double quantile(double val, double scale, double shape) {
-    return scale * Math.pow(val / (1. - val), 1. / shape);
+    return scale * FastMath.pow(val / (1. - val), 1. / shape);
   }
 
   @Override
   public double nextRandom() {
     double u = random.nextDouble();
-    return scale * Math.pow(u / (1. - u), 1. / shape);
+    return scale * FastMath.pow(u / (1. - u), 1. / shape);
   }
 
   @Override

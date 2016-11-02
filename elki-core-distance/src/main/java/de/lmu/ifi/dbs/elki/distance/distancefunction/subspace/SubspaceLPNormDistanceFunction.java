@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * LP-Norm distance function between {@link NumberVector}s only in specified
@@ -75,9 +76,9 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
     double sqrDist = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       double delta = Math.abs(v1.doubleValue(d) - v2.doubleValue(d));
-      sqrDist += Math.pow(delta, p);
+      sqrDist += FastMath.pow(delta, p);
     }
-    return Math.pow(sqrDist, 1. / p);
+    return FastMath.pow(sqrDist, 1. / p);
   }
 
   protected double minDistObject(SpatialComparable mbr, NumberVector v) {
@@ -98,9 +99,9 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
           continue;
         }
       }
-      sqrDist += Math.pow(delta, p);
+      sqrDist += FastMath.pow(delta, p);
     }
-    return Math.pow(sqrDist, 1. / p);
+    return FastMath.pow(sqrDist, 1. / p);
   }
 
   @Override
@@ -126,9 +127,9 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
           continue;
         }
       }
-      sqrDist += Math.pow(delta, p);
+      sqrDist += FastMath.pow(delta, p);
     }
-    return Math.pow(sqrDist, 1. / p);
+    return FastMath.pow(sqrDist, 1. / p);
   }
 
   @Override
@@ -136,9 +137,9 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
     double sqrDist = 0;
     for(int d = BitsUtil.nextSetBit(dimensions, 0); d >= 0; d = BitsUtil.nextSetBit(dimensions, d + 1)) {
       double delta = Math.abs(obj.doubleValue(d));
-      sqrDist += Math.pow(delta, p);
+      sqrDist += FastMath.pow(delta, p);
     }
-    return Math.pow(sqrDist, 1. / p);
+    return FastMath.pow(sqrDist, 1. / p);
   }
 
   @Override

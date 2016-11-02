@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Different version of the BIC criterion.
@@ -52,7 +53,7 @@ public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasu
   @Override
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
     return logLikelihoodAlternate(relation, clustering, distanceFunction) //
-        - (.5 * clustering.getAllClusters().size()) * Math.log(numPoints(clustering));
+        - (.5 * clustering.getAllClusters().size()) * FastMath.log(numPoints(clustering));
   }
 
   @Override

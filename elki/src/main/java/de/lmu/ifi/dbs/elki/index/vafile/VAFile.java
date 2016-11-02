@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.vafile;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import net.jafama.FastMath;
 
 /**
  * Vector-approximation file (VAFile)
@@ -83,7 +84,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @param <V> Vector type
  */
 @Title("An approximation based data structure for similarity search")
-@Reference(authors = "Weber, R. and Blott, S.", title = "An approximation based data structure for similarity search", booktitle = "Report TR1997b, ETH Zentrum, Zurich, Switzerland", url = "http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.40.480&rep=rep1&type=pdf")
+@Reference(authors = "Weber, R. and Blott, S.", //
+title = "An approximation based data structure for similarity search", //
+booktitle = "Report TR1997b, ETH Zentrum, Zurich, Switzerland", //
+url = "http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.40.480&rep=rep1&type=pdf")
 public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> implements KNNIndex<V>, RangeIndex<V> {
   /**
    * Logging class.
@@ -146,7 +150,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
    * @throws IllegalArgumentException
    */
   public void setPartitions(Relation<V> relation) throws IllegalArgumentException {
-    if((Math.log(partitions) / Math.log(2)) != (int) (Math.log(partitions) / Math.log(2))) {
+    if((FastMath.log(partitions) / FastMath.log(2)) != (int) (FastMath.log(partitions) / FastMath.log(2))) {
       throw new IllegalArgumentException("Number of partitions must be a power of 2!");
     }
 

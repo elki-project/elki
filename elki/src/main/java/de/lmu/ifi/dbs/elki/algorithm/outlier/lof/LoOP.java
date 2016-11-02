@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -66,6 +66,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import net.jafama.FastMath;
 
 /**
  * LoOP: Local Outlier Probabilities
@@ -255,7 +256,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
         ssum += d * d;
         ks++;
       }
-      double pdist = ks > 0 ? Math.sqrt(ssum / ks) : 0.;
+      double pdist = ks > 0 ? FastMath.sqrt(ssum / ks) : 0.;
       pdists.putDouble(iditer, pdist);
       LOG.incrementProcessed(prdsProgress);
     }
@@ -297,7 +298,7 @@ public class LoOP<O> extends AbstractAlgorithm<OutlierResult> implements Outlier
     }
     LOG.ensureCompleted(progressPLOFs);
 
-    nplof = lambda * Math.sqrt(nplof / relation.size());
+    nplof = lambda * FastMath.sqrt(nplof / relation.size());
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("nplof normalization factor is " + nplof);
     }

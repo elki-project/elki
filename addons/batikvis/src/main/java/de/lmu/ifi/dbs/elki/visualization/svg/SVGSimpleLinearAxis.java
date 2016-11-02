@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.svg;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClassManager.CSSNamingConflict;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
+import net.jafama.FastMath;
 
 /**
  * Class to draw a simple axis with tick marks on the plot.
@@ -154,7 +155,7 @@ public class SVGSimpleLinearAxis {
     }
     Alignment pos = Alignment.LL;
     if(labels) {
-      double angle = Math.atan2(ty, tx);
+      double angle = FastMath.atan2(ty, tx);
       // System.err.println(tx + " " + (-ty) + " " + angle);
       if(angle > 2.6) { // pi .. 2.6 = 180 .. 150
         pos = labelstyle == LabelStyle.RIGHTHAND ? Alignment.RC : Alignment.LC;
@@ -181,7 +182,7 @@ public class SVGSimpleLinearAxis {
       int sw = 1;
       { // Compute how many ticks to draw
         int numticks = (int) ((scale.getMax() - scale.getMin()) / scale.getRes());
-        double tlen = Math.sqrt(tx * tx + ty * ty);
+        double tlen = FastMath.sqrt(tx * tx + ty * ty);
         double minl = 10 * style.getLineWidth(StyleLibrary.AXIS_TICK);
         // Try proper divisors first.
         if(sw * tlen / numticks < minl) {
@@ -196,7 +197,7 @@ public class SVGSimpleLinearAxis {
         }
         // Otherwise, also allow non-divisors.
         if(sw * tlen / numticks < minl) {
-          sw = (int)Math.floor(minl * numticks / tlen);
+          sw = (int) Math.floor(minl * numticks / tlen);
         }
       }
       for(double tick = scale.getMin(); tick <= scale.getMax() + scale.getRes() / 10; tick += sw * scale.getRes()) {

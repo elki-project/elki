@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,9 +29,10 @@ import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
- * Scaling function to invert values by computing -1 * Math.log(x)
+ * Scaling function to invert values by computing -1 * FastMath.log(x)
  * 
  * Useful for example for scaling
  * {@link de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased.ABOD}, but see
@@ -49,9 +50,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.3
  */
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
-title = "Interpreting and Unifying Outlier Scores", //
-booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
-url = "http://dx.doi.org/10.1137/1.9781611972818.2")
+    title = "Interpreting and Unifying Outlier Scores", //
+    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
+    url = "http://dx.doi.org/10.1137/1.9781611972818.2")
 public class OutlierMinusLogScaling implements OutlierScalingFunction {
   /**
    * Maximum value seen, set by {@link #prepare}
@@ -73,7 +74,7 @@ public class OutlierMinusLogScaling implements OutlierScalingFunction {
   @Override
   public double getScaled(double value) {
     assert (max != 0) : "prepare() was not run prior to using the scaling function.";
-    return -Math.log(value / max) / mlogmax;
+    return -FastMath.log(value / max) / mlogmax;
   }
 
   @Override
@@ -90,27 +91,27 @@ public class OutlierMinusLogScaling implements OutlierScalingFunction {
   public void prepare(OutlierResult or) {
     DoubleMinMax mm = new DoubleMinMax();
     DoubleRelation scores = or.getScores();
-    for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+    for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
       double val = scores.doubleValue(id);
-      if (!Double.isNaN(val) && !Double.isInfinite(val)) {
+      if(!Double.isNaN(val) && !Double.isInfinite(val)) {
         mm.put(val);
       }
     }
     max = mm.getMax();
-    mlogmax = -Math.log(mm.getMin() / max);
+    mlogmax = -FastMath.log(mm.getMin() / max);
   }
 
   @Override
   public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
     DoubleMinMax mm = new DoubleMinMax();
     final int size = adapter.size(array);
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       double val = adapter.getDouble(array, i);
-      if (!Double.isNaN(val) && !Double.isInfinite(val)) {
+      if(!Double.isNaN(val) && !Double.isInfinite(val)) {
         mm.put(val);
       }
     }
     max = mm.getMax();
-    mlogmax = -Math.log(mm.getMin() / max);
+    mlogmax = -FastMath.log(mm.getMin() / max);
   }
 }

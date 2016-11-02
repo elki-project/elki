@@ -330,7 +330,7 @@ public class EarthModelsTest {
     testEarthModel(SphericalHaversineEarthModel.STATIC, SDM_WGS84, .00405, 1e-12);
     // WGS84 Vincenty to WGS84 Vincenty: with "geosphere" we have a high
     // agreement.
-    testEarthModel(SphericalHaversineEarthModel.STATIC, GEOSPHERE_HAVERSINE, 6.662e-16, 1e-12);
+    testEarthModel(SphericalHaversineEarthModel.STATIC, GEOSPHERE_HAVERSINE, 6.662e-14, 1e-12);
   }
 
   @Test
@@ -351,7 +351,7 @@ public class EarthModelsTest {
     testEarthModel(SphericalVincentyEarthModel.STATIC, SDM_WGS84, .00405, 1e-12);
     // Spherical Vincenty to Spherical Vincenty: with "geosphere" we have a high
     // agreement.
-    testEarthModel(SphericalVincentyEarthModel.STATIC, GEOSPHERE_VINCENTY_SPHERE, 4.441e-16, 1e-12);
+    testEarthModel(SphericalVincentyEarthModel.STATIC, GEOSPHERE_VINCENTY_SPHERE, 4.441e-15, 1e-12);
   }
 
   protected void testEarthModel(EarthModel model, final double[][] ref, final double relerror, final double abserror) {

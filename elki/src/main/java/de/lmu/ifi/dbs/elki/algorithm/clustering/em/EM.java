@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Clustering by expectation maximization (EM-Algorithm), also known as Gaussian
@@ -292,7 +293,7 @@ public class EM<V extends NumberVector, M extends MeanModel> extends AbstractAlg
       for(int i = 0; i < k; i++) {
         priorProbability += probabilities[i];
       }
-      double logP = Math.max(Math.log(priorProbability), MIN_LOGLIKELIHOOD);
+      double logP = Math.max(FastMath.log(priorProbability), MIN_LOGLIKELIHOOD);
       emSum += (logP == logP) ? logP : 0.; /* avoid NaN */
 
       double[] clusterProbabilities = new double[k];

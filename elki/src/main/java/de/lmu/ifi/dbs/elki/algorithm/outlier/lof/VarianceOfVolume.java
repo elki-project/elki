@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import net.jafama.FastMath;
 
 /**
  * Variance of Volume for outlier detection.
@@ -155,7 +156,7 @@ public class VarianceOfVolume<O extends SpatialComparable> extends AbstractDista
    */
   private void computeVolumes(KNNQuery<O> knnq, int dim, DBIDs ids, WritableDoubleDataStore vols) {
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Volume", ids.size(), LOG) : null;
-    double scaleconst = MathUtil.SQRTPI * Math.pow(GammaDistribution.gamma(1 + dim * .5), -1. / dim);
+    double scaleconst = MathUtil.SQRTPI * FastMath.pow(GammaDistribution.gamma(1 + dim * .5), -1. / dim);
     boolean warned = false;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double dk = knnq.getKNNForDBID(iter, k).getKNNDistance();

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * Normalize the data set by applying log(1+|x|*b)/log(b+1) to any value. If the
@@ -63,7 +64,7 @@ public class Log1PlusNormalization<V extends NumberVector> extends AbstractStrea
   public Log1PlusNormalization(double boost) {
     super();
     this.boost = boost;
-    this.scale = 1. / Math.log1p(boost);
+    this.scale = 1. / FastMath.log1p(boost);
   }
 
   @Override
@@ -71,7 +72,7 @@ public class Log1PlusNormalization<V extends NumberVector> extends AbstractStrea
     double[] data = new double[featureVector.getDimensionality()];
     for(int d = 0; d < data.length; ++d) {
       data[d] = featureVector.doubleValue(d);
-      data[d] = Math.log1p((data[d] > 0 ? data[d] : -data[d]) * boost) * scale;
+      data[d] = FastMath.log1p((data[d] > 0 ? data[d] : -data[d]) * boost) * scale;
     }
     return factory.newNumberVector(data);
   }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Linear Kernel function that computes a similarity between the two feature
@@ -63,7 +64,7 @@ public class LinearKernelFunction extends PolynomialKernelFunction {
 
   @Override
   public double distance(final NumberVector fv1, final NumberVector fv2) {
-    return Math.sqrt(similarity(fv1, fv1) + similarity(fv2, fv2) - 2 * similarity(fv1, fv2));
+    return FastMath.sqrt(similarity(fv1, fv1) + similarity(fv2, fv2) - 2 * similarity(fv1, fv2));
   }
 
   /**

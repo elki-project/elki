@@ -28,6 +28,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Rayleigh distribution.
@@ -118,7 +119,7 @@ public class RayleighDistribution extends AbstractDistribution {
       return 0.;
     }
     final double xs = x / sigma;
-    return xs / sigma * Math.exp(-.5 * xs * xs);
+    return xs / sigma * FastMath.exp(-.5 * xs * xs);
   }
 
   @Override
@@ -138,7 +139,7 @@ public class RayleighDistribution extends AbstractDistribution {
       return Double.NEGATIVE_INFINITY;
     }
     final double xs = x / sigma;
-    return Math.log(xs / sigma) - .5 * xs * xs;
+    return FastMath.log(xs / sigma) - .5 * xs * xs;
   }
 
   @Override
@@ -158,7 +159,7 @@ public class RayleighDistribution extends AbstractDistribution {
       return 0.;
     }
     final double xs = x / sigma;
-    return 1. - Math.exp(-.5 * xs * xs);
+    return 1. - FastMath.exp(-.5 * xs * xs);
   }
 
   @Override
@@ -184,13 +185,13 @@ public class RayleighDistribution extends AbstractDistribution {
       return Double.POSITIVE_INFINITY;
     }
     else {
-      return sigma * Math.sqrt(-2. * Math.log(val));
+      return sigma * FastMath.sqrt(-2. * FastMath.log(val));
     }
   }
 
   @Override
   public double nextRandom() {
-    return mu + sigma * Math.sqrt(-2. * Math.log(random.nextDouble()));
+    return mu + sigma * FastMath.sqrt(-2. * FastMath.log(random.nextDouble()));
   }
 
   @Override

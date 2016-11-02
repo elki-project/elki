@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import net.jafama.FastMath;
 
 /**
  * Angle-Based Outlier Detection / Angle-Based Outlier Factor.
@@ -89,9 +90,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 @Title("LB-ABOD: Lower Bounded Angle-Based Outlier Detection")
 @Description("Outlier detection using variance analysis on angles, especially for high dimensional data sets.")
 @Reference(authors = "H.-P. Kriegel, M. Schubert, A. Zimek", //
-title = "Angle-Based Outlier Detection in High-dimensional Data", //
-booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", //
-url = "http://dx.doi.org/10.1145/1401890.1401946")
+    title = "Angle-Based Outlier Detection in High-dimensional Data", //
+    booktitle = "Proc. 14th ACM SIGKDD Int. Conf. on Knowledge Discovery and Data Mining (KDD '08), Las Vegas, NV, 2008", //
+    url = "http://dx.doi.org/10.1145/1401890.1401946")
 @Alias({ "de.lmu.ifi.dbs.elki.algorithm.outlier.LBABOD", "lb-abod" })
 public class LBABOD<V extends NumberVector> extends FastABOD<V> {
   /**
@@ -157,7 +158,7 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
         double sqdAB = simAA + simBB - simAB - simAB;
         sqDists.putDouble(pB, sqdAB);
         final double isqdAB = 1. / sqdAB;
-        sumid += Math.sqrt(isqdAB);
+        sumid += FastMath.sqrt(isqdAB);
         sumisqd += isqdAB;
         // Update heap
         nn.insert(sqdAB, pB);
@@ -188,7 +189,7 @@ public class LBABOD<V extends NumberVector> extends FastABOD<V> {
           double simBC = kernelMatrix.getSimilarity(iB, iC);
           double numerator = simBC - simAB - simAC + simAA;
           double sqweight = 1. / (sqdAB * sqdAC);
-          double weight = Math.sqrt(sqweight);
+          double weight = FastMath.sqrt(sqweight);
           double val = numerator * sqweight;
           nnsum += val * weight;
           nnsumsq += val * val * weight;

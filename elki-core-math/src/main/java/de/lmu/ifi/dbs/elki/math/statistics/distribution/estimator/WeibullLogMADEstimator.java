@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.WeibullDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Parameter estimation via median and median absolute deviation from median
@@ -43,7 +44,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has WeibullDistribution - - estimates
  */
-@Reference(title = "Applied Robust Statistics", authors = "D. J. Olive", booktitle = "Applied Robust Statistics", url="http://lagrange.math.siu.edu/Olive/preprints.htm")
+@Reference(title = "Applied Robust Statistics", //
+authors = "D. J. Olive", //
+booktitle = "Applied Robust Statistics", //
+url="http://lagrange.math.siu.edu/Olive/preprints.htm")
 public class WeibullLogMADEstimator extends AbstractLogMADEstimator<WeibullDistribution> {
   /**
    * The more robust median based estimator.
@@ -60,7 +64,7 @@ public class WeibullLogMADEstimator extends AbstractLogMADEstimator<WeibullDistr
   @Override
   public WeibullDistribution estimateFromLogMedianMAD(double median, double mad, double shift) {
     double k = 1. / (1.30370 * mad);
-    double lambda = Math.exp(median - MathUtil.LOGLOG2 / k);
+    double lambda = FastMath.exp(median - MathUtil.LOGLOG2 / k);
 
     return new WeibullDistribution(k, lambda);
   }

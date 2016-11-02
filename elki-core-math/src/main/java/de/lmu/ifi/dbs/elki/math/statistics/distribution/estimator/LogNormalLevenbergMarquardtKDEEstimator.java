@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.LogNormalDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Distribution parameter estimation using Levenberg-Marquardt iterative
@@ -73,7 +74,7 @@ public class LogNormalLevenbergMarquardtKDEEstimator implements DistributionEsti
       if (!(val > 0)) {
         throw new ArithmeticException("Cannot fit logNormal to a data set which includes non-positive values: " + val);
       }
-      x[i] = Math.log(val);
+      x[i] = FastMath.log(val);
       mv.put(x[i]);
     }
     // Sort our copy.

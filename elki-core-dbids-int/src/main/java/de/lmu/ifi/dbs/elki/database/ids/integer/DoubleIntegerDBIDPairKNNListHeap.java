@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
 import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import net.jafama.FastMath;
 
 /**
  * KNN Heap implemented using a list of DoubleInt pair objects.
@@ -171,7 +172,7 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
   @Override
   public KNNList toKNNListSqrt() {
     for(int i = 0; i < size; i++) {
-      data[i].value = Math.sqrt(data[i].value);
+      data[i].value = FastMath.sqrt(data[i].value);
     }
     return null;
   }

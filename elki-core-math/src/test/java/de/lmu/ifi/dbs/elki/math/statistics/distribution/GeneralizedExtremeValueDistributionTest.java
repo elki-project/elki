@@ -162,8 +162,8 @@ public class GeneralizedExtremeValueDistributionTest extends AbstractDistributio
     checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, 4.), "quant_scipy_4_05_05", 1e-13);
     checkQuantile(new GeneralizedExtremeValueDistribution(.5, 1., -1.), "quant_scipy_M1_05_1", 1e-15);
     checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -1.), "quant_scipy_M1_05_05", 1e-15);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "quant_scipy_M2_05_05", 1e-14);
-    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "quant_scipy_M4_05_05", 1e-14);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -2.), "quant_scipy_M2_05_05", 1e-15);
+    checkQuantile(new GeneralizedExtremeValueDistribution(.5, .5, -4.), "quant_scipy_M4_05_05", 1e-15);
 
     checkQuantile(new GeneralizedExtremeValueDistribution(.2, 1., .8), "quant_gnur_08_02_1", 1e-13);
     checkQuantile(new GeneralizedExtremeValueDistribution(.5, 1., 1.), "quant_gnur_1_05_1", 1e-13);

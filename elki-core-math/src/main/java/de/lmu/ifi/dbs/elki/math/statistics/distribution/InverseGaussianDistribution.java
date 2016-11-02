@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Inverse Gaussian distribution aka Wald distribution.
@@ -140,7 +141,7 @@ public class InverseGaussianDistribution extends AbstractDistribution {
   public double nextRandom() {
     double v = random.nextGaussian();
     v *= v;
-    double x = mean + mean * .5 / shape * (mean * v - Math.sqrt(4. * mean * shape * v + mean * mean * v * v));
+    double x = mean + mean * .5 / shape * (mean * v - FastMath.sqrt(4. * mean * shape * v + mean * mean * v * v));
     double u = random.nextDouble();
     if(u * (mean + x) <= mean) {
       return x;
@@ -168,8 +169,8 @@ public class InverseGaussianDistribution extends AbstractDistribution {
       return 0;
     }
     final double v = (x - mu) / mu;
-    double t1 = Math.sqrt(shape / (MathUtil.TWOPI * x * x * x));
-    return t1 > 0 ? t1 * Math.exp(-shape * v * v * .5 / x) : 0;
+    double t1 = FastMath.sqrt(shape / (MathUtil.TWOPI * x * x * x));
+    return t1 > 0 ? t1 * FastMath.exp(-shape * v * v * .5 / x) : 0;
   }
 
   /**
@@ -185,7 +186,7 @@ public class InverseGaussianDistribution extends AbstractDistribution {
       return Double.NEGATIVE_INFINITY;
     }
     final double v = (x - mu) / mu;
-    return v < Double.MAX_VALUE ? 0.5 * Math.log(shape / (MathUtil.TWOPI * x * x * x)) - shape * v * v / (2. * x) : Double.NEGATIVE_INFINITY;
+    return v < Double.MAX_VALUE ? 0.5 * FastMath.log(shape / (MathUtil.TWOPI * x * x * x)) - shape * v * v / (2. * x) : Double.NEGATIVE_INFINITY;
   }
 
   /**
@@ -202,13 +203,13 @@ public class InverseGaussianDistribution extends AbstractDistribution {
     }
     // TODO: accelerate by caching exp(2 * shape / mu).
     final double v0 = x / mu;
-    final double v1 = Math.sqrt(shape / x);
+    final double v1 = FastMath.sqrt(shape / x);
     if(v1 == 0.) {
       return v0 > 0. ? 1 : 0.;
     }
     double c1 = NormalDistribution.standardNormalCDF(v1 * (v0 - 1.));
     double c2 = NormalDistribution.standardNormalCDF(-v1 * (v0 + 1.));
-    return (c2 > 0.) ? c1 + Math.exp(2 * shape / mu) * c2 : c1;
+    return (c2 > 0.) ? c1 + FastMath.exp(2 * shape / mu) * c2 : c1;
   }
 
   /**

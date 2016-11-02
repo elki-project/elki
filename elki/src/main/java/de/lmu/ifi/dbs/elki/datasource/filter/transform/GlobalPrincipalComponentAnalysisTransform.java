@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Apply principal component analysis to the data set.
@@ -134,7 +135,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
       for(int d = 0; d < dim; d++) {
         EigenPair ep = eps.getEigenPair(d);
         double[] ev = ep.getEigenvector();
-        double mult = 1. / Math.sqrt(ep.getEigenvalue());
+        double mult = 1. / FastMath.sqrt(ep.getEigenvalue());
         // Fill weighted and transposed:
         for(int i = 0; i < dim; i++) {
           proj[d][i] = ev[i] * mult;
@@ -150,7 +151,7 @@ public class GlobalPrincipalComponentAnalysisTransform<O extends NumberVector> e
       for(int d = 0; d < pdim; d++) {
         EigenPair ep = eps.getEigenPair(d);
         double[] ev = ep.getEigenvector();
-        double mult = 1. / Math.sqrt(ep.getEigenvalue());
+        double mult = 1. / FastMath.sqrt(ep.getEigenvalue());
         // Fill weighted and transposed:
         for(int i = 0; i < dim; i++) {
           proj[d][i] = ev[i] * mult;

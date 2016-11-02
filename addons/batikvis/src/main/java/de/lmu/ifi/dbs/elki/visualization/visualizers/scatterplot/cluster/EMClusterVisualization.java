@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -70,6 +70,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
+import net.jafama.FastMath;
 
 /**
  * Visualizer for generating SVG-Elements containing ellipses for first, second
@@ -221,7 +222,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
         double[][] pc = new double[eps.size()][];
         for(int i = 0; i < eps.size(); i++) {
           EigenPair ep = eps.getEigenPair(i);
-          double[] sev = times(ep.getEigenvector(), Math.sqrt(ep.getEigenvalue()));
+          double[] sev = times(ep.getEigenvector(), FastMath.sqrt(ep.getEigenvalue()));
           pc[i] = proj.fastProjectRelativeDataToRenderSpace(sev);
         }
         if(drawStyle != 0 || eps.size() == 2) {
@@ -338,7 +339,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
         }
         plusEquals(diag, pc[j]);
       }
-      timesEquals(diag, 1.0 / Math.sqrt(pc.length));
+      timesEquals(diag, 1.0 / FastMath.sqrt(pc.length));
       hull.add(diag);
       hull.add(times(diag, -1));
 
@@ -368,10 +369,10 @@ public class EMClusterVisualization extends AbstractVisFactory {
           hull.add(times(pmq, -1));
           for(int l = k + 1; l < pc.length; l++) {
             double[] r = pc[k];
-            double[] ppqpr = timesEquals(plus(ppq, r), Math.sqrt(1 / 3.));
-            double[] pmqpr = timesEquals(plus(pmq, r), Math.sqrt(1 / 3.));
-            double[] ppqmr = timesEquals(minus(ppq, r), Math.sqrt(1 / 3.));
-            double[] pmqmr = timesEquals(minus(pmq, r), Math.sqrt(1 / 3.));
+            double[] ppqpr = timesEquals(plus(ppq, r), FastMath.sqrt(1 / 3.));
+            double[] pmqpr = timesEquals(plus(pmq, r), FastMath.sqrt(1 / 3.));
+            double[] ppqmr = timesEquals(minus(ppq, r), FastMath.sqrt(1 / 3.));
+            double[] pmqmr = timesEquals(minus(pmq, r), FastMath.sqrt(1 / 3.));
             hull.add(ppqpr);
             hull.add(times(ppqpr, -1));
             hull.add(pmqpr);
@@ -384,7 +385,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
         }
         plusEquals(diag, pc[j]);
       }
-      timesEquals(diag, 1.0 / Math.sqrt(pc.length));
+      timesEquals(diag, 1.0 / FastMath.sqrt(pc.length));
       hull.add(diag);
       hull.add(times(diag, -1));
       return hull.getHull();

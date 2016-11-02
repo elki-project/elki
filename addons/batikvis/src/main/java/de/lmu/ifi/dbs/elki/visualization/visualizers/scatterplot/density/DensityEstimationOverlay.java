@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.density;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
+import net.jafama.FastMath;
 
 /**
  * A simple density estimation visualization, based on a simple kernel-density
@@ -163,8 +164,8 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
       // Set bandwidths according to Scott's rule:
       // Note: in projected space, d=2.
       double[] bandwidth = new double[2];
-      bandwidth[0] = MathUtil.SQRT5 * mv0.getSampleStddev() * Math.pow(rel.size(), -1 / 6.);
-      bandwidth[1] = MathUtil.SQRT5 * mv1.getSampleStddev() * Math.pow(rel.size(), -1 / 6.);
+      bandwidth[0] = MathUtil.SQRT5 * mv0.getSampleStddev() * FastMath.pow(rel.size(), -1 / 6.);
+      bandwidth[1] = MathUtil.SQRT5 * mv1.getSampleStddev() * FastMath.pow(rel.size(), -1 / 6.);
       return bandwidth;
     }
 

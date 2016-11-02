@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import net.jafama.FastMath;
 
 /**
  * Outlier have smallest GMOD_PROB: the outlier scores is the <em>probability
@@ -112,14 +113,14 @@ public class GaussianModel<V extends NumberVector> extends AbstractAlgorithm<Out
 
     // Normalization factors for Gaussian PDF
     double det = new LUDecomposition(covarianceMatrix).det();
-    final double fakt = (1.0 / (Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * det)));
+    final double fakt = 1.0 / FastMath.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * det);
 
     // for each object compute Mahalanobis distance
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       double[] x = minusEquals(relation.get(iditer).toArray(), mean);
       // Gaussian PDF
       final double mDist = transposeTimesTimes(x, covarianceTransposed, x);
-      final double prob = fakt * Math.exp(-mDist * .5);
+      final double prob = fakt * FastMath.exp(-mDist * .5);
 
       mm.put(prob);
       oscores.putDouble(iditer, prob);

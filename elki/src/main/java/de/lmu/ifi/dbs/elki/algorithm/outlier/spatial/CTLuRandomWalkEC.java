@@ -59,6 +59,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import net.jafama.FastMath;
 
 /**
  * Spatial outlier detection based on random walks.
@@ -81,7 +82,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("Random Walk on Exhaustive Combination")
 @Description("Spatial Outlier Detection using Random Walk on Exhaustive Combination")
-@Reference(authors = "X. Liu and C.-T. Lu and F. Chen", title = "Spatial outlier detection: random walk based approaches", booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems, 2010", url = "http://dx.doi.org/10.1145/1869790.1869841")
+@Reference(authors = "X. Liu and C.-T. Lu and F. Chen", //
+title = "Spatial outlier detection: random walk based approaches", //
+booktitle = "Proc. 18th SIGSPATIAL International Conference on Advances in Geographic Information Systems", //
+url = "http://dx.doi.org/10.1145/1869790.1869841")
 public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, OutlierResult> implements OutlierAlgorithm {
   /**
    * Logger.
@@ -155,7 +159,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
           }
           else {
             double diff = Math.abs(val - relation.get(n).doubleValue(0));
-            double exp = Math.exp(Math.pow(diff, alpha));
+            double exp = FastMath.exp(FastMath.pow(diff, alpha));
             // Implementation note: not inverting exp worked a lot better.
             // Therefore we diverge from the article here.
             e = exp / distance;
@@ -218,7 +222,7 @@ public class CTLuRandomWalkEC<P> extends AbstractDistanceBasedAlgorithm<P, Outli
         gmean *= sim;
         cnt++;
       }
-      final double score = Math.pow(gmean, 1.0 / cnt);
+      final double score = FastMath.pow(gmean, 1.0 / cnt);
       minmax.put(score);
       scores.putDouble(id, score);
     }

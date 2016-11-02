@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import net.jafama.FastMath;
 
 /**
  * Dendrogram visualizer.
@@ -222,7 +223,7 @@ public class DendrogramVisualization extends AbstractVisFactory {
       DBIDVar pa = DBIDUtil.newVar();
 
       final int size = ids.size();
-      double linew = StyleLibrary.SCALE * .1 / Math.log1p(size);
+      double linew = StyleLibrary.SCALE * .1 / FastMath.log1p(size);
       double width = StyleLibrary.SCALE,
           height = width / getWidth() * getHeight();
       double xscale = width / size, xoff = xscale * .5;

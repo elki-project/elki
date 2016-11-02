@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
 import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import net.jafama.FastMath;
 
 /**
  * Abstract base class for estimators based on the statistical moments.
@@ -56,7 +57,7 @@ public abstract class AbstractLogMOMEstimator<D extends Distribution> implements
       if (Double.isInfinite(val) || Double.isNaN(val) || val <= 0.) {
         continue;
       }
-      mv.put(Math.log(val));
+      mv.put(FastMath.log(val));
     }
     return estimateFromLogStatisticalMoments(mv, min);
   }

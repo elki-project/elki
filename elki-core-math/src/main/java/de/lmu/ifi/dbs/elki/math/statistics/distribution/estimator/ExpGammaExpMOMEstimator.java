@@ -25,6 +25,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.ExpGammaDistribution;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Simple parameter estimation for the ExpGamma distribution.
@@ -57,7 +58,7 @@ public class ExpGammaExpMOMEstimator implements DistributionEstimator<ExpGammaDi
     final int len = adapter.size(data);
     MeanVariance mv = new MeanVariance();
     for(int i = 0; i < len; i++) {
-      mv.put(Math.exp(adapter.getDouble(data, i)));
+      mv.put(FastMath.exp(adapter.getDouble(data, i)));
     }
     return estimateFromExpMeanVariance(mv);
   }

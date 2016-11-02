@@ -79,6 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * A meta estimator that will try a number of (inexpensive) estimations, then
@@ -217,7 +218,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     double shift = Math.min(0., min - (max - min) * 1e-10);
     for(int i = 0; i < len; i++) {
       double val = x[i] - shift;
-      val = val > 0. ? Math.log(val) : Double.NEGATIVE_INFINITY;
+      val = val > 0. ? FastMath.log(val) : Double.NEGATIVE_INFINITY;
       logx[i] = val;
       if(!Double.isInfinite(val) && !Double.isNaN(val)) {
         logmom.put(val);

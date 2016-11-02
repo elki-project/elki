@@ -1,14 +1,10 @@
 package de.lmu.ifi.dbs.elki.math.statistics;
 
-import java.util.Arrays;
-
-import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +22,11 @@ import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.Arrays;
+
+import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.KernelDensityFunction;
+import net.jafama.FastMath;
 
 /**
  * Estimate density given an array of points.
@@ -127,7 +128,7 @@ public class KernelDensityEstimator {
     final double min = data[0];
     final double max = data[data.length - 1];
     // Heuristic for choosing the window size.
-    int windows = 1 + (int) (Math.log(data.length));
+    int windows = 1 + (int) (FastMath.log(data.length));
 
     process(data, min, max, kernel, windows, epsilon);
   }

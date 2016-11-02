@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Class for testing the estimation quality of intrinsic dimensionality
@@ -131,7 +132,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     estimators.add(PWM2Estimator.STATIC);
 
     PrintStream out = System.out; // TODO: add output file parameter?
-    final int digits = (int) Math.ceil(Math.log10(maxk + 1));
+    final int digits = (int) FastMath.ceil(FastMath.log10(maxk + 1));
     switch(format){
     case TABULAR:
       out.append(String.format("%" + digits + "s", "k"));
@@ -197,7 +198,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
     double[] dists = new double[maxk + 1];
     final double e = 1. / dim;
     for(int i = 0; i <= maxk; i++) {
-      dists[i] = Math.pow(rnd.nextDouble(), e);
+      dists[i] = FastMath.pow(rnd.nextDouble(), e);
     }
     Arrays.sort(dists);
     return dists;
@@ -257,7 +258,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
           sqsum += v * v;
         }
         sqsum /= data.length;
-        return new double[] { avg, Math.sqrt(sqsum) };
+        return new double[] { avg, FastMath.sqrt(sqsum) };
       }
 
       @Override
@@ -285,7 +286,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
           sqsum += v * v;
         }
         sqsum /= data.length;
-        return new double[] { avg, Math.sqrt(sqsum), min, max };
+        return new double[] { avg, FastMath.sqrt(sqsum), min, max };
       }
 
       @Override
@@ -382,7 +383,7 @@ public class EvaluateIntrinsicDimensionalityEstimators extends AbstractApplicati
         double[] ret = new double[quants.length];
         for(int i = 0; i < quants.length; i++) {
           final double dleft = (l - 1) * quants[i];
-          final int ileft = (int) Math.floor(dleft);
+          final int ileft = (int) FastMath.floor(dleft);
           final double err = dleft - ileft;
           if(err < Double.MIN_NORMAL) {
             ret[i] = data[ileft];

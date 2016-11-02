@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,6 +27,8 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+
+import net.jafama.FastMath;
 
 /**
  * Provides an approximation for knn-distances line consisting of incline m,
@@ -112,7 +114,7 @@ public class ApproximationLine implements Externalizable {
     if (k < k_0) {
       return Double.POSITIVE_INFINITY;
     }
-    return m * StrictMath.log(k) + t;
+    return m * FastMath.log(k) + t;
   }
 
   /**
@@ -125,7 +127,7 @@ public class ApproximationLine implements Externalizable {
     if (k < k_0) {
       return 0.;
     }
-    return Math.exp(getValueAt(k));
+    return FastMath.exp(getValueAt(k));
   }
 
   /**

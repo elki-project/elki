@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.invertedlist;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.index.RangeIndex;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Simple index using inverted lists.
@@ -153,7 +154,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
       len += val * val;
       getOrCreateColumn(dim).add(val, ref);
     }
-    length.put(ref, Math.sqrt(len));
+    length.put(ref, FastMath.sqrt(len));
   }
 
   /**
@@ -196,7 +197,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
         cands.add(n);
       }
     }
-    return Math.sqrt(len);
+    return FastMath.sqrt(len);
   }
 
   /**
@@ -225,7 +226,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
         cands.add(n);
       }
     }
-    return Math.sqrt(len);
+    return FastMath.sqrt(len);
   }
 
   /**
@@ -419,7 +420,7 @@ public class InMemoryInvertedIndex<V extends NumberVector> extends AbstractIndex
           DataStoreFactory.HINT_TEMP | DataStoreFactory.HINT_HOT, 0.);
       double len = naiveQuery(obj, scores, cands);
       // dist = acos(sim/len) <-> sim = cos(dist)*len
-      double simrange = Math.cos(range) * len;
+      double simrange = FastMath.cos(range) * len;
       for(DBIDIter n = cands.iter(); n.valid(); n.advance()) {
         double sim = scores.doubleValue(n) / length.doubleValue(n);
         if(sim >= simrange) {

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Simple circular layout based on the minimum spanning tree.
@@ -112,8 +113,8 @@ public class SimpleCircularMSTLayout3DPC extends AbstractLayout3DPC<SimpleCircul
    */
   public static void computePositions(Node node, int depth, double aoff, double awid, int maxdepth) {
     double r = depth / (maxdepth - 1.);
-    node.x = Math.sin(aoff + awid * .5) * r;
-    node.y = Math.cos(aoff + awid * .5) * r;
+    node.x = FastMath.sin(aoff + awid * .5) * r;
+    node.y = FastMath.cos(aoff + awid * .5) * r;
 
     double cpos = aoff;
     double cwid = awid / node.weight;

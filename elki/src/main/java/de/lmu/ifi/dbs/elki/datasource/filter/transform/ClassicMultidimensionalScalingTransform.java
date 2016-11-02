@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Rescale the data set using multidimensional scaling, MDS.
@@ -126,7 +127,7 @@ public class ClassicMultidimensionalScalingTransform<I, O extends NumberVector> 
         double[][] u = svd.getU();
         double[] lambda = svd.getSingularValues();
         for(int i = 0; i < tdim; i++) {
-          lambda[i] = Math.sqrt(Math.abs(lambda[i]));
+          lambda[i] = FastMath.sqrt(Math.abs(lambda[i]));
         }
 
         double[] buf = new double[tdim];

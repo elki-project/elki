@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Euclidean distance for {@link NumberVector}s.
@@ -125,12 +126,12 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
     else if(dim2 > mindim) {
       agg += preNorm(v2, mindim, dim2);
     }
-    return Math.sqrt(agg);
+    return FastMath.sqrt(agg);
   }
 
   @Override
   public double norm(NumberVector v) {
-    return Math.sqrt(preNorm(v, 0, v.getDimensionality()));
+    return FastMath.sqrt(preNorm(v, 0, v.getDimensionality()));
   }
 
   @Override
@@ -152,7 +153,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
     if(dim2 > mindim) {
       agg += (v2 != null) ? preNorm(v2, mindim, dim2) : preNormMBR(mbr2, mindim, dim2);
     }
-    return Math.sqrt(agg);
+    return FastMath.sqrt(agg);
   }
 
   /**
@@ -182,7 +183,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
       double delta = d1 > d2 ? d1 : d2;
       agg += delta * delta;
     }
-    return Math.sqrt(agg);
+    return FastMath.sqrt(agg);
   }
 
   @Override

@@ -58,6 +58,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * Outlier detection algorithm using a mixture model approach. The data is
@@ -116,8 +117,8 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
    */
   public GaussianUniformMixture(double l, double c) {
     super();
-    this.logl = Math.log(l);
-    this.logml = Math.log(1 - l);
+    this.logl = FastMath.log(l);
+    this.logml = FastMath.log(1 - l);
     this.c = c;
   }
 
@@ -188,7 +189,7 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
    */
   private double loglikelihoodAnomalous(DBIDs anomalousObjs) {
     int n = anomalousObjs.size();
-    return n * Math.log(1.0 / n);
+    return n * FastMath.log(1.0 / n);
   }
 
   /**
@@ -210,13 +211,13 @@ public class GaussianUniformMixture<V extends NumberVector> extends AbstractAlgo
     double[][] covInv = inverse(covarianceMatrix);
 
     double covarianceDet = new LUDecomposition(covarianceMatrix).det();
-    double fakt = 1.0 / Math.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * covarianceDet);
+    double fakt = 1.0 / FastMath.sqrt(MathUtil.powi(MathUtil.TWOPI, RelationUtil.dimensionality(relation)) * covarianceDet);
     // for each object compute probability and sum
     double prob = 0;
     for(DBIDIter iter = objids.iter(); iter.valid(); iter.advance()) {
       double[] x = minusEquals(relation.get(iter).toArray(), mean);
       double mDist = transposeTimesTimes(x, covInv, x);
-      prob += Math.log(fakt * Math.exp(-mDist * .5));
+      prob += FastMath.log(fakt * FastMath.exp(-mDist * .5));
     }
     return prob;
   }

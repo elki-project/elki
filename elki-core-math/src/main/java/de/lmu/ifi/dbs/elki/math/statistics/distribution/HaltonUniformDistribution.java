@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Halton sequences are a pseudo-uniform distribution. The data is actually too
@@ -154,7 +155,7 @@ public class HaltonUniformDistribution implements Distribution {
 
     this.base = (short) base;
     this.invbase = 1.0 / base;
-    this.logbase = Math.log(base);
+    this.logbase = FastMath.log(base);
     // 32 bit * log(2) / log(base)
     this.maxi = (int) (32.0 * MathUtil.LOG2 / logbase);
     this.current = seed;
@@ -220,7 +221,7 @@ public class HaltonUniformDistribution implements Distribution {
     if(!(val >= min) || val > max) {
       return Double.NEGATIVE_INFINITY;
     }
-    return (len > 0.) ? Math.log(1.0 / len) : Double.POSITIVE_INFINITY;
+    return (len > 0.) ? FastMath.log(1.0 / len) : Double.POSITIVE_INFINITY;
   }
 
   @Override

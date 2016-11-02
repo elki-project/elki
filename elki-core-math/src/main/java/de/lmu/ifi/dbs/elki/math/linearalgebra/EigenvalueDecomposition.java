@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  */
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.FastMath;
 
 /**
  * Eigenvalues and eigenvectors of a real matrix.
@@ -49,7 +50,7 @@ public class EigenvalueDecomposition {
   /**
    * Epsilon.
    */
-  private static final double EPS = Math.pow(2.0, -52.0);
+  private static final double EPS = 0x1P-52; // = Math.pow(2.0, -52.0);
 
   /**
    * Row and column dimension (square matrix).
@@ -130,7 +131,7 @@ public class EigenvalueDecomposition {
           h += d[k] * d[k];
         }
         double f = d[i - 1];
-        double g = Math.sqrt(h);
+        double g = FastMath.sqrt(h);
         if(f > 0) {
           g = -g;
         }
@@ -347,7 +348,7 @@ public class EigenvalueDecomposition {
           ort[i] = H[i][m - 1] / scale;
           h += ort[i] * ort[i];
         }
-        double g = Math.sqrt(h);
+        double g = FastMath.sqrt(h);
         if(ort[m] > 0) {
           g = -g;
         }
@@ -500,7 +501,7 @@ public class EigenvalueDecomposition {
         w = H[n][n - 1] * H[n - 1][n];
         p = (H[n - 1][n - 1] - H[n][n]) / 2.0;
         q = p * p + w;
-        z = Math.sqrt(Math.abs(q));
+        z = FastMath.sqrt(Math.abs(q));
         H[n][n] = H[n][n] + exshift;
         H[n - 1][n - 1] = H[n - 1][n - 1] + exshift;
         x = H[n][n];
@@ -525,7 +526,7 @@ public class EigenvalueDecomposition {
           s = Math.abs(x) + Math.abs(z);
           p = x / s;
           q = z / s;
-          r = Math.sqrt(p * p + q * q);
+          r = FastMath.sqrt(p * p + q * q);
           p = p / r;
           q = q / r;
 
@@ -598,7 +599,7 @@ public class EigenvalueDecomposition {
           s = (y - x) / 2.0;
           s = s * s + w;
           if(s > 0) {
-            s = Math.sqrt(s);
+            s = FastMath.sqrt(s);
             if(y < x) {
               s = -s;
             }
@@ -661,7 +662,7 @@ public class EigenvalueDecomposition {
           if(x == 0.0) {
             break;
           }
-          s = Math.sqrt(p * p + q * q + r * r);
+          s = FastMath.sqrt(p * p + q * q + r * r);
           if(p < 0) {
             s = -s;
           }

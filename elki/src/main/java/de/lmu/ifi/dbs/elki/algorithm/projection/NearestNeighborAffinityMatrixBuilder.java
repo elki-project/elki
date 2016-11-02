@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import net.jafama.FastMath;
 
 /**
  * Build sparse affinity matrix using the nearest neighbors only.
@@ -77,7 +78,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
 
   public NearestNeighborAffinityMatrixBuilder(DistanceFunction<? super O> distanceFunction, double perplexity) {
     super(distanceFunction, perplexity);
-    this.numberOfNeighbours = (int) Math.ceil(3 * perplexity);
+    this.numberOfNeighbours = (int) FastMath.ceil(3 * perplexity);
   }
 
   @Override
@@ -115,7 +116,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    */
   protected void computePij(DBIDRange ids, KNNQuery<?> knnq, boolean square, int numberOfNeighbours, double[][] pij, int[][] indices, double initialScale) {
     Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.neighborspijmatrix").begin() : null;
-    final double logPerp = Math.log(perplexity);
+    final double logPerp = FastMath.log(perplexity);
     // Scratch arrays, resizable
     DoubleArray dists = new DoubleArray(numberOfNeighbours + 10);
     IntegerArray inds = new IntegerArray(numberOfNeighbours + 10);
@@ -203,7 +204,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    * @param pij_i Output row
    */
   protected static void computeSigma(int i, DoubleArray pij_row, double perplexity, double log_perp, double[] pij_i) {
-    double max = pij_row.get((int) Math.ceil(perplexity)) / Math.E;
+    double max = pij_row.get((int) FastMath.ceil(perplexity)) / Math.E;
     double beta = 1 / max; // beta = 1. / (2*sigma*sigma)
     double diff = computeH(pij_row, pij_i, -beta) - log_perp;
     double betaMin = 0.;
@@ -234,7 +235,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
     assert (pij_row.length == len);
     double sumP = 0.;
     for(int j = 0; j < len; j++) {
-      sumP += (pij_row[j] = Math.exp(dist_i.get(j) * mbeta));
+      sumP += (pij_row[j] = FastMath.exp(dist_i.get(j) * mbeta));
     }
     if(!(sumP > 0)) {
       // All pij are zero. Bad news.
@@ -246,7 +247,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
     for(int j = 0; j < len; j++) {
       sum += dist_i.get(j) * (pij_row[j] *= s);
     }
-    return Math.log(sumP) - mbeta * sum;
+    return FastMath.log(sumP) - mbeta * sum;
   }
 
   /**

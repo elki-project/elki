@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import net.jafama.FastMath;
+
 /**
  * Cholesky Decomposition.
  * <P>
@@ -91,7 +93,7 @@ public class CholeskyDecomposition implements java.io.Serializable {
       }
       d = A[j][j] - d;
       isspd &= (d > 0.0);
-      L[j][j] = Math.sqrt(Math.max(d, 0.0));
+      L[j][j] = FastMath.sqrt(Math.max(d, 0.0));
       for(int k = j + 1; k < n; k++) {
         L[j][k] = 0.0;
       }

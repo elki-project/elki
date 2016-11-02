@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * Edit Distance With Real Penalty distance for numerical vectors.
@@ -123,7 +124,7 @@ public class ERPDistanceFunction extends DTWDistanceFunction {
     }
 
     // TODO: support Euclidean, Manhattan here:
-    return Math.sqrt(buf[cur + dim2 - 1]);
+    return FastMath.sqrt(buf[cur + dim2 - 1]);
   }
 
   @Override

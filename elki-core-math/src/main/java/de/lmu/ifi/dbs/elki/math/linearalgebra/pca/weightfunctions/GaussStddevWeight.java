@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra.pca.weightfunctions;
  */
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.FastMath;
 
 /**
  * Gaussian Weight function, scaled such using standard deviation
@@ -52,6 +53,6 @@ public final class GaussStddevWeight implements WeightFunction {
       return 1;
     }
     double normdistance = distance / stddev;
-    return scaling * java.lang.Math.exp(-.5 * normdistance * normdistance) / stddev;
+    return scaling * FastMath.exp(-.5 * normdistance * normdistance) / stddev;
   }
 }

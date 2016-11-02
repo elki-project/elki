@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.adapter;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import net.jafama.FastMath;
 
 /**
  * Adapter from a normalized similarity function to a distance function using
@@ -79,7 +80,7 @@ public class LnSimilarityAdapter<O> extends AbstractSimilarityAdapter<O> {
 
     @Override
     public double transform(double similarity) {
-      return -Math.log(similarity);
+      return -FastMath.log(similarity);
     }
   }
 

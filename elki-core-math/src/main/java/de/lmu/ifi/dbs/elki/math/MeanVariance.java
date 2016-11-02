@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import net.jafama.FastMath;
 
 /**
  * Do some simple statistics (mean, variance) using a numerically stable online
@@ -249,7 +250,7 @@ public class MeanVariance extends Mean {
    * @return stddev
    */
   public double getNaiveStddev() {
-    return Math.sqrt(getNaiveVariance());
+    return FastMath.sqrt(getNaiveVariance());
   }
 
   /**
@@ -258,7 +259,7 @@ public class MeanVariance extends Mean {
    * @return stddev
    */
   public double getSampleStddev() {
-    return Math.sqrt(getSampleVariance());
+    return FastMath.sqrt(getSampleVariance());
   }
 
   /**

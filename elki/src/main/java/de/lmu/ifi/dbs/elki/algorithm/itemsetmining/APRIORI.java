@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.InconsistentDataException;
 import gnu.trove.iterator.TLongIntIterator;
 import gnu.trove.map.hash.TLongIntHashMap;
+import net.jafama.FastMath;
 
 /**
  * The APRIORI algorithm for Mining Association Rules.
@@ -259,7 +260,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
       }
     }
     // Generate candidates of length 2.
-    List<SparseItemset> frequent = new ArrayList<>(f1 * (int) Math.sqrt(f1));
+    List<SparseItemset> frequent = new ArrayList<>(f1 * (int) FastMath.sqrt(f1));
     for(TLongIntIterator iter = map.iterator(); iter.hasNext();) {
       iter.advance(); // Trove style iterator - advance first.
       if(iter.value() >= needed) {

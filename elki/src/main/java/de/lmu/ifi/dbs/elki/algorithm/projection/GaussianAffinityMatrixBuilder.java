@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Compute the affinity matrix for SNE and tSNE using a Gaussian distribution
@@ -158,7 +159,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
     for(int i = 0; i < size; i++) {
       double logP = computeH(i, dist[i], pij[i], msigmasq);
       if(mv != null) {
-        mv.put(Math.exp(logP));
+        mv.put(FastMath.exp(logP));
       }
       LOG.incrementProcessed(prog);
     }
@@ -200,10 +201,10 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
     double sumP = 0.;
     // Skip point "i", break loop in two:
     for(int j = 0; j < i; j++) {
-      sumP += (pij_i[j] = MathUtil.exp(dist_i[j] * mbeta));
+      sumP += (pij_i[j] = FastMath.exp(dist_i[j] * mbeta));
     }
     for(int j = i + 1; j < dist_i.length; j++) {
-      sumP += (pij_i[j] = MathUtil.exp(dist_i[j] * mbeta));
+      sumP += (pij_i[j] = FastMath.exp(dist_i[j] * mbeta));
     }
     if(!(sumP > 0)) {
       // All pij are zero. Bad news.
@@ -215,7 +216,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
     for(int j = 0; j < dist_i.length; j++) {
       sum += dist_i[j] * (pij_i[j] *= s);
     }
-    return Math.log(sumP) - mbeta * sum;
+    return FastMath.log(sumP) - mbeta * sum;
   }
 
   /**

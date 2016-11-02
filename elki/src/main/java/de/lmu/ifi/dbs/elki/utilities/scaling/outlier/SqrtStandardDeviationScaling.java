@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
@@ -60,9 +61,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * @since 0.3
  */
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
-title = "Interpreting and Unifying Outlier Scores", //
-booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
-url = "http://dx.doi.org/10.1137/1.9781611972818.2")
+    title = "Interpreting and Unifying Outlier Scores", //
+    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
+    url = "http://dx.doi.org/10.1137/1.9781611972818.2")
 public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
   /**
    * Effective parameters.
@@ -96,11 +97,11 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
   @Override
   public double getScaled(double value) {
     assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    if (value <= min) {
+    if(value <= min) {
       return 0;
     }
-    value = (value <= min) ? 0 : Math.sqrt(value - min);
-    if (value <= mean) {
+    value = (value <= min) ? 0 : FastMath.sqrt(value - min);
+    if(value <= mean) {
       return 0;
     }
     return Math.max(0, NormalDistribution.erf((value - mean) / factor));
@@ -108,61 +109,63 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
 
   @Override
   public void prepare(OutlierResult or) {
-    if (pmean == null) {
+    if(pmean == null) {
       MeanVarianceMinMax mv = new MeanVarianceMinMax();
       DoubleRelation scores = or.getScores();
-      for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+      for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
         double val = scores.doubleValue(id);
-        val = (val <= min) ? 0 : Math.sqrt(val - min);
+        val = (val <= min) ? 0 : FastMath.sqrt(val - min);
         mv.put(val);
       }
       min = (pmin == null) ? mv.getMin() : pmin;
       mean = mv.getMean();
       factor = plambda * mv.getSampleStddev() * MathUtil.SQRT2;
-    } else {
+    }
+    else {
       mean = pmean;
       double sqsum = 0;
       int cnt = 0;
       DoubleRelation scores = or.getScores();
       double mm = Double.POSITIVE_INFINITY;
-      for (DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
+      for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
         double val = scores.doubleValue(id);
         mm = Math.min(mm, val);
-        val = (val <= min) ? 0 : Math.sqrt(val - min);
+        val = (val <= min) ? 0 : FastMath.sqrt(val - min);
         sqsum += (val - mean) * (val - mean);
         cnt += 1;
       }
       min = (pmin == null) ? mm : pmin;
-      factor = plambda * Math.sqrt(sqsum / cnt) * MathUtil.SQRT2;
+      factor = plambda * FastMath.sqrt(sqsum / cnt) * MathUtil.SQRT2;
     }
   }
 
   @Override
   public <A> void prepare(A array, NumberArrayAdapter<?, A> adapter) {
-    if (pmean == null) {
+    if(pmean == null) {
       MeanVarianceMinMax mv = new MeanVarianceMinMax();
       final int size = adapter.size(array);
-      for (int i = 0; i < size; i++) {
+      for(int i = 0; i < size; i++) {
         double val = adapter.getDouble(array, i);
-        val = (val <= min) ? 0 : Math.sqrt(val - min);
+        val = (val <= min) ? 0 : FastMath.sqrt(val - min);
         mv.put(val);
       }
       min = (pmin == null) ? mv.getMin() : pmin;
       mean = mv.getMean();
       factor = plambda * mv.getSampleStddev() * MathUtil.SQRT2;
-    } else {
+    }
+    else {
       mean = pmean;
       Mean sqsum = new Mean();
       double mm = Double.POSITIVE_INFINITY;
       final int size = adapter.size(array);
-      for (int i = 0; i < size; i++) {
+      for(int i = 0; i < size; i++) {
         double val = adapter.getDouble(array, i);
         mm = Math.min(mm, val);
-        val = (val <= min) ? 0 : Math.sqrt(val - min);
+        val = (val <= min) ? 0 : FastMath.sqrt(val - min);
         sqsum.put((val - mean) * (val - mean));
       }
       min = (pmin == null) ? mm : pmin;
-      factor = plambda * Math.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
+      factor = plambda * FastMath.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
     }
   }
 
@@ -219,18 +222,18 @@ public class SqrtStandardDeviationScaling implements OutlierScalingFunction {
       super.makeOptions(config);
       DoubleParameter minP = new DoubleParameter(MIN_ID);
       minP.setOptional(true);
-      if (config.grab(minP)) {
+      if(config.grab(minP)) {
         min = minP.doubleValue();
       }
 
       DoubleParameter meanP = new DoubleParameter(MEAN_ID);
       meanP.setOptional(true);
-      if (config.grab(meanP)) {
+      if(config.grab(meanP)) {
         mean = meanP.doubleValue();
       }
 
       DoubleParameter lambdaP = new DoubleParameter(LAMBDA_ID, 3.0);
-      if (config.grab(lambdaP)) {
+      if(config.grab(lambdaP)) {
         lambda = lambdaP.doubleValue();
       }
     }

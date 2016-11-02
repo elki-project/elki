@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import net.jafama.FastMath;
 
 /**
  * Kernel matrix representation.
@@ -209,7 +210,7 @@ public class KernelMatrix {
    * @return the distance between the two objects
    */
   public double getDistance(final DBIDRef o1, final DBIDRef o2) {
-    return Math.sqrt(getSquaredDistance(o1, o2));
+    return FastMath.sqrt(getSquaredDistance(o1, o2));
   }
 
   /**

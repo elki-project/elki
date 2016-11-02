@@ -84,6 +84,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import net.jafama.FastMath;
 
 /**
  * The CASH algorithm is a subspace clustering algorithm based on the Hough
@@ -402,7 +403,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     double d_min = minMax[0];
     double d_max = minMax[1];
     double dIntervalLength = d_max - d_min;
-    int numDIntervals = (int) Math.ceil(dIntervalLength / jitter);
+    int numDIntervals = (int) FastMath.ceil(dIntervalLength / jitter);
     double dIntervalSize = dIntervalLength / numDIntervals;
     double[] d_mins = new double[numDIntervals];
     double[] d_maxs = new double[numDIntervals];
@@ -517,7 +518,7 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
     double[] nn = new double[dim + 1];
     for(int i = 0; i < nn.length; i++) {
         double alpha_i = i == alpha.length ? 0 : alpha[i];
-        nn[i] = sinusProduct(0, i, alpha) * StrictMath.cos(alpha_i);
+        nn[i] = ParameterizationFunction.sinusProduct(0, i, alpha) * FastMath.cos(alpha_i);
     }
     timesEquals(nn, 1. / euclideanLength(nn)); // Normalize
     // Find orthogonal system, in transposed form:
@@ -550,24 +551,6 @@ public class CASH<V extends NumberVector> extends AbstractAlgorithm<Clustering<M
       }
     }
     return transpose(basis);
-  }
-
-  /**
-   * Computes the product of all sinus values of the specified angles from start
-   * to end index.
-   *
-   * @param start the index to start
-   * @param end the index to end
-   * @param alpha the array of angles
-   * @return the product of all sinus values of the specified angles from start
-   *         to end index
-   */
-  private double sinusProduct(int start, int end, double[] alpha) {
-    double result = 1;
-    for(int j = start; j < end; j++) {
-      result *= Math.sin(alpha[j]);
-    }
-    return result;
   }
 
   /**

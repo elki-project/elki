@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Exp-Gamma Distribution, with random generation and density functions.
@@ -130,7 +131,7 @@ public class ExpGammaDistribution extends AbstractDistribution {
 
   @Override
   public double nextRandom() {
-    return Math.log(GammaDistribution.nextRandom(k, 1., random)) / theta + shift;
+    return FastMath.log(GammaDistribution.nextRandom(k, 1., random)) / theta + shift;
   }
 
   /**
@@ -169,7 +170,7 @@ public class ExpGammaDistribution extends AbstractDistribution {
     if(x <= shift) {
       return 0.;
     }
-    final double e = Math.exp((x - shift) * theta);
+    final double e = FastMath.exp((x - shift) * theta);
     return e < Double.POSITIVE_INFINITY ? GammaDistribution.regularizedGammaP(k, e) : 1.;
   }
 
@@ -185,7 +186,7 @@ public class ExpGammaDistribution extends AbstractDistribution {
     if(x <= shift) {
       return 0.;
     }
-    final double e = Math.exp((x - shift) * theta);
+    final double e = FastMath.exp((x - shift) * theta);
     return e < Double.POSITIVE_INFINITY ? GammaDistribution.logregularizedGammaP(k, e) : 0.;
   }
 
@@ -202,8 +203,8 @@ public class ExpGammaDistribution extends AbstractDistribution {
       return 0.;
     }
     x = (x - shift) * theta;
-    final double ex = Math.exp(x);
-    return ex < Double.POSITIVE_INFINITY ? Math.exp(k * x - ex - GammaDistribution.logGamma(k)) * theta : 0.;
+    final double ex = FastMath.exp(x);
+    return ex < Double.POSITIVE_INFINITY ? FastMath.exp(k * x - ex - GammaDistribution.logGamma(k)) * theta : 0.;
   }
 
   /**
@@ -219,8 +220,8 @@ public class ExpGammaDistribution extends AbstractDistribution {
       return Double.NEGATIVE_INFINITY;
     }
     x = (x - shift) * theta;
-    double ex = Math.exp(x);
-    return ex < Double.POSITIVE_INFINITY ? k * x - ex - GammaDistribution.logGamma(k) + Math.log(theta) : Double.NEGATIVE_INFINITY;
+    double ex = FastMath.exp(x);
+    return ex < Double.POSITIVE_INFINITY ? k * x - ex - GammaDistribution.logGamma(k) + FastMath.log(theta) : Double.NEGATIVE_INFINITY;
   }
 
   /**
@@ -233,7 +234,7 @@ public class ExpGammaDistribution extends AbstractDistribution {
    * @return Probit for ExpGamma distribution
    */
   public static double quantile(double p, double k, double theta, double shift) {
-    return Math.log(GammaDistribution.quantile(p, k, theta)) + shift;
+    return FastMath.log(GammaDistribution.quantile(p, k, theta)) + shift;
   }
 
   /**

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Gamma Distribution, with random generation and density functions.
@@ -224,11 +225,11 @@ public class GammaDistribution extends AbstractDistribution {
       return (k == 1.) ? theta : 0;
     }
     if(k == 1.) {
-      return Math.exp(-x * theta) * theta;
+      return FastMath.exp(-x * theta) * theta;
     }
     final double xt = x * theta;
     return (xt == Double.POSITIVE_INFINITY) ? 0. : //
-        Math.exp((k - 1.0) * Math.log(xt) - xt - logGamma(k)) * theta;
+        FastMath.exp((k - 1.0) * FastMath.log(xt) - xt - logGamma(k)) * theta;
   }
 
   /**
@@ -244,14 +245,14 @@ public class GammaDistribution extends AbstractDistribution {
       return Double.NEGATIVE_INFINITY;
     }
     if(x == 0) {
-      return (k == 1.0) ? Math.log(theta) : Double.NEGATIVE_INFINITY;
+      return (k == 1.0) ? FastMath.log(theta) : Double.NEGATIVE_INFINITY;
     }
     if(k == 1.0) {
-      return Math.log(theta) - x * theta;
+      return FastMath.log(theta) - x * theta;
     }
     final double xt = x * theta;
     return (xt == Double.POSITIVE_INFINITY) ? Double.NEGATIVE_INFINITY : //
-        Math.log(theta) + (k - 1.0) * Math.log(xt) - xt - logGamma(k);
+        FastMath.log(theta) + (k - 1.0) * FastMath.log(xt) - xt - logGamma(k);
   }
 
   /**
@@ -271,12 +272,12 @@ public class GammaDistribution extends AbstractDistribution {
     }
     double g = 607.0 / 128.0;
     double tmp = x + g + .5;
-    tmp = (x + 0.5) * Math.log(tmp) - tmp;
+    tmp = (x + 0.5) * FastMath.log(tmp) - tmp;
     double ser = LANCZOS[0];
     for(int i = LANCZOS.length - 1; i > 0; --i) {
       ser += LANCZOS[i] / (x + i);
     }
-    return tmp + Math.log(MathUtil.SQRTTWOPI * ser / x);
+    return tmp + FastMath.log(MathUtil.SQRTTWOPI * ser / x);
   }
 
   /**
@@ -284,15 +285,15 @@ public class GammaDistribution extends AbstractDistribution {
    * 
    * Note: for numerical reasons, it is preferable to use {@link #logGamma} when
    * possible! In particular, this method just computes
-   * {@code Math.exp(logGamma(x))} anyway.
+   * {@code FastMath.exp(logGamma(x))} anyway.
    * 
-   * Try to postpone the {@code Math.exp} call to preserve numeric range!
+   * Try to postpone the {@code FastMath.exp} call to preserve numeric range!
    * 
    * @param x Position
    * @return Gamma at this position
    */
   public static double gamma(double x) {
-    return Math.exp(logGamma(x));
+    return FastMath.exp(logGamma(x));
   }
 
   /**
@@ -333,7 +334,7 @@ public class GammaDistribution extends AbstractDistribution {
         break;
       }
     }
-    return Math.exp(-x + (a * Math.log(x)) - logGamma(a)) * sum;
+    return FastMath.exp(-x + (a * FastMath.log(x)) - logGamma(a)) * sum;
   }
 
   /**
@@ -359,7 +360,7 @@ public class GammaDistribution extends AbstractDistribution {
     if(x >= a + 1) {
       // Expected to converge faster
       // FIXME: and in log?
-      return Math.log(1.0 - regularizedGammaQ(a, x));
+      return FastMath.log(1.0 - regularizedGammaQ(a, x));
     }
     // Loosely following "Numerical Recipes"
     double del = 1.0 / a;
@@ -376,7 +377,7 @@ public class GammaDistribution extends AbstractDistribution {
       return 0;
     }
     // TODO: reread numerical recipes, can we replace log(sum)?
-    return -x + (a * Math.log(x)) - logGamma(a) + Math.log(sum);
+    return -x + (a * FastMath.log(x)) - logGamma(a) + FastMath.log(sum);
   }
 
   /**
@@ -428,7 +429,7 @@ public class GammaDistribution extends AbstractDistribution {
         break;
       }
     }
-    return fac * Math.exp(-x + a * Math.log(x) - logGamma(a));
+    return fac * FastMath.exp(-x + a * FastMath.log(x) - logGamma(a));
   }
 
   /**
@@ -463,14 +464,14 @@ public class GammaDistribution extends AbstractDistribution {
       while(true) {
         final double p = b * random.nextDouble();
         if(p <= 1.0) { // when gds <= 1
-          final double gds = Math.exp(Math.log(p) / k);
-          if(Math.log(random.nextDouble()) <= -gds) {
+          final double gds = FastMath.exp(FastMath.log(p) / k);
+          if(FastMath.log(random.nextDouble()) <= -gds) {
             return (gds / theta);
           }
         }
         else { // when gds > 1
-          final double gds = -Math.log((b - p) / k);
-          if(Math.log(random.nextDouble()) <= ((k - 1.0) * Math.log(gds))) {
+          final double gds = -FastMath.log((b - p) / k);
+          if(FastMath.log(random.nextDouble()) <= ((k - 1.0) * FastMath.log(gds))) {
             return (gds / theta);
           }
         }
@@ -481,7 +482,7 @@ public class GammaDistribution extends AbstractDistribution {
       final double ss, s, d;
       if(k != -1.0) {
         ss = k - 0.5;
-        s = Math.sqrt(ss);
+        s = FastMath.sqrt(ss);
         d = 5.656854249 - 12.0 * s;
       }
       else {
@@ -511,7 +512,7 @@ public class GammaDistribution extends AbstractDistribution {
 
       // Simpler accept cases & parameter computation
       {
-        final double t = v1 * Math.sqrt(-2.0 * Math.log(v12) / v12);
+        final double t = v1 * FastMath.sqrt(-2.0 * FastMath.log(v12) / v12);
         final double x = s + 0.5 * t;
         final double gds = x * x;
         if(t >= 0.0) {
@@ -558,13 +559,13 @@ public class GammaDistribution extends AbstractDistribution {
           final double v = t / (s + s);
           final double q;
           if(Math.abs(v) > 0.25) {
-            q = q0 - s * t + 0.25 * t * t + (ss + ss) * Math.log(1.0 + v);
+            q = q0 - s * t + 0.25 * t * t + (ss + ss) * FastMath.log(1.0 + v);
           }
           else {
             q = q0 + 0.5 * t * t * ((((((((a9 * v + a8) * v + a7) * v + a6) * v + a5) * v + a4) * v + a3) * v + a2) * v + a1) * v;
           }
           // Quotient acceptance:
-          if(Math.log(1.0 - un) <= q) {
+          if(FastMath.log(1.0 - un) <= q) {
             return (gds / theta);
           }
         }
@@ -575,7 +576,7 @@ public class GammaDistribution extends AbstractDistribution {
         double e, u, sign_u, t;
         // Retry until t is sufficiently large
         do {
-          e = -Math.log(random.nextDouble());
+          e = -FastMath.log(random.nextDouble());
           u = random.nextDouble();
           u = u + u - 1.0;
           sign_u = (u > 0) ? 1.0 : -1.0;
@@ -587,7 +588,7 @@ public class GammaDistribution extends AbstractDistribution {
         final double v = t / (s + s);
         final double q;
         if(Math.abs(v) > 0.25) {
-          q = q0 - s * t + 0.25 * t * t + (ss + ss) * Math.log(1.0 + v);
+          q = q0 - s * t + 0.25 * t * t + (ss + ss) * FastMath.log(1.0 + v);
         }
         else {
           q = q0 + 0.5 * t * t * ((((((((a9 * v + a8) * v + a7) * v + a6) * v + a5) * v + a4) * v + a3) * v + a2) * v + a1) * v;
@@ -598,13 +599,13 @@ public class GammaDistribution extends AbstractDistribution {
         // Compute w(t)
         final double w;
         if(q > 0.5) {
-          w = Math.exp(q) - 1.0;
+          w = FastMath.exp(q) - 1.0;
         }
         else {
           w = ((((((e7 * q + e6) * q + e5) * q + e4) * q + e3) * q + e2) * q + e1) * q;
         }
         // Hat acceptance
-        if(c * u * sign_u <= w * Math.exp(e - 0.5 * t * t)) {
+        if(c * u * sign_u <= w * FastMath.exp(e - 0.5 * t * t)) {
           final double x = s + 0.5 * t;
           return (x * x / theta);
         }
@@ -653,39 +654,39 @@ public class GammaDistribution extends AbstractDistribution {
     final double k = 0.5 * nu;
 
     // For small chi squared values - AS 91
-    final double logp = Math.log(p);
+    final double logp = FastMath.log(p);
     if(nu < -1.24 * logp) {
       // FIXME: implement and use logGammap1 instead - more stable?
       //
       // final double lgam1pa = (alpha < 0.5) ? logGammap1(alpha) :
-      // (Math.log(alpha) + g);
-      // return Math.exp((lgam1pa + logp) / alpha + MathUtil.LOG2);
+      // (FastMath.log(alpha) + g);
+      // return FastMath.exp((lgam1pa + logp) / alpha + MathUtil.LOG2);
       // This is literal AS 91, above is the GNU R variant.
-      return Math.pow(p * k * Math.exp(g + k * MathUtil.LOG2), 1. / k);
+      return FastMath.pow(p * k * FastMath.exp(g + k * MathUtil.LOG2), 1. / k);
     }
     else if(nu > 0.32) {
       // Wilson and Hilferty estimate: - AS 91 at 3
       final double x = NormalDistribution.quantile(p, 0, 1);
       final double p1 = 2. / (9. * nu);
-      final double a = x * Math.sqrt(p1) + 1 - p1;
+      final double a = x * FastMath.sqrt(p1) + 1 - p1;
       double ch = nu * a * a * a;
 
       // Better approximation for p tending to 1:
       if(ch > 2.2 * nu + 6) {
-        ch = -2 * (Math.log1p(-p) - (k - 1) * Math.log(0.5 * ch) + g);
+        ch = -2 * (FastMath.log1p(-p) - (k - 1) * FastMath.log(0.5 * ch) + g);
       }
       return ch;
     }
     else {
       // nu <= 0.32, AS 91 at 1
       final double C7 = 4.67, C8 = 6.66, C9 = 6.73, C10 = 13.32;
-      final double ag = Math.log1p(-p) + g + (k - 1) * MathUtil.LOG2;
+      final double ag = FastMath.log1p(-p) + g + (k - 1) * MathUtil.LOG2;
       double ch = 0.4;
       while(true) {
         final double p1 = 1 + ch * (C7 + ch);
         final double p2 = ch * (C9 + ch * (C8 + ch));
         final double t = -0.5 + (C7 + 2 * ch) / p1 - (C9 + ch * (C10 + 3 * ch)) / p2;
-        final double delta = (1 - Math.exp(ag + 0.5 * ch) * p2 / p1) / t;
+        final double delta = (1 - FastMath.exp(ag + 0.5 * ch) * p2 / p1) / t;
         ch -= delta;
         if(Math.abs(delta) > EPS1 * Math.abs(ch)) {
           return ch;
@@ -781,7 +782,7 @@ public class GammaDistribution extends AbstractDistribution {
           break chisq;
         }
         { // Taylor series of AS 91: iteration via "goto 4"
-          final double t = p2 * Math.exp(k * MathUtil.LOG2 + g + p1 - c * Math.log(ch));
+          final double t = p2 * FastMath.exp(k * MathUtil.LOG2 + g + p1 - c * FastMath.log(ch));
           final double b = t / ch;
           final double a = 0.5 * t - b * c;
           final double s1 = (210. + a * (140. + a * (105. + a * (84. + a * (70. + 60. * a))))) / 420.;
@@ -807,7 +808,7 @@ public class GammaDistribution extends AbstractDistribution {
     if(max_newton_iterations > 0) {
       // Refine result using final Newton steps.
       // TODO: add unit tests that show an improvement! Maybe in logscale only?
-      x = gammaQuantileNewtonRefinement(Math.log(p), k, theta, max_newton_iterations, x);
+      x = gammaQuantileNewtonRefinement(FastMath.log(p), k, theta, max_newton_iterations, x);
     }
     return x;
   }
@@ -850,7 +851,7 @@ public class GammaDistribution extends AbstractDistribution {
       if(g == Double.NEGATIVE_INFINITY) {
         break;
       }
-      final double newx = x - logpe * Math.exp(logpc - g);
+      final double newx = x - logpe * FastMath.exp(logpc - g);
       // New estimate:
       logpc = logcdf(newx, k, theta);
       if(Math.abs(logpc - logpt) > Math.abs(logpe) || (i > 0 && Math.abs(logpc - logpt) == Math.abs(logpe))) {
@@ -892,7 +893,7 @@ public class GammaDistribution extends AbstractDistribution {
     else if(x > 49.) {
       final double ix2 = 1. / (x * x);
       // Partial series expansion
-      return Math.log(x) - 0.5 / x - ix2 * ((1.0 / 12.) + ix2 * (1.0 / 120. - ix2 / 252.));
+      return FastMath.log(x) - 0.5 / x - ix2 * ((1.0 / 12.) + ix2 * (1.0 / 120. - ix2 / 252.));
       // + O(x^8) error
     }
     else {

@@ -80,12 +80,12 @@ public class GeneralizedExtremeValueLMMEstimatorTest extends AbstractDistributio
     data = this.data.get("random_M2_05_05");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("k", dist.getK(), -2, 1.0037265433180718);
-    assertStat("mu", dist.getMu(), 0.5, 0.6332110415323768);
+    assertStat("mu", dist.getMu(), 0.5, 0.6332110415321495);
     assertStat("sigma", dist.getSigma(), 0.5, 2.9163648075831836);
     data = this.data.get("random_M4_05_05");
     dist = est.estimate(data, DoubleArrayAdapter.STATIC);
     assertStat("k", dist.getK(), -4, 3.0000007718540083);
-    assertStat("mu", dist.getMu(), 0.5, 42.607935547828674);
-    assertStat("sigma", dist.getSigma(), 0.5, 274.7233375224945);
+    assertStat("mu", dist.getMu(), 0.5, 42.607935667037964);
+    assertStat("sigma", dist.getSigma(), 0.5, 274.7233375224944);
   }
 }

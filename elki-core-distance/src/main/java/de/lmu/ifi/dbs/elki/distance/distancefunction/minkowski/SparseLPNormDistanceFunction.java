@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * LP-Norm, optimized for {@link SparseNumberVector}s.
@@ -66,19 +67,19 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
       if(d1 < d2) {
         // In first only
         final double val = Math.abs(v1.iterDoubleValue(i1));
-        accu += Math.pow(val, p);
+        accu += FastMath.pow(val, p);
         i1 = v1.iterAdvance(i1);
       }
       else if(d2 < d1) {
         // In second only
         final double val = Math.abs(v2.iterDoubleValue(i2));
-        accu += Math.pow(val, p);
+        accu += FastMath.pow(val, p);
         i2 = v2.iterAdvance(i2);
       }
       else {
         // Both vectors have a value.
         final double val = Math.abs(v1.iterDoubleValue(i1) - v2.iterDoubleValue(i2));
-        accu += Math.pow(val, p);
+        accu += FastMath.pow(val, p);
         i1 = v1.iterAdvance(i1);
         i2 = v2.iterAdvance(i2);
       }
@@ -86,16 +87,16 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
     while(v1.iterValid(i1)) {
       // In first only
       final double val = Math.abs(v1.iterDoubleValue(i1));
-      accu += Math.pow(val, p);
+      accu += FastMath.pow(val, p);
       i1 = v1.iterAdvance(i1);
     }
     while(v2.iterValid(i2)) {
       // In second only
       final double val = Math.abs(v2.iterDoubleValue(i2));
-      accu += Math.pow(val, p);
+      accu += FastMath.pow(val, p);
       i2 = v2.iterAdvance(i2);
     }
-    return Math.pow(accu, invp);
+    return FastMath.pow(accu, invp);
   }
 
   @Override
@@ -103,9 +104,9 @@ public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunct
     double accu = 0.;
     for(int it = v1.iter(); v1.iterValid(it); it = v1.iterAdvance(it)) {
       final double val = Math.abs(v1.iterDoubleValue(it));
-      accu += Math.pow(val, p);
+      accu += FastMath.pow(val, p);
     }
-    return Math.pow(accu, invp);
+    return FastMath.pow(accu, invp);
   }
 
   @Override

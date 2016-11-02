@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -82,6 +82,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleObjPair;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Representative clustering of uncertain data.
@@ -298,7 +299,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
   private double computeConfidence(int support, int samples) {
     final double z = NormalDistribution.standardNormalQuantile(alpha);
     final double eprob = support / (double) samples;
-    return Math.max(0., eprob - z * Math.sqrt((eprob * (1 - eprob)) / samples));
+    return Math.max(0., eprob - z * FastMath.sqrt((eprob * (1 - eprob)) / samples));
   }
 
   /**

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -64,6 +64,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * Adaptive outlierness for subspace outlier ranking (OUTRES).
@@ -89,7 +90,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @param <V> vector type
  */
-@Reference(authors = "E. Müller, M. Schiffer, T. Seidl", title = "Adaptive outlierness for subspace outlier ranking", booktitle = "Proc. 19th ACM International Conference on Information and knowledge management")
+@Reference(authors = "E. Müller, M. Schiffer, T. Seidl", //
+title = "Adaptive outlierness for subspace outlier ranking", //
+booktitle = "Proc. 19th ACM International Conference on Information and knowledge management")
 public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The logger for this class.
@@ -251,7 +254,7 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
    */
   protected boolean relevantSubspace(long[] subspace, DoubleDBIDList neigh, KernelDensityEstimator kernel) {
     Relation<V> relation = kernel.relation;
-    final double crit = K_S_CRITICAL001 / Math.sqrt(neigh.size());
+    final double crit = K_S_CRITICAL001 / FastMath.sqrt(neigh.size());
 
     for(int dim = BitsUtil.nextSetBit(subspace, 0); dim > 0; dim = BitsUtil.nextSetBit(subspace, dim + 1)) {
       // TODO: can we save this copy somehow?
@@ -357,7 +360,7 @@ public class OUTRES<V extends NumberVector> extends AbstractAlgorithm<OutlierRes
     protected double optimalBandwidth(int dim) {
       // Pi in the publication is redundant and cancels out!
       double hopt = 8 * GammaDistribution.gamma(dim / 2.0 + 1) * (dim + 4) * MathUtil.powi(2, dim);
-      return hopt * Math.pow(relation.size(), (-1. / (dim + 4)));
+      return hopt * FastMath.pow(relation.size(), (-1. / (dim + 4)));
     }
 
     /**

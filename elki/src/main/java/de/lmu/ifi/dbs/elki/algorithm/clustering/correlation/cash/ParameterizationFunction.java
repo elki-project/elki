@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation.cash;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
+import net.jafama.FastMath;
 
 /**
  * A parameterization function describes all lines in a d-dimensional feature
@@ -106,7 +107,7 @@ public class ParameterizationFunction {
     double result = 0;
     for(int i = 0; i < d; i++) {
       double alpha_i = i == d - 1 ? 0 : alpha[i];
-      result += vec.doubleValue(i) * sinusProduct(0, i, alpha) * Math.cos(alpha_i);
+      result += vec.doubleValue(i) * sinusProduct(0, i, alpha) * FastMath.cos(alpha_i);
     }
     return result;
   }
@@ -425,10 +426,10 @@ public class ParameterizationFunction {
    * @return the product of all sinus values of the specified angles from start
    *         to end index
    */
-  private double sinusProduct(int start, int end, double[] alpha) {
+  public static double sinusProduct(int start, int end, double[] alpha) {
     double result = 1;
     for(int j = start; j < end; j++) {
-      result *= Math.sin(alpha[j]);
+      result *= FastMath.sin(alpha[j]);
     }
     return result;
   }
@@ -497,7 +498,7 @@ public class ParameterizationFunction {
     double tan = 0;
     for(int j = n + 1; j < vec.getDimensionality(); j++) {
       double alpha_j = j == vec.getDimensionality() - 1 ? 0 : alpha[j];
-      tan += vec.doubleValue(j) * sinusProduct(n + 1, j, alpha) * Math.cos(alpha_j);
+      tan += vec.doubleValue(j) * sinusProduct(n + 1, j, alpha) * FastMath.cos(alpha_j);
     }
     tan /= vec.doubleValue(n);
 

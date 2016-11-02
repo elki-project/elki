@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.quality;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Bayesian Information Criterion (BIC), also known as Schwarz criterion (SBC,
@@ -62,7 +63,7 @@ public class BayesianInformationCriterion extends AbstractKMeansQualityMeasure<N
   @Override
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
     return logLikelihood(relation, clustering, distanceFunction) //
-        - (.5 * numberOfFreeParameters(relation, clustering)) * Math.log(numPoints(clustering));
+        - (.5 * numberOfFreeParameters(relation, clustering)) * FastMath.log(numPoints(clustering));
   }
 
   @Override

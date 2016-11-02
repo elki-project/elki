@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.CovarianceMatrix;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Class to compute the dimension similarity based on covariances.
@@ -55,7 +56,7 @@ public class CovarianceDimensionSimilarity implements DimensionSimilarity<Number
     double[][] mat = covmat.destroyToSampleMatrix();
     // Transform diagonal to 1 / stddev
     for (int i = 0; i < mat.length; i++) {
-      mat[i][i] = 1. / Math.sqrt(mat[i][i]);
+      mat[i][i] = 1. / FastMath.sqrt(mat[i][i]);
     }
     // Fill output matrix:
     for (int x = 0; x < dim; x++) {

@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.FastMath;
 
 /**
  * Class providing basic vector mathematics, for low-level vectors stored as
@@ -629,7 +630,7 @@ public final class VMath {
       final double v = v1[row];
       acc += v * v;
     }
-    return Math.sqrt(acc);
+    return FastMath.sqrt(acc);
   }
 
   /**
@@ -1452,7 +1453,7 @@ public final class VMath {
       for(int row = 0; row < m1.length; row++) {
         norm = norm + (m1[row][col] * m1[row][col]);
       }
-      norm = Math.sqrt(norm);
+      norm = FastMath.sqrt(norm);
       if(norm != 0) {
         for(int row = 0; row < m1.length; row++) {
           m1[row][col] /= norm;
@@ -1684,7 +1685,7 @@ public final class VMath {
       final double r2 = v2[k];
       e2 += r2 * r2;
     }
-    double a = Math.sqrt((s / e1) * (s / e2));
+    double a = FastMath.sqrt((s / e1) * (s / e2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -1721,7 +1722,7 @@ public final class VMath {
       final double r2 = v2[k] - ok;
       e2 += r2 * r2;
     }
-    double a = Math.sqrt((s / e1) * (s / e2));
+    double a = FastMath.sqrt((s / e1) * (s / e2));
     return (a < 1.) ? a : 1.;
   }
 }

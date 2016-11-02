@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedPara
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * Implementation of the HiSC algorithm, an algorithm for detecting hierarchies
@@ -269,7 +270,7 @@ public class HiSC<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       double manhattanI = v1.doubleValue(i) - v2.doubleValue(i);
       sqrDist += manhattanI * manhattanI;
     }
-    return Math.sqrt(sqrDist);
+    return FastMath.sqrt(sqrDist);
   }
 
   @Override

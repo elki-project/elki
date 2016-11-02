@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -69,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Fast Outlier Detection in High Dimensional Spaces
@@ -684,15 +685,15 @@ public class HilOut<O extends NumberVector> extends AbstractDistanceBasedAlgorit
           double a = Math.max(p_m_r, r - p_m_r);
           dist += a * a;
         }
-        dist = Math.sqrt(dist);
+        dist = FastMath.sqrt(dist);
       }
       else if(!Double.isInfinite(t)) {
         dist = 0.0;
         for(int dim = 0; dim < d; dim++) {
           final double p_m_r = getDimForObject(obj, dim) % r;
-          dist += Math.pow(Math.max(p_m_r, r - p_m_r), t);
+          dist += FastMath.pow(Math.max(p_m_r, r - p_m_r), t);
         }
-        dist = Math.pow(dist, 1.0 / t);
+        dist = FastMath.pow(dist, 1.0 / t);
       }
       else {
         dist = Double.NEGATIVE_INFINITY;

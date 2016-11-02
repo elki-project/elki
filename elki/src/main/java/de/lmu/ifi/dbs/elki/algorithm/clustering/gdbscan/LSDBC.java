@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import gnu.trove.list.array.TIntArrayList;
+import net.jafama.FastMath;
 
 /**
  * Locally scaled Density Based Clustering.
@@ -128,7 +129,7 @@ public class LSDBC<O extends NumberVector> extends AbstractDistanceBasedAlgorith
   public Clustering<Model> run(Database database, Relation<O> relation) {
     StepProgress stepprog = LOG.isVerbose() ? new StepProgress("LSDBC", 3) : null;
     final int dim = RelationUtil.dimensionality(relation);
-    final double factor = Math.pow(2., alpha / dim);
+    final double factor = FastMath.pow(2., alpha / dim);
 
     final DBIDs ids = relation.getDBIDs();
     LOG.beginStep(stepprog, 1, "Materializing kNN neighborhoods");

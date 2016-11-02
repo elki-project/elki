@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import net.jafama.FastMath;
 
 /**
  * LP-Norm for {@link NumberVector}s, optimized version for integer values of p.
@@ -131,12 +132,12 @@ public class LPIntegerNormDistanceFunction extends LPNormDistanceFunction {
     else if(dim2 > mindim) {
       agg += preNorm(v2, mindim, dim2);
     }
-    return Math.pow(agg, invp);
+    return FastMath.pow(agg, invp);
   }
 
   @Override
   public double norm(NumberVector v) {
-    return Math.pow(preNorm(v, 0, v.getDimensionality()), invp);
+    return FastMath.pow(preNorm(v, 0, v.getDimensionality()), invp);
   }
 
   @Override
@@ -158,7 +159,7 @@ public class LPIntegerNormDistanceFunction extends LPNormDistanceFunction {
     if(dim2 > mindim) {
       agg += (v2 != null) ? preNorm(v2, mindim, dim2) : preNormMBR(mbr2, mindim, dim2);
     }
-    return Math.pow(agg, invp);
+    return FastMath.pow(agg, invp);
   }
 
   /**

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 import gnu.trove.iterator.TIntDoubleIterator;
 import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
+import net.jafama.FastMath;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -96,7 +97,7 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector>
     for(TIntDoubleIterator iter = idf.iterator(); iter.hasNext();) {
       iter.advance();
       // Note: dbsize is a double!
-      iter.setValue(Math.log(dbsize / iter.value()));
+      iter.setValue(FastMath.log(dbsize / iter.value()));
     }
   }
 

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Arrange dimensions based on the entropy of the slope spectrum.
@@ -127,11 +128,11 @@ public class SlopeInversionDependenceMeasure extends SlopeDependenceMeasure {
     for(int l = 0; l < PRECISION; l++) {
       if(angles[l] > 0) {
         final double p = angles[l] / (double) len;
-        entropy += p * Math.log(p);
+        entropy += p * FastMath.log(p);
       }
       if(angleI[l] > 0) {
         final double p = angleI[l] / (double) len;
-        entropyI += p * Math.log(p);
+        entropyI += p * FastMath.log(p);
       }
     }
     if(entropy >= entropyI) {

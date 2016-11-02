@@ -65,6 +65,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Fast Outlier Detection Using the "approximate Local Correlation Integral".
@@ -278,7 +279,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     // LOCI
     long cb = sn.getCubicSum(cg.getLevel() - sn.getLevel());
     double n_hat = (double) sq / sn.getCount();
-    double sig_n_hat = java.lang.Math.sqrt(cb * sn.getCount() - (sq * sq)) / sn.getCount();
+    double sig_n_hat = FastMath.sqrt(cb * sn.getCount() - (sq * sq)) / sn.getCount();
     // Avoid NaN - correct result 0.0?
     if(sig_n_hat < Double.MIN_NORMAL) {
       return 0.0;
@@ -476,7 +477,7 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     private double getShiftedDim(NumberVector obj, int dim, int level) {
       double pos = obj.doubleValue(dim) + shift[dim];
       pos = (pos - min[dim]) / width[dim] * (1 + level);
-      return pos - Math.floor(pos);
+      return pos - FastMath.floor(pos);
     }
 
     /**

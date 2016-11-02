@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Laplace distribution also known as double exponential distribution
@@ -124,7 +125,7 @@ public class LaplaceDistribution extends AbstractDistribution {
 
   @Override
   public double pdf(double val) {
-    return .5 * rate * Math.exp(-rate * Math.abs(val - location));
+    return .5 * rate * FastMath.exp(-rate * Math.abs(val - location));
   }
 
   /**
@@ -135,12 +136,12 @@ public class LaplaceDistribution extends AbstractDistribution {
    * @return probability density
    */
   public static double pdf(double val, double rate) {
-    return .5 * rate * Math.exp(-rate * Math.abs(val));
+    return .5 * rate * FastMath.exp(-rate * Math.abs(val));
   }
 
   @Override
   public double logpdf(double val) {
-    return Math.log(.5 * rate) - rate * Math.abs(val - location);
+    return FastMath.log(.5 * rate) - rate * Math.abs(val - location);
   }
 
   /**
@@ -151,12 +152,12 @@ public class LaplaceDistribution extends AbstractDistribution {
    * @return probability density
    */
   public static double logpdf(double val, double rate) {
-    return Math.log(.5 * rate) - rate * Math.abs(val);
+    return FastMath.log(.5 * rate) - rate * Math.abs(val);
   }
 
   @Override
   public double cdf(double val) {
-    final double v = .5 * Math.exp(-rate * (val - location));
+    final double v = .5 * FastMath.exp(-rate * (val - location));
     return (val < location) ? v : 1 - v;
   }
 
@@ -168,17 +169,17 @@ public class LaplaceDistribution extends AbstractDistribution {
    * @return cumulative density
    */
   public static double cdf(double val, double rate) {
-    final double v = .5 * Math.exp(-rate * val);
+    final double v = .5 * FastMath.exp(-rate * val);
     return (val < 0.) ? v : 1 - v;
   }
 
   @Override
   public double quantile(double val) {
     if(val < .5) {
-      return Math.log(2 * val) / rate + location;
+      return FastMath.log(2 * val) / rate + location;
     }
     else {
-      return -Math.log(2. - 2. * val) / rate + location;
+      return -FastMath.log(2. - 2. * val) / rate + location;
     }
   }
 
@@ -192,10 +193,10 @@ public class LaplaceDistribution extends AbstractDistribution {
    */
   public static double quantile(double val, double rate, double location) {
     if(val < .5) {
-      return Math.log(2 * val) / rate + location;
+      return FastMath.log(2 * val) / rate + location;
     }
     else {
-      return -Math.log(2. - 2. * val) / rate + location;
+      return -FastMath.log(2. - 2. * val) / rate + location;
     }
   }
 
@@ -207,10 +208,10 @@ public class LaplaceDistribution extends AbstractDistribution {
   public double nextRandom() {
     double val = random.nextDouble();
     if(val < .5) {
-      return Math.log(2 * val) / rate + location;
+      return FastMath.log(2 * val) / rate + location;
     }
     else {
-      return -Math.log(2. - 2. * val) / rate + location;
+      return -FastMath.log(2. - 2. * val) / rate + location;
     }
   }
 

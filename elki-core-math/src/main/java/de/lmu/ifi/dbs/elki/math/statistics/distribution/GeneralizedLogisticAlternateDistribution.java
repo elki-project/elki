@@ -27,6 +27,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Generalized logistic distribution.
@@ -135,10 +136,10 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
   public static double pdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
     if(shape != 0.) {
-      val = -Math.log(1 - shape * val) / shape;
+      val = -FastMath.log(1 - shape * val) / shape;
     }
-    double f = 1. + Math.exp(-val);
-    return Math.exp(-val * (1 - shape)) / (scale * f * f);
+    double f = 1. + FastMath.exp(-val);
+    return FastMath.exp(-val * (1 - shape)) / (scale * f * f);
   }
 
   @Override
@@ -158,10 +159,10 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
   public static double logpdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
     if(shape != 0.) {
-      val = -Math.log(1 - shape * val) / shape;
+      val = -FastMath.log(1 - shape * val) / shape;
     }
-    double f = 1. + Math.exp(-val);
-    return -val * (1 - shape) - Math.log(scale * f * f);
+    double f = 1. + FastMath.exp(-val);
+    return -val * (1 - shape) - FastMath.log(scale * f * f);
   }
 
   @Override
@@ -185,9 +186,9 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
       if(tmp < 1e-15) {
         return (shape < 0) ? 0 : 1;
       }
-      val = -Math.log(tmp) / shape;
+      val = -FastMath.log(tmp) / shape;
     }
-    return 1. / (1. + Math.exp(-val));
+    return 1. / (1. + FastMath.exp(-val));
   }
 
   @Override
@@ -206,9 +207,9 @@ public class GeneralizedLogisticAlternateDistribution extends AbstractDistributi
    */
   public static double quantile(double val, double loc, double scale, double shape) {
     if(shape == 0.) {
-      return loc - scale * Math.log((1 - val) / val);
+      return loc - scale * FastMath.log((1 - val) / val);
     }
-    return loc + scale * (1 - Math.pow((1 - val) / val, shape)) / shape;
+    return loc + scale * (1 - FastMath.pow((1 - val) / val, shape)) / shape;
   }
 
   @Override

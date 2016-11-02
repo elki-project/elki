@@ -73,6 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * <p/>
@@ -427,7 +428,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
         sigma_i += diff * diff;
       }
       sigma_i /= (dim - 1);
-      sigma_i = Math.sqrt(sigma_i);
+      sigma_i = FastMath.sqrt(sigma_i);
 
       for(int j = 0; j < dim; j++) {
         z_ijs.add(new DoubleIntInt((x_i[j] - y_i) / sigma_i, i, j));
@@ -499,7 +500,7 @@ public class PROCLUS<V extends NumberVector> extends AbstractProjectedClustering
         sigma_i += diff * diff;
       }
       sigma_i /= (dim - 1);
-      sigma_i = Math.sqrt(sigma_i);
+      sigma_i = FastMath.sqrt(sigma_i);
 
       for(int j = 0; j < dim; j++) {
         z_ijs.add(new DoubleIntInt((x_i[j] - y_i) / sigma_i, i, j));

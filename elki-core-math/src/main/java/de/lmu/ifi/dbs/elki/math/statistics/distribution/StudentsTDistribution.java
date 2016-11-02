@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Student's t distribution.
@@ -112,8 +113,8 @@ public class StudentsTDistribution extends AbstractDistribution {
    */
   public static double pdf(double val, int v) {
     // TODO: improve precision by computing "exp" last?
-    return Math.exp(GammaDistribution.logGamma((v + 1) * .5) - GammaDistribution.logGamma(v * .5)) //
-        * (1 / Math.sqrt(v * Math.PI)) * Math.pow(1 + (val * val) / v, -((v + 1) * .5));
+    return FastMath.exp(GammaDistribution.logGamma((v + 1) * .5) - GammaDistribution.logGamma(v * .5)) //
+        * (1 / FastMath.sqrt(v * Math.PI)) * FastMath.pow(1 + (val * val) / v, -((v + 1) * .5));
   }
 
   /**
@@ -125,7 +126,7 @@ public class StudentsTDistribution extends AbstractDistribution {
    */
   public static double logpdf(double val, int v) {
     return GammaDistribution.logGamma((v + 1) * .5) - GammaDistribution.logGamma(v * .5) //
-        - .5 * Math.log(v * Math.PI) + Math.log1p(val * val / v) * -.5 * (v + 1);
+        - .5 * FastMath.log(v * Math.PI) + FastMath.log1p(val * val / v) * -.5 * (v + 1);
   }
 
   /**

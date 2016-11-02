@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.timeseries;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,6 +28,7 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import net.jafama.FastMath;
 
 /**
  * Dynamic Time Warping distance (DTW) for numerical vectors.
@@ -124,7 +125,7 @@ public class DTWDistanceFunction extends AbstractEditDistanceFunction {
     }
 
     // TODO: support Euclidean, Manhattan here:
-    return Math.sqrt(buf[cur + dim2 - 1]);
+    return FastMath.sqrt(buf[cur + dim2 - 1]);
   }
 
   /**

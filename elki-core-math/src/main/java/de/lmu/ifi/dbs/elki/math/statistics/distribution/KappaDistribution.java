@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Kappa distribution, by Hosking.
@@ -133,9 +134,9 @@ public class KappaDistribution extends AbstractDistribution {
       if(val < 1e-15) {
         return 0.;
       }
-      val = (1. - 1. / shape1) * Math.log(val);
+      val = (1. - 1. / shape1) * FastMath.log(val);
     }
-    return Math.exp(-val) / scale * Math.pow(c, 1. - shape2);
+    return FastMath.exp(-val) / scale * FastMath.pow(c, 1. - shape2);
   }
 
   @Override
@@ -161,9 +162,9 @@ public class KappaDistribution extends AbstractDistribution {
       if(val < 1e-15) {
         return Double.NEGATIVE_INFINITY;
       }
-      val = (1. - 1. / shape1) * Math.log(val);
+      val = (1. - 1. / shape1) * FastMath.log(val);
     }
-    return -val - Math.log(scale) + Math.log(c) * (1. - shape2);
+    return -val - FastMath.log(scale) + FastMath.log(c) * (1. - shape2);
   }
 
   @Override
@@ -188,20 +189,20 @@ public class KappaDistribution extends AbstractDistribution {
       if(tmp < 1e-15) {
         return (shape1 < 0.) ? 0. : 1.;
       }
-      val = Math.exp(Math.log(tmp) / shape1);
+      val = FastMath.exp(FastMath.log(tmp) / shape1);
     }
     else {
-      val = Math.exp(-val);
+      val = FastMath.exp(-val);
     }
     if(shape2 != 0.) {
       double tmp = 1. - shape2 * val;
       if(tmp < 1e-15) {
         return 0.;
       }
-      val = Math.exp(Math.log(tmp) / shape2);
+      val = FastMath.exp(FastMath.log(tmp) / shape2);
     }
     else {
-      val = Math.exp(-val);
+      val = FastMath.exp(-val);
     }
     return val;
   }
@@ -236,10 +237,10 @@ public class KappaDistribution extends AbstractDistribution {
       }
       else {
         if(shape1 != 0.) {
-          return loc + scale / shape1 * (1. - Math.pow(shape2, -shape1));
+          return loc + scale / shape1 * (1. - FastMath.pow(shape2, -shape1));
         }
         else {
-          return loc + scale * Math.log(shape2);
+          return loc + scale * FastMath.log(shape2);
         }
       }
     }
@@ -249,13 +250,13 @@ public class KappaDistribution extends AbstractDistribution {
       }
       return loc + scale / shape1;
     }
-    val = -Math.log(val);
+    val = -FastMath.log(val);
     if(shape2 != 0.) {
-      val = (1 - Math.exp(-shape2 * val)) / shape2;
+      val = (1 - FastMath.exp(-shape2 * val)) / shape2;
     }
-    val = -Math.log(val);
+    val = -FastMath.log(val);
     if(shape1 != 0.) {
-      val = (1 - Math.exp(-shape1 * val)) / shape1;
+      val = (1 - FastMath.exp(-shape1 * val)) / shape1;
     }
     return loc + scale * val;
   }

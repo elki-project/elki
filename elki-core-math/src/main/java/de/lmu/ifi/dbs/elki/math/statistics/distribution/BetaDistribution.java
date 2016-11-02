@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Beta Distribution with implementation of the regularized incomplete beta
@@ -131,7 +132,7 @@ public class BetaDistribution extends AbstractDistribution {
     if(val == 1.) {
       return (beta > 1.) ? 0. : (beta < 1.) ? Double.POSITIVE_INFINITY : alpha;
     }
-    return Math.exp(-logbab + Math.log(val) * (alpha - 1) + Math.log1p(-val) * (beta - 1));
+    return FastMath.exp(-logbab + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1));
   }
 
   @Override
@@ -140,12 +141,12 @@ public class BetaDistribution extends AbstractDistribution {
       return Double.NEGATIVE_INFINITY;
     }
     if(val == 0.) {
-      return (alpha > 1.) ? Double.NEGATIVE_INFINITY : (alpha < 1.) ? Double.POSITIVE_INFINITY : Math.log(beta);
+      return (alpha > 1.) ? Double.NEGATIVE_INFINITY : (alpha < 1.) ? Double.POSITIVE_INFINITY : FastMath.log(beta);
     }
     if(val == 1.) {
-      return (beta > 1.) ? Double.NEGATIVE_INFINITY : (beta < 1.) ? Double.POSITIVE_INFINITY : Math.log(alpha);
+      return (beta > 1.) ? Double.NEGATIVE_INFINITY : (beta < 1.) ? Double.POSITIVE_INFINITY : FastMath.log(alpha);
     }
-    return -logbab + Math.log(val) * (alpha - 1) + Math.log1p(-val) * (beta - 1);
+    return -logbab + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1);
   }
 
   @Override
@@ -162,7 +163,7 @@ public class BetaDistribution extends AbstractDistribution {
     if(alpha > SWITCH && beta > SWITCH) {
       return regularizedIncBetaQuadrature(alpha, beta, x);
     }
-    double bt = Math.exp(-logbab + alpha * Math.log(x) + beta * Math.log1p(-x));
+    double bt = FastMath.exp(-logbab + alpha * FastMath.log(x) + beta * FastMath.log1p(-x));
     if(x < (alpha + 1.0) / (alpha + beta + 2.0)) {
       return bt * regularizedIncBetaCF(alpha, beta, x) / alpha;
     }
@@ -237,7 +238,7 @@ public class BetaDistribution extends AbstractDistribution {
     if(val == 1.) {
       return (beta > 1.) ? 0. : (beta < 1.) ? Double.POSITIVE_INFINITY : alpha;
     }
-    return Math.exp(-logBeta(alpha, beta) + Math.log(val) * (alpha - 1) + Math.log1p(-val) * (beta - 1));
+    return FastMath.exp(-logBeta(alpha, beta) + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1));
   }
 
   /**
@@ -256,12 +257,12 @@ public class BetaDistribution extends AbstractDistribution {
       return Double.NEGATIVE_INFINITY;
     }
     if(val == 0.) {
-      return (alpha > 1.) ? Double.NEGATIVE_INFINITY : (alpha < 1.) ? Double.POSITIVE_INFINITY : Math.log(beta);
+      return (alpha > 1.) ? Double.NEGATIVE_INFINITY : (alpha < 1.) ? Double.POSITIVE_INFINITY : FastMath.log(beta);
     }
     if(val == 1.) {
-      return (beta > 1.) ? Double.NEGATIVE_INFINITY : (beta < 1.) ? Double.POSITIVE_INFINITY : Math.log(alpha);
+      return (beta > 1.) ? Double.NEGATIVE_INFINITY : (beta < 1.) ? Double.POSITIVE_INFINITY : FastMath.log(alpha);
     }
-    return -logBeta(alpha, beta) + Math.log(val) * (alpha - 1) + Math.log1p(-val) * (beta - 1);
+    return -logBeta(alpha, beta) + FastMath.log(val) * (alpha - 1) + FastMath.log1p(-val) * (beta - 1);
   }
 
   /**
@@ -297,7 +298,7 @@ public class BetaDistribution extends AbstractDistribution {
     if(alpha > SWITCH && beta > SWITCH) {
       return regularizedIncBetaQuadrature(alpha, beta, x);
     }
-    double bt = Math.exp(-logBeta(alpha, beta) + alpha * Math.log(x) + beta * Math.log1p(-x));
+    double bt = FastMath.exp(-logBeta(alpha, beta) + alpha * FastMath.log(x) + beta * FastMath.log1p(-x));
     if(x < (alpha + 1.0) / (alpha + beta + 2.0)) {
       return bt * regularizedIncBetaCF(alpha, beta, x) / alpha;
     }
@@ -373,9 +374,9 @@ public class BetaDistribution extends AbstractDistribution {
     final double a1 = alpha - 1.0;
     final double b1 = beta - 1.0;
     final double mu = alpha / alphapbeta;
-    final double lnmu = Math.log(mu);
-    final double lnmuc = Math.log1p(-mu);
-    double t = Math.sqrt(alpha * beta / (alphapbeta * alphapbeta * (alphapbeta + 1.0)));
+    final double lnmu = FastMath.log(mu);
+    final double lnmuc = FastMath.log1p(-mu);
+    double t = FastMath.sqrt(alpha * beta / (alphapbeta * alphapbeta * (alphapbeta + 1.0)));
     final double xu;
     if(x > alpha / alphapbeta) {
       if(x >= 1.0) {
@@ -392,9 +393,9 @@ public class BetaDistribution extends AbstractDistribution {
     double sum = 0.0;
     for(int i = 0; i < GAUSSLEGENDRE_Y.length; i++) {
       t = x + (xu - x) * GAUSSLEGENDRE_Y[i];
-      sum += GAUSSLEGENDRE_W[i] * Math.exp(a1 * (Math.log(t) - lnmu) + b1 * (Math.log1p(-t) - lnmuc));
+      sum += GAUSSLEGENDRE_W[i] * FastMath.exp(a1 * (FastMath.log(t) - lnmu) + b1 * (FastMath.log1p(-t) - lnmuc));
     }
-    double ans = sum * (xu - x) * Math.exp(a1 * lnmu - GammaDistribution.logGamma(alpha) + b1 * lnmuc - GammaDistribution.logGamma(beta) + GammaDistribution.logGamma(alphapbeta));
+    double ans = sum * (xu - x) * FastMath.exp(a1 * lnmu - GammaDistribution.logGamma(alpha) + b1 * lnmuc - GammaDistribution.logGamma(beta) + GammaDistribution.logGamma(alphapbeta));
     return ans > 0 ? 1.0 - ans : -ans;
   }
 
@@ -443,7 +444,7 @@ public class BetaDistribution extends AbstractDistribution {
     double x;
     {
       // Very fast approximation of y.
-      double tmp = Math.sqrt(-2 * Math.log(p));
+      double tmp = FastMath.sqrt(-2 * FastMath.log(p));
       double y = tmp - (2.30753 + 0.27061 * tmp) / (1. + (0.99229 + 0.04481 * tmp) * tmp);
 
       if(alpha > 1 && beta > 1) {
@@ -451,21 +452,21 @@ public class BetaDistribution extends AbstractDistribution {
         double s = 1. / (alpha + alpha - 1.);
         double t = 1. / (beta + beta - 1.);
         double h = 2. / (s + t);
-        double w = y * Math.sqrt(h + r) / h - (t - s) * (r + 5. / 6. - 2. / (3. * h));
-        x = alpha / (alpha + beta * Math.exp(w + w));
+        double w = y * FastMath.sqrt(h + r) / h - (t - s) * (r + 5. / 6. - 2. / (3. * h));
+        x = alpha / (alpha + beta * FastMath.exp(w + w));
       }
       else {
         double r = beta + beta;
         double t = 1. / (9. * beta);
-        final double a = 1. - t + y * Math.sqrt(t);
+        final double a = 1. - t + y * FastMath.sqrt(t);
         t = r * a * a * a;
         if(t <= 0.) {
-          x = 1. - Math.exp((Math.log1p(-p) + Math.log(beta) + logbeta) / beta);
+          x = 1. - FastMath.exp((FastMath.log1p(-p) + FastMath.log(beta) + logbeta) / beta);
         }
         else {
           t = (4. * alpha + r - 2.) / t;
           if(t <= 1.) {
-            x = Math.exp((Math.log(p * alpha) + logbeta) / alpha);
+            x = FastMath.exp((FastMath.log(p * alpha) + logbeta) / alpha);
           }
           else {
             x = 1. - 2. / (t + 1.);
@@ -484,7 +485,7 @@ public class BetaDistribution extends AbstractDistribution {
       final double ibeta = 1 - beta;
 
       // Desired accuracy, as from GNU R adoption of AS 109
-      final double acu = Math.max(1e-300, Math.pow(10., -13 - 2.5 / (alpha * alpha) - .5 / (p * p)));
+      final double acu = Math.max(1e-300, FastMath.pow(10., -13 - 2.5 / (alpha * alpha) - .5 / (p * p)));
       double prevstep = 0., y = 0., stepsize = 1;
 
       for(int outer = 0; outer < 1000; outer++) {
@@ -494,7 +495,7 @@ public class BetaDistribution extends AbstractDistribution {
           return Double.NaN;
         }
         // Error gradient
-        ynew = (ynew - p) * Math.exp(logbeta + ialpha * Math.log(x) + ibeta * Math.log1p(-x));
+        ynew = (ynew - p) * FastMath.exp(logbeta + ialpha * FastMath.log(x) + ibeta * FastMath.log1p(-x));
         if(ynew * y <= 0.) {
           prevstep = Math.max(Math.abs(stepsize), 3e-308);
         }

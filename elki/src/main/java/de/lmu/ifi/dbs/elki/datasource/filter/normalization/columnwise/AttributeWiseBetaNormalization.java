@@ -49,6 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
+import net.jafama.FastMath;
 
 /**
  * Project the data using a Beta distribution.
@@ -175,7 +176,7 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
       }
 
       // Beta distribution for projection
-      double p = Math.pow(alpha, -1 / Math.sqrt(dim));
+      double p = FastMath.pow(alpha, -1 / FastMath.sqrt(dim));
       BetaDistribution beta = new BetaDistribution(p, p);
       // Normalization scan
       double[] buf = new double[dim];

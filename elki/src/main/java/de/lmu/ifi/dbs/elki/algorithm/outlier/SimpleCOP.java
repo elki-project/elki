@@ -52,6 +52,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
@@ -131,7 +132,7 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     WritableDataStore<CorrelationAnalysisSolution<?>> cop_sol = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, CorrelationAnalysisSolution.class);
     {// compute neighbors of each db object
       FiniteProgress progressLocalPCA = LOG.isVerbose() ? new FiniteProgress("Correlation Outlier Probabilities", data.size(), LOG) : null;
-      double sqrt2 = Math.sqrt(2.0);
+      double sqrt2 = MathUtil.SQRT2;
       for(DBIDIter id = data.iterDBIDs(); id.valid(); id.advance()) {
         KNNList neighbors = knnQuery.getKNNForDBID(id, k + 1);
         ModifiableDBIDs nids = DBIDUtil.newArray(neighbors);

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Cosine kernel density estimator.
@@ -66,7 +67,7 @@ public final class CosineKernelDensityFunction implements KernelDensityFunction 
 
   @Override
   public double density(double delta) {
-    return (delta < 1.) ? MathUtil.QUARTERPI * Math.cos(MathUtil.HALFPI * delta) : 0.;
+    return (delta < 1.) ? MathUtil.QUARTERPI * FastMath.cos(MathUtil.HALFPI * delta) : 0.;
   }
 
   @Override

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -22,6 +22,8 @@ package de.lmu.ifi.dbs.elki.math;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import net.jafama.FastMath;
 
 /**
  * Class to precompute / cache Sinus and Cosinus values.
@@ -97,7 +99,7 @@ public abstract class SinCosTable {
       this.sintable = new double[steps];
       double ang = 0.;
       for (int i = 0; i < steps; i++, ang += radstep) {
-        this.costable[i] = Math.cos(ang);
+        this.costable[i] = FastMath.cos(ang);
         this.sintable[i] = MathUtil.cosToSin(ang, this.costable[i]);
       }
     }
@@ -167,8 +169,8 @@ public abstract class SinCosTable {
       this.sintable = new double[halfsteps + 1];
       double ang = 0.;
       for (int i = 0; i < halfsteps + 1; i++, ang += radstep) {
-        this.costable[i] = Math.cos(ang);
-        this.sintable[i] = Math.sin(ang);
+        this.costable[i] = FastMath.cos(ang);
+        this.sintable[i] = FastMath.sin(ang);
       }
     }
 
@@ -247,7 +249,7 @@ public abstract class SinCosTable {
       this.costable = new double[quarsteps + 1];
       double ang = 0.;
       for (int i = 0; i < quarsteps + 1; i++, ang += radstep) {
-        this.costable[i] = Math.cos(ang);
+        this.costable[i] = FastMath.cos(ang);
       }
     }
 

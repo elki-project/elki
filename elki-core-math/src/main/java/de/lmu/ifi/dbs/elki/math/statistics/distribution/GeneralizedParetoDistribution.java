@@ -28,6 +28,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Generalized Pareto Distribution (GPD), popular for modeling long tail
@@ -125,7 +126,7 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
     if(x < 0 || (xi < 0 && x > -1. / xi)) {
       return 0.;
     }
-    return ((xi == 0) ? 1. : Math.pow(1 + xi * x, -1 / xi - 1)) / sigma;
+    return ((xi == 0) ? 1. : FastMath.pow(1 + xi * x, -1 / xi - 1)) / sigma;
   }
 
   @Override
@@ -151,7 +152,7 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
     if(xi == 0) {
       return Double.POSITIVE_INFINITY;
     }
-    return ((xi == -1) ? 0. : Math.log(1 + xi * x) * (-1 / xi - 1)) - Math.log(sigma);
+    return ((xi == -1) ? 0. : FastMath.log(1 + xi * x) * (-1 / xi - 1)) - FastMath.log(sigma);
   }
 
   @Override
@@ -177,7 +178,7 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
     if(xi < 0 && val > -1. / xi) {
       return 1.;
     }
-    return 1 - Math.pow(1 + xi * val, -1. / xi);
+    return 1 - FastMath.pow(1 + xi * val, -1. / xi);
   }
 
   @Override
@@ -199,9 +200,9 @@ public class GeneralizedParetoDistribution extends AbstractDistribution {
       return Double.NaN;
     }
     if(xi == 0.) {
-      return mu - sigma * Math.log(1 - val);
+      return mu - sigma * FastMath.log(1 - val);
     }
-    return mu - sigma / xi * (1 - Math.pow(1 - val, -xi));
+    return mu - sigma / xi * (1 - FastMath.pow(1 - val, -xi));
   }
 
   @Override

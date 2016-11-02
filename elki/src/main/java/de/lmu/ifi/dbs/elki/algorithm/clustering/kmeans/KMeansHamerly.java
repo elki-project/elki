@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import net.jafama.FastMath;
 
 /**
  * Hamerly's fast k-means by exploiting the triangle inequality.
@@ -222,7 +223,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     }
     // We need half the Euclidean distance
     for(int i = 0; i < k; i++) {
-      sep[i] = issquared ? Math.sqrt(sep[i]) : sep[i];
+      sep[i] = issquared ? FastMath.sqrt(sep[i]) : sep[i];
       sep[i] *= .5;
     }
   }
@@ -262,8 +263,8 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
       // make squared Euclidean a metric:
       if(issquared) {
-        min1 = Math.sqrt(min1);
-        min2 = Math.sqrt(min2);
+        min1 = FastMath.sqrt(min1);
+        min2 = FastMath.sqrt(min2);
       }
       ModifiableDBIDs newc = clusters.get(minIndex);
       newc.add(it);
@@ -309,7 +310,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       // Update the upper bound
       V fv = relation.get(it);
       u = df.distance(fv, DoubleVector.wrap(means[cur]));
-      u = issquared ? Math.sqrt(u) : u;
+      u = issquared ? FastMath.sqrt(u) : u;
       upper.putDouble(it, u);
       if(u <= z || u <= sa) {
         continue;
@@ -330,8 +331,8 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
       }
       // make squared Euclidean a metric:
       if(issquared) {
-        min1 = Math.sqrt(min1);
-        min2 = Math.sqrt(min2);
+        min1 = FastMath.sqrt(min1);
+        min2 = FastMath.sqrt(min2);
       }
       if(minIndex != cur) {
         assignment.putInt(it, minIndex);
@@ -368,7 +369,7 @@ public class KMeansHamerly<V extends NumberVector> extends AbstractKMeans<V, KMe
     double max = 0.;
     for(int i = 0; i < k; i++) {
       double d = distanceFunction.distance(DoubleVector.wrap(means[i]), DoubleVector.wrap(newmeans[i]));
-      d = issquared ? Math.sqrt(d) : d;
+      d = issquared ? FastMath.sqrt(d) : d;
       dists[i] = d;
       max = (d > max) ? d : max;
     }

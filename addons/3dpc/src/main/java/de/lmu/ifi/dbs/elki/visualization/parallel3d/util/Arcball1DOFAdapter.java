@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.parallel3d.util;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,6 +32,7 @@ import javax.media.opengl.GL2;
 import javax.swing.event.MouseInputAdapter;
 
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import net.jafama.FastMath;
 
 /**
  * Arcball style helper.
@@ -109,7 +110,7 @@ public class Arcball1DOFAdapter extends MouseInputAdapter {
 
     Point startPoint = e.getPoint();
     mapMouseToPlane(startcamera, startPoint, startvec);
-    startangle = Math.atan2(startvec[1], startvec[0]);
+    startangle = FastMath.atan2(startvec[1], startvec[0]);
   }
 
   /**
@@ -139,7 +140,7 @@ public class Arcball1DOFAdapter extends MouseInputAdapter {
   @Override
   public void mouseDragged(MouseEvent e) {
     mapMouseToPlane(startcamera, e.getPoint(), endvec);
-    double upangle = Math.atan2(endvec[1], endvec[0]);
+    double upangle = FastMath.atan2(endvec[1], endvec[0]);
     camera.setRotationZ(startcamera.getRotationZ() + (upangle - startangle));
     // TODO: add full arcball support?
   }
@@ -159,9 +160,9 @@ public class Arcball1DOFAdapter extends MouseInputAdapter {
     gl.glBegin(GL.GL_LINES);
     gl.glVertex3f(0.f, 0.f, 0.f);
     double rot = startangle - startcamera.getRotationZ();
-    gl.glVertex3f((float) Math.cos(rot) * 4.f, (float) -Math.sin(rot) * 4.f, 0.f);
-    gl.glVertex3f((float) Math.cos(rot) * 1.f, (float) -Math.sin(rot) * 1.f, 0.f);
-    gl.glVertex3f((float) Math.cos(rot) * 1.f, (float) -Math.sin(rot) * 1.f, 1.f);
+    gl.glVertex3f((float) FastMath.cos(rot) * 4.f, (float) -FastMath.sin(rot) * 4.f, 0.f);
+    gl.glVertex3f((float) FastMath.cos(rot) * 1.f, (float) -FastMath.sin(rot) * 1.f, 0.f);
+    gl.glVertex3f((float) FastMath.cos(rot) * 1.f, (float) -FastMath.sin(rot) * 1.f, 1.f);
     gl.glEnd();
   }
 }

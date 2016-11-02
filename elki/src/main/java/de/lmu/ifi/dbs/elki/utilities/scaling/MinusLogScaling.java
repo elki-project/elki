@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import net.jafama.FastMath;
 
 /**
  * Scaling function to invert values by computing -1 * Math.log(x)
@@ -33,14 +34,14 @@ package de.lmu.ifi.dbs.elki.utilities.scaling;
 public class MinusLogScaling implements StaticScalingFunction {
   @Override
   public double getScaled(double value) {
-    return - Math.log(value);
+    return -FastMath.log(value);
   }
 
   @Override
   public double getMin() {
     return Double.NEGATIVE_INFINITY;
   }
-  
+
   @Override
   public double getMax() {
     return Double.POSITIVE_INFINITY;

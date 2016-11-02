@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Pair-counting measures.
@@ -165,7 +166,7 @@ public class PairCounting {
       title = "A method for comparing two hierarchical clusterings", //
       booktitle = "Journal of the American Statistical Association, Vol. 78 Issue 383")
   public double fowlkesMallows() {
-    return Math.sqrt(precision() * recall());
+    return FastMath.sqrt(precision() * recall());
   }
 
   /**
@@ -194,7 +195,7 @@ public class PairCounting {
    * @return The adjusted Rand index (ARI).
    */
   public double adjustedRandIndex() {
-    double d = Math.sqrt(pairconfuse[0] + pairconfuse[1] + pairconfuse[2] + pairconfuse[3]);
+    double d = FastMath.sqrt(pairconfuse[0] + pairconfuse[1] + pairconfuse[2] + pairconfuse[3]);
     // Note: avoid (a+b)*(a+c) as this will cause long overflows easily
     // Because we have O(N^2) pairs, and thus this value is temporarily O(N^4)
     double exp = (pairconfuse[0] + pairconfuse[1]) / d * (pairconfuse[0] + pairconfuse[2]) / d;

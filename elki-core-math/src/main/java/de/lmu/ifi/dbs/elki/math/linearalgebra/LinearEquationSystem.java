@@ -24,6 +24,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  */
 
 import gnu.trove.list.array.TIntArrayList;
+import net.jafama.FastMath;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -736,7 +737,7 @@ public class LinearEquationSystem {
     if(value < 10) {
       return 1;
     }
-    return (int) Math.log10(value) + 1;
+    return (int) FastMath.log10(value) + 1;
   }
 
   /**

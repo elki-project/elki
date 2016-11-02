@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Exponential distribution.
@@ -125,7 +126,7 @@ public class ExponentialDistribution extends AbstractDistribution {
     if(val < location) {
       return 0.;
     }
-    return rate * Math.exp(-rate * (val - location));
+    return rate * FastMath.exp(-rate * (val - location));
   }
 
   @Override
@@ -133,7 +134,7 @@ public class ExponentialDistribution extends AbstractDistribution {
     if(val < location) {
       return Double.NEGATIVE_INFINITY;
     }
-    return Math.log(rate) - rate * (val - location);
+    return FastMath.log(rate) - rate * (val - location);
   }
 
   /**
@@ -147,7 +148,7 @@ public class ExponentialDistribution extends AbstractDistribution {
     if(val < 0.) {
       return 0.;
     }
-    return rate * Math.exp(-rate * val);
+    return rate * FastMath.exp(-rate * val);
   }
 
   /**
@@ -161,7 +162,7 @@ public class ExponentialDistribution extends AbstractDistribution {
     if(val < 0.) {
       return Double.NEGATIVE_INFINITY;
     }
-    return Math.log(rate) - rate * val;
+    return FastMath.log(rate) - rate * val;
   }
 
   @Override
@@ -169,7 +170,7 @@ public class ExponentialDistribution extends AbstractDistribution {
     if(val < location) {
       return 0.;
     }
-    return 1 - Math.exp(-rate * (val - location));
+    return 1 - FastMath.exp(-rate * (val - location));
   }
 
   /**
@@ -183,12 +184,12 @@ public class ExponentialDistribution extends AbstractDistribution {
     if(val < 0.) {
       return 0.;
     }
-    return 1 - Math.exp(-rate * val);
+    return 1 - FastMath.exp(-rate * val);
   }
 
   @Override
   public double quantile(double val) {
-    return -Math.log(1 - val) / rate + location;
+    return -FastMath.log(1 - val) / rate + location;
   }
 
   /**
@@ -199,7 +200,7 @@ public class ExponentialDistribution extends AbstractDistribution {
    * @return Quantile
    */
   public static double quantile(double val, double rate) {
-    return -Math.log(1 - val) / rate;
+    return -FastMath.log(1 - val) / rate;
   }
 
   /**
@@ -213,7 +214,7 @@ public class ExponentialDistribution extends AbstractDistribution {
    */
   @Override
   public double nextRandom() {
-    return -Math.log(random.nextDouble()) / rate + location;
+    return -FastMath.log(random.nextDouble()) / rate + location;
   }
 
   @Override

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.meta;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -79,6 +79,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Algorithm to compute High Contrast Subspaces for Density-Based Outlier
@@ -86,7 +87,7 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  * 
  * Reference:
  * <p>
- * Fabian Keller, Emmanuel Müller, Klemens Böhm:<br />
+ * F. Keller and E. Müller and K. Böhm:<br />
  * HiCS: High Contrast Subspaces for Density-Based Outlier Ranking<br />
  * in: Proc. IEEE 28th Int. Conf. on Data Engineering (ICDE 2012), Washington,
  * DC, USA
@@ -103,7 +104,10 @@ import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
  */
 @Title("HiCS: High Contrast Subspaces for Density-Based Outlier Ranking")
 @Description("Algorithm to compute High Contrast Subspaces in a database as a pre-processing step for for density-based outlier ranking methods.")
-@Reference(authors = "Fabian Keller, Emmanuel Müller, Klemens Böhm", title = "HiCS: High Contrast Subspaces for Density-Based Outlier Ranking", booktitle = "Proc. IEEE 28th International Conference on Data Engineering (ICDE 2012)", url = "http://dx.doi.org/10.1109/ICDE.2012.88")
+@Reference(authors = "F. Keller and E. Müller and K. Böhm", //
+title = "HiCS: High Contrast Subspaces for Density-Based Outlier Ranking", //
+booktitle = "Proc. IEEE 28th International Conference on Data Engineering (ICDE 2012)", //
+url = "http://dx.doi.org/10.1109/ICDE.2012.88")
 public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResult> implements OutlierAlgorithm {
   /**
    * The Logger for this class.
@@ -337,7 +341,7 @@ public class HiCS<V extends NumberVector> extends AbstractAlgorithm<OutlierResul
    */
   private void calculateContrast(Relation<? extends NumberVector> relation, HiCSSubspace subspace, ArrayList<ArrayDBIDs> subspaceIndex, Random random) {
     final int card = subspace.cardinality();
-    final double alpha1 = Math.pow(alpha, (1.0 / card));
+    final double alpha1 = FastMath.pow(alpha, (1.0 / card));
     final int windowsize = (int) (relation.size() * alpha1);
     final FiniteProgress prog = LOG.isDebugging() ? new FiniteProgress("Monte-Carlo iterations", m, LOG) : null;
 

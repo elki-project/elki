@@ -28,6 +28,7 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Weibull distribution.
@@ -164,8 +165,8 @@ public class WeibullDistribution extends AbstractDistribution {
       return 0.;
     }
     double xl = (x - theta) / lambda;
-    double p = Math.pow(xl, k - 1), p2 = p * -xl;
-    return p2 != Double.NEGATIVE_INFINITY ? k / lambda * p * Math.exp(p2) : 0.;
+    double p = FastMath.pow(xl, k - 1), p2 = p * -xl;
+    return p2 != Double.NEGATIVE_INFINITY ? k / lambda * p * FastMath.exp(p2) : 0.;
   }
 
   /**
@@ -182,7 +183,7 @@ public class WeibullDistribution extends AbstractDistribution {
       return Double.NEGATIVE_INFINITY;
     }
     double xl = (x - theta) / lambda;
-    return Math.log(k / lambda) + (k - 1) * Math.log(xl) - Math.pow(xl, k);
+    return FastMath.log(k / lambda) + (k - 1) * FastMath.log(xl) - FastMath.pow(xl, k);
   }
 
   /**
@@ -196,7 +197,7 @@ public class WeibullDistribution extends AbstractDistribution {
    */
   public static double cdf(double val, double k, double lambda, double theta) {
     if(val > theta) {
-      return 1.0 - Math.exp(-Math.pow((val - theta) / lambda, k));
+      return 1.0 - FastMath.exp(-FastMath.pow((val - theta) / lambda, k));
     }
     else {
       return 0.0;
@@ -228,7 +229,7 @@ public class WeibullDistribution extends AbstractDistribution {
       return Double.POSITIVE_INFINITY;
     }
     else {
-      return theta + lambda * Math.pow(-Math.log(1.0 - val), 1.0 / k);
+      return theta + lambda * FastMath.pow(-FastMath.log(1.0 - val), 1.0 / k);
     }
   }
 
@@ -239,7 +240,7 @@ public class WeibullDistribution extends AbstractDistribution {
 
   @Override
   public double nextRandom() {
-    return theta + lambda * Math.pow(-Math.log(1 - random.nextDouble()), 1. / k);
+    return theta + lambda * FastMath.pow(-FastMath.log(1 - random.nextDouble()), 1. / k);
   }
 
   @Override

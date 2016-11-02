@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Tries to fit a mixture model (exponential for inliers and gaussian for
@@ -52,9 +53,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.4.0
  */
 @Reference(authors = "J. Gao, P.-N. Tan", //
-title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", //
-booktitle = "Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.", //
-url = "http://dx.doi.org/10.1109/ICDM.2006.43")
+    title = "Converting Output Scores from Outlier Detection Algorithms into Probability Estimates", //
+    booktitle = "Proc. Sixth International Conference on Data Mining, 2006. ICDM'06.", //
+    url = "http://dx.doi.org/10.1109/ICDM.2006.43")
 public class MixtureModelOutlierScalingFunction implements OutlierScalingFunction {
   /**
    * The logger for this class.
@@ -101,7 +102,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
    */
   protected static double calcP_i(double f, double mu, double sigma) {
     final double fmu = f - mu;
-    return ONEBYSQRT2PI / sigma * Math.exp(fmu * fmu / (-2 * sigma * sigma));
+    return ONEBYSQRT2PI / sigma * FastMath.exp(fmu * fmu / (-2 * sigma * sigma));
   }
 
   /**
@@ -112,7 +113,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
    * @return probability
    */
   protected static double calcQ_i(double f, double lambda) {
-    return lambda * Math.exp(-lambda * f);
+    return lambda * FastMath.exp(-lambda * f);
   }
 
   /**
@@ -179,7 +180,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
         break;
       }
       double newMu = owsum / otisum;
-      double newSigma = Math.max(Math.sqrt(osqsum / otisum - newMu * newMu), Double.MIN_NORMAL);
+      double newSigma = Math.max(FastMath.sqrt(osqsum / otisum - newMu * newMu), Double.MIN_NORMAL);
       double newLambda = Math.min(itisum / iwsum, Double.MAX_VALUE);
       double newAlpha = otisum / ids.size();
       // converged?
@@ -261,7 +262,7 @@ public class MixtureModelOutlierScalingFunction implements OutlierScalingFunctio
         break;
       }
       double newMu = owsum / otisum;
-      double newSigma = Math.max(Math.sqrt(osqsum / otisum - newMu * newMu), Double.MIN_NORMAL);
+      double newSigma = Math.max(FastMath.sqrt(osqsum / otisum - newMu * newMu), Double.MIN_NORMAL);
       double newLambda = Math.min(itisum / iwsum, Double.MAX_VALUE);
       double newAlpha = otisum / size;
       // converged?

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Spearman rank-correlation coefficient, also known as Spearmans Rho.
@@ -60,7 +61,7 @@ public class SpearmanCorrelationDependenceMeasure extends AbstractDependenceMeas
       cov += d1 * d2;
     }
     // Note: we did not normalize by len, as this cancels out.
-    return cov / Math.sqrt(v1 * v2);
+    return cov / FastMath.sqrt(v1 * v2);
   }
 
   /**

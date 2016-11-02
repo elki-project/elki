@@ -45,6 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Rescale the data set using multidimensional scaling, MDS.
@@ -245,7 +246,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
       return;
     }
     // Standardize:
-    final double s = 1. / Math.sqrt(l2);
+    final double s = 1. / FastMath.sqrt(l2);
     for(int d = 0; d < out.length; d++) {
       out[d] *= s;
     }
@@ -271,7 +272,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
       out[d1] = t;
       l += t * t;
     }
-    return l > 0 ? Math.sqrt(l) : 0.;
+    return l > 0 ? FastMath.sqrt(l) : 0.;
   }
 
   /**

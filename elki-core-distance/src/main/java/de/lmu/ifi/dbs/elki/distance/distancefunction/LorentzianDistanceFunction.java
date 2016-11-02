@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Lorentzian distance function for vector spaces.
@@ -65,7 +66,7 @@ public class LorentzianDistanceFunction extends AbstractSpatialNorm {
     double agg = 0.;
     for(int d = 0; d < dim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      agg += Math.log1p(Math.abs(xd - yd));
+      agg += FastMath.log1p(Math.abs(xd - yd));
     }
     return agg;
   }
@@ -76,7 +77,7 @@ public class LorentzianDistanceFunction extends AbstractSpatialNorm {
     double agg = 0.;
     for(int i = 0; i < dim; i++) {
       final double xi = v1.doubleValue(i);
-      agg += Math.log(1. + Math.abs(xi));
+      agg += FastMath.log(1. + Math.abs(xi));
     }
     return agg;
   }
@@ -99,7 +100,7 @@ public class LorentzianDistanceFunction extends AbstractSpatialNorm {
         // Minimum difference is 0
         continue;
       }
-      agg += Math.log(1. + diff);
+      agg += FastMath.log(1. + diff);
     }
     return agg;
   }

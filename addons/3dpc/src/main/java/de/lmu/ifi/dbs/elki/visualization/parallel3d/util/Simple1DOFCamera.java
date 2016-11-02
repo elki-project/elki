@@ -1,17 +1,10 @@
 package de.lmu.ifi.dbs.elki.visualization.parallel3d.util;
 
-import java.util.ArrayList;
-
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.fixedfunc.GLMatrixFunc;
-import javax.media.opengl.glu.GLU;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,6 +22,15 @@ import javax.media.opengl.glu.GLU;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import java.util.ArrayList;
+
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.fixedfunc.GLMatrixFunc;
+import javax.media.opengl.glu.GLU;
+
+import net.jafama.FastMath;
 
 /**
  * Class for a simple camera. Restricted: always looks at 0,0,0 from a position
@@ -213,8 +215,8 @@ public class Simple1DOFCamera {
    */
   public void setRotationZ(double rotationZ) {
     this.rotationZ = rotationZ;
-    this.cosZ = Math.cos(rotationZ);
-    this.sinZ = Math.sin(rotationZ);
+    this.cosZ = FastMath.cos(rotationZ);
+    this.sinZ = FastMath.sin(rotationZ);
 
     fireCameraChangedEvent();
   }

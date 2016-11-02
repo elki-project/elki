@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import gnu.trove.map.hash.TIntDoubleHashMap;
+import net.jafama.FastMath;
 
 /**
  * Utility functions for use with vectors.
@@ -112,7 +113,7 @@ public final class VectorUtil {
     }
     final double a = (cross == 0.) ? 0. : //
         (l1 == 0. || l2 == 0.) ? 1. : //
-            Math.sqrt((cross / l1) * (cross / l2));
+            FastMath.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -161,7 +162,7 @@ public final class VectorUtil {
     }
     final double a = (cross == 0.) ? 0. : //
         (l1 == 0. || l2 == 0.) ? 1. : //
-            Math.sqrt((cross / l1) * (cross / l2));
+            FastMath.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -205,7 +206,7 @@ public final class VectorUtil {
     }
     final double a = (cross == 0.) ? 0. : //
         (l1 == 0. || l2 == 0.) ? 1. : //
-            Math.sqrt((cross / l1) * (cross / l2));
+            FastMath.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -291,7 +292,7 @@ public final class VectorUtil {
     final double cross = Math.max(s1, Math.abs(s2));
     final double a = (cross == 0.) ? 0. : //
         (l1 == 0. || l2 == 0.) ? 1. : //
-            Math.sqrt((cross / l1) * (cross / l2));
+            FastMath.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 
@@ -332,7 +333,7 @@ public final class VectorUtil {
     }
     final double a = (cross == 0.) ? 0. : //
         (l1 == 0. || l2 == 0.) ? 1. : //
-            Math.sqrt((cross / l1) * (cross / l2));
+            FastMath.sqrt((cross / l1) * (cross / l2));
     return (a < 1.) ? a : 1.;
   }
 

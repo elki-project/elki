@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -61,6 +61,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
+import net.jafama.FastMath;
 
 /**
  * <p/>
@@ -476,8 +477,8 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
     for(int i = 0; i < denseSubspaces.size(); i++) {
       int mi = means[0][i];
       int mp = means[1][i];
-      double log_mi = mi == 0 ? 0 : StrictMath.log(mi) / StrictMath.log(2);
-      double log_mp = mp == 0 ? 0 : StrictMath.log(mp) / StrictMath.log(2);
+      double log_mi = mi == 0 ? 0 : FastMath.log(mi) / FastMath.log(2);
+      double log_mp = mp == 0 ? 0 : FastMath.log(mp) / FastMath.log(2);
       double diff_mi = diffs[0][i];
       double diff_mp = diffs[1][i];
       codeLength[i] = log_mi + diff_mi + log_mp + diff_mp;
@@ -513,9 +514,9 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
     for(int i = 0; i < denseSubspaces.size(); i++) {
       resultMI += denseSubspaces.get(i).getCoverage();
       resultMP += denseSubspaces.get(n - i).getCoverage();
-      mi[i] = (int) Math.ceil(resultMI / (i + 1));
+      mi[i] = (int) FastMath.ceil(resultMI / (i + 1));
       if(i != n) {
-        mp[n - 1 - i] = (int) Math.ceil(resultMP / (i + 1));
+        mp[n - 1 - i] = (int) FastMath.ceil(resultMP / (i + 1));
       }
     }
 
@@ -550,9 +551,9 @@ public class CLIQUE<V extends NumberVector> extends AbstractAlgorithm<Clustering
 
     for(int i = 0; i < denseSubspaces.size(); i++) {
       double diffMI = Math.abs(denseSubspaces.get(i).getCoverage() - mi[i]);
-      resultMI += diffMI == 0.0 ? 0 : StrictMath.log(diffMI) / StrictMath.log(2);
+      resultMI += diffMI == 0.0 ? 0 : FastMath.log(diffMI) / FastMath.log(2);
       double diffMP = (i != n) ? Math.abs(denseSubspaces.get(n - i).getCoverage() - mp[n - 1 - i]) : 0;
-      resultMP += diffMP == 0.0 ? 0 : StrictMath.log(diffMP) / StrictMath.log(2);
+      resultMP += diffMP == 0.0 ? 0 : FastMath.log(diffMP) / FastMath.log(2);
       diff_mi[i] = resultMI;
       if(i != n) {
         diff_mp[n - 1 - i] = resultMP;

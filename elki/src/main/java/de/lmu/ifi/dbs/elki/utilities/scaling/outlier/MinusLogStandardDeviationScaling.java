@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1].
@@ -52,9 +53,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.3
  */
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
-title = "Interpreting and Unifying Outlier Scores", //
-booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
-url = "http://dx.doi.org/10.1137/1.9781611972818.2")
+    title = "Interpreting and Unifying Outlier Scores", //
+    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
+    url = "http://dx.doi.org/10.1137/1.9781611972818.2")
 public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
   /**
    * Constructor.
@@ -69,7 +70,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
   @Override
   public double getScaled(double value) {
     assert (factor != 0) : "prepare() was not run prior to using the scaling function.";
-    final double mlogv = -Math.log(value);
+    final double mlogv = -FastMath.log(value);
     if(mlogv < mean || Double.isNaN(mlogv)) {
       return 0.0;
     }
@@ -82,7 +83,7 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
       MeanVariance mv = new MeanVariance();
       DoubleRelation scores = or.getScores();
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-        double val = -Math.log(scores.doubleValue(id));
+        double val = -FastMath.log(scores.doubleValue(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           mv.put(val);
         }
@@ -95,12 +96,12 @@ public class MinusLogStandardDeviationScaling extends StandardDeviationScaling {
       Mean sqsum = new Mean();
       DoubleRelation scores = or.getScores();
       for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
-        double val = -Math.log(scores.doubleValue(id));
+        double val = -FastMath.log(scores.doubleValue(id));
         if(!Double.isNaN(val) && !Double.isInfinite(val)) {
           sqsum.put((val - mean) * (val - mean));
         }
       }
-      factor = lambda * Math.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
+      factor = lambda * FastMath.sqrt(sqsum.getMean()) * MathUtil.SQRT2;
     }
   }
 

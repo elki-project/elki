@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.scaling.outlier;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Scaling that can map arbitrary values to a probability in the range of [0:1],
@@ -47,9 +48,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.3
  */
 @Reference(authors = "H.-P. Kriegel, P. Kröger, E. Schubert, A. Zimek", //
-title = "Interpreting and Unifying Outlier Scores", //
-booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
-url = "http://dx.doi.org/10.1137/1.9781611972818.2")
+    title = "Interpreting and Unifying Outlier Scores", //
+    booktitle = "Proc. 11th SIAM International Conference on Data Mining (SDM), Mesa, AZ, 2011", //
+    url = "http://dx.doi.org/10.1137/1.9781611972818.2")
 public class MinusLogGammaScaling extends OutlierGammaScaling {
   /**
    * Maximum value seen
@@ -71,7 +72,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
   @Override
   protected double preScale(double score) {
     assert (max > 0) : "prepare() was not run prior to using the scaling function.";
-    return -Math.log(score / max) / mlogmax;
+    return -FastMath.log(score / max) / mlogmax;
   }
 
   @Override
@@ -87,7 +88,7 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
       }
     }
     max = mm.getMax();
-    mlogmax = -Math.log(mm.getMin() / max);
+    mlogmax = -FastMath.log(mm.getMin() / max);
     // with the prescaling, do Gamma Scaling.
     MeanVariance mv = new MeanVariance();
     for(DBIDIter id = scores.iterDBIDs(); id.valid(); id.advance()) {
@@ -102,7 +103,8 @@ public class MinusLogGammaScaling extends OutlierGammaScaling {
     k = (mean * mean) / var;
     theta = var / mean;
     atmean = GammaDistribution.regularizedGammaP(k, mean / theta);
-    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+" valatmean"+atmean);
+    // logger.warning("Mean:"+mean+" Var:"+var+" Theta: "+theta+" k: "+k+"
+    // valatmean"+atmean);
   }
 
   /**

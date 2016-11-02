@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.distribution.estimator;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.StatisticalMoments;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import net.jafama.FastMath;
 
 /**
  * Estimators that work on Mean and Variance only (i.e. the first two moments
@@ -71,7 +72,7 @@ public abstract class AbstractLogMeanVarianceEstimator<D extends Distribution> e
       if (Double.isInfinite(val) || Double.isNaN(val) || val <= 0.) {
         continue;
       }
-      mv.put(Math.log(val));
+      mv.put(FastMath.log(val));
     }
     if (!(mv.getCount() > 1.)) {
       throw new ArithmeticException("Too small sample size to estimate variance.");

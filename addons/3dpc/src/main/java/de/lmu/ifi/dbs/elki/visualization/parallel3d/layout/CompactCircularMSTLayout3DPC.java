@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import net.jafama.FastMath;
 
 /**
  * Simple circular layout based on the minimum spanning tree.
@@ -112,17 +113,17 @@ public class CompactCircularMSTLayout3DPC extends AbstractLayout3DPC<CompactCirc
    * @param radiusinc Radius per depth step
    */
   public static void computePositions(Node node, int depth, double aoff, double awid, double radius, double radiusinc) {
-    node.x = Math.sin(aoff) * radius;
-    node.y = Math.cos(aoff) * radius;
+    node.x = FastMath.sin(aoff) * radius;
+    node.y = FastMath.cos(aoff) * radius;
 
     // Angular width per weight
     double cwid = awid / node.weight;
     // Avoid overly wide angles - shrink radius if necessary.
     double div = 1;
     if (node.weight > 1) {
-      double s = Math.sin(awid * .5), c = Math.cos(awid * .5);
+      double s = FastMath.sin(awid * .5), c = FastMath.cos(awid * .5);
       double dx = s * (depth + 1), dy = c * (depth + 1) - depth;
-      double d = Math.sqrt(dx * dx + dy * dy) / MathUtil.SQRT2;
+      double d = FastMath.sqrt(dx * dx + dy * dy) / MathUtil.SQRT2;
       div = Math.max(div, d);
     }
     // Angular position of current child:

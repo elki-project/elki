@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Uniform distribution.
@@ -129,7 +130,7 @@ public class UniformDistribution extends AbstractDistribution {
     if (!(val >= min) || val > max) {
       return Double.NEGATIVE_INFINITY;
     }
-    return (len > 0.) ? Math.log(1.0 / len) : Double.POSITIVE_INFINITY;
+    return (len > 0.) ? FastMath.log(1.0 / len) : Double.POSITIVE_INFINITY;
   }
 
   @Override

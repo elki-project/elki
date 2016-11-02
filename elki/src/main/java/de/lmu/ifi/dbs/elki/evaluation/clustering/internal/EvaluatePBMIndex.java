@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -53,6 +53,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  *
@@ -72,9 +73,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @apiviz.composedOf NoiseHandling
  */
 @Reference(authors = "M. K. Pakhira, and S. Bandyopadhyay, and U. Maulik", //
-title = "Validity index for crisp and fuzzy clusters",//
-booktitle = "Pattern recognition, 37(3)",//
-url = "http://dx.doi.org/10.1016/j.patcog.2003.06.005")
+    title = "Validity index for crisp and fuzzy clusters", //
+    booktitle = "Pattern recognition, 37(3)", //
+    url = "http://dx.doi.org/10.1016/j.patcog.2003.06.005")
 public class EvaluatePBMIndex implements Evaluator {
   /**
    * Logger for debug output.
@@ -192,7 +193,7 @@ public class EvaluatePBMIndex implements Evaluator {
       }
     }
 
-    final double pbm = Math.pow((1. / centroids.length) * (b / a) * max, 2.);
+    final double pbm = FastMath.pow((1. / centroids.length) * (b / a) * max, 2.);
 
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".pbm.noise-handling", noiseHandling.toString()));

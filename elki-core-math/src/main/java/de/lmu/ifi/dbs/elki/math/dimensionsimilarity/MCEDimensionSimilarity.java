@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Compute dimension similarity by using a nested means discretization.
@@ -89,7 +90,7 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector>
     // Check: for 10000 this should give 4, for 150 it gives 1.
     int power = Math.max(1, (int) Math.floor(p * .5));
     int gridsize = 1 << power;
-    double loggrid = Math.log((double) gridsize);
+    double loggrid = FastMath.log(gridsize);
 
     ArrayList<ArrayList<DBIDs>> parts = buildPartitions(relation, subset, power, matrix);
 
@@ -263,10 +264,10 @@ public class MCEDimensionSimilarity implements DimensionSimilarity<NumberVector>
         double py = mat[j][i] / sumy;
 
         if(px > 0.) {
-          mx[i] -= px * Math.log(px);
+          mx[i] -= px * FastMath.log(px);
         }
         if(py > 0.) {
-          my[i] -= py * Math.log(py);
+          my[i] -= py * FastMath.log(py);
         }
       }
     }

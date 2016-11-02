@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * The square root of Jensen-Shannon divergence is metric.
@@ -75,13 +76,13 @@ public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractNumberV
         continue;
       }
       if(xd > 0.) {
-        agg += xd * Math.log(xd / md);
+        agg += xd * FastMath.log(xd / md);
       }
       if(yd > 0.) {
-        agg += yd * Math.log(yd / md);
+        agg += yd * FastMath.log(yd / md);
       }
     }
-    return Math.sqrt(agg);
+    return FastMath.sqrt(agg);
   }
 
   @Override

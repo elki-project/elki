@@ -27,15 +27,16 @@ import java.util.Random;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * Generalized logistic distribution. (Type I, Skew-logistic distribution)
  * 
  * One of multiple ways of generalizing the logistic distribution.
  * 
- * {@code pdf(x) = shape * Math.exp(-x) / (1 + Math.exp(-x))**(shape+1)}
+ * {@code pdf(x) = shape * FastMath.exp(-x) / (1 + FastMath.exp(-x))**(shape+1)}
  * 
- * {@code cdf(x) = Math.pow(1+Math.exp(-x), -shape)}
+ * {@code cdf(x) = FastMath.pow(1+FastMath.exp(-x), -shape)}
  * 
  * Where {@code shape=1} yields the regular logistic distribution.
  * 
@@ -113,9 +114,9 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
       return 0.;
     }
     val = (val - loc) / scale;
-    double e = Math.exp(-val);
+    double e = FastMath.exp(-val);
     double f = 1. + e;
-    return e < Double.POSITIVE_INFINITY ? shape * e / (scale * Math.pow(f, shape + 1.)) : 0.;
+    return e < Double.POSITIVE_INFINITY ? shape * e / (scale * FastMath.pow(f, shape + 1.)) : 0.;
   }
 
   @Override
@@ -136,8 +137,8 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
    */
   public static double logpdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
-    double e = Math.exp(-val);
-    return -(val + (shape + 1.0) * Math.log1p(e)) + Math.log(shape);
+    double e = FastMath.exp(-val);
+    return -(val + (shape + 1.0) * FastMath.log1p(e)) + FastMath.log(shape);
   }
 
   @Override
@@ -156,7 +157,7 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
    */
   public static double cdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
-    return Math.pow(1. + Math.exp(-val), -shape);
+    return FastMath.pow(1. + FastMath.exp(-val), -shape);
   }
 
   /**
@@ -172,7 +173,7 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
    */
   public static double logcdf(double val, double loc, double scale, double shape) {
     val = (val - loc) / scale;
-    return Math.log1p(Math.exp(-val)) * -shape;
+    return FastMath.log1p(FastMath.exp(-val)) * -shape;
   }
 
   /**
@@ -185,7 +186,7 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
    * @return Quantile
    */
   public static double quantile(double val, double loc, double scale, double shape) {
-    return loc - scale * Math.log(Math.exp(Math.log(val) / -shape) - 1);
+    return loc - scale * FastMath.log(FastMath.exp(FastMath.log(val) / -shape) - 1);
   }
 
   @Override
@@ -196,7 +197,7 @@ public class GeneralizedLogisticDistribution extends AbstractDistribution {
   @Override
   public double nextRandom() {
     double u = random.nextDouble();
-    return location - scale * Math.log(Math.exp(Math.log(u) / -shape) - 1);
+    return location - scale * FastMath.log(FastMath.exp(FastMath.log(u) / -shape) - 1);
   }
 
   @Override

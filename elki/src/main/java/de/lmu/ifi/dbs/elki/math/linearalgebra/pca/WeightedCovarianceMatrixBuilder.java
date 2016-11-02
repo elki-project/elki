@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * {@link CovarianceMatrixBuilder} with weights.
@@ -123,7 +124,7 @@ public class WeightedCovarianceMatrixBuilder extends AbstractCovarianceMatrixBui
         maxdist = 1.0;
       }
       // compute standard deviation.
-      stddev = Math.sqrt(stddev / ids.size());
+      stddev = FastMath.sqrt(stddev / ids.size());
     }
 
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
@@ -170,7 +171,7 @@ public class WeightedCovarianceMatrixBuilder extends AbstractCovarianceMatrixBui
       if(maxdist == 0.0) {
         maxdist = 1.0;
       }
-      stddev = Math.sqrt(stddev / k);
+      stddev = FastMath.sqrt(stddev / k);
     }
 
     // calculate weighted PCA

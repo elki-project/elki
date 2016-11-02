@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import net.jafama.FastMath;
 
 /**
  * LP-Norm for {@link NumberVector}s.
@@ -74,7 +75,7 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
     for(int d = start; d < end; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       final double delta = (xd >= yd) ? xd - yd : yd - xd;
-      agg += Math.pow(delta, p);
+      agg += FastMath.pow(delta, p);
     }
     return agg;
   }
@@ -97,7 +98,7 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
         delta = value - mbr.getMax(d);
       }
       if(delta > 0.) {
-        agg += Math.pow(delta, p);
+        agg += FastMath.pow(delta, p);
       }
     }
     return agg;
@@ -120,7 +121,7 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
         delta = mbr1.getMin(d) - mbr2.getMax(d);
       }
       if(delta > 0.) {
-        agg += Math.pow(delta, p);
+        agg += FastMath.pow(delta, p);
       }
     }
     return agg;
@@ -139,7 +140,7 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
     for(int d = start; d < end; d++) {
       final double xd = v.doubleValue(d);
       final double delta = xd >= 0. ? xd : -xd;
-      agg += Math.pow(delta, p);
+      agg += FastMath.pow(delta, p);
     }
     return agg;
   }
@@ -160,7 +161,7 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
         delta = -mbr.getMax(d);
       }
       if(delta > 0.) {
-        agg += Math.pow(delta, p);
+        agg += FastMath.pow(delta, p);
       }
     }
     return agg;
@@ -177,12 +178,12 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
     else if(dim2 > mindim) {
       agg += preNorm(v2, mindim, dim2);
     }
-    return Math.pow(agg, invp);
+    return FastMath.pow(agg, invp);
   }
 
   @Override
   public double norm(NumberVector v) {
-    return Math.pow(preNorm(v, 0, v.getDimensionality()), invp);
+    return FastMath.pow(preNorm(v, 0, v.getDimensionality()), invp);
   }
 
   @Override
@@ -204,7 +205,7 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
     if(dim2 > mindim) {
       agg += (v2 != null) ? preNorm(v2, mindim, dim2) : preNormMBR(mbr2, mindim, dim2);
     }
-    return Math.pow(agg, invp);
+    return FastMath.pow(agg, invp);
   }
 
   @Override

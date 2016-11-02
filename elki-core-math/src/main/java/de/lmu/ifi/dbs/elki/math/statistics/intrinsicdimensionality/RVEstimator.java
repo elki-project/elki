@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Regularly Varying Functions estimator of the intrinsic dimensionality
@@ -67,8 +68,8 @@ public class RVEstimator extends AbstractIntrinsicDimensionalityEstimator {
     final double p = (r3 - r2) / (r1 - 2 * r2 + r3);
     // Optimized away: final double a1 = 1;
     final double a2 = (1. - p) / p;
-    return (/* a1 * */ Math.log(n3 / (double) n2) //
-        + a2 * Math.log(n1 / (double) n2)) / (/* a1 * */ Math.log(r3 / r2) + a2 * Math.log(r1 / r2));
+    return (/* a1 * */ FastMath.log(n3 / (double) n2) //
+        + a2 * FastMath.log(n1 / (double) n2)) / (/* a1 * */ FastMath.log(r3 / r2) + a2 * FastMath.log(r1 / r2));
   }
 
   /**

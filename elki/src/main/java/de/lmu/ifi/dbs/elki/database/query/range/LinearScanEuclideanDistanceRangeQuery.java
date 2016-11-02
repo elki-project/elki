@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.query.range;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
+import net.jafama.FastMath;
 
 /**
  * Optimized linear scan for Euclidean distance range queries.
@@ -104,7 +105,7 @@ public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> exten
     while(iter.valid()) {
       final double sqdistance = SQUARED.distance(obj, relation.get(iter));
       if(sqdistance <= sqrange) {
-        final double dist = Math.sqrt(sqdistance);
+        final double dist = FastMath.sqrt(sqdistance);
         if(dist <= range) { // double check, as we increased the radius above
           result.add(dist, iter);
         }

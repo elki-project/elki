@@ -73,6 +73,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import net.jafama.FastMath;
 
 /**
  * Implementation of the HiCO algorithm, an algorithm for detecting hierarchies
@@ -341,7 +342,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       double[] v2_i = getCol(v2_strong, i);
       // check, if distance of v2_i to the space of rv1 > delta
       // (i.e., if v2_i spans up a new dimension)
-      double dist = Math.sqrt(squareSum(v2_i) - transposeTimesTimes(v2_i, m1_czech, v2_i));
+      double dist = FastMath.sqrt(squareSum(v2_i) - transposeTimesTimes(v2_i, m1_czech, v2_i));
 
       // if so, insert v2_i into v1 and adjust v1
       // and compute m1_czech new, increase lambda1
@@ -357,7 +358,7 @@ public class HiCO<V extends NumberVector> extends GeneralizedOPTICS<V, Correlati
       double[] v1_i = getCol(v1_strong, i);
       // check, if distance of v1_i to the space of rv2 > delta
       // (i.e., if v1_i spans up a new dimension)
-      double dist = Math.sqrt(squareSum(v1_i) - transposeTimesTimes(v1_i, m2_czech, v1_i));
+      double dist = FastMath.sqrt(squareSum(v1_i) - transposeTimesTimes(v1_i, m2_czech, v1_i));
 
       // if so, insert v1_i into v2 and adjust v2
       // and compute m2_czech new , increase lambda2

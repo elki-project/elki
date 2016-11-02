@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.geodesy;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.geodesy;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * A simple spherical earth model using radius 6371009 m.
@@ -55,8 +56,8 @@ public class SphericalVincentyEarthModel extends AbstractEarthModel {
   @Override
   public double[] latLngRadToECEF(double lat, double lng) {
     // Then to sine and cosines:
-    final double clat = Math.cos(lat), slat = MathUtil.cosToSin(lat, clat);
-    final double clng = Math.cos(lng), slng = MathUtil.cosToSin(lng, clng);
+    final double clat = FastMath.cos(lat), slat = MathUtil.cosToSin(lat, clat);
+    final double clng = FastMath.cos(lng), slng = MathUtil.cosToSin(lng, clng);
 
     return new double[] { EARTH_RADIUS * clat * clng, EARTH_RADIUS * clat * slng, EARTH_RADIUS * slat };
   }
@@ -64,16 +65,16 @@ public class SphericalVincentyEarthModel extends AbstractEarthModel {
   @Override
   public double[] latLngRadToECEF(double lat, double lng, double h) {
     // Then to sine and cosines:
-    final double clat = Math.cos(lat), slat = MathUtil.cosToSin(lat, clat);
-    final double clng = Math.cos(lng), slng = MathUtil.cosToSin(lng, clng);
+    final double clat = FastMath.cos(lat), slat = MathUtil.cosToSin(lat, clat);
+    final double clng = FastMath.cos(lng), slng = MathUtil.cosToSin(lng, clng);
 
     return new double[] { (EARTH_RADIUS + h) * clat * clng, (EARTH_RADIUS + h) * clat * slng, (EARTH_RADIUS + h) * slat };
   }
 
   @Override
   public double ecefToLatRad(double x, double y, double z) {
-    final double p = Math.sqrt(x * x + y * y);
-    return Math.atan2(z, p);
+    final double p = FastMath.sqrt(x * x + y * y);
+    return FastMath.atan2(z, p);
   }
 
   @Override

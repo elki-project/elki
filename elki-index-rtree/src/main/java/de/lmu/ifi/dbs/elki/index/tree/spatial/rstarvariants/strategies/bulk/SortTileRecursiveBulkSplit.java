@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.QuickSelect;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Sort-Tile-Recursive aims at tiling the data space with a grid-like structure
@@ -57,7 +58,7 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
   @Override
   public <T extends SpatialComparable> List<List<T>> partition(List<T> spatialObjects, int minEntries, int maxEntries) {
     final int dims = spatialObjects.get(0).getDimensionality();
-    final int p = (int) Math.ceil(spatialObjects.size() / (double) maxEntries);
+    final int p = (int) FastMath.ceil(spatialObjects.size() / (double) maxEntries);
     List<List<T>> ret = new ArrayList<>(p);
     strPartition(spatialObjects, 0, spatialObjects.size(), 0, dims, maxEntries, new SpatialSingleMeanComparator(0), ret);
     return ret;
@@ -77,8 +78,8 @@ public class SortTileRecursiveBulkSplit extends AbstractBulkSplit {
    * @param <T> data type
    */
   protected <T extends SpatialComparable> void strPartition(List<T> objs, int start, int end, int depth, int dims, int maxEntries, SpatialSingleMeanComparator c, List<List<T>> ret) {
-    final int p = (int) Math.ceil((end - start) / (double) maxEntries);
-    final int s = (int) Math.ceil(Math.pow(p, 1.0 / (dims - depth)));
+    final int p = (int) FastMath.ceil((end - start) / (double) maxEntries);
+    final int s = (int) FastMath.ceil(FastMath.pow(p, 1.0 / (dims - depth)));
 
     final double len = end - start; // double intentional!
     for (int i = 0; i < s; i++) {

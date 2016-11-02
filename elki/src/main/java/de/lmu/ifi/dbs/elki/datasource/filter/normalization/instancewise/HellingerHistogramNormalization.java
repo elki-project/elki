@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Normalize histograms by scaling them to L1 norm 1, then taking the square
@@ -68,7 +69,7 @@ public class HellingerHistogramNormalization<V extends NumberVector> extends Abs
     if(sum > 0.) {
       for(int d = 0; d < data.length; ++d) {
         if(data[d] > 0) {
-          data[d] = Math.sqrt(data[d] / sum);
+          data[d] = FastMath.sqrt(data[d] / sum);
         }
       }
     }

@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.GammaDistribution;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.GeneralizedExtremeValueDistribution;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Estimate the parameters of a Generalized Extreme Value Distribution, using
@@ -123,17 +124,18 @@ public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<Ge
       if(t3 < -.8) {
         // Newton-Raphson iteration for t3 < -.8
         if(t3 <= -.97) {
-          g = 1. - Math.log1p(t3) * MathUtil.ONE_BY_LOG2;
+          g = 1. - FastMath.log1p(t3) * MathUtil.ONE_BY_LOG2;
         }
         double t0 = .5 * (t3 + 3.);
         for(int it = 1;; it++) {
-          double x2 = Math.pow(2., -g), xx2 = 1. - x2;
-          double x3 = Math.pow(3., -g), xx3 = 1. - x3;
+          // These sometimes do not converge with FastMath.
+          double x2 = FastMath.pow(2., -g), xx2 = 1. - x2;
+          double x3 = FastMath.pow(3., -g), xx3 = 1. - x3;
           double t = xx3 / xx2;
           double deriv = (xx2 * x3 * MathUtil.LOG3 - xx3 * x2 * MathUtil.LOG2) / (xx2 * xx2);
           double oldg = g;
           g -= (t - t0) / deriv;
-          if(Math.abs(g - oldg) < 1e-20 * g) {
+          if(Math.abs(g - oldg) < 1e-14 * g) {
             break;
           }
           if(it >= MAXIT) {
@@ -142,10 +144,10 @@ public class GeneralizedExtremeValueLMMEstimator extends AbstractLMMEstimator<Ge
         }
       }
     }
-    double gam = Math.exp(GammaDistribution.logGamma(1. + g));
+    double gam = FastMath.exp(GammaDistribution.logGamma(1. + g));
     final double mu, sigma, k;
     k = g;
-    sigma = xmom[1] * g / (gam * (1. - Math.pow(2., -g)));
+    sigma = xmom[1] * g / (gam * (1. - FastMath.pow(2., -g)));
     mu = xmom[0] - sigma * (1. - gam) / g;
     return new GeneralizedExtremeValueDistribution(mu, sigma, k);
   }

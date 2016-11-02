@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Hill estimator of the intrinsic dimensionality (maximum likelihood estimator
@@ -66,7 +67,7 @@ public class HillEstimator extends AbstractIntrinsicDimensionalityEstimator {
       if(!(v > 0.)) {
         continue;
       }
-      sum += v < halfw ? Math.log(v / w) : Math.log1p((v - w) / w);
+      sum += v < halfw ? FastMath.log(v / w) : FastMath.log1p((v - w) / w);
       ++valid;
     }
     if(valid < 1) {

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Arrange dimensions based on the entropy of the slope spectrum.
@@ -66,7 +67,7 @@ public class SlopeDimensionSimilarity implements DimensionSimilarity<NumberVecto
   /**
    * Precision for entropy normalization.
    */
-  protected final static double LOG_PRECISION = Math.log(PRECISION);
+  protected final static double LOG_PRECISION = FastMath.log(PRECISION);
 
   /**
    * Scaling factor.
@@ -129,7 +130,7 @@ public class SlopeDimensionSimilarity implements DimensionSimilarity<NumberVecto
         for (int l = 0; l < PRECISION; l++) {
           if (as[l] > 0) {
             final double p = as[l] / (double) size;
-            entropy += p * Math.log(p);
+            entropy += p * FastMath.log(p);
           }
         }
         entropy /= LOG_PRECISION;

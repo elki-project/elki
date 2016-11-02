@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * INCOMPLETE implementation of the poisson distribution.
@@ -167,7 +168,7 @@ public class PoissonDistribution extends AbstractDistribution {
 
   @Override
   public double logpdf(double x) {
-    return Math.log(pmf(x, n, p));
+    return FastMath.log(pmf(x, n, p));
   }
 
   /**
@@ -197,23 +198,23 @@ public class PoissonDistribution extends AbstractDistribution {
     // Extreme values of x
     if(x == 0) {
       if(p < .1) {
-        return Math.exp(-devianceTerm(n, n * q) - n * p);
+        return FastMath.exp(-devianceTerm(n, n * q) - n * p);
       }
       else {
-        return Math.exp(n * Math.log(q));
+        return FastMath.exp(n * FastMath.log(q));
       }
     }
     if(x == n) {
       if(p > .9) {
-        return Math.exp(-devianceTerm(n, n * p) - n * q);
+        return FastMath.exp(-devianceTerm(n, n * p) - n * q);
       }
       else {
-        return Math.exp(n * Math.log(p));
+        return FastMath.exp(n * FastMath.log(p));
       }
     }
     final double lc = stirlingError(n) - stirlingError(x) - stirlingError(n - x) - devianceTerm(x, n * p) - devianceTerm(n - x, n * q);
     final double f = (MathUtil.TWOPI * x * (n - x)) / n;
-    return Math.exp(lc) / Math.sqrt(f);
+    return FastMath.exp(lc) / FastMath.sqrt(f);
   }
 
   /**
@@ -243,7 +244,7 @@ public class PoissonDistribution extends AbstractDistribution {
         return -devianceTerm(n, n * q) - n * p;
       }
       else {
-        return n * Math.log(q);
+        return n * FastMath.log(q);
       }
     }
     if(x == n) {
@@ -251,12 +252,12 @@ public class PoissonDistribution extends AbstractDistribution {
         return -devianceTerm(n, n * p) - n * q;
       }
       else {
-        return n * Math.log(p);
+        return n * FastMath.log(p);
       }
     }
     final double lc = stirlingError(n) - stirlingError(x) - stirlingError(n - x) - devianceTerm(x, n * p) - devianceTerm(n - x, n * q);
     final double f = (MathUtil.TWOPI * x * (n - x)) / n;
-    return lc - .5 * Math.log(f);
+    return lc - .5 * FastMath.log(f);
   }
 
   @Override
@@ -294,7 +295,7 @@ public class PoissonDistribution extends AbstractDistribution {
       return rawProbability(x_plus_1 - 1, lambda);
     }
     if(lambda > Math.abs(x_plus_1 - 1) * MathUtil.LOG2 * Double.MAX_EXPONENT / 1e-14) {
-      return Math.exp(-lambda - GammaDistribution.logGamma(x_plus_1));
+      return FastMath.exp(-lambda - GammaDistribution.logGamma(x_plus_1));
     }
     else {
       return rawProbability(x_plus_1, lambda) * (x_plus_1 / lambda);
@@ -321,7 +322,7 @@ public class PoissonDistribution extends AbstractDistribution {
       return -lambda - GammaDistribution.logGamma(x_plus_1);
     }
     else {
-      return rawLogProbability(x_plus_1, lambda) + Math.log(x_plus_1 / lambda);
+      return rawLogProbability(x_plus_1, lambda) + FastMath.log(x_plus_1 / lambda);
     }
   }
 
@@ -366,11 +367,11 @@ public class PoissonDistribution extends AbstractDistribution {
     if(n < 16.0) {
       // Our table has a step size of 0.5
       final double n2 = 2.0 * n;
-      if(Math.floor(n2) == n2) { // Exact match
+      if(FastMath.floor(n2) == n2) { // Exact match
         return STIRLING_EXACT_ERROR[(int) n2];
       }
       else {
-        return GammaDistribution.logGamma(n + 1.0) - (n + 0.5) * Math.log(n) + n - MathUtil.LOGSQRTTWOPI;
+        return GammaDistribution.logGamma(n + 1.0) - (n + 0.5) * FastMath.log(n) + n - MathUtil.LOGSQRTTWOPI;
       }
     }
     final double nn = n * n;
@@ -411,7 +412,7 @@ public class PoissonDistribution extends AbstractDistribution {
         s = s1;
       }
     }
-    return x * Math.log(x / np) + np - x;
+    return x * FastMath.log(x / np) + np - x;
   }
 
   /**
@@ -433,15 +434,15 @@ public class PoissonDistribution extends AbstractDistribution {
       return 0.;
     }
     if(x <= lambda * Double.MIN_NORMAL) {
-      return Math.exp(-lambda);
+      return FastMath.exp(-lambda);
     }
     if(lambda < x * Double.MIN_NORMAL) {
-      double r = -lambda + x * Math.log(lambda) - GammaDistribution.logGamma(x + 1);
-      return Math.exp(r);
+      double r = -lambda + x * FastMath.log(lambda) - GammaDistribution.logGamma(x + 1);
+      return FastMath.exp(r);
     }
     final double f = MathUtil.TWOPI * x;
     final double y = -stirlingError(x) - devianceTerm(x, lambda);
-    return Math.exp(y) / Math.sqrt(f);
+    return FastMath.exp(y) / FastMath.sqrt(f);
   }
 
   /**
@@ -466,11 +467,11 @@ public class PoissonDistribution extends AbstractDistribution {
       return -lambda;
     }
     if(lambda < x * Double.MIN_NORMAL) {
-      return -lambda + x * Math.log(lambda) - GammaDistribution.logGamma(x + 1);
+      return -lambda + x * FastMath.log(lambda) - GammaDistribution.logGamma(x + 1);
     }
     final double f = MathUtil.TWOPI * x;
     final double y = -stirlingError(x) - devianceTerm(x, lambda);
-    return -0.5 * Math.log(f) + y;
+    return -0.5 * FastMath.log(f) + y;
   }
 
   @Override
@@ -510,15 +511,15 @@ public class PoissonDistribution extends AbstractDistribution {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
 
-      IntParameter nP = new IntParameter(N_ID);
-      nP.addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+      IntParameter nP = new IntParameter(N_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(nP)) {
         n = nP.intValue();
       }
 
-      DoubleParameter probP = new DoubleParameter(PROB_ID);
-      probP.addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      probP.addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+      DoubleParameter probP = new DoubleParameter(PROB_ID) //
+      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(probP)) {
         p = probP.doubleValue();
       }

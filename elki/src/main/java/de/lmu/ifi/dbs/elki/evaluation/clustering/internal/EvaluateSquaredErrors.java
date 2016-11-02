@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.internal;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -68,6 +68,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+import net.jafama.FastMath;
 
 /**
  * Evaluate a clustering by reporting the squared errors (SSE, SSQ), as used by
@@ -161,14 +162,14 @@ public class EvaluateSquaredErrors implements Evaluator {
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(key + ".mean", sum / div));
       LOG.statistics(new DoubleStatistic(key + ".ssq", ssq));
-      LOG.statistics(new DoubleStatistic(key + ".rmsd", Math.sqrt(ssq / div)));
+      LOG.statistics(new DoubleStatistic(key + ".rmsd", FastMath.sqrt(ssq / div)));
     }
 
     EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Mean distance", sum / div, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("Sum of Squares", ssq, 0., Double.POSITIVE_INFINITY, true);
-    g.addMeasure("RMSD", Math.sqrt(ssq / div), 0., Double.POSITIVE_INFINITY, true);
+    g.addMeasure("RMSD", FastMath.sqrt(ssq / div), 0., Double.POSITIVE_INFINITY, true);
     db.getHierarchy().add(c, ev);
     return ssq;
   }

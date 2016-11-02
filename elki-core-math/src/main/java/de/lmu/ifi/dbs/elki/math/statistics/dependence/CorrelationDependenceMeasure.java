@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.statistics.dependence;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -28,6 +28,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Pearson product-moment correlation coefficient.
@@ -75,7 +76,7 @@ public class CorrelationDependenceMeasure extends AbstractDependenceMeasure {
       cov += d1 * d2;
     }
     // Note: we did not normalize by len, as this cancels out.
-    return cov / Math.sqrt(v1 * v2);
+    return cov / FastMath.sqrt(v1 * v2);
   }
 
   @Override
@@ -113,7 +114,7 @@ public class CorrelationDependenceMeasure extends AbstractDependenceMeasure {
       if(vst[y] == 0.) {
         LOG.warning("Correlation is not well defined for constant attributes.");
       }
-      vst[y] = Math.sqrt(vst[y]);
+      vst[y] = FastMath.sqrt(vst[y]);
     }
     for(int y = 1, c = 0; y < dims; y++) {
       for(int x = 0; x < y; x++) {

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -62,6 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
+import net.jafama.FastMath;
 
 /**
  * <p>
@@ -163,11 +164,11 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
     ArrayModifiableDBIDs S = DBIDUtil.newArray(relation.getDBIDs());
 
     // Precompute values as described in Figure 2.
-    double r = Math.abs(Math.log(d + d) / Math.log(beta * .5));
+    double r = Math.abs(FastMath.log(d + d) / FastMath.log(beta * .5));
     // Outer loop count.
     int n = (int) (2. / alpha);
     // Inner loop count.
-    int m = (int) (Math.pow(2. / alpha, r) * Math.log(4));
+    int m = (int) (FastMath.pow(2. / alpha, r) * FastMath.log(4));
     if(heuristics) {
       m = Math.min(m, Math.min(1000000, d * d));
     }
@@ -437,7 +438,7 @@ public class DOC<V extends NumberVector> extends AbstractAlgorithm<Clustering<Su
    *         other clusters).
    */
   private double computeClusterQuality(int clusterSize, int numRelevantDimensions) {
-    return clusterSize * Math.pow(1. / beta, numRelevantDimensions);
+    return clusterSize * FastMath.pow(1. / beta, numRelevantDimensions);
   }
 
   // ---------------------------------------------------------------------- //
