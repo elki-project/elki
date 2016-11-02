@@ -27,6 +27,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllInOne;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.TrivialAllNoise;
@@ -34,13 +35,9 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Validate {@link ClusterContingencyTable} with respect to its ability to compare
@@ -64,13 +61,7 @@ public class ClusterContingencyTableTest {
    */
   @Test
   public void testCompareDatabases() {
-    ListParameterization params = new ListParameterization();
-    // Input
-    params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
-
-    // get database
-    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
-    db.initialize();
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, null, null);
 
     // verify data set size.
     Relation<?> rel = db.getRelation(TypeUtil.ANY);

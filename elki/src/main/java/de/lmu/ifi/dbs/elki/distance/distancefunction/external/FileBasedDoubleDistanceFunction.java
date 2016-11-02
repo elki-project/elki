@@ -108,7 +108,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
   public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> database) {
     if(cache == null) {
       try {
-        loadCache(matrixfile);
+        loadCache(new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile))));
       }
       catch(IOException e) {
         throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
@@ -122,11 +122,13 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
     return (i1 == i2) ? 0. : cache.get(makeKey(i1 + min, i2 + min));
   }
 
-  private void loadCache(File matrixfile) throws IOException {
-    loadCache(new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile))));
-  }
-
-  private void loadCache(InputStream in) throws IOException {
+  /**
+   * Fill cache from an input stream.
+   * 
+   * @param in Input stream
+   * @throws IOException
+   */
+  protected void loadCache(InputStream in) throws IOException {
     cache = new TLongDoubleHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1L, Double.POSITIVE_INFINITY);
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;

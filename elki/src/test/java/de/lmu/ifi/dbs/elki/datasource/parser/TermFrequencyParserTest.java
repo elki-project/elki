@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,18 +26,21 @@ package de.lmu.ifi.dbs.elki.datasource.parser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.data.SparseDoubleVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.AbstractDatabase;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.AbstractDatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.InputStreamDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SparseEuclideanDistanceFunction;
@@ -58,14 +61,14 @@ public class TermFrequencyParserTest {
   public static String DBLP_DATA = "data/testdata/parsing/termfreq-dblp.ascii.gz";
 
   @Test
-  public void testDBLPData() {
+  public void testDBLPData() throws IOException {
+    InputStream is = AbstractSimpleAlgorithmTest.open(DBLP_DATA);
+    // Setup parser and data loading
+    TermFrequencyParser<SparseDoubleVector> parser = new TermFrequencyParser<>(false, SparseDoubleVector.FACTORY);
+    InputStreamDatabaseConnection dbc = new InputStreamDatabaseConnection(is, null, parser);
+
     ListParameterization config = new ListParameterization();
-    config.addParameter(AbstractDatabaseConnection.Parameterizer.PARSER_ID, TermFrequencyParser.class);
-    config.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, DBLP_DATA);
-
-    ArrayList<Object> filters = new ArrayList<>();
-    config.addParameter(AbstractDatabaseConnection.Parameterizer.FILTERS_ID, filters);
-
+    config.addParameter(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, dbc);
     Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, config);
 
     if(config.hasUnusedParameters()) {
@@ -75,7 +78,6 @@ public class TermFrequencyParserTest {
       config.logAndClearReportedErrors();
       fail("Parameterization errors.");
     }
-
     db.initialize();
 
     Relation<SparseNumberVector> rel = db.getRelation(TypeUtil.SPARSE_VECTOR_VARIABLE_LENGTH);

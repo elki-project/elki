@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,10 +26,10 @@ package de.lmu.ifi.dbs.elki.index;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
@@ -37,10 +37,8 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -69,43 +67,43 @@ public abstract class AbstractIndexStructureTest {
 
   // the 10 next neighbors of the query point
   double[][] shouldc = new double[][] { //
-  { 0.45000428746088883, 0.484504234161508, 0.5538595167151342 }, //
-  { 0.4111050036231091, 0.429204794352013, 0.4689430202460606 }, //
-  { 0.4758477631164003, 0.6021538103067177, 0.5556807408692025 }, //
-  { 0.4163288957164025, 0.49604545242979536, 0.4054361013566713 }, //
-  { 0.5819940640461848, 0.48586944418231115, 0.6289592025558619 }, //
-  { 0.4373568207802466, 0.3468650110814596, 0.49566951629699485 }, //
-  { 0.40283109564192643, 0.6301433694690401, 0.44313571161129883 }, //
-  { 0.6545840114867083, 0.4919617658889418, 0.5905461546078652 }, //
-  { 0.6011097673869055, 0.6562921241634017, 0.44830647520493694 }, //
-  { 0.5127485678175534, 0.29708449200895504, 0.561722374659424 }, //
+      { 0.45000428746088883, 0.484504234161508, 0.5538595167151342 }, //
+      { 0.4111050036231091, 0.429204794352013, 0.4689430202460606 }, //
+      { 0.4758477631164003, 0.6021538103067177, 0.5556807408692025 }, //
+      { 0.4163288957164025, 0.49604545242979536, 0.4054361013566713 }, //
+      { 0.5819940640461848, 0.48586944418231115, 0.6289592025558619 }, //
+      { 0.4373568207802466, 0.3468650110814596, 0.49566951629699485 }, //
+      { 0.40283109564192643, 0.6301433694690401, 0.44313571161129883 }, //
+      { 0.6545840114867083, 0.4919617658889418, 0.5905461546078652 }, //
+      { 0.6011097673869055, 0.6562921241634017, 0.44830647520493694 }, //
+      { 0.5127485678175534, 0.29708449200895504, 0.561722374659424 }, //
   };
 
   // and their distances
   double[] shouldd = new double[] { //
-  0.07510351238126374, 0.11780839322826206, 0.11882371989803064, 0.1263282354232315, //
-  0.15347043712184602, 0.1655090505771259, 0.17208323533934652, 0.17933052146586306, //
-  0.19319066655063877, 0.21247795391113142 };
+      0.07510351238126374, 0.11780839322826206, 0.11882371989803064, 0.1263282354232315, //
+      0.15347043712184602, 0.1655090505771259, 0.17208323533934652, 0.17933052146586306, //
+      0.19319066655063877, 0.21247795391113142 };
 
   // the 10 next neighbors of the query point
   double[][] cosshouldc = new double[][] { //
-  { 0.9388918784671444, 0.9369194808634538, 0.9516174288228975 }, //
-  { 0.7935657901929466, 0.8267149570739274, 0.8272559426355307 }, //
-  { 0.8890643793450695, 0.8437901951504767, 0.8829882896201193 }, //
-  { 0.8063843680107571, 0.8398807048463017, 0.7684707062186061 }, //
-  { 0.9161117092342763, 0.8422669974489574, 0.8359110785874984 }, //
-  { 0.7216963585662849, 0.7890921579518568, 0.8203282873655718 }, //
-  { 0.4111050036231091, 0.429204794352013, 0.4689430202460606 }, //
-  { 0.9361084305156224, 0.8005811202045534, 0.8467431187531834 }, //
-  { 0.769186011075896, 0.7004483428021823, 0.834918908745398 }, //
-  { 0.8616135674236818, 0.7527587616292614, 0.9089966965471046 }, //
+      { 0.9388918784671444, 0.9369194808634538, 0.9516174288228975 }, //
+      { 0.7935657901929466, 0.8267149570739274, 0.8272559426355307 }, //
+      { 0.8890643793450695, 0.8437901951504767, 0.8829882896201193 }, //
+      { 0.8063843680107571, 0.8398807048463017, 0.7684707062186061 }, //
+      { 0.9161117092342763, 0.8422669974489574, 0.8359110785874984 }, //
+      { 0.7216963585662849, 0.7890921579518568, 0.8203282873655718 }, //
+      { 0.4111050036231091, 0.429204794352013, 0.4689430202460606 }, //
+      { 0.9361084305156224, 0.8005811202045534, 0.8467431187531834 }, //
+      { 0.769186011075896, 0.7004483428021823, 0.834918908745398 }, //
+      { 0.8616135674236818, 0.7527587616292614, 0.9089966965471046 }, //
   };
 
   // and their distances
   double[] cosshouldd = new double[] { //
-  2.388222990501454E-5, 1.8642729910156586E-4, 2.646439281461799E-4, 6.560940454963804E-4,//
-  8.847811747589862E-4, 0.0013998753062922642, 0.0015284394211749763, 0.002127161867922056,//
-  0.002544219809804127, 0.003009950345141843 };
+      2.388222990501454E-5, 1.8642729910156586E-4, 2.646439281461799E-4, 6.560940454963804E-4, //
+      8.847811747589862E-4, 0.0013998753062922642, 0.0015284394211749763, 0.002127161867922056, //
+      0.002544219809804127, 0.003009950345141843 };
 
   double eps = shouldd[shouldd.length - 1];
 
@@ -117,16 +115,9 @@ public abstract class AbstractIndexStructureTest {
    * @param inputparams
    */
   protected void testExactEuclidean(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
-    inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
-
-    // get database
-    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, inputparams);
-    db.initialize();
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams, null);
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
-
-    // verify data set size.
-    assertTrue(rep.size() == shoulds);
 
     if(expectKNNQuery != null) {
       // get the 10 next neighbors
@@ -174,16 +165,9 @@ public abstract class AbstractIndexStructureTest {
    * @param inputparams
    */
   protected void testExactCosine(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
-    inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
-
-    // get database
-    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, inputparams);
-    db.initialize();
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams, null);
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, CosineDistanceFunction.STATIC);
-
-    // verify data set size.
-    assertTrue(rep.size() == shoulds);
 
     if(expectKNNQuery != null) {
       // get the 10 next neighbors

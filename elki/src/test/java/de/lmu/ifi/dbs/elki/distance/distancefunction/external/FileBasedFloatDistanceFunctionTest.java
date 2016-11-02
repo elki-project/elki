@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class FileBasedDoubleDistanceFunctionTest extends AbstractSimpleAlgorithmTest {
+public class FileBasedFloatDistanceFunctionTest extends AbstractSimpleAlgorithmTest {
   final static String FILENAME = "data/testdata/unittests/distance/AsciiDistanceMatrix.ascii";
 
   @Test
@@ -61,7 +61,7 @@ public class FileBasedDoubleDistanceFunctionTest extends AbstractSimpleAlgorithm
 
     ListParameterization distparams = new ListParameterization();
     distparams.addParameter(FileBasedDoubleDistanceFunction.Parameterizer.MATRIX_ID, FILENAME);
-    FileBasedDoubleDistanceFunction df = new FileBasedDoubleDistanceFunction(//
+    FileBasedFloatDistanceFunction df = new FileBasedFloatDistanceFunction(//
         new AsciiDistanceParser(CSVReaderFormat.DEFAULT_FORMAT), null);
     // We need to read from a resource, instead of a file.
     df.loadCache(FileUtil.openSystemFile(FILENAME));

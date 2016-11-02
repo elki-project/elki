@@ -77,18 +77,12 @@ public abstract class AbstractSimpleAlgorithmTest {
   public final static String UNITTEST = "data/testdata/unittests/";
 
   /**
-   * Notice: this is okay for tests - don't use this for frequently used
-   * objects, use a static instance instead!
-   */
-  protected Logging logger = Logging.getLogger(this.getClass());
-
-  /**
    * Validate that parameterization succeeded: no parameters left, no
    * parameterization errors.
    *
    * @param config Parameterization to test
    */
-  protected void testParameterizationOk(ListParameterization config) {
+  public static void testParameterizationOk(ListParameterization config) {
     if(config.hasUnusedParameters()) {
       fail("Unused parameters: " + config.getRemainingParameters());
     }
@@ -106,9 +100,12 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @param params Extra parameters
    * @return Database
    */
-  protected <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params, Class<?>[] filters) {
+  public static <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params, Class<?>[] filters) {
     // Allow loading test data from resources.
     try (InputStream is = open(filename)) {
+      if (params == null) {
+        params = new ListParameterization();
+      }
       // Instantiate filters manually. TODO: redesign
       List<ObjectFilter> filterlist = new ArrayList<>();
       filterlist.add(new FixedDBIDsFilter(1));
@@ -130,7 +127,9 @@ public abstract class AbstractSimpleAlgorithmTest {
 
       db.initialize();
       Relation<?> rel = db.getRelation(TypeUtil.ANY);
-      assertEquals("Database size does not match.", expectedSize, rel.size());
+      if (expectedSize > 0) {
+        assertEquals("Database size does not match.", expectedSize, rel.size());
+      }
       return db;
     }
     catch(IOException e) {
@@ -147,7 +146,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @return Input stream
    * @throws IOException
    */
-  private InputStream open(String filename) throws IOException {
+  public static InputStream open(String filename) throws IOException {
     InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(filename);
     return filename.endsWith(".gz") ? new GZIPInputStream(is) : is;
   }
@@ -191,9 +190,7 @@ public abstract class AbstractSimpleAlgorithmTest {
     ClusterContingencyTable ct = new ClusterContingencyTable(true, false);
     ct.process(clustering, rbl);
     double score = ct.getPaircount().f1Measure();
-    if(logger.isVerbose()) {
-      logger.verbose(this.getClass().getSimpleName() + " score: " + score + " expect: " + expected);
-    }
+    Logging.getLogger(this.getClass()).verbose(this.getClass().getSimpleName() + " score: " + score + " expect: " + expected);
     assertEquals(this.getClass().getSimpleName() + ": Score does not match.", expected, score, 0.0001);
   }
 

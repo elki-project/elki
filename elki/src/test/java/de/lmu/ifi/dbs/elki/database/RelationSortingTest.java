@@ -1,28 +1,10 @@
 package de.lmu.ifi.dbs.elki.database;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import org.junit.Test;
-
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.VectorUtil;
-import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -41,6 +23,22 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Test;
+
+import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.VectorUtil;
+import de.lmu.ifi.dbs.elki.data.VectorUtil.SortDBIDsBySingleDimension;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+
 /**
  * Unit test that loads a data file and sorts it. This tests some key parts of
  * the database and ID layers.
@@ -54,10 +52,7 @@ public class RelationSortingTest {
 
   @Test
   public void testSorting() {
-    ListParameterization params = new ListParameterization();
-    params.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, filename);
-    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, params);
-    db.initialize();
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(filename, -1, null, null);
     Relation<? extends NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(rel.getDBIDs());

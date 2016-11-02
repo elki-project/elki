@@ -23,9 +23,6 @@ package de.lmu.ifi.dbs.elki.algorithm;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -39,8 +36,6 @@ import de.lmu.ifi.dbs.elki.database.ids.KNNList;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
-import de.lmu.ifi.dbs.elki.datasource.filter.FixedDBIDsFilter;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
@@ -51,7 +46,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeFacto
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.ParameterException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -82,20 +76,8 @@ public class KNNJoinTest {
 
   @Test
   public void testLinearScan() {
-    ListParameterization inputparams = new ListParameterization();
-    inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
-    List<Class<?>> filters = Arrays.asList(new Class<?>[] { FixedDBIDsFilter.class });
-    inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.FILTERS_ID, filters);
-    inputparams.addParameter(FixedDBIDsFilter.Parameterizer.IDSTART_ID, 1);
-
-    // get database
-    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, inputparams);
-    inputparams.failOnErrors();
-
-    db.initialize();
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, null, null);
     Relation<NumberVector> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    // verify data set size.
-    org.junit.Assert.assertEquals("Database size does not match.", shoulds, relation.size());
 
     // Euclidean
     {
@@ -174,19 +156,8 @@ public class KNNJoinTest {
    * @throws ParameterException
    */
   void doKNNJoin(ListParameterization inputparams) {
-    inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.INPUT_ID, dataset);
-    List<Class<?>> filters = Arrays.asList(new Class<?>[] { FixedDBIDsFilter.class });
-    inputparams.addParameter(FileBasedDatabaseConnection.Parameterizer.FILTERS_ID, filters);
-    inputparams.addParameter(FixedDBIDsFilter.Parameterizer.IDSTART_ID, 1);
-
-    // get database
-    Database db = ClassGenericsUtil.parameterizeOrAbort(StaticArrayDatabase.class, inputparams);
-    inputparams.failOnErrors();
-
-    db.initialize();
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams, null);
     Relation<NumberVector> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    // verify data set size.
-    org.junit.Assert.assertEquals("Database size does not match.", shoulds, relation.size());
 
     // Euclidean
     {

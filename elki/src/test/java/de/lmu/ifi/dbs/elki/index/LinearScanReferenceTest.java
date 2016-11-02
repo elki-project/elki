@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,6 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanPrimitiveDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.LinearScanPrimitiveDistanceRangeQuery;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * This unit test verifies that the linear scan produces the reference result.
@@ -41,8 +40,7 @@ public class LinearScanReferenceTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testExact() {
-    ListParameterization params = new ListParameterization();
-    testExactEuclidean(params, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
+    testExactEuclidean(null, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
   }
 
   /**
@@ -50,7 +48,6 @@ public class LinearScanReferenceTest extends AbstractIndexStructureTest {
    */
   @Test
   public void testExactCosine() {
-    ListParameterization params = new ListParameterization();
-    testExactCosine(params, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
+    testExactCosine(null, LinearScanPrimitiveDistanceKNNQuery.class, LinearScanPrimitiveDistanceRangeQuery.class);
   }
 }

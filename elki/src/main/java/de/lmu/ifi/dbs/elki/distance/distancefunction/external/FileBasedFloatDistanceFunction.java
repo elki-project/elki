@@ -107,7 +107,7 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
   public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> database) {
     if(cache == null) {
       try {
-        loadCache(parser, matrixfile);
+        loadCache(new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile))));
       }
       catch(IOException e) {
         throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
@@ -121,8 +121,13 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
     return (i1 == i2) ? 0. : cache.get(makeKey(i1 + min, i2 + min));
   }
 
-  private void loadCache(DistanceParser parser, File matrixfile) throws IOException {
-    InputStream in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile)));
+  /**
+   * Fill cache from an input stream.
+   * 
+   * @param in Input stream
+   * @throws IOException
+   */
+  protected void loadCache(InputStream in) throws IOException {
     cache = new TLongFloatHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1L, Float.POSITIVE_INFINITY);
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
@@ -159,8 +164,8 @@ public class FileBasedFloatDistanceFunction extends AbstractDBIDRangeDistanceFun
    */
   protected static final long makeKey(int i1, int i2) {
     return (i1 < i2) //
-    ? ((((long) i1) << 32) | i2)//
-    : ((((long) i2) << 32) | i1);
+        ? ((((long) i1) << 32) | i2)//
+        : ((((long) i2) << 32) | i1);
   }
 
   @Override
