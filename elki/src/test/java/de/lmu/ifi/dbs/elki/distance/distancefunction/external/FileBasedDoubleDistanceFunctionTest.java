@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
 
+import java.io.IOException;
+
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
@@ -12,7 +14,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.datasource.DBIDRangeDatabaseConnection;
+import de.lmu.ifi.dbs.elki.datasource.parser.CSVReaderFormat;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
@@ -25,7 +29,7 @@ public class FileBasedDoubleDistanceFunctionTest extends AbstractSimpleAlgorithm
   final static String FILENAME = "data/testdata/unittests/distance/AsciiDistanceMatrix.ascii";
 
   @Test
-  public void testExternalDistance() {
+  public void testExternalDistance() throws IOException {
     ListParameterization params = new ListParameterization();
     params.addParameter(AbstractDatabase.Parameterizer.DATABASE_CONNECTION_ID, DBIDRangeDatabaseConnection.class);
     params.addParameter(DBIDRangeDatabaseConnection.Parameterizer.COUNT_ID, 4);
@@ -35,7 +39,10 @@ public class FileBasedDoubleDistanceFunctionTest extends AbstractSimpleAlgorithm
 
     ListParameterization distparams = new ListParameterization();
     distparams.addParameter(FileBasedDoubleDistanceFunction.Parameterizer.MATRIX_ID, FILENAME);
-    FileBasedDoubleDistanceFunction df = ClassGenericsUtil.parameterizeOrAbort(FileBasedDoubleDistanceFunction.class, distparams);
+    FileBasedDoubleDistanceFunction df = new FileBasedDoubleDistanceFunction(//
+        new AsciiDistanceParser(CSVReaderFormat.DEFAULT_FORMAT), null);
+    // We need to read from a resource, instead of a file.
+    df.loadCache(FileUtil.openSystemFile(FILENAME));
     SLINK<DBID> slink = new SLINK<>(df);
     ExtractFlatClusteringFromHierarchy clus = new ExtractFlatClusteringFromHierarchy(slink, 0.5, false, false);
     Clustering<DendrogramModel> c = clus.run(db);

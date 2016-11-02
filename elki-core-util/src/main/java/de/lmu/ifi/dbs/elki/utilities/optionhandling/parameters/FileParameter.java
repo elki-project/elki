@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -118,9 +118,10 @@ public class FileParameter extends AbstractParameter<FileParameter, File> {
     }
     if(fileType.equals(FileType.INPUT_FILE)) {
       try {
-        if(!obj.exists()) {
-          throw new WrongParameterValueException("Given file " + obj.getPath() + " for parameter \"" + getName() + "\" does not exist!\n");
+        if(obj.exists()) {
+          return true;
         }
+        throw new WrongParameterValueException("Given file " + obj.getPath() + " for parameter \"" + getName() + "\" does not exist!\n");
       }
       catch(SecurityException e) {
         throw new WrongParameterValueException("Given file \"" + obj.getPath() + "\" cannot be read, access denied!\n" + e.getMessage());

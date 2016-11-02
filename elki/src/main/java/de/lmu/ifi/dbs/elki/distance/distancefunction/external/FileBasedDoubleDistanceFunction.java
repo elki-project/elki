@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.external;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -108,7 +108,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
   public <O extends DBID> DistanceQuery<O> instantiate(Relation<O> database) {
     if(cache == null) {
       try {
-        loadCache(parser, matrixfile);
+        loadCache(matrixfile);
       }
       catch(IOException e) {
         throw new AbortException("Could not load external distance file: " + matrixfile.toString(), e);
@@ -122,8 +122,11 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
     return (i1 == i2) ? 0. : cache.get(makeKey(i1 + min, i2 + min));
   }
 
-  private void loadCache(DistanceParser parser, File matrixfile) throws IOException {
-    InputStream in = new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile)));
+  private void loadCache(File matrixfile) throws IOException {
+    loadCache(new BufferedInputStream(FileUtil.tryGzipInput(new FileInputStream(matrixfile))));
+  }
+
+  private void loadCache(InputStream in) throws IOException {
     cache = new TLongDoubleHashMap(Constants.DEFAULT_CAPACITY, Constants.DEFAULT_LOAD_FACTOR, -1L, Double.POSITIVE_INFINITY);
     min = Integer.MAX_VALUE;
     max = Integer.MIN_VALUE;
@@ -146,7 +149,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
         return cache.containsKey(makeKey(id1, id2));
       }
     });
-    if(min != 0) {
+    if(min != 0 && LOG.isVerbose()) {
       LOG.verbose("Distance matrix is supposed to be 0-indexed. Choosing offset " + min + " to compensate.");
     }
   }
@@ -160,8 +163,8 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
    */
   protected static final long makeKey(int i1, int i2) {
     return (i1 < i2) //
-    ? ((((long) i1) << 32) | i2)//
-    : ((((long) i2) << 32) | i1);
+        ? ((((long) i1) << 32) | i2)//
+        : ((((long) i2) << 32) | i1);
   }
 
   @Override
@@ -199,7 +202,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
      * </p>
      */
     public static final OptionID MATRIX_ID = new OptionID("distance.matrix", //
-    "The name of the file containing the distance matrix.");
+        "The name of the file containing the distance matrix.");
 
     /**
      * Optional parameter to specify the parsers to provide a database, must
@@ -210,7 +213,7 @@ public class FileBasedDoubleDistanceFunction extends AbstractDBIDRangeDistanceFu
      * </p>
      */
     public static final OptionID PARSER_ID = new OptionID("distance.parser", //
-    "Parser used to load the distance matrix.");
+        "Parser used to load the distance matrix.");
 
     /**
      * Input file.
