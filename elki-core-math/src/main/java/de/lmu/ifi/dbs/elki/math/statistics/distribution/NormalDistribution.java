@@ -473,10 +473,15 @@ public class NormalDistribution extends AbstractDistribution {
     if(x <= -8.22) {
       return 0.;
     }
-    double s = x, t = 0, b = x, q = x * x, i = 1;
-    while(s != t) {
-      s = (t = s) + (b *= q / (i += 2));
+    if(x != x) {
+      return Double.NaN;
     }
+    double s = x, t = 0, b = x, q = x * x, i = 1;
+    while(s != t && i < 1000) {
+      t = s;
+      s += (b *= q / (i += 2));
+    }
+    // Constant is 0.5 * log(2*pi)
     return .5 + s * FastMath.exp(-.5 * q - .91893853320467274178);
   }
 
@@ -503,6 +508,9 @@ public class NormalDistribution extends AbstractDistribution {
     }
     if(x <= -8.22) {
       return 0.;
+    }
+    if(x != x) {
+      return Double.NaN;
     }
     double s = x, t = 0, b = x, q = x * x, i = 1;
     while(s != t) {
