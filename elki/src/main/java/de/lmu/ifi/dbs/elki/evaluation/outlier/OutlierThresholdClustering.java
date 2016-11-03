@@ -82,7 +82,7 @@ public class OutlierThresholdClustering implements Evaluator {
 
   @Override
   public void processNewResult(ResultHierarchy hier, Result newResult) {
-    List<OutlierResult> ors = ResultUtil.filterResults(hier, OutlierResult.class);
+    List<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
     for(OutlierResult or : ors) {
       hier.add(or, split(or));
     }
