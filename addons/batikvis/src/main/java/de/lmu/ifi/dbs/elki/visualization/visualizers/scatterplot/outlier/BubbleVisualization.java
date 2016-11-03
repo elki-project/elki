@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
+import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierLinearScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -320,7 +321,7 @@ public class BubbleVisualization extends AbstractVisFactory {
         fill = fillF.isTrue();
       }
 
-      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, OutlierScalingFunction.class, true);
+      ObjectParameter<ScalingFunction> scalingP = new ObjectParameter<>(SCALING_ID, ScalingFunction.class, OutlierLinearScaling.class);
       if(config.grab(scalingP)) {
         scaling = scalingP.instantiateClass(config);
       }
