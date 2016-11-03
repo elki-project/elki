@@ -52,7 +52,7 @@ public class DoubleListParameter extends ListParameter<DoubleListParameter, doub
       String[] values = SPLIT.split((String) obj);
       double[] doubleValue = new double[values.length];
       for(int i = 0; i < values.length; i++) {
-        doubleValue[i++] = ParseUtil.parseDouble(values[i]);
+        doubleValue[i] = ParseUtil.parseDouble(values[i]);
       }
       return doubleValue;
     }
