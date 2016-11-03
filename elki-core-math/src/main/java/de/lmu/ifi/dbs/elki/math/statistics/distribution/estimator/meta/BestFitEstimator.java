@@ -186,16 +186,19 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     final int len = adapter.size(data);
 
     // Build various statistics:
-    StatisticalMoments mom = new StatisticalMoments(), logmom = new StatisticalMoments();
-    double[] x = new double[len], scratch = new double[len], logx = new double[len];
+    StatisticalMoments mom = new StatisticalMoments(),
+        logmom = new StatisticalMoments();
+    double[] x = new double[len], scratch = new double[len],
+        logx = new double[len];
 
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("Computing statistical moments and L-Moments.");
     }
     for(int i = 0; i < len; i++) {
-      final double val = adapter.getDouble(data, i);
-      x[i] = val;
-      mom.put(val);
+      final double val = x[i] = adapter.getDouble(data, i);
+      if(Double.NEGATIVE_INFINITY < val && val < Double.POSITIVE_INFINITY) {
+        mom.put(val);
+      }
     }
     if(mom.getMax() <= mom.getMin()) {
       LOG.warning("Constant distribution detected. Cannot fit.");
@@ -210,7 +213,8 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
     catch(ArithmeticException e) {
       lmm = null;
     }
-    final double min = x[0], median = .5 * (x[len >> 1] + x[(len + 1) >> 1]), max = x[len - 1];
+    final double min = x[0], median = .5 * (x[len >> 1] + x[(len + 1) >> 1]),
+        max = x[len - 1];
     if(LOG.isDebuggingFine()) {
       LOG.debugFine("Computing statistical moments in logspace.");
     }
@@ -220,7 +224,7 @@ public class BestFitEstimator implements DistributionEstimator<Distribution> {
       double val = x[i] - shift;
       val = val > 0. ? FastMath.log(val) : Double.NEGATIVE_INFINITY;
       logx[i] = val;
-      if(!Double.isInfinite(val) && !Double.isNaN(val)) {
+      if(Double.NEGATIVE_INFINITY < val && val < Double.POSITIVE_INFINITY) {
         logmom.put(val);
       }
     }
