@@ -23,46 +23,102 @@ package de.lmu.ifi.dbs.elki.algorithm.timeseries;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.copy;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.squareSum;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.Mean;
-import de.lmu.ifi.dbs.elki.result.ChangePointDetectionResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
+import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleIntPair;
+import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * Off-line multiple change point detection algorithm
+ * Off-line change point detection algorithm detecting a change in mean, based
+ * on the cumulative sum (CUSUM), same-variance assumption, and using bootstrap
+ * sampling for significance estimation.
+ * 
+ * References:
+ * <p>
+ * D. Picard<br />
+ * Testing and Estimating Change-Points in Time Series<br />
+ * Advances in Applied Probability Vol. 17
+ * </p>
+ * early results along these lines can be found in:
+ * <p>
+ * E. S. Page<br />
+ * On Problems in which a Change in a Parameter Occurs at an Unknown Point<br />
+ * Biometrika Vol. 44
+ * </p>
+ * also discussed in:
+ * <p>
+ * M. Basseville and I. V. Nikiforov<br />
+ * Section 2.6: Off-line Change Detection<br />
+ * Detection of Abrupt Changes - Theory and Application<br />
+ * </p>
  *
  * @author Sebastian Rühl
+ * @author Erich Schubert
  */
-@Title("Off-line Change Point Detection: Algorithm for detecting change point in time series")
+@Title("Off-line Change Point Detection")
 @Description("Detects multiple change points in a time series")
-public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<ChangePointDetectionResult> {
+@Reference(authors = "D. Picard", //
+    title = "Testing and Estimating Change-Points in Time Series ", //
+    booktitle = "Advances in Applied Probability Vol. 17", //
+    url = "http://www.jstor.org/stable/1427090")
+public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<ChangePoints> {
   /**
    * Class logger
    */
   private static final Logging LOG = Logging.getLogger(OfflineChangePointDetectionAlgorithm.class);
 
-  private int confidence, bootstrapSteps;
+  /**
+   * Additional reference (early literature).
+   */
+  @Reference(authors = "E. S. Page ", //
+      title = "On Problems in which a Change in a Parameter Occurs at an Unknown Point", //
+      booktitle = "Biometrika Vol. 44", //
+      url = "http://www.jstor.org/stable/2333258")
+  public static final Void ADDITIONAL_REFERENCE = null;
+
+  /**
+   * Additional reference (textbook).
+   */
+  @Reference(authors = "M. Basseville and I. V. Nikiforov", //
+      title = "Section 2.6: Off-line Change Detection", //
+      booktitle = "Detection of Abrupt Changes - Theory and Application", //
+      url = "http://people.irisa.fr/Michele.Basseville/kniga/kniga.pdf")
+  public static final Void ADDITIONAL_REFERENCE2 = null;
+
+  /**
+   * Number of samples for bootstrap significance.
+   */
+  int bootstrapSamples;
+
+  /**
+   * Mininum confidence.
+   */
+  double minConfidence;
+
+  /**
+   * Random generator
+   */
+  RandomFactory rnd;
 
   /**
    * Constructor
@@ -70,9 +126,10 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
    * @param confidence Confidence
    * @param bootstrapSteps Steps for bootstrapping
    */
-  public OfflineChangePointDetectionAlgorithm(int confidence, int bootstrapSteps) {
-    this.confidence = confidence;
-    this.bootstrapSteps = bootstrapSteps;
+  public OfflineChangePointDetectionAlgorithm(double confidence, int bootstrapSteps, RandomFactory rnd) {
+    this.minConfidence = confidence;
+    this.bootstrapSamples = bootstrapSteps;
+    this.rnd = rnd;
   }
 
   /**
@@ -81,181 +138,210 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
    * @param relation the relation to process
    * @return list with all the detected change point for every time series
    */
-  public ChangePointDetectionResult run(Relation<DoubleVector> relation) {
-    List<ChangePoints> result = new ArrayList<>();
-
-    for(DBIDIter realtion_iter = relation.getDBIDs().iter(); realtion_iter.valid(); realtion_iter.advance()) {
-      result.add(new ChangePoints(multipleChangepointsWithConfidence(relation.get(realtion_iter).toArray())));
+  public ChangePoints run(Relation<DoubleVector> relation) {
+    if(!(relation.getDBIDs() instanceof ArrayDBIDs)) {
+      throw new AbortException("This implementation may only be used on static databases, with ArrayDBIDs to provide a clear order.");
     }
-
-    return new ChangePointDetectionResult("Change Point List", "changepoints", result);
+    return new Instance(rnd.getSingleThreadedRandom()).run(relation);
   }
 
   /**
-   * Performs multiple change point detection for a given time series Overloaded
-   * method, this method initializes the method and then calls other version
-   * with set variables
-   *
-   * @param values time series
-   * @return list of change point for given time series
+   * Instance for a single data set.
+   * 
+   * @author Erich Schubert
    */
-  private List<ChangePoint> multipleChangepointsWithConfidence(double[] values) {
-    List<ChangePoint> result = new ArrayList<>();
-    result = multipleChangepointsWithConfidence(result, values, 0);
-    return result;
+  class Instance {
+    /**
+     * Raw data column.
+     */
+    double[] column;
+
+    /**
+     * Cumulative sum.
+     */
+    double[] sums;
+
+    /**
+     * Temporary storage for bootstrap testing.
+     */
+    double[] bstrap;
+
+    /**
+     * Iterator to reference data positions.
+     */
+    DBIDArrayIter iter;
+
+    /**
+     * Result to output to.
+     */
+    ChangePoints result;
+
+    /**
+     * Current column number.
+     */
+    int columnnr;
+
+    /**
+     * Random generator.
+     */
+    Random rnd;
+
+    /**
+     * Constructor.
+     *
+     * @param rnd Random generator
+     */
+    public Instance(Random rnd) {
+      this.rnd = rnd;
+    }
+
+    /**
+     * Run the change point detection algorithm on a data relation.
+     * 
+     * @param relation Data relation.
+     * @return Change points
+     */
+    public ChangePoints run(Relation<DoubleVector> relation) {
+      final ArrayDBIDs ids = (ArrayDBIDs) relation.getDBIDs();
+      final int dim = RelationUtil.dimensionality(relation);
+      final int size = ids.size();
+      iter = ids.iter();
+
+      column = new double[size];
+      sums = new double[size];
+      bstrap = new double[size];
+      result = new ChangePoints("CUSUM Changepoints", "cusum-changepoints");
+
+      for(columnnr = 0; columnnr < dim; columnnr++) {
+        // Materialize one column of the data.
+        for(iter.seek(0); iter.valid(); iter.advance()) {
+          column[iter.getOffset()] = relation.get(iter).doubleValue(columnnr);
+        }
+        cusum(column, sums, 0, size);
+        multipleChangepointsWithConfidence(0, size);
+      }
+      return result;
+    }
+
+    /**
+     * Performs multiple change point detection for a given time series. This
+     * method uses a kind of divide and conquer approach
+     *
+     * @param begin Interval begin
+     * @param end Interval end
+     * @return Last change point position, or begin
+     */
+    private int multipleChangepointsWithConfidence(int begin, int end) {
+      if(end - begin <= 3) {
+        return begin; // Too short.
+      }
+      DoubleIntPair change = bestChangeInMean(sums, begin, end);
+      double confidence = bootstrapConfidence(begin, end, change.first);
+      // return the detected changepoint
+      if(confidence < minConfidence) {
+        return begin; // Stop.
+      }
+      // Divide and Conquer:
+      multipleChangepointsWithConfidence(begin, change.second);
+      result.add(iter.seek(change.second), columnnr, confidence);
+      return multipleChangepointsWithConfidence(change.second, end);
+    }
+
+    /**
+     * Calculates the confidence for the most probable change point of the given
+     * timer series. Confidence is calculated with the help of bootstrapping.
+     *
+     * @param begin Subset begin
+     * @param end Subset end
+     * @param thresh Threshold
+     * @return confidence for most probable change point
+     */
+    private double bootstrapConfidence(int begin, int end, double thresh) {
+      final int len = end - begin;
+      int pos = 0;
+      for(int i = 0; i < bootstrapSamples; i++) {
+        System.arraycopy(column, begin, bstrap, 0, len);
+        shuffle(bstrap, len, rnd);
+        cusum(bstrap, bstrap, 0, len);
+        double score = bestChangeInMean(bstrap, 0, len).first;
+        if(score < thresh) {
+          ++pos;
+        }
+      }
+      return pos / (double) bootstrapSamples;
+    }
   }
 
   /**
-   * Actually performs multiple change point detection for a given time series
-   * This method uses a kind of divide and conquer approach
+   * Compute the incremental sum of an array, i.e. the sum of all points up to
+   * the given index.
    *
-   * @param result list containing detected change point
-   * @param values current time series
-   * @param tmpArraryStartIndex current position in the time series
-   * @return list of change point for given time series
+   * @param data Input data
+   * @param out Output array (must be large enough).
    */
-
-  private List<ChangePoint> multipleChangepointsWithConfidence(List<ChangePoint> result, double[] values, int tmpArraryStartIndex) {
-    double tmpConf = confidenceLevel(values, bootstrapSteps);
-    int tmpMaxPos = tmpArraryStartIndex + getMaximumIndex(likelihoodRatioChangeInMean(values));
-    // return the detected changepoint
-    if(!(tmpConf < confidence || values.length <= 3 || (tmpMaxPos - tmpArraryStartIndex + 1 == values.length))) {
-      // cannot split up arrays of size 3, that would make every element a change point
-      multipleChangepointsWithConfidence(result, Arrays.copyOfRange(values, 0, tmpMaxPos - tmpArraryStartIndex), tmpArraryStartIndex);
-      multipleChangepointsWithConfidence(result, Arrays.copyOfRange(values, tmpMaxPos - tmpArraryStartIndex + 1, values.length), tmpMaxPos);
-      result.add(new ChangePoint(tmpMaxPos, tmpConf));
+  public static void cusum(double[] data, double[] out, int begin, int end) {
+    assert (out.length >= data.length);
+    // Use Kahan summation for better precision!
+    // FIXME: this should be unit tested.
+    double m = 0., carry = 0.;
+    for(int i = begin; i < end; i++) {
+      double v = data[i] - carry; // Compensation
+      double n = out[i] = (m + v); // May lose small digits of v.
+      carry = (n - m) - v; // Recover lost bits
+      m = n;
     }
-    return result;
   }
 
   /**
+   * Find the best position to assume a change in mean.
    *
-   * @param values time series
-   * @return log likelihood ratio for every observation
+   * @param sums Cumulative sums
+   * @param begin Interval begin
+   * @param end Interval end
+   * @return Best change position
    */
-  private double[] likelihoodRatioChangeInMean(double[] values) {
-    double[] result = new double[values.length];
+  public static DoubleIntPair bestChangeInMean(double[] sums, int begin, int end) {
+    final int len = end - begin, last = end - 1;
+    final double suml = begin > 0 ? sums[begin - 1] : 0.;
+    final double sumr = sums[last];
 
-    // vector containing means for all different vector lengths, last index
-    // contains mean over all elements
-    double[] meansLeft = new double[values.length];
-    Mean currentMeanLeft = new Mean();
-    for(int i = 0; i < meansLeft.length; i++) {
-      currentMeanLeft.put(values[i]);
-      meansLeft[i] = currentMeanLeft.getMean();
-    }
-    // first index contains mean over all elements coming from the other side
-    double[] meansRight = new double[values.length];
-    Mean currentMeanRight = new Mean();
-    for(int i = meansRight.length - 1; i >= 0; i--) {
-      currentMeanRight.put(values[i]);
-      meansRight[i] = currentMeanRight.getMean();
-    }
-
-    result[0] = -squareSum(minus(values, meansRight[0]));
-    for(int i = 1; i < values.length; i++) {
-      result[i] = -((squareSum(minus(Arrays.copyOfRange(values, 0, i), meansLeft[i - 1]))) + (squareSum(minus(Arrays.copyOfRange(values, i, values.length), meansRight[i]))));
-    }
-
-    return result;
-  }
-
-  /**
-   * Calculates the confidence for the most probable change point of the given
-   * timer series. Confidence is calculated with the help of bootstrapping.
-   *
-   * @param values time series
-   * @param steps steps for bootstrapping
-   * @return confidence for most probable change point
-   */
-  private double confidenceLevel(double[] values, int steps) {
-    double estimator = getBootstrapEstimator(likelihoodRatioChangeInMean(values));
-    int x = 0;
-    for(int i = 0; i < steps; i++) {
-      double[] tmpValues = shuffleVector(values);
-      double tmpEstimator = getBootstrapEstimator(likelihoodRatioChangeInMean(tmpValues));
-      if(tmpEstimator < estimator) {
-        x += 1;
+    int bestpos = begin;
+    double bestscore = Double.NEGATIVE_INFINITY;
+    // Iterate elements k=2..n-1 in math notation_
+    for(int j = begin, km1 = 1; j < last; j++, km1++) {
+      assert (km1 < len); // FIXME: remove eventually
+      final double sumj = sums[j]; // Sum _inclusive_ j'th element.
+      // Derive the left mean and right mean from the precomputed aggregates:
+      final double lmean = (sumj - suml) / km1;
+      final double rmean = (sumr - sumj) / (len - km1);
+      // Equation 2.6.17 from the Basseville book
+      final double dm = lmean - rmean;
+      final double score = km1 * (double) (len - km1) * dm * dm;
+      if(score > bestscore) {
+        bestpos = j + 1;
+        bestscore = score;
       }
     }
-    return 100 * ((double) x / (double) steps);
+    return new DoubleIntPair(bestscore, bestpos);
   }
 
   /**
-   * Estimator used by bootstrapping
+   * Fisher-Yates shuffle of a partial array
    *
-   * @param values time series
-   * @return bootstrap estimator
+   * @param bstrap Data to shuffle
+   * @param len Length of valid data
+   * @param rnd Random generator
    */
-  private double getBootstrapEstimator(double[] values) {
-    return getMaximum(values) - getMinimum(values);
-  }
-
-  /**
-   * Shuffles the observations of a time series
-   *
-   * @param values time series
-   * @return shuffled time series
-   */
-  private double[] shuffleVector(double[] values) {
-    double[] result = copy(values);
-    Random rnd = new Random();
-    for(int i = result.length - 1; i > 0; i--) {
-      int index = rnd.nextInt(i + 1);
-      double tmp = result[index];
-      result[index] = result[i];
-      result[i] = tmp;
+  public static void shuffle(double[] bstrap, int len, Random rnd) {
+    int i = len;
+    while(i > 0) {
+      final int r = rnd.nextInt(i);
+      --i;
+      // Swap
+      double tmp = bstrap[r];
+      bstrap[r] = bstrap[i];
+      bstrap[i] = tmp;
     }
-
-    return result;
-  }
-
-  /**
-   * Returns index of maximum value in double array
-   *
-   * @param values array
-   * @return index of maximum value
-   */
-  private int getMaximumIndex(double[] values) {
-    int result = 0;
-    for(int i = 0; i < values.length; i++) {
-      if((values[i] >= values[result])) {
-        result = i;
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Returns maximum of a double array
-   *
-   * @param values array
-   * @return maximum value
-   */
-  private double getMaximum(double[] values) {
-    double result = values[0];
-    for(double value : values) {
-      if(value > result) {
-        result = value;
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Returns minimum of a double array
-   *
-   * @param values array
-   * @return minimum value
-   */
-  private double getMinimum(double[] values) {
-    double result = values[0];
-    for(double value : values) {
-      if(value < result) {
-        result = value;
-      }
-    }
-    return result;
   }
 
   @Override
@@ -268,34 +354,71 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
     return LOG;
   }
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Number of samples for bootstrap significance.
+     */
+    public static final OptionID BOOTSTRAP_ID = new OptionID("changepointdetection.bootstrap.samples", //
+        "Number of samples to draw for bootstrapping the confidence estimate.");
 
-    public static final OptionID CONFIDENCE_ID = new OptionID("changepointdetection.confidence", //
-        "Confidence level for terminating");
+    /**
+     * Mininum confidence.
+     */
+    public static final OptionID CONFIDENCE_ID = new OptionID("changepointdetection.bootstrap.confidence", //
+        "Confidence level to use with bootstrap sampling.");
 
-    public static final OptionID BOOTSTRAP_ID = new OptionID("changepointdetection.bootstrapsteps", //
-        "Steps for bootstrapping");
+    /**
+     * Random generator seed.
+     */
+    public static final OptionID RANDOM_ID = new OptionID("changepointdetection.seed", //
+        "Random generator seed for bootstrap sampling.");
 
-    private int confidence, bootstrap_steps;
+    /**
+     * Number of samples for bootstrap significance.
+     */
+    int bootstrapSamples = 1000;
+
+    /**
+     * Mininum confidence.
+     */
+    double minConfidence;
+
+    /**
+     * Random generator
+     */
+    RandomFactory rnd;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      IntParameter confidence_parameter = new IntParameter(CONFIDENCE_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(confidence_parameter)) {
-        confidence = confidence_parameter.getValue();
+      IntParameter bootstrapsamplesP = new IntParameter(BOOTSTRAP_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT) //
+          .setDefaultValue(1000);
+      if(config.grab(bootstrapsamplesP)) {
+        bootstrapSamples = bootstrapsamplesP.getValue();
       }
-      IntParameter bootstrap_steps_parameter = new IntParameter(BOOTSTRAP_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
-      if(config.grab(bootstrap_steps_parameter)) {
-        bootstrap_steps = bootstrap_steps_parameter.getValue();
+      DoubleParameter confidenceP = new DoubleParameter(CONFIDENCE_ID) //
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE) //
+          .setDefaultValue(1 - 2.5 / bootstrapSamples);
+      if(config.grab(confidenceP)) {
+        minConfidence = confidenceP.doubleValue();
+      }
+
+      RandomParameter rndP = new RandomParameter(RANDOM_ID);
+      if(config.grab(rndP)) {
+        rnd = rndP.getValue();
       }
     }
 
     @Override
     protected OfflineChangePointDetectionAlgorithm makeInstance() {
-      return new OfflineChangePointDetectionAlgorithm(confidence, bootstrap_steps);
+      return new OfflineChangePointDetectionAlgorithm(minConfidence, bootstrapSamples, rnd);
     }
   }
 }

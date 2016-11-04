@@ -23,19 +23,28 @@ package de.lmu.ifi.dbs.elki.algorithm.timeseries;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
-import de.lmu.ifi.dbs.elki.data.DoubleVector;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
+import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.ChangePointDetectionResult;
+import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -51,6 +60,10 @@ import net.jafama.FastMath;
  * detection. The hashing and scalability parts of Signi-Trend are not
  * applicable here.
  * 
+ * This implementation currently does not use timestamps, and thus only works
+ * for fixed-interval measurements. It could be extended to allow dynamic data
+ * windows by adjusting the alpha parameter based on time deltas.
+ * 
  * Reference:
  * <p>
  * E. Schubert, M. Weiler, H. Kriegel<br />
@@ -59,16 +72,19 @@ import net.jafama.FastMath;
  * Proc. 20th ACM SIGKDD international conference on Knowledge discovery and
  * data mining
  * </p>
+ * 
+ * TODO: add support for dynamic time, and optimize for sparse vectors.
  *
- * @author Sebastian Rühl
  * @author Erich Schubert
+ * 
+ * @apiviz.composedOf Instance
  */
 @Title("Signi-Trend: scalable detection of emerging topics in textual streams by hashed significance thresholds")
 @Reference(authors = "E. Schubert, M. Weiler, H. Kriegel", //
     title = "Signi-Trend: scalable detection of emerging topics in textual streams by hashed significance thresholds", //
     booktitle = "Proc. 20th ACM SIGKDD international conference on Knowledge discovery and data mining", //
     url = "http://dx.doi.org/10.1145/2623330.2623740")
-public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePointDetectionResult> {
+public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
   /**
    * Class logger
    */
@@ -109,54 +125,116 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePointDete
    * @param relation relation to process
    * @return list with all the detected trends for every time series
    */
-  public ChangePointDetectionResult run(Relation<DoubleVector> relation) {
-    List<ChangePoints> result = new ArrayList<>();
-
-    for(DBIDIter realtion_iter = relation.getDBIDs().iter(); realtion_iter.valid(); realtion_iter.advance()) {
-      result.add(new ChangePoints(detectTrend(relation.get(realtion_iter).toArray())));
-    }
-    return new ChangePointDetectionResult("Signi-Trend Changepoints", "signitrend-changepoints", result);
+  public ChangePoints run(Relation<NumberVector> relation) {
+    return new Instance().run(relation);
   }
 
   /**
-   * Performs the trend detection for a given time series Detects increases and
-   * decreases in trend Learning rate alpha is adjusted with an updated weight
-   *
-   * @param values time series
-   * @return list of trend for given time series
+   * Instance for one data set.
+   * 
+   * @author Erich Schubert
    */
-  private List<ChangePoint> detectTrend(double[] values) {
-    List<ChangePoint> result = new ArrayList<>();
+  protected class Instance {
+    /**
+     * Moving average and variance.
+     */
+    protected double[] ewma, ewmv;
 
-    // Cold start:
-    double ewma = values[0];
-    double ewmv = ewma * ewma;
-    double weight = alpha;
+    /**
+     * Current weight:
+     */
+    protected double weight;
 
-    for(int i = 1; i < values.length; i++) {
-      // Adjusted alpha will converge to alpha.
-      double inc = (1 - weight) * alpha;
-      double alph = alpha / (weight * (1 - alpha) + alpha);
-      weight += inc;
-
-      // Compare to previous estimate:
-      double sigma = (values[i] - ewma) / (FastMath.sqrt(ewmv) + bias);
-      if(sigma > minsigma || sigma < -minsigma) {
-        result.add(new ChangePoint(i, sigma));
-      }
-
-      final double deli = values[i] - ewma;
-      final double inci = alph * deli;
-      ewma += inci;
-      ewmv = (1 - alph) * (ewmv + inci * deli);
+    /**
+     * Constructor.
+     */
+    public Instance() {
+      super();
     }
 
-    return result;
+    /**
+     * Process a relation.
+     * 
+     * @param relation Data relation
+     * @return Change points
+     */
+    public ChangePoints run(Relation<NumberVector> relation) {
+      if(!(relation.getDBIDs() instanceof ArrayDBIDs)) {
+        throw new AbortException("This implementation may only be used on static databases, with ArrayDBIDs to provide a clear order.");
+      }
+      final ArrayDBIDs ids = (ArrayDBIDs) relation.getDBIDs();
+      final int dim = RelationUtil.dimensionality(relation);
+      ewma = new double[dim];
+      ewmv = new double[dim];
+      weight = 0.;
+
+      ChangePoints changepoints = new ChangePoints("Signi-Trend Changepoints", "signitrend-changepoints");
+      WritableDoubleDataStore vals = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_SORTED | DataStoreFactory.HINT_STATIC);
+      DoubleMinMax mm = new DoubleMinMax();
+      for(DBIDIter iter = relation.iterDBIDs(); iter.valid(); iter.advance()) {
+        double absmax = processRow(iter, relation.get(iter), changepoints);
+        vals.putDouble(iter, absmax); // Store absolute maximum
+        mm.put(absmax);
+      }
+      OutlierScoreMeta meta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0, Double.POSITIVE_INFINITY, 0.);
+      DoubleRelation scores = new MaterializedDoubleRelation("Signi-Trend scores", "signitrend-scores", vals, relation.getDBIDs());
+      changepoints.addChildResult(new OutlierResult(meta, scores));
+      return changepoints;
+    }
+
+    /**
+     * Process one row, assuming a constant time interval.
+     * 
+     * @param iter Row identifier for reporting.
+     * @param row Data row
+     * @param changepoints Change points result for output
+     * @return absolute maximum deviation.
+     */
+    private double processRow(DBIDRef iter, NumberVector row, ChangePoints changepoints) {
+      if(!(weight > 0.)) {
+        // Cold start.
+        for(int d = 0; d < row.getDimensionality(); d++) {
+          double v = ewma[d] = row.doubleValue(d);
+          ewmv[d] = v * v;
+        }
+        weight = alpha;
+        return 0.;
+      }
+      double alpha = SigniTrendChangeDetection.this.alpha;
+      double minsigma = SigniTrendChangeDetection.this.minsigma;
+      // Adjust alpha until the difference is neglibile
+      if(weight < 1.) {
+        final double inc = (1 - weight) * alpha; // Weight increment
+        alpha = alpha / (weight * (1 - alpha) + alpha);
+        weight += inc;
+      }
+
+      double absmax = 0.;
+      for(int d = 0; d < row.getDimensionality(); d++) {
+        final double v = row.doubleValue(d);
+        // Old estimate:
+        final double avg = ewma[d], var = ewmv[d];
+        // Change detection (using previous estimate!)
+        double sigma = (v - avg) / (FastMath.sqrt(var) + bias);
+        if(sigma >= minsigma || sigma <= -minsigma) {
+          changepoints.add(iter, d, sigma);
+        }
+        // Track maximum of all columns
+        absmax = sigma > absmax ? sigma : -sigma > absmax ? -sigma : absmax;
+
+        // Update estimates:
+        final double deli = v - avg;
+        final double inci = alpha * deli;
+        ewma[d] += inci;
+        ewmv[d] = (1 - alpha) * (var + inci * deli);
+      }
+      return absmax;
+    }
   }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH);
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_FIELD);
   }
 
   @Override
@@ -164,16 +242,31 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePointDete
     return LOG;
   }
 
+  /**
+   * Parameterization class.
+   * 
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
   public static class Parameterizer extends AbstractParameterizer {
-
+    /**
+     * Parameter for half-life aging.
+     */
     public static final OptionID HALFLIFE_ID = new OptionID("signitrend.halflife", //
-        "Half time");
+        "Half-life time: number of time steps until data has lost half its weight.");
 
+    /**
+     * Bias adjustment for chance
+     */
     public static final OptionID BIAS_ID = new OptionID("signitrend.bias", //
-        "Bias");
+        "Adjustment for chance: a small constant corresponding to background noise levels.");
 
+    /**
+     * Sigma reporting threshold.
+     */
     public static final OptionID MINSIGMA_ID = new OptionID("signitrend.minsigma", //
-        "Minimal Sigma");
+        "Significance threshold for reporting");
 
     /**
      * Half-life aging parameter.
@@ -193,20 +286,20 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePointDete
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      DoubleParameter bias_parameter = new DoubleParameter(BIAS_ID) //
+      DoubleParameter halflifeP = new DoubleParameter(HALFLIFE_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(bias_parameter)) {
-        bias = bias_parameter.getValue();
+      if(config.grab(halflifeP)) {
+        halflife = halflifeP.doubleValue();
       }
-      DoubleParameter halflife_parameter = new DoubleParameter(HALFLIFE_ID) //
-          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(halflife_parameter)) {
-        halflife = halflife_parameter.getValue();
+      DoubleParameter biasP = new DoubleParameter(BIAS_ID) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+      if(config.grab(biasP)) {
+        bias = biasP.doubleValue();
       }
-      DoubleParameter minsigma_parameter = new DoubleParameter(MINSIGMA_ID) //
+      DoubleParameter minsigmaP = new DoubleParameter(MINSIGMA_ID) //
           .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
-      if(config.grab(minsigma_parameter)) {
-        minsigma = minsigma_parameter.getValue();
+      if(config.grab(minsigmaP)) {
+        minsigma = minsigmaP.getValue();
       }
     }
 

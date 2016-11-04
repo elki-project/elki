@@ -23,26 +23,56 @@ package de.lmu.ifi.dbs.elki.algorithm.timeseries;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+
 /**
- * Multiple Change Points
+ * Change point detection result Used by change or trend detection algorithms
+ * 
+ * TODO: we need access to the data labels / timestamp information!
  *
  * @author Sebastian Rühl
+ * @author Erich Schubert
  */
-public class ChangePoints {
+public class ChangePoints extends BasicResult implements TextWriteable {
+  /**
+   * Change points.
+   */
+  List<ChangePoint> changepoints = new ArrayList<>();
 
-  List<ChangePoint> points;
-
-  public ChangePoints(List<ChangePoint> points) {
-    this.points = points;
+  /**
+   * Result constructor.
+   *
+   * @param name Full name
+   * @param shortname Short name (for filenames)
+   */
+  public ChangePoints(String name, String shortname) {
+    super(name, shortname);
   }
 
-  public StringBuilder appendTo(StringBuilder buf) {
-    for(ChangePoint pnt : points) {
-      pnt.appendTo(buf);
-      buf.append(",");
+  @Override
+  public void writeToText(TextWriterStream out, String label) {
+    StringBuilder buf = new StringBuilder();
+    for(ChangePoint cp : changepoints) {
+      buf.setLength(0);
+      out.inlinePrintNoQuotes(cp.appendTo(buf));
+      out.flush();
     }
-    return buf.deleteCharAt(buf.length() - 1);
+  }
+
+  /**
+   * Add a change point to the result.
+   * 
+   * @param iter Time reference
+   * @param column Column
+   * @param score Score
+   */
+  public void add(DBIDRef iter, int column, double score) {
+    changepoints.add(new ChangePoint(iter, column, score));
   }
 }

@@ -23,22 +23,52 @@ package de.lmu.ifi.dbs.elki.algorithm.timeseries;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+
 /**
  * Single Change Point
  *
  * @author Sebastian Rühl
+ * @author Erich Schubert
  */
 public class ChangePoint {
+  /**
+   * Data set reference.
+   */
+  DBID id;
 
-    double index, accuracy;
+  /**
+   * Column id.
+   */
+  int column;
 
-    public ChangePoint(double index, double accuracy){
-        this.index = index;
-        this.accuracy = accuracy;
-    }
+  /**
+   * Score
+   */
+  double score;
 
-    public StringBuilder appendTo(StringBuilder buf) {
-        // TO DO with label????
-        return buf.append("[").append(index).append(", ").append(accuracy).append("]");
-    }
+  /**
+   * Constructor.
+   *
+   * @param iter Data set reference
+   * @param column Column
+   * @param score Score
+   */
+  public ChangePoint(DBIDRef iter, int column, double score) {
+    this.id = DBIDUtil.deref(iter);
+    this.column = column;
+    this.score = score;
+  }
+
+  /**
+   * Append to a text buffer.
+   * 
+   * @param buf Text buffer
+   * @return Text buffer
+   */
+  public StringBuilder appendTo(StringBuilder buf) {
+    return buf.append(DBIDUtil.toString((DBIDRef) id)).append(" ").append(column).append(" ").append(score);
+  }
 }
