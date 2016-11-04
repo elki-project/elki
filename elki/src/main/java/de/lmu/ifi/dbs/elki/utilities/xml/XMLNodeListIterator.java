@@ -73,12 +73,4 @@ public final class XMLNodeListIterator implements Iterator<Node> {
     this.index++;
     return cur;
   }
-
-  /**
-   * Removal: unsupported operation.
-   */
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException();
-  }
 }

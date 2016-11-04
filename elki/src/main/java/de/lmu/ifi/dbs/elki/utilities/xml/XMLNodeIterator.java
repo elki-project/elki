@@ -66,12 +66,4 @@ public final class XMLNodeIterator implements Iterator<Node> {
     next = next.getNextSibling();
     return cur;
   }
-
-  /**
-   * Removal: unsupported operation.
-   */
-  @Override
-  public void remove() {
-    throw new UnsupportedOperationException();
-  }
 }

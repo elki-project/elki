@@ -219,10 +219,5 @@ public class PlotItem {
       next = null;
       return ret;
     }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
   }
 }

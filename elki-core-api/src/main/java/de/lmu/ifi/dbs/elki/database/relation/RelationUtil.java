@@ -257,11 +257,6 @@ public final class RelationUtil {
       iter.advance();
       return ret;
     }
-
-    @Override
-    public void remove() {
-      throw new UnsupportedOperationException();
-    }
   }
 
   /**
