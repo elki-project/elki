@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.result;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,38 +23,30 @@ package de.lmu.ifi.dbs.elki.result;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.util.List;
+
 import de.lmu.ifi.dbs.elki.algorithm.timeseries.ChangePoints;
-import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
-import java.util.List;
-
 /**
- * Change point detection result
- * Used by change or trend detection algorithms
+ * Change point detection result Used by change or trend detection algorithms
  *
  * @author Sebastian Rühl
  */
 public class ChangePointDetectionResult extends BasicResult implements TextWriteable {
 
-    private List<ChangePoints> results;
-    private Relation<LabelList> labellist;
+  private List<ChangePoints> results;
 
-    public ChangePointDetectionResult(String name, String shortname, List<ChangePoints> results, Relation<LabelList> labellist) {
-        super(name, shortname);
-        this.results = results;
-        this.labellist = labellist;
-    }
+  public ChangePointDetectionResult(String name, String shortname, List<ChangePoints> results) {
+    super(name, shortname);
+    this.results = results;
+  }
 
-    public void writeToText(TextWriterStream out, String label) {
-        DBIDIter labeliter = labellist.iterDBIDs();
-        for(ChangePoints cp : results) {
-            out.inlinePrintNoQuotes(cp.appendTo(new StringBuilder(), labellist.get(labeliter)));
-            out.flush();
-            labeliter.advance();
-        }
+  public void writeToText(TextWriterStream out, String label) {
+    for(ChangePoints cp : results) {
+      out.inlinePrintNoQuotes(cp.appendTo(new StringBuilder()));
+      out.flush();
     }
+  }
 }

@@ -25,8 +25,6 @@ package de.lmu.ifi.dbs.elki.algorithm.timeseries;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.LabelList;
-
 /**
  * Multiple Change Points
  *
@@ -40,8 +38,7 @@ public class ChangePoints {
     this.points = points;
   }
 
-  public StringBuilder appendTo(StringBuilder buf, LabelList labels) {
-    buf.append(labels.toString()).append(": ");
+  public StringBuilder appendTo(StringBuilder buf) {
     for(ChangePoint pnt : points) {
       pnt.appendTo(buf);
       buf.append(",");

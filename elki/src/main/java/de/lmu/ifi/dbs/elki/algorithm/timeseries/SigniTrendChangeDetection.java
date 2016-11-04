@@ -28,7 +28,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -42,7 +41,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import net.jafama.FastMath;
 
 /**
@@ -63,6 +61,7 @@ import net.jafama.FastMath;
  * </p>
  *
  * @author Sebastian Rühl
+ * @author Erich Schubert
  */
 @Title("Signi-Trend: scalable detection of emerging topics in textual streams by hashed significance thresholds")
 @Reference(authors = "E. Schubert, M. Weiler, H. Kriegel", //
@@ -75,79 +74,48 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePointDete
    */
   private static final Logging LOG = Logging.getLogger(SigniTrendChangeDetection.class);
 
-  private double bias, halflife, minsigma;
+  /**
+   * Exponential aging parameter.
+   */
+  private double alpha;
 
-  private boolean slowalpha;
+  /**
+   * Bias for small values.
+   */
+  private double bias;
+
+  /**
+   * Minimum sigma to report.
+   */
+  private double minsigma;
 
   /**
    * Constructor
    *
-   * @param bias beta term
    * @param halflife half-life for learning rate alpha
+   * @param bias beta term
    * @param minsigma threshold for detecting a trend
-   * @param slowalpha use corrected alpha
    */
-  public SigniTrendChangeDetection(double bias, double halflife, double minsigma, boolean slowalpha) {
+  public SigniTrendChangeDetection(double halflife, double bias, double minsigma) {
+    // Compute alpha from half-life parameter:
+    this.alpha = 1. - FastMath.exp(FastMath.log(0.5) / halflife);
     this.bias = bias;
-    this.halflife = halflife;
     this.minsigma = minsigma;
-    this.slowalpha = slowalpha;
   }
 
   /**
    * Executes Signi-Trend for given relation
    *
    * @param relation relation to process
-   * @param labellist labels of distinct timer series
    * @return list with all the detected trends for every time series
    */
-  public ChangePointDetectionResult run(Relation<DoubleVector> relation, Relation<LabelList> labellist) {
+  public ChangePointDetectionResult run(Relation<DoubleVector> relation) {
     List<ChangePoints> result = new ArrayList<>();
 
-    if(slowalpha) {
-      for(DBIDIter realtion_iter = relation.getDBIDs().iter(); realtion_iter.valid(); realtion_iter.advance()) {
-        result.add(new ChangePoints(detectTrendSlow(relation.get(realtion_iter).toArray())));
-      }
+    for(DBIDIter realtion_iter = relation.getDBIDs().iter(); realtion_iter.valid(); realtion_iter.advance()) {
+      result.add(new ChangePoints(detectTrend(relation.get(realtion_iter).toArray())));
     }
-    else {
-      for(DBIDIter realtion_iter = relation.getDBIDs().iter(); realtion_iter.valid(); realtion_iter.advance()) {
-        result.add(new ChangePoints(detectTrend(relation.get(realtion_iter).toArray())));
-      }
-    }
-    return new ChangePointDetectionResult("Signi-Trend Changepoints", "signitrend-changepoints", result, labellist);
-  }
-
-  /**
-   * Performs the trend detection for a given time series Detects increases and
-   * decreases in trend
-   *
-   * @param values time series
-   * @return list of trend for given time series
-   */
-  private List<ChangePoint> detectTrend(double[] values) {
-    List<ChangePoint> result = new ArrayList<>();
-
-    double alpha = 1 - FastMath.exp(FastMath.log(0.5) / halflife);
-
-    double ewma = values[0];
-    double ewmavar = ewma * ewma;
-    double[] sigma = new double[values.length];
-    sigma[0] = 0;
-
-    for(int i = 1; i < values.length; i++) {
-      sigma[i] = (values[i] - ewma) / (FastMath.sqrt(ewmavar) + bias);
-      double delta = values[i] - ewma;
-      ewma += alpha * delta;
-      ewmavar = (1 - alpha) * (ewmavar + alpha * delta * delta);
-    }
-
-    for(int i = 0; i < sigma.length; i++) {
-      if(sigma[i] > minsigma || sigma[i] < -minsigma) {
-        result.add(new ChangePoint(i, sigma[i]));
-      }
-    }
-
-    return result;
+    return new ChangePointDetectionResult("Signi-Trend Changepoints", "signitrend-changepoints", result);
   }
 
   /**
@@ -157,32 +125,30 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePointDete
    * @param values time series
    * @return list of trend for given time series
    */
-  private List<ChangePoint> detectTrendSlow(double[] values) {
+  private List<ChangePoint> detectTrend(double[] values) {
     List<ChangePoint> result = new ArrayList<>();
 
-    double alpha = 1 - FastMath.exp(FastMath.log(0.5) / halflife);
-
+    // Cold start:
     double ewma = values[0];
-    double ewmavar = ewma * ewma;
-    double[] sigma = new double[values.length];
-    sigma[0] = 0;
+    double ewmv = ewma * ewma;
     double weight = alpha;
 
     for(int i = 1; i < values.length; i++) {
+      // Adjusted alpha will converge to alpha.
       double inc = (1 - weight) * alpha;
-      double alpha_cor = alpha / (weight * (1 - alpha) + alpha);
-      weight = weight + inc;
+      double alph = alpha / (weight * (1 - alpha) + alpha);
+      weight += inc;
 
-      sigma[i] = (values[i] - ewma) / (FastMath.sqrt(ewmavar) + bias);
-      double delta = values[i] - ewma;
-      ewma += alpha_cor * delta;
-      ewmavar = (1 - alpha) * (ewmavar + alpha_cor * delta * delta);
-    }
-
-    for(int i = 0; i < sigma.length; i++) {
-      if(sigma[i] > minsigma || sigma[i] < -minsigma) {
-        result.add(new ChangePoint(i, sigma[i]));
+      // Compare to previous estimate:
+      double sigma = (values[i] - ewma) / (FastMath.sqrt(ewmv) + bias);
+      if(sigma > minsigma || sigma < -minsigma) {
+        result.add(new ChangePoint(i, sigma));
       }
+
+      final double deli = values[i] - ewma;
+      final double inci = alph * deli;
+      ewma += inci;
+      ewmv = (1 - alph) * (ewmv + inci * deli);
     }
 
     return result;
@@ -190,7 +156,7 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePointDete
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH, TypeUtil.LABELLIST);
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH);
   }
 
   @Override
@@ -200,21 +166,29 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePointDete
 
   public static class Parameterizer extends AbstractParameterizer {
 
-    public static final OptionID BIAS_ID = new OptionID("signitrend.bias", //
-        "Bias");
-
     public static final OptionID HALFLIFE_ID = new OptionID("signitrend.halflife", //
         "Half time");
+
+    public static final OptionID BIAS_ID = new OptionID("signitrend.bias", //
+        "Bias");
 
     public static final OptionID MINSIGMA_ID = new OptionID("signitrend.minsigma", //
         "Minimal Sigma");
 
-    public static final OptionID SLOWLEARNING_ID = new OptionID("signitrend.slowlearning", //
-        "Slow learning rate alpha");
+    /**
+     * Half-life aging parameter.
+     */
+    private double halflife;
 
-    private double bias, halflife, minsigma;
+    /**
+     * Bias for small values.
+     */
+    private double bias;
 
-    private boolean slowalpha;
+    /**
+     * Minimum sigma to report.
+     */
+    private double minsigma;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -234,15 +208,11 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePointDete
       if(config.grab(minsigma_parameter)) {
         minsigma = minsigma_parameter.getValue();
       }
-      Flag slowalpha_parameter = new Flag(SLOWLEARNING_ID);
-      if(config.grab(slowalpha_parameter)) {
-        slowalpha = slowalpha_parameter.isTrue();
-      }
     }
 
     @Override
     protected SigniTrendChangeDetection makeInstance() {
-      return new SigniTrendChangeDetection(bias, halflife, minsigma, slowalpha);
+      return new SigniTrendChangeDetection(halflife, bias, minsigma);
     }
   }
 }

@@ -34,7 +34,6 @@ import java.util.Random;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
-import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -55,7 +54,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  *
  * @author Sebastian Rühl
  */
-
 @Title("Off-line Change Point Detection: Algorithm for detecting change point in time series")
 @Description("Detects multiple change points in a time series")
 public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<ChangePointDetectionResult> {
@@ -81,19 +79,16 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
    * Executes multiple change point detection for given relation
    *
    * @param relation the relation to process
-   * @param labellist labels of distinct time series
    * @return list with all the detected change point for every time series
    */
-  public ChangePointDetectionResult run(Relation<DoubleVector> relation, Relation<LabelList> labellist) {
-
+  public ChangePointDetectionResult run(Relation<DoubleVector> relation) {
     List<ChangePoints> result = new ArrayList<>();
 
     for(DBIDIter realtion_iter = relation.getDBIDs().iter(); realtion_iter.valid(); realtion_iter.advance()) {
-
       result.add(new ChangePoints(multipleChangepointsWithConfidence(relation.get(realtion_iter).toArray())));
     }
 
-    return new ChangePointDetectionResult("Change Point List", "changepoints", result, labellist);
+    return new ChangePointDetectionResult("Change Point List", "changepoints", result);
   }
 
   /**
@@ -122,31 +117,14 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
 
   private List<ChangePoint> multipleChangepointsWithConfidence(List<ChangePoint> result, double[] values, int tmpArraryStartIndex) {
     double tmpConf = confidenceLevel(values, bootstrapSteps);
-    int tmpMaxPos = tmpArraryStartIndex + getMaximumIndex(likelihoodRatioChangeInMean(values)); // return
-                                                                                                // the
-                                                                                                // detected
-                                                                                                // changepoint
-
-    if(!(tmpConf < confidence || values.length <= 3 || (tmpMaxPos - tmpArraryStartIndex + 1 == values.length))) { // cannot
-                                                                                                                  // split
-                                                                                                                  // up
-                                                                                                                  // arrays
-                                                                                                                  // of
-                                                                                                                  // size
-                                                                                                                  // 3,
-                                                                                                                  // that
-                                                                                                                  // would
-                                                                                                                  // make
-                                                                                                                  // every
-                                                                                                                  // element
-                                                                                                                  // a
-                                                                                                                  // change
-                                                                                                                  // point
+    int tmpMaxPos = tmpArraryStartIndex + getMaximumIndex(likelihoodRatioChangeInMean(values));
+    // return the detected changepoint
+    if(!(tmpConf < confidence || values.length <= 3 || (tmpMaxPos - tmpArraryStartIndex + 1 == values.length))) {
+      // cannot split up arrays of size 3, that would make every element a change point
       multipleChangepointsWithConfidence(result, Arrays.copyOfRange(values, 0, tmpMaxPos - tmpArraryStartIndex), tmpArraryStartIndex);
       multipleChangepointsWithConfidence(result, Arrays.copyOfRange(values, tmpMaxPos - tmpArraryStartIndex + 1, values.length), tmpMaxPos);
       result.add(new ChangePoint(tmpMaxPos, tmpConf));
     }
-
     return result;
   }
 
@@ -282,7 +260,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH, TypeUtil.LABELLIST);
+    return TypeUtil.array(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH);
   }
 
   @Override
