@@ -28,16 +28,14 @@ import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.Mean;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 import de.lmu.ifi.dbs.elki.result.ChangePointDetectionResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -85,7 +83,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
         for(DBIDIter realtion_iter = relation.getDBIDs().iter(); realtion_iter.valid(); realtion_iter.advance()) {
 
             result.add(new ChangePoints(
-                    multipleChangepointsWithConfidence(relation.get(realtion_iter).getValues())));
+                    multipleChangepointsWithConfidence(relation.get(realtion_iter).toArray())));
         }
 
         return new ChangePointDetectionResult("Change Point List", "changepoints", result, labellist);
@@ -155,10 +153,10 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
             meansRight[i] = currentMeanRight.getMean();
         }
 
-        result[0] = -(VMath.sumElements(VMath.square(VMath.minus(values, meansRight[0]))));
+        result[0] = -squareSum(minus(values, meansRight[0]));
         for(int i = 1; i < values.length; i++){
-            result[i] = -(  (VMath.squareSum(VMath.minus(Arrays.copyOfRange(values, 0, i), meansLeft[i-1])))
-                        +   (VMath.squareSum(VMath.minus(Arrays.copyOfRange(values, i, values.length), meansRight[i])))
+            result[i] = -(  (squareSum(minus(Arrays.copyOfRange(values, 0, i), meansLeft[i-1])))
+                        +   (squareSum(minus(Arrays.copyOfRange(values, i, values.length), meansRight[i])))
                         );
         }
 
@@ -204,7 +202,7 @@ public class OfflineChangePointDetectionAlgorithm extends AbstractAlgorithm<Chan
      */
     private double[] shuffleVector(double[] values)
     {
-        double[] result= VMath.copy(values);
+        double[] result= copy(values);
         Random rnd = new Random();
         for (int i = result.length - 1; i > 0; i--)
         {

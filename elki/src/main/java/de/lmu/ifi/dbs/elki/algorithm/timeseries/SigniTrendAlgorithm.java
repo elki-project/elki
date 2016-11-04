@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import net.jafama.FastMath;
 
 import java.util.*;
 
@@ -95,12 +96,12 @@ public class SigniTrendAlgorithm extends AbstractAlgorithm<ChangePointDetectionR
         if(slowalpha == 1){
             for(DBIDIter realtion_iter = relation.getDBIDs().iter(); realtion_iter.valid(); realtion_iter.advance()) {
 
-                result.add(new ChangePoints(detectTrendSlow(relation.get(realtion_iter).getValues())));
+                result.add(new ChangePoints(detectTrendSlow(relation.get(realtion_iter).toArray())));
             }
         } else {
             for(DBIDIter realtion_iter = relation.getDBIDs().iter(); realtion_iter.valid(); realtion_iter.advance()) {
 
-                result.add(new ChangePoints(detectTrend(relation.get(realtion_iter).getValues())));
+                result.add(new ChangePoints(detectTrend(relation.get(realtion_iter).toArray())));
             }
         }
 
@@ -118,7 +119,7 @@ public class SigniTrendAlgorithm extends AbstractAlgorithm<ChangePointDetectionR
     private List<ChangePoint> detectTrend(double[] values){
         List<ChangePoint> result = new ArrayList<>();
 
-        double alpha = 1 - Math.exp(Math.log(0.5)/halflife);
+        double alpha = 1 - FastMath.exp(FastMath.log(0.5)/halflife);
 
         double ewma = values[0];
         double ewmavar = ewma * ewma;
@@ -126,7 +127,7 @@ public class SigniTrendAlgorithm extends AbstractAlgorithm<ChangePointDetectionR
         sigma[0] = 0;
 
         for(int i = 1; i < values.length; i++){
-            sigma[i] = (values[i] - ewma) / (Math.sqrt(ewmavar) + bias);
+            sigma[i] = (values[i] - ewma) / (FastMath.sqrt(ewmavar) + bias);
             double delta = values[i] - ewma;
             ewma += alpha * delta;
             ewmavar = (1 - alpha) * (ewmavar + alpha * delta * delta);
@@ -152,7 +153,7 @@ public class SigniTrendAlgorithm extends AbstractAlgorithm<ChangePointDetectionR
     private List<ChangePoint> detectTrendSlow(double[] values){
         List<ChangePoint> result = new ArrayList<>();
 
-        double alpha = 1 - Math.exp(Math.log(0.5)/halflife);
+        double alpha = 1 - FastMath.exp(FastMath.log(0.5)/halflife);
 
         double ewma = values[0];
         double ewmavar = ewma * ewma;
@@ -165,7 +166,7 @@ public class SigniTrendAlgorithm extends AbstractAlgorithm<ChangePointDetectionR
             double alpha_cor = alpha / (weight * (1 - alpha) + alpha);
             weight = weight + inc;
 
-            sigma[i] = (values[i] - ewma) / (Math.sqrt(ewmavar) + bias);
+            sigma[i] = (values[i] - ewma) / (FastMath.sqrt(ewmavar) + bias);
             double delta = values[i] - ewma;
             ewma += alpha_cor * delta;
             ewmavar = (1 - alpha) * (ewmavar + alpha_cor * delta * delta);
