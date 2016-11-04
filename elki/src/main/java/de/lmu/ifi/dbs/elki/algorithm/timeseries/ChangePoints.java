@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.timeseries;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,9 +23,9 @@ package de.lmu.ifi.dbs.elki.algorithm.timeseries;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.data.LabelList;
-
 import java.util.List;
+
+import de.lmu.ifi.dbs.elki.data.LabelList;
 
 /**
  * Multiple Change Points
@@ -34,18 +34,18 @@ import java.util.List;
  */
 public class ChangePoints {
 
-    List<ChangePoint> points;
+  List<ChangePoint> points;
 
-    public ChangePoints(List<ChangePoint> points){
-        this.points = points;
-    }
+  public ChangePoints(List<ChangePoint> points) {
+    this.points = points;
+  }
 
-    public StringBuilder appendTo(StringBuilder buf, LabelList labels) {
-        buf.append(labels.toString()).append(": ");
-        for (ChangePoint pnt : points) {
-            pnt.appendTo(buf);
-            buf.append(",");
-        }
-        return buf.deleteCharAt(buf.length()-1);
+  public StringBuilder appendTo(StringBuilder buf, LabelList labels) {
+    buf.append(labels.toString()).append(": ");
+    for(ChangePoint pnt : points) {
+      pnt.appendTo(buf);
+      buf.append(",");
     }
+    return buf.deleteCharAt(buf.length() - 1);
+  }
 }
