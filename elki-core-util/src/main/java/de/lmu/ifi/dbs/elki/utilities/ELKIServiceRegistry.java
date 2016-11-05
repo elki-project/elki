@@ -50,7 +50,7 @@ public class ELKIServiceRegistry {
   /**
    * Class loader
    */
-  private static final URLClassLoader CLASSLOADER = (URLClassLoader) ClassLoader.getSystemClassLoader();
+  private static final URLClassLoader CLASSLOADER = (URLClassLoader) ELKIServiceRegistry.class.getClassLoader();
 
   /**
    * Factory class postfix.

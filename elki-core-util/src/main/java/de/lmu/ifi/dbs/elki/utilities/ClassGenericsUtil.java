@@ -68,7 +68,7 @@ public final class ClassGenericsUtil {
   /**
    * Class loader.
    */
-  private static final ClassLoader loader = ClassLoader.getSystemClassLoader();
+  static final ClassLoader CLASSLOADER = ClassGenericsUtil.class.getClassLoader();
 
   /**
    * Name for a static "parameterize" factory method.
@@ -101,11 +101,11 @@ public final class ClassGenericsUtil {
   public static <T> T instantiate(Class<T> type, String className) throws ClassInstantiationException {
     try {
       try {
-        return type.cast(loader.loadClass(className).newInstance());
+        return type.cast(CLASSLOADER.loadClass(className).newInstance());
       }
       catch(ClassNotFoundException e) {
         // try package of type
-        return type.cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
+        return type.cast(CLASSLOADER.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
     }
     catch(InstantiationException|IllegalAccessException|ClassNotFoundException|ClassCastException e) {
@@ -140,11 +140,11 @@ public final class ClassGenericsUtil {
     // (probably not because generics are implemented via erasure.
     try {
       try {
-        return ((Class<T>) type).cast(loader.loadClass(className).newInstance());
+        return ((Class<T>) type).cast(CLASSLOADER.loadClass(className).newInstance());
       }
       catch(ClassNotFoundException e) {
         // try package of type
-        return ((Class<T>) type).cast(loader.loadClass(type.getPackage().getName() + "." + className).newInstance());
+        return ((Class<T>) type).cast(CLASSLOADER.loadClass(type.getPackage().getName() + "." + className).newInstance());
       }
     }
     catch(InstantiationException|IllegalAccessException|ClassNotFoundException|ClassCastException e) {

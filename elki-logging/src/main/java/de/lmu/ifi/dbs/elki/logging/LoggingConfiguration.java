@@ -26,7 +26,10 @@ package de.lmu.ifi.dbs.elki.logging;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Properties;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
@@ -154,12 +157,29 @@ public final class LoggingConfiguration {
     }
     catch(FileNotFoundException e) {
       // try with classloader
-      String resname = filename.replace(File.separatorChar, '/');
-      InputStream result = ClassLoader.getSystemResourceAsStream(resname);
-      if(result == null) {
+      String resname = File.separatorChar != '/' ? filename.replace(File.separatorChar, '/') : filename;
+      ClassLoader cl = LoggingConfiguration.class.getClassLoader();
+      InputStream result = cl.getResourceAsStream(resname);
+      if(result != null) {
+        return result;
+      }
+      // Sometimes, URLClassLoader does not work right. Try harder:
+      URL u = cl.getResource(resname);
+      if(u == null) {
         throw e;
       }
-      return result;
+      try {
+        URLConnection conn = u.openConnection();
+        conn.setUseCaches(false);
+        result = conn.getInputStream();
+        if(result != null) {
+          return result;
+        }
+      }
+      catch(IOException x) {
+        throw e; // Throw original error instead.
+      }
+      throw e;
     }
   }
 
@@ -177,7 +197,8 @@ public final class LoggingConfiguration {
    */
   public static void setVerbose(java.util.logging.Level verbose) {
     if(verbose.intValue() <= Level.VERBOSE.intValue()) {
-      // decrease to VERBOSE if it was higher, otherwise further to VERYVERBOSE
+      // decrease to VERBOSE if it was higher, otherwise further to
+      // VERYVERBOSE
       if(LOGGER_GLOBAL_TOP.getLevel() == null || LOGGER_GLOBAL_TOP.getLevel().intValue() > verbose.intValue()) {
         LOGGER_GLOBAL_TOP.setLevel(verbose);
       }
@@ -189,13 +210,13 @@ public final class LoggingConfiguration {
       // re-increase to given level if it was verbose or "very verbose".
       if(LOGGER_GLOBAL_TOP.getLevel() != null && (//
       Level.VERBOSE.equals(LOGGER_GLOBAL_TOP.getLevel()) || //
-      Level.VERYVERBOSE.equals(LOGGER_GLOBAL_TOP.getLevel()) //
+          Level.VERYVERBOSE.equals(LOGGER_GLOBAL_TOP.getLevel()) //
       )) {
         LOGGER_GLOBAL_TOP.setLevel(verbose);
       }
       if(LOGGER_ELKI_TOP.getLevel() != null && (//
       Level.VERBOSE.equals(LOGGER_ELKI_TOP.getLevel()) || //
-      Level.VERYVERBOSE.equals(LOGGER_ELKI_TOP.getLevel()) //
+          Level.VERYVERBOSE.equals(LOGGER_ELKI_TOP.getLevel()) //
       )) {
         LOGGER_ELKI_TOP.setLevel(verbose);
       }

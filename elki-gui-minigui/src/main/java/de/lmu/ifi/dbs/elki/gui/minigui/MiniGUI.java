@@ -702,7 +702,7 @@ public class MiniGUI extends AbstractApplication {
   public static void main(final String[] args) {
     // Detect the common problem of an incomplete class path:
     try {
-      Class<?> clz = ClassLoader.getSystemClassLoader().loadClass("de.lmu.ifi.dbs.elki.database.ids.DBIDUtil");
+      Class<?> clz = Thread.currentThread().getContextClassLoader().loadClass("de.lmu.ifi.dbs.elki.database.ids.DBIDUtil");
       clz.getMethod("newHashSet").invoke(null);
     }
     catch(ReflectiveOperationException e) {

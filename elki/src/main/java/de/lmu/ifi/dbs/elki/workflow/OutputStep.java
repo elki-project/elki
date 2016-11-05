@@ -90,7 +90,7 @@ public class OutputStep implements WorkflowStep {
     defaultHandlers = new ArrayList<>(1);
     Class<? extends ResultHandler> clz;
     try {
-      clz = (Class<? extends ResultHandler>) ClassLoader.getSystemClassLoader().loadClass(//
+      clz = (Class<? extends ResultHandler>) Thread.currentThread().getContextClassLoader().loadClass(//
       "de.lmu.ifi.dbs.elki.result.AutomaticVisualization");
     }
     catch(ClassNotFoundException e) {

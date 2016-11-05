@@ -147,7 +147,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @throws IOException
    */
   public static InputStream open(String filename) throws IOException {
-    InputStream is = ClassLoader.getSystemClassLoader().getResourceAsStream(filename);
+    InputStream is = AbstractSimpleAlgorithmTest.class.getClassLoader().getResourceAsStream(filename);
     return filename.endsWith(".gz") ? new GZIPInputStream(is) : is;
   }
 

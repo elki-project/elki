@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Enumeration;
 
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -67,21 +68,23 @@ public class ELKIServiceLoader {
    * Load the service file.
    */
   public static void load(Class<?> parent) {
-    load(parent, ClassLoader.getSystemClassLoader());
+    load(parent, ELKIServiceLoader.class.getClassLoader());
   }
 
   /**
    * Load the service file.
    */
   public static void load(Class<?> parent, ClassLoader cl) {
+    char[] buf = new char[0x4000];
     try {
       String fullName = RESOURCE_PREFIX + parent.getName();
       Enumeration<URL> configfiles = cl.getResources(fullName);
       while(configfiles.hasMoreElements()) {
         URL nextElement = configfiles.nextElement();
-        char[] buf = new char[0x4000];
+        URLConnection conn = nextElement.openConnection();
+        conn.setUseCaches(false);
         try (
-            InputStreamReader is = new InputStreamReader(nextElement.openStream(), "UTF-8");) {
+            InputStreamReader is = new InputStreamReader(conn.getInputStream(), "UTF-8");) {
           int start = 0, cur = 0, valid = is.read(buf, 0, buf.length);
           char c;
           while(cur < valid) {

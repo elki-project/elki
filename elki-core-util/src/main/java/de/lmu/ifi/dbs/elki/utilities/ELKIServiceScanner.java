@@ -53,7 +53,7 @@ public class ELKIServiceScanner {
   /**
    * Class loader
    */
-  private static final URLClassLoader CLASSLOADER = (URLClassLoader) ClassLoader.getSystemClassLoader();
+  private static final URLClassLoader CLASSLOADER = (URLClassLoader) ELKIServiceScanner.class.getClassLoader();
 
   /**
    * Factory class postfix.

@@ -29,6 +29,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -93,12 +95,29 @@ public final class FileUtil {
     }
     catch(FileNotFoundException e) {
       // try with classloader
-      String resname = filename.replace(File.separatorChar, '/');
-      InputStream result = ClassLoader.getSystemResourceAsStream(resname);
-      if(result == null) {
+      String resname = File.separatorChar != '/' ? filename.replace(File.separatorChar, '/') : filename;
+      ClassLoader cl = FileUtil.class.getClassLoader();
+      InputStream result = cl.getResourceAsStream(resname);
+      if(result != null) {
+        return result;
+      }
+      // Sometimes, URLClassLoader does not work right. Try harder:
+      URL u = cl.getResource(resname);
+      if(u == null) {
         throw e;
       }
-      return result;
+      try {
+        URLConnection conn = u.openConnection();
+        conn.setUseCaches(false);
+        result = conn.getInputStream();
+        if(result != null) {
+          return result;
+        }
+      }
+      catch(IOException x) {
+        throw e; // Throw original error instead.
+      }
+      throw e;
     }
   }
 
