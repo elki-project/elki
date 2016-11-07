@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerPrototypeHierarchyRepresenatationResult;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerPrototypeHierarchyRepresentationResult;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
@@ -53,7 +53,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjStaticHistogram.Iter;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -167,24 +166,23 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
     DBIDs ids = pointerresult.getDBIDs();
     DBIDDataStore pi = pointerresult.getParentStore();
     DoubleDataStore lambda = pointerresult.getParentDistanceStore();
-    boolean prototyped = pointerresult instanceof PointerPrototypeHierarchyRepresenatationResult;
+    boolean prototyped = pointerresult instanceof PointerPrototypeHierarchyRepresentationResult;
 
     Clustering<DendrogramModel> result = extractClusters(ids, pi, lambda, prototyped);
     result.addChildResult(pointerresult);
 
     if(prototyped) {
-      PointerPrototypeHierarchyRepresenatationResult prototypePointerResult = (PointerPrototypeHierarchyRepresenatationResult) pointerresult;
+      PointerPrototypeHierarchyRepresentationResult prototypePointerResult = (PointerPrototypeHierarchyRepresentationResult) pointerresult;
       DBIDs cluster;
       DBID prot;
-      
+
       // Set the prototype for each cluster
       for(de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter<Cluster<DendrogramModel>> iter = result.iterToplevelClusters(); iter.valid(); iter.advance()) {
-        PrototypeDendrogramModel model = (PrototypeDendrogramModel) iter.get().getModel();        
-        
+        PrototypeDendrogramModel model = (PrototypeDendrogramModel) iter.get().getModel();
+
         cluster = iter.get().getIDs();
         prot = prototypePointerResult.getPrototypeByCluster(cluster);
         iter.get().getNameAutomatic();
-        System.out.println(prot + " name: " + iter.get().getNameAutomatic());
         model.setPrototype(prot);
       }
     }
@@ -548,7 +546,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
 
       if(thresholdmode == null || ThresholdMode.BY_MINCLUSTERS.equals(thresholdmode)) {
         IntParameter minclustersP = new IntParameter(MINCLUSTERS_ID) //
-        .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(minclustersP)) {
           minclusters = minclustersP.intValue();
         }

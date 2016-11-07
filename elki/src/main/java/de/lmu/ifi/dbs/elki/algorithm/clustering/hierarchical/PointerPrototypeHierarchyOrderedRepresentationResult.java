@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 
-public class PointerPrototypeHierarchyOrderedRepresentationResult extends PointerPrototypeHierarchyRepresenatationResult {
+public class PointerPrototypeHierarchyOrderedRepresentationResult extends PointerPrototypeHierarchyRepresentationResult {
   
   private IntegerDataStore mergeOrder;
   

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
@@ -47,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
-public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresenatationResult> implements HierarchicalClusteringAlgorithm {
+public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
 
   private static final Logging LOG = Logging.getLogger(MiniMaxNNChain.class);
 
@@ -57,7 +58,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
     super(distanceFunction);
   }
 
-  public PointerPrototypeHierarchyRepresenatationResult run(Database db, Relation<O> relation) {
+  public PointerPrototypeHierarchyRepresentationResult run(Database db, Relation<O> relation) {
     DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction(), DatabaseQuery.HINT_OPTIMIZED_ONLY);
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     if(dq == null && ids instanceof DBIDRange) {
@@ -82,9 +83,10 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
 
     double[] dists = new double[AGNES.triangleSize(size)];
     ArrayModifiableDBIDs prots = DBIDUtil.newArray(AGNES.triangleSize(size));
+    DBIDArrayMIter protiter = prots.iter();
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
 
-    // Initizalize lambda
+    // Initialize lambda
     for(ix.seek(0); ix.valid(); ix.advance()) {
       pi.put(ix, ix);
       lambda.put(ix, Double.POSITIVE_INFINITY);
@@ -92,28 +94,29 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
 
     MiniMax.initializeMatrices(dists, prots, dq, ix, iy);
 
-    nnChainCore(size, dists, prots, dq, ix, iy, pi, lambda, prototypes, clusters);
+    nnChainCore(size, dists, protiter, dq, ix, iy, pi, lambda, prototypes, clusters);
 
     LOG.ensureCompleted(progress);
 
-    return new PointerPrototypeHierarchyRepresenatationResult(ids, pi, lambda, prototypes);
+    return new PointerPrototypeHierarchyRepresentationResult(ids, pi, lambda, prototypes);
   }
 
-  /** Uses NNChain as in
-   * "Modern hierarchical, agglomerative clustering algorithms"  by Daniel Müllner
+  /**
+   * Uses NNChain as in "Modern hierarchical, agglomerative clustering
+   * algorithms" by Daniel Müllner
    * 
-   * @param size  number of ids in the data set
+   * @param size number of ids in the data set
    * @param distances distance matrix
    * @param prots computed prototypes
-   * @param dq  distance query of the data set
-   * @param ix  iterator to reuse
-   * @param iy  another iterator to reuse
-   * @param pi  parent data store
+   * @param dq distance query of the data set
+   * @param ix iterator to reuse
+   * @param iy another iterator to reuse
+   * @param pi parent data store
    * @param lambda distance to parent data store
-   * @param prototypes  prototypes data store
+   * @param prototypes prototypes data store
    * @param clusters current clusters
    */
-  private void nnChainCore(int size, double[] distances, ArrayModifiableDBIDs prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters) {
+  private void nnChainCore(int size, double[] distances, DBIDArrayMIter prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters) {
     IntegerArray chain = new IntegerArray(size + 1); // The maximum chain size =
                                                      // number of ids + 1
     int a = -1;

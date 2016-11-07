@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -32,12 +33,14 @@ import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayMIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -46,20 +49,68 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
-import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
-
-public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresenatationResult> implements HierarchicalClusteringAlgorithm {
-
+/**
+ * Minimax Linkage clustering.
+ * 
+ * Reference:
+ * <p>
+ * S. I. Ao, K. Yip, M. Ng, D. Cheung, P.-Y. Fong, I. Melhado and P. C.
+ * Sham<br />
+ * CLUSTAG: hierarchical clustering and graph methods for selecting tag
+ * SNPs<br />
+ * Bioinformatics, 21 (8)
+ * </p>
+ * <p>
+ * J. Bien and R. Tibshirani<br >
+ * Hierarchical Clustering with Prototypes via Minimax Linkage<br />
+ * Journal of the American Statistical Association 106(495)
+ * </p>
+ * 
+ * @author Julian Erhard
+ * @author Erich Schubert
+ *
+ * @param <O> Object type
+ */
+@Reference(authors = "S. I. Ao, K. Yip, M. Ng, D. Cheung, P.-Y. Fong, I. Melhado and P. C. Sham", //
+    title = "CLUSTAG: hierarchical clustering and graph methods for selecting tag SNPs", //
+    booktitle = "Bioinformatics, 21 (8)", //
+    url = "http://dx.doi.org/10.1093/bioinformatics/bti201")
+public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+  /**
+   * Class Logger.
+   */
   private static final Logging LOG = Logging.getLogger(MiniMax.class);
 
+  /**
+   * Additional reference with detailed discussion.
+   */
+  @Reference(authors = "J. Bien and R. Tibshirani", //
+      title = "Hierarchical Clustering with Prototypes via Minimax Linkage", //
+      booktitle = "Journal of the American Statistical Association 106(495)", //
+      url = "http://dx.doi.org/10.1198/jasa.2011.tm10183")
+  public static final Void ADDITIONAL_REFERNECE = null;
+
+  /**
+   * Constructor.
+   *
+   * @param distanceFunction Distance function to use.
+   */
   public MiniMax(DistanceFunction<? super O> distanceFunction) {
     super(distanceFunction);
   }
 
-  public PointerPrototypeHierarchyRepresenatationResult run(Database db, Relation<O> relation) {
+  /**
+   * Run the algorithm on a database.
+   * 
+   * @param db Database
+   * @param relation Relation to process.
+   * @return Hierarchical result
+   */
+  public PointerPrototypeHierarchyRepresentationResult run(Database db, Relation<O> relation) {
     DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction(), DatabaseQuery.HINT_OPTIMIZED_ONLY);
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
     if(dq == null && ids instanceof DBIDRange) {
@@ -77,35 +128,34 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
     WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
     WritableDBIDDataStore prototypes = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    TIntObjectHashMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
-    final Logging log = getLogger();
-
-    FiniteProgress progress = log.isVerbose() ? new FiniteProgress("Running MiniMax", size - 1, log) : null;
+    TIntObjectHashMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>(size);
 
     double[] dists = new double[AGNES.triangleSize(size)];
     ArrayModifiableDBIDs prots = DBIDUtil.newArray(AGNES.triangleSize(size));
+    DBIDArrayMIter protiter = prots.iter();
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
 
-    // Initizalize lambda
+    // Initialize pi and lambda
     for(ix.seek(0); ix.valid(); ix.advance()) {
       pi.put(ix, ix);
       lambda.put(ix, Double.POSITIVE_INFINITY);
     }
-
     initializeMatrices(dists, prots, dq, ix, iy);
 
-    for(int i = 1; i < size ; i++) {
-      findMerge(size, dists, prots, ix, iy, pi, lambda, prototypes, clusters, dq);
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("MiniMax clustering", size - 1, LOG) : null;
+    for(int i = 1; i < size; i++) {
+      findMerge(size, dists, protiter, ix, iy, pi, lambda, prototypes, clusters, dq);
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
 
-    return new PointerPrototypeHierarchyRepresenatationResult(ids, pi, lambda, prototypes);
+    return new PointerPrototypeHierarchyRepresentationResult(ids, pi, lambda, prototypes);
   }
 
-  /** Initializes the inter-cluster distance matrix and the prototypes of possible merges
+  /**
+   * Initializes the inter-cluster distance matrix of possible merges
+   * 
    * @param distances The cluster distance matrix
-   * @param prots The array for the prototypes for merges
    * @param dq The distance query
    * @param ix An iterator over the data base
    * @param iy Another iterator over the data base
@@ -115,18 +165,32 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
     for(ix.seek(0); ix.valid(); ix.advance()) {
       for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
         distances[pos] = dq.distance(ix, iy);
-        prots.set(pos, ix);
+        prots.add(iy);
         pos++;
       }
     }
+    assert (prots.size() == pos);
   }
 
-  protected static <O> void findMerge(int size, double[] distances, ArrayModifiableDBIDs prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq) {
+  /**
+   * Find the best merge.
+   * 
+   * @param size Size
+   * @param distances Distances array
+   * @param prots Prototypes
+   * @param ix Iterator (reused)
+   * @param iy Iterator (reused)
+   * @param pi Parent reference
+   * @param lambda Merging height
+   * @param prototypes Prototype storage
+   * @param clusters Current clusters
+   * @param dq Distance query
+   */
+  protected static void findMerge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq) {
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
 
     for(int dx = 0; dx < size; dx++) {
-
       // Skip if object is already linked
       if(lambda.doubleValue(ix.seek(dx)) < Double.POSITIVE_INFINITY) {
         continue;
@@ -150,8 +214,9 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
     merge(size, distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, x, y);
   }
 
-  /** Merges two clusters given by x, y, their points with smallest IDs,
-   * and y to keep
+  /**
+   * Merges two clusters given by x, y, their points with smallest IDs, and y to
+   * keep
    * 
    * @param size number of ids in the data set
    * @param distances distance matrix
@@ -162,12 +227,13 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * @param lambda distance to parent data structure
    * @param prototypes prototype data store
    * @param clusters the clusters
-   * @param dq  distance query of the data set
+   * @param dq distance query of the data set
    * @param x first cluster to merge
    * @param y second cluster to merge
    */
-  protected static <O> void merge(int size, double[] distances, ArrayModifiableDBIDs prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int x, int y) {
-    int offset = AGNES.triangleSize(Math.max(x, y)) + Math.min(y, x);
+  protected static void merge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
+    assert (y < x);
+    int offset = AGNES.triangleSize(x) + y;
 
     ix.seek(x);
     iy.seek(y);
@@ -175,8 +241,7 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
       LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + distances[offset]);
     }
 
-    ModifiableDBIDs cx = clusters.get(x);
-    ModifiableDBIDs cy = clusters.get(y);
+    ModifiableDBIDs cx = clusters.get(x), cy = clusters.get(y);
 
     // Keep y
     if(cy == null) {
@@ -194,15 +259,14 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
 
     // parent of x is set to y
     pi.put(ix, iy);
-
     lambda.put(ix, distances[offset]);
-
-    prototypes.put(ix, prots.get(offset));
+    prototypes.putDBID(ix, prots.seek(offset));
 
     updateMatrices(size, distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, y);
   }
 
-  /** Update the entries of the matrices that contain a distance to c, the newly
+  /**
+   * Update the entries of the matrices that contain a distance to c, the newly
    * merged cluster.
    * 
    * @param size number of ids in the data set
@@ -214,270 +278,171 @@ public class MiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototy
    * @param lambda distance to parent data structure
    * @param prototypes prototype data store
    * @param clusters the clusters
-   * @param dq  distance query of the data set
+   * @param dq distance query of the data set
    * @param c the cluster to update distances to
    */
-  protected static <O> void updateMatrices(int size, double[] distances, ArrayModifiableDBIDs prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int c) {
-
+  protected static <O> void updateMatrices(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int c) {
     // c is the new cluster.
     // Update entries (at (x,y) with x > y) in the matrix where x = c or y = c
 
     // Update entries at (c,y) with y < c
-    int x = c;
-    int y = 0;
-    ix.seek(x);
-    for(; y < x; y++) {
-      iy.seek(y);
+    ix.seek(c);
+    for(iy.seek(0); iy.getOffset() < c; iy.advance()) {
       // Skip entry if already merged
       if(lambda.doubleValue(iy) < Double.POSITIVE_INFINITY) {
         continue;
       }
-      updateEntry(distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, x, y);
+      updateEntry(distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, c, iy.getOffset());
     }
 
     // Update entries at (x,c) with x > c
-    x = c + 1;
-    y = c;
-    iy.seek(y);
-    for(; x < size; x++) {
-      ix.seek(x);
+    iy.seek(c);
+    for(ix.seek(c + 1); ix.valid(); ix.advance()) {
       // Skip entry if already merged
       if(lambda.doubleValue(ix) < Double.POSITIVE_INFINITY) {
         continue;
       }
-      updateEntry(distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, x, y);
+      updateEntry(distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, ix.getOffset(), c);
     }
   }
 
-  /** Update entry at x,y for distance matrix distances
+  /**
+   * Update entry at x,y for distance matrix distances
    * 
    * @param distances distance matrix
    * @param prots calculated prototypes
-   * @param ix  iterator to reuse
-   * @param iy  iterator to reuse
-   * @param pi  parent data structure
-   * @param lambda  distance to parent data structure
-   * @param prototypes  prototypes store data strucutre
-   * @param clusters  the clusters
-   * @param dq  distancequery on the data set
+   * @param ix iterator to reuse
+   * @param iy iterator to reuse
+   * @param pi parent data structure
+   * @param lambda distance to parent data structure
+   * @param prototypes prototypes store data strucutre
+   * @param clusters the clusters
+   * @param dq distancequery on the data set
    * @param x index of cluster, x > y
    * @param y index of cluster, y < x
    * @param dimensions number of dimensions
    */
-  protected static <O> void updateEntry(double[] distances, ArrayModifiableDBIDs prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int x, int y) {
-    double minDist;
-    double maxDist;
-    double dist;
-    
-    assert( x > y);
+  protected static void updateEntry(double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<?> dq, int x, int y) {
+    assert (y < x);
+    ModifiableDBIDs cx = clusters.get(x), cy = clusters.get(y);
 
-    // Dummy initialization for the compiler
-    DBID prototype = DBIDUtil.generateSingleDBID();
-    ModifiableDBIDs cx;
-    ModifiableDBIDs cy;
+    DBIDVar prototype = DBIDUtil.newVar(ix.seek(x)); // Default prototype
+    double minMaxDist = Double.POSITIVE_INFINITY;
 
-    minDist = Double.POSITIVE_INFINITY;
-
-    cx = clusters.get(x);
-    cy = clusters.get(y);
-
-    if(cx == null) {
-      cx = DBIDUtil.newHashSet();
-      cx.add(ix);
+    // Two "real" clusters:
+    if(cx != null && cy != null) {
+      minMaxDist = findPrototype(dq, cx, cy, prototype, minMaxDist);
+      minMaxDist = findPrototype(dq, cy, cx, prototype, minMaxDist);
     }
-    if(cy == null) {
-      cy = DBIDUtil.newHashSet();
-      cy.add(iy);
+    else if(cx != null) {
+      // cy is singleton.
+      minMaxDist = findPrototypeSingleton(dq, cx, iy.seek(y), prototype, minMaxDist);
     }
-
-    // To find the prototype of cluster cx union cy, we first test all elements
-    // of cluster cx
-    findPrototype: for(DBIDIter i = cx.iter(); i.valid(); i.advance()) {
-
-      maxDist = Double.NEGATIVE_INFINITY;
-
-      // Maximum distance of i to all elements in cx
-      for(DBIDIter j = cy.iter(); j.valid(); j.advance()) {
-        dist = dq.distance(i, j);
-        if(dist > maxDist) {
-          maxDist = dist;
-          // Optimization: continue with next i if this one cannot be a
-          // prototype
-          if(maxDist > minDist) {
-            continue findPrototype;
-          }
-        }
-      }
-      // Maximum distance of i to all elements in cy
-      for(DBIDIter j = cx.iter(); j.valid(); j.advance()) {
-        dist = dq.distance(i, j);
-        if(dist > maxDist) {
-          maxDist = dist;
-          if(maxDist > minDist) {
-            continue findPrototype;
-          }
-        }
-      }
-
-      if(maxDist < minDist) {
-        minDist = maxDist;
-        prototype = DBIDUtil.deref(i);
-      }
+    else if(cy != null) {
+      // cx is singleton.
+      minMaxDist = findPrototypeSingleton(dq, cy, ix.seek(x), prototype, minMaxDist);
+    }
+    else {
+      minMaxDist = dq.distance(ix.seek(x), iy.seek(y));
+      prototype.set(ix);
     }
 
-    // To find the prototype of cluster cx union cy, we secondly test all
-    // elements of
-    // cluster cy
-    findPrototype: for(DBIDIter i = cy.iter(); i.valid(); i.advance()) {
-
-      maxDist = Double.NEGATIVE_INFINITY;
-
-      // Maximum distance of i to all elements in cx
-      for(DBIDIter j = cx.iter(); j.valid(); j.advance()) {
-        dist = dq.distance(i, j);
-        if(dist > maxDist) {
-          maxDist = dist;
-          if(maxDist > minDist) {
-            continue findPrototype;
-          }
-        }
-      }
-      // Maximum distance of i to all elements in cy
-      for(DBIDIter j = cy.iter(); j.valid(); j.advance()) {
-        dist = dq.distance(i, j);
-        if(dist > maxDist) {
-          maxDist = dist;
-          if(maxDist > minDist) {
-            continue findPrototype;
-          }
-        }
-      }
-
-      if(maxDist < minDist) {
-        minDist = maxDist;
-        prototype = DBIDUtil.deref(i);
-      }
-    }
-
-    distances[AGNES.triangleSize(x) + y] = minDist;
-    prots.set(AGNES.triangleSize(x) + y, prototype);
-
+    final int offset = AGNES.triangleSize(x) + y;
+    distances[offset] = minMaxDist;
+    prots.seek(offset).setDBID(prototype);
   }
-  
+
   /**
-   * Return distance and prototype
-   * @param distances distance matrix
-   * @param prots calculated prototypes
-   * @param ix  iterator to reuse
-   * @param iy  iterator to reuse
-   * @param pi  parent data structure
-   * @param lambda  distance to parent data structure
-   * @param prototypes  prototypes store data strucutre
-   * @param clusters  the clusters
-   * @param dq  distancequery on the data set
-   * @param x index of cluster, x > y
-   * @param y index of cluster, y < x
-   * @param dimensions number of dimensions
+   * Find the prototypes.
+   * 
+   * @param dq Distance query
+   * @param cx First set
+   * @param cy Second set
+   * @param prototype Prototype output variable
+   * @param minMaxDist Previously best distance.
+   * @return New best distance
    */
-  public static <O> Pair<Double, DBID> getDistance(ArrayModifiableDBIDs prots, DBIDArrayIter ix, DBIDArrayIter iy, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, int x, int y) {
-    double minDist;
-    double maxDist;
-    double dist;
-    
-    assert( x > y);
+  private static double findPrototype(DistanceQuery<?> dq, DBIDs cx, DBIDs cy, DBIDVar prototype, double minMaxDist) {
+    for(DBIDIter i = cx.iter(); i.valid(); i.advance()) {
+      double maxDist = 0.;
 
-    // Dummy initialization for the compiler
-    DBID prototype = DBIDUtil.generateSingleDBID();
-    ModifiableDBIDs cx;
-    ModifiableDBIDs cy;
-
-    minDist = Double.POSITIVE_INFINITY;
-
-    cx = clusters.get(x);
-    cy = clusters.get(y);
-    ix.seek(x);
-    iy.seek(y);
-
-    if(cx == null) {
-      cx = DBIDUtil.newHashSet();
-      cx.add(ix);
-    }
-    if(cy == null) {
-      cy = DBIDUtil.newHashSet();
-      cy.add(iy);
-    }
-
-    // To find the prototype of cluster cx union cy, we first test all elements
-    // of cluster cx
-    findPrototype: for(DBIDIter i = cx.iter(); i.valid(); i.advance()) {
-
-      maxDist = Double.NEGATIVE_INFINITY;
-
-      // Maximum distance of i to all elements in cx
-      for(DBIDIter j = cy.iter(); j.valid(); j.advance()) {
-
-        dist = dq.distance(i, j);
-        if(dist > maxDist) {
-          maxDist = dist;
-          // Optimization: continue with next i if this one cannot be a
-          // prototype
-          if(maxDist > minDist) {
-            continue findPrototype;
-          }
-        }
-      }
       // Maximum distance of i to all elements in cy
-      for(DBIDIter j = cx.iter(); j.valid(); j.advance()) {
-        dist = dq.distance(i, j);
-        if(dist > maxDist) {
-          maxDist = dist;
-          if(maxDist > minDist) {
-            continue findPrototype;
-          }
-        }
+      maxDist = findMax(dq, i, cy, maxDist, minMaxDist);
+      if(maxDist >= minMaxDist) { // We already have an at least equally good
+                                  // candidate.
+        continue;
       }
-
-      if(maxDist < minDist) {
-        minDist = maxDist;
-        prototype = DBIDUtil.deref(i);
-      }
-    }
-
-    // To find the prototype of cluster cx union cy, we secondly test all
-    // elements of
-    // cluster cy
-    findPrototype: for(DBIDIter i = cy.iter(); i.valid(); i.advance()) {
-
-      maxDist = Double.NEGATIVE_INFINITY;
-
       // Maximum distance of i to all elements in cx
-      for(DBIDIter j = cx.iter(); j.valid(); j.advance()) {
-        dist = dq.distance(i, j);
-        if(dist > maxDist) {
-          maxDist = dist;
-          if(maxDist > minDist) {
-            continue findPrototype;
-          }
-        }
-      }
-      // Maximum distance of i to all elements in cy
-      for(DBIDIter j = cy.iter(); j.valid(); j.advance()) {
-        dist = dq.distance(i, j);
-        if(dist > maxDist) {
-          maxDist = dist;
-          if(maxDist > minDist) {
-            continue findPrototype;
-          }
-        }
-      }
+      maxDist = findMax(dq, i, cx, maxDist, minMaxDist);
 
-      if(maxDist < minDist) {
-        minDist = maxDist;
-        prototype = DBIDUtil.deref(i);
+      // New best solution?
+      if(maxDist < minMaxDist) {
+        minMaxDist = maxDist;
+        prototype.set(i);
       }
     }
+    return minMaxDist;
+  }
 
-    return new Pair<Double, DBID>(minDist, prototype);
+  /**
+   * Find the prototypes.
+   * 
+   * @param dq Distance query
+   * @param cx First set
+   * @param cy Singleton object
+   * @param prototype Prototype output variable
+   * @param minMaxDist Previously best distance.
+   * @return New best distance
+   */
+  private static double findPrototypeSingleton(DistanceQuery<?> dq, DBIDs cx, DBIDRef cy, DBIDVar prototype, double minMaxDist) {
+    double maxDisty = 0.;
+    for(DBIDIter i = cx.iter(); i.valid(); i.advance()) {
+      // Maximum distance of i to the element in cy
+      double maxDist = dq.distance(i, cy);
+      // Maximum of distances from cy.
+      maxDisty = (maxDist > maxDisty) ? maxDist : maxDisty;
+      // We know a better solution already.
+      if(maxDist >= minMaxDist) {
+        continue;
+      }
+      // Maximum distance of i to all other elements in cx
+      maxDist = findMax(dq, i, cx, maxDist, minMaxDist);
+
+      if(maxDist < minMaxDist) {
+        minMaxDist = maxDist;
+        prototype.set(i);
+      }
+    }
+    // Singleton point.
+    if(maxDisty < minMaxDist) {
+      minMaxDist = maxDisty;
+      prototype.set(cy);
+    }
+    return minMaxDist;
+  }
+
+  /**
+   * Find the maximum distance of one object to a set.
+   *
+   * @param dq Distance query
+   * @param i Current object
+   * @param cy Set of candidates
+   * @param maxDist Known maximum to others
+   * @param minMaxDist Early stopping threshold
+   * @return Maximum distance
+   */
+  private static double findMax(DistanceQuery<?> dq, DBIDIter i, DBIDs cy, double maxDist, double minMaxDist) {
+    for(DBIDIter j = cy.iter(); j.valid(); j.advance()) {
+      double dist = dq.distance(i, j);
+      if(dist > maxDist) {
+        // Stop early, if we already know a better candidate.
+        if(dist >= minMaxDist) {
+          return dist;
+        }
+        maxDist = dist;
+      }
+    }
+    return maxDist;
   }
 
   @Override

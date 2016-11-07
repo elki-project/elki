@@ -30,7 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
-public class PointerPrototypeHierarchyRepresenatationResult extends PointerHierarchyRepresentationResult {
+public class PointerPrototypeHierarchyRepresentationResult extends PointerHierarchyRepresentationResult {
 
   private DBIDDataStore prototypes;
 
@@ -42,7 +42,7 @@ public class PointerPrototypeHierarchyRepresenatationResult extends PointerHiera
    * @param parentDistance
    * @param prototype
    */
-  public PointerPrototypeHierarchyRepresenatationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, DBIDDataStore prototypes) {
+  public PointerPrototypeHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, DBIDDataStore prototypes) {
     super(ids, parent, parentDistance);
     this.prototypes = prototypes;
   }
