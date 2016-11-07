@@ -138,6 +138,9 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialGeneratedOutlier
 de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialAverageCoordinateOutlier
 de.lmu.ifi.dbs.elki.algorithm.projection.BarnesHutTSNE
 de.lmu.ifi.dbs.elki.algorithm.projection.TSNE
+de.lmu.ifi.dbs.elki.algorithm.projection.SNE
+de.lmu.ifi.dbs.elki.algorithm.timeseries.OfflineChangePointDetectionAlgorithm
+de.lmu.ifi.dbs.elki.algorithm.timeseries.SigniTrendChangeDetection
 de.lmu.ifi.dbs.elki.algorithm.statistics.AddSingleScale
 de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceQuantileSampler
