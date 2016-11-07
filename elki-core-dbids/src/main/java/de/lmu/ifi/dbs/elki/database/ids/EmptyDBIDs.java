@@ -151,5 +151,10 @@ public class EmptyDBIDs implements ArrayStaticDBIDs, SetDBIDs {
     public int getOffset() {
       return 0;
     }
+
+    @Override
+    public void setDBID(DBIDRef val) {
+      throw new UnsupportedOperationException();
+    }
   }
 }

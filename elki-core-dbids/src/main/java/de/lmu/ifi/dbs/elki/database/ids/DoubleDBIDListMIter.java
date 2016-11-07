@@ -42,4 +42,7 @@ public interface DoubleDBIDListMIter extends DoubleDBIDListIter, DBIDArrayMIter 
    * @param value New value
    */
   void setDouble(double value);
+
+  @Override
+  DoubleDBIDListMIter seek(int off);
 }

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.ids;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,5 +30,17 @@ package de.lmu.ifi.dbs.elki.database.ids;
  * @since 0.4.0
  */
 public interface DBIDArrayMIter extends DBIDArrayIter, DBIDMIter {
-  // Nothing new, see {@link DBIDArrayIter} and {@link DBIDMIter}
+  /**
+   * Set the current value.
+   * 
+   * Note: if the iterator is just after the last position, this may be
+   * equivalent to an add, but some implementations may not support this
+   * operation!
+   * 
+   * @param val new value
+   */
+  void setDBID(DBIDRef val);
+
+  @Override
+  DBIDArrayMIter seek(int off);
 }

@@ -355,6 +355,18 @@ class ArrayModifiableIntegerDBIDs implements ArrayModifiableDBIDs, IntegerArrayD
     }
 
     @Override
+    public void setDBID(DBIDRef val) {
+      if(pos == size) {
+        add(val);
+        return;
+      }
+      if(pos >= size) {
+        throw new ArrayIndexOutOfBoundsException();
+      }
+      store[pos] = val.internalGetIndex();
+    }
+
+    @Override
     public void remove() {
       ArrayModifiableIntegerDBIDs.this.remove(pos--);
     }

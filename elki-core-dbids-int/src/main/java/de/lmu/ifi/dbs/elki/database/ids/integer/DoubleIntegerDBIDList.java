@@ -335,11 +335,17 @@ class DoubleIntegerDBIDList implements ModifiableDoubleDBIDList, IntegerDBIDs {
 
     @Override
     public void setDBID(DBIDRef ref) {
+      if(pos >= size) {
+        throw new ArrayIndexOutOfBoundsException();
+      }
       ids[pos] = ref.internalGetIndex();
     }
 
     @Override
     public void setDouble(double value) {
+      if(pos >= size) {
+        throw new ArrayIndexOutOfBoundsException();
+      }
       dists[pos] = value;
     }
 
