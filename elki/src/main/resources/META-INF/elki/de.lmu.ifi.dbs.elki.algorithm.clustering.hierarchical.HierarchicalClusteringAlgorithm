@@ -4,3 +4,6 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AGNES HAC NaiveAgglomerati
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CLINK Defays
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMaxAnderberg
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMaxNNChain
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMax
