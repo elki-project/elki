@@ -30,11 +30,10 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.PrototypeModel;
 import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -163,21 +162,14 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
         try {
           if(model instanceof PrototypeModel) {
             Object prototype = ((PrototypeModel<?>) model).getPrototype();
-            if(prototype == null) {
-              continue;
-            }
-            if(prototype instanceof DBID) {
-              NumberVector v = rel.get((DBID) prototype);
-              if(v == null) {
-                continue;
-              }
-              mean = proj.fastProjectDataToRenderSpace(v);
-            }
-            else if(prototype instanceof double[]) {
+            if(prototype instanceof double[]) {
               mean = proj.fastProjectDataToRenderSpace((double[]) prototype);
             }
+            else if(prototype instanceof DBIDRef) {
+              mean = proj.fastProjectDataToRenderSpace(rel.get((DBIDRef) prototype));
+            }
           }
-          else {
+          if(mean == null) {
             continue;
           }
         }

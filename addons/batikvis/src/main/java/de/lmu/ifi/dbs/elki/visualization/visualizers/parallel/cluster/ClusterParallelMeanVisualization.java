@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -31,12 +31,12 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
-import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.PrototypeModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -153,24 +153,26 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
         Model model = ci.next().getModel();
         double[] mean = null;
         try {
-          if(model instanceof MeanModel) {
-            mean = ((MeanModel) model).getMean();
+          if(model instanceof PrototypeModel) {
+            Object prototype = ((PrototypeModel<?>) model).getPrototype();
+            if(prototype instanceof double[]) {
+              mean = proj.fastProjectDataToRenderSpace((double[]) prototype);
+            }
+            else if(prototype instanceof DBIDRef) {
+              mean = proj.fastProjectDataToRenderSpace(relation.get((DBIDRef) prototype));
+            }
           }
-          else if(model instanceof MedoidModel) {
-            mean = relation.get(((MedoidModel) model).getMedoid()).toArray();
+          if(mean == null) {
+            continue;
           }
         }
         catch(ObjectNotFoundException e) {
           continue; // Element not found.
         }
-        if(mean == null) {
-          continue;
-        }
-        double[] pmean = proj.fastProjectDataToRenderSpace(mean);
 
         SVGPath path = new SVGPath();
-        for(int i = 0; i < pmean.length; i++) {
-          path.drawTo(getVisibleAxisX(i), pmean[i]);
+        for(int i = 0; i < mean.length; i++) {
+          path.drawTo(getVisibleAxisX(i), mean[i]);
         }
         Element meanline = path.makeElement(svgp);
 

@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,11 +30,12 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.MeanModel;
-import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.model.PrototypeModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -146,17 +147,23 @@ public class ClusterStarVisualization extends AbstractVisFactory {
       for(int cnum = 0; ci.hasNext(); cnum++) {
         Cluster<Model> clus = ci.next();
         Model model = clus.getModel();
-        double[] mean;
-        if(model instanceof MeanModel) {
-          MeanModel mmodel = (MeanModel) model;
-          mean = proj.fastProjectDataToRenderSpace(mmodel.getMean());
+        double[] mean = null;
+        try {
+          if(model instanceof PrototypeModel) {
+            Object prototype = ((PrototypeModel<?>) model).getPrototype();
+            if(prototype instanceof double[]) {
+              mean = proj.fastProjectDataToRenderSpace((double[]) prototype);
+            }
+            else if(prototype instanceof DBIDRef) {
+              mean = proj.fastProjectDataToRenderSpace(rel.get((DBIDRef) prototype));
+            }
+          }
+          if(mean == null) {
+            continue;
+          }
         }
-        else if(model instanceof MedoidModel) {
-          MedoidModel mmodel = (MedoidModel) model;
-          mean = proj.fastProjectDataToRenderSpace(rel.get(mmodel.getMedoid()));
-        }
-        else {
-          continue;
+        catch(ObjectNotFoundException e) {
+          continue; // Element not found.
         }
 
         if(!svgp.getCSSClassManager().contains(CSS_MEAN_STAR + "_" + cnum)) {
