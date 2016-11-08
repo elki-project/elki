@@ -240,7 +240,7 @@ public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, Point
     clusters.put(y, cy);
 
     // parent of x is set to y
-    builder.add(ix, distances[offset], iy, prots.seek(y));
+    builder.add(ix, distances[offset], iy, prots.seek(offset));
 
     // Deactivate x in cache:
     besti[x] = -1;
