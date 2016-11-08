@@ -29,10 +29,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
@@ -63,20 +59,18 @@ import gnu.trove.map.hash.TIntObjectHashMap;
  * Cluster Analysis for Applications<br />
  * ISBN: 0120576503
  * </p>
+ * 
+ * @author Julian Erhard
+ * @author Erich Schubert
  */
 @Reference(authors = "M. R. Anderberg", //
-title = "Hierarchical Clustering Methods", //
-booktitle = "Cluster Analysis for Applications")
-public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult>implements HierarchicalClusteringAlgorithm {
+    title = "Hierarchical Clustering Methods", //
+    booktitle = "Cluster Analysis for Applications")
+public class MiniMaxAnderberg<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
-  private static final Logging LOG = Logging.getLogger(AnderbergMiniMax.class);
-
-  /**
-   * Current linkage method in use.
-   */
-  LinkageMethod linkage = WardLinkageMethod.STATIC;
+  private static final Logging LOG = Logging.getLogger(MiniMaxAnderberg.class);
 
   /**
    * Constructor.
@@ -84,7 +78,7 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * @param distanceFunction Distance function to use
    * @param linkage Linkage method
    */
-  public AnderbergMiniMax(DistanceFunction<? super O> distanceFunction) {
+  public MiniMaxAnderberg(DistanceFunction<? super O> distanceFunction) {
     super(distanceFunction);
   }
 
@@ -102,13 +96,12 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
 
     if(size > 0x10000) {
       throw new AbortException("This implementation does not scale to data sets larger than " + //
-      0x10000 // = 65535
-      + " instances (~16 GB RAM), at which point the Java maximum array size is reached.");
+          0x10000 // = 65535
+          + " instances (~16 GB RAM), at which point the Java maximum array size is reached.");
     }
 
-    WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
-    WritableDBIDDataStore prototypes = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
+    // Initialize space for result:
+    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids);
     TIntObjectHashMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
 
     // Compute the initial (lower triangular) distance matrix.
@@ -118,11 +111,6 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
 
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     MiniMax.initializeMatrices(distances, prots, dq, ix, iy);
-    
-    for(ix.seek(0); ix.valid(); ix.advance()) {
-      pi.put(ix, ix);
-      lambda.put(ix, Double.POSITIVE_INFINITY);
-    }
 
     // Arrays used for caching:
     double[] bestd = new double[size];
@@ -133,11 +121,11 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
     int wsize = size;
     for(int i = 1; i < size; i++) {
-      findMerge(wsize, distances, protiter, ix, iy, pi, lambda, prototypes, clusters, bestd, besti, dq);
+      findMerge(wsize, distances, protiter, ix, iy, builder, clusters, bestd, besti, dq);
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    return new PointerPrototypeHierarchyRepresentationResult(ids, pi, lambda, prototypes);
+    return (PointerPrototypeHierarchyRepresentationResult) builder.complete();
   }
 
   /**
@@ -152,7 +140,7 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
     Arrays.fill(bestd, Double.POSITIVE_INFINITY);
     Arrays.fill(besti, -1);
     for(int x = 0, p = 0; x < size; x++) {
-      assert(p == AGNES.triangleSize(x));
+      assert (p == AGNES.triangleSize(x));
       double bestdx = Double.POSITIVE_INFINITY;
       int bestix = -1;
       for(int y = 0; y < x; y++, p++) {
@@ -179,15 +167,13 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * @param prots the prototypes of merges between clusters
    * @param ix an iterator over the data set
    * @param iy another iterator over the data set
-   * @param pi the data structure holding the parent relation
-   * @param lambda the data structure holding the distance to parent
-   * @param prototypes the data structure holding the prototype of a cluster merge
+   * @param builder Result builder
    * @param clusters the current clustering
    * @param bestd the distances to the nearest neighboring cluster
    * @param besti the nearest neighboring cluster
    * @param dq the range query
    */
-  protected void findMerge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, double[] bestd, int[] besti, DistanceQuery<O> dq) {
+  protected void findMerge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters, double[] bestd, int[] besti, DistanceQuery<O> dq) {
     double mindist = Double.POSITIVE_INFINITY;
     int x = -1, y = -1;
     // Find minimum:
@@ -202,35 +188,34 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
         y = besti[cx];
       }
     }
-//    assert(lambda.doubleValue(ix.seek(x < y ? y : x))==Double.POSITIVE_INFINITY);
-    assert(x >= 0 && y >= 0);
-    assert(x != y);
-    merge(size, distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, bestd, besti, x < y ? y : x, x < y ? x : y);
+    // assert(lambda.doubleValue(ix.seek(x < y ? y :
+    // x))==Double.POSITIVE_INFINITY);
+    assert (x >= 0 && y >= 0);
+    assert (x != y);
+    merge(size, distances, prots, ix, iy, builder, clusters, dq, bestd, besti, x < y ? y : x, x < y ? x : y);
   }
 
-/**
- * Execute the cluster merge
- * 
- * @param size size of data set
- * @param distances the inter-cluster distance matrix
- * @param prots the prototypes of merges between clusters
- * @param ix an iterator over the data set
- * @param iy another iterator over the data set
- * @param pi the data structure holding the parent relation
- * @param lambda the data structure holding the distance to parent
- * @param prototypes the data structure holding the prototype of a cluster merge
- * @param clusters the current clustering
- * @param dq the range query
- * @param bestd the distances to the nearest neighboring cluster
- * @param besti the nearest neighboring cluster
- * @param x first cluster to merge, with x > y
- * @param y second cluster to merge, with y < x
- */
-  protected void merge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
+  /**
+   * Execute the cluster merge
+   * 
+   * @param size size of data set
+   * @param distances the inter-cluster distance matrix
+   * @param prots the prototypes of merges between clusters
+   * @param ix an iterator over the data set
+   * @param iy another iterator over the data set
+   * @param builder Result builder
+   * @param clusters the current clustering
+   * @param dq the range query
+   * @param bestd the distances to the nearest neighboring cluster
+   * @param besti the nearest neighboring cluster
+   * @param x first cluster to merge, with x > y
+   * @param y second cluster to merge, with y < x
+   */
+  protected void merge(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
     int offset = AGNES.triangleSize(x) + y;
-    
-    assert(y < x);
-    
+
+    assert (y < x);
+
     ix.seek(x);
     iy.seek(y);
     if(LOG.isDebuggingFine()) {
@@ -245,7 +230,7 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
       cy = DBIDUtil.newHashSet();
       cy.add(iy);
     }
-    if(cx == null) {  
+    if(cx == null) {
       cy.add(ix);
     }
     else {
@@ -255,15 +240,11 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
     clusters.put(y, cy);
 
     // parent of x is set to y
-    pi.put(ix, iy);
-
-    lambda.put(ix, distances[offset]);
-
-    prototypes.put(ix, prots.seek(y));
+    builder.add(ix, distances[offset], iy, prots.seek(y));
 
     // Deactivate x in cache:
     besti[x] = -1;
-    updateMatrices(size, distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, bestd, besti, x, y);
+    updateMatrices(size, distances, prots, ix, iy, builder, clusters, dq, bestd, besti, x, y);
     if(besti[y] == x) {
       findBest(size, distances, bestd, besti, y);
     }
@@ -278,9 +259,7 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * @param prots the prototypes of merges between clusters
    * @param ix an iterator over the data set
    * @param iy another iterator over the data set
-   * @param pi the data structure holding the parent relation
-   * @param lambda the data structure holding the distance to parent
-   * @param prototypes the data structure holding the prototype of a cluster merge
+   * @param builder Result builder
    * @param clusters the current clustering
    * @param dq the range query
    * @param bestd the distances to the nearest neighboring cluster
@@ -288,7 +267,7 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * @param x first cluster to merge, with x > y
    * @param y second cluster to merge, with y < x
    */
-  private void updateMatrices(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
+  private void updateMatrices(int size, double[] distances, DBIDArrayMIter prots, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters, DistanceQuery<O> dq, double[] bestd, int[] besti, int x, int y) {
     // c is the new cluster.
     // Update entries (at (a,b) with a > b) in the matrix where a = y or b = y
 
@@ -299,11 +278,11 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
     for(; b < a; b++) {
       iy.seek(b);
       // Skip entry if already merged
-      if(lambda.doubleValue(iy) < Double.POSITIVE_INFINITY) {
+      if(builder.isLinked(iy)) {
         continue;
       }
-      MiniMax.updateEntry(distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, a, b);
-      updateCache(size, distances, bestd, besti, x, y, b, distances[AGNES.triangleSize(y)+b]);
+      MiniMax.updateEntry(distances, prots, ix, iy, clusters, dq, a, b);
+      updateCache(size, distances, bestd, besti, x, y, b, distances[AGNES.triangleSize(y) + b]);
     }
 
     // Update entries at (a,y) with a > y
@@ -313,11 +292,11 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
     for(; a < size; a++) {
       ix.seek(a);
       // Skip entry if already merged
-      if(lambda.doubleValue(ix) < Double.POSITIVE_INFINITY) {
+      if(builder.isLinked(ix)) {
         continue;
       }
-      MiniMax.updateEntry(distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, a, b);
-      updateCache(size, distances, bestd, besti, x, y, a, distances[AGNES.triangleSize(a)+y]);
+      MiniMax.updateEntry(distances, prots, ix, iy, clusters, dq, a, b);
+      updateCache(size, distances, bestd, besti, x, y, a, distances[AGNES.triangleSize(a) + y]);
     }
   }
 
@@ -333,14 +312,13 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
    * @param j Updated value d(y, j)
    * @param d New distance
    */
-    private void updateCache(int size, double[] scratch, double[] bestd, int[] besti, int x, int y, int j, double d) {
-      // New best
-      /*if(d <= bestd[j]) { //We do not need this here, as d(j, x u y) >= min { d (j, x), d(j, y) }
-        bestd[j] = d;
-        besti[j] = y;
-        return;
-      }*/
-      // Needs slow upate.
+  private void updateCache(int size, double[] scratch, double[] bestd, int[] besti, int x, int y, int j, double d) {
+    // New best
+    /*
+     * if(d <= bestd[j]) { //We do not need this here, as d(j, x u y) >= min { d
+     * (j, x), d(j, y) } bestd[j] = d; besti[j] = y; return; }
+     */
+    // Needs slow upate.
     if(besti[j] == x || besti[j] == y) {
       findBest(size, scratch, bestd, besti, j);
     }
@@ -397,8 +375,8 @@ public class AnderbergMiniMax<O> extends AbstractDistanceBasedAlgorithm<O, Point
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
 
     @Override
-    protected AnderbergMiniMax<O> makeInstance() {
-      return new AnderbergMiniMax<>(distanceFunction);
+    protected MiniMaxAnderberg<O> makeInstance() {
+      return new MiniMaxAnderberg<>(distanceFunction);
     }
   }
 }

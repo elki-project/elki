@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -26,10 +27,6 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
@@ -45,14 +42,30 @@ import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
+/**
+ * MiniMax hierarchical clustering using the NNchain algorithm.
+ * 
+ * Reference:
+ * <p>
+ * F. Murtagh<br />
+ * A survey of recent advances in hierarchical clustering algorithms<br />
+ * The Computer Journal 26(4)
+ * </p>
+ * 
+ * @author Julian Erhard
+ *
+ * @param <O> Object type
+ */
+@Reference(authors = "F. Murtagh", //
+    title = "A survey of recent advances in hierarchical clustering algorithms", //
+    booktitle = "The Computer Journal 26(4)", //
+    url = "http://dx.doi.org/10.1093/comjnl/26.4.354")
 public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
-
   private static final Logging LOG = Logging.getLogger(MiniMaxNNChain.class);
-
-  private FiniteProgress progress;
 
   public MiniMaxNNChain(DistanceFunction<? super O> distanceFunction) {
     super(distanceFunction);
@@ -73,32 +86,20 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
     }
     final int size = ids.size();
 
-    WritableDBIDDataStore pi = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
-    WritableDoubleDataStore lambda = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
-    WritableDBIDDataStore prototypes = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
+    // Initialize space for result:
+    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids);
     TIntObjectHashMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
-    final Logging log = getLogger();
-
-    progress = log.isVerbose() ? new FiniteProgress("Running MiniMaxNNChainCovertree", size - 1, log) : null;
 
     double[] dists = new double[AGNES.triangleSize(size)];
     ArrayModifiableDBIDs prots = DBIDUtil.newArray(AGNES.triangleSize(size));
     DBIDArrayMIter protiter = prots.iter();
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
 
-    // Initialize lambda
-    for(ix.seek(0); ix.valid(); ix.advance()) {
-      pi.put(ix, ix);
-      lambda.put(ix, Double.POSITIVE_INFINITY);
-    }
-
     MiniMax.initializeMatrices(dists, prots, dq, ix, iy);
 
-    nnChainCore(size, dists, protiter, dq, ix, iy, pi, lambda, prototypes, clusters);
+    nnChainCore(size, dists, protiter, dq, ix, iy, builder, clusters);
 
-    LOG.ensureCompleted(progress);
-
-    return new PointerPrototypeHierarchyRepresentationResult(ids, pi, lambda, prototypes);
+    return (PointerPrototypeHierarchyRepresentationResult) builder.complete();
   }
 
   /**
@@ -111,12 +112,10 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
    * @param dq distance query of the data set
    * @param ix iterator to reuse
    * @param iy another iterator to reuse
-   * @param pi parent data store
-   * @param lambda distance to parent data store
-   * @param prototypes prototypes data store
+   * @param builder Result builder
    * @param clusters current clusters
    */
-  private void nnChainCore(int size, double[] distances, DBIDArrayMIter prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, WritableDBIDDataStore pi, WritableDoubleDataStore lambda, WritableDBIDDataStore prototypes, TIntObjectHashMap<ModifiableDBIDs> clusters) {
+  private void nnChainCore(int size, double[] distances, DBIDArrayMIter prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters) {
     IntegerArray chain = new IntegerArray(size + 1); // The maximum chain size =
                                                      // number of ids + 1
     int a = -1;
@@ -126,15 +125,15 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
     double dist;
     int lastIndex;
 
+    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running MiniMaxNNChain", size - 1, LOG) : null;
     for(int k = 0; k < size - 1; k++) {
       if(chain.size() <= 3) {
-
         // Accessing two arbitrary not yet merged elements could be optimized to
         // work in O(1) like in Müllner;
         // however this usually does not have a huge impact (empirically just
         // about 1/5000 of total performance)
         for(ix.seek(0); ix.valid(); ix.advance()) {
-          if(lambda.doubleValue(ix) == Double.POSITIVE_INFINITY) {
+          if(!builder.isLinked(ix)) {
             a = ix.getOffset();
             break;
           }
@@ -144,19 +143,15 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
         chain.add(a);
 
         for(ix.seek(0); ix.valid(); ix.advance()) {
-          if(lambda.doubleValue(ix) == Double.POSITIVE_INFINITY) {
+          if(!builder.isLinked(ix)) {
             b = ix.getOffset();
-            if(a == b) {
-              continue;
-            }
-            else {
+            if(a != b) {
               break;
             }
           }
         }
       }
       else {
-
         lastIndex = chain.size - 1;
         a = chain.get(lastIndex - 3);
         // Get the point that has been retained during the last merge.
@@ -167,7 +162,7 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
         c = b;
         minDist = getDistance(distances, b, a);
         for(int i = 0; i < size; i++) {
-          if(i != a && lambda.doubleValue(ix.seek(i)) == Double.POSITIVE_INFINITY) {
+          if(i != a && !builder.isLinked(ix.seek(i))) {
             dist = getDistance(distances, i, a);
             if(dist < minDist) {
               minDist = dist;
@@ -188,13 +183,13 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
         y = a;
       }
       else {
-        assert (a > b);
         x = a;
         y = b;
       }
-      MiniMax.merge(size, distances, prots, ix, iy, pi, lambda, prototypes, clusters, dq, x, y);
+      MiniMax.merge(size, distances, prots, ix, iy, builder, clusters, dq, x, y);
       LOG.incrementProcessed(progress);
     }
+    LOG.ensureCompleted(progress);
   }
 
   protected static double getDistance(double[] distances, int x, int y) {
@@ -221,12 +216,9 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
   }
 
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
-
     @Override
     protected MiniMaxNNChain<O> makeInstance() {
       return new MiniMaxNNChain<>(distanceFunction);
     }
-
   }
-
 }

@@ -77,6 +77,11 @@ public class PointerHierarchyRepresentationBuilder {
   protected int mergecount = 0;
 
   /**
+   * Prototype storage, may be {@code null}.
+   */
+  protected WritableDBIDDataStore prototypes;
+
+  /**
    * Constructor.
    *
    * @param ids IDs
@@ -105,7 +110,34 @@ public class PointerHierarchyRepresentationBuilder {
    * @param par Parent
    */
   public void add(DBIDRef cur, double distance, DBIDRef par) {
+    assert prototypes == null;
     parent.putDBID(cur, par);
+    double olddist = parentDistance.putDouble(cur, distance);
+    assert (olddist == Double.POSITIVE_INFINITY) : "Object was already linked!";
+    order.putInt(cur, mergecount);
+    ++mergecount;
+  }
+
+  /**
+   * Add an element to the pointer representation.
+   *
+   * Important: If an algorithm does not produce links in an increasing fashion,
+   * a warning will be issued and the linking distance will be increased.
+   * Otherwise, the hierarchy would be misinterpreted when links are executed
+   * ordered by their distance.
+   *
+   * @param cur Current object
+   * @param distance Link distance
+   * @param par Parent
+   * @param prototype
+   */
+  public void add(DBIDRef cur, double distance, DBIDRef par, DBIDRef prototype) {
+    if(mergecount == 0) {
+      prototypes = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
+    }
+    assert prototypes != null;
+    parent.putDBID(cur, par);
+    prototypes.putDBID(cur, prototype);
     double olddist = parentDistance.putDouble(cur, distance);
     assert (olddist == Double.POSITIVE_INFINITY) : "Object was already linked!";
     order.putInt(cur, mergecount);
@@ -124,6 +156,9 @@ public class PointerHierarchyRepresentationBuilder {
     }
     if(mergecount != ids.size() - 1) {
       LOG.warning(mergecount + " merges were added to the hierarchy, expected " + (ids.size() - 1));
+    }
+    if(prototypes != null) {
+      return new PointerPrototypeHierarchyRepresentationResult(ids, parent, parentDistance, order, prototypes);
     }
     return new PointerHierarchyRepresentationResult(ids, parent, parentDistance, order);
   }
