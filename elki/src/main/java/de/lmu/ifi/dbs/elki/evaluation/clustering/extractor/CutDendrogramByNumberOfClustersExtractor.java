@@ -26,9 +26,7 @@ import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -53,18 +51,18 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class ExtractFlatClusteringFromHierarchyEvaluator implements Evaluator {
+public class CutDendrogramByNumberOfClustersExtractor implements Evaluator {
   /**
    * Class to perform the cluster extraction.
    */
-  private ExtractFlatClusteringFromHierarchy inner;
+  private CutDendrogramByNumberOfClusters inner;
 
   /**
    * Constructor.
    *
    * @param inner Inner algorithm instance.
    */
-  public ExtractFlatClusteringFromHierarchyEvaluator(ExtractFlatClusteringFromHierarchy inner) {
+  public CutDendrogramByNumberOfClustersExtractor(CutDendrogramByNumberOfClusters inner) {
     this.inner = inner;
   }
 
@@ -72,8 +70,7 @@ public class ExtractFlatClusteringFromHierarchyEvaluator implements Evaluator {
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     ArrayList<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(hier, newResult, PointerHierarchyRepresentationResult.class);
     for(PointerHierarchyRepresentationResult pointerresult : hrs) {
-      Clustering<DendrogramModel> result = inner.extractClusters(pointerresult);
-      pointerresult.addChildResult(result);
+      pointerresult.addChildResult(inner.run(pointerresult));
     }
   }
 
@@ -114,7 +111,7 @@ public class ExtractFlatClusteringFromHierarchyEvaluator implements Evaluator {
     /**
      * Inner algorithm to extract a clustering.
      */
-    ExtractFlatClusteringFromHierarchy inner;
+    CutDendrogramByNumberOfClusters inner;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -123,12 +120,12 @@ public class ExtractFlatClusteringFromHierarchyEvaluator implements Evaluator {
       overrides.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, DummyHierarchicalClusteringAlgorithm.class);
       ChainedParameterization list = new ChainedParameterization(overrides, config);
       list.errorsTo(config);
-      inner = list.tryInstantiate(ExtractFlatClusteringFromHierarchy.class);
+      inner = list.tryInstantiate(CutDendrogramByNumberOfClusters.class);
     }
 
     @Override
-    protected ExtractFlatClusteringFromHierarchyEvaluator makeInstance() {
-      return new ExtractFlatClusteringFromHierarchyEvaluator(inner);
+    protected CutDendrogramByNumberOfClustersExtractor makeInstance() {
+      return new CutDendrogramByNumberOfClustersExtractor(inner);
     }
   }
 }

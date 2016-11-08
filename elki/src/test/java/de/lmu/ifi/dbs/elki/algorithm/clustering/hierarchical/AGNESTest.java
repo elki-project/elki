@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -53,10 +53,10 @@ public class AGNESTest extends AbstractSimpleAlgorithmTest {
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, SingleLinkageMethod.class);
-    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database
@@ -76,9 +76,9 @@ public class AGNESTest extends AbstractSimpleAlgorithmTest {
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
-    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database
@@ -98,10 +98,10 @@ public class AGNESTest extends AbstractSimpleAlgorithmTest {
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, GroupAverageLinkageMethod.class);
-    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database
@@ -121,10 +121,10 @@ public class AGNESTest extends AbstractSimpleAlgorithmTest {
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AGNES.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, CompleteLinkageMethod.class);
-    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database

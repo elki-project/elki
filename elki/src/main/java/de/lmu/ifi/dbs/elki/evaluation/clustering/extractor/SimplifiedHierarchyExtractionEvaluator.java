@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.Simplifi
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.extractor.ExtractFlatClusteringFromHierarchyEvaluator.DummyHierarchicalClusteringAlgorithm;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.extractor.CutDendrogramByHeightExtractor.DummyHierarchicalClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;

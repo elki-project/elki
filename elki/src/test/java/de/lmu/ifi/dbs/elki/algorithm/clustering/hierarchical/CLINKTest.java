@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -54,9 +54,9 @@ public class CLINKTest extends AbstractSimpleAlgorithmTest {
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 2);
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 2);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, CLINK.class);
-    ExtractFlatClusteringFromHierarchy slink = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    CutDendrogramByNumberOfClusters slink = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
     // run SLINK on database

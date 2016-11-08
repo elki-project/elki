@@ -28,7 +28,7 @@ import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByHeight;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
 import de.lmu.ifi.dbs.elki.database.AbstractDatabase;
@@ -66,7 +66,7 @@ public class FileBasedFloatDistanceFunctionTest extends AbstractSimpleAlgorithmT
     // We need to read from a resource, instead of a file.
     df.loadCache(FileUtil.openSystemFile(FILENAME));
     SLINK<DBID> slink = new SLINK<>(df);
-    ExtractFlatClusteringFromHierarchy clus = new ExtractFlatClusteringFromHierarchy(slink, 0.5, false, false);
+    CutDendrogramByHeight clus = new CutDendrogramByHeight(slink, 0.5, false);
     Clustering<DendrogramModel> c = clus.run(db);
 
     testClusterSizes(c, new int[] { 2, 2 });

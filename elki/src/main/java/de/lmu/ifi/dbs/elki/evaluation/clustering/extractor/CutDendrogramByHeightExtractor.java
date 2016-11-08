@@ -24,16 +24,17 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.extractor;
 
 import java.util.ArrayList;
 
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByHeight;
+import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.evaluation.clustering.extractor.CutDendrogramByHeightExtractor.DummyHierarchicalClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ChainedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -43,25 +44,25 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 /**
  * Extract clusters from a hierarchical clustering, during the evaluation phase.
  *
- * Usually, it is more elegant to use {@link HDBSCANHierarchyExtraction} as
- * primary algorithm. But in order to extract <em>multiple</em> partitionings
+ * Usually, it is more elegant to use {@link ExtractFlatClusteringFromHierarchy}
+ * as primary algorithm. But in order to extract <em>multiple</em> partitionings
  * from the same clustering, this can be useful.
  *
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class HDBSCANHierarchyExtractionEvaluator implements Evaluator {
+public class CutDendrogramByHeightExtractor implements Evaluator {
   /**
    * Class to perform the cluster extraction.
    */
-  private HDBSCANHierarchyExtraction inner;
+  private CutDendrogramByHeight inner;
 
   /**
    * Constructor.
    *
    * @param inner Inner algorithm instance.
    */
-  public HDBSCANHierarchyExtractionEvaluator(HDBSCANHierarchyExtraction inner) {
+  public CutDendrogramByHeightExtractor(CutDendrogramByHeight inner) {
     this.inner = inner;
   }
 
@@ -69,8 +70,33 @@ public class HDBSCANHierarchyExtractionEvaluator implements Evaluator {
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     ArrayList<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(hier, newResult, PointerHierarchyRepresentationResult.class);
     for(PointerHierarchyRepresentationResult pointerresult : hrs) {
-      Clustering<DendrogramModel> result = inner.extractClusters(pointerresult);
-      pointerresult.addChildResult(result);
+      pointerresult.addChildResult(inner.run(pointerresult));
+    }
+  }
+
+  /**
+   * Dummy instance.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
+  protected static class DummyHierarchicalClusteringAlgorithm implements HierarchicalClusteringAlgorithm {
+    /**
+     * Constructor.
+     */
+    public DummyHierarchicalClusteringAlgorithm() {
+      super();
+    }
+
+    @Override
+    public TypeInformation[] getInputTypeRestriction() {
+      return TypeUtil.array();
+    }
+
+    @Override
+    public PointerHierarchyRepresentationResult run(Database db) {
+      throw new AbortException("This must not be called");
     }
   }
 
@@ -85,7 +111,7 @@ public class HDBSCANHierarchyExtractionEvaluator implements Evaluator {
     /**
      * Inner algorithm to extract a clustering.
      */
-    HDBSCANHierarchyExtraction inner;
+    CutDendrogramByHeight inner;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -93,12 +119,13 @@ public class HDBSCANHierarchyExtractionEvaluator implements Evaluator {
       ListParameterization overrides = new ListParameterization();
       overrides.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, DummyHierarchicalClusteringAlgorithm.class);
       ChainedParameterization list = new ChainedParameterization(overrides, config);
-      inner = ClassGenericsUtil.parameterizeOrAbort(HDBSCANHierarchyExtraction.class, list);
+      list.errorsTo(config);
+      inner = list.tryInstantiate(CutDendrogramByHeight.class);
     }
 
     @Override
-    protected HDBSCANHierarchyExtractionEvaluator makeInstance() {
-      return new HDBSCANHierarchyExtractionEvaluator(inner);
+    protected CutDendrogramByHeightExtractor makeInstance() {
+      return new CutDendrogramByHeightExtractor(inner);
     }
   }
 }

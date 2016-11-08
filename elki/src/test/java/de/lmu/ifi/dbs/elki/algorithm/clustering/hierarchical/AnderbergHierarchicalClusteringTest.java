@@ -26,7 +26,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 import org.junit.Test;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.ExtractFlatClusteringFromHierarchy;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -54,10 +54,10 @@ public class AnderbergHierarchicalClusteringTest extends AbstractSimpleAlgorithm
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AnderbergHierarchicalClustering.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, SingleLinkageMethod.class);
-    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database
@@ -77,9 +77,9 @@ public class AnderbergHierarchicalClusteringTest extends AbstractSimpleAlgorithm
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AnderbergHierarchicalClustering.class);
-    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database
@@ -99,10 +99,10 @@ public class AnderbergHierarchicalClusteringTest extends AbstractSimpleAlgorithm
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AnderbergHierarchicalClustering.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, GroupAverageLinkageMethod.class);
-    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database
@@ -122,10 +122,10 @@ public class AnderbergHierarchicalClusteringTest extends AbstractSimpleAlgorithm
 
     // Setup algorithm
     ListParameterization params = new ListParameterization();
-    params.addParameter(ExtractFlatClusteringFromHierarchy.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
     params.addParameter(AlgorithmStep.Parameterizer.ALGORITHM_ID, AnderbergHierarchicalClustering.class);
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, CompleteLinkageMethod.class);
-    ExtractFlatClusteringFromHierarchy c = ClassGenericsUtil.parameterizeOrAbort(ExtractFlatClusteringFromHierarchy.class, params);
+    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
 
     // run clustering algorithm on database
