@@ -55,6 +55,11 @@ import gnu.trove.map.hash.TIntObjectHashMap;
  * A survey of recent advances in hierarchical clustering algorithms<br />
  * The Computer Journal 26(4)
  * </p>
+ * <p>
+ * D. Müllner<br />
+ * Modern hierarchical, agglomerative clustering algorithms<br />
+ * arXiv preprint arXiv:1109.2378
+ * </p>
  * 
  * @author Julian Erhard
  *
@@ -65,12 +70,36 @@ import gnu.trove.map.hash.TIntObjectHashMap;
     booktitle = "The Computer Journal 26(4)", //
     url = "http://dx.doi.org/10.1093/comjnl/26.4.354")
 public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, PointerPrototypeHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
+  /**
+   * Class logger.
+   */
   private static final Logging LOG = Logging.getLogger(MiniMaxNNChain.class);
 
+  /**
+   * Additional literature:
+   */
+  @Reference(authors = "D. Müllner", //
+      title = "Modern hierarchical, agglomerative clustering algorithms", //
+      booktitle = "arXiv preprint arXiv:1109.2378", //
+      url = "https://arxiv.org/abs/1109.2378")
+  public static final Void ADDITIONAL_REFERNCE = null;
+
+  /**
+   * Constructor.
+   *
+   * @param distanceFunction Distance function
+   */
   public MiniMaxNNChain(DistanceFunction<? super O> distanceFunction) {
     super(distanceFunction);
   }
 
+  /**
+   * Run the algorithm
+   * 
+   * @param db Database to run on
+   * @param relation Data relation
+   * @return Clustering result
+   */
   public PointerPrototypeHierarchyRepresentationResult run(Database db, Relation<O> relation) {
     DistanceQuery<O> dq = db.getDistanceQuery(relation, getDistanceFunction(), DatabaseQuery.HINT_OPTIMIZED_ONLY);
     ArrayDBIDs ids = DBIDUtil.ensureArray(relation.getDBIDs());
@@ -84,12 +113,12 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
     if(dq == null) {
       throw new AbortException("This implementation only supports StaticArrayDatabase.");
     }
-    final int size = ids.size();
 
     // Initialize space for result:
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids);
     TIntObjectHashMap<ModifiableDBIDs> clusters = new TIntObjectHashMap<>();
 
+    final int size = ids.size();
     double[] dists = new double[AGNES.triangleSize(size)];
     ArrayModifiableDBIDs prots = DBIDUtil.newArray(AGNES.triangleSize(size));
     DBIDArrayMIter protiter = prots.iter();
@@ -116,17 +145,12 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
    * @param clusters current clusters
    */
   private void nnChainCore(int size, double[] distances, DBIDArrayMIter prots, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, PointerHierarchyRepresentationBuilder builder, TIntObjectHashMap<ModifiableDBIDs> clusters) {
-    IntegerArray chain = new IntegerArray(size + 1); // The maximum chain size =
-                                                     // number of ids + 1
-    int a = -1;
-    int b = -1;
-    int c, x, y;
-    double minDist = Double.POSITIVE_INFINITY;
-    double dist;
-    int lastIndex;
+    // The maximum chain size = number of ids + 1
+    IntegerArray chain = new IntegerArray(size + 1);
 
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Running MiniMaxNNChain", size - 1, LOG) : null;
     for(int k = 0; k < size - 1; k++) {
+      int a = -1, b = -1;
       if(chain.size() <= 3) {
         // Accessing two arbitrary not yet merged elements could be optimized to
         // work in O(1) like in Müllner;
@@ -152,18 +176,18 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
         }
       }
       else {
-        lastIndex = chain.size - 1;
+        int lastIndex = chain.size - 1;
         a = chain.get(lastIndex - 3);
         // Get the point that has been retained during the last merge.
         b = (chain.get(lastIndex - 2) < chain.get(lastIndex - 1)) ? chain.get(lastIndex - 2) : chain.get(lastIndex - 1);
         chain.remove(lastIndex - 2, 3);
       }
       do {
-        c = b;
-        minDist = getDistance(distances, b, a);
+        int c = b;
+        double minDist = getDistance(distances, b, a);
         for(int i = 0; i < size; i++) {
           if(i != a && !builder.isLinked(ix.seek(i))) {
-            dist = getDistance(distances, i, a);
+            double dist = getDistance(distances, i, a);
             if(dist < minDist) {
               minDist = dist;
               c = i;
@@ -178,30 +202,28 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
       }
       while(!(chain.size() >= 3 && a == chain.get(chain.size - 1 - 2)));
 
+      // We always merge the larger into the smaller index:
       if(a < b) {
-        x = b;
-        y = a;
+        int tmp = a;
+        a = b;
+        b = tmp;
       }
-      else {
-        x = a;
-        y = b;
-      }
-      MiniMax.merge(size, distances, prots, ix, iy, builder, clusters, dq, x, y);
+      MiniMax.merge(size, distances, prots, ix, iy, builder, clusters, dq, a, b);
       LOG.incrementProcessed(progress);
     }
     LOG.ensureCompleted(progress);
   }
 
   protected static double getDistance(double[] distances, int x, int y) {
-    if(x > y) {
-      return distances[AGNES.triangleSize(x) + y];
-    }
-    else if(y > x) {
-      return distances[AGNES.triangleSize(y) + x];
-    }
-    else {
+    if(x == y) {
       return 0;
     }
+    if(x < y) {
+      int tmp = x;
+      x = y;
+      y = tmp;
+    }
+    return distances[AGNES.triangleSize(x) + y];
   }
 
   @Override
@@ -215,6 +237,13 @@ public class MiniMaxNNChain<O> extends AbstractDistanceBasedAlgorithm<O, Pointer
     return LOG;
   }
 
+  /**
+   * Parameterization class.
+   * 
+ * @author Julian Erhard
+   *
+   * @param <O> Object type
+   */
   public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
     @Override
     protected MiniMaxNNChain<O> makeInstance() {
