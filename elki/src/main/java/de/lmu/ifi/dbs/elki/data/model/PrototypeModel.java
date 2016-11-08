@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,36 +32,22 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @author Erich Schubert
  * @since 0.3
  */
-public class PrototypeModel<V> extends AbstractModel implements TextWriteable {
+public interface PrototypeModel<V> extends Model {
   /**
-   * Cluster prototype
+   * @return prototype
    */
-  protected V prototype;
-
-  /**
-   * Constructor with prototype
-   * 
-   * @param prototype Cluster prototype
-   */
-  public PrototypeModel(V prototype) {
-    super();
-    this.prototype = prototype;
-  }
-
-  /**
-   * @return mean
-   */
-  public V getPrototype() {
-    return prototype;
-  }
+  abstract V getPrototype();
 
   /**
    * Implementation of {@link TextWriteable} interface.
    */
   @Override
-  public void writeToText(TextWriterStream out, String label) {
-    super.writeToText(out, label);
-    out.commentPrintLn("Cluster " + getPrototypeType() + ": " + prototype.toString());
+  default void writeToText(TextWriterStream out, String label) {
+    if(label != null) {
+      out.commentPrintLn(label);
+    }
+    out.commentPrintLn("Model class: " + getClass().getName());
+    out.commentPrintLn("Cluster " + getPrototypeType() + ": " + getPrototype());
   }
 
   /**
@@ -69,7 +55,5 @@ public class PrototypeModel<V> extends AbstractModel implements TextWriteable {
    * 
    * @return String name
    */
-  protected String getPrototypeType() {
-    return "Prototype";
-  }
+  abstract String getPrototypeType();
 }

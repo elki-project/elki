@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @apiviz.composedOf LinearEquationSystem
  */
-public class LinearEquationModel extends AbstractModel implements TextWriteable {
+public class LinearEquationModel implements Model, TextWriteable {
   /**
    * Equation system
    */
@@ -68,13 +68,12 @@ public class LinearEquationModel extends AbstractModel implements TextWriteable 
     this.les = les;
   }
   
-  /**
-   * Implementation of {@link TextWriteable} interface
-   */
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    super.writeToText(out, label);
+    if(label != null) {
+      out.commentPrintLn(label);
+    }
+    out.commentPrintLn("Model class: " + getClass().getName());
     out.commentPrintLn(les.equationsToString(6));
   }
-
 }

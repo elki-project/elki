@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @author Erich Schubert
  * @since 0.3
  */
-public class CoreObjectsModel extends AbstractModel implements TextWriteable {
+public class CoreObjectsModel implements Model, TextWriteable {
   /**
    * Objects that are part of the cluster core.
    */
@@ -66,7 +66,10 @@ public class CoreObjectsModel extends AbstractModel implements TextWriteable {
 
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    super.writeToText(out, label);
+    if(label != null) {
+      out.commentPrintLn(label);
+    }
+    out.commentPrintLn("Model class: " + getClass().getName());
     out.commentPrintLn("Number of core points: " + core.size());
   }
 }

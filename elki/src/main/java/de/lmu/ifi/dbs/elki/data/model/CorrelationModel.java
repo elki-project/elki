@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * 
  * @apiviz.composedOf PCAFilteredResult
  */
-public class CorrelationModel extends PrototypeModel<double[]> implements TextWriteable {
+public class CorrelationModel extends SimplePrototypeModel<double[]> {
   /**
    * The computed PCA result of this cluster.
    */
@@ -78,7 +78,10 @@ public class CorrelationModel extends PrototypeModel<double[]> implements TextWr
    */
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    super.writeToText(out, label);
+    if(label != null) {
+      out.commentPrintLn(label);
+    }
+    out.commentPrintLn("Model class: " + getClass().getName());
     out.commentPrintLn("Centroid: " + out.normalizationRestore(getPrototype()).toString());
     out.commentPrintLn("Strong Eigenvectors:");
     String strong = getPCAResult().getStrongEigenvectors().toString();

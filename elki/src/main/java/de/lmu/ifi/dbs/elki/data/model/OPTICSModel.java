@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,7 +30,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class OPTICSModel extends AbstractModel {
+public class OPTICSModel implements Model {
   /**
    * Start index
    */

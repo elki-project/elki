@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,21 +23,19 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
- * Model for dendrograms, provides the distance to the child cluster.
+ * Model for dendrograms, provides the height of this subtree.
  * 
  * @author Elke Achtert
  * @since 0.4.0
  */
-// TODO: comments
-public class DendrogramModel extends AbstractModel {
+public class DendrogramModel implements Model {
   /**
    * Distance to child cluster
    */
-  private double distance;
+  private double height;
 
   /**
    * Constructor.
@@ -46,27 +44,27 @@ public class DendrogramModel extends AbstractModel {
    */
   public DendrogramModel(double distance) {
     super();
-    this.distance = distance;
+    this.height = distance;
   }
 
   /**
    * @return the distance
    */
   public double getDistance() {
-    return distance;
+    return height;
   }
 
-  /**
-   * Implementation of {@link TextWriteable} interface.
-   */
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    super.writeToText(out, label);
-    out.commentPrintLn("Distance to children: " + distance);
+    if(label != null) {
+      out.commentPrintLn(label);
+    }
+    out.commentPrintLn("Model class: " + getClass().getName());
+    out.commentPrintLn("Cluster height: " + height);
   }
 
   @Override
   public String toString() {
-    return "Distance to children: " + distance;
+    return "Distance to children: " + height;
   }
 }

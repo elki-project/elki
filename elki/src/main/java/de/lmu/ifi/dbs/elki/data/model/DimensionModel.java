@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,12 +27,12 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
- * Cluster model just providing a cluster dimensionality.
+ * Cluster model additionally providing a cluster dimensionality.
  * 
  * @author Erich Schubert
  * @since 0.2
  */
-public class DimensionModel extends AbstractModel implements TextWriteable {
+public class DimensionModel implements Model, TextWriteable {
   /**
    * Number of dimensions
    */
@@ -40,6 +40,7 @@ public class DimensionModel extends AbstractModel implements TextWriteable {
 
   /**
    * Constructor
+   * 
    * @param dimension number of dimensions
    */
   public DimensionModel(int dimension) {
@@ -58,20 +59,19 @@ public class DimensionModel extends AbstractModel implements TextWriteable {
 
   /**
    * Set cluster dimensionality
-   *  
+   * 
    * @param dimension new dimensionality
    */
   public void setDimension(int dimension) {
     this.dimension = dimension;
   }
-  
-  /**
-   * Implementation of {@link TextWriteable} interface
-   */
+
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    super.writeToText(out, label);
-    out.commentPrintLn("Dimension: "+dimension);
+    if(label != null) {
+      out.commentPrintLn(label);
+    }
+    out.commentPrintLn("Model class: " + getClass().getName());
+    out.commentPrintLn("Dimension: " + dimension);
   }
-  
 }

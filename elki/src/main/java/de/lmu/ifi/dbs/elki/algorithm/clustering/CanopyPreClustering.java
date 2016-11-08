@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.PrototypeModel;
+import de.lmu.ifi.dbs.elki.data.model.SimplePrototypeModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -140,7 +141,7 @@ public class CanopyPreClustering<O> extends AbstractDistanceBasedAlgorithm<O, Cl
       }
       // TODO: remember the central object using a CanopyModel?
       // Construct cluster:
-      clusters.add(new Cluster<>(cids, new PrototypeModel<>(relation.get(first))));
+      clusters.add(new Cluster<>(cids, new SimplePrototypeModel<>(relation.get(first))));
 
       if(prog != null) {
         prog.setProcessed(size - ids.size(), LOG);

@@ -26,6 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.PrototypeModel;
+import de.lmu.ifi.dbs.elki.data.model.SimplePrototypeModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -110,7 +111,7 @@ public class Leader<O> extends AbstractDistanceBasedAlgorithm<O, Clustering<Prot
         }
       }
       assert (ids.size() > 0 && ids.contains(it));
-      PrototypeModel<O> mod = new PrototypeModel<>(relation.get(it));
+      PrototypeModel<O> mod = new SimplePrototypeModel<>(relation.get(it));
       clustering.addToplevelCluster(new Cluster<>(ids, mod));
     }
     LOG.statistics(new LongStatistic(this.getClass().getName() + ".queries", queries));

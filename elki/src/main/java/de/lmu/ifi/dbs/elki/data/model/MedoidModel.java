@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
  * @author Erich Schubert
  * @since 0.3
  */
-public class MedoidModel extends PrototypeModel<DBID> implements TextWriteable {
+public class MedoidModel extends SimplePrototypeModel<DBID> implements TextWriteable {
   /**
    * Constructor with medoid
    * 
@@ -50,7 +50,7 @@ public class MedoidModel extends PrototypeModel<DBID> implements TextWriteable {
   }
 
   @Override
-  protected String getPrototypeType() {
+  public String getPrototypeType() {
     return "Medoid";
   }
 }

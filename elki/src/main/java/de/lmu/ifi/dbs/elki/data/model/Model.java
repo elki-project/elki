@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data.model;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -23,6 +23,8 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
+
 /**
  * Base interface for Model classes.
  * 
@@ -32,5 +34,20 @@ package de.lmu.ifi.dbs.elki.data.model;
  * @apiviz.landmark
  */
 public interface Model {
-  // currently, there are no requirements on a model.
+  /**
+   * Default implementation of
+   * {@link de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable#writeToText}.
+   * 
+   * Note: we deliberately do not implement TextWriteable!
+   * 
+   * @param out Output steam
+   * @param label Optional label to prefix
+   */
+  // actually @Override, for TextWriteable.
+  default void writeToText(TextWriterStream out, String label) {
+    if(label != null) {
+      out.commentPrintLn(label);
+    }
+    out.commentPrintLn("Model class: " + getClass().getName());
+  }
 }

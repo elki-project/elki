@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.data.model;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -22,41 +23,42 @@ package de.lmu.ifi.dbs.elki.data.model;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
- * Hierarchical cluster, with prototype.
+ * Cluster model that stores a prototype for each cluster.
  * 
- * @author Julian Erhard
+ * @author Erich Schubert
+ * @since 0.3
  */
-public class PrototypeDendrogramModel extends DendrogramModel implements PrototypeModel<DBID> {
+public class SimplePrototypeModel<V> implements PrototypeModel<V>, TextWriteable {
   /**
-   * Prototype of this cluster
+   * Cluster prototype
    */
-  protected DBID prototype;
+  protected V prototype;
 
   /**
-   * Constructor.
-   *
-   * @param distance Merging distance
-   * @param prototype Prototype
+   * Constructor with prototype
+   * 
+   * @param prototype Cluster prototype
    */
-  public PrototypeDendrogramModel(double distance, DBID prototype) {
-    super(distance);
+  public SimplePrototypeModel(V prototype) {
+    super();
     this.prototype = prototype;
   }
 
-  /**
-   * @return prototype
-   */
-  public DBID getPrototype() {
+  @Override
+  public V getPrototype() {
     return prototype;
   }
 
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    super.writeToText(out, label);
+    if(label != null) {
+      out.commentPrintLn(label);
+    }
+    out.commentPrintLn("Model class: " + getClass().getName());
     out.commentPrintLn("Cluster " + getPrototypeType() + ": " + prototype.toString());
   }
 
