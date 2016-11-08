@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.statistics;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -27,20 +27,15 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListSizeConstraint;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
 
 /**
  * Pseudo "algorithm" that computes the global min/max for a relation across all
@@ -49,23 +44,14 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * FIXME: this should become part of relation metadata.
  *
  * @author Erich Schubert
- * @since 0.5.0
  */
-@Description("Setup a scaling so that all dimensions are scaled equally in visualization.")
-public class AddSingleScale implements Algorithm {
-  /**
-   * Minimum and maximum to use.
-   */
-  double[] minmax = null;
-
+@Description("Setup a scaling so that all dimensions have the same value range.")
+public class AddUniformScale implements Algorithm {
   /**
    * Constructor.
-   *
-   * @param minmax Minimum and maximum values
    */
-  public AddSingleScale(double[] minmax) {
+  public AddUniformScale() {
     super();
-    this.minmax = minmax;
   }
 
   @SuppressWarnings("unchecked")
@@ -87,34 +73,27 @@ public class AddSingleScale implements Algorithm {
    * @return Scales
    */
   private ScalesResult run(Relation<? extends NumberVector> rel) {
-    final int dim = RelationUtil.dimensionality(rel);
+    double[][] mms = RelationUtil.computeMinMax(rel);
+    int dim = mms[0].length;
+    double delta = 0.;
+    for(int d = 0; d < dim; d++) {
+      double del = mms[1][d] - mms[0][d];
+      delta = del > delta ? del : delta;
+    }
+    if(delta < Double.MIN_NORMAL) {
+      delta = 1.;
+    }
+    int log10res = (int) Math.ceil(Math.log10(delta / (LinearScale.MAXTICKS - 1)));
+    double res = MathUtil.powi(10, log10res);
+    double target = Math.ceil(delta / res) * res; // Target width
     LinearScale[] scales = new LinearScale[dim];
-    if(minmax == null) {
-      DoubleMinMax mm = new DoubleMinMax();
-      for(DBIDIter iditer = rel.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        NumberVector vec = rel.get(iditer);
-        for(int d = 0; d < dim; d++) {
-          final double val = vec.doubleValue(d);
-          if(val != val) {
-            continue; // NaN
-          }
-          mm.put(val);
-        }
-      }
-      LinearScale scale = new LinearScale(mm.getMin(), mm.getMax());
-      for(int i = 0; i < dim; i++) {
-        scales[i] = scale;
-      }
+    for(int d = 0; d < dim; d++) {
+      double mid = (mms[0][d] + mms[1][d] - target) * .5;
+      double min = Math.floor(mid / res) * res;
+      double max = Math.ceil((mid + target) / res) * res;
+      scales[d] = new LinearScale(min, max);
     }
-    else {
-      // Use predefined.
-      LinearScale scale = new LinearScale(minmax[0], minmax[1]);
-      for(int i = 0; i < dim; i++) {
-        scales[i] = scale;
-      }
-    }
-    ScalesResult res = new ScalesResult(scales);
-    return res;
+    return new ScalesResult(scales);
   }
 
   @Override
@@ -130,30 +109,9 @@ public class AddSingleScale implements Algorithm {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
-    /**
-     * Minimum and maximum values.
-     */
-    public static final OptionID MINMAX_ID = new OptionID("scales.minmax", "Forcibly set the scales to the given range.");
-
-    /**
-     * Minimum and maximum to use.
-     */
-    double[] minmax = null;
-
     @Override
-    protected void makeOptions(Parameterization config) {
-      super.makeOptions(config);
-      DoubleListParameter minmaxP = new DoubleListParameter(MINMAX_ID) //
-          .setOptional(true) //
-          .addConstraint(new ListSizeConstraint(2));
-      if(config.grab(minmaxP)) {
-        minmax = minmaxP.getValue().clone();
-      }
-    }
-
-    @Override
-    protected AddSingleScale makeInstance() {
-      return new AddSingleScale(minmax);
+    protected AddUniformScale makeInstance() {
+      return new AddUniformScale();
     }
   }
 }

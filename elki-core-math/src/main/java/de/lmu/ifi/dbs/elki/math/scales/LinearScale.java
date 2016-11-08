@@ -45,8 +45,15 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 // TODO: magic to choose appropriate linear/log scales based on data
 // distribution.
 public class LinearScale {
-  // at 31 scale steps, decrease resolution.
-  private final double ZOOMFACTOR = Math.log10(31);
+  /**
+   * Maximum number of steps at which to decrease the resolution.
+   */
+  public static final int MAXTICKS = 31;
+
+  /**
+   * Resulting factor.
+   */
+  private final double ZOOMFACTOR = Math.log10(MAXTICKS);
 
   /**
    * min value of the scale
@@ -94,8 +101,8 @@ public class LinearScale {
     res = MathUtil.powi(10, log10res);
 
     // round min and max according to the resolution counters
-    this.min = Math.floor(min / res) * res;
-    this.max = Math.ceil(max / res) * res;
+    this.min = Math.floor(min / res * 1.001) * res;
+    this.max = Math.ceil(max / res * .999) * res;
     if(this.min == this.max) {
       this.max = this.min + res;
     }
@@ -241,5 +248,10 @@ public class LinearScale {
     NumberFormat fmt = NumberFormat.getInstance(Locale.US);
     fmt.setMaximumFractionDigits(-log10res);
     return fmt.format(val);
+  }
+
+  @Override
+  public String toString() {
+    return "LinearScale[" + min + ", " + max + "]";
   }
 }

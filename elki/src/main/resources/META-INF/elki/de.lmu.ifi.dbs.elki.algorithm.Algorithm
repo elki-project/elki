@@ -146,6 +146,7 @@ de.lmu.ifi.dbs.elki.algorithm.projection.SNE
 de.lmu.ifi.dbs.elki.algorithm.timeseries.OfflineChangePointDetectionAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.timeseries.SigniTrendChangeDetection
 de.lmu.ifi.dbs.elki.algorithm.statistics.AddSingleScale
+de.lmu.ifi.dbs.elki.algorithm.statistics.AddUniformScale
 de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceQuantileSampler
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses
