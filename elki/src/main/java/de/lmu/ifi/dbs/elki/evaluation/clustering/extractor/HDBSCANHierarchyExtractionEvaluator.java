@@ -69,7 +69,7 @@ public class HDBSCANHierarchyExtractionEvaluator implements Evaluator {
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     ArrayList<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(hier, newResult, PointerHierarchyRepresentationResult.class);
     for(PointerHierarchyRepresentationResult pointerresult : hrs) {
-      Clustering<DendrogramModel> result = inner.extractClusters(pointerresult);
+      Clustering<DendrogramModel> result = inner.run(pointerresult);
       pointerresult.addChildResult(result);
     }
   }

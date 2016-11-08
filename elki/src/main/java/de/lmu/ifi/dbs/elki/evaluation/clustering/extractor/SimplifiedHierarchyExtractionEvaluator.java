@@ -26,8 +26,6 @@ import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.SimplifiedHierarchyExtraction;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.extractor.CutDendrogramByHeightExtractor.DummyHierarchicalClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -69,8 +67,7 @@ public class SimplifiedHierarchyExtractionEvaluator implements Evaluator {
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     ArrayList<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(hier, newResult, PointerHierarchyRepresentationResult.class);
     for(PointerHierarchyRepresentationResult pointerresult : hrs) {
-      Clustering<DendrogramModel> result = inner.extractClusters(pointerresult);
-      pointerresult.addChildResult(result);
+      pointerresult.addChildResult(inner.run(pointerresult));
     }
   }
 

@@ -79,35 +79,28 @@ public class PointerPrototypeHierarchyRepresentationResult extends PointerHierar
    * Extract the prototype of a given cluster. When the argument is not a valid
    * cluster of this Pointer Hierarchy, the return value is unspecified.
    * 
-   * @param cluster A valid cluster of this Pointer Hierarchy
+   * @param members Cluster members
    * @return The prototype of the cluster
    */
-  public DBID findPrototype(DBIDs cluster) {
-    if(cluster.isEmpty()) {
-      return null;
-    }
-    else if(cluster.size() >= 2) {
-      // The prototype is stored at the same ID that has the
-      // first (smallest) ID of the cluster as a parent.
-      DBIDVar var = DBIDUtil.newVar();
-      DBID firstID = DBIDUtil.deref(cluster.iter());
-
-      // The entry in pi for the first ID contains a DBID of a different
-      // cluster.
-      // Hence, skip this one by advancing.
-      DBIDIter i = cluster.iter().advance();
-      for(; i.valid(); i.advance()) {
-        parent.assignVar(i, var);
-        if(DBIDUtil.equal(firstID, var)) {
-          break;
-        }
+  public DBID findPrototype(DBIDs members) {
+    // Find the last merge within the cluster.
+    // The object with maximum priority will merge outside of the cluster,
+    // So we need the second largest priority.
+    DBIDVar proto = DBIDUtil.newVar(), last = DBIDUtil.newVar();
+    int maxprio = Integer.MIN_VALUE, secprio = Integer.MIN_VALUE;
+    for(DBIDIter it = members.iter(); it.valid(); it.advance()) {
+      int prio = mergeOrder.intValue(it);
+      if(prio > maxprio) {
+        secprio = maxprio;
+        proto.set(last);
+        maxprio = prio;
+        last.set(it);
       }
-      return prototypes.get(i);
+      else if(prio > secprio) {
+        secprio = prio;
+        proto.set(it);
+      }
     }
-    else {
-      // Set the only point in the cluster as prototype.
-      return DBIDUtil.deref(cluster.iter());
-    }
+    return DBIDUtil.deref(prototypes.assignVar(proto, proto));
   }
-
 }

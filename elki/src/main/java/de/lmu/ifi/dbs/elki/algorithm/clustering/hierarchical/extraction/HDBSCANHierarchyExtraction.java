@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -30,9 +30,11 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HierarchicalClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerDensityHierarchyRepresentationResult;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerPrototypeHierarchyRepresentationResult;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
+import de.lmu.ifi.dbs.elki.data.model.PrototypeDendrogramModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
@@ -46,7 +48,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -129,129 +130,228 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
   @Override
   public Clustering<DendrogramModel> run(Database database) {
     PointerHierarchyRepresentationResult pointerresult = algorithm.run(database);
-    Clustering<DendrogramModel> result = extractClusters(pointerresult);
+    return run(pointerresult);
+  }
+
+  /**
+   * Process an existing result.
+   * 
+   * @param pointerresult Existing result in pointer representation.
+   * @return Clustering
+   */
+  public Clustering<DendrogramModel> run(PointerHierarchyRepresentationResult pointerresult) {
+    Clustering<DendrogramModel> result = new Instance(pointerresult).run();
     result.addChildResult(pointerresult);
     return result;
   }
 
   /**
-   * Extract all clusters from the pi-lambda-representation.
+   * Instance for a single data set.
+   * 
+   * @author Erich Schubert
    *
-   * @param pointerresult Result in pointer representation
-   * @return Hierarchical clustering
+   * @apiviz.exclude
    */
-  public Clustering<DendrogramModel> extractClusters(PointerHierarchyRepresentationResult pointerresult) {
-    DBIDs ids = pointerresult.getDBIDs();
-    DBIDDataStore pi = pointerresult.getParentStore();
-    DoubleDataStore lambda = pointerresult.getParentDistanceStore();
-    DoubleDataStore coredist = null;
-    if(pointerresult instanceof PointerDensityHierarchyRepresentationResult) {
-      coredist = ((PointerDensityHierarchyRepresentationResult) pointerresult).getCoreDistanceStore();
+  protected class Instance {
+    /**
+     * Unordered IDs
+     */
+    protected ArrayDBIDs ids;
+
+    /**
+     * Parent pointer
+     */
+    protected DBIDDataStore pi;
+
+    /**
+     * Merge distance
+     */
+    protected DoubleDataStore lambda;
+
+    /**
+     * Core distances (if available, may be {@code null}).
+     */
+    protected DoubleDataStore coredist = null;
+
+    /**
+     * The hierarchical result to process.
+     */
+    protected PointerHierarchyRepresentationResult pointerresult;
+
+    /**
+     * Constructor.
+     *
+     * @param pointerresult Hierarchical result
+     */
+    public Instance(PointerHierarchyRepresentationResult pointerresult) {
+      this.ids = pointerresult.topologicalSort();
+      this.pi = pointerresult.getParentStore();
+      this.lambda = pointerresult.getParentDistanceStore();
+      this.pointerresult = pointerresult;
+      if(pointerresult instanceof PointerDensityHierarchyRepresentationResult) {
+        this.coredist = ((PointerDensityHierarchyRepresentationResult) pointerresult).getCoreDistanceStore();
+      }
     }
 
-    FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
+    /**
+     * Extract all clusters from the pi-lambda-representation.
+     *
+     * @return Hierarchical clustering
+     */
+    public Clustering<DendrogramModel> run() {
+      FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
 
-    // Sort DBIDs by lambda, to process merges in increasing order.
-    ArrayDBIDs order = pointerresult.topologicalSort();
+      // Sort DBIDs by lambda, to process merges in increasing order.
+      ArrayDBIDs order = pointerresult.topologicalSort();
 
-    WritableDataStore<TempCluster> cluster_map = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP, TempCluster.class);
+      WritableDataStore<TempCluster> cluster_map = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP, TempCluster.class);
 
-    ArrayModifiableDBIDs noise = DBIDUtil.newArray();
-    ArrayList<TempCluster> toplevel = new ArrayList<>();
+      ArrayModifiableDBIDs noise = DBIDUtil.newArray();
+      ArrayList<TempCluster> toplevel = new ArrayList<>();
 
-    DBIDVar olead = DBIDUtil.newVar(); // Variable for successor.
-    // Perform one join at a time, in increasing order
-    for(DBIDArrayIter clead = order.iter(); clead.valid(); clead.advance()) {
-      final double dist = lambda.doubleValue(clead); // Join distance
-      final double cdist = (coredist != null) ? coredist.doubleValue(clead) : dist;
-      // Original cluster (may be null):
-      TempCluster cclus = cluster_map.get(clead);
-      // Per definition of pointer hierarchy, must not be referenced anymore:
-      cluster_map.put(clead, null); // Forget previous assignment.
-      final boolean cSpurious = isSpurious(cclus, cdist <= dist);
+      DBIDVar olead = DBIDUtil.newVar(); // Variable for successor.
+      // Perform one join at a time, in increasing order
+      for(DBIDArrayIter clead = order.iter(); clead.valid(); clead.advance()) {
+        final double dist = lambda.doubleValue(clead); // Join distance
+        final double cdist = (coredist != null) ? coredist.doubleValue(clead) : dist;
+        // Original cluster (may be null):
+        TempCluster cclus = cluster_map.get(clead);
+        // Per definition of pointer hierarchy, must not be referenced anymore:
+        cluster_map.put(clead, null); // Forget previous assignment.
+        final boolean cSpurious = isSpurious(cclus, cdist <= dist);
 
-      // Successor object/cluster:
-      pi.assignVar(clead, olead); // Find successor
-      // If we don't have a (different) successor, we are at the root level.
-      if(DBIDUtil.equal(clead, olead) || olead.isEmpty()) {
-        if(cclus != null) {
-          if(cclus.isSpurious(minClSize)) {
-            noise.addDBIDs(cclus.members);
+        // Successor object/cluster:
+        pi.assignVar(clead, olead); // Find successor
+        // If we don't have a (different) successor, we are at the root level.
+        if(DBIDUtil.equal(clead, olead) || olead.isEmpty()) {
+          if(cclus != null) {
+            if(cclus.isSpurious(minClSize)) {
+              noise.addDBIDs(cclus.members);
+            }
+            else {
+              toplevel.add(cclus);
+            }
+            cluster_map.put(clead, null);
           }
+          else if(cSpurious) { // Spurious singleton
+            noise.add(clead);
+          }
+          else { // Non-spurious singleton
+            toplevel.add(new TempCluster(dist, clead));
+          }
+          LOG.incrementProcessed(progress);
+          continue; // top level cluster.
+        }
+        // Other cluster (cluster of successor)
+        TempCluster oclus = cluster_map.get(olead);
+        final double odist = (coredist != null) ? coredist.doubleValue(olead) : dist;
+        final boolean oSpurious = isSpurious(oclus, odist <= dist);
+
+        final TempCluster nclus; // Resulting cluster.
+        if(!oSpurious && !cSpurious) {
+          // Full merge: both not spurious, new parent.
+          cclus = cclus != null ? cclus : new TempCluster(cdist, clead);
+          oclus = oclus != null ? oclus : new TempCluster(odist, olead);
+          nclus = new TempCluster(dist, oclus, cclus);
+        }
+        else {
+          // Prefer recycling a non-spurious cluster (could have children!)
+          if(!oSpurious && oclus != null) {
+            nclus = oclus.grow(dist, cclus, clead);
+          }
+          else if(!cSpurious && cclus != null) {
+            nclus = cclus.grow(dist, oclus, olead);
+          }
+          // Then recycle, but reset
+          else if(oclus != null) {
+            nclus = oclus.grow(dist, cclus, clead).resetAggregate();
+          }
+          else if(cclus != null) {
+            nclus = cclus.grow(dist, oclus, olead).resetAggregate();
+          }
+          // Last option: a new 2-element cluster.
           else {
-            toplevel.add(cclus);
+            nclus = new TempCluster(dist, clead, olead);
           }
-          cluster_map.put(clead, null);
         }
-        else if(cSpurious) { // Spurious singleton
-          noise.add(clead);
-        }
-        else { // Non-spurious singleton
-          toplevel.add(new TempCluster(dist, clead));
-        }
+        assert (nclus != null);
+        cluster_map.put(olead, nclus);
         LOG.incrementProcessed(progress);
-        continue; // top level cluster.
       }
-      // Other cluster (cluster of successor)
-      TempCluster oclus = cluster_map.get(olead);
-      final double odist = (coredist != null) ? coredist.doubleValue(olead) : dist;
-      final boolean oSpurious = isSpurious(oclus, odist <= dist);
+      LOG.ensureCompleted(progress);
 
-      final TempCluster nclus; // Resulting cluster.
-      if(!oSpurious && !cSpurious) {
-        // Full merge: both not spurious, new parent.
-        cclus = cclus != null ? cclus : new TempCluster(cdist, clead);
-        oclus = oclus != null ? oclus : new TempCluster(odist, olead);
-        nclus = new TempCluster(dist, oclus, cclus);
+      // Build final dendrogram:
+      final Clustering<DendrogramModel> dendrogram = new Clustering<>("Hierarchical Clustering", "hierarchical-clustering");
+      Cluster<DendrogramModel> nclus = null;
+      if(noise.size() > 0) {
+        nclus = new Cluster<>("Noise", noise, true, new DendrogramModel(Double.POSITIVE_INFINITY));
+        dendrogram.addToplevelCluster(nclus);
+      }
+      for(TempCluster clus : toplevel) {
+        finalizeCluster(clus, dendrogram, nclus, false);
+      }
+      return dendrogram;
+    }
+
+    /**
+     * Spurious, also for non-materialized clusters.
+     *
+     * @param clus Cluster, may be {@code null} for 1-element clusters.
+     * @param isCore Core property
+     * @return {@code true} if spurious.
+     */
+    private boolean isSpurious(TempCluster clus, boolean isCore) {
+      return clus != null ? clus.isSpurious(minClSize) : (minClSize > 1 || !isCore);
+    }
+
+    /**
+     * Make the cluster for the given object
+     *
+     * @param temp Current temporary cluster
+     * @param clustering Parent clustering
+     * @param parent Parent cluster (for hierarchical output)
+     * @param flatten Flag to flatten all clusters below.
+     */
+    private void finalizeCluster(TempCluster temp, Clustering<DendrogramModel> clustering, Cluster<DendrogramModel> parent, boolean flatten) {
+      final String name = "C_" + FormatUtil.NF6.format(temp.dist);
+      DendrogramModel model;
+      if(temp.members != null && !temp.members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyRepresentationResult) {
+        model = new PrototypeDendrogramModel(temp.dist, ((PointerPrototypeHierarchyRepresentationResult) pointerresult).findPrototype(temp.members));
       }
       else {
-        // Prefer recycling a non-spurious cluster (could have children!)
-        if(!oSpurious && oclus != null) {
-          nclus = oclus.grow(dist, cclus, clead);
+        model = new DendrogramModel(temp.dist);
+      }
+      Cluster<DendrogramModel> clus = new Cluster<>(name, temp.members, model);
+      if(hierarchical && parent != null) { // Hierarchical output
+        clustering.addChildCluster(parent, clus);
+      }
+      else {
+        clustering.addToplevelCluster(clus);
+      }
+      collectChildren(temp, clustering, temp, clus, flatten);
+      temp.members = null;
+      temp.children = null;
+    }
+
+    /**
+     * Recursive flattening of clusters.
+     *
+     * @param clustering Output clustering
+     * @param cur Current temporary cluster
+     * @param clus Output cluster
+     * @param flatten Flag to indicate everything below should be flattened.
+     */
+    private void collectChildren(TempCluster temp, Clustering<DendrogramModel> clustering, TempCluster cur, Cluster<DendrogramModel> clus, boolean flatten) {
+      for(TempCluster child : cur.children) {
+        if(flatten || child.totalStability() < 0) {
+          temp.members.addDBIDs(child.members);
+          collectChildren(temp, clustering, child, clus, flatten);
         }
-        else if(!cSpurious && cclus != null) {
-          nclus = cclus.grow(dist, oclus, olead);
-        }
-        // Then recycle, but reset
-        else if(oclus != null) {
-          nclus = oclus.grow(dist, cclus, clead).resetAggregate();
-        }
-        else if(cclus != null) {
-          nclus = cclus.grow(dist, oclus, olead).resetAggregate();
-        }
-        // Last option: a new 2-element cluster.
         else {
-          nclus = new TempCluster(dist, clead, olead);
+          finalizeCluster(child, clustering, clus, true);
         }
       }
-      assert (nclus != null);
-      cluster_map.put(olead, nclus);
-      LOG.incrementProcessed(progress);
     }
-    LOG.ensureCompleted(progress);
-
-    // Build final dendrogram:
-    final Clustering<DendrogramModel> dendrogram = new Clustering<>("Hierarchical Clustering", "hierarchical-clustering");
-    Cluster<DendrogramModel> nclus = null;
-    if(noise.size() > 0) {
-      nclus = new Cluster<>("Noise", noise, true, new DendrogramModel(Double.POSITIVE_INFINITY));
-      dendrogram.addToplevelCluster(nclus);
-    }
-    for(TempCluster clus : toplevel) {
-      clus.finalizeCluster(dendrogram, nclus, false, hierarchical);
-    }
-    return dendrogram;
-  }
-
-  /**
-   * Spurious, also for non-materialized clusters.
-   *
-   * @param clus Cluster, may be {@code null} for 1-element clusters.
-   * @param isCore Core property
-   * @return {@code true} if spurious.
-   */
-  private boolean isSpurious(TempCluster clus, boolean isCore) {
-    return clus != null ? clus.isSpurious(minClSize) : (minClSize > 1 || !isCore);
   }
 
   /**
@@ -423,49 +523,6 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
      */
     public boolean isSpurious(int minClSize) {
       return children.isEmpty() && members.size() < minClSize;
-    }
-
-    /**
-     * Make the cluster for the given object
-     *
-     * @param clustering Parent clustering
-     * @param parent Parent cluster (for hierarchical output)
-     * @param flatten Flag to flatten all clusters below.
-     * @param hierarchical Hierarchical outpu
-     */
-    private void finalizeCluster(Clustering<DendrogramModel> clustering, Cluster<DendrogramModel> parent, boolean flatten, boolean hierarchical) {
-      final String name = "C_" + FormatUtil.NF6.format(dist);
-      Cluster<DendrogramModel> clus = new Cluster<>(name, members, new DendrogramModel(dist));
-      if(hierarchical && parent != null) { // Hierarchical output
-        clustering.addChildCluster(parent, clus);
-      }
-      else {
-        clustering.addToplevelCluster(clus);
-      }
-      collectChildren(clustering, this, clus, flatten, hierarchical);
-      members = null;
-      children = null;
-    }
-
-    /**
-     * Recursive flattening of clusters.
-     *
-     * @param clustering Output clustering
-     * @param cur Current temporary cluster
-     * @param clus Output cluster
-     * @param flatten Flag to indicate everything below should be flattened.
-     * @param hierarchical Hierarchical output
-     */
-    private void collectChildren(Clustering<DendrogramModel> clustering, TempCluster cur, Cluster<DendrogramModel> clus, boolean flatten, boolean hierarchical) {
-      for(TempCluster child : cur.children) {
-        if(flatten || child.totalStability() < 0) {
-          members.addDBIDs(child.members);
-          collectChildren(clustering, child, clus, flatten, hierarchical);
-        }
-        else {
-          child.finalizeCluster(clustering, clus, true, hierarchical);
-        }
-      }
     }
   }
 

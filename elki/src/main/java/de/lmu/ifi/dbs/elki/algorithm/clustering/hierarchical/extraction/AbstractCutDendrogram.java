@@ -387,22 +387,22 @@ public abstract class AbstractCutDendrogram implements ClusteringAlgorithm<Clust
      */
     protected Cluster<DendrogramModel> makeCluster(DBIDRef lead, double depth, DBIDs members) {
       final String name;
-      if(members.size() == 0) {
-        name = "mrg_" + DBIDUtil.toString(lead) + "_" + depth;
-      }
-      else if(!Double.isNaN(depth) && Double.isInfinite(depth) || (members.size() == 1 && members.contains(lead))) {
+      if(members == null || (members.size() == 1 && members.contains(lead))) {
         name = "obj_" + DBIDUtil.toString(lead);
       }
-      else if(!Double.isNaN(depth)) {
+      else if(members.size() == 0) {
+        name = "mrg_" + DBIDUtil.toString(lead) + "_" + depth;
+      }
+      else if(depth < Double.POSITIVE_INFINITY) {
         name = "clu_" + DBIDUtil.toString(lead) + "_" + depth;
       }
       else {
         // Complete data set only?
-        name = "clu_" + DBIDUtil.toString(lead);
+        name = "top_" + DBIDUtil.toString(lead);
       }
 
       DendrogramModel model;
-      if(!members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyRepresentationResult) {
+      if(members != null && !members.isEmpty() && pointerresult instanceof PointerPrototypeHierarchyRepresentationResult) {
         model = new PrototypeDendrogramModel(depth, ((PointerPrototypeHierarchyRepresentationResult) pointerresult).findPrototype(members));
       }
       else {
