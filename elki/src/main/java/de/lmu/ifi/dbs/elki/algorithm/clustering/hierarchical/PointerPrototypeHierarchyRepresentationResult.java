@@ -24,27 +24,48 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
 import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.IntegerDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 
+/**
+ * Hierarchical clustering with prototypes (used by {@link MiniMax}).
+ * 
+ * @author Julian Erhard
+ */
 public class PointerPrototypeHierarchyRepresentationResult extends PointerHierarchyRepresentationResult {
-
-  private DBIDDataStore prototypes;
+  /**
+   * Prototypes
+   */
+  DBIDDataStore prototypes;
 
   /**
    * Constructor.
    *
-   * @param ids
-   * @param parent
-   * @param parentDistance
-   * @param prototype
+   * @param ids Objects clustered
+   * @param parent Parent object
+   * @param parentDistance Merging distance
+   * @param mergeOrder Merging order
+   * @param prototypes Cluster prototypes
+   */
+  public PointerPrototypeHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, IntegerDataStore mergeOrder, DBIDDataStore prototypes) {
+    super(ids, parent, parentDistance, mergeOrder);
+    this.prototypes = prototypes;
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param ids Objects clustered
+   * @param parent Parent object
+   * @param parentDistance Merging distance
+   * @param prototypes Cluster prototypes
    */
   public PointerPrototypeHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, DBIDDataStore prototypes) {
-    super(ids, parent, parentDistance);
-    this.prototypes = prototypes;
+    this(ids, parent, parentDistance, null, prototypes);
   }
 
   /**
@@ -61,7 +82,7 @@ public class PointerPrototypeHierarchyRepresentationResult extends PointerHierar
    * @param cluster A valid cluster of this Pointer Hierarchy
    * @return The prototype of the cluster
    */
-  public DBID getPrototypeByCluster(DBIDs cluster) {
+  public DBID findPrototype(DBIDs cluster) {
     if(cluster.isEmpty()) {
       return null;
     }

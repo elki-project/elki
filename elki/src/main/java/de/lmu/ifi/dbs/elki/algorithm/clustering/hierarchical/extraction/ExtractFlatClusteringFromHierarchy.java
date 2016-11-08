@@ -39,9 +39,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -163,51 +161,33 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
   @Override
   public Clustering<DendrogramModel> run(Database database) {
     PointerHierarchyRepresentationResult pointerresult = algorithm.run(database);
-    DBIDs ids = pointerresult.getDBIDs();
-    DBIDDataStore pi = pointerresult.getParentStore();
-    DoubleDataStore lambda = pointerresult.getParentDistanceStore();
-    boolean prototyped = pointerresult instanceof PointerPrototypeHierarchyRepresentationResult;
 
-    Clustering<DendrogramModel> result = extractClusters(ids, pi, lambda, prototyped);
+    Clustering<DendrogramModel> result = extractClusters(pointerresult);
     result.addChildResult(pointerresult);
-
-    if(prototyped) {
-      PointerPrototypeHierarchyRepresentationResult prototypePointerResult = (PointerPrototypeHierarchyRepresentationResult) pointerresult;
-      DBIDs cluster;
-      DBID prot;
-
-      // Set the prototype for each cluster
-      for(de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter<Cluster<DendrogramModel>> iter = result.iterToplevelClusters(); iter.valid(); iter.advance()) {
-        PrototypeDendrogramModel model = (PrototypeDendrogramModel) iter.get().getModel();
-
-        cluster = iter.get().getIDs();
-        prot = prototypePointerResult.getPrototypeByCluster(cluster);
-        iter.get().getNameAutomatic();
-        model.setPrototype(prot);
-      }
-    }
     return result;
   }
 
   /**
    * Extract all clusters from the pi-lambda-representation.
    *
-   * @param ids Object ids to process
-   * @param pi Pi store
-   * @param lambda Lambda store
+   * @param pointerresult Result in pointer representation
    *
    * @return Hierarchical clustering
    */
-  public Clustering<DendrogramModel> extractClusters(DBIDs ids, DBIDDataStore pi, DoubleDataStore lambda, boolean prototyped) {
+  public Clustering<DendrogramModel> extractClusters(PointerHierarchyRepresentationResult pointerresult) {
+    DBIDs ids = pointerresult.topologicalSort();
+    DBIDDataStore pi = pointerresult.getParentStore();
+    DoubleDataStore lambda = pointerresult.getParentDistanceStore();
+    PointerPrototypeHierarchyRepresentationResult prototypePointerResult = null;
+    if(pointerresult instanceof PointerPrototypeHierarchyRepresentationResult) {
+      prototypePointerResult = (PointerPrototypeHierarchyRepresentationResult) pointerresult;
+    }
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
 
-    // Sort DBIDs by lambda. We need this for two things:
-    // a) to determine the stop distance from "minclusters" parameter
-    // b) to process arrows in decreasing / increasing order
-    ArrayDBIDs order = PointerHierarchyRepresentationResult.topologicalSort(ids, pi, lambda);
-    DBIDArrayIter it = order.iter(); // Used multiple times!
+    // Sort DBIDs topologically.
+    DBIDArrayIter it = pointerresult.topologicalSort().iter();
 
-    final int split = findSplit(order, it, lambda);
+    final int split = findSplit(it, ids.size(), lambda);
 
     // Extract the child clusters
     final int expcnum = ids.size() - split;
@@ -260,7 +240,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
         int i = 0;
         for(DBIDIter it2 = cluster_leads.iter(); it2.valid(); it2.advance(), i++) {
           double depth = cluster_dist.get(i);
-          clusters.add(makeCluster(it2, depth, cluster_dbids.get(i), prototyped));
+          clusters.add(makeCluster(it2, depth, cluster_dbids.get(i), prototypePointerResult));
         }
         cluster_dist = null; // Invalidate
         cluster_dbids = null; // Invalidate
@@ -277,7 +257,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
           clus = null;
         }
         else {
-          clus = makeCluster(it, Double.NaN, DBIDUtil.deref(it), prototyped);
+          clus = makeCluster(it, Double.NaN, DBIDUtil.deref(it), prototypePointerResult);
         }
         // The successor to join:
         pi.assignVar(it, succ); // succ = pi(it)
@@ -307,7 +287,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
             if(clus == null) {
               cids.add(it);
             }
-            Cluster<DendrogramModel> npclus = makeCluster(succ, depth, cids, prototyped);
+            Cluster<DendrogramModel> npclus = makeCluster(succ, depth, cids, prototypePointerResult);
             if(clus != null) {
               dendrogram.addChildCluster(npclus, clus);
             }
@@ -326,13 +306,13 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
               cids.add(it);
             }
             // New cluster for parent and/or new point
-            pclus = makeCluster(succ, depth, cids, prototyped);
+            pclus = makeCluster(succ, depth, cids, prototypePointerResult);
           }
           else {
             // Create a new, one-element cluster for parent, and a merged
             // cluster on top.
-            pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS, prototyped);
-            dendrogram.addChildCluster(pclus, makeCluster(succ, Double.NaN, DBIDUtil.deref(succ), prototyped));
+            pclus = makeCluster(succ, depth, DBIDUtil.EMPTYDBIDS, prototypePointerResult);
+            dendrogram.addChildCluster(pclus, makeCluster(succ, Double.NaN, DBIDUtil.deref(succ), prototypePointerResult));
           }
           if(clus != null) {
             dendrogram.addChildCluster(pclus, clus);
@@ -358,7 +338,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
         int i = 0;
         for(DBIDIter it2 = cluster_leads.iter(); it2.valid(); it2.advance(), i++) {
           double depth = cluster_dist.get(i);
-          dendrogram.addToplevelCluster(makeCluster(it2, depth, cluster_dbids.get(i), prototyped));
+          dendrogram.addToplevelCluster(makeCluster(it2, depth, cluster_dbids.get(i), prototypePointerResult));
         }
         cluster_dist = null; // Invalidate
       }
@@ -376,7 +356,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
       for(it.seek(split); it.valid(); it.advance()) {
         int clusterid = cluster_map.intValue(it);
         if(clusterid < 0) {
-          dendrogram.addToplevelCluster(makeCluster(it, Double.NaN, DBIDUtil.deref(it), prototyped));
+          dendrogram.addToplevelCluster(makeCluster(it, Double.NaN, DBIDUtil.deref(it), prototypePointerResult));
         }
 
         // Decrement counter
@@ -396,15 +376,15 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
   /**
    * Find the splitting point in the ordered DBIDs list.
    *
-   * @param order Ordered list
    * @param it Iterator on this list (reused)
+   * @param size Cluster size
    * @param lambda Join distances.
    * @return Splitting point
    */
-  private int findSplit(ArrayDBIDs order, DBIDArrayIter it, DoubleDataStore lambda) {
+  private int findSplit(DBIDArrayIter it, int size, DoubleDataStore lambda) {
     int split;
     if(minclusters > 0) {
-      split = order.size() > minclusters ? order.size() - minclusters : 0;
+      split = size > minclusters ? size - minclusters : 0;
       it.seek(split);
       // Stop distance:
       final double stopdist = lambda.doubleValue(it);
@@ -415,7 +395,7 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
       }
     }
     else if(!Double.isNaN(threshold)) {
-      split = order.size();
+      split = size;
       it.seek(split - 1);
       while(it.valid() && threshold <= lambda.doubleValue(it)) {
         split--;
@@ -434,9 +414,11 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
    * @param lead Leading object
    * @param depth Linkage depth
    * @param members Member objects
+   * @param prototypeResult May be {@code null}, otherwise prototypes are
+   *        obtained from this.
    * @return Cluster
    */
-  private Cluster<DendrogramModel> makeCluster(DBIDRef lead, double depth, DBIDs members, boolean prototyped) {
+  protected Cluster<DendrogramModel> makeCluster(DBIDRef lead, double depth, DBIDs members, PointerPrototypeHierarchyRepresentationResult prototypeResult) {
     final String name;
     if(members.size() == 0) {
       name = "mrg_" + DBIDUtil.toString(lead) + "_" + depth;
@@ -452,15 +434,14 @@ public class ExtractFlatClusteringFromHierarchy implements ClusteringAlgorithm<C
       name = "clu_" + DBIDUtil.toString(lead);
     }
 
-    Cluster<DendrogramModel> cluster;
-    if(prototyped) {
-      cluster = new Cluster<DendrogramModel>(name, members, new PrototypeDendrogramModel(depth));
+    DendrogramModel model;
+    if(prototypeResult != null) {
+      model = new PrototypeDendrogramModel(depth, prototypeResult.findPrototype(members));
     }
     else {
-      cluster = new Cluster<>(name, members, new DendrogramModel(depth));
+      model = new DendrogramModel(depth);
     }
-
-    return cluster;
+    return new Cluster<>(name, members, model);
   }
 
   @Override

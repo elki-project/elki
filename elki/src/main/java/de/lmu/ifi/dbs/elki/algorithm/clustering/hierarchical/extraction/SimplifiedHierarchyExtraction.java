@@ -80,9 +80,9 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * @apiviz.uses PointerHierarchyRepresentationResult
  */
 @Reference(authors = "R. J. G. B. Campello, D. Moulavi, and J. Sander", //
-title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
-booktitle = "Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining, PAKDD", //
-url = "http://dx.doi.org/10.1007/978-3-642-37456-2_14")
+    title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
+    booktitle = "Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining, PAKDD", //
+    url = "http://dx.doi.org/10.1007/978-3-642-37456-2_14")
 public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
   /**
    * Class logger.
@@ -114,15 +114,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
   @Override
   public Clustering<DendrogramModel> run(Database database) {
     PointerHierarchyRepresentationResult pointerresult = algorithm.run(database);
-    DBIDs ids = pointerresult.getDBIDs();
-    DBIDDataStore pi = pointerresult.getParentStore();
-    DoubleDataStore lambda = pointerresult.getParentDistanceStore();
-    DoubleDataStore coredist = null;
-    if(pointerresult instanceof PointerDensityHierarchyRepresentationResult) {
-      coredist = ((PointerDensityHierarchyRepresentationResult) pointerresult).getCoreDistanceStore();
-    }
-
-    Clustering<DendrogramModel> result = extractClusters(ids, pi, lambda, coredist);
+    Clustering<DendrogramModel> result = extractClusters(pointerresult);
     result.addChildResult(pointerresult);
     return result;
   }
@@ -130,17 +122,21 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
   /**
    * Extract all clusters from the pi-lambda-representation.
    *
-   * @param ids Object ids to process
-   * @param pi Pi store
-   * @param lambda Lambda store
-   * @param coredist Core distances
+   * @param pointerresult Result in pointer representation
    * @return Hierarchical clustering
    */
-  public Clustering<DendrogramModel> extractClusters(DBIDs ids, DBIDDataStore pi, DoubleDataStore lambda, DoubleDataStore coredist) {
+  public Clustering<DendrogramModel> extractClusters(PointerHierarchyRepresentationResult pointerresult) {
+    DBIDs ids = pointerresult.getDBIDs();
+    DBIDDataStore pi = pointerresult.getParentStore();
+    DoubleDataStore lambda = pointerresult.getParentDistanceStore();
+    DoubleDataStore coredist = null;
+    if(pointerresult instanceof PointerDensityHierarchyRepresentationResult) {
+      coredist = ((PointerDensityHierarchyRepresentationResult) pointerresult).getCoreDistanceStore();
+    }
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
 
     // Sort DBIDs by lambda, to process merges in increasing order.
-    ArrayDBIDs order = PointerHierarchyRepresentationResult.topologicalSort(ids, pi, lambda);
+    ArrayDBIDs order = pointerresult.topologicalSort();
 
     WritableDataStore<TempCluster> cluster_map = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP, TempCluster.class);
 
@@ -359,7 +355,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
         name = "clu_" + DBIDUtil.toString(lead);
       }
       Cluster<DendrogramModel> cluster = new Cluster<>(name, DBIDUtil.newArray(newids), //
-      new DendrogramModel(depth));
+          new DendrogramModel(depth));
       for(Cluster<DendrogramModel> child : children) {
         clustering.addChildCluster(cluster, child);
       }
@@ -418,7 +414,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
       }
 
       IntParameter minclustersP = new IntParameter(MINCLUSTERSIZE_ID, 1) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minclustersP)) {
         minClSize = minclustersP.intValue();
       }

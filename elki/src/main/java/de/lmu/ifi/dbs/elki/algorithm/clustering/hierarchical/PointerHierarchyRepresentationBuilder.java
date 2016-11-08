@@ -62,14 +62,19 @@ public class PointerHierarchyRepresentationBuilder {
   protected WritableDoubleDataStore parentDistance;
 
   /**
-   * Last linking distance.
-   */
-  protected double prevdist;
-
-  /**
    * Cluster size storage. May be uninitialized!
    */
   protected WritableIntegerDataStore csize;
+
+  /**
+   * Store merge order.
+   */
+  protected WritableIntegerDataStore order;
+
+  /**
+   * Merge counter (for merge ordering).
+   */
+  protected int mergecount = 0;
 
   /**
    * Constructor.
@@ -81,10 +86,10 @@ public class PointerHierarchyRepresentationBuilder {
     this.ids = ids;
     this.parent = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
     this.parentDistance = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, Double.POSITIVE_INFINITY);
-    this.prevdist = Double.NEGATIVE_INFINITY;
     for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
       parent.put(it, it);
     }
+    this.order = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, ids.size());
   }
 
   /**
@@ -100,14 +105,11 @@ public class PointerHierarchyRepresentationBuilder {
    * @param par Parent
    */
   public void add(DBIDRef cur, double distance, DBIDRef par) {
-    if(distance < prevdist) {
-      LOG.warning("Non-monotone hierarchical clustering detected. Adjusting linking distance from " + distance + " to " + prevdist);
-      distance = prevdist;
-    }
     parent.putDBID(cur, par);
     double olddist = parentDistance.putDouble(cur, distance);
     assert (olddist == Double.POSITIVE_INFINITY) : "Object was already linked!";
-    prevdist = distance;
+    order.putInt(cur, mergecount);
+    ++mergecount;
   }
 
   /**
@@ -120,7 +122,10 @@ public class PointerHierarchyRepresentationBuilder {
       csize.destroy();
       csize = null;
     }
-    return new PointerHierarchyRepresentationResult(ids, parent, parentDistance);
+    if(mergecount != ids.size() - 1) {
+      LOG.warning(mergecount + " merges were added to the hierarchy, expected " + (ids.size() - 1));
+    }
+    return new PointerHierarchyRepresentationResult(ids, parent, parentDistance, order);
   }
 
   /**

@@ -76,6 +76,11 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
   IntegerDataStore positions = null;
 
   /**
+   * Merge order, useful for non-monotonous hierarchies.
+   */
+  IntegerDataStore mergeOrder = null;
+
+  /**
    * Constructor.
    *
    * @param ids IDs processed.
@@ -83,10 +88,23 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
    * @param parentDistance Distance to parent.
    */
   public PointerHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance) {
+    this(ids, parent, parentDistance, null);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param ids IDs processed.
+   * @param parent Parent pointer.
+   * @param parentDistance Distance to parent.
+   * @param mergeOrder Order in which to execute merges
+   */
+  public PointerHierarchyRepresentationResult(DBIDs ids, DBIDDataStore parent, DoubleDataStore parentDistance, IntegerDataStore mergeOrder) {
     super("Pointer Representation", "pointer-representation");
     this.ids = ids;
     this.parent = parent;
     this.parentDistance = parentDistance;
+    this.mergeOrder = mergeOrder;
   }
 
   /**
@@ -125,7 +143,7 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
     if(positions != null) {
       return positions; // Return cached.
     }
-    ArrayDBIDs order = topologicalSort(ids, parent, parentDistance);
+    final ArrayDBIDs order = topologicalSort();
     DBIDArrayIter it = order.iter();
     final int last = order.size() - 1;
     // Subtree sizes of each element:
@@ -162,19 +180,21 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
   }
 
   /**
-   * Perform topological sorting based on the successor order.
-   *
-   * @param oids IDs to sort
-   * @param parent Parent relationship.
-   * @param parentDistance Distance to parent.
-   * @return Sorted order
+   * Topological sort the object IDs.
+   * 
+   * @return Sorted object ids.
    */
-  public static ArrayDBIDs topologicalSort(DBIDs oids, DBIDDataStore parent, DoubleDataStore parentDistance) {
-    // We used to simply sort by merging distance
-    // But for e.g. Median Linkage, this would lead to problems, as links are
-    // not necessarily performed in ascending order anymore!
-    ArrayModifiableDBIDs ids = DBIDUtil.newArray(oids);
-    ids.sort(new DataStoreUtil.DescendingByDoubleDataStoreAndId(parentDistance));
+  public ArrayDBIDs topologicalSort() {
+    ArrayModifiableDBIDs ids = DBIDUtil.newArray(this.ids);
+    if(mergeOrder != null) {
+      ids.sort(new DataStoreUtil.DescendingByIntegerDataStore(mergeOrder));
+    }
+    else {
+      // We used to simply sort by merging distance
+      // But for e.g. Median Linkage, this would lead to problems, as links are
+      // not necessarily performed in ascending order anymore!
+      ids.sort(new DataStoreUtil.DescendingByDoubleDataStoreAndId(parentDistance));
+    }
     final int size = ids.size();
     ModifiableDBIDs seen = DBIDUtil.newHashSet(size);
     ArrayModifiableDBIDs order = DBIDUtil.newArray(size);

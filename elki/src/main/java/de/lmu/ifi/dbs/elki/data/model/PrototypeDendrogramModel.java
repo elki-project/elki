@@ -23,40 +23,37 @@ package de.lmu.ifi.dbs.elki.data.model;
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
+/**
+ * Hierarchical cluster, with prototype.
+ * 
+ * @author Julian Erhard
+ */
 public class PrototypeDendrogramModel extends DendrogramModel {
-
+  /**
+   * Prototype of this cluster
+   */
   protected DBID prototype;
-  
+
+  /**
+   * Constructor.
+   *
+   * @param distance Merging distance
+   * @param prototype Prototype
+   */
   public PrototypeDendrogramModel(double distance, DBID prototype) {
-    this(distance);
+    super(distance);
     this.prototype = prototype;
   }
-  
-  public PrototypeDendrogramModel(double distance) {
-    super(distance);
-  }
-  
+
   /**
    * @return prototype
    */
   public DBID getPrototype() {
     return prototype;
   }
-  
-  /**
-   * @param prototype the prototype of the cluster
-   */
-  public void setPrototype(DBID prototype) {
-    this.prototype = prototype;
-  }
-  
 
-  /**
-   * Implementation of {@link TextWriteable} interface.
-   */
   @Override
   public void writeToText(TextWriterStream out, String label) {
     super.writeToText(out, label);
@@ -71,5 +68,4 @@ public class PrototypeDendrogramModel extends DendrogramModel {
   protected String getPrototypeType() {
     return "Prototype";
   }
-
 }

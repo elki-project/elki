@@ -88,9 +88,9 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * @apiviz.uses PointerHierarchyRepresentationResult
  */
 @Reference(authors = "R. J. G. B. Campello, D. Moulavi, and J. Sander", //
-title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
-booktitle = "Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining, PAKDD", //
-url = "http://dx.doi.org/10.1007/978-3-642-37456-2_14")
+    title = "Density-Based Clustering Based on Hierarchical Density Estimates", //
+    booktitle = "Pacific-Asia Conference on Advances in Knowledge Discovery and Data Mining, PAKDD", //
+    url = "http://dx.doi.org/10.1007/978-3-642-37456-2_14")
 public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clustering<DendrogramModel>> {
   /**
    * Class logger.
@@ -129,6 +129,18 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
   @Override
   public Clustering<DendrogramModel> run(Database database) {
     PointerHierarchyRepresentationResult pointerresult = algorithm.run(database);
+    Clustering<DendrogramModel> result = extractClusters(pointerresult);
+    result.addChildResult(pointerresult);
+    return result;
+  }
+
+  /**
+   * Extract all clusters from the pi-lambda-representation.
+   *
+   * @param pointerresult Result in pointer representation
+   * @return Hierarchical clustering
+   */
+  public Clustering<DendrogramModel> extractClusters(PointerHierarchyRepresentationResult pointerresult) {
     DBIDs ids = pointerresult.getDBIDs();
     DBIDDataStore pi = pointerresult.getParentStore();
     DoubleDataStore lambda = pointerresult.getParentDistanceStore();
@@ -137,25 +149,10 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       coredist = ((PointerDensityHierarchyRepresentationResult) pointerresult).getCoreDistanceStore();
     }
 
-    Clustering<DendrogramModel> result = extractClusters(ids, pi, lambda, coredist);
-    result.addChildResult(pointerresult);
-    return result;
-  }
-
-  /**
-   * Extract all clusters from the pi-lambda-representation.
-   *
-   * @param ids Object ids to process
-   * @param pi Pi store
-   * @param lambda Lambda store
-   * @param coredist Core distances
-   * @return Hierarchical clustering
-   */
-  public Clustering<DendrogramModel> extractClusters(DBIDs ids, DBIDDataStore pi, DoubleDataStore lambda, DoubleDataStore coredist) {
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Extracting clusters", ids.size(), LOG) : null;
 
     // Sort DBIDs by lambda, to process merges in increasing order.
-    ArrayDBIDs order = PointerHierarchyRepresentationResult.topologicalSort(ids, pi, lambda);
+    ArrayDBIDs order = pointerresult.topologicalSort();
 
     WritableDataStore<TempCluster> cluster_map = DataStoreUtil.makeStorage(ids, DataStoreFactory.HINT_TEMP, TempCluster.class);
 
@@ -519,7 +516,7 @@ public class HDBSCANHierarchyExtraction implements ClusteringAlgorithm<Clusterin
       }
 
       IntParameter minclustersP = new IntParameter(MINCLUSTERSIZE_ID, 1) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minclustersP)) {
         minClSize = minclustersP.intValue();
       }

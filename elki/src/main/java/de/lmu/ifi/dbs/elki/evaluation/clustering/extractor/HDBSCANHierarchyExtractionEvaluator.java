@@ -3,7 +3,7 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.extractor;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -24,14 +24,10 @@ package de.lmu.ifi.dbs.elki.evaluation.clustering.extractor;
 
 import java.util.ArrayList;
 
-import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerDensityHierarchyRepresentationResult;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.PointerHierarchyRepresentationResult;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.HDBSCANHierarchyExtraction;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
-import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.extractor.ExtractFlatClusteringFromHierarchyEvaluator.DummyHierarchicalClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.result.Result;
@@ -73,15 +69,7 @@ public class HDBSCANHierarchyExtractionEvaluator implements Evaluator {
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     ArrayList<PointerHierarchyRepresentationResult> hrs = ResultUtil.filterResults(hier, newResult, PointerHierarchyRepresentationResult.class);
     for(PointerHierarchyRepresentationResult pointerresult : hrs) {
-      DBIDs ids = pointerresult.getDBIDs();
-      DBIDDataStore pi = pointerresult.getParentStore();
-      DoubleDataStore lambda = pointerresult.getParentDistanceStore();
-      DoubleDataStore coredist = null;
-      if(pointerresult instanceof PointerDensityHierarchyRepresentationResult) {
-        coredist = ((PointerDensityHierarchyRepresentationResult) pointerresult).getCoreDistanceStore();
-      }
-
-      Clustering<DendrogramModel> result = inner.extractClusters(ids, pi, lambda, coredist);
+      Clustering<DendrogramModel> result = inner.extractClusters(pointerresult);
       pointerresult.addChildResult(result);
     }
   }
