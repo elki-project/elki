@@ -382,7 +382,7 @@
 			<modules>
 				<module>addons/batikvis</module>
 				<module>addons/3dpc</module>
-				<module>addons/joglviz</module>
+				<module>addons/joglvis</module>
 			</modules>
 		</profile>
 		<!-- Profile for publishing to Sonatype Maven repository. -->
