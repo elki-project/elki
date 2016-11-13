@@ -1,0 +1,10 @@
+
+description = 'ELKI - Core Distance Functions'
+dependencies {
+  compile project(':elki-logging')
+  compile project(':elki-core-api')
+  compile project(':elki-core-data')
+  compile project(':elki-core-util')
+  compile project(':elki-core-math')
+    testCompile group: 'junit', name: 'junit', version:'[4.8,)'
+}

@@ -1,0 +1,32 @@
+rootProject.name = 'elki-project'
+
+def module(m, d=null) {
+  include ":$m"
+  if (!d) d = m
+  project(":$m").projectDir = "$rootDir/$d" as File
+}
+
+module 'elki-logging'
+module 'elki-core-api'
+module 'elki-core-math'
+module 'elki-core-util'
+module 'elki-core-data'
+module 'elki-core-distance'
+module 'elki-core-dbids'
+module 'elki-core-dbids-int'
+module 'elki-persistent'
+module 'elki-index'
+module 'elki-index-rtree'
+module 'elki-gui-minigui'
+module 'elki'
+module 'elki-docutil'
+// Addons:
+module 'elki-batik-visualization', 'addons/batikvis'
+module 'elki-uncertain', 'addons/uncertain'
+module 'elki-libsvm', 'addons/libsvm'
+//module 'elki-lucene', 'addons/lucene'
+module 'elki-3dpc', 'addons/3dpc'
+module 'elki-joglviz', 'addons/joglviz'
+module 'elki-tutorial', 'addons/tutorial'
+// Fat-jar bundle
+module 'elki-bundle', 'addons/bundle'

@@ -1,0 +1,6 @@
+
+description = 'ELKI - Uncertain data handling'
+dependencies {
+  compile project(':elki')
+    testCompile group: 'junit', name: 'junit', version:'[4.8,)'
+}

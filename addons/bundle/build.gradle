@@ -1,0 +1,62 @@
+plugins {
+  id "com.github.johnrengelman.shadow" version "1.2.4"
+}
+
+description = 'ELKI - Single-jar Bundle'
+
+// Subprojects to not include:
+def bundleExclude = [ project.path, project.parent, ":elki-docutil" ]
+
+configurations {
+  doc { transitive false }
+}
+
+dependencies {
+  compile project(':elki')
+  // Depend on all subprojects, except those listed
+  project.parent.subprojects.findAll { !bundleExclude.contains(it.path) }.each {
+    compile it
+    doc files(it.sourceSets.main.java.srcDirs)
+  }
+
+  testCompile project(':elki-docutil')
+}
+
+jar {
+  manifest {
+    // Expand ${project.version} in MANIFEST.MF
+    from("src/main/resources/META-INF/MANIFEST.MF") {
+      eachEntry { it.value = it.value.replace('${project.version}', project.version) }
+    }
+    attributes(
+      "Main-Class" : "de.lmu.ifi.dbs.elki.application.ELKILauncher",
+      "Class-Path": configurations.runtime.collect { "lib/"+it.getName() }.join(' ')
+    )
+  }
+}
+
+packageSources.from(configurations.doc)
+
+javadoc {
+  source configurations.doc
+  include "**/*.java"
+}
+
+shadowJar {
+  destinationDir = project.parent.rootDir
+  classifier = null
+  manifest {
+    attributes("Class-Path" : "")
+  }
+  mergeServiceFiles {
+    path = "META-INF/services"
+  }
+  mergeServiceFiles {
+    path = "META-INF/elki"
+  }
+}
+
+javadoc.dependsOn documentParameters
+javadoc.dependsOn documentReferences
+assemble.dependsOn collectDependencies
+assemble.dependsOn shadowJar

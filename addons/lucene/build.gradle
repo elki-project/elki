@@ -1,0 +1,7 @@
+
+description = 'ELKI - Lucene based extensions'
+dependencies {
+  compile project(':elki')
+    compile group: 'org.apache.lucene', name: 'lucene-core', version:'3.6.2'
+    compile group: 'org.apache.lucene', name: 'lucene-queries', version:'3.6.2'
+}

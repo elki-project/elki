@@ -1,5 +1,7 @@
 /target/
 /local/
-/**/target
+/**/target/
+/**/build/
 /MiniGUI-saved-settings.txt
 /**/*~
+/**/.gradle

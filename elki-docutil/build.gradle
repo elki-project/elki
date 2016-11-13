@@ -1,0 +1,6 @@
+
+description = 'ELKI - Documentation Utilities'
+dependencies {
+  compile project(':elki-core-util')
+    testCompile group: 'com.github.javaparser', name: 'javaparser-core', version:'2.3.0'
+}

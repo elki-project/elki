@@ -1,0 +1,8 @@
+
+description = 'ELKI - 3D Parallel Coordinate Trees Visualization'
+dependencies {
+  compile project(':elki')
+    compile group: 'org.jogamp.jogl', name: 'jogl-all-main', version:'2.1.5-01'
+    compile group: 'org.jogamp.gluegen', name: 'gluegen-rt-main', version:'2.1.5-01'
+  compile project(':elki-batik-visualization')
+}

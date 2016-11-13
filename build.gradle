@@ -1,0 +1,145 @@
+description = "ELKI - Parent Project"
+
+// Try to get a git commit id for javadoc
+def getCommitHash() {
+  if(!new File(".git").exists()) return ""
+  def head = new File(".git", "HEAD").text.split(":")
+  if (head.length == 1) return head[0].trim().take(12)
+  return new File(".git", head[1].trim()).text.take(12)
+}
+
+allprojects  {
+  apply plugin: 'maven'
+  apply plugin: 'java'
+
+  group = 'de.lmu.ifi.dbs.elki'
+  version = '0.7.2-SNAPSHOT'
+
+  repositories {
+    mavenLocal()
+    maven { url "http://repo.maven.apache.org/maven2" }
+  }
+  ext.description = description
+  ext.year = new Date().format('yyyy')
+  ext.vendor = "ELKI Development Team"
+  ext.url = "https://elki-project.github.io/"
+  ext.isSnapshot = version.endsWith("-SNAPSHOT")
+  ext.buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'")
+}
+
+subprojects {
+  sourceCompatibility = 1.8
+  targetCompatibility = 1.8
+  compileJava.options.encoding = 'UTF-8'
+
+  // Some jar options
+  afterEvaluate { // Otherwise, project.description does not work.
+    jar {
+      manifest {
+        attributes(
+          "Implementation-Title" : project.description ?: project.name,
+          "Implementation-Version" : project.version,
+          "Implementation-Vendor" : project.vendor,
+          "Implementation-Vendor-Id" : project.group,
+          "Implementation-URL" : project.url,
+        )
+      }
+    }
+  }
+  // Build source jars:
+  task packageSources(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+  }
+  artifacts.archives packageSources
+  // Build javadoc jars:
+  task packageJavadoc(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+  }
+  artifacts.archives packageJavadoc
+
+  // Javadoc options
+  javadoc {
+    options {
+      encoding = 'UTF-8'
+      docEncoding = 'UTF-8'
+      stylesheetFile = "$rootDir/elki/src/main/javadoc/stylesheet.css" as File
+      noTree = false
+      noNavBar = false
+      noIndex = false
+      noHelp = true
+      splitIndex = true
+      author = true
+      use = true
+      memberLevel = JavadocMemberLevel.PRIVATE
+      noDeprecated = false
+      noDeprecatedList = false
+      docFilesSubDirs = true
+      docTitle = 'ELKI'
+      windowTitle = 'ELKI: Environment for DeveLoping KDD-Applications Supported by Index-Structures'
+      if (new File("src/main/javadoc/overview.html").exists()) overview = "src/main/javadoc/overview.html"
+      group('Algorithms', ['de.lmu.ifi.dbs.elki.algorithm*'])
+      group('Databases and Index Structures', ['de.lmu.ifi.dbs.elki.database*', 'de.lmu.ifi.dbs.elki.index*', 'de.lmu.ifi.dbs.elki.datasource*', 'de.lmu.ifi.dbs.elki.persistent*'])
+      group('Datatypes and Distance Functions', ['de.lmu.ifi.dbs.elki.data', 'de.lmu.ifi.dbs.elki.data.*', 'de.lmu.ifi.dbs.elki.distance*'])
+      group('Evaluation', ['de.lmu.ifi.dbs.elki.evalu*'])
+      group('GUI and Visualization', ['de.lmu.ifi.dbs.elki.gui*', 'de.lmu.ifi.dbs.elki.vis*'])
+      group('Utilities and Miscellaneous', ['de.lmu.ifi.dbs.elki', 'de.lmu.ifi.dbs.elki.*'])
+      group('Tutorial Code and Examples', ['tutorial', 'tutorial.*'])
+      header = """<img src="{@docRoot}/figures/elki-logo-200.png" width="200">"""
+      footer = """ELKI version $project.version"""
+      if (isSnapshot) {
+        def commit = getCommitHash()
+        if (commit) footer += """ rev. $commit"""
+        footer += """ built at $buildTime"""
+      }
+      bottom = """Copyright &copy; $year <a href="https://elki-project.github.io/">ELKI Development Team</a>. <a href="https://elki-project.github.io/license">License information.</a>"""
+      links = [
+        "http://trove4j.sourceforge.net/javadocs/",
+        "http://www.w3.org/2003/01/dom2-javadoc/",
+        "https://xmlgraphics.apache.org/batik/javadoc/"
+      ]
+      addStringOption('Xdoclint:none')
+    }
+  }
+  // Resources to copy to every javadoc
+  task copyDocResources(type: Copy) {
+    from("$rootDir/elki/src/main/javadoc") {
+      include "**/stylesheet.css"
+      include "**/elki-logo-200.png"
+    }
+    from("$projectDir/src/main/javadoc") {
+      exclude "overview.html"
+    }
+    into "$project.buildDir/docs/javadoc"
+  }
+  javadoc.dependsOn copyDocResources
+  // Additional documentation: parameters
+  task documentParameters(type: JavaExec) {
+    description "Generate parameter documentation"
+    group = "Documentation"
+    classpath = sourceSets.test.runtimeClasspath
+    main = 'de.lmu.ifi.dbs.elki.application.internal.DocumentParameters'
+    args "$project.buildDir/docs/javadoc/parameters-byclass.html"
+    args "$project.buildDir/docs/javadoc/parameters-byopt.html"
+  }
+  // To use, add javadoc.dependsOn documentParameters
+  // Additional documentation: references
+  task documentReferences(type: JavaExec) {
+    description "Generate references list"
+    group = "Documentation"
+    classpath = sourceSets.test.runtimeClasspath
+    main = 'de.lmu.ifi.dbs.elki.application.internal.DocumentReferences'
+    args "$project.buildDir/docs/javadoc/references.html"
+    args "$project.buildDir/docs/references.trac"
+  }
+  // To use, add javadoc.dependsOn documentReferences
+  // Collect dependencies
+  task collectDependencies(type: Copy) {
+    description = "Collect dependencies"
+    group = "Build"
+    from configurations.runtime
+    into "$project.buildDir/libs/lib"
+  }
+  // To use, invoke assemble.dependsOn collectDependencies
+}
