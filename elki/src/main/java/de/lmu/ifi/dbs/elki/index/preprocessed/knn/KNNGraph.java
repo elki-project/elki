@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
@@ -83,6 +84,11 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   private double rho = 1.0;
   
   /**
+   * maximum number of iterations
+   */
+  private int iterations = 100;
+  
+  /**
    * set initial neighbors? 
    */
   private boolean setInitialNeighbors;
@@ -110,12 +116,13 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
    * @param k k
    * @param rnd Random generator
    */
-  public KNNGraph(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, RandomFactory rnd, double delta, double rho, boolean setInitialNeighbors) {
+  public KNNGraph(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, RandomFactory rnd, double delta, double rho, boolean setInitialNeighbors, int iterations) {
     super(relation, distanceFunction, k);
     this.rnd = rnd;
     this.delta = delta;
     this.rho = rho;
     this.setInitialNeighbors = setInitialNeighbors;
+    this.iterations = iterations;
   }
   
   @Override
@@ -184,8 +191,9 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     int size = relation.size();
     int counter = internal_k * size;
     double rate = 0.0;
+    int iter=0;
 
-    while (counter >= delta*internal_k*size && counter > 0){
+    while (counter >= delta*internal_k*size && counter > 0 && iter < iterations){
       LOG.incrementProcessed(progress);
       counter = 0;
       
@@ -310,6 +318,18 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         LOG.verbose("Update rate in this iteration: " + rate);
       }
       if (rate < delta) break;
+      iter++;
+    }
+    if (LOG.isVerbose()){
+      if (iter == iterations){
+        LOG.verbose("Loop exit because maximum number of iterations is reached.");
+      }
+      else if (rate < delta){
+        LOG.verbose("Loop exit because update rate got smaller than delta.");
+      }
+      else{
+        LOG.verbose("Loop exit because counter reached delta*k*size.");
+      }
     }
     //convert store to storage
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -512,23 +532,29 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     private final boolean setInitialNeighbors;
     
     /**
+     * maximum number of iterations
+     */
+    private final int iterations;
+    
+    /**
      * Constructor.
      *
      * @param k K
      * @param distanceFunction distance function
      * @param rnd Random generator
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction, RandomFactory rnd, double delta, double rho, boolean setInitialNeighbors) {
+    public Factory(int k, DistanceFunction<? super O> distanceFunction, RandomFactory rnd, double delta, double rho, boolean setInitialNeighbors, int iterations) {
       super(k, distanceFunction);
       this.rnd = rnd;
       this.delta = delta;
       this.rho = rho;
       this.setInitialNeighbors = setInitialNeighbors;
+      this.iterations = iterations;
     }
 
     @Override
     public KNNGraph<O> instantiate(Relation<O> relation) {
-      return new KNNGraph<>(relation, distanceFunction, k, rnd, delta, rho, setInitialNeighbors);
+      return new KNNGraph<>(relation, distanceFunction, k, rnd, delta, rho, setInitialNeighbors, iterations);
     }
 
     /**
@@ -566,6 +592,11 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       public static final OptionID INITIAL_ID = new OptionID("knngraph.setInitialNeighbors", "Initialize neighbors with sampled Neighbors?");
       
       /**
+       * maximum number of iterations
+       */
+      public static final OptionID ITER_ID = new OptionID("knngraph.iterations", "maximum number of iterations");
+      
+      /**
        * Random generator
        */
       private RandomFactory rnd;
@@ -584,6 +615,11 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
        * set initial neighbors 
        */
       private boolean setInitialNeighbors;
+      
+      /**
+       * maximum number of iterations
+       */
+      private int iterations;
       
       @Override
       protected void makeOptions(Parameterization config) {
@@ -604,11 +640,15 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         if(config.grab(initialP)) {
           setInitialNeighbors = initialP.isTrue();
         }
+        IntParameter iterP = new IntParameter(ITER_ID, 100);
+        if (config.grab(iterP)){
+          iterations = iterP.getValue();
+        }
       }
 
       @Override
       protected KNNGraph.Factory<O> makeInstance() {
-        return new KNNGraph.Factory<>(k, distanceFunction, rnd, delta, rho, setInitialNeighbors);
+        return new KNNGraph.Factory<>(k, distanceFunction, rnd, delta, rho, setInitialNeighbors, iterations);
       }
     }
   }
