@@ -1,7 +1,11 @@
-/target/
-/local/
 /**/target/
 /**/build/
-/MiniGUI-saved-settings.txt
-/**/*~
+/**/bin/
+/**/.project
+/**/.settings
+/**/.classpath
 /**/.gradle
+/**/*~
+/MiniGUI-saved-settings.txt
+/local/
+/elki-bundle*.jar

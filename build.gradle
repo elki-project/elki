@@ -8,9 +8,34 @@ def getCommitHash() {
   return new File(".git", head[1].trim()).text.take(12)
 }
 
+import org.gradle.plugins.ide.internal.generator.PropertiesPersistableConfigurationObject;
+import org.gradle.plugins.ide.api.PropertiesGeneratorTask;
+import org.gradle.api.internal.PropertiesTransformer;
+
+// Class to allow updating arbitrary properties files
+class PropertiesFile extends PropertiesPersistableConfigurationObject {
+    public PropertiesFile(PropertiesTransformer t) { super(t); }
+    @Override protected void load(Properties properties) { }
+    @Override protected void store(Properties properties) { }
+    @Override protected String getDefaultResourceName() { return ""; }
+    @Override public void loadDefaults() { load(new StringBufferInputStream("")); }
+}
+
+// Task to update arbitrary properties files (set outputFile)
+class PropertiesFileTask extends PropertiesGeneratorTask<PropertiesFile> {
+    private final PropertiesFileContentMerger file;
+    public PropertiesFileTask() { file = new PropertiesFileContentMerger(getTransformer()); }
+    protected PropertiesFile create() { return new PropertiesFile(getTransformer()); }
+    protected void configure(PropertiesFile props) {
+        file.getBeforeMerged().execute(props); file.getWhenMerged().execute(props);
+    }
+    public void file(Closure closure) { ConfigureUtil.configure(closure, file); }
+}
+
 allprojects  {
   apply plugin: 'maven'
   apply plugin: 'java'
+  apply plugin: 'eclipse'
 
   group = 'de.lmu.ifi.dbs.elki'
   version = '0.7.2-SNAPSHOT'
@@ -25,6 +50,35 @@ allprojects  {
   ext.url = "https://elki-project.github.io/"
   ext.isSnapshot = version.endsWith("-SNAPSHOT")
   ext.buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'")
+  
+  eclipse {
+    pathVariables 'M2_REPO': new File(repositories.MavenLocal.url)
+    project {
+      natures 'org.eclipse.buildship.core.gradleprojectnature'
+    }
+    classpath {
+      defaultOutputDir = "build/classes/main" as File
+      downloadSources = true
+    }
+    jdt.file {
+      withProperties {
+        it.load new FileInputStream("$rootDir/conventions/elkiformatter.properties" as String)
+      }
+    }
+  }
+  task eclipseUIPreferences(type: PropertiesFileTask) {
+    description = "Generate Eclipse UI settings"
+    outputFile = "$projectDir/.settings/org.eclipse.jdt.ui.prefs" as File
+    file { withProperties {
+      it.load new FileInputStream("$rootDir/conventions/codetemplates.properties" as String)
+	} }
+  }
+  tasks.eclipse.dependsOn eclipseUIPreferences
+  task eclipseBuildshipPreferences(type: PropertiesFileTask) {
+    description = "Generate Eclipse buildship settings"
+    outputFile = "$projectDir/.settings/org.eclipse.buildship.core.prefs" as File
+  }
+  tasks.eclipse.dependsOn eclipseBuildshipPreferences
 }
 
 subprojects {
@@ -143,3 +197,18 @@ subprojects {
   }
   // To use, invoke assemble.dependsOn collectDependencies
 }
+
+
+configurations {
+  enabledModules {
+    transitive false
+    extendsFrom runtime
+  }
+}
+
+dependencies {
+  def depsExclude = [ rootProject.path, ":elki-bundle" ]
+  rootProject.subprojects.findAll { !depsExclude.contains(it.path) }.each { enabledModules it }
+}
+
+eclipse.classpath.plusConfigurations = [project.configurations.enabledModules]
