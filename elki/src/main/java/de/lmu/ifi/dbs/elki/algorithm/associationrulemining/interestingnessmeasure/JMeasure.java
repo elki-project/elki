@@ -22,12 +22,24 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * J-Measure interestingnss measure
+ * 
+ * Reference:
+ * <p>
+ * R. M Goodman and P. Smyth<br />
+ * Rule induction using infor- mation theory<br />
+ * G. Piatetsky, 1991
+ * </p>
  * 
  * @author Frederic Sautter
  *
  */
+@Reference(authors = "R. M Goodman and P. Smyth", //
+title = "Rule induction using infor- mation theory", //
+booktitle = "G. Piatetsky, 1991")
 public class JMeasure extends AbstractInterestingnessMeasure {
 
   public JMeasure() {

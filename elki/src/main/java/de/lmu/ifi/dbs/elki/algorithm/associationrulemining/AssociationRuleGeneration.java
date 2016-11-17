@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AssociationRuleResult;
 import de.lmu.ifi.dbs.elki.result.FrequentItemsetsResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
  * This algorithm calls a specified frequent itemset algorithm
@@ -59,6 +60,9 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  * @author Frederic Sautter
  *
  */
+@Reference(authors = "Mohammed J Zaki and Wagner Meira Jr.", //
+title = "Data mining and analysis: fundamental concepts and algorithms", //
+booktitle = "Cambridge University Press, 2014")
 public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm {
 
   /**

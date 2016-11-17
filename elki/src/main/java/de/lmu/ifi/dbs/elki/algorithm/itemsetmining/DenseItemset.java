@@ -76,6 +76,7 @@ public class DenseItemset extends Itemset {
   }
   
   public int[] toSparseRep() {
+  // TODO for association rule mining
     return new int[0];
   }
 

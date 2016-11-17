@@ -22,12 +22,24 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * Klosgen interestingnss measure
+ * 
+ * Reference:
+ * <p>
+ * W. Klosgen<br />
+ * Explora: A multipattern and multistrategy discovery assistant<br />
+ * In Advances in knowledge discovery and data mining, American Association for Artificial Intelligence, 1996
+ * </p>
  * 
  * @author Frederic Sautter
  *
  */
+@Reference(authors = "W. Klosgen", //
+title = "Explora: A multipattern and multistrategy discovery assistant", //
+booktitle = "Advances in knowledge discovery and data mining, American Association for Artificial Intelligence, 1996")
 public class Klosgen extends AbstractInterestingnessMeasure {
 
   public Klosgen() {

@@ -22,12 +22,24 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * Certainty factor interestingnss measure
+ * 
+ * Reference:
+ * <p>
+ * F. Berzal, I. Blanco, M. Vila and others<br />
+ * Measuring the accuracy and interest of association rules: A new framework<br />
+ * Intelligent Data Analysis, 6(3), 2002
+ * </p>
  * 
  * @author Frederic Sautter
  *
  */
+@Reference(authors = "F. Berzal, I. Blanco, M. Vila and others", //
+title = "Measuring the accuracy and interest of association rules: A new framework", //
+booktitle = "Intelligent Data Analysis, 6(3), 2002")
 public class CertaintyFactor extends AbstractInterestingnessMeasure {
 
   public CertaintyFactor() {

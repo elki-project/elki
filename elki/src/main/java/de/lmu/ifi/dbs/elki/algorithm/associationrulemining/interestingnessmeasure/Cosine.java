@@ -22,12 +22,24 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * Cosine interestingnss measure
+ * 
+ * Reference:
+ * <p>
+ * P. Tan and V. Kumar<br />
+ * Interestingness measures for association patterns: A perspective<br />
+ * In Proc. of Workshop on Postprocessing in Machine Learning and Data Mining, 2000
+ * </p>
  * 
  * @author Frederic Sautter
  *
  */
+@Reference(authors = "P. Tan and V. Kumar", //
+title = "Interestingness measures for association patterns: A perspective", //
+booktitle = "Proc. of Workshop on Postprocessing in Machine Learning and Data Mining, 2000")
 public class Cosine extends AbstractInterestingnessMeasure {
 
   public Cosine() {

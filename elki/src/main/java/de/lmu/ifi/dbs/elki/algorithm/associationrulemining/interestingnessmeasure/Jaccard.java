@@ -22,12 +22,24 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * Jaccard interestingnss measure
+ * 
+ * Reference:
+ * <p>
+ * C.J. van Rijsbergen<br />
+ * Information Retrieval, 2nd Edition<br />
+ * Butterworths, London, 1979
+ * </p>
  * 
  * @author Frederic Sautter
  *
  */
+@Reference(authors = "C.J. van Rijsbergen", //
+title = "Information Retrieval, 2nd Edition", //
+booktitle = "Butterworths, London, 1979")
 public class Jaccard extends AbstractInterestingnessMeasure {
 
   public Jaccard() {

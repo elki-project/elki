@@ -22,12 +22,24 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * Lift interestingnss measure
+ * 
+ * Reference:
+ * <p>
+ * S. Brin, R. Motwani, and C. Silverstein<br />
+ * Beyond market baskets: Generalizing association rules to correlations<br />
+ * In ACM SIGMOD Record, volume 26, ACM, 1997
+ * </p>
  * 
  * @author Frederic Sautter
  *
  */
+@Reference(authors = "S. Brin, R. Motwani, and C. Silverstein", //
+title = "Beyond market baskets: Generalizing association rules to correlations", //
+booktitle = "ACM SIGMOD Record, volume 26, ACM, 1997")
 public class Lift extends AbstractInterestingnessMeasure {
 
   public Lift() {
