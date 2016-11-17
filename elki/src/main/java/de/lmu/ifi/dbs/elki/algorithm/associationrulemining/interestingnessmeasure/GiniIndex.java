@@ -22,12 +22,24 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * Gini index interestingnss measure
+ * 
+ * Reference:
+ * <p>
+ * L. Breiman, J. Friedman, C. J. Stone, and R. A Olshen<br />
+ * Classification and regression trees<br />
+ * CRC press, 1984
+ * </p>
  * 
  * @author Frederic Sautter
  *
  */
+@Reference(authors = "L. Breiman, J. Friedman, C. J. Stone, and R. A Olshen", //
+title = "Classification and regression trees", //
+booktitle = "CRC press, 1984")
 public class GiniIndex extends AbstractInterestingnessMeasure {
 
   public GiniIndex() {

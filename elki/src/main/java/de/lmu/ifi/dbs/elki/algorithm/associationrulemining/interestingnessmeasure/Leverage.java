@@ -22,12 +22,24 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * Leverage interestingnss measure
+ * 
+ * Reference:
+ * <p>
+ * G. Piatetsky-Shapiro<br />
+ * Discovery, analysis, and presentation of strong rules<br />
+ * In Knowledge discovery in databases, 1991
+ * </p>
  * 
  * @author Frederic Sautter
  *
  */
+@Reference(authors = "G. Piatetsky-Shapiro", //
+title = "Discovery, analysis, and presentation of strong rules", //
+booktitle = "Knowledge discovery in databases, 1991")
 public class Leverage extends AbstractInterestingnessMeasure {
 
   public Leverage() {

@@ -22,12 +22,24 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * Added value interestingnss measure
+ * 
+ * Reference:
+ * <p>
+ * S. Sahar, Sigal, Y. Mansour<br />
+ * Empirical evaluation of interest-level criteria<br />
+ * AeroSense'99. International Society for Optics and Photonics, 1999
+ * </p>
  * 
  * @author Frederic Sautter
  *
  */
+@Reference(authors = "S. Sahar, Sigal, Y. Mansour", //
+title = "Empirical evaluation of interest-level criteria", //
+booktitle = "AeroSense'99. International Society for Optics and Photonics, 1999")
 public class AddedValue extends AbstractInterestingnessMeasure {
 
   public AddedValue() {
