@@ -58,4 +58,3 @@ shadowJar {
 
 javadoc.dependsOn documentParameters
 javadoc.dependsOn documentReferences
-assemble.dependsOn collectDependencies

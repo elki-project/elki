@@ -195,7 +195,7 @@ subprojects {
     from configurations.runtime
     into "$project.buildDir/libs/lib"
   }
-  // To use, invoke assemble.dependsOn collectDependencies
+  jar.dependsOn collectDependencies
 }
 
 
