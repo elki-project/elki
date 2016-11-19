@@ -52,7 +52,7 @@ allprojects  {
   ext.buildTime = new Date().format("yyyy-MM-dd'T'HH:mm'Z'")
   
   eclipse {
-    pathVariables 'M2_REPO': new File(repositories.MavenLocal.url)
+    // Not supported by Buildship: pathVariables 'M2_REPO': new File(repositories.MavenLocal.url)
     project {
       natures 'org.eclipse.buildship.core.gradleprojectnature'
     }
