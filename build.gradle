@@ -36,6 +36,7 @@ allprojects  {
   apply plugin: 'maven'
   apply plugin: 'java'
   apply plugin: 'eclipse'
+  if(project.hasProperty('jacoco')) apply plugin: 'jacoco'
 
   group = 'de.lmu.ifi.dbs.elki'
   version = '0.7.2-SNAPSHOT'
@@ -153,7 +154,7 @@ subprojects {
         "http://www.w3.org/2003/01/dom2-javadoc/",
         "https://xmlgraphics.apache.org/batik/javadoc/"
       ]
-      addStringOption('Xdoclint:none')
+      addBooleanOption('Xdoclint:none', true)
     }
   }
   // Resources to copy to every javadoc
@@ -212,3 +213,25 @@ dependencies {
 }
 
 eclipse.classpath.plusConfigurations = [project.configurations.enabledModules]
+
+if(project.hasProperty('jacoco')) {
+  task codeCoverageReport(type: JacocoReport) {
+    dependsOn tasks.test
+    executionData = files()
+    subprojects.each {
+      dependsOn it.tasks.test
+      sourceSets it.sourceSets.main
+    }
+    doFirst {
+      executionData = fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+      executionData = files(executionData.findAll { it.exists() })
+    }
+
+    reports {
+      html.enabled = true
+      xml.enabled = true
+      xml.destination = "${buildDir}/reports/jacoco/report.xml"
+    }
+  }
+  check.dependsOn codeCoverageReport
+}
