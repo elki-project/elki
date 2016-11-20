@@ -1,4 +1,5 @@
-package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasure;
+package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -20,35 +21,40 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
+import net.jafama.FastMath;
+
 /**
- * Leverage interestingnss measure
+ * Cosine interestingness measure, P(A,B)/sqrt(P(A)*P(B)).
+ * 
+ * The interestingness measure called IS by Tan and Kumar.
  * 
  * Reference:
  * <p>
- * G. Piatetsky-Shapiro<br />
- * Discovery, analysis, and presentation of strong rules<br />
- * In Knowledge discovery in databases, 1991
+ * P. Tan and V. Kumar<br />
+ * Interestingness measures for association patterns: A perspective<br />
+ * In Proc. Workshop on Postprocessing in Machine Learning and Data Mining
  * </p>
  * 
  * @author Frederic Sautter
- *
  */
-@Reference(authors = "G. Piatetsky-Shapiro", //
-title = "Discovery, analysis, and presentation of strong rules", //
-booktitle = "Knowledge discovery in databases, 1991")
-public class Leverage extends AbstractInterestingnessMeasure {
-
-  public Leverage() {
-    // TODO Auto-generated constructor stub
+@Reference(authors = "P. Tan and V. Kumar", //
+    title = "Interestingness measures for association patterns: A perspective", //
+    booktitle = "Proc. Workshop on Postprocessing in Machine Learning and Data Mining", //
+    url="https://www.cs.umn.edu/sites/cs.umn.edu/files/tech_reports/00-036.pdf")
+public class Cosine implements InterestingnessMeasure {
+  /**
+   * Constructor.
+   */
+  public Cosine() {
+    super();
   }
 
   @Override
-  public double measure(int totalTransactions, int supportX, int supportY, int supportXY) {
-    return ((double) supportXY / totalTransactions) - ((double) supportX / totalTransactions) * ((double) supportY / totalTransactions);
+  public double measure(int t, int sX, int sY, int sXY) {
+    return sXY / FastMath.sqrt(sX * sY);
   }
-
 }

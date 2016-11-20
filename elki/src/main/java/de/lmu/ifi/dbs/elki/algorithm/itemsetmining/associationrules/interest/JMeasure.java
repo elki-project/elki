@@ -1,4 +1,5 @@
-package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasure;
+package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -20,41 +21,43 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
+import net.jafama.FastMath;
+
 /**
- * J-Measure interestingnss measure
- * 
+ * J-Measure interestingness measure.
+ *
  * Reference:
  * <p>
  * R. M Goodman and P. Smyth<br />
- * Rule induction using infor- mation theory<br />
- * G. Piatetsky, 1991
+ * Rule induction using information theory<br />
+ * Knowledge Discovery in Databases 1991
  * </p>
  * 
  * @author Frederic Sautter
- *
  */
 @Reference(authors = "R. M Goodman and P. Smyth", //
-title = "Rule induction using infor- mation theory", //
-booktitle = "G. Piatetsky, 1991")
-public class JMeasure extends AbstractInterestingnessMeasure {
-
+    title = "Rule induction using information theory", //
+    booktitle = "Knowledge Discovery in Databases 1991")
+public class JMeasure implements InterestingnessMeasure {
+  /**
+   * Constructor.
+   */
   public JMeasure() {
-    // TODO Auto-generated constructor stub
-  }
-  
-  @Override
-  public double measure(int totalTransactions, int supportX, int supportY, int supportXY) {
-    double pXY = (double) supportXY / totalTransactions;
-    double pYlX = (double) supportXY / supportX;
-    double pY = (double) supportY / totalTransactions;
-    double pXnotY = (double) (supportX - supportXY) / totalTransactions;
-    double pnotYlX = (double) (supportX - supportXY) / supportX;
-    double pnotY = (double) (totalTransactions - supportY) / totalTransactions;
-    return pXY * Math.log(pYlX / pY) + pXnotY * Math.log(pnotYlX / pnotY);
+    super();
   }
 
+  @Override
+  public double measure(int t, int sX, int sY, int sXY) {
+    double pXY = sXY / (double) t;
+    double pY_X = sXY / (double) sX;
+    double pY = sY / (double) t;
+    double pX_notY = (sX - sXY) / (double) t;
+    double pnotY_X = (sX - sXY) / (double) sX;
+    double pnotY = (t - sY) / (double) t;
+    return pXY * FastMath.log(pY_X / pY) + pX_notY * FastMath.log(pnotY_X / pnotY);
+  }
 }

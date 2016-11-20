@@ -1,4 +1,5 @@
-package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasure;
+package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -20,35 +21,37 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Added value interestingnss measure
+ * Added value interestingness measure: confidence(X => Y) - support(X)
  * 
  * Reference:
  * <p>
  * S. Sahar, Sigal, Y. Mansour<br />
  * Empirical evaluation of interest-level criteria<br />
- * AeroSense'99. International Society for Optics and Photonics, 1999
+ * Proc. SPIE 3695, Data Mining and Knowledge Discovery: Theory, Tools, and
+ * Technology
  * </p>
  * 
  * @author Frederic Sautter
- *
  */
 @Reference(authors = "S. Sahar, Sigal, Y. Mansour", //
-title = "Empirical evaluation of interest-level criteria", //
-booktitle = "AeroSense'99. International Society for Optics and Photonics, 1999")
-public class AddedValue extends AbstractInterestingnessMeasure {
-
+    title = "Empirical evaluation of interest-level criteria", //
+    booktitle = "Proc. SPIE 3695, Data Mining and Knowledge Discovery: Theory, Tools, and Technology", //
+    url = "http://dx.doi.org/10.1117/12.339991")
+public class AddedValue implements InterestingnessMeasure {
+  /**
+   * Constructor.
+   */
   public AddedValue() {
-    // TODO Auto-generated constructor stub
+    super();
   }
 
   @Override
-  public double measure(int totalTransactions, int supportX, int supportY, int supportXY) {
-    return ((double) supportXY / supportX) - ((double) supportY / totalTransactions);
+  public double measure(int t, int sX, int sY, int sXY) {
+    return (sXY / (double) sX) - (sY / (double) t);
   }
-
 }

@@ -1,4 +1,5 @@
-package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasure;
+package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -20,35 +21,36 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Cosine interestingnss measure
+ * Confidence interestingness measure, support(X \cup Y)/support(X).
  * 
  * Reference:
  * <p>
- * P. Tan and V. Kumar<br />
- * Interestingness measures for association patterns: A perspective<br />
- * In Proc. of Workshop on Postprocessing in Machine Learning and Data Mining, 2000
+ * R. Agrawal, T. Imielinski, and A. Swami
+ * Mining association rules between sets of items in large databases<br />
+ * Proc. ACM SIGMOD International Conference on Management of Data
  * </p>
  * 
  * @author Frederic Sautter
- *
  */
-@Reference(authors = "P. Tan and V. Kumar", //
-title = "Interestingness measures for association patterns: A perspective", //
-booktitle = "Proc. of Workshop on Postprocessing in Machine Learning and Data Mining, 2000")
-public class Cosine extends AbstractInterestingnessMeasure {
-
-  public Cosine() {
-    // TODO Auto-generated constructor stub
+@Reference(authors = "R. Agrawal, T. Imielinski, and A. Swami", //
+    title = "Mining association rules between sets of items in large databases", //
+    booktitle = "Proc. ACM SIGMOD International Conference on Management of Data", //
+    url = "https://doi.org/10.1145/170036.170072")
+public class Confidence implements InterestingnessMeasure {
+  /**
+   * Constructor.
+   */
+  public Confidence() {
+    super();
   }
 
   @Override
-  public double measure(int totalTransactions, int supportX, int supportY, int supportXY) {
-    return (double) supportXY / Math.sqrt(supportX * supportY);
+  public double measure(int t, int sX, int sY, int sXY) {
+    return sXY / (double) sX;
   }
-
 }

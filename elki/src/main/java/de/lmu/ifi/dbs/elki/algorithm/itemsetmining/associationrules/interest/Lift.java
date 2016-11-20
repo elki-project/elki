@@ -1,4 +1,5 @@
-package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasure;
+package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -20,35 +21,35 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Jaccard interestingnss measure
- * 
+ * Lift interestingness measure.
+ *
  * Reference:
  * <p>
- * C.J. van Rijsbergen<br />
- * Information Retrieval, 2nd Edition<br />
- * Butterworths, London, 1979
+ * S. Brin, R. Motwani, and C. Silverstein<br />
+ * Beyond market baskets: Generalizing association rules to correlations<br />
+ * In ACM SIGMOD Record, volume 26, ACM, 1997
  * </p>
  * 
  * @author Frederic Sautter
- *
  */
-@Reference(authors = "C.J. van Rijsbergen", //
-title = "Information Retrieval, 2nd Edition", //
-booktitle = "Butterworths, London, 1979")
-public class Jaccard extends AbstractInterestingnessMeasure {
-
-  public Jaccard() {
-    // TODO Auto-generated constructor stub
+@Reference(authors = "S. Brin, R. Motwani, and C. Silverstein", //
+    title = "Beyond market baskets: Generalizing association rules to correlations", //
+    booktitle = "ACM SIGMOD Record, volume 26, ACM, 1997")
+public class Lift implements InterestingnessMeasure {
+  /**
+   * Constructor.
+   */
+  public Lift() {
+    super();
   }
-  
+
   @Override
-  public double measure(int totalTransactions, int supportX, int supportY, int supportXY) {
-    return (double) supportXY / ((double) supportX + supportY - supportXY);
+  public double measure(int t, int sX, int sY, int sXY) {
+    return (sXY / (double) sX) / (sY / (double) t);
   }
-
 }

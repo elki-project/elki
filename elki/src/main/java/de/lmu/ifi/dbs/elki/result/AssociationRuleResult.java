@@ -24,7 +24,7 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.associationrulemining.AssociationRule;
+import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.AssociationRule;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
@@ -34,23 +34,19 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * Result class for association rule mining
  * 
  * @author Frederic Sautter
- *
  */
 public class AssociationRuleResult extends BasicResult implements TextWriteable {
-  
   /**
    * Association rules together with the interestingness measure.
    */
   private List<AssociationRule> rules;
-  
+
   /**
    * Metadata of the data relation, for item labels.
    */
   private VectorFieldTypeInformation<BitVector> meta;
-  
-  
+
   /**
-   * 
    * Constructor.
    *
    * @param name
@@ -60,11 +56,8 @@ public class AssociationRuleResult extends BasicResult implements TextWriteable 
     super(name, shortname);
     this.rules = rules;
     this.meta = meta;
-    // TODO Auto-generated constructor stub
   }
-  
-  
-  
+
   /**
    * Returns the rules.
    * 
@@ -73,7 +66,7 @@ public class AssociationRuleResult extends BasicResult implements TextWriteable 
   public List<AssociationRule> getRules() {
     return rules;
   }
-  
+
   /**
    * Returns Metadata of the data relation, for item labels.
    * 
@@ -85,11 +78,11 @@ public class AssociationRuleResult extends BasicResult implements TextWriteable 
 
   @Override
   public void writeToText(TextWriterStream out, String label) {
-    // TODO Auto-generated method stub
+    StringBuilder buf = new StringBuilder();
     for(AssociationRule rule : rules) {
-      out.inlinePrintNoQuotes(rule.appendTo(new StringBuilder(), meta));
+      buf.setLength(0); // Reuse
+      out.inlinePrintNoQuotes(rule.appendTo(buf, meta));
       out.flush();
     }
   }
-
 }

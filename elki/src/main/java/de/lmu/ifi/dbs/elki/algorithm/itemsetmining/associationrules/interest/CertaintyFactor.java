@@ -1,4 +1,5 @@
-package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasure;
+package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -20,35 +21,36 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Klosgen interestingnss measure
- * 
+ * Certainty factor interestingness measure.
+ *
  * Reference:
  * <p>
- * W. Klosgen<br />
- * Explora: A multipattern and multistrategy discovery assistant<br />
- * In Advances in knowledge discovery and data mining, American Association for Artificial Intelligence, 1996
+ * F. Berzal, I. Blanco, D. Sánchez, M. Vila<br />
+ * Measuring the accuracy and interest of association rules: A new
+ * framework<br />
+ * Intelligent Data Analysis, 6(3), 2002
  * </p>
  * 
  * @author Frederic Sautter
- *
  */
-@Reference(authors = "W. Klosgen", //
-title = "Explora: A multipattern and multistrategy discovery assistant", //
-booktitle = "Advances in knowledge discovery and data mining, American Association for Artificial Intelligence, 1996")
-public class Klosgen extends AbstractInterestingnessMeasure {
-
-  public Klosgen() {
-    // TODO Auto-generated constructor stub
+@Reference(authors = "F. Berzal, I. Blanco, D. Sánchez, M. Vila", //
+    title = "Measuring the accuracy and interest of association rules: A new framework", //
+    booktitle = "Intelligent Data Analysis, 6(3), 2002")
+public class CertaintyFactor implements InterestingnessMeasure {
+  /**
+   * Constructor.
+   */
+  public CertaintyFactor() {
+    super();
   }
-  
+
   @Override
-  public double measure(int totalTransactions, int supportX, int supportY, int supportXY) {
-    return Math.sqrt((double) supportXY/ totalTransactions) * (((double) supportXY / supportX) - ((double) supportY / totalTransactions));
+  public double measure(int t, int sX, int sY, int sXY) {
+    return ((sXY / (double) sX) - (sY / (double) t)) / ((t - sY) / (double) t);
   }
-
 }

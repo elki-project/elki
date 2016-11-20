@@ -1,25 +1,21 @@
-package de.lmu.ifi.dbs.elki.algorithm.associationrulemining;
+package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules;
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2016
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * Copyright (C) 2016
+ * Ludwig-Maximilians-Universität München
+ * Lehr- und Forschungseinheit für Datenbanksysteme
+ * ELKI Development Team
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 import java.util.ArrayList;
@@ -27,12 +23,12 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasure.AbstractInterestingnessMeasure;
-import de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasure.Confidence;
 import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.AbstractFrequentItemsetAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.Itemset;
 import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.OneItemset;
 import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.SparseItemset;
+import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.Confidence;
+import de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest.InterestingnessMeasure;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -49,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * This algorithm calls a specified frequent itemset algorithm
  * and calculates all association rules, having a interest value between
  * then the specified boundaries form the obtained frequent itemsets
- * 
+ *
  * Reference:
  * <p>
  * Mohammed J Zaki and Wagner Meira Jr.</br>
@@ -58,12 +54,15 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * </p>
  * 
  * @author Frederic Sautter
- *
  */
 @Reference(authors = "Mohammed J Zaki and Wagner Meira Jr.", //
-title = "Data mining and analysis: fundamental concepts and algorithms", //
-booktitle = "Cambridge University Press, 2014")
+    title = "Data mining and analysis: fundamental concepts and algorithms", //
+    booktitle = "Cambridge University Press, 2014")
 public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(AbstractAssociationRuleAlgorithm.class);
 
   /**
    * Constructor.
@@ -73,7 +72,7 @@ public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm 
    * @param minmeasure Minimum threshold for interestingness measure
    * @param maxmeasure Maximum threshold for interestingness measure
    */
-  public AssociationRuleGeneration(AbstractFrequentItemsetAlgorithm frequentItemAlgo, AbstractInterestingnessMeasure interestMeasure, double minmeasure, double maxmeasure) {
+  public AssociationRuleGeneration(AbstractFrequentItemsetAlgorithm frequentItemAlgo, InterestingnessMeasure interestMeasure, double minmeasure, double maxmeasure) {
     super(frequentItemAlgo, interestMeasure, minmeasure, maxmeasure);
   }
 
@@ -84,67 +83,62 @@ public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm 
    * @param interestMeasure Interestingness measure
    * @param minmeasure Minimum threshold for interestingness measure
    */
-  public AssociationRuleGeneration(AbstractFrequentItemsetAlgorithm frequentItemAlgo, AbstractInterestingnessMeasure interestMeasure, double minmeasure) {
+  public AssociationRuleGeneration(AbstractFrequentItemsetAlgorithm frequentItemAlgo, InterestingnessMeasure interestMeasure, double minmeasure) {
     super(frequentItemAlgo, interestMeasure, minmeasure);
   }
-  
-  
-  
-  public AssociationRuleResult run(Database database, final Relation<BitVector> relation) {
-    
+
+  public AssociationRuleResult run(Database database) {
     // Total number of transactions in transaction database;
-    final int totalTransactions = relation.size();
-    
+    // final int totalTransactions = relation.size();
+
     // Run frequent itemset mining
     FrequentItemsetsResult frequentResult = frequentItemAlgo.run(database);
-    
+
     // Generate HashMap of resulting ArrayList with items in reverse order
     LinkedHashMap<Itemset, Itemset> frequentItems = frequentResult.getRevHashMapRep();
-    
+
     // Meta data for item tags
     VectorFieldTypeInformation<BitVector> meta = frequentResult.getMeta();
-    
+
     // Output List
     List<AssociationRule> rules = new ArrayList<AssociationRule>();
-    
+
     // Iterate through all frequent itemsets
     for(Itemset itemset : frequentItems.keySet()) {
       int[] itemsetSparse = itemset.toSparseRep();
-      
+
       // stops if OneItemsets are reached
-      if (itemsetSparse.length > 1) {
-        List<Itemset> subsets = new ArrayList<Itemset>();
-        boolean[] pruning = new boolean[(1 << itemsetSparse.length) - 2];
-        calcSubsets(itemsetSparse, subsets, pruning, frequentItems);
-      
-        // Iterate through subsets
-        for(int i = 0; i < pruning.length; i++) {
-          if (pruning[i] == true) {
-            Itemset antecedent = subsets.get(i);
-            Itemset consequent = subsets.get(subsets.size() - i - 1);
-            double measure = this.interestMeasure.measure(totalTransactions, antecedent.getSupport(), consequent.getSupport(), itemset.getSupport());
-            
-            if(measure >= minmeasure && measure <= this.maxmeasure) {
-              rules.add(new AssociationRule(itemset, consequent, antecedent.getSupport(), measure));
-            } else {
-              if (this.interestMeasure instanceof Confidence) {
-                prune(antecedent,pruning, subsets);
-              }
+      if(itemsetSparse.length <= 1) {
+        break;
+      }
+      List<Itemset> subsets = new ArrayList<Itemset>();
+      boolean[] pruning = new boolean[(1 << itemsetSparse.length) - 2];
+      calcSubsets(itemsetSparse, subsets, pruning, frequentItems);
+
+      // Iterate through subsets
+      for(int i = 0; i < pruning.length; i++) {
+        if(pruning[i] == true) {
+          Itemset antecedent = subsets.get(i);
+          Itemset consequent = subsets.get(subsets.size() - i - 1);
+          double measure = interestingness.measure(totalTransactions, antecedent.getSupport(), consequent.getSupport(), itemset.getSupport());
+
+          if(measure >= minmeasure && measure <= this.maxmeasure) {
+            rules.add(new AssociationRule(itemset, consequent, antecedent.getSupport(), measure));
+          }
+          else {
+            if(interestingness instanceof Confidence) {
+              prune(antecedent, pruning, subsets);
             }
           }
         }
-      } else {
-        break;
       }
     }
-    return new AssociationRuleResult("AssociationRule-Generation", "arule-generation", rules, meta);
+    return new AssociationRuleResult("association rules", "arules", rules, meta);
   }
-  
+
   /**
    * Fills a list with all subsets of a given itemset.
    * 
-   * @author Frederic Sautter
-   *
    * @param itemset Sparse representation of an itemset.
    * @param subsets List to fill with subsets
    * @param pruning Array for pruning
@@ -155,9 +149,10 @@ public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm 
     int index = 0;
     while(creator > 0) {
       int[] subset = bitToSparse(creator, itemset);
-      if (subset.length == 1) {
+      if(subset.length == 1) {
         subsets.add(map.get(new OneItemset(subset[0])));
-      } else {
+      }
+      else {
         subsets.add(map.get(new SparseItemset(subset)));
       }
       pruning[index] = true;
@@ -165,13 +160,12 @@ public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm 
       creator--;
     }
   }
-  
+
   /**
    * Returns the Subset of a set in a SparseItemset representation
    * 
    * @param bitset Subset of set in a bitset representation
    * @param set Itemset
-   * 
    * @return itemset in SparseItemset representation.
    */
   private static int[] bitToSparse(long bitset, int[] set) {
@@ -185,7 +179,7 @@ public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm 
     }
     return subset;
   }
-  
+
   /**
    * Prunes the subset list according to the confidence monotonicity
    * 
@@ -205,16 +199,10 @@ public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm 
   }
 
   @Override
-  public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.BIT_VECTOR_FIELD);
+  protected Logging getLogger() {
+    return LOG;
   }
 
-  @Override
-  protected Logging getLogger() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
   /**
    * Parameterization class.
    *
@@ -226,5 +214,4 @@ public class AssociationRuleGeneration extends AbstractAssociationRuleAlgorithm 
       return new AssociationRuleGeneration(frequentItemAlgo, interestMeasure, minmeasure, maxmeasure);
     }
   }
-
 }

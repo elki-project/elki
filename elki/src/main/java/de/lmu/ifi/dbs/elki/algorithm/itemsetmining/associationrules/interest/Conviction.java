@@ -1,4 +1,5 @@
-package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasure;
+package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -20,37 +21,36 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Certainty factor interestingnss measure
+ * Conviction interestingness measure: P(X) P(notY) / P(X, notY)
  * 
  * Reference:
  * <p>
- * F. Berzal, I. Blanco, M. Vila and others<br />
- * Measuring the accuracy and interest of association rules: A new framework<br />
- * Intelligent Data Analysis, 6(3), 2002
+ * S. Brin, R. Motwani, J. D Ullman, and S Tsur<br />
+ * Dynamic itemset counting and implication rules for market basket data<br />
+ * In Proc. 1997 ACM SIGMOD international conference on management of data
  * </p>
  * 
  * @author Frederic Sautter
- *
  */
-@Reference(authors = "F. Berzal, I. Blanco, M. Vila and others", //
-title = "Measuring the accuracy and interest of association rules: A new framework", //
-booktitle = "Intelligent Data Analysis, 6(3), 2002")
-public class CertaintyFactor extends AbstractInterestingnessMeasure {
-
-  public CertaintyFactor() {
-    // TODO Auto-generated constructor stub
+@Reference(authors = "S. Brin, R. Motwani, J. D Ullman, and S Tsur", //
+    title = "Dynamic itemset counting and implication rules for market basket data", //
+    booktitle = "Proc. 1997 ACM SIGMOD international conference on management of data", //
+    url = "https://doi.org/10.1145/253260.253325")
+public class Conviction implements InterestingnessMeasure {
+  /**
+   * Constructor.
+   */
+  public Conviction() {
+    super();
   }
 
   @Override
-  public double measure(int totalTransactions, int supportX, int supportY, int supportXY) {
-    double dividend = ((double) supportXY / supportX) - ((double) supportY / totalTransactions);
-    double divisor = (double) (totalTransactions - supportY) / totalTransactions;
-    return dividend / divisor;
+  public double measure(int t, int sX, int sY, int sXY) {
+    return (sX * (double) (t - sY)) / (t * (long) (sX - sXY));
   }
-
 }

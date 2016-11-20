@@ -1,4 +1,5 @@
-package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasure;
+package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -20,35 +21,22 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
+*/
 
 /**
- * Abstract base class for interestingness measures.
+ * Interface for interestingness measures.
  * 
  * @author Frederic Sautter
- *
  */
-public abstract class AbstractInterestingnessMeasure {
-  
-  /**
-   * 
-   * Constructor.
-   *
-   */
-  public AbstractInterestingnessMeasure(){}
-  
-  
-  
+public interface InterestingnessMeasure {
   /**
    * Computes the value of the measure for a given support values
    * 
-   * @param totalTransactions Total number of transaction
-   * @param supportX Support of the antecedent
-   * @param supportY Support of the consequent
-   * @param supportXY Support of the union of antecedent and consequent
-   * 
+   * @param t Total number of transaction
+   * @param sX Support of the antecedent
+   * @param sY Support of the consequent
+   * @param sXY Support of the union of antecedent and consequent
    * @return value of the measure
    */
-  public abstract double measure(int totalTransactions, int supportX, int supportY, int supportXY);
+  double measure(int t, int sX, int sY, int sXY);
 }

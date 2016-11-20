@@ -1,4 +1,5 @@
-package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasure;
+package de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.interest;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -20,35 +21,36 @@ package de.lmu.ifi.dbs.elki.algorithm.associationrulemining.interestingnessmeasu
 
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+*/
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
- * Conviction interestingnss measure
- * 
+ * Klosgen interestingness measure.
+ *
  * Reference:
  * <p>
- * S. Brin, R. Motwani, J. D Ullman, and S Tsur<br />
- * Dynamic itemset counting and implication rules for market basket data<br />
- * In ACM SIGMOD Record, volume 26, ACM, 1997
+ * W. Klosgen<br />
+ * Explora: A multipattern and multistrategy discovery assistant<br />
+ * In Advances in knowledge discovery and data mining, American Association for
+ * Artificial Intelligence, 1996
  * </p>
  * 
  * @author Frederic Sautter
- *
  */
-@Reference(authors = "S. Brin, R. Motwani, J. D Ullman, and S Tsur", //
-title = "Dynamic itemset counting and implication rules for market basket data", //
-booktitle = "ACM SIGMOD Record, volume 26, ACM, 1997")
-public class Conviction extends AbstractInterestingnessMeasure {
-
-  public Conviction() {
-    // TODO Auto-generated constructor stub
+@Reference(authors = "W. Klosgen", //
+    title = "Explora: A multipattern and multistrategy discovery assistant", //
+    booktitle = "Advances in knowledge discovery and data mining, American Association for Artificial Intelligence, 1996")
+public class Klosgen implements InterestingnessMeasure {
+  /**
+   * Constructor.
+   */
+  public Klosgen() {
+    super();
   }
 
   @Override
-  public double measure(int totalTransactions, int supportX, int supportY, int supportXY) {
-    return (double) (supportX * (totalTransactions - supportY)) / (totalTransactions * (supportX - supportXY));
+  public double measure(int t, int sX, int sY, int sXY) {
+    return Math.sqrt(sXY / (double) t) * ((sXY / (double) sX) - (sY / (double) t));
   }
-
 }
