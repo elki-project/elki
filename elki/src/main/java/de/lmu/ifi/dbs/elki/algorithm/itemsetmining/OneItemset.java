@@ -59,6 +59,10 @@ public class OneItemset extends Itemset {
     this.item = item;
     this.support = support;
   }
+  
+  public OneItemset copy() {
+    return new OneItemset(this.item, this.support);
+  }
 
   @Override
   public int length() {
@@ -77,6 +81,10 @@ public class OneItemset extends Itemset {
     BitsUtil.setI(bits, item);
     return bits;
   }
+  
+  public int[] toSparseRep() {
+    return new int[] { this.item };
+  }
 
   @Override
   public int hashCode() {
@@ -91,6 +99,9 @@ public class OneItemset extends Itemset {
     if(obj == null) {
       return false;
     }
+    if(obj instanceof SparseItemset) {
+      return this.equalsSparseItemset((SparseItemset) obj);
+    }
     if(!(obj instanceof Itemset) || ((Itemset) obj).length() != 1) {
       return false;
     }
@@ -99,6 +110,13 @@ public class OneItemset extends Itemset {
     }
     OneItemset other = (OneItemset) obj;
     return item == other.item;
+  }
+  
+  public boolean equalsSparseItemset(SparseItemset itemset) {
+    if (itemset.length() != 1) {
+      return false;
+    }
+    return itemset.indices[0] == this.item;
   }
 
   @Override

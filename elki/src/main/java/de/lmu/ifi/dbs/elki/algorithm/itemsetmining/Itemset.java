@@ -54,6 +54,27 @@ public abstract class Itemset implements Comparable<Itemset> {
   public int getSupport() {
     return support;
   }
+  
+  /**
+   * Return identical copy of the object;
+   * 
+   * @return Itemset
+   */
+  abstract public Itemset copy();
+  
+  /**
+   * Test whether this itemset equals a given object
+   * 
+   * @param object
+   */
+  abstract public boolean equals(Object obj);
+  
+  /**
+   * Test whether the itemset equals a Sparseitemset represenation
+   * 
+   * @param itemset Sparse representation
+   */
+  abstract public boolean equalsSparseItemset(SparseItemset itemset);
 
   /**
    * Test whether the itemset is contained in a bit vector.
@@ -76,6 +97,13 @@ public abstract class Itemset implements Comparable<Itemset> {
    * @return Itemset contents.
    */
   abstract public long[] getItems();
+  
+  /**
+   * Get a SparseItemset like representation of the Itemset.
+   * 
+   * @return Itemset contents.
+   */
+  abstract public int[] toSparseRep();
 
   @Override
   public String toString() {

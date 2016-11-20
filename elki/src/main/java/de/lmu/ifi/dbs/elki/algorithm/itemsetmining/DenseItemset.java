@@ -54,6 +54,12 @@ public class DenseItemset extends Itemset {
     this.length = length;
   }
 
+  public DenseItemset copy() {
+    DenseItemset itemset = new DenseItemset(this.items.clone(), this.items.length);
+    itemset.support = this.getSupport();
+    return itemset;
+  }
+  
   @Override
   public int length() {
     return length;
@@ -67,6 +73,11 @@ public class DenseItemset extends Itemset {
   @Override
   public long[] getItems() {
     return items;
+  }
+  
+  public int[] toSparseRep() {
+  // TODO for association rule mining
+    return new int[0];
   }
 
   @Override
@@ -90,6 +101,10 @@ public class DenseItemset extends Itemset {
       return false;
     }
     return BitsUtil.equal(items, ((DenseItemset) obj).items);
+  }
+  
+  public boolean equalsSparseItemset(SparseItemset itemset) {
+    return false;
   }
 
   @Override
