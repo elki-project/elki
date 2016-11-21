@@ -133,7 +133,7 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
     LOG.statistics(etime.end());
 
     LOG.statistics(new LongStatistic(STAT + "frequent-itemsets", solution.size()));
-    return new FrequentItemsetsResult("Eclat", "eclat", solution, meta);
+    return new FrequentItemsetsResult("Eclat", "eclat", solution, meta, relation.size());
   }
 
   // TODO: implement diffsets.

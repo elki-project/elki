@@ -1,26 +1,26 @@
 package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
 
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2016
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2016
+ * Ludwig-Maximilians-Universität München
+ * Lehr- und Forschungseinheit für Datenbanksysteme
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 import java.util.ArrayList;
@@ -81,9 +81,9 @@ import net.jafama.FastMath;
 @Title("APRIORI: Algorithm for Mining Association Rules")
 @Description("Searches for frequent itemsets")
 @Reference(authors = "R. Agrawal, R. Srikant", //
-title = "Fast Algorithms for Mining Association Rules", //
-booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", //
-url = "http://www.vldb.org/conf/1994/P487.PDF")
+    title = "Fast Algorithms for Mining Association Rules", //
+    booktitle = "Proc. 20th Int. Conf. on Very Large Data Bases (VLDB '94), Santiago de Chile, Chile 1994", //
+    url = "http://www.vldb.org/conf/1994/P487.PDF")
 @Alias("de.lmu.ifi.dbs.elki.algorithm.APRIORI")
 public class APRIORI extends AbstractFrequentItemsetAlgorithm {
   /**
@@ -184,7 +184,7 @@ public class APRIORI extends AbstractFrequentItemsetAlgorithm {
         }
       }
     }
-    return new FrequentItemsetsResult("APRIORI", "apriori", solution, meta);
+    return new FrequentItemsetsResult("APRIORI", "apriori", solution, meta, size);
   }
 
   /**

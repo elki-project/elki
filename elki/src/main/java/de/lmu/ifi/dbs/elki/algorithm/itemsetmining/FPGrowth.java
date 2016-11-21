@@ -183,7 +183,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
     LOG.statistics(etime.end());
     LOG.statistics(new LongStatistic(STAT + "frequent-itemsets", solution.size()));
 
-    return new FrequentItemsetsResult("FP-Growth", "fp-growth", solution, meta);
+    return new FrequentItemsetsResult("FP-Growth", "fp-growth", solution, meta, relation.size());
   }
 
   /**

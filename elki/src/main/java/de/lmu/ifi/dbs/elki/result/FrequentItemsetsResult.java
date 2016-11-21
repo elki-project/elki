@@ -1,26 +1,26 @@
 package de.lmu.ifi.dbs.elki.result;
 
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2016
+ * Ludwig-Maximilians-Universität München
+ * Lehr- und Forschungseinheit für Datenbanksysteme
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 import java.util.List;
@@ -49,17 +49,24 @@ public class FrequentItemsetsResult extends BasicResult implements TextWriteable
   private VectorFieldTypeInformation<BitVector> meta;
 
   /**
+   * Total number of transactions.
+   */
+  private int total;
+
+  /**
    * Constructor.
    * 
    * @param name The long name (for pretty printing)
    * @param shortname the short name (for filenames etc.)
    * @param itemsets Frequent itemsets
    * @param meta Metadata
+   * @param total Total number of transactions
    */
-  public FrequentItemsetsResult(String name, String shortname, List<Itemset> itemsets, VectorFieldTypeInformation<BitVector> meta) {
+  public FrequentItemsetsResult(String name, String shortname, List<Itemset> itemsets, VectorFieldTypeInformation<BitVector> meta, int total) {
     super(name, shortname);
     this.itemsets = itemsets;
     this.meta = meta;
+    this.total = total;
   }
 
   /**
@@ -73,9 +80,29 @@ public class FrequentItemsetsResult extends BasicResult implements TextWriteable
 
   @Override
   public void writeToText(TextWriterStream out, String label) {
+    StringBuilder buf = new StringBuilder();
     for(Itemset itemset : itemsets) {
-      out.inlinePrintNoQuotes(itemset.appendTo(new StringBuilder(), meta));
+      buf.setLength(0); // Reuse
+      out.inlinePrintNoQuotes(itemset.appendTo(buf, meta));
       out.flush();
     }
+  }
+
+  /**
+   * Get the metadata used for serialization.
+   * 
+   * @return Metadata
+   */
+  public VectorFieldTypeInformation<BitVector> getMeta() {
+    return meta;
+  }
+
+  /**
+   * Get the total number of transactions.
+   * 
+   * @return Total transactions
+   */
+  public int getTotal() {
+    return total;
   }
 }
