@@ -1,32 +1,31 @@
 package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
 
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2016
+ * Ludwig-Maximilians-Universität München
+ * Lehr- und Forschungseinheit für Datenbanksysteme
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
  * APRIORI itemset.
@@ -65,52 +64,53 @@ public class OneItemset extends Itemset {
     return 1;
   }
 
+  @SuppressWarnings("deprecation")
   @Override
-  public boolean containedIn(BitVector bv) {
-    // TODO: add a booleanValue method to BitVector?
-    return bv.longValue(item) != 0L;
+  public boolean containedIn(SparseNumberVector bv) {
+    // Ignore deprecated, as we want binary search here.
+    return bv.doubleValue(item) != 0.;
   }
 
   @Override
-  public long[] getItems() {
-    long[] bits = BitsUtil.zero(item);
-    BitsUtil.setI(bits, item);
-    return bits;
+  public
+  int iter() {
+    return 0;
   }
 
   @Override
-  public int hashCode() {
+  public
+  boolean iterValid(int iter) {
+    return iter == 0;
+  }
+
+  @Override
+  public
+  int iterAdvance(int iter) {
+    return 1;
+  }
+
+  @Override
+  public
+  int iterDim(int iter) {
+    assert (iter == 0);
     return item;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
+    if(obj instanceof OneItemset) {
+      return item == ((OneItemset) obj).item;
     }
-    if(obj == null) {
-      return false;
-    }
-    if(!(obj instanceof Itemset) || ((Itemset) obj).length() != 1) {
-      return false;
-    }
-    if(getClass() != obj.getClass()) {
-      return false;
-    }
-    OneItemset other = (OneItemset) obj;
-    return item == other.item;
+    return super.equals(obj);
   }
 
   @Override
   public int compareTo(Itemset o) {
-    int cmp = Integer.compare(1, o.length());
-    if(cmp != 0) {
-      return cmp;
-    }
     if(o instanceof OneItemset) {
-      return Integer.compare(item, ((OneItemset) o).item);
+      int oitem = ((OneItemset) o).item;
+      return item < oitem ? -1 : item > oitem ? +1 : 0;
     }
-    throw new AbortException("Itemset of length 1 not using OneItemset!");
+    return super.compareTo(o);
   }
 
   @Override

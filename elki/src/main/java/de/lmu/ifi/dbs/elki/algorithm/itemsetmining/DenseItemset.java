@@ -1,33 +1,34 @@
 package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
 
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2016
+ * Ludwig-Maximilians-Universität München
+ * Lehr- und Forschungseinheit für Datenbanksysteme
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import de.lmu.ifi.dbs.elki.data.BitVector;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
- * APRIORI itemset.
+ * APRIORI itemset, dense representation.
  * 
  * @author Erich Schubert
  * @since 0.7.0
@@ -60,51 +61,64 @@ public class DenseItemset extends Itemset {
   }
 
   @Override
-  public boolean containedIn(BitVector bv) {
-    return bv.contains(items);
+  public boolean containedIn(SparseNumberVector bv) {
+    if(bv instanceof BitVector) {
+      return ((BitVector) bv).contains(items);
+    }
+    return super.containedIn(bv);
   }
 
   @Override
-  public long[] getItems() {
-    return items;
+  public
+  int iter() {
+    return BitsUtil.nextSetBit(items, 0);
   }
 
   @Override
-  public int hashCode() {
-    return BitsUtil.hashCode(items);
+  public
+  boolean iterValid(int iter) {
+    return iter >= 0;
+  }
+
+  @Override
+  public
+  int iterAdvance(int iter) {
+    return BitsUtil.nextSetBit(items, iter + 1);
+  }
+
+  @Override
+  public
+  int iterDim(int iter) {
+    return iter;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
+    if(obj instanceof DenseItemset) {
+      return BitsUtil.equal(items, ((DenseItemset) obj).items);
     }
-    if(obj == null) {
-      return false;
-    }
-    if(!(obj instanceof Itemset) || ((Itemset) obj).length() != 1) {
-      return false;
-    }
-    // TODO: allow comparison to DenseItemset?
-    if(getClass() != obj.getClass()) {
-      return false;
-    }
-    return BitsUtil.equal(items, ((DenseItemset) obj).items);
+    return super.equals(obj);
   }
 
   @Override
   public int compareTo(Itemset o) {
-    int cmp = Integer.compare(length, o.length());
-    if(cmp != 0) {
-      return cmp;
+    final int l1 = length(), l2 = o.length();
+    if(l1 < l2) {
+      return -1;
     }
-    DenseItemset other = (DenseItemset) o;
-    for(int i = 0; i < items.length; i++) {
-      if(items[i] != other.items[i]) {
-        return -Long.compare(Long.reverse(items[i]), Long.reverse(other.items[i]));
+    if(l1 > l2) {
+      return +1;
+    }
+    if(o instanceof DenseItemset) {
+      DenseItemset other = (DenseItemset) o;
+      for(int i = 0; i < items.length; i++) {
+        if(items[i] != other.items[i]) {
+          return -Long.compare(Long.reverse(items[i]), Long.reverse(other.items[i]));
+        }
       }
+      return 0;
     }
-    return 0;
+    return super.compareLexicographical(this, o);
   }
 
   @Override

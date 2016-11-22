@@ -1,33 +1,28 @@
 package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
 
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2016
+ * Ludwig-Maximilians-Universität München
+ * Lehr- und Forschungseinheit für Datenbanksysteme
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import java.util.Arrays;
-
-import de.lmu.ifi.dbs.elki.data.BitVector;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -81,79 +76,53 @@ public class SparseItemset extends Itemset {
   }
 
   @Override
-  public boolean containedIn(BitVector bv) {
-    for(int item : indices) {
-      if(!bv.booleanValue(item)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  @Override
-  public long[] getItems() {
-    long[] bits = BitsUtil.zero(indices[indices.length - 1]);
-    for(int item : indices) {
-      BitsUtil.setI(bits, item);
-    }
-    return bits;
-  }
-
-  @Override
-  public int hashCode() {
-    return Arrays.hashCode(indices);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj == null) {
-      return false;
-    }
-    if(!(obj instanceof Itemset) || ((Itemset) obj).length() != 1) {
-      return false;
-    }
-    // TODO: allow comparing to DenseItemset etc?
-    if(getClass() != obj.getClass()) {
-      return false;
-    }
-    return Arrays.equals(indices, ((SparseItemset) obj).indices);
-  }
-
-  @Override
-  public int compareTo(Itemset o) {
-    int cmp = Integer.compare(indices.length, o.length());
-    if(cmp != 0) {
-      return cmp;
-    }
-    SparseItemset other = (SparseItemset) o;
-    for(int i = 0; i < indices.length; i++) {
-      int c = Integer.compare(indices[i], other.indices[i]);
-      if(c != 0) {
-        return c;
-      }
-    }
+  public
+  int iter() {
     return 0;
   }
 
   @Override
-  public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
-    for(int j = 0; j < indices.length; j++) {
-      if(j > 0) {
-        buf.append(", ");
-      }
-      String lbl = (meta != null) ? meta.getLabel(indices[j]) : null;
-      if(lbl == null) {
-        buf.append(indices[j]);
-      }
-      else {
-        buf.append(lbl);
-      }
+  public
+  boolean iterValid(int iter) {
+    return iter < indices.length;
+  }
+
+  @Override
+  public
+  int iterAdvance(int iter) {
+    return ++iter;
+  }
+
+  @Override
+  public
+  int iterDim(int iter) {
+    return indices[iter];
+  }
+
+  @Override
+  public int compareTo(Itemset o) {
+    // Compare by length, then lexicographical.
+    final int l1 = length(), l2 = o.length();
+    if(l1 < l2) {
+      return -1;
     }
-    buf.append(": ").append(support);
-    return buf;
+    if(l1 > l2) {
+      return +1;
+    }
+    if(o instanceof SparseItemset) {
+      SparseItemset other = (SparseItemset) o;
+      for(int i = 0; i < indices.length; i++) {
+        int v1 = indices[i], v2 = other.indices[i];
+        if(v1 < v2) {
+          return -1;
+        }
+        if(v1 > v2) {
+          return +1;
+        }
+      }
+      return 0;
+    }
+    return super.compareLexicographical(this, o);
   }
 
   /**

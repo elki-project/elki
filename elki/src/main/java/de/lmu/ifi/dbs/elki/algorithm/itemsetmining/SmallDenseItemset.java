@@ -1,34 +1,34 @@
 package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
 
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2016
+ * Ludwig-Maximilians-Universität München
+ * Lehr- und Forschungseinheit für Datenbanksysteme
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
- * APRIORI itemset.
+ * APRIORI itemset, dense representation for up to 64 items.
  * 
  * @author Erich Schubert
  * @since 0.7.0
@@ -61,66 +61,58 @@ public class SmallDenseItemset extends Itemset {
   }
 
   @Override
-  public boolean containedIn(BitVector bv) {
-    return bv.contains(new long[] { items });
+  public boolean containedIn(SparseNumberVector bv) {
+    if(bv instanceof BitVector) {
+      return ((BitVector) bv).contains(new long[] { items });
+    }
+    return super.containedIn(bv);
   }
 
   @Override
-  public long[] getItems() {
-    return new long[] { items };
+  public
+  int iter() {
+    return BitsUtil.nextSetBit(items, 0);
   }
 
   @Override
-  public int hashCode() {
-    return BitsUtil.hashCode(items);
+  public
+  boolean iterValid(int iter) {
+    return iter >= 0;
+  }
+
+  @Override
+  public
+  int iterAdvance(int iter) {
+    return BitsUtil.nextSetBit(items, iter + 1);
+  }
+
+  @Override
+  public
+  int iterDim(int iter) {
+    return iter;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
+    if(obj instanceof SmallDenseItemset) {
+      return items == ((SmallDenseItemset) obj).items;
     }
-    if(obj == null) {
-      return false;
-    }
-    if(!(obj instanceof Itemset) || ((Itemset) obj).length() != 1) {
-      return false;
-    }
-    // TODO: allow comparison to DenseItemset?
-    if(getClass() != obj.getClass()) {
-      return false;
-    }
-    return items == ((SmallDenseItemset) obj).items;
+    return super.equals(obj);
   }
 
   @Override
   public int compareTo(Itemset o) {
-    int cmp = Integer.compare(length, o.length());
-    if(cmp != 0) {
-      return cmp;
+    final int l1 = length(), l2 = o.length();
+    if(l1 < l2) {
+      return -1;
     }
-    SmallDenseItemset other = (SmallDenseItemset) o;
-    return -Long.compare(Long.reverse(items), Long.reverse(other.items));
-  }
-
-  @Override
-  public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
-    int i = BitsUtil.nextSetBit(items, 0);
-    while(true) {
-      String lbl = (meta != null) ? meta.getLabel(i) : null;
-      if(lbl == null) {
-        buf.append(i);
-      }
-      else {
-        buf.append(lbl);
-      }
-      i = BitsUtil.nextSetBit(items, i + 1);
-      if(i < 0) {
-        break;
-      }
-      buf.append(", ");
+    if(l1 > l2) {
+      return +1;
     }
-    buf.append(": ").append(support);
-    return buf;
+    if(o instanceof SmallDenseItemset) {
+      long oitems = ((SmallDenseItemset) o).items;
+      return -Long.compare(Long.reverse(items), Long.reverse(oitems));
+    }
+    return super.compareLexicographical(this, o);
   }
 }

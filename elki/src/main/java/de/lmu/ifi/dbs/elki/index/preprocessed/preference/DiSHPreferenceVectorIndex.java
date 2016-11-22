@@ -260,7 +260,7 @@ public class DiSHPreferenceVectorIndex<V extends NumberVector> extends AbstractP
     long[] preferenceVector = BitsUtil.zero(dimensionality);
     for(Itemset itemset : frequentItemsets) {
       if((maxCardinality < itemset.length()) || (maxCardinality == itemset.length() && maxSupport == itemset.getSupport())) {
-        preferenceVector = itemset.getItems();
+        preferenceVector = Itemset.toBitset(itemset, BitsUtil.zero(dimensionality));
         maxCardinality = itemset.length();
         maxSupport = itemset.getSupport();
       }
