@@ -1,33 +1,28 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2016
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2016
+ * Ludwig-Maximilians-Universität München
+ * Lehr- und Forschungseinheit für Datenbanksysteme
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -103,7 +98,7 @@ public abstract class AbstractSimpleAlgorithmTest {
   public static <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params, Class<?>[] filters) {
     // Allow loading test data from resources.
     try (InputStream is = open(filename)) {
-      if (params == null) {
+      if(params == null) {
         params = new ListParameterization();
       }
       // Instantiate filters manually. TODO: redesign
@@ -127,7 +122,7 @@ public abstract class AbstractSimpleAlgorithmTest {
 
       db.initialize();
       Relation<?> rel = db.getRelation(TypeUtil.ANY);
-      if (expectedSize > 0) {
+      if(expectedSize > 0) {
         assertEquals("Database size does not match.", expectedSize, rel.size());
       }
       return db;
@@ -148,6 +143,9 @@ public abstract class AbstractSimpleAlgorithmTest {
    */
   public static InputStream open(String filename) throws IOException {
     InputStream is = AbstractSimpleAlgorithmTest.class.getClassLoader().getResourceAsStream(filename);
+    if(is == null) {
+      throw new IOException("Resource not found: " + filename);
+    }
     return filename.endsWith(".gz") ? new GZIPInputStream(is) : is;
   }
 
