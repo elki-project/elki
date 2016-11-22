@@ -114,7 +114,7 @@ public class OneItemset extends Itemset {
   }
 
   @Override
-  public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
+  public StringBuilder appendItemsTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
     String lbl = (meta != null) ? meta.getLabel(item) : null;
     if(lbl == null) {
       buf.append(item);
@@ -122,6 +122,6 @@ public class OneItemset extends Itemset {
     else {
       buf.append(lbl);
     }
-    return buf.append(": ").append(support);
+    return buf;
   }
 }

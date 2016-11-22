@@ -25,6 +25,7 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 
 /**
@@ -114,5 +115,25 @@ public class SmallDenseItemset extends Itemset {
       return -Long.compare(Long.reverse(items), Long.reverse(oitems));
     }
     return super.compareLexicographical(this, o);
+  }
+
+  @Override
+  public StringBuilder appendItemsTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
+    int i = BitsUtil.nextSetBit(items, 0);
+    while(true) {
+      String lbl = (meta != null) ? meta.getLabel(i) : null;
+      if(lbl == null) {
+        buf.append(i);
+      }
+      else {
+        buf.append(lbl);
+      }
+      i = BitsUtil.nextSetBit(items, i + 1);
+      if(i < 0) {
+        break;
+      }
+      buf.append(", ");
+    }
+    return buf;
   }
 }

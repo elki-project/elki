@@ -216,13 +216,25 @@ public abstract class Itemset implements Comparable<Itemset> {
   }
 
   /**
-   * Append to a string buffer.
+   * Append items and support to a string buffer.
    * 
    * @param buf Buffer
    * @param meta Relation metadata (for labels)
    * @return String buffer for chaining.
    */
-  public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
+  public final StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
+    appendItemsTo(buf, meta);
+    return buf.append(": ").append(support);
+  }
+
+  /**
+   * Only append the items to a string buffer.
+   * 
+   * @param buf Buffer
+   * @param meta Relation metadata (for labels)
+   * @return String buffer for chaining.
+   */
+  public StringBuilder appendItemsTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
     int it = this.iter();
     if(this.iterValid(it)) {
       while(true) {
@@ -241,6 +253,6 @@ public abstract class Itemset implements Comparable<Itemset> {
         buf.append(", ");
       }
     }
-    return buf.append(": ").append(support);
+    return buf;
   }
 }

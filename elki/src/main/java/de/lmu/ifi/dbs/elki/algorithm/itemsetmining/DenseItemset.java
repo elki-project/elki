@@ -122,7 +122,7 @@ public class DenseItemset extends Itemset {
   }
 
   @Override
-  public StringBuilder appendTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
+  public StringBuilder appendItemsTo(StringBuilder buf, VectorFieldTypeInformation<BitVector> meta) {
     int i = BitsUtil.nextSetBit(items, 0);
     while(true) {
       String lbl = (meta != null) ? meta.getLabel(i) : null;
@@ -138,7 +138,6 @@ public class DenseItemset extends Itemset {
       }
       buf.append(", ");
     }
-    buf.append(": ").append(support);
     return buf;
   }
 }
