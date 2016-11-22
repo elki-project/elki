@@ -58,7 +58,7 @@ public class FrequentItemsetsResult extends BasicResult implements TextWriteable
    * 
    * @param name The long name (for pretty printing)
    * @param shortname the short name (for filenames etc.)
-   * @param itemsets Frequent itemsets
+   * @param itemsets Frequent itemsets (sorted, by size then lexicographically)
    * @param meta Metadata
    * @param total Total number of transactions
    */
