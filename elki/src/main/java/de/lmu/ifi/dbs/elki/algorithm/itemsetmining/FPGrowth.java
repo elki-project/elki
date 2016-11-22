@@ -1,26 +1,26 @@
 package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
 
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2015
+ * Ludwig-Maximilians-Universität München
+ * Lehr- und Forschungseinheit für Datenbanksysteme
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,9 +80,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @apiviz.composedOf FPTree
  */
 @Reference(authors = "J. Han, J. Pei, Y. Yin", //
-title = "Mining frequent patterns without candidate generation", //
-booktitle = "Proceedings of the 2000 ACM SIGMOD international conference on Management of data ", //
-url = "http://dx.doi.org/10.1145/342009.335372")
+    title = "Mining frequent patterns without candidate generation", //
+    booktitle = "Proceedings of the 2000 ACM SIGMOD international conference on Management of data ", //
+    url = "http://dx.doi.org/10.1145/342009.335372")
 public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
   /**
    * Class logger.
@@ -137,13 +137,9 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
     if(LOG.isStatistics()) {
       tree.logStatistics();
     }
-    // Reduce memory usage:
-    tree.reduceMemory();
-    LOG.statistics(ctime.end());
-
     if(LOG.isDebuggingFinest()) {
       StringBuilder buf = new StringBuilder();
-      buf.append("FP-tree:\n");
+      buf.append("FP-tree minsupp " + minsupp + ":\n");
       tree.appendTo(buf, new FPNode.Translator() {
         @Override
         public void appendTo(StringBuilder buf, int i) {
@@ -153,6 +149,9 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
       });
       LOG.debugFinest(buf.toString());
     }
+    // Reduce memory usage:
+    tree.reduceMemory();
+    LOG.statistics(ctime.end());
 
     LOG.verbose("Extracting frequent patterns.");
     Duration etime = LOG.newDuration(STAT + "fp-growth.extraction.time").begin();
@@ -345,7 +344,8 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      * @param col Itemset collector
      */
     public void extract(int minsupp, int minlength, int maxlength, boolean destruct, Collector col) {
-      int[] buf = new int[header.length], buf2 = new int[header.length], buf3 = new int[header.length];
+      int[] buf = new int[header.length], buf2 = new int[header.length],
+          buf3 = new int[header.length];
       int stop = (minlength > 1) ? minlength - 1 : 0;
       FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Extracting itemsets", header.length - stop, LOG) : null;
       for(int j = header.length - 1; j >= stop; --j) {
@@ -374,14 +374,13 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
       if(header[item] == null) {
         return;
       }
-      // No siblings: single path only.
-      if(header[item].sibling == null) {
-        if(header[item].count < minsupp) {
-          return;
+      // No siblings, no children: single path only.
+      if(header[item].sibling == null && header[item].numchildren == 0) {
+        if(header[item].count >= minsupp) {
+          extractLinear(header[item].count, minlength, maxlength, item, postfix, plen, buf2, col);
         }
-        extractLinear(header[item].count, minsupp, minlength, maxlength, item, postfix, plen, buf2, col);
         if(destruct) {
-          Arrays.fill(header, null);
+          header[item] = null;
         }
         return;
       }
@@ -446,7 +445,6 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      * Extract itemsets from a linear tree.
      *
      * @param supp Current support
-     * @param minsupp Minimum support
      * @param minlength Minimum length
      * @param maxlength Maximum length
      * @param item Current item
@@ -455,28 +453,29 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      * @param buf2 Scratch buffer
      * @param col Output collector
      */
-    private void extractLinear(int supp, int minsupp, int minlength, int maxlength, int item, int[] postfix, int plen, int[] buf2, Collector col) {
+    private void extractLinear(int supp, int minlength, int maxlength, int item, int[] postfix, int plen, int[] buf2, Collector col) {
       // For testing minimum length:
       final int mminlength = minlength - plen;
-      // Without current item:
-      if(item > 0 && item >= mminlength && plen < maxlength) {
-        extractLinear(supp, minsupp, minlength, maxlength, item - 1, postfix, plen, buf2, col);
-      }
-      // With current item:
-      if(header[item] == null || item + 1 < mminlength) {
+      // Unsatisfiable even with current item:
+      if(item + 1 < mminlength) {
         return;
       }
-      int csupp = header[item].count;
-      if(csupp < minsupp) {
-        return;
-      }
+      // Add current item:
       postfix[plen++] = item;
-      int support = csupp < supp ? csupp : supp;
       if(plen >= minlength && plen <= maxlength) {
-        col.collect(support, postfix, 0, plen);
+        col.collect(supp, postfix, 0, plen);
       }
-      if(item > 0 && plen < maxlength) {
-        extractLinear(support, minsupp, minlength, maxlength, item - 1, postfix, plen, buf2, col);
+      // Any more parents will exceed the maximum length:
+      if(plen == maxlength) {
+        return;
+      }
+      assert (header[item] != null);
+      // Look at parent nodes:
+      for(FPNode p = header[item].parent; p.key >= 0; p = p.parent) {
+        if(p.key < mminlength) {
+          break; // Too short.
+        }
+        extractLinear(supp, minlength, maxlength, p.key, postfix, plen, buf2, col);
       }
     }
 
@@ -618,7 +617,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
      * @param depth Current depth
      */
     private void appendTo(StringBuilder buf, Translator t, int depth) {
-      if(key > 0) {
+      if(key >= 0) {
         t.appendTo(buf, key);
         buf.append(": ");
       }
