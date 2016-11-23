@@ -121,4 +121,16 @@ public class EclatTest extends AbstractFrequentItemsetAlgorithmTest {
       assertEquals("Size not as expected.", 1, res.getItemsets().size());
     }
   }
+
+  @Test
+  public void testLarge() {
+    Database db = loadTransactions(UNITTEST + "itemsets/zutaten.txt.gz", 16401);
+    {
+      ListParameterization params = new ListParameterization();
+      params.addParameter(Eclat.Parameterizer.MINSUPP_ID, 200);
+      Eclat ap = ClassGenericsUtil.parameterizeOrAbort(Eclat.class, params);
+      FrequentItemsetsResult res = ap.run(db);
+      assertEquals("Size not as expected.", 184, res.getItemsets().size());
+    }
+  }
 }

@@ -121,4 +121,16 @@ public class FPGrowthTest extends AbstractFrequentItemsetAlgorithmTest {
       assertEquals("Size not as expected.", 1, res.getItemsets().size());
     }
   }
+
+  @Test
+  public void testLarge() {
+    Database db = loadTransactions(UNITTEST + "itemsets/zutaten.txt.gz", 16401);
+    {
+      ListParameterization params = new ListParameterization();
+      params.addParameter(FPGrowth.Parameterizer.MINSUPP_ID, 200);
+      FPGrowth ap = ClassGenericsUtil.parameterizeOrAbort(FPGrowth.class, params);
+      FrequentItemsetsResult res = ap.run(db);
+      assertEquals("Size not as expected.", 184, res.getItemsets().size());
+    }
+  }
 }

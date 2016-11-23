@@ -121,4 +121,16 @@ public class APRIORITest extends AbstractFrequentItemsetAlgorithmTest {
       assertEquals("Size not as expected.", 1, res.getItemsets().size());
     }
   }
+
+  @Test
+  public void testLarge() {
+    Database db = loadTransactions(UNITTEST + "itemsets/zutaten.txt.gz", 16401);
+    {
+      ListParameterization params = new ListParameterization();
+      params.addParameter(APRIORI.Parameterizer.MINSUPP_ID, 200);
+      APRIORI ap = ClassGenericsUtil.parameterizeOrAbort(APRIORI.class, params);
+      FrequentItemsetsResult res = ap.run(db);
+      assertEquals("Size not as expected.", 184, res.getItemsets().size());
+    }
+  }
 }
