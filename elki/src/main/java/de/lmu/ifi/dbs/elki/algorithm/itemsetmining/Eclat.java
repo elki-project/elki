@@ -154,6 +154,7 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
 
   private void extractItemsets(DBIDs iset, DBIDs[] idx, int[] buf, int depth, int start, int minsupp, List<Itemset> solution) {
     // TODO: reuse arrays.
+    final int depth1 = depth + 1;
     for(int i = start; i < idx.length; i++) {
       if(idx[i] == null) {
         continue;
@@ -163,12 +164,12 @@ public class Eclat extends AbstractFrequentItemsetAlgorithm {
         continue;
       }
       buf[depth] = i;
-      int[] items = Arrays.copyOf(buf, depth + 1);
-      if(depth >= minlength) {
+      int[] items = Arrays.copyOf(buf, depth1);
+      if(depth1 >= minlength) {
         solution.add(new SparseItemset(items, ids.size()));
       }
-      if(depth < maxlength) {
-        extractItemsets(ids, idx, buf, depth + 1, i + 1, minsupp, solution);
+      if(depth1 <= maxlength) {
+        extractItemsets(ids, idx, buf, depth1, i + 1, minsupp, solution);
       }
     }
   }
