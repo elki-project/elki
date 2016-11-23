@@ -1,25 +1,25 @@
 package de.lmu.ifi.dbs.elki.algorithm.projection;
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2016
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2016
+ * Ludwig-Maximilians-Universität München
+ * Lehr- und Forschungseinheit für Datenbanksysteme
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
@@ -36,8 +36,10 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -76,9 +78,27 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    */
   private int numberOfNeighbours;
 
+  /**
+   * Constructor.
+   *
+   * @param distanceFunction Distance function
+   * @param perplexity Desired perplexity (will use 3*perplexity neighbors)
+   */
   public NearestNeighborAffinityMatrixBuilder(DistanceFunction<? super O> distanceFunction, double perplexity) {
     super(distanceFunction, perplexity);
     this.numberOfNeighbours = (int) FastMath.ceil(3 * perplexity);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param distanceFunction Distance function
+   * @param perplexity Desired perplexity
+   * @param neighbors Number of neighbors to use
+   */
+  public NearestNeighborAffinityMatrixBuilder(DistanceFunction<? super O> distanceFunction, double perplexity, int neighbors) {
+    super(distanceFunction, perplexity);
+    this.numberOfNeighbours = neighbors;
   }
 
   @Override
@@ -122,13 +142,17 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
     IntegerArray inds = new IntegerArray(numberOfNeighbours + 10);
     // Compute nearest-neighbor sparse affinity matrix
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Finding neighbors and optimizing perplexity", ids.size(), LOG) : null;
+    MeanVariance mv = LOG.isStatistics() ? new MeanVariance() : null;
     for(DBIDArrayIter ix = ids.iter(); ix.valid(); ix.advance()) {
       dists.clear();
       inds.clear();
       KNNList neighbours = knnq.getKNNForDBID(ix, numberOfNeighbours + 1);
       convertNeighbors(ids, ix, square, neighbours, dists, inds);
-      computeSigma(ix.getOffset(), dists, perplexity, logPerp, //
+      double beta = computeSigma(ix.getOffset(), dists, perplexity, logPerp, //
           pij[ix.getOffset()] = new double[dists.size()]);
+      if(mv != null) {
+        mv.put(beta > 0 ? FastMath.sqrt(.5 / beta) : 0.); // Sigma
+      }
       indices[ix.getOffset()] = inds.toArray();
       LOG.incrementProcessed(prog);
     }
@@ -163,8 +187,10 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
         }
       }
     }
-    if(timer != null) {
+    if(LOG.isStatistics()) { // timer != null, mv != null
       LOG.statistics(timer.end());
+      LOG.statistics(new DoubleStatistic(NearestNeighborAffinityMatrixBuilder.class.getName() + ".sigma.average", mv.getMean()));
+      LOG.statistics(new DoubleStatistic(NearestNeighborAffinityMatrixBuilder.class.getName() + ".sigma.stddev", mv.getSampleStddev()));
     }
   }
 
@@ -202,8 +228,9 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    * @param perplexity Desired perplexity
    * @param logPerp Log of desired perplexity
    * @param pij_i Output row
+   * @return beta
    */
-  protected static void computeSigma(int i, DoubleArray pij_row, double perplexity, double log_perp, double[] pij_i) {
+  protected static double computeSigma(int i, DoubleArray pij_row, double perplexity, double log_perp, double[] pij_i) {
     double max = pij_row.get((int) FastMath.ceil(perplexity)) / Math.E;
     double beta = 1 / max; // beta = 1. / (2*sigma*sigma)
     double diff = computeH(pij_row, pij_i, -beta) - log_perp;
@@ -220,6 +247,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
       }
       diff = computeH(pij_row, pij_i, -beta) - log_perp;
     }
+    return beta;
   }
 
   /**
