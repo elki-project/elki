@@ -139,7 +139,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
     }
     if(LOG.isDebuggingFinest()) {
       StringBuilder buf = new StringBuilder();
-      buf.append("FP-tree minsupp " + minsupp + ":\n");
+      buf.append("FP-tree:\n");
       tree.appendTo(buf, new FPNode.Translator() {
         @Override
         public void appendTo(StringBuilder buf, int i) {
@@ -380,6 +380,7 @@ public class FPGrowth extends AbstractFrequentItemsetAlgorithm {
           extractLinear(header[item].count, minlength, maxlength, item, postfix, plen, buf2, col);
         }
         if(destruct) {
+          header[item].parent.numchildren--;
           header[item] = null;
         }
         return;
