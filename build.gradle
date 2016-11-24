@@ -80,6 +80,13 @@ allprojects  {
     outputFile = "$projectDir/.settings/org.eclipse.buildship.core.prefs" as File
   }
   tasks.eclipse.dependsOn eclipseBuildshipPreferences
+  // Enable logging, but with output disabled, for code coverage
+  if(project.hasProperty('jacoco')) {
+    task testWithLogging(type: Test) {
+      systemProperty "java.util.logging.config.file", "$rootDir/elki-logging/src/test/resources/de/lmu/ifi/dbs/elki/logging/logging.properties"
+    }
+    test.dependsOn testWithLogging
+  }
 }
 
 subprojects {
