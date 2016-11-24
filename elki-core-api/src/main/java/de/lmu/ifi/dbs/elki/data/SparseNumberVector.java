@@ -72,7 +72,9 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
    *         dimension!</b>
    */
   @Override
-  int iter();
+  default int iter() {
+    return 0;
+  }
   
   /**
    * Update the vector space dimensionality.
