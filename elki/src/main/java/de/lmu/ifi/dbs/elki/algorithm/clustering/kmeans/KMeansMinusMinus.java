@@ -151,10 +151,11 @@ public class KMeansMinusMinus<V extends NumberVector> extends AbstractKMeans<V, 
     double[] varsum = new double[k];
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    DoubleStatistic varstat = LOG.isStatistics() ? new DoubleStatistic(this.getClass().getName() + ".variance-sum") : null;
+    DoubleStatistic varstat = new DoubleStatistic(this.getClass().getName() + ".variance-sum");
+    assert(varstat != null); // Otherwise, the vartotal break below will fail!
 
     int iteration = 0;
-    double prevvartotal = 0.;
+    double prevvartotal = Double.POSITIVE_INFINITY;
     for(; maxiter <= 0 || iteration < maxiter; iteration++) {
       minHeap.clear();
       for(int i = 0; i < k; i++) {
