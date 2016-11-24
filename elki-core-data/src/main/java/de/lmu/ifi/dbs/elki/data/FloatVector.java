@@ -101,6 +101,11 @@ public class FloatVector extends AbstractNumberVector {
   }
 
   @Override
+  public float floatValue(int dimension) {
+    return values[dimension];
+  }
+
+  @Override
   public long longValue(int dimension) {
     return (long) values[dimension];
   }

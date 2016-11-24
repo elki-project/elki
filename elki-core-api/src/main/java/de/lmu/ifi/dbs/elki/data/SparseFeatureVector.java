@@ -55,7 +55,9 @@ public interface SparseFeatureVector<D> extends FeatureVector<D> {
    * @return Identifier for the first non-zero dimension, <b>not necessarily the
    *         dimension!</b>
    */
-  int iter();
+  default int iter() {
+    return 0;
+  }
 
   /**
    * Get the dimension an iterator points to.
@@ -71,7 +73,9 @@ public interface SparseFeatureVector<D> extends FeatureVector<D> {
    * @param iter Previous iterator position
    * @return Next iterator position
    */
-  int iterAdvance(int iter);
+  default int iterAdvance(int iter) {
+    return iter + 1;
+  }
 
   /**
    * Retract the iterator to the next position.
@@ -79,7 +83,9 @@ public interface SparseFeatureVector<D> extends FeatureVector<D> {
    * @param iter Next iterator position
    * @return Previous iterator position
    */
-  int iterRetract(int iter);
+  default int iterRetract(int iter) {
+    return iter - 1;
+  }
 
   /**
    * Test the iterator position for validity.

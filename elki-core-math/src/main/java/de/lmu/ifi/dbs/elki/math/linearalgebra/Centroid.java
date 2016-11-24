@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -137,48 +137,13 @@ public class Centroid implements NumberVector {
   }
 
   @Override
-  public float floatValue(int dimension) {
-    return (float) elements[dimension];
-  }
-
-  @Override
-  public byte byteValue(int dimension) {
-    return (byte) elements[dimension];
-  }
-
-  @Override
-  public int intValue(int dimension) {
-    return (int) elements[dimension];
-  }
-
-  @Override
   public long longValue(int dimension) {
     return (long) elements[dimension];
   }
 
   @Override
-  public short shortValue(int dimension) {
-    return (short) elements[dimension];
-  }
-
-  @Override
   public int getDimensionality() {
     return elements.length;
-  }
-
-  @Override
-  public double getMin(int dimension) {
-    return elements[dimension];
-  }
-
-  @Override
-  public double getMax(int dimension) {
-    return elements[dimension];
-  }
-
-  @Override
-  public Double getValue(int dimension) {
-    return elements[dimension];
   }
 
   @Override

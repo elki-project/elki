@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -29,25 +29,31 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike;
  * @author Erich Schubert
  * @since 0.4.0
  * 
- * @param <T> Item type
- * @param <A> Array object type
+ * @param <T>
+ *            Item type
+ * @param <A>
+ *            Array object type
  */
 public interface ArrayAdapter<T, A> {
-  /**
-   * Get the size of the array.
-   * 
-   * @param array Array-like thing
-   * @return Size
-   */
-  public int size(A array);
+	/**
+	 * Get the size of the array.
+	 * 
+	 * @param array
+	 *            Array-like thing
+	 * @return Size
+	 */
+	int size(A array);
 
-  /**
-   * Get the off'th item from the array.
-   * 
-   * @param array Array to get from
-   * @param off Offset
-   * @return Item at offset off
-   * @throws IndexOutOfBoundsException for an invalid index.
-   */
-  public T get(A array, int off) throws IndexOutOfBoundsException;
+	/**
+	 * Get the off'th item from the array.
+	 * 
+	 * @param array
+	 *            Array to get from
+	 * @param off
+	 *            Offset
+	 * @return Item at offset off
+	 * @throws IndexOutOfBoundsException
+	 *             for an invalid index.
+	 */
+	T get(A array, int off) throws IndexOutOfBoundsException;
 }

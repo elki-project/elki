@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -88,25 +88,6 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
     return values.length;
   }
 
-  @Override
-  public double getMin(int dimension) {
-    return values[dimension];
-  }
-
-  @Override
-  public double getMax(int dimension) {
-    return values[dimension];
-  }
-
-  /**
-   * Returns the values of the underlying data object of this entry.
-   * 
-   * @return the values of the underlying data object of this entry
-   */
-  public double[] getValues() {
-    return values;
-  }
-
   /**
    * Calls the super method and writes the values of this entry to the specified
    * stream.
@@ -142,39 +123,13 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
   }
 
   @Override
-  @Deprecated
-  public Double getValue(int dimension) {
-    return values[dimension];
-  }
-
-  @Override
   public double doubleValue(int dimension) {
     return values[dimension];
   }
 
   @Override
-  public float floatValue(int dimension) {
-    return (float) values[dimension];
-  }
-
-  @Override
-  public int intValue(int dimension) {
-    return (int) values[dimension];
-  }
-
-  @Override
   public long longValue(int dimension) {
     return (long) values[dimension];
-  }
-
-  @Override
-  public short shortValue(int dimension) {
-    return (short) values[dimension];
-  }
-
-  @Override
-  public byte byteValue(int dimension) {
-    return (byte) values[dimension];
   }
 
   @Override

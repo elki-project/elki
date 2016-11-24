@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.data;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -33,42 +33,6 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberVectorAdapte
  * @since 0.2
  */
 public abstract class AbstractNumberVector implements NumberVector {
-  /**
-   * The String to separate attribute values in a String that represents the
-   * values.
-   */
-  public static final String ATTRIBUTE_SEPARATOR = " ";
-
-  @Override
-  public double getMin(int dimension) {
-    return doubleValue(dimension);
-  }
-
-  @Override
-  public double getMax(int dimension) {
-    return doubleValue(dimension);
-  }
-
-  @Override
-  public byte byteValue(int dimension) {
-    return (byte) longValue(dimension);
-  }
-
-  @Override
-  public float floatValue(int dimension) {
-    return (float) doubleValue(dimension);
-  }
-
-  @Override
-  public int intValue(int dimension) {
-    return (int) longValue(dimension);
-  }
-
-  @Override
-  public short shortValue(int dimension) {
-    return (short) longValue(dimension);
-  }
-
   /**
    * Factory class.
    * 

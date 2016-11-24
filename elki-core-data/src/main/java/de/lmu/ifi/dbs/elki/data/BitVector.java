@@ -143,28 +143,8 @@ public class BitVector extends AbstractNumberVector implements SparseNumberVecto
   }
 
   @Override
-  public float iterFloatValue(int iter) {
-    return 1.f; // When properly used: always true!
-  }
-
-  @Override
-  public int iterIntValue(int iter) {
-    return 1; // When properly used: always true!
-  }
-
-  @Override
-  public short iterShortValue(int iter) {
-    return 1; // When properly used: always true!
-  }
-
-  @Override
   public long iterLongValue(int iter) {
     return 1L; // When properly used: always true!
-  }
-
-  @Override
-  public byte iterByteValue(int iter) {
-    return 1; // When properly used: always true!
   }
 
   /**

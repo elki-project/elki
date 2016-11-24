@@ -125,17 +125,6 @@ public class IntegerVector extends AbstractNumberVector {
     return values[dimension];
   }
 
-  /**
-   * Get a copy of the raw int[] array.
-   * 
-   * @return copy of values array.
-   */
-  public int[] getValues() {
-    int[] copy = new int[values.length];
-    System.arraycopy(values, 0, copy, 0, values.length);
-    return copy;
-  }
-
   @Override
   public double[] toArray() {
     double[] data = new double[values.length];

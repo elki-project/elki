@@ -117,11 +117,6 @@ public class ShortVector extends AbstractNumberVector {
   }
 
   @Override
-  public int intValue(int dimension) {
-    return values[dimension];
-  }
-
-  @Override
   public short shortValue(int dimension) {
     return values[dimension];
   }

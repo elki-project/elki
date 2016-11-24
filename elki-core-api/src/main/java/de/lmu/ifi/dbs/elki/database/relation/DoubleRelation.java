@@ -38,14 +38,16 @@ public interface DoubleRelation extends ModifiableRelation<Double> {
    * @param id Object ID
    * @return object instance
    */
-  public double doubleValue(DBIDRef id);
+  double doubleValue(DBIDRef id);
 
   /**
    * @deprecated use {@link #doubleValue} instead.
    */
   @Deprecated
   @Override
-  public Double get(DBIDRef id);
+  default Double get(DBIDRef id) {
+    return doubleValue(id);
+  }
 
   /**
    * Set an object representation.
@@ -54,14 +56,14 @@ public interface DoubleRelation extends ModifiableRelation<Double> {
    * @param val Value
    */
   // TODO: remove / move to a writable API?
-  public void set(DBIDRef id, double val);
+  void set(DBIDRef id, double val);
 
   /**
    * @deprecated use {@link #set(DBIDRef, double)} instead.
    */
   @Deprecated
   @Override
-  public void insert(DBIDRef id, Double val);
+  void insert(DBIDRef id, Double val);
 
   /**
    * Execute a function for each ID.

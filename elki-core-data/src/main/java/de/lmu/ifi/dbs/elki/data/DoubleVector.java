@@ -91,12 +91,6 @@ public class DoubleVector extends AbstractNumberVector {
   }
 
   @Override
-  @Deprecated
-  public Double getValue(int dimension) {
-    return values[dimension];
-  }
-
-  @Override
   public double doubleValue(int dimension) {
     return values[dimension];
   }

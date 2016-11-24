@@ -226,14 +226,20 @@ public class SparseFloatVector extends AbstractNumberVector implements SparseNum
 
   @Override
   @Deprecated
-  public long longValue(int dimension) {
+  public float floatValue(int dimension) {
     int pos = Arrays.binarySearch(this.indexes, dimension);
     if(pos >= 0) {
-      return (long) values[pos];
+      return values[pos];
     }
     else {
-      return 0;
+      return 0.0f;
     }
+  }
+
+  @Override
+  @Deprecated
+  public long longValue(int dimension) {
+    return (long) floatValue(dimension);
   }
 
   @Override
@@ -276,23 +282,8 @@ public class SparseFloatVector extends AbstractNumberVector implements SparseNum
   }
 
   @Override
-  public int iter() {
-    return 0;
-  }
-
-  @Override
   public int iterDim(int iter) {
     return indexes[iter];
-  }
-
-  @Override
-  public int iterAdvance(int iter) {
-    return iter + 1;
-  }
-
-  @Override
-  public int iterRetract(int iter) {
-    return iter - 1;
   }
 
   @Override
@@ -311,23 +302,8 @@ public class SparseFloatVector extends AbstractNumberVector implements SparseNum
   }
 
   @Override
-  public int iterIntValue(int iter) {
-    return (int) values[iter];
-  }
-
-  @Override
-  public short iterShortValue(int iter) {
-    return (short) values[iter];
-  }
-
-  @Override
   public long iterLongValue(int iter) {
     return (long) values[iter];
-  }
-
-  @Override
-  public byte iterByteValue(int iter) {
-    return (byte) values[iter];
   }
 
   /**

@@ -121,12 +121,6 @@ public class MaterializedDoubleRelation extends AbstractRelation<Double>implemen
     this.content = content;
   }
 
-  @Deprecated
-  @Override
-  public Double get(DBIDRef id) {
-    return content.doubleValue(id);
-  }
-
   @Override
   public double doubleValue(DBIDRef id) {
     return content.doubleValue(id);

@@ -274,23 +274,8 @@ public class SparseDoubleVector extends AbstractNumberVector implements SparseNu
   }
 
   @Override
-  public int iter() {
-    return 0;
-  }
-
-  @Override
   public int iterDim(int iter) {
     return indexes[iter];
-  }
-
-  @Override
-  public int iterAdvance(int iter) {
-    return iter + 1;
-  }
-
-  @Override
-  public int iterRetract(int iter) {
-    return iter - 1;
   }
 
   @Override
@@ -304,28 +289,8 @@ public class SparseDoubleVector extends AbstractNumberVector implements SparseNu
   }
 
   @Override
-  public float iterFloatValue(int iter) {
-    return (float) values[iter];
-  }
-
-  @Override
-  public int iterIntValue(int iter) {
-    return (int) values[iter];
-  }
-
-  @Override
-  public short iterShortValue(int iter) {
-    return (short) values[iter];
-  }
-
-  @Override
   public long iterLongValue(int iter) {
     return (long) values[iter];
-  }
-
-  @Override
-  public byte iterByteValue(int iter) {
-    return (byte) values[iter];
   }
 
   /**

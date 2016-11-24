@@ -1,4 +1,5 @@
 package de.lmu.ifi.dbs.elki.database.relation;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -161,7 +162,10 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * @param hints Optimizer hints (optional)
    * @return KNN Query object
    */
-  KNNQuery<O> getKNNQuery(DistanceFunction<? super O> distanceFunction, Object... hints);
+  default KNNQuery<O> getKNNQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
+    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
+    return getKNNQuery(distanceQuery, hints);
+  }
 
   /**
    * Get a range query object for the given distance query. (Range queries in
@@ -199,7 +203,10 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * @param hints Optimizer hints (optional)
    * @return KNN Query object
    */
-  RangeQuery<O> getRangeQuery(DistanceFunction<? super O> distanceFunction, Object... hints);
+  default RangeQuery<O> getRangeQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
+    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
+    return getRangeQuery(distanceQuery, hints);
+  }
 
   /**
    * Get a range query object for the given similarity query. (Range queries in
@@ -237,7 +244,10 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * @param hints Optimizer hints (optional)
    * @return KNN Query object
    */
-  RangeQuery<O> getSimilarityRangeQuery(SimilarityFunction<? super O> simFunction, Object... hints);
+  default RangeQuery<O> getSimilarityRangeQuery(SimilarityFunction<? super O> simFunction, Object... hints) {
+    SimilarityQuery<O> simQuery = getSimilarityQuery(simFunction, hints);
+    return getSimilarityRangeQuery(simQuery, hints);
+  }
 
   /**
    * Get a rKNN query object for the given distance query.
@@ -273,5 +283,8 @@ public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
    * @param hints Optimizer hints (optional)
    * @return KNN Query object
    */
-  RKNNQuery<O> getRKNNQuery(DistanceFunction<? super O> distanceFunction, Object... hints);
+  default RKNNQuery<O> getRKNNQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
+    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
+    return getRKNNQuery(distanceQuery, hints);
+  }
 }

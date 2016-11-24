@@ -50,13 +50,6 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector {
     return (long) val;
   }
 
-  @Deprecated
-  @Override
-  public Double getValue(int dimension) {
-    assert (dimension == 0) : "Incorrect dimension requested for 1-dimensional vector.";
-    return this.val;
-  }
-
   @Override
   public double[] toArray() {
     return new double[] { val };

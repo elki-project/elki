@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.relation;
 This file is part of ELKI:
 Environment for Developing KDD-Applications Supported by Index-Structures
 
-Copyright (C) 2015
+Copyright (C) 2016
 Ludwig-Maximilians-Universität München
 Lehr- und Forschungseinheit für Datenbanksysteme
 ELKI Development Team
@@ -166,12 +166,6 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
   }
 
   @Override
-  public KNNQuery<O> getKNNQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
-    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
-    return getKNNQuery(distanceQuery, hints);
-  }
-
-  @Override
   public RangeQuery<O> getRangeQuery(DistanceQuery<O> distanceQuery, Object... hints) {
     if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
@@ -213,12 +207,6 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
   }
 
   @Override
-  public RangeQuery<O> getRangeQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
-    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
-    return getRangeQuery(distanceQuery, hints);
-  }
-
-  @Override
   public RangeQuery<O> getSimilarityRangeQuery(SimilarityQuery<O> simQuery, Object... hints) {
     if(simQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
@@ -257,12 +245,6 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
       getLogger().debugFinest(buf.toString());
     }
     return QueryUtil.getLinearScanSimilarityRangeQuery(simQuery);
-  }
-
-  @Override
-  public RangeQuery<O> getSimilarityRangeQuery(SimilarityFunction<? super O> simFunction, Object... hints) {
-    SimilarityQuery<O> simQuery = getSimilarityQuery(simFunction, hints);
-    return getSimilarityRangeQuery(simQuery, hints);
   }
 
   @Override
@@ -309,12 +291,6 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
     }
     KNNQuery<O> knnQuery = getKNNQuery(distanceQuery, DatabaseQuery.HINT_BULK, maxk);
     return new LinearScanRKNNQuery<>(distanceQuery, knnQuery, maxk);
-  }
-
-  @Override
-  public RKNNQuery<O> getRKNNQuery(DistanceFunction<? super O> distanceFunction, Object... hints) {
-    DistanceQuery<O> distanceQuery = getDistanceQuery(distanceFunction, hints);
-    return getRKNNQuery(distanceQuery, hints);
   }
 
   /**

@@ -645,21 +645,6 @@ public class ALOCI<O extends NumberVector> extends AbstractAlgorithm<OutlierResu
     public double[] toArray() {
       return center.clone();
     }
-
-    @Override
-    public Double getValue(int dimension) {
-      return center[dimension];
-    }
-
-    @Override
-    public double getMin(int dimension) {
-      return center[dimension];
-    }
-
-    @Override
-    public double getMax(int dimension) {
-      return center[dimension];
-    }
   }
 
   /**

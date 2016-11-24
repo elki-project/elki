@@ -40,6 +40,12 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
  */
 public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
   /**
+   * The String to separate attribute values in a String that represents the
+   * values.
+   */
+  public static final String ATTRIBUTE_SEPARATOR = " ";
+
+  /**
    * Number vectors of <em>variable</em> length.
    */
   public static final VectorTypeInformation<NumberVector> VARIABLE_LENGTH = VectorTypeInformation.typeRequest(NumberVector.class);
@@ -61,8 +67,20 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
 
   @Deprecated
   @Override
-  Number getValue(int dimension);
-  
+  default Number getValue(int dimension) {
+    return doubleValue(dimension);
+  }
+
+  @Override
+  default double getMin(int dimension) {
+    return doubleValue(dimension);
+  }
+
+  @Override
+  default double getMax(int dimension) {
+    return doubleValue(dimension);
+  }
+
   /**
    * Returns the value in the specified dimension as double.
    * 
@@ -87,7 +105,9 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
-  float floatValue(int dimension);
+  default float floatValue(int dimension) {
+    return (float) doubleValue(dimension);
+  }
 
   /**
    * Returns the value in the specified dimension as int.
@@ -100,7 +120,9 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
-  int intValue(int dimension);
+  default int intValue(int dimension) {
+    return (int) longValue(dimension);
+  }
 
   /**
    * Returns the value in the specified dimension as long.
@@ -126,7 +148,9 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
-  short shortValue(int dimension);
+  default short shortValue(int dimension) {
+    return (short) longValue(dimension);
+  }
 
   /**
    * Returns the value in the specified dimension as byte.
@@ -139,7 +163,9 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
    *        <code>this.getDimensionality()</code>
    * @return the value in the specified dimension
    */
-  byte byteValue(int dimension);
+  default byte byteValue(int dimension) {
+    return (byte) longValue(dimension);
+  }
 
   /**
    * Returns a double array <i>copy</i> of this vector.

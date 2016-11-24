@@ -1,8 +1,5 @@
 package de.lmu.ifi.dbs.elki.data;
 
-import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
-
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -25,6 +22,9 @@ import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
  You should have received a copy of the GNU Affero General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
 
 import gnu.trove.map.TIntDoubleMap;
 
@@ -73,7 +73,7 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
    */
   @Override
   int iter();
-
+  
   /**
    * Update the vector space dimensionality.
    * 
@@ -95,7 +95,9 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
    * @param iter Iterator
    * @return Value at the current position
    */
-  float iterFloatValue(int iter);
+  default float iterFloatValue(int iter) {
+    return (float) iterDoubleValue(iter);
+  }
 
   /**
    * Get the value of the iterators' current dimension.
@@ -103,7 +105,9 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
    * @param iter Iterator
    * @return Value at the current position
    */
-  int iterIntValue(int iter);
+  default int iterIntValue(int iter) {
+    return (int) iterLongValue(iter);
+  }
 
   /**
    * Get the value of the iterators' current dimension.
@@ -111,7 +115,9 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
    * @param iter Iterator
    * @return Value at the current position
    */
-  short iterShortValue(int iter);
+  default short iterShortValue(int iter) {
+    return (short) iterLongValue(iter);
+  }
 
   /**
    * Get the value of the iterators' current dimension.
@@ -127,7 +133,9 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
    * @param iter Iterator
    * @return Value at the current position
    */
-  byte iterByteValue(int iter);
+  default byte iterByteValue(int iter) {
+    return (byte) iterLongValue(iter);
+  }
 
   /**
    * @deprecated As the vectors are sparse, try to iterate over the sparse
@@ -143,7 +151,9 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
    */
   @Override
   @Deprecated
-  float floatValue(int dimension);
+  default float floatValue(int dimension) {
+    return (float) doubleValue(dimension);
+  }
 
   /**
    * @deprecated As the vectors are sparse, try to iterate over the sparse
@@ -151,7 +161,9 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
    */
   @Override
   @Deprecated
-  int intValue(int dimension);
+  default int intValue(int dimension) {
+    return (int) longValue(dimension);
+  }
 
   /**
    * @deprecated As the vectors are sparse, try to iterate over the sparse
@@ -167,7 +179,9 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
    */
   @Override
   @Deprecated
-  short shortValue(int dimension);
+  default short shortValue(int dimension) {
+    return (short) longValue(dimension);
+  }
 
   /**
    * @deprecated As the vectors are sparse, try to iterate over the sparse
@@ -175,7 +189,9 @@ public interface SparseNumberVector extends NumberVector, SparseFeatureVector<Nu
    */
   @Override
   @Deprecated
-  byte byteValue(int dimension);
+  default byte byteValue(int dimension) {
+    return (byte) longValue(dimension);
+  }
 
   /**
    * Factory for sparse number vectors: make from a dim-value map.
