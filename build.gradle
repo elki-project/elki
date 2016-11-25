@@ -58,7 +58,8 @@ allprojects  {
       natures 'org.eclipse.buildship.core.gradleprojectnature'
     }
     classpath {
-      defaultOutputDir = "build/classes/main" as File
+      // Causes duplicate files, because Eclipse copies resoures to this folder
+      // defaultOutputDir = "build/classes/main" as File
       downloadSources = true
     }
     jdt.file {
@@ -95,7 +96,7 @@ subprojects {
   compileJava.options.encoding = 'UTF-8'
 
   // Some jar options
-  afterEvaluate { // Otherwise, project.description does not work.
+  afterEvaluate { // Otherwise, project.description does not work?
     jar {
       manifest {
         attributes(
@@ -106,6 +107,16 @@ subprojects {
           "Implementation-URL" : project.url,
         )
       }
+    }
+  }
+  processResources {
+    from("$rootDir/elki/src/main/resources/META-INF") {
+      include "NOTICE"
+      into "META-INF"
+    }
+    from("$rootDir/elki/src/main/resources/de/lmu/ifi/dbs/elki/LICENSE.txt") {
+      rename "\\.txt\$", ""
+      into "license"
     }
   }
   // Build source jars:
