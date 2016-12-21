@@ -221,6 +221,12 @@
 
 		<dependency>
 			<groupId>de.lmu.ifi.dbs.elki</groupId>
+			<artifactId>elki-index-mtree</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>de.lmu.ifi.dbs.elki</groupId>
 			<artifactId>elki-docutil</artifactId>
 			<version>${project.version}</version>
 			<scope>test</scope>

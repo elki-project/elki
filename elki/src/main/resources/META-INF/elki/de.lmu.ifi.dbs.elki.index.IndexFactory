@@ -4,11 +4,6 @@ de.lmu.ifi.dbs.elki.index.tree.metrical.covertree.CoverTree$Factory
 de.lmu.ifi.dbs.elki.index.tree.metrical.covertree.SimplifiedCoverTree$Factory
 de.lmu.ifi.dbs.elki.index.tree.spatial.kd.SmallMemoryKDTree$Factory smallkd kd
 de.lmu.ifi.dbs.elki.index.tree.spatial.kd.MinimalisticMemoryKDTree$Factory minikd
-de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeFactory mtree m
-de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp.MkAppTreeFactory
-# de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop.MkCopTreeFactory
-de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTreeFactory
-de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab.MkTabTreeFactory
 de.lmu.ifi.dbs.elki.index.idistance.InMemoryIDistanceIndex$Factory
 de.lmu.ifi.dbs.elki.index.invertedlist.InMemoryInvertedIndex$Factory
 de.lmu.ifi.dbs.elki.index.lsh.InMemoryLSHIndex

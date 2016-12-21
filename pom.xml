@@ -34,6 +34,7 @@
 		<module>elki-persistent</module>
 		<module>elki-index</module>
 		<module>elki-index-rtree</module>
+		<module>elki-index-mtree</module>
 		<module>elki-gui-minigui</module>
 		<module>elki</module>
 		<!-- this will eventually become non-default compile time only -->

@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
@@ -99,13 +98,11 @@ public class MTreeIndex<O> extends MTree<O>implements RangeIndex<O>, KNNIndex<O>
     int distanceSize = ByteArrayUtil.SIZE_DOUBLE; // exampleLeaf.getParentDistance().externalizableSize();
 
     // FIXME: simulate a proper feature size!
-    int featuresize = 0;
-    if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(relation.getDataTypeInformation())) {
-      @SuppressWarnings("unchecked")
-      Relation<? extends SpatialComparable> vrel = (Relation<? extends SpatialComparable>) relation;
-      featuresize = 8 * RelationUtil.dimensionality(vrel);
-    }
-    if(featuresize <= 0) {
+    @SuppressWarnings("unchecked")
+    Relation<? extends SpatialComparable> vrel = (Relation<? extends SpatialComparable>) relation;
+    final int dim = RelationUtil.dimensionality(vrel);
+    int featuresize = 8 * dim;
+    if(dim <= 0) {
       getLogger().warning("Relation does not have a dimensionality -- simulating M-tree as external index!");
       featuresize = 0;
     }
