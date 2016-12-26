@@ -4,7 +4,7 @@ package de.lmu.ifi.dbs.elki.database.datastore.memory;
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
 
- Copyright (C) 2015
+ Copyright (C) 2016
  Ludwig-Maximilians-Universität München
  Lehr- und Forschungseinheit für Datenbanksysteme
  ELKI Development Team
@@ -34,13 +34,16 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 /**
  * A class to answer representation queries using a map. Basically, it is just a
  * wrapper around a regular map.
+ * 
+ * Rather than using this directly, use a {@link WritableDataStore} from the
+ * DataStoreFactory.
  *
  * @author Erich Schubert
  * @since 0.4.0
  *
  * @param <T> Representation object type
  */
-public class MapStore<T> implements WritableDataStore<T> {
+class MapStore<T> implements WritableDataStore<T> {
   /**
    * Storage Map.
    */
