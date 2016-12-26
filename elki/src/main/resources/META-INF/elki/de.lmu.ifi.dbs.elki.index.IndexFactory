@@ -12,6 +12,7 @@ de.lmu.ifi.dbs.elki.index.vafile.PartialVAFile$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.CachedDoubleDistanceKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNGraph$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNJoinMaterializeKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.MetricalIndexApproximationMaterializeKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.PartitionApproximationMaterializeKNNPreprocessor$Factory
