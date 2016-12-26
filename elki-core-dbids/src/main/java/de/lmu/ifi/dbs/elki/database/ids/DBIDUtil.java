@@ -519,7 +519,7 @@ public final class DBIDUtil {
   /**
    * Produce a random shuffling of the given DBID array.
    *
-   * @param ids Original DBIDs
+   * @param ids Original DBIDs, no duplicates allowed
    * @param rnd Random generator
    */
   public static void randomShuffle(ArrayModifiableDBIDs ids, RandomFactory rnd) {
@@ -529,7 +529,7 @@ public final class DBIDUtil {
   /**
    * Produce a random shuffling of the given DBID array.
    *
-   * @param ids Original DBIDs
+   * @param ids Original DBIDs, no duplicates allowed
    * @param random Random generator
    */
   public static void randomShuffle(ArrayModifiableDBIDs ids, Random random) {
@@ -542,7 +542,7 @@ public final class DBIDUtil {
    * Only the first {@code limit} elements will be fully randomized, but the
    * remaining objects will also be changed.
    *
-   * @param ids Original DBIDs
+   * @param ids Original DBIDs, no duplicates allowed
    * @param random Random generator
    * @param limit Shuffling limit.
    */
@@ -556,7 +556,7 @@ public final class DBIDUtil {
   /**
    * Produce a random sample of the given DBIDs.
    *
-   * @param source Original DBIDs
+   * @param source Original DBIDs, no duplicates allowed
    * @param k k Parameter
    * @param seed Random generator seed
    * @return new DBIDs
@@ -568,7 +568,7 @@ public final class DBIDUtil {
   /**
    * Produce a random sample of the given DBIDs.
    *
-   * @param source Original DBIDs
+   * @param source Original DBIDs, no duplicates allowed
    * @param k k Parameter
    * @param seed Random generator seed
    * @return new DBIDs
@@ -585,7 +585,7 @@ public final class DBIDUtil {
   /**
    * Produce a random sample of the given DBIDs.
    *
-   * @param source Original DBIDs
+   * @param source Original DBIDs, no duplicates allowed
    * @param k k Parameter
    * @param rnd Random generator
    * @return new DBIDs
@@ -597,7 +597,20 @@ public final class DBIDUtil {
   /**
    * Produce a random sample of the given DBIDs.
    *
-   * @param source Original DBIDs
+   * @param source Original DBIDs, no duplicates allowed
+   * @param except Excluded object
+   * @param k k Parameter
+   * @param rnd Random generator
+   * @return new DBIDs
+   */
+  public static ModifiableDBIDs randomSampleExcept(DBIDs source, DBIDRef except, int k, RandomFactory rnd) {
+    return randomSampleExcept(source, except, k, rnd.getSingleThreadedRandom());
+  }
+
+  /**
+   * Produce a random sample of the given DBIDs.
+   *
+   * @param source Original DBIDs, no duplicates allowed
    * @param k k Parameter
    * @param random Random generator
    * @return new DBIDs
@@ -616,9 +629,10 @@ public final class DBIDUtil {
     if(k < source.size() >> 1) {
       ArrayDBIDs aids = DBIDUtil.ensureArray(source);
       DBIDArrayIter iter = aids.iter();
+      final int size = aids.size();
       HashSetModifiableDBIDs sample = DBIDUtil.newHashSet(k);
       while(sample.size() < k) {
-        iter.seek(random.nextInt(aids.size()));
+        iter.seek(random.nextInt(size));
         sample.add(iter);
       }
       return sample;
@@ -637,7 +651,58 @@ public final class DBIDUtil {
   /**
    * Produce a random sample of the given DBIDs.
    *
-   * @param ids Original ids
+   * @param source Original DBIDs, no duplicates allowed
+   * @param except Excluded object
+   * @param k k Parameter
+   * @param random Random generator
+   * @return new DBIDs
+   */
+  public static ModifiableDBIDs randomSampleExcept(DBIDs source, DBIDRef except, int k, Random random) {
+    if(k < 0 || k > source.size()) {
+      throw new IllegalArgumentException("Illegal value for size of random sample: " + k + " > " + source.size() + " or < 0");
+    }
+    if(random == null) {
+      // Fast, and we're single-threaded here anyway.
+      random = new FastNonThreadsafeRandom();
+    }
+
+    // TODO: better balancing for different sizes
+    // Two methods: constructive vs. destructive
+    if(k < source.size() >> 1) {
+      ArrayDBIDs aids = DBIDUtil.ensureArray(source);
+      DBIDArrayIter iter = aids.iter();
+      int size = aids.size();
+      HashSetModifiableDBIDs sample = DBIDUtil.newHashSet(k);
+      while(sample.size() < k) {
+        iter.seek(random.nextInt(size));
+        if(!equal(iter, except)) {
+          sample.add(iter);
+        }
+      }
+      return sample;
+    }
+    else {
+      ArrayModifiableDBIDs sample = DBIDUtil.newArray(source);
+      randomShuffle(sample, random, k);
+      // Avoid excluded object:
+      for(DBIDArrayIter iter = sample.iter(); iter.valid() && iter.getOffset() < k; iter.advance()) {
+        if(equal(iter, except)) {
+          sample.swap(iter.getOffset(), k);
+          break; // Assuming that except occurrs only once!
+        }
+      }
+      // Delete trailing elements
+      for(int i = sample.size() - 1; i >= k; i--) {
+        sample.remove(i);
+      }
+      return sample;
+    }
+  }
+
+  /**
+   * Produce a random sample of the given DBIDs.
+   *
+   * @param ids Original ids, no duplicates allowed
    * @param rate Sampling rate
    * @param random Random generator
    * @return Sample
@@ -649,7 +714,7 @@ public final class DBIDUtil {
   /**
    * Produce a random sample of the given DBIDs.
    *
-   * @param ids Original ids
+   * @param ids Original ids, no duplicates allowed
    * @param rate Sampling rate
    * @param random Random generator
    * @return Sample
