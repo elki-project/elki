@@ -22,7 +22,8 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.datastore.memory.MapStore;
+import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
+import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
 import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.DatabaseQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
@@ -34,6 +35,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -57,19 +59,14 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   private static final Logging LOG = Logging.getLogger(KNNGraph.class);
 
   /**
+   * Log prefix.
+   */
+  private String prefix = getClass().getCanonicalName();
+
+  /**
    * Random generator
    */
   private final RandomFactory rnd;
-
-  /**
-   * total distance computations
-   */
-  private long counter_all = 0;
-
-  /**
-   * new neighbors per iteration
-   */
-  private int t = 0;
 
   /**
    * early termination parameter
@@ -94,17 +91,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * store for neighbors
    */
-  private MapStore<KNNHeap> store = new MapStore<>();
-
-  /**
-   * store for new reverse neighbors
-   */
-  private MapStore<HashSetModifiableDBIDs> newReverseNeighbors = new MapStore<>();
-
-  /**
-   * store for new reverse neighbors
-   */
-  private MapStore<HashSetModifiableDBIDs> oldReverseNeighbors = new MapStore<>();
+  private WritableDataStore<KNNHeap> store;
 
   /**
    * Constructor.
@@ -132,53 +119,59 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     final DBIDs ids = relation.getDBIDs();
     final long starttime = System.currentTimeMillis();
     IndefiniteProgress progress = LOG.isVerbose() ? new IndefiniteProgress("KNNGraph iteration", LOG) : null;
-    storage = new MapStore<KNNList>();
 
     // to add query point itself in the end, internally (k-1) is used
     final int internal_k = k - 1;
 
+    // kNN store
+    store = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, KNNHeap.class);
+    // store for new reverse neighbors
+    WritableDataStore<HashSetModifiableDBIDs> newReverseNeighbors = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, HashSetModifiableDBIDs.class);
+    // store for new reverse neighbors
+    WritableDataStore<HashSetModifiableDBIDs> oldReverseNeighbors = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, HashSetModifiableDBIDs.class);
+    // Sample of new forward neighbors.
+    WritableDataStore<HashSetModifiableDBIDs> sampleNewNeighbors = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, HashSetModifiableDBIDs.class);
     // data structures for new and sampled new neighbors
-    MapStore<HashSetModifiableDBIDs> flag = new MapStore<HashSetModifiableDBIDs>();
-    MapStore<HashSetModifiableDBIDs> sampleNewHash = new MapStore<HashSetModifiableDBIDs>();
+    WritableDataStore<HashSetModifiableDBIDs> flag = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, HashSetModifiableDBIDs.class);
 
-    KNNHeap dummyHeap = DBIDUtil.newHeap(internal_k);
-
-    // calculate k-1 neighbors and add object itself in the end (heaps in store
-    // are initialized in add-method)
+    // Initialize data structures:
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
+      store.put(iditer, DBIDUtil.newHeap(internal_k));
+      newReverseNeighbors.put(iditer, DBIDUtil.newHashSet());
+      oldReverseNeighbors.put(iditer, DBIDUtil.newHashSet());
+    }
 
     // this variable is the sampling size
     final int items = (int) Math.ceil(rho * internal_k);
 
     // initialize neighbors (depends on -setInitialNeighbors option)
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      // initialize sampled NN and adapt to size "items" --> remove object if it
-      // is part of the sample, else remove the last random object
-      ModifiableDBIDs sample = DBIDUtil.randomSampleExcept(ids, iditer, items, rnd);
-      sampleNewHash.put(iditer, DBIDUtil.newHashSet(sample));
-      // initialize RNN and adapt to size "items" --> remove object if it is
-      // part
-      // of the sample, else remove the last random object
-      ModifiableDBIDs sample2 = DBIDUtil.randomSampleExcept(ids, iditer, items, rnd);
-      newReverseNeighbors.put(iditer, DBIDUtil.newHashSet(sample2));
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
+      // initialize sampled NN
+      ModifiableDBIDs sampleNew = DBIDUtil.randomSampleExcept(ids, iditer, items, rnd);
+      sampleNewNeighbors.put(iditer, DBIDUtil.newHashSet(sampleNew));
+      // initialize RNN
+      ModifiableDBIDs sampleRev = DBIDUtil.randomSampleExcept(ids, iditer, items, rnd);
+      newReverseNeighbors.put(iditer, DBIDUtil.newHashSet(sampleRev));
       // initialize new neighbors
       flag.put(iditer, DBIDUtil.newHashSet());
       // initialize store
       if(setInitialNeighbors) {
-        for(DBIDIter siter = sample.iter(); siter.valid(); siter.advance()) {
+        HashSetModifiableDBIDs flags = flag.get(iditer);
+        for(DBIDIter siter = sampleNew.iter(); siter.valid(); siter.advance()) {
           if(add(iditer, siter, distanceQuery.distance(iditer, siter))) {
-            HashSetModifiableDBIDs iditernew = flag.get(iditer);
-            iditernew.add(siter);
+            flags.add(siter);
           }
         }
       }
     }
 
     final int size = relation.size();
+    long counter_all = 0;
     double rate = 0.0;
     int iter = 0;
 
-    for(int counter = internal_k * size; counter >= delta * internal_k * size && counter > 0 && iter < iterations; iter++) {
-      counter = 0;
+    for(; iter < iterations; iter++) {
+      long counter = 0;
 
       // iterate through dataset
       for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
@@ -186,25 +179,21 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         HashSetModifiableDBIDs newNeighbors = flag.get(iditer);
         HashSetModifiableDBIDs oldNeighbors = DBIDUtil.newHashSet();
         KNNHeap heap = store.get(iditer);
-        if(heap != null) {
-          for(DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
-            if(!newNeighbors.contains(heapiter)) {
-              oldNeighbors.add(heapiter);
-            }
+        for(DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
+          if(!newNeighbors.contains(heapiter)) {
+            oldNeighbors.add(heapiter);
           }
         }
 
         // Sampling
-        HashSetModifiableDBIDs sampleNew = sampleNewHash.get(iditer);
+        HashSetModifiableDBIDs sampleNew = sampleNewNeighbors.get(iditer);
 
         HashSetModifiableDBIDs newRev = DBIDUtil.newHashSet();
         if(newReverseNeighbors.get(iditer) != null) {
           newRev = newReverseNeighbors.get(iditer);
           // symmetrize
           newRev.removeDBIDs(sampleNew);
-          if(newRev.size() > items) {
-            newRev = DBIDUtil.newHashSet(DBIDUtil.randomSample(newRev, items, rnd));
-          }
+          boundSize(newRev, items);
         }
 
         HashSetModifiableDBIDs oldRev = DBIDUtil.newHashSet();
@@ -212,140 +201,178 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
           oldRev = oldReverseNeighbors.get(iditer);
           // symmetrize
           oldRev.removeDBIDs(oldNeighbors);
-          if(oldRev.size() > items) {
-            oldRev = DBIDUtil.newHashSet(DBIDUtil.randomSample(oldRev, items, rnd));
-          }
+          boundSize(oldRev, items);
         }
-
-        // 3 loops
-        // nn_new
-        for(DBIDIter sniter = sampleNew.iter(); sniter.valid(); sniter.advance()) {
-          // nn_new X nn_new
-          for(DBIDIter niter2 = sampleNew.iter(); niter2.valid(); niter2.advance()) {
-            if(DBIDUtil.compare(sniter, niter2) < 0) {
-              addpair(flag, sniter, niter2);
-              counter++;
-            }
-          }
-          // nn_new X nn_old
-          for(DBIDMIter niter2 = oldNeighbors.iter(); niter2.valid(); niter2.advance()) {
-            if(!DBIDUtil.equal(sniter, niter2)) {
-              addpair(flag, sniter, niter2);
-              counter++;
-            }
-          }
-        }
-        // rnn_new
-        for(DBIDIter nriter = newRev.iter(); nriter.valid(); nriter.advance()) {
-          // rnn_new X rnn_new
-          for(DBIDIter niter2 = newRev.iter(); niter2.valid(); niter2.advance()) {
-            if(DBIDUtil.compare(nriter, niter2) < 0) {
-              addpair(flag, nriter, niter2);
-              counter++;
-            }
-          }
-          // rnn_new X rnn_old
-          for(DBIDIter niter2 = oldRev.iter(); niter2.valid(); niter2.advance()) {
-            if(!DBIDUtil.equal(nriter, niter2)) {
-              addpair(flag, nriter, niter2);
-              counter++;
-            }
-          }
-        }
-
-        // nn_new
-        for(DBIDIter sniter2 = sampleNew.iter(); sniter2.valid(); sniter2.advance()) {
-          // nn_new X rnn_old
-          for(DBIDIter niter2 = oldRev.iter(); niter2.valid(); niter2.advance()) {
-            if(!DBIDUtil.equal(sniter2, niter2)) {
-              addpair(flag, sniter2, niter2);
-              counter++;
-            }
-          }
-          // nn_new X rnn_new
-          for(DBIDIter niter2 = newRev.iter(); niter2.valid(); niter2.advance()) {
-            if(DBIDUtil.compare(sniter2, niter2) < 0) {
-              addpair(flag, sniter2, niter2);
-              counter++;
-            }
-          }
-        }
-        // nn_old
-        for(DBIDIter niter = oldNeighbors.iter(); niter.valid(); niter.advance()) {
-          // nn_old X rnn_new
-          for(DBIDIter niter2 = newRev.iter(); niter2.valid(); niter2.advance()) {
-            if(!DBIDUtil.equal(niter, niter2)) {
-              addpair(flag, niter, niter2);
-              counter++;
-            }
-          }
-        }
+        counter += processNewNeighbors(flag, sampleNew, oldNeighbors, newRev, oldRev);
       }
       counter_all += counter;
-      if(LOG.isVerbose()) {
-        // LOG.verbose("Distance computations in this iteration" + counter);
-        LOG.verbose("Scan rate in this iteration: " + counter_all / (size * (size - 1.0) / 2.0));
+      if(LOG.isStatistics()) {
+        LOG.statistics(new DoubleStatistic(prefix + ".scan-rate", counter_all * .5 / (size * (size - 1L))));
       }
 
-      // t is according to the original implementation the number of new
-      // neighbors
-      t = 0;
-      sampleNewHash = sampleNew(flag, items);
+      // t is the number of new neighbors
+      int t = sampleNew(ids, sampleNewNeighbors, flag, items);
 
       // calculate old and new reverse neighbors
-      newReverseNeighbors.clear();
-      oldReverseNeighbors.clear();
-      reverse(sampleNewHash);
+      clearAll(ids, newReverseNeighbors);
+      clearAll(ids, oldReverseNeighbors);
+      reverse(sampleNewNeighbors, newReverseNeighbors, oldReverseNeighbors);
 
       rate = (double) t / (double) (internal_k * size);
-      if(LOG.isVerbose()) {
-        LOG.verbose("Update rate in this iteration: " + rate);
+      if(LOG.isStatistics()) {
+        LOG.statistics(new DoubleStatistic(prefix + ".update-rate", rate));
       }
-      LOG.incrementProcessed(progress);
-      if(rate < delta) {
+      if(counter < delta * internal_k * size) {
+        LOG.verbose("KNNGraph terminated because we performaned delta*k*size distance computations.");
         break;
       }
+      if(rate < delta) {
+        LOG.verbose("KNNGraph terminated because update rate got smaller than delta.");
+        break;
+      }
+      LOG.incrementProcessed(progress);
     }
-    if(LOG.isVerbose()) {
-      if(iter == iterations) {
-        LOG.verbose("Loop exit because maximum number of iterations is reached.");
-      }
-      else if(rate < delta) {
-        LOG.verbose("Loop exit because update rate got smaller than delta.");
-      }
-      else {
-        LOG.verbose("Loop exit because counter reached delta*k*size.");
-      }
-    }
-    // convert store to storage
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-      // convert heap in list and add query point
-      KNNHeap heap = store.get(iditer);
-      KNNList list;
-      if(heap != null) {
-        KNNHeap newHeap = DBIDUtil.newHeap(k);
-        newHeap.insert(0, iditer);
-        for(DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
-          newHeap.insert(heapiter.doubleValue(), heapiter);
-        }
-        list = newHeap.toKNNList();
-      }
-      else {
-        dummyHeap.clear();
-        dummyHeap.insert(0, iditer);
-        list = dummyHeap.toKNNList();
-      }
-      storage.put(iditer, list);
+    if(LOG.isVerbose() && iter == iterations) {
+      LOG.verbose("KNNGraph terminated because the maximum number of iterations was reached.");
     }
     LOG.setCompleted(progress);
+    // convert store to storage
+    storage = DataStoreFactory.FACTORY.makeStorage(ids, DataStoreFactory.HINT_DB, KNNList.class);
+    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+      KNNHeap tempHeap = DBIDUtil.newHeap(k);
+      // Add query point and convert heap to list:
+      KNNHeap heap = store.get(iditer);
+      tempHeap.insert(0, iditer);
+      for(DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
+        tempHeap.insert(heapiter.doubleValue(), heapiter);
+      }
+      storage.put(iditer, tempHeap.toKNNList());
+    }
     final long end = System.currentTimeMillis();
     if(LOG.isStatistics()) {
-      LOG.statistics(new LongStatistic(this.getClass().getCanonicalName() + ".construction-time.ms", end - starttime));
+      LOG.statistics(new LongStatistic(prefix + ".construction-time.ms", end - starttime));
     }
   }
 
   /**
-   * Add cand to iditer-heap neighbors with distance
+   * Clear (but reuse) all sets in the given storage.
+   * 
+   * @param ids Ids to process
+   * @param sets Sets to clear
+   */
+  private void clearAll(DBIDs ids, WritableDataStore<HashSetModifiableDBIDs> sets) {
+    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+      sets.get(it).clear();
+    }
+  }
+
+  /**
+   * Bound the size of a set by random sampling.
+   * 
+   * @param set Set to process
+   * @param items Maximum size
+   */
+  private void boundSize(HashSetModifiableDBIDs set, int items) {
+    if(set.size() > items) {
+      DBIDs sample = DBIDUtil.randomSample(set, items, rnd);
+      set.clear();
+      set.addDBIDs(sample);
+    }
+  }
+
+  /**
+   * Process new neighbors.
+   * 
+   * This is a complex join, because we do not need to join old neighbors with
+   * old neighbors, and we have forward- and reverse neighbors each.
+   *
+   * @param flag Flags to mark new neighbors.
+   * @param newFwd New forward neighbors
+   * @param oldFwd Old forward neighbors
+   * @param newRev New reverse neighbors
+   * @param oldRev Old reverse neighbors
+   * @return Number of new neighbors
+   */
+  private int processNewNeighbors(WritableDataStore<HashSetModifiableDBIDs> flag, HashSetModifiableDBIDs newFwd, HashSetModifiableDBIDs oldFwd, HashSetModifiableDBIDs newRev, HashSetModifiableDBIDs oldRev) {
+    int counter = 0;
+    // nn_new
+    if(!newFwd.isEmpty()) {
+      for(DBIDIter sniter = newFwd.iter(); sniter.valid(); sniter.advance()) {
+        // nn_new X nn_new
+        for(DBIDIter niter2 = newFwd.iter(); niter2.valid(); niter2.advance()) {
+          if(DBIDUtil.compare(sniter, niter2) < 0) { // Only x < y.
+            addpair(flag, sniter, niter2);
+            counter++;
+          }
+        }
+        // nn_new X nn_old
+        for(DBIDMIter niter2 = oldFwd.iter(); niter2.valid(); niter2.advance()) {
+          if(DBIDUtil.equal(sniter, niter2)) {
+            continue;
+          }
+          addpair(flag, sniter, niter2);
+          counter++;
+        }
+      }
+    }
+    // rnn_new
+    if(!newRev.isEmpty()) {
+      for(DBIDIter nriter = newRev.iter(); nriter.valid(); nriter.advance()) {
+        // rnn_new X rnn_new
+        for(DBIDIter niter2 = newRev.iter(); niter2.valid(); niter2.advance()) {
+          if(DBIDUtil.compare(nriter, niter2) < 0) { // Only x < y
+            addpair(flag, nriter, niter2);
+            counter++;
+          }
+        }
+        // rnn_new X rnn_old
+        for(DBIDIter niter2 = oldRev.iter(); niter2.valid(); niter2.advance()) {
+          if(DBIDUtil.equal(nriter, niter2)) {
+            continue;
+          }
+          addpair(flag, nriter, niter2);
+          counter++;
+        }
+      }
+    }
+
+    // nn_new
+    if(!newFwd.isEmpty()) {
+      for(DBIDIter sniter2 = newFwd.iter(); sniter2.valid(); sniter2.advance()) {
+        // nn_new X rnn_old
+        for(DBIDIter niter2 = oldRev.iter(); niter2.valid(); niter2.advance()) {
+          if(!DBIDUtil.equal(sniter2, niter2)) {
+            addpair(flag, sniter2, niter2);
+            counter++;
+          }
+        }
+        // nn_new X rnn_new
+        for(DBIDIter niter2 = newRev.iter(); niter2.valid(); niter2.advance()) {
+          if(DBIDUtil.compare(sniter2, niter2) < 0) {
+            addpair(flag, sniter2, niter2);
+            counter++;
+          }
+        }
+      }
+    }
+    // nn_old
+    if(!newRev.isEmpty() && !oldFwd.isEmpty()) {
+      for(DBIDIter niter = oldFwd.iter(); niter.valid(); niter.advance()) {
+        // nn_old X rnn_new
+        for(DBIDIter niter2 = newRev.iter(); niter2.valid(); niter2.advance()) {
+          if(DBIDUtil.equal(niter, niter2)) {
+            continue;
+          }
+          addpair(flag, niter, niter2);
+          counter++;
+        }
+      }
+    }
+    return counter;
+  }
+
+  /**
+   * Add cand to cur's heap neighbors with distance
    *
    * @param cur Current object
    * @param cand Neighbor candidate
@@ -354,26 +381,14 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
    */
   private boolean add(DBIDRef cur, DBIDRef cand, double distance) {
     KNNHeap neighbors = store.get(cur);
-    if(neighbors != null) {
-      // check if actual object is already contained in hash
-      for(DoubleDBIDListIter heapiter = neighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
-        if(DBIDUtil.equal(heapiter, cand)) {
-          return false;
-        }
-      }
+    if(neighbors.contains(cand)) {
+      return false;
     }
-    else {
-      // heap of size (k-1) because one of the neighbors is the query point
-      // itself
-      neighbors = DBIDUtil.newHeap(k - 1);
-    }
-    // calculate similarity of v and u2
     double newKDistance = neighbors.insert(distance, cand);
-    store.put(cur, neighbors);
     return (distance <= newKDistance);
   }
 
-  private void addpair(MapStore<HashSetModifiableDBIDs> newNeighbors, DBIDRef o1, DBIDRef o2) {
+  private void addpair(WritableDataStore<HashSetModifiableDBIDs> newNeighbors, DBIDRef o1, DBIDRef o2) {
     final double distance = distanceQuery.distance(o1, o2);
     if(add(o1, o2, distance)) {
       newNeighbors.get(o1).add(o2);
@@ -386,37 +401,30 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * samples newNeighbors for every object
    * 
+   * @param sampleNewNeighbors Output of sampled new neighbors
    * @param store - neighbors for every object
    * @param newNeighborHash - new neighbors for every object
-   * @return sampled new Neighbors for every object
+   * @return Number of new neighbors
    */
-  private MapStore<HashSetModifiableDBIDs> sampleNew(MapStore<HashSetModifiableDBIDs> newNeighborHash, int items) {
-    MapStore<HashSetModifiableDBIDs> sampleNewNeighbors = new MapStore<>();
-    for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
+  private int sampleNew(DBIDs ids, WritableDataStore<HashSetModifiableDBIDs> sampleNewNeighbors, WritableDataStore<HashSetModifiableDBIDs> newNeighborHash, int items) {
+    int t = 0;
+    for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       KNNHeap realNeighbors = store.get(iditer);
       HashSetModifiableDBIDs newNeighbors = newNeighborHash.get(iditer);
-      HashSetModifiableDBIDs realNewNeighbors = DBIDUtil.newHashSet();
-      if(realNeighbors != null) {
-        for(DoubleDBIDListIter heapiter = realNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
-          if(newNeighbors.contains(heapiter)) {
-            realNewNeighbors.add(heapiter);
-            t++;
-          }
+      HashSetModifiableDBIDs realNewNeighbors = sampleNewNeighbors.get(iditer);
+      realNewNeighbors.clear(); // Reuse
+      for(DoubleDBIDListIter heapiter = realNeighbors.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
+        if(newNeighbors.contains(heapiter)) {
+          realNewNeighbors.add(heapiter);
+          t++;
         }
       }
-      HashSetModifiableDBIDs sampleNew;
-      if(realNewNeighbors.size() > items) {
-        sampleNew = DBIDUtil.newHashSet(DBIDUtil.randomSample(realNewNeighbors, items, rnd));
-      }
-      else {
-        sampleNew = realNewNeighbors;
-      }
+      boundSize(realNewNeighbors, items);
 
-      sampleNewNeighbors.put(iditer, sampleNew);
-      newNeighbors.removeDBIDs(sampleNew);
+      newNeighbors.removeDBIDs(realNewNeighbors);
       newNeighborHash.put(iditer, newNeighbors);
     }
-    return sampleNewNeighbors;
+    return t;
   }
 
   /**
@@ -425,28 +433,16 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
    * @param store - neighbors for every object
    * @param sampleNewHash - new neighbors for every object
    */
-  private void reverse(MapStore<HashSetModifiableDBIDs> sampleNewHash) {
+  private void reverse(WritableDataStore<HashSetModifiableDBIDs> sampleNewHash, WritableDataStore<HashSetModifiableDBIDs> newReverseNeighbors, WritableDataStore<HashSetModifiableDBIDs> oldReverseNeighbors) {
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       KNNHeap heap = store.get(iditer);
-      DBIDs newNeighbors = sampleNewHash.get(iditer);
-      if(heap != null) {
-        for(DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
-          if(newNeighbors.contains(heapiter)) {
-            HashSetModifiableDBIDs newReverse = newReverseNeighbors.get(heapiter);
-            if(newReverse == null) {
-              newReverse = DBIDUtil.newHashSet();
-            }
-            newReverse.add(iditer);
-            newReverseNeighbors.put(heapiter, newReverse);
-          }
-          else {
-            HashSetModifiableDBIDs oldReverse = oldReverseNeighbors.get(heapiter);
-            if(oldReverse == null) {
-              oldReverse = DBIDUtil.newHashSet();
-            }
-            oldReverse.add(iditer);
-            oldReverseNeighbors.put(heapiter, oldReverse);
-          }
+      HashSetDBIDs newNeighbors = sampleNewHash.get(iditer);
+      for(DoubleDBIDListIter heapiter = heap.unorderedIterator(); heapiter.valid(); heapiter.advance()) {
+        if(newNeighbors.contains(heapiter)) {
+          newReverseNeighbors.get(heapiter).add(iditer);
+        }
+        else {
+          oldReverseNeighbors.get(heapiter).add(iditer);
         }
       }
     }
@@ -459,10 +455,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
 
   @Override
   public void logStatistics() {
-    double size = (double) relation.size();
-    if(LOG.isStatistics()) {
-      LOG.statistics(new DoubleStatistic("Scan rate", counter_all / (size * (size - 1.0) / 2.0)));
-    }
+    // TODO
   }
 
   @Override
@@ -614,11 +607,13 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         if(config.grab(rndP)) {
           rnd = rndP.getValue();
         }
-        DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.001);
+        DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.001) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
         if(config.grab(deltaP)) {
           delta = deltaP.getValue();
         }
-        DoubleParameter rhoP = new DoubleParameter(RHO_ID, 1);
+        DoubleParameter rhoP = new DoubleParameter(RHO_ID, 1) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
         if(config.grab(rhoP)) {
           rho = rhoP.getValue();
         }
@@ -626,7 +621,8 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         if(config.grab(initialP)) {
           setInitialNeighbors = initialP.isTrue();
         }
-        IntParameter iterP = new IntParameter(ITER_ID, 100);
+        IntParameter iterP = new IntParameter(ITER_ID, 100) //
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
         if(config.grab(iterP)) {
           iterations = iterP.getValue();
         }
