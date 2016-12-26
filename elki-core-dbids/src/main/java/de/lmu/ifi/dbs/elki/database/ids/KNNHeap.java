@@ -130,4 +130,12 @@ public interface KNNHeap {
    * @return Iterator
    */
   DoubleDBIDListIter unorderedIterator();
+
+  /**
+   * Check if an object is already in the heap.
+   * 
+   * @param other Other object
+   * @return {@code true} if contained
+   */
+  boolean contains(DBIDRef other);
 }

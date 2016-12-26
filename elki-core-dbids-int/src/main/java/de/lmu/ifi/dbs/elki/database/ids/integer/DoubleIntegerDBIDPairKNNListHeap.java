@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.database.ids.integer;
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
@@ -225,8 +224,8 @@ class DoubleIntegerDBIDPairKNNListHeap implements IntegerDBIDKNNList, KNNHeap {
 
   @Override
   public boolean contains(DBIDRef o) {
-    for(DBIDIter iter = iter(); iter.valid(); iter.advance()) {
-      if(DBIDUtil.equal(iter, o)) {
+    for(int i = 0; i < size; i++) {
+      if(DBIDUtil.equal(data[i], o)) {
         return true;
       }
     }

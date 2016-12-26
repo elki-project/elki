@@ -76,7 +76,7 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
     final int size = HeapUtil.nextPow2Int(minsize + 1) - 1;
     double[] twoheap = new double[size];
     int[] twovals = new int[size];
-      
+
     this.twoheap = twoheap;
     this.twovals = twovals;
   }
@@ -103,7 +103,7 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
     final double co = o;
     final int cv = v;
     // System.err.println("Add: " + o);
-    if (size >= twoheap.length) {
+    if(size >= twoheap.length) {
       // Grow by one layer.
       twoheap = Arrays.copyOf(twoheap, twoheap.length + twoheap.length + 1);
       twovals = Arrays.copyOf(twovals, twovals.length + twovals.length + 1);
@@ -117,9 +117,10 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
 
   @Override
   public void add(double key, int val, int max) {
-    if (size < max) {
+    if(size < max) {
       add(key, val);
-    } else if (twoheap[0] > key) {
+    }
+    else if(twoheap[0] > key) {
       replaceTopElement(key, val);
     }
   }
@@ -137,10 +138,10 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
    * @param val Current value
    */
   private void heapifyUp(int twopos, double cur, int val) {
-    while (twopos > 0) {
+    while(twopos > 0) {
       final int parent = (twopos - 1) >>> 1;
       double par = twoheap[parent];
-      if (cur <= par) {
+      if(cur <= par) {
         break;
       }
       twoheap[twopos] = par;
@@ -155,13 +156,14 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
   public void poll() {
     --size;
     // Replacement object:
-    if (size > 0) {
+    if(size > 0) {
       final double reinsert = twoheap[size];
       final int reinsertv = twovals[size];
       twoheap[size] = 0.0;
       twovals[size] = 0;
       heapifyDown(reinsert, reinsertv);
-    } else {
+    }
+    else {
       twoheap[0] = 0.0;
       twovals[0] = 0;
     }
@@ -176,15 +178,15 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
   private void heapifyDown(double cur, int val) {
     final int stop = size >>> 1;
     int twopos = 0;
-    while (twopos < stop) {
+    while(twopos < stop) {
       int bestchild = (twopos << 1) + 1;
       double best = twoheap[bestchild];
       final int right = bestchild + 1;
-      if (right < size && best < twoheap[right]) {
+      if(right < size && best < twoheap[right]) {
         bestchild = right;
         best = twoheap[right];
       }
-      if (cur >= best) {
+      if(cur >= best) {
         break;
       }
       twoheap[twopos] = best;
@@ -209,7 +211,7 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
   public String toString() {
     StringBuilder buf = new StringBuilder();
     buf.append(DoubleIntegerMaxHeap.class.getSimpleName()).append(" [");
-    for (UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
+    for(UnsortedIter iter = new UnsortedIter(); iter.valid(); iter.advance()) {
       buf.append(iter.getKey()).append(':').append(iter.getValue()).append(',');
     }
     buf.append(']');
@@ -262,5 +264,20 @@ public class DoubleIntegerMaxHeap implements DoubleIntegerHeap {
     public int getValue() {
       return twovals[pos];
     }
+  }
+
+  /**
+   * Contains operation for a key.
+   *
+   * @param q Key
+   * @return {@code true} if the key is contained in the heap
+   */
+  public boolean containsValue(int q) {
+    for(int i = 0; i < size; i++) {
+      if(twovals[i] == q) {
+        return true;
+      }
+    }
+    return false;
   }
 }

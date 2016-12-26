@@ -76,7 +76,8 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
   /**
    * Constructor.
    *
-   * @param k Size of knn.
+   * @param k
+   *        Size of knn.
    */
   protected DoubleIntegerDBIDKNNHeap(int k) {
     super();
@@ -142,8 +143,10 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
   /**
    * Do a full update for the heap.
    *
-   * @param distance Distance
-   * @param iid Object id
+   * @param distance
+   *        Distance
+   * @param iid
+   *        Object id
    */
   private final void updateHeap(final double distance, final int iid) {
     final double prevdist = kdist;
@@ -162,7 +165,8 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
   /**
    * Ensure the ties array has capacity for at least one more element.
    *
-   * @param id Id to add
+   * @param id
+   *        Id to add
    */
   private final void addToTies(int id) {
     if(ties.length == numties) {
@@ -274,10 +278,26 @@ class DoubleIntegerDBIDKNNHeap implements KNNHeap {
   }
 
   @Override
+  public boolean contains(DBIDRef o) {
+    final int q = o.internalGetIndex();
+    for(int i = 0; i < numties; i++) {
+      if(ties[i] == q) {
+        return true;
+      }
+    }
+    return heap.containsValue(q);
+  }
+
+  @Override
   public DoubleDBIDListIter unorderedIterator() {
     return new UnorderedIter();
   }
 
+  /**
+   * Iterate over all objects in the heap, not ordered.
+   * 
+   * @author Erich Schubert
+   */
   private class UnorderedIter implements DoubleDBIDListIter {
     /**
      * Iterator of the real heap.
