@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
+import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -44,19 +45,31 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.RandomParameter;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * KNNGraph, also known as NN-desent, is an approximate nearest neighbor search
+ * NN-desent (also known as KNNGraph) is an approximate nearest neighbor search
  * algorithm beginning with a random sample, then iteratively refining this
  * sample until.
  * 
+ * Reference:
+ * <p>
+ * W. Dong and C. Moses and K. Li<br />
+ * Efficient k-nearest neighbor graph construction for generic similarity
+ * measures<br />
+ * In Proc. 20th international conference on World Wide Web WWW'11
+ * </p>
+ *
  * @author Evelyn Kirner
  *
  * @param <O> Object type
  */
-public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
+@Reference(authors = "W. Dong and C. Moses and K. Li", //
+    title = "Efficient k-nearest neighbor graph construction for generic similarity measures", //
+    booktitle = "Proc. 20th international conference on World Wide Web WWW'11", //
+    url = "http://dx.doi.org/10.1145/1963405.1963487")
+public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
   /**
    * Logger
    */
-  private static final Logging LOG = Logging.getLogger(KNNGraph.class);
+  private static final Logging LOG = Logging.getLogger(NNDescent.class);
 
   /**
    * Log prefix.
@@ -105,7 +118,7 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
    * @param setInitialNeighbors Always use initial neighbors
    * @param iterations Maximum number of iterations
    */
-  public KNNGraph(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, RandomFactory rnd, double delta, double rho, boolean setInitialNeighbors, int iterations) {
+  public NNDescent(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, RandomFactory rnd, double delta, double rho, boolean setInitialNeighbors, int iterations) {
     super(relation, distanceFunction, k);
     this.rnd = rnd;
     this.delta = delta;
@@ -188,21 +201,13 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
         // Sampling
         HashSetModifiableDBIDs sampleNew = sampleNewNeighbors.get(iditer);
 
-        HashSetModifiableDBIDs newRev = DBIDUtil.newHashSet();
-        if(newReverseNeighbors.get(iditer) != null) {
-          newRev = newReverseNeighbors.get(iditer);
-          // symmetrize
-          newRev.removeDBIDs(sampleNew);
-          boundSize(newRev, items);
-        }
+        HashSetModifiableDBIDs newRev = newReverseNeighbors.get(iditer);
+        newRev.removeDBIDs(sampleNew);
+        boundSize(newRev, items);
 
-        HashSetModifiableDBIDs oldRev = DBIDUtil.newHashSet();
-        if(oldReverseNeighbors.get(iditer) != null) {
-          oldRev = oldReverseNeighbors.get(iditer);
-          // symmetrize
-          oldRev.removeDBIDs(oldNeighbors);
-          boundSize(oldRev, items);
-        }
+        HashSetModifiableDBIDs oldRev = oldReverseNeighbors.get(iditer);
+        oldRev.removeDBIDs(oldNeighbors);
+        boundSize(oldRev, items);
         counter += processNewNeighbors(flag, sampleNew, oldNeighbors, newRev, oldRev);
       }
       counter_all += counter;
@@ -532,8 +537,8 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
     }
 
     @Override
-    public KNNGraph<O> instantiate(Relation<O> relation) {
-      return new KNNGraph<>(relation, distanceFunction, k, rnd, delta, rho, setInitialNeighbors, iterations);
+    public NNDescent<O> instantiate(Relation<O> relation) {
+      return new NNDescent<>(relation, distanceFunction, k, rnd, delta, rho, setInitialNeighbors, iterations);
     }
 
     /**
@@ -629,8 +634,8 @@ public class KNNGraph<O> extends AbstractMaterializeKNNPreprocessor<O> {
       }
 
       @Override
-      protected KNNGraph.Factory<O> makeInstance() {
-        return new KNNGraph.Factory<>(k, distanceFunction, rnd, delta, rho, setInitialNeighbors, iterations);
+      protected NNDescent.Factory<O> makeInstance() {
+        return new NNDescent.Factory<>(k, distanceFunction, rnd, delta, rho, setInitialNeighbors, iterations);
       }
     }
   }

@@ -41,15 +41,15 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNGraph;
+import de.lmu.ifi.dbs.elki.index.preprocessed.knn.NNDescent;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
- * Regression test for KNNGraph
+ * Regression test for NNDescent
  */
-public class KNNGraphTest {
+public class NNDescentTest {
   // the following values depend on the data set used!
   static String dataset = "data/testdata/unittests/3clusters-and-noise-2d.csv";
 
@@ -79,7 +79,7 @@ public class KNNGraphTest {
     config.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistanceFunction());
     config.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, k);
     RandomFactory rnd = new RandomFactory(0L);
-    KNNGraph<DoubleVector> preproc = new KNNGraph<>(rep, distanceQuery.getDistanceFunction(), k, rnd, 0.1, 0.5, true, 10);
+    NNDescent<DoubleVector> preproc = new NNDescent<>(rep, distanceQuery.getDistanceFunction(), k, rnd, 0.1, 0.5, true, 10);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     // add as index
     db.getHierarchy().add(rep, preproc);
