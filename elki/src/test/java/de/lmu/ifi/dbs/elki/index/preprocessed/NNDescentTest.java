@@ -42,9 +42,8 @@ import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.NNDescent;
-import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 
 /**
  * Regression test for NNDescent
@@ -68,27 +67,30 @@ public class NNDescentTest {
   public void testPreprocessor() {
     Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, null, null);
 
-    Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
+    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);
 
     // get linear queries
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
 
     // get preprocessed queries
     ListParameterization config = new ListParameterization();
-    config.addParameter(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistanceFunction());
-    config.addParameter(MaterializeKNNPreprocessor.Factory.K_ID, k);
-    RandomFactory rnd = new RandomFactory(0L);
-    NNDescent<DoubleVector> preproc = new NNDescent<>(rep, distanceQuery.getDistanceFunction(), k, rnd, 0.1, 0.5, true, 10);
+    config.addParameter(NNDescent.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistanceFunction());
+    config.addParameter(NNDescent.Factory.K_ID, k);
+    config.addParameter(NNDescent.Factory.Parameterizer.SEED_ID, 0);
+    config.addParameter(NNDescent.Factory.Parameterizer.DELTA_ID, 0.1);
+    config.addParameter(NNDescent.Factory.Parameterizer.RHO_ID, 0.5);
+    NNDescent.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(NNDescent.Factory.class, config);
+    NNDescent<DoubleVector> preproc = preprocf.instantiate(rel);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     // add as index
-    db.getHierarchy().add(rep, preproc);
+    db.getHierarchy().add(rel, preproc);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries
-    testKNNQueries(rep, lin_knn_query, preproc_knn_query, k);
+    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
     // also test partial queries, forward only
-    testKNNQueries(rep, lin_knn_query, preproc_knn_query, k / 2);
+    testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
   }
 
   private void testKNNQueries(Relation<DoubleVector> rep, KNNQuery<DoubleVector> lin_knn_query, KNNQuery<DoubleVector> preproc_knn_query, int k) {

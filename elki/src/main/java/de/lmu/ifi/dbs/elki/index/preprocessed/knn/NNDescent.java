@@ -97,9 +97,9 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
   private int iterations = 100;
 
   /**
-   * set initial neighbors?
+   * Do not use initial neighbors
    */
-  private boolean setInitialNeighbors;
+  private boolean noInitialNeighbors;
 
   /**
    * store for neighbors
@@ -115,15 +115,15 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
    * @param rnd Random generator
    * @param delta Delta threshold
    * @param rho Rho threshold
-   * @param setInitialNeighbors Always use initial neighbors
+   * @param noInitialNeighbors Do not use initial neighbors
    * @param iterations Maximum number of iterations
    */
-  public NNDescent(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, RandomFactory rnd, double delta, double rho, boolean setInitialNeighbors, int iterations) {
+  public NNDescent(Relation<O> relation, DistanceFunction<? super O> distanceFunction, int k, RandomFactory rnd, double delta, double rho, boolean noInitialNeighbors, int iterations) {
     super(relation, distanceFunction, k);
     this.rnd = rnd;
     this.delta = delta;
     this.rho = rho;
-    this.setInitialNeighbors = setInitialNeighbors;
+    this.noInitialNeighbors = noInitialNeighbors;
     this.iterations = iterations;
   }
 
@@ -157,6 +157,8 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
     // this variable is the sampling size
     final int items = (int) Math.ceil(rho * internal_k);
 
+    long counter_all = 0;
+
     // initialize neighbors (depends on -setInitialNeighbors option)
     for(DBIDIter iditer = ids.iter(); iditer.valid(); iditer.advance()) {
       // initialize sampled NN
@@ -168,18 +170,18 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
       // initialize new neighbors
       flag.put(iditer, DBIDUtil.newHashSet());
       // initialize store
-      if(setInitialNeighbors) {
+      if(!noInitialNeighbors) {
         HashSetModifiableDBIDs flags = flag.get(iditer);
         for(DBIDIter siter = sampleNew.iter(); siter.valid(); siter.advance()) {
           if(add(iditer, siter, distanceQuery.distance(iditer, siter))) {
             flags.add(siter);
           }
         }
+        counter_all += sampleNew.size();
       }
     }
 
     final int size = relation.size();
-    long counter_all = 0;
     double rate = 0.0;
     int iter = 0;
 
@@ -509,7 +511,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
     /**
      * set initial neighbors?
      */
-    private final boolean setInitialNeighbors;
+    private final boolean noInitialNeighbors;
 
     /**
      * maximum number of iterations
@@ -524,21 +526,21 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
      * @param rnd Random generator
      * @param delta Delta threshold
      * @param rho Rho threshold
-     * @param setInitialNeighbors Always use initial neighbors
+     * @param noInitialNeighbors Do not use initial neighbors
      * @param iterations Maximum number of iterations
      */
-    public Factory(int k, DistanceFunction<? super O> distanceFunction, RandomFactory rnd, double delta, double rho, boolean setInitialNeighbors, int iterations) {
+    public Factory(int k, DistanceFunction<? super O> distanceFunction, RandomFactory rnd, double delta, double rho, boolean noInitialNeighbors, int iterations) {
       super(k, distanceFunction);
       this.rnd = rnd;
       this.delta = delta;
       this.rho = rho;
-      this.setInitialNeighbors = setInitialNeighbors;
+      this.noInitialNeighbors = noInitialNeighbors;
       this.iterations = iterations;
     }
 
     @Override
     public NNDescent<O> instantiate(Relation<O> relation) {
-      return new NNDescent<>(relation, distanceFunction, k, rnd, delta, rho, setInitialNeighbors, iterations);
+      return new NNDescent<>(relation, distanceFunction, k, rnd, delta, rho, noInitialNeighbors, iterations);
     }
 
     /**
@@ -573,7 +575,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
       /**
        * Whether to initialize neighbors with sampled neighbors.
        */
-      public static final OptionID INITIAL_ID = new OptionID("knngraph.setInitialNeighbors", "Initialize neighbors with sampled Neighbors?");
+      public static final OptionID INITIAL_ID = new OptionID("knngraph.no-initial", "Do not use initial neighbors.");
 
       /**
        * maximum number of iterations
@@ -596,9 +598,9 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
       private double rho;
 
       /**
-       * set initial neighbors
+       * No initial neighbors
        */
-      private boolean setInitialNeighbors;
+      private boolean noInitialNeighbors;
 
       /**
        * maximum number of iterations
@@ -618,13 +620,13 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
           delta = deltaP.getValue();
         }
         DoubleParameter rhoP = new DoubleParameter(RHO_ID, 1) //
-            .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_DOUBLE);
+            .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
         if(config.grab(rhoP)) {
           rho = rhoP.getValue();
         }
         Flag initialP = new Flag(INITIAL_ID);
         if(config.grab(initialP)) {
-          setInitialNeighbors = initialP.isTrue();
+          noInitialNeighbors = initialP.isTrue();
         }
         IntParameter iterP = new IntParameter(ITER_ID, 100) //
             .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
@@ -635,7 +637,7 @@ public class NNDescent<O> extends AbstractMaterializeKNNPreprocessor<O> {
 
       @Override
       protected NNDescent.Factory<O> makeInstance() {
-        return new NNDescent.Factory<>(k, distanceFunction, rnd, delta, rho, setInitialNeighbors, iterations);
+        return new NNDescent.Factory<>(k, distanceFunction, rnd, delta, rho, noInitialNeighbors, iterations);
       }
     }
   }
