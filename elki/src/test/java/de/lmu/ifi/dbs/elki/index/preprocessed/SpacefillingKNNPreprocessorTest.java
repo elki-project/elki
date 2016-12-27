@@ -78,11 +78,12 @@ public class SpacefillingKNNPreprocessorTest {
     config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.CURVES_ID, //
         HilbertSpatialSorter.class.getName() + "," + PeanoSpatialSorter.class.getName() + "," //
             + ZCurveSpatialSorter.class.getName() + "," + BinarySplitSpatialSorter.class.getName());
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 6);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.DIM_ID, 7);
     config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.PROJECTION_ID, AchlioptasRandomProjectionFamily.class);
     config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.VARIANTS_ID, 10);
-    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 3.);
+    config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.WINDOW_ID, 5.);
     config.addParameter(SpacefillingKNNPreprocessor.Factory.Parameterizer.RANDOM_ID, 0L);
+    config.addParameter(AchlioptasRandomProjectionFamily.Parameterizer.RANDOM_ID, 0L);
     SpacefillingKNNPreprocessor.Factory<DoubleVector> preprocf = ClassGenericsUtil.parameterizeOrAbort(SpacefillingKNNPreprocessor.Factory.class, config);
     SpacefillingKNNPreprocessor<DoubleVector> preproc = preprocf.instantiate(rel);
     preproc.initialize();
