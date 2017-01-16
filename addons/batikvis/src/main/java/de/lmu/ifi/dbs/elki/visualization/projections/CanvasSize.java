@@ -1,5 +1,7 @@
 package de.lmu.ifi.dbs.elki.visualization.projections;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /*
  This file is part of ELKI:
  Environment for Developing KDD-Applications Supported by Index-Structures
@@ -131,6 +133,39 @@ public class CanvasSize {
       factor = Math.min(factor, (origin[1] - miny) / -delta[1]);
     }
     return factor;
+  }
+
+  /**
+   * Clip a line on the margin (modifies arrays!)
+   * 
+   * @param origin Origin point, <b>will be modified</b>
+   * @param target Target point, <b>will be modified</b>
+   * @return {@code false} if entirely outside the margin
+   */
+  public boolean clipToMargin(double[] origin, double[] target) {
+    assert (target.length == 2 && origin.length == 2);
+    if ((origin[0] < minx && target[0] < minx) //
+        || (origin[0] > maxx && target[0] > maxx) //
+        || (origin[1] < miny && target[1] < miny) //
+        || (origin[1] > maxy && target[1] > maxy)) {
+      return false;
+    }
+    double deltax = target[0] - origin[0];
+    double deltay = target[1] - origin[1];
+    double fmaxx = (maxx - origin[0]) / deltax;
+    double fmaxy = (maxy - origin[1]) / deltay;
+    double fminx = (minx - origin[0]) / deltax;
+    double fminy = (miny - origin[1]) / deltay;
+    double factor1 = MathUtil.min(1, fmaxx > fminx ? fmaxx : fminx, fmaxy > fminy ? fmaxy : fminy);
+    double factor2 = MathUtil.max(0, fmaxx < fminx ? fmaxx : fminx, fmaxy < fminy ? fmaxy : fminy);
+    if (factor1 <= factor2) {
+      return false; // Clipped!
+    }
+    target[0] = origin[0] + factor1 * deltax;
+    target[1] = origin[1] + factor1 * deltay;
+    origin[0] += factor2 * deltax;
+    origin[1] += factor2 * deltay;
+    return true;
   }
 
   @Override
