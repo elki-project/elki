@@ -50,33 +50,29 @@ public class AverageInterclusterDistance implements BIRCHDistance {
   public static final AverageInterclusterDistance STATIC = new AverageInterclusterDistance();
 
   @Override
-  public double distance(NumberVector v, ClusteringFeature cf) {
-    final int d = v.getDimensionality();
-    assert (d == cf.getDimensionality());
-    // SS for new vector v:
-    double ss = 0;
-    for(int i = 0; i < d; i++) {
-      double x = v.doubleValue(i);
-      ss += x * x;
-    }
+  public double squaredDistance(NumberVector v, ClusteringFeature cf) {
+    final int dim = v.getDimensionality();
+    assert (dim == cf.getDimensionality());
+    // Dot product:
     double sum = 0;
-    for(int i = 0; i < d; i++) {
-      sum += v.doubleValue(i) * cf.ls[i];
+    for(int d = 0; d < dim; d++) {
+      sum += v.doubleValue(d) * cf.ls[d];
     }
-    sum = /* 1. * */ cf.sumOfSumOfSquares() + cf.n * ss - 2 * sum;
-    return sum > 0 ? Math.sqrt(sum / cf.n) : 0;
+    sum = /* 1. * */ cf.sumOfSumOfSquares() + cf.n * ClusteringFeature.sumOfSquares(v) - 2 * sum;
+    return sum > 0 ? sum / cf.n : 0;
   }
 
   @Override
-  public double distance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    final int d = cf1.getDimensionality();
-    assert (d == cf2.getDimensionality());
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      sum += cf1.ls[i] * cf2.ls[i];
+  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
+    final int dim = cf1.getDimensionality();
+    assert (dim == cf2.getDimensionality());
+    // Dot product:
+    double sum = 0;
+    for(int d = 0; d < dim; d++) {
+      sum += cf1.ls[d] * cf2.ls[d];
     }
-    sum = cf1.n * cf2.sumOfSumOfSquares() + cf2.n * cf1.sumOfSumOfSquares() - 2 * sum;
-    return sum > 0 ? Math.sqrt(sum / (cf1.n * (long) cf2.n)) : 0;
+    sum = cf2.n * cf1.sumOfSumOfSquares() + cf1.n * cf2.sumOfSumOfSquares() - 2 * sum;
+    return sum > 0 ? sum / (cf1.n * (long) cf2.n) : 0;
   }
 
   /**

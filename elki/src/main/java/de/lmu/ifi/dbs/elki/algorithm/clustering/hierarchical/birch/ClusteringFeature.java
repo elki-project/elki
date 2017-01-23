@@ -104,93 +104,6 @@ public class ClusteringFeature {
   }
 
   /**
-   * Compute the radius of a cluster feature.
-   * 
-   * Based on Appendix A of Data clustering for very large datasets plus
-   * applications, Tian Zhang, Doctoral Dissertation, 1997.
-   * 
-   * @return Radius
-   */
-  public double radius() {
-    if(n <= 1) {
-      return 0.;
-    }
-    double sum = sumOfSumOfSquares();
-    sum /= n;
-    for(int i = 0; i < ls.length; i++) {
-      double v = ls[i] / n;
-      sum -= v * v;
-    }
-    return Math.sqrt(sum);
-  }
-
-  /**
-   * Compute the radius of a cluster feature.
-   * 
-   * Based on Appendix A of Data clustering for very large datasets plus
-   * applications, Tian Zhang, Doctoral Dissertation, 1997.
-   * 
-   * @param nv Virtual point to be added.
-   * @return Radius
-   */
-  public double radiusWith(NumberVector nv) {
-    if(n <= 0) {
-      return 0.;
-    }
-    double sum = sumOfSumOfSquares();
-    for(int i = 0; i < ls.length; i++) {
-      double v = nv.doubleValue(i);
-      sum += v * v;
-    }
-    sum /= n + 1;
-    for(int i = 0; i < ls.length; i++) {
-      double v = (ls[i] + nv.doubleValue(i)) / (n + 1);
-      sum -= v * v;
-    }
-    return Math.sqrt(sum);
-  }
-
-  /**
-   * Compute the diameter of a cluster feature.
-   * 
-   * Based on Appendix A of Data clustering for very large datasets plus
-   * applications, Tian Zhang, Doctoral Dissertation, 1997.
-   * 
-   * @return Diameter
-   */
-  public double diameter() {
-    if(n <= 1) {
-      return 0.;
-    }
-    double v = (ss * n - sumOfSquaresOfSums()) * 2. / (n * (n - 1.));
-    return v > 0. ? Math.sqrt(v) : 0.;
-  }
-
-  /**
-   * Compute the diameter of a cluster feature.
-   * 
-   * Based on Appendix A of Data clustering for very large datasets plus
-   * applications, Tian Zhang, Doctoral Dissertation, 1997.
-   * 
-   * @param nv Additional vector
-   * @return Diameter
-   */
-  public double diameterSqWith(NumberVector nv) {
-    if(n <= 0) {
-      return 0.;
-    }
-    double sum1 = ss, sum2 = 0.;
-    for(int i = 0; i < ls.length; i++) {
-      double x = nv.doubleValue(i);
-      sum1 += x * x;
-      double v = ls[i] + x;
-      sum2 += v * v;
-    }
-    double diameter = (sum1 * (n + 1) - sum2) * 2. / ((n + 1.) * n);
-    return diameter > 0 ? diameter : 0.;
-  }
-
-  /**
    * Sum over all dimensions of sums of squares.
    *
    * @return Sum of SS
@@ -220,5 +133,21 @@ public class ClusteringFeature {
    */
   public int getDimensionality() {
     return ls.length;
+  }
+
+  /**
+   * Compute the sum of squares of a vector.
+   *
+   * @param v Vector
+   * @return Sum of squares
+   */
+  public static double sumOfSquares(NumberVector v) {
+    final int dim = v.getDimensionality();
+    double sum = 0;
+    for(int d = 0; d < dim; d++) {
+      double x = v.doubleValue(d);
+      sum += x * x;
+    }
+    return sum;
   }
 }

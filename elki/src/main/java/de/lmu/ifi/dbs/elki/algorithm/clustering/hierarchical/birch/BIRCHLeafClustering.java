@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.data.model.KMeansModel;
+import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -62,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
     title = "BIRCH: An Efficient Data Clustering Method for Very Large Databases", //
     booktitle = "Proc. 1996 ACM SIGMOD International Conference on Management of Data", //
     url = "http://dx.doi.org/10.1145/233269.233324")
-public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<KMeansModel>> implements ClusteringAlgorithm<Clustering<KMeansModel>> {
+public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>> implements ClusteringAlgorithm<Clustering<MeanModel>> {
   /**
    * Class logger.
    */
@@ -98,7 +98,7 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<KMeansMode
    * @param relation Input data
    * @return Clustering
    */
-  public Clustering<KMeansModel> run(Relation<NumberVector> relation) {
+  public Clustering<MeanModel> run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
     CFTree tree = cffactory.newTree();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Building tree", relation.size(), LOG) : null;
@@ -107,15 +107,14 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<KMeansMode
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
-    Clustering<KMeansModel> result = new Clustering<>("BIRCH-leaves", "BIRCH leaves");
+    Clustering<MeanModel> result = new Clustering<>("BIRCH-leaves", "BIRCH leaves");
     for(CFTree.LeafIterator iter = tree.leafIterator(); iter.valid(); iter.advance()) {
       CFTree.LeafEntry leaf = iter.get();
       double[] center = new double[dim];
       for(int i = 0; i < dim; i++) {
         center[i] = leaf.centroid(i);
       }
-      double varsum = leaf.sumOfSumOfSquares() - leaf.sumOfSquaresOfSums();
-      result.addToplevelCluster(new Cluster<>(leaf.getIDs(), new KMeansModel(center, varsum)));
+      result.addToplevelCluster(new Cluster<>(leaf.getIDs(), new MeanModel(center)));
     }
     return result;
   }
@@ -130,6 +129,13 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<KMeansMode
     return LOG;
   }
 
+  /**
+   * Parameterization class.
+   *
+   * @author Erich Schubert
+   *
+   * @apiviz.exclude
+   */
   public static class Parameterizer extends AbstractParameterizer {
     /**
      * CFTree factory.

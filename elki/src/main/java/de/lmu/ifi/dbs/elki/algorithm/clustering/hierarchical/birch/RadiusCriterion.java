@@ -23,66 +23,66 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Centroid Euclidean distance.
- * 
- * Reference:
- * <p>
- * Data Clustering for Very Large Datasets Plus Applications<br />
- * T. Zhang<br />
- * Doctoral Dissertation, 1997.
- * </p>
+ * Average Radius (R) criterion.
  * 
  * @author Erich Schubert
  */
-@Alias({ "D0" })
-@Reference(authors = "T. Zhang", //
-    title = "Data Clustering for Very Large Datasets Plus Applications", //
-    booktitle = "University of Wisconsin Madison, Technical Report #1355", //
-    url = "ftp://ftp.cs.wisc.edu/pub/techreports/1997/TR1355.pdf")
-public class CentroidEuclideanDistance implements BIRCHDistance {
+@Alias("R")
+public class RadiusCriterion implements BIRCHAbsorptionCriterion {
   /**
    * Static instance.
    */
-  public static final CentroidEuclideanDistance STATIC = new CentroidEuclideanDistance();
+  public static final RadiusCriterion STATIC = new RadiusCriterion();
 
   @Override
-  public double squaredDistance(NumberVector v, ClusteringFeature cf) {
-    final int d = v.getDimensionality();
-    assert (d == cf.getDimensionality());
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      double dx = cf.centroid(i) - v.doubleValue(i);
-      sum += dx * dx;
+  public double squaredCriterion(ClusteringFeature f1, NumberVector n) {
+    if(f1.n <= 0) {
+      return 0.;
+    }
+    final int dim = f1.ls.length;
+    final double div = 1. / (f1.n + 1);
+    // Sum_d sum_i squares
+    double sum = f1.sumOfSumOfSquares();
+    for(int d = 0; d < dim; d++) {
+      double v = n.doubleValue(d);
+      sum += v * v;
+    }
+    sum *= div;
+    // Sum_d square sum_i
+    for(int d = 0; d < dim; d++) {
+      double v = (f1.ls[d] + n.doubleValue(d)) * div;
+      sum -= v * v;
     }
     return sum;
   }
 
   @Override
-  public double squaredDistance(ClusteringFeature v, ClusteringFeature cf) {
-    final int d = v.getDimensionality();
-    assert (d == cf.getDimensionality());
-    double sum = 0.;
-    for(int i = 0; i < d; i++) {
-      double dx = cf.centroid(i) - v.centroid(i);
-      sum += dx * dx;
+  public double squaredCriterion(ClusteringFeature f1, ClusteringFeature f2) {
+    final int n12 = f1.n + f2.n;
+    if(n12 <= 1) {
+      return 0.;
+    }
+    final int dim = f1.ls.length;
+    final double div = 1. / n12;
+    double sum = (f1.sumOfSumOfSquares() + f2.sumOfSumOfSquares()) * div;
+    for(int i = 0; i < dim; i++) {
+      double v = (f1.ls[i] + f2.ls[i]) * div;
+      sum -= v * v;
     }
     return sum;
   }
 
   /**
-   * Parameterization class.
+   * Parameterization class
    * 
    * @author Erich Schubert
-   * 
-   * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected CentroidEuclideanDistance makeInstance() {
+    protected RadiusCriterion makeInstance() {
       return STATIC;
     }
   }

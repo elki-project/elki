@@ -36,6 +36,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * Doctoral Dissertation, 1997.
  * </p>
  * 
+ * Note: this distance did not work well in the original work, apparently.
+ * 
  * @author Erich Schubert
  */
 @Alias({ "D3" })
@@ -50,36 +52,31 @@ public class AverageIntraclusterDistance implements BIRCHDistance {
   public static final AverageIntraclusterDistance STATIC = new AverageIntraclusterDistance();
 
   @Override
-  public double distance(NumberVector v, ClusteringFeature cf) {
-    final int d = v.getDimensionality();
-    assert (d == cf.getDimensionality());
+  public double squaredDistance(NumberVector v, ClusteringFeature cf) {
+    final int dim = v.getDimensionality();
+    assert (dim == cf.getDimensionality());
     final int n12 = 1 + cf.n;
-    double sum = cf.sumOfSumOfSquares();
-    for(int i = 0; i < d; i++) {
-      double x = v.doubleValue(i);
-      sum += x * x;
+    final double div1 = 1. / n12, div2 = 1. / (n12 - 1);
+    double sum = (cf.sumOfSumOfSquares() + ClusteringFeature.sumOfSquares(v)) * div2;
+    for(int d = 0; d < dim; d++) {
+      double x = cf.ls[d] + v.doubleValue(d);
+      sum -= (x * div1) * (x * div2);
     }
-    sum *= n12;
-    for(int i = 0; i < d; i++) {
-      double x = cf.ls[i] + v.doubleValue(i);
-      sum -= x * x;
-    }
-    double sqd = sum / (0.5 * n12 * (n12 - 1.));
-    return sqd > 0 ? Math.sqrt(sqd) : 0;
+    return sum > 0 ? sum * 2. : 0;
   }
 
   @Override
-  public double distance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    final int d = cf1.getDimensionality();
-    assert (d == cf2.getDimensionality());
+  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
+    final int dim = cf1.getDimensionality();
+    assert (dim == cf2.getDimensionality());
     final int n12 = cf1.n + cf2.n;
-    double sum = n12 * (cf1.sumOfSumOfSquares() + cf2.sumOfSumOfSquares());
-    for(int i = 0; i < d; i++) {
-      double v = cf1.ls[i] + cf2.ls[i];
-      sum -= v * v;
+    final double div1 = 1. / n12, div2 = 1. / (n12 - 1);
+    double sum = (cf1.sumOfSumOfSquares() + cf2.sumOfSumOfSquares()) * div2;
+    for(int d = 0; d < dim; d++) {
+      double x = cf1.ls[d] + cf2.ls[d];
+      sum -= (x * div1) * (x * div2);
     }
-    double sqd = sum / (0.5 * n12 * (n12 - 1.));
-    return sqd > 0 ? Math.sqrt(sqd) : 0.;
+    return sum > 0 ? sum * 2. : 0;
   }
 
   /**

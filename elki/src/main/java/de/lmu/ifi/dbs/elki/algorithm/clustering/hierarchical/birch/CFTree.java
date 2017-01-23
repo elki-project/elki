@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
@@ -57,8 +56,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * implement the originally proposed page size management at the same time.
  * 
  * Condensing and merging refinement are possible, and improvements are welcome!
- * 
- * TODO: Alternatively, allow bounding the "diameter" instead of the radius?
  * 
  * References:
  * <p>
@@ -89,6 +86,11 @@ public class CFTree {
   BIRCHDistance distance;
 
   /**
+   * Criterion for absorbing points.
+   */
+  BIRCHAbsorptionCriterion absorption;
+
+  /**
    * Squared maximum radius threshold of a clusterin feature.
    */
   double thresholdsq;
@@ -107,12 +109,14 @@ public class CFTree {
    * Constructor.
    *
    * @param distance Distance function to use
+   * @param absorption Absorption criterion
    * @param threshold Threshold
    * @param capacity Capacity
    */
-  public CFTree(BIRCHDistance distance, double threshold, int capacity) {
+  public CFTree(BIRCHDistance distance, BIRCHAbsorptionCriterion absorption, double threshold, int capacity) {
     super();
     this.distance = distance;
+    this.absorption = absorption;
     this.thresholdsq = threshold * threshold;
     this.capacity = capacity;
   }
@@ -159,13 +163,13 @@ public class CFTree {
 
     // Find the best child:
     int best = 0;
-    double bestd = distance.distance(nv, cfs[0]);
+    double bestd = distance.squaredDistance(nv, cfs[0]);
     for(int i = 1; i < cfs.length; i++) {
       ClusteringFeature cf = cfs[i];
       if(cf == null) {
         break;
       }
-      double d2 = distance.distance(nv, cf);
+      double d2 = distance.squaredDistance(nv, cf);
       if(d2 < bestd) {
         best = i;
         bestd = d2;
@@ -176,11 +180,9 @@ public class CFTree {
     if(child instanceof LeafEntry) {
       LeafEntry leaf = (LeafEntry) child;
       // Threshold constraint satisfied?
-      LoggingUtil.warning(leaf.n+" "+leaf.diameter()+" "+Math.sqrt(leaf.diameterSqWith(nv)));
-      if(leaf.diameterSqWith(nv) <= thresholdsq) {
+      if(absorption.squaredCriterion(leaf, nv) <= thresholdsq) {
         leaf.add(id, nv);
         node.addToStatistics(nv);
-        assert(leaf.diameter() <= Math.sqrt(thresholdsq)) : leaf.diameter() +" > "+ Math.sqrt(thresholdsq);
         return null;
       }
       leaf = new LeafEntry(nv.getDimensionality());
@@ -219,14 +221,14 @@ public class CFTree {
     for(int i = 0; i < capacity; i++) {
       ClusteringFeature ci = node.children[i];
       for(int j = i + 1; j < capacity; j++) {
-        double d = dists[i][j] = dists[j][i] = distance.distance(ci, node.children[j]);
+        double d = dists[i][j] = dists[j][i] = distance.squaredDistance(ci, node.children[j]);
         if(d > maxd) {
           maxd = d;
           m1 = i;
           m2 = j;
         }
       }
-      double d = dists[i][capacity] = dists[capacity][i] = distance.distance(ci, newchild);
+      double d = dists[i][capacity] = dists[capacity][i] = distance.squaredDistance(ci, newchild);
       if(d > maxd) {
         maxd = d;
         m1 = i;
@@ -449,6 +451,11 @@ public class CFTree {
     BIRCHDistance distance;
 
     /**
+     * Criterion for absorbing points.
+     */
+    BIRCHAbsorptionCriterion absorption;
+
+    /**
      * Cluster merge threshold.
      */
     double threshold;
@@ -462,11 +469,13 @@ public class CFTree {
      * Constructor.
      *
      * @param distance Distance to use
+     * @param absorption Absorption criterion (diameter, distance).
      * @param threshold Distance threshold
      * @param branchingFactor Maximum branching factor.
      */
-    public Factory(BIRCHDistance distance, double threshold, int branchingFactor) {
+    public Factory(BIRCHDistance distance, BIRCHAbsorptionCriterion absorption, double threshold, int branchingFactor) {
       this.distance = distance;
+      this.absorption = absorption;
       this.threshold = threshold;
       this.branchingFactor = branchingFactor;
     }
@@ -477,7 +486,7 @@ public class CFTree {
      * @return New tree
      */
     public CFTree newTree() {
-      return new CFTree(distance, threshold, branchingFactor);
+      return new CFTree(distance, absorption, threshold, branchingFactor);
     }
 
     /**
@@ -490,6 +499,11 @@ public class CFTree {
        * Distance function parameter.
        */
       private static final OptionID DISTANCE_ID = new OptionID("cftree.distance", "Distance function to use for node assignment.");
+
+      /**
+       * Absorption parameter.
+       */
+      private static final OptionID ABSORPTION_ID = new OptionID("cftree.absorption", "Absorption criterion to use.");
 
       /**
        * Distance threshold.
@@ -505,6 +519,11 @@ public class CFTree {
        * BIRCH distance function to use
        */
       BIRCHDistance distance;
+
+      /**
+       * Criterion for absorbing points.
+       */
+      BIRCHAbsorptionCriterion absorption;
 
       /**
        * Cluster merge threshold.
@@ -523,6 +542,11 @@ public class CFTree {
           distance = distanceP.instantiateClass(config);
         }
 
+        ObjectParameter<BIRCHAbsorptionCriterion> absorptionP = new ObjectParameter<>(ABSORPTION_ID, BIRCHAbsorptionCriterion.class, DiameterCriterion.class);
+        if(config.grab(absorptionP)) {
+          absorption = absorptionP.instantiateClass(config);
+        }
+
         DoubleParameter thresholdP = new DoubleParameter(THRESHOLD_ID) //
             .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
         if(config.grab(thresholdP)) {
@@ -539,7 +563,7 @@ public class CFTree {
 
       @Override
       protected CFTree.Factory makeInstance() {
-        return new CFTree.Factory(distance, threshold, branchingFactor);
+        return new CFTree.Factory(distance, absorption, threshold, branchingFactor);
       }
     }
   }

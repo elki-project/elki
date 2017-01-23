@@ -50,46 +50,43 @@ public class VarianceIncreaseDistance implements BIRCHDistance {
   public static final VarianceIncreaseDistance STATIC = new VarianceIncreaseDistance();
 
   @Override
-  public double distance(NumberVector v, ClusteringFeature cf) {
-    final int d = v.getDimensionality();
-    assert (d == cf.getDimensionality());
-    double ss2 = cf.sumOfSumOfSquares();
-    int n2 = cf.n, n12 = 1 + n2;
-    double sum12 = 0., sum1 = 0., sum2 = 0.;
-    for(int i = 0; i < d; i++) {
-      double x1 = v.doubleValue(i), x2 = cf.ls[i];
-      double x12 = (x1 + x2) / n12;
-      sum12 += x12 * x12;
-      // n1 is 1.
-      sum1 += x1 * x1;
-      x2 = x2 / n2;
-      sum2 += x2 * x2;
+  public double squaredDistance(NumberVector v, ClusteringFeature cf) {
+    final int dim = v.getDimensionality();
+    assert (dim == cf.getDimensionality());
+    final int n2 = cf.n, n3 = 1 + n2;
+    final double div2 = 1. / n2, div3 = 1. / n3;
+    double dot1 = 0., dot2 = 0., dot3 = 0.;
+    for(int d = 0; d < dim; d++) {
+      double x1 = v.doubleValue(d), x2 = cf.ls[d];
+      double x3 = (x1 + x2) * div3;
+      x2 *= div2;
+      // x1 *= div1;
+      dot1 += x1 * x1;
+      dot2 += x2 * x2;
+      dot3 += x3 * x3;
     }
-    double sum = (sum1 + ss2) / n12 - sum12 //
-        + ss2 / n2 - sum2;
-    return sum > 0 ? Math.sqrt(sum) : 0;
+    double sum = /* 1 * */ dot1 + n2 * dot2 - n3 * dot3;
+    return sum > 0 ? sum : 0;
   }
 
   @Override
-  public double distance(ClusteringFeature cf1, ClusteringFeature cf2) {
-    final int d = cf1.getDimensionality();
-    assert (d == cf2.getDimensionality());
-    double ss1 = cf1.sumOfSumOfSquares(), ss2 = cf2.sumOfSumOfSquares();
-    int n1 = cf1.n, n2 = cf2.n, n12 = n1 + n2;
-    double sum12 = 0., sum1 = 0., sum2 = 0.;
-    for(int i = 0; i < d; i++) {
-      double x1 = cf1.ls[i], x2 = cf2.ls[i];
-      double x12 = (x1 + x2) / n12; // E(x)
-      sum12 += x12 * x12; // sum E(x)^2
-      x1 = x1 / n1; // E(x)
-      sum1 += x1 * x1; // sum E(x)^2
-      x2 = x2 / n2; // E(x)
-      sum2 += x2 * x2; // sum E(x)^2
+  public double squaredDistance(ClusteringFeature cf1, ClusteringFeature cf2) {
+    final int dim = cf1.getDimensionality();
+    assert (dim == cf2.getDimensionality());
+    final int n1 = cf1.n, n2 = cf2.n, n3 = 1 + n2;
+    final double div1 = 1. / cf1.n, div2 = 1. / n2, div3 = 1. / n3;
+    double dot1 = 0., dot2 = 0., dot3 = 0.;
+    for(int d = 0; d < dim; d++) {
+      double x1 = cf1.ls[d], x2 = cf2.ls[d];
+      double x3 = (x1 + x2) * div3;
+      x2 *= div2;
+      x1 *= div1;
+      dot1 += x1 * x1;
+      dot2 += x2 * x2;
+      dot3 += x3 * x3;
     }
-    double sum = (ss1 + ss2) / n12 - sum12 //
-        + ss1 / n1 - sum1 //
-        + ss2 / n2 - sum2;
-    return sum > 0 ? Math.sqrt(sum) : 0;
+    double sum = n1 * dot1 + n2 * dot2 - n3 * dot3;
+    return sum > 0 ? sum : 0;
   }
 
   /**

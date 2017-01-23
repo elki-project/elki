@@ -50,7 +50,7 @@ public class CentroidManhattanDistance implements BIRCHDistance {
   public static final CentroidManhattanDistance STATIC = new CentroidManhattanDistance();
 
   @Override
-  public double distance(NumberVector v, ClusteringFeature cf) {
+  public double squaredDistance(NumberVector v, ClusteringFeature cf) {
     final int d = v.getDimensionality();
     assert (d == cf.getDimensionality());
     double sum = 0.;
@@ -62,7 +62,7 @@ public class CentroidManhattanDistance implements BIRCHDistance {
   }
 
   @Override
-  public double distance(ClusteringFeature v, ClusteringFeature cf) {
+  public double squaredDistance(ClusteringFeature v, ClusteringFeature cf) {
     final int d = v.getDimensionality();
     assert (d == cf.getDimensionality());
     double sum = 0.;

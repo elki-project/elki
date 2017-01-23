@@ -24,30 +24,26 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 
 /**
- * Distance function for BIRCH clustering.
- * 
- * For performance we (usually) use squared distances.
- * 
- * The exception to this rule is Manhattan.
- * 
+ * BIRCH absorption criterion.
+ *
  * @author Erich Schubert
  */
-public interface BIRCHDistance {
+public interface BIRCHAbsorptionCriterion {
   /**
-   * Distance of a vector to a clustering feature.
-   * 
-   * @param v Vector
-   * @param cf Clustering Feature
-   * @return Distance
+   * Quality of a CF when adding a data point
+   *
+   * @param f1 Clustering feature
+   * @param n Data point
+   * @return Quality
    */
-  double squaredDistance(NumberVector v, ClusteringFeature cf);
+  double squaredCriterion(ClusteringFeature f1, NumberVector n);
 
   /**
-   * Distance between two clustering features.
+   * Quality when merging two CFs.
    * 
-   * @param c1 First clustering feature
-   * @param c2 Second clustering feature
-   * @return Distance
+   * @param f1 First clustering feature
+   * @param f2 Second clustering feature
+   * @return Quality
    */
-  double squaredDistance(ClusteringFeature c1, ClusteringFeature c2);
+  double squaredCriterion(ClusteringFeature f1, ClusteringFeature f2);
 }
