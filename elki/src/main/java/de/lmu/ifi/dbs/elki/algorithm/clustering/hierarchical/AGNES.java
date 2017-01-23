@@ -1,26 +1,26 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2015
+ * Ludwig-Maximilians-Universität München
+ * Lehr- und Forschungseinheit für Datenbanksysteme
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
@@ -94,12 +94,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  */
 @Reference(authors = "L. Kaufman and P. J. Rousseeuw", //
-title = "Agglomerative Nesting (Program AGNES)", //
-booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
-url = "http://dx.doi.org/10.1002/9780470316801.ch5")
+    title = "Agglomerative Nesting (Program AGNES)", //
+    booktitle = "Finding Groups in Data: An Introduction to Cluster Analysis", //
+    url = "http://dx.doi.org/10.1002/9780470316801.ch5")
 @Alias({ "HAC", "NaiveAgglomerativeHierarchicalClustering", //
-"de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering" })
-public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult>implements HierarchicalClusteringAlgorithm {
+    "de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering" })
+public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchyRepresentationResult> implements HierarchicalClusteringAlgorithm {
   /**
    * Class logger
    */
@@ -125,9 +125,9 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * Additional historical reference for single-linkage.
    */
   @Reference(authors = "P. H. Sneath", //
-  title = "The application of computers to taxonomy", //
-  booktitle = "Journal of general microbiology, 17(1)", //
-  url = "http://dx.doi.org/10.1099/00221287-17-1-201")
+      title = "The application of computers to taxonomy", //
+      booktitle = "Journal of general microbiology, 17(1)", //
+      url = "http://dx.doi.org/10.1099/00221287-17-1-201")
   public static final Void ADDITIONAL_REFERENCE = null;
 
   /**
@@ -144,8 +144,8 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
 
     if(size > 0x10000) {
       throw new AbortException("This implementation does not scale to data sets larger than " + //
-      0x10000 // = 65535
-      + " instances (~16 GB RAM), at which point the Java maximum array size is reached.");
+          0x10000 // = 65535
+          + " instances (~16 GB RAM), at which point the Java maximum array size is reached.");
     }
     if(SingleLinkageMethod.class.isInstance(linkage)) {
       LOG.verbose("Notice: SLINK is a much faster algorithm for single-linkage clustering!");
@@ -197,10 +197,12 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @param iy Data iterator
    * @param square Flag to use squared distances.
    */
-  protected static <O> void initializeDistanceMatrix(double[] scratch, DistanceQuery<O> dq, DBIDArrayIter ix, DBIDArrayIter iy, boolean square) {
+  protected static void initializeDistanceMatrix(double[] scratch, DistanceQuery<?> dq, DBIDArrayIter ix, DBIDArrayIter iy, boolean square) {
     int pos = 0;
     for(ix.seek(0); ix.valid(); ix.advance()) {
-      for(iy.seek(0); iy.getOffset() < ix.getOffset(); iy.advance()) {
+      final int x = ix.getOffset();
+      assert (pos == triangleSize(x));
+      for(iy.seek(0); iy.getOffset() < x; iy.advance()) {
         double dist = dq.distance(ix, iy);
         // Ward uses variances -- i.e. squared values
         dist = square ? (dist * dist) : dist;
@@ -229,7 +231,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
       if(builder.isLinked(ix.seek(ox))) {
         continue;
       }
-      assert(xbase == triangleSize(ox));
+      assert (xbase == triangleSize(ox));
       for(int oy = 0; oy < ox; oy++) {
         // Skip if object has already joined a cluster:
         if(builder.isLinked(iy.seek(oy))) {
@@ -243,7 +245,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
         }
       }
     }
-    assert(x >= 0 && y >= 0);
+    assert (x >= 0 && y >= 0);
     merge(size, scratch, ix, iy, builder, mindist, x, y);
     return x;
   }
@@ -268,7 +270,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
       LOG.debugFine("Merging: " + DBIDUtil.toString(ix) + " -> " + DBIDUtil.toString(iy) + " " + mindist);
     }
     // Perform merge in data structure: x -> y
-    assert(y < x);
+    assert (y < x);
     // Since y < x, prefer keeping y, dropping x.
     builder.add(ix, mindist, iy);
     // Update cluster size for y:
@@ -293,7 +295,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @param sizey Old size of second cluster
    */
   protected void updateMatrix(int size, double[] scratch, DBIDArrayIter ij, PointerHierarchyRepresentationBuilder builder, double mindist, int x, int y, final int sizex, final int sizey) {
-    // Update distance matrix. Note: miny < minx
+    // Update distance matrix. Note: y < x
     final int xbase = triangleSize(x), ybase = triangleSize(y);
 
     // Write to (y, j), with j < y
@@ -302,9 +304,9 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
       if(builder.isLinked(ij.seek(j))) {
         continue;
       }
-      final int sizej = builder.getSize(ij);
+      assert (j < y); // Otherwise, ybase + j is the wrong position!
       final int yb = ybase + j;
-      scratch[yb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[yb], sizej, mindist);
+      scratch[yb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[yb], builder.getSize(ij), mindist);
     }
     j++; // Skip y
     // Write to (j, y), with y < j < x
@@ -313,9 +315,8 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
       if(builder.isLinked(ij.seek(j))) {
         continue;
       }
-      final int sizej = builder.getSize(ij);
       final int jb = jbase + y;
-      scratch[jb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jb], sizej, mindist);
+      scratch[jb] = linkage.combine(sizex, scratch[xbase + j], sizey, scratch[jb], builder.getSize(ij), mindist);
     }
     jbase += j++; // Skip x
     // Write to (j, y), with y < x < j
@@ -323,8 +324,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
       if(builder.isLinked(ij.seek(j))) {
         continue;
       }
-      final int sizej = builder.getSize(ij);
-      scratch[jbase + y] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jbase + y], sizej, mindist);
+      scratch[jbase + y] = linkage.combine(sizex, scratch[jbase + x], sizey, scratch[jbase + y], builder.getSize(ij), mindist);
     }
   }
 

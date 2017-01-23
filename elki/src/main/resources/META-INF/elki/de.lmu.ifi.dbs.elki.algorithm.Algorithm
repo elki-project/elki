@@ -13,6 +13,7 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramBy
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK clustering.SLINK single-link single-linkage
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AnderbergHierarchicalClustering
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NNChain
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AGNES HAC NaiveAgglomerativeHierarchicalClustering de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CLINK Defays
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory
