@@ -255,6 +255,36 @@ public final class DataStoreUtil {
    *
    * @apiviz.exclude
    */
+  public static class AscendingByIntegerDataStore implements Comparator<DBIDRef> {
+    /**
+     * Scores to use for sorting.
+     */
+    private final IntegerDataStore scores;
+
+    /**
+     * Constructor.
+     *
+     * @param scores Scores for sorting
+     */
+    public AscendingByIntegerDataStore(IntegerDataStore scores) {
+      super();
+      this.scores = scores;
+    }
+
+    @Override
+    public int compare(DBIDRef id1, DBIDRef id2) {
+      return Integer.compare(scores.intValue(id1), scores.intValue(id2));
+    }
+  }
+  
+  /**
+   * Sort objects by a integer relation
+   *
+   * @author Erich Schubert
+   * @author Julian Erhard
+   *
+   * @apiviz.exclude
+   */
   public static class DescendingByIntegerDataStore implements Comparator<DBIDRef> {
     /**
      * Scores to use for sorting.
@@ -273,7 +303,7 @@ public final class DataStoreUtil {
 
     @Override
     public int compare(DBIDRef id1, DBIDRef id2) {
-      return Double.compare(scores.intValue(id2), scores.intValue(id1));
+      return Integer.compare(scores.intValue(id2), scores.intValue(id1));
     }
   }
 }
