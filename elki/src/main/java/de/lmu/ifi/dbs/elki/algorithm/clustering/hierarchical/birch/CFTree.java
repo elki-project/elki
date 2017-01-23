@@ -63,6 +63,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * BIRCH: An Efficient Data Clustering Method for Very Large Databases
  * Proc. 1996 ACM SIGMOD International Conference on Management of Data
  * </p>
+ * <p>
+ * T. Zhang and R. Ramakrishnan and M. Livny<br />
+ * BIRCH: A New Data Clustering Algorithm and Its Applications<br />
+ * Data Min. Knowl. Discovery
+ * </p>
  * 
  * @author Erich Schubert
  */
