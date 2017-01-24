@@ -20,15 +20,11 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.io;
 
+import java.nio.charset.Charset;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Formatter;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * Utility methods for output formatting of various number objects
@@ -117,7 +113,7 @@ public final class FormatUtil {
   /**
    * Non-breaking unicode space character.
    */
-  public static final String NONBREAKING_SPACE = "\u00a0";
+  public static final char NONBREAKING_SPACE = "UTF-8".equals(Charset.defaultCharset().name()) ? '\u00a0' : ' ';
 
   /**
    * The time unit sizes: ms, s, m, h, d; all in ms.
