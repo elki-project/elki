@@ -1,30 +1,28 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
-
 /*
- Copyright (C) 2015
- Johannes Schneider, ABB Research,Switzerland, johannes.schneider@alumni.ethz.ch
-
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Copyright (C) 2015
+ * Johannes Schneider, ABB Research, Switzerland,
+ * johannes.schneider@alumni.ethz.ch
+ * 
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2017
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -78,9 +76,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @apiviz.composedOf RandomProjectedNeighborsAndDensities
  */
 @Reference(authors = "J. Schneider and M. Vlachos", //
-title = "Fast parameterless density-based clustering via random projections", //
-booktitle = "Proc. 22nd ACM international conference on Conference on Information & Knowledge Management (CIKM)", //
-url = "http://dx.doi.org/10.1145/2505515.2505590")
+    title = "Fast parameterless density-based clustering via random projections", //
+    booktitle = "Proc. 22nd ACM international conference on Conference on Information & Knowledge Management (CIKM)", //
+    url = "http://dx.doi.org/10.1145/2505515.2505590")
 public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<ClusterOrder> implements OPTICSTypeAlgorithm {
   /**
    * Class logger.
@@ -249,7 +247,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntParameter minptsP = new IntParameter(AbstractOPTICS.Parameterizer.MINPTS_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         minpts = minptsP.intValue();
       }

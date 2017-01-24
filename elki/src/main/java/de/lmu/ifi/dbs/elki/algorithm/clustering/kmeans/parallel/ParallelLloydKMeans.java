@@ -1,3 +1,23 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2017
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithmUtil;
@@ -65,12 +85,12 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
     KMeansProcessor<V> kmm = new KMeansProcessor<>(relation, distanceFunction, assignment, varsum);
 
     IndefiniteProgress prog = LOG.isVerbose() ? new IndefiniteProgress("K-Means iteration", LOG) : null;
-    for (int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
+    for(int iteration = 0; maxiter <= 0 || iteration < maxiter; iteration++) {
       LOG.incrementProcessed(prog);
       kmm.nextIteration(means);
       ParallelExecutor.run(ids, kmm);
       // Stop if no cluster assignment changed.
-      if (!kmm.changed()) {
+      if(!kmm.changed()) {
         break;
       }
       means = kmm.getMeans();
@@ -81,9 +101,9 @@ public class ParallelLloydKMeans<V extends NumberVector> extends AbstractKMeans<
     ArrayModifiableDBIDs[] clusters = ClusteringAlgorithmUtil.partitionsFromIntegerLabels(ids, assignment, k);
 
     Clustering<KMeansModel> result = new Clustering<>("k-Means Clustering", "kmeans-clustering");
-    for (int i = 0; i < clusters.length; i++) {
+    for(int i = 0; i < clusters.length; i++) {
       DBIDs cids = clusters[i];
-      if (cids.size() == 0) {
+      if(cids.size() == 0) {
         continue;
       }
       KMeansModel model = new KMeansModel(means[i], varsum[i]);

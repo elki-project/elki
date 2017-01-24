@@ -1,3 +1,23 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2017
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -57,21 +77,26 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
   @Override
   public void setValue(Object obj) throws ParameterException {
     // This is a bit hackish. Set both seed and random (via super.setValue())
-    if (obj instanceof RandomFactory) {
+    if(obj instanceof RandomFactory) {
       seed = null;
-    } else if (obj instanceof Long) {
+    }
+    else if(obj instanceof Long) {
       seed = (Long) obj;
       obj = RandomFactory.get(seed);
-    } else if (obj instanceof Number) {
+    }
+    else if(obj instanceof Number) {
       seed = Long.valueOf(((Number) obj).longValue());
       obj = RandomFactory.get(seed);
-    } else if ("global random".equals(obj)) {
+    }
+    else if("global random".equals(obj)) {
       obj = RandomFactory.DEFAULT;
-    } else {
+    }
+    else {
       try {
         seed = Long.valueOf(obj.toString());
         obj = RandomFactory.get(seed);
-      } catch (NullPointerException|NumberFormatException e) {
+      }
+      catch(NullPointerException | NumberFormatException e) {
         throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
       }
     }
@@ -80,18 +105,19 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
 
   @Override
   protected RandomFactory parseValue(Object obj) throws ParameterException {
-    if (obj instanceof RandomFactory) {
+    if(obj instanceof RandomFactory) {
       return (RandomFactory) obj;
     }
-    if (obj instanceof Long) {
+    if(obj instanceof Long) {
       return RandomFactory.get((Long) obj);
     }
-    if (obj instanceof Number) {
+    if(obj instanceof Number) {
       return RandomFactory.get(Long.valueOf(((Number) obj).longValue()));
     }
     try {
       return RandomFactory.get(Long.valueOf(obj.toString()));
-    } catch (NullPointerException|NumberFormatException e) {
+    }
+    catch(NullPointerException | NumberFormatException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
     }
   }
@@ -99,7 +125,7 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
   @Override
   public Object getGivenValue() {
     Object r = super.getGivenValue();
-    if (r != null && seed != null) {
+    if(r != null && seed != null) {
       super.givenValue = RandomFactory.get(seed);
       r = super.givenValue;
     }
@@ -113,7 +139,7 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
 
   @Override
   public String getDefaultValueAsString() {
-    if (defaultValue == RandomFactory.DEFAULT) {
+    if(defaultValue == RandomFactory.DEFAULT) {
       return "global random";
     }
     return super.getDefaultValueAsString();

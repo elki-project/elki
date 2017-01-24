@@ -1,26 +1,24 @@
-package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.index;
-
-/*This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2015
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2017
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.index;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -97,16 +95,16 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewSiblings(context, start, AbstractRStarTree.class, ParallelPlotProjector.class, //
-    new VisualizationTree.Handler2<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>, ParallelPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, AbstractRStarTree<RStarTreeNode, SpatialEntry, ?> tree, ParallelPlotProjector<?> p) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, p.getRelation(), RTreeParallelVisualization.this);
-        task.level = VisualizationTask.LEVEL_BACKGROUND + 2;
-        task.default_visibility = false;
-        context.addVis((Result) tree, task);
-        context.addVis(p, task);
-      }
-    });
+        new VisualizationTree.Handler2<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>, ParallelPlotProjector<?>>() {
+          @Override
+          public void process(VisualizerContext context, AbstractRStarTree<RStarTreeNode, SpatialEntry, ?> tree, ParallelPlotProjector<?> p) {
+            final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, p.getRelation(), RTreeParallelVisualization.this);
+            task.level = VisualizationTask.LEVEL_BACKGROUND + 2;
+            task.default_visibility = false;
+            context.addVis((Result) tree, task);
+            context.addVis(p, task);
+          }
+        });
   }
 
   /**
@@ -119,7 +117,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
    * @param <N> Tree node type
    * @param <E> Tree entry type
    */
-  public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractParallelVisualization<NumberVector>implements DataStoreListener {
+  public class Instance<N extends AbstractRStarTreeNode<N, E>, E extends SpatialEntry> extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
     /**
      * The tree we visualize
      */
@@ -197,7 +195,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
       final int dim = proj.getVisibleDimensions();
       double[] min = proj.fastProjectDataToRenderSpace(SpatialUtil.getMin(entry));
       double[] max = proj.fastProjectDataToRenderSpace(SpatialUtil.getMax(entry));
-      assert(min.length == dim && max.length == dim);
+      assert (min.length == dim && max.length == dim);
       SVGPath path = new SVGPath();
       for(int i = 0; i < dim; i++) {
         path.drawTo(getVisibleAxisX(i), Math.max(min[i], max[i]));
