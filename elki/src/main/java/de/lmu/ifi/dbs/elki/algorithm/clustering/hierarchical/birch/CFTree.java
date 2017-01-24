@@ -22,12 +22,14 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
  */
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
@@ -86,6 +88,11 @@ public class CFTree {
   public static final Void ADDITIONAL_REFERENCE = null;
 
   /**
+   * Class logger.
+   */
+  public static final Logging LOG = Logging.getLogger(CFTree.class);
+
+  /**
    * Distance function to use.
    */
   BIRCHDistance distance;
@@ -109,6 +116,11 @@ public class CFTree {
    * Current root node.
    */
   TreeNode root = null;
+
+  /**
+   * Leaf node counter.
+   */
+  int leaves;
 
   /**
    * Constructor.
@@ -141,6 +153,7 @@ public class CFTree {
       root = new TreeNode(dim, capacity);
       root.children[0] = leaf;
       root.addToStatistics(nv);
+      ++leaves;
       return;
     }
     TreeNode other = insert(root, id, nv);
@@ -151,6 +164,77 @@ public class CFTree {
       newnode.addToStatistics(newnode.children[1] = other);
       root = newnode;
     }
+  }
+
+  /**
+   * Rebuild the CFTree to condense it to approximately half the size.
+   */
+  protected void rebuildTree() {
+    final int dim = root.getDimensionality();
+    double t = estimateThreshold(root) / leaves;
+    t *= t;
+    // Never decrease the threshold.
+    thresholdsq = t > thresholdsq ? t : thresholdsq;
+    LOG.debug("New squared threshold: " + thresholdsq);
+
+    LeafIterator iter = new LeafIterator(root); // Will keep the old root.
+    assert (iter.valid());
+    LeafEntry first = iter.get();
+
+    leaves = 0;
+    // Make a new root node:
+    root = new TreeNode(dim, capacity);
+    root.children[0] = first;
+    root.addToStatistics(first);
+    ++leaves;
+    for(iter.advance(); iter.valid(); iter.advance()) {
+      TreeNode other = insert(root, iter.get());
+      // Handle root overflow:
+      if(other != null) {
+        TreeNode newnode = new TreeNode(dim, capacity);
+        newnode.addToStatistics(newnode.children[0] = root);
+        newnode.addToStatistics(newnode.children[1] = other);
+        root = newnode;
+      }
+    }
+  }
+
+  private double estimateThreshold(TreeNode current) {
+    ClusteringFeature[] children = current.children;
+    double total = 0.;
+    if(children[0] instanceof LeafEntry) {
+      if (children[1] == null) {
+        return 0.;
+      }
+      double[] best = new double[children.length]; // Cache.
+      Arrays.fill(best, Double.POSITIVE_INFINITY);
+      for(int i = 0; i < children.length; i++) {
+        ClusteringFeature ci = children[i];
+        if(ci == null) {
+          break;
+        }
+        double bi = best[i];
+        for(int j = i + 1; j < children.length; j++) {
+          if(children[j] == null) {
+            break;
+          }
+          double dist = absorption.squaredCriterion(ci, children[j]);
+          bi = bi < dist ? bi : dist;
+          best[j] = best[j] < dist ? best[j] : dist;
+        }
+        total += bi > 0 ? Math.sqrt(bi) : 0;
+      }
+    }
+    else {
+      assert (children[0] instanceof TreeNode) : "Node is neither child nor inner?";
+      for(int i = 0; i < children.length; i++) {
+        if(children[i] == null) {
+          break;
+        }
+        total += estimateThreshold((TreeNode) children[i]);
+      }
+    }
+    return total;
   }
 
   /**
@@ -167,8 +251,8 @@ public class CFTree {
     assert (cfs[0] != null) : "Unexpected empty node!";
 
     // Find the best child:
-    int best = 0;
-    double bestd = distance.squaredDistance(nv, cfs[0]);
+    ClusteringFeature best = cfs[0];
+    double bestd = distance.squaredDistance(nv, best);
     for(int i = 1; i < cfs.length; i++) {
       ClusteringFeature cf = cfs[i];
       if(cf == null) {
@@ -176,14 +260,13 @@ public class CFTree {
       }
       double d2 = distance.squaredDistance(nv, cf);
       if(d2 < bestd) {
-        best = i;
+        best = cf;
         bestd = d2;
       }
     }
 
-    ClusteringFeature child = node.children[best];
-    if(child instanceof LeafEntry) {
-      LeafEntry leaf = (LeafEntry) child;
+    if(best instanceof LeafEntry) {
+      LeafEntry leaf = (LeafEntry) best;
       // Threshold constraint satisfied?
       if(absorption.squaredCriterion(leaf, nv) <= thresholdsq) {
         leaf.add(id, nv);
@@ -192,14 +275,15 @@ public class CFTree {
       }
       leaf = new LeafEntry(nv.getDimensionality());
       leaf.add(id, nv);
+      ++leaves;
       if(add(node.children, leaf)) {
         node.addToStatistics(nv); // Update statistics
         return null;
       }
       return split(node, leaf);
     }
-    assert (child instanceof TreeNode) : "Node is neither child nor inner?";
-    TreeNode newchild = insert((TreeNode) child, id, nv);
+    assert (best instanceof TreeNode) : "Node is neither child nor inner?";
+    TreeNode newchild = insert((TreeNode) best, id, nv);
     if(newchild == null || add(node.children, newchild)) {
       node.addToStatistics(nv); // Update statistics
       return null;
@@ -274,6 +358,59 @@ public class CFTree {
   }
 
   /**
+   * Recursive insertion.
+   *
+   * @param node Current node
+   * @param nleaf Leaf entry to add.
+   * @return New sibling, if the node was split.
+   */
+  private TreeNode insert(TreeNode node, LeafEntry nleaf) {
+    // Find closest child:
+    ClusteringFeature[] cfs = node.children;
+    assert (cfs[0] != null) : "Unexpected empty node!";
+
+    // Find the best child:
+    ClusteringFeature best = cfs[0];
+    double bestd = distance.squaredDistance(nleaf, best);
+    for(int i = 1; i < cfs.length; i++) {
+      ClusteringFeature cf = cfs[i];
+      if(cf == null) {
+        break;
+      }
+      double d2 = distance.squaredDistance(nleaf, cf);
+      if(d2 < bestd) {
+        best = cf;
+        bestd = d2;
+      }
+    }
+
+    assert (best != nleaf);
+    if(best instanceof LeafEntry) {
+      LeafEntry leaf = (LeafEntry) best;
+      // Threshold constraint satisfied?
+      if(absorption.squaredCriterion(leaf, nleaf) <= thresholdsq) {
+        leaf.addToStatistics(nleaf);
+        leaf.ids.addDBIDs(nleaf.getIDs());
+        node.addToStatistics(nleaf);
+        return null;
+      }
+      ++leaves; // We have to add this entry
+      if(add(node.children, nleaf)) {
+        node.addToStatistics(nleaf); // Update statistics
+        return null;
+      }
+      return split(node, nleaf);
+    }
+    assert (best instanceof TreeNode) : "Node is neither child nor inner?";
+    TreeNode newchild = insert((TreeNode) best, nleaf);
+    if(newchild == null || add(node.children, newchild)) {
+      node.addToStatistics(nleaf); // Update statistics
+      return null;
+    }
+    return split(node, newchild);
+  }
+
+  /**
    * Add a node to the first unused slot.
    *
    * @param children Children list
@@ -296,7 +433,7 @@ public class CFTree {
    * @return Leaf node iterator.
    */
   public LeafIterator leafIterator() {
-    return new LeafIterator();
+    return new LeafIterator(root);
   }
 
   /**
@@ -304,7 +441,7 @@ public class CFTree {
    *
    * @author Erich Schubert
    */
-  public class LeafIterator implements Iter {
+  public static class LeafIterator implements Iter {
     /**
      * Queue of open ends.
      */
@@ -317,8 +454,10 @@ public class CFTree {
 
     /**
      * Constructor.
+     * 
+     * @param root Root node
      */
-    private LeafIterator() {
+    private LeafIterator(TreeNode root) {
       queue = new ArrayList<>();
       queue.add(root);
       advance();
@@ -348,11 +487,12 @@ public class CFTree {
           current = (LeafEntry) f;
           break;
         }
-        assert (f instanceof TreeNode);
+        assert (f instanceof TreeNode) : "Node is neither child nor inner?";
         for(ClusteringFeature c : ((TreeNode) f).children) {
-          if(c != null) {
-            queue.add(c);
+          if(c == null) {
+            break;
           }
+          queue.add(c);
         }
       }
       return this;
@@ -430,6 +570,9 @@ public class CFTree {
     FormatUtil.appendSpace(buf, d).append(n.n);
     for(int i = 0; i < n.getDimensionality(); i++) {
       buf.append(' ').append(n.centroid(i));
+    }
+    if(n instanceof LeafEntry) {
+      buf.append(" - ").append(((LeafEntry) n).n);
     }
     buf.append('\n');
     if(n instanceof TreeNode) {
@@ -533,7 +676,7 @@ public class CFTree {
       /**
        * Cluster merge threshold.
        */
-      double threshold;
+      double threshold = 0.;
 
       /**
        * Maximum branching factor of CFTree.
@@ -553,7 +696,8 @@ public class CFTree {
         }
 
         DoubleParameter thresholdP = new DoubleParameter(THRESHOLD_ID) //
-            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+            .setOptional(true);
         if(config.grab(thresholdP)) {
           threshold = thresholdP.doubleValue();
         }
