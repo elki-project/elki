@@ -1,36 +1,27 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster;
 
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2016
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ * 
+ * Copyright (C) 2017
+ * ELKI Development Team
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusTimes;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.normalize;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plus;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimes;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,15 +36,11 @@ import de.lmu.ifi.dbs.elki.data.model.EMModel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.Polygon;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.EigenPair;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.SortedEigenPairs;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParameterization;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -70,6 +57,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
+
 import net.jafama.FastMath;
 
 /**
@@ -84,6 +72,11 @@ import net.jafama.FastMath;
  * @apiviz.uses Instance oneway - - «create»
  */
 public class EMClusterVisualization extends AbstractVisFactory {
+  /**
+   * Class logger.
+   */
+  private static final Logging LOG = Logging.getLogger(EMClusterVisualization.class);
+
   /**
    * A short name characterizing this Visualizer.
    */
@@ -182,9 +175,6 @@ public class EMClusterVisualization extends AbstractVisFactory {
       StyleLibrary style = context.getStyleLibrary();
       ColorLibrary colors = style.getColorSet(StyleLibrary.PLOT);
 
-      // PCARunner
-      PCARunner pcarun = ClassGenericsUtil.parameterizeOrAbort(PCARunner.class, new EmptyParameterization());
-
       Iterator<Cluster<Model>> ci = clusters.iterator();
       for(int cnum = 0; cnum < clusters.size(); cnum++) {
         Cluster<Model> clus = ci.next();
@@ -218,19 +208,21 @@ public class EMClusterVisualization extends AbstractVisFactory {
         double[] cent = proj.fastProjectDataToRenderSpace(centroid);
 
         // Compute the eigenvectors
-        SortedEigenPairs eps = pcarun.processCovarMatrix(covmat).getEigenPairs();
-        double[][] pc = new double[eps.size()][];
-        for(int i = 0; i < eps.size(); i++) {
-          EigenPair ep = eps.getEigenPair(i);
-          double[] sev = times(ep.getEigenvector(), FastMath.sqrt(ep.getEigenvalue()));
+        EigenvalueDecomposition evd = new EigenvalueDecomposition(covmat);
+        double[] eigenvalues = evd.getRealEigenvalues();
+        double[][] eigenvectors = evd.getV();
+
+        // Projected eigenvectors:
+        double[][] pc = new double[eigenvalues.length][];
+        for(int i = 0; i < eigenvalues.length; i++) {
+          double[] sev = times(eigenvectors[i], FastMath.sqrt(eigenvalues[i]));
           pc[i] = proj.fastProjectRelativeDataToRenderSpace(sev);
         }
-        if(drawStyle != 0 || eps.size() == 2) {
+        if(drawStyle != 0 || eigenvalues.length == 2) {
           drawSphere2D(sname, cent, pc);
         }
         else {
-          Polygon chres = makeHullComplex(pc);
-          drawHullLines(sname, cent, chres);
+          drawHullLines(sname, cent, makeHullComplex(pc));
         }
       }
     }
@@ -256,21 +248,21 @@ public class EMClusterVisualization extends AbstractVisFactory {
 
             path.moveTo(p1);
             path.cubicTo(//
-            plusTimes(p1, pc[dim2], KAPPA * i), //
-            plusTimes(p2, pc[dim1], KAPPA * i), //
-            p2);
+                plusTimes(p1, pc[dim2], KAPPA * i), //
+                plusTimes(p2, pc[dim1], KAPPA * i), //
+                p2);
             path.cubicTo(//
-            minusTimes(p2, pc[dim1], KAPPA * i), //
-            plusTimes(p3, pc[dim2], KAPPA * i), //
-            p3);
+                minusTimes(p2, pc[dim1], KAPPA * i), //
+                plusTimes(p3, pc[dim2], KAPPA * i), //
+                p3);
             path.cubicTo(//
-            minusTimes(p3, pc[dim2], KAPPA * i), //
-            minusTimes(p4, pc[dim1], KAPPA * i), //
-            p4);
+                minusTimes(p3, pc[dim2], KAPPA * i), //
+                minusTimes(p4, pc[dim1], KAPPA * i), //
+                p4);
             path.cubicTo(//
-            plusTimes(p4, pc[dim1], KAPPA * i), //
-            minusTimes(p1, pc[dim2], KAPPA * i), //
-            p1);
+                plusTimes(p4, pc[dim1], KAPPA * i), //
+                minusTimes(p1, pc[dim2], KAPPA * i), //
+                p1);
             path.close();
 
             Element ellipse = path.makeElement(svgp);
@@ -465,13 +457,11 @@ public class EMClusterVisualization extends AbstractVisFactory {
       final double zn = rPrNe[0] * oPrev[1] - rPrNe[1] * oPrev[0];
       final double n = oPrev[1] * oNext[0] - oPrev[0] * oNext[1];
       if(n == 0) {
-        LoggingUtil.warning("Parallel?!?");
+        LOG.warning("Parallel?!?");
         path.drawTo(sNext[0], sNext[1]);
         return;
       }
-      final double tp = Math.abs(zp / n);
-      final double tn = Math.abs(zn / n);
-      // LoggingUtil.warning("tp: "+tp+" tn: "+tn);
+      final double tp = Math.abs(zp / n), tn = Math.abs(zn / n);
 
       // Guide points
       final double[] gPrev = plusTimes(sPrev, oPrev, KAPPA * scale * tp);
