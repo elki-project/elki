@@ -20,10 +20,10 @@
  */
 package de.lmu.ifi.dbs.elki.math.geometry;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
@@ -42,7 +42,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  */
 @Reference(authors = "Paul Graham", //
     title = "An Efficient Algorithm for Determining the Convex Hull of a Finite Planar Set", //
-    booktitle = "Information Processing Letters 1")
+    booktitle = "Information Processing Letters 1", //
+    url = "dx.doi.org/10.1016/0020-0190(72)90045-2")
 public class GrahamScanConvexHull2D {
   /**
    * The current set of points
@@ -75,7 +76,7 @@ public class GrahamScanConvexHull2D {
    * Constructor.
    */
   public GrahamScanConvexHull2D() {
-    this.points = new LinkedList<>();
+    this.points = new ArrayList<>();
   }
 
   /**
@@ -85,7 +86,7 @@ public class GrahamScanConvexHull2D {
    */
   public void add(double... point) {
     if(this.ok) {
-      this.points = new LinkedList<>(this.points);
+      this.points = new ArrayList<>(this.points);
       this.ok = false;
     }
     this.points.add(point);
@@ -214,7 +215,7 @@ public class GrahamScanConvexHull2D {
   private final boolean isConvex(double[] a, double[] b, double[] c) {
     // We're using factor to improve numerical contrast for small polygons.
     double area = (b[0] - a[0]) * factor * (c[1] - a[1]) - (c[0] - a[0]) * factor * (b[1] - a[1]);
-    return (area == 0) ? (mdist(b, c) > mdist(a, b) + mdist(a, c)) : (area < 0);
+    return (-1e-13 < area && area < 1e-13) ? (mdist(b, c) > mdist(a, b) + mdist(a, c)) : (area < 0);
   }
 
   /**
