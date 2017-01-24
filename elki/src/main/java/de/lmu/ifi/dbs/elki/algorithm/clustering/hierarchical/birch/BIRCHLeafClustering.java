@@ -1,5 +1,3 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
-
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
@@ -20,6 +18,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
@@ -29,11 +28,9 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.model.MeanModel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -100,13 +97,7 @@ public class BIRCHLeafClustering extends AbstractAlgorithm<Clustering<MeanModel>
    */
   public Clustering<MeanModel> run(Relation<NumberVector> relation) {
     final int dim = RelationUtil.dimensionality(relation);
-    CFTree tree = cffactory.newTree();
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Building tree", relation.size(), LOG) : null;
-    for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
-      tree.insert(it, relation.get(it));
-      LOG.incrementProcessed(prog);
-    }
-    LOG.ensureCompleted(prog);
+    CFTree tree = cffactory.newTree(relation.getDBIDs(), relation);
     Clustering<MeanModel> result = new Clustering<>("BIRCH-leaves", "BIRCH leaves");
     for(CFTree.LeafIterator iter = tree.leafIterator(); iter.valid(); iter.advance()) {
       CFTree.LeafEntry leaf = iter.get();

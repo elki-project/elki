@@ -1,5 +1,3 @@
-package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
-
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
@@ -20,16 +18,16 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.birch;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
@@ -203,26 +201,36 @@ public class CFTree {
     ClusteringFeature[] children = current.children;
     double total = 0.;
     if(children[0] instanceof LeafEntry) {
-      if (children[1] == null) {
+      if(children[1] == null) {
         return 0.;
       }
       double[] best = new double[children.length]; // Cache.
       Arrays.fill(best, Double.POSITIVE_INFINITY);
+      int[] besti = new int[children.length];
       for(int i = 0; i < children.length; i++) {
         ClusteringFeature ci = children[i];
         if(ci == null) {
           break;
         }
         double bi = best[i];
+        int bestii = besti[i];
         for(int j = i + 1; j < children.length; j++) {
           if(children[j] == null) {
             break;
           }
-          double dist = absorption.squaredCriterion(ci, children[j]);
-          bi = bi < dist ? bi : dist;
-          best[j] = best[j] < dist ? best[j] : dist;
+          // double dist = absorption.squaredCriterion(ci, children[j]);
+          double dist = distance.squaredDistance(ci, children[j]);
+          if(dist < bi) {
+            bi = dist;
+            bestii = j;
+          }
+          if(dist < best[j]) {
+            best[j] = dist;
+            besti[j] = i;
+          }
         }
-        total += bi > 0 ? Math.sqrt(bi) : 0;
+        double t = absorption.squaredCriterion(ci, children[bestii]);
+        total += t > 0 ? Math.sqrt(t) : 0;
       }
     }
     else {
@@ -614,27 +622,50 @@ public class CFTree {
     int branchingFactor;
 
     /**
+     * Maximum number of leaves (absolute or relative)
+     */
+    double maxleaves;
+
+    /**
      * Constructor.
      *
      * @param distance Distance to use
      * @param absorption Absorption criterion (diameter, distance).
      * @param threshold Distance threshold
      * @param branchingFactor Maximum branching factor.
+     * @param maxleaves Maximum number of leaves
      */
-    public Factory(BIRCHDistance distance, BIRCHAbsorptionCriterion absorption, double threshold, int branchingFactor) {
+    public Factory(BIRCHDistance distance, BIRCHAbsorptionCriterion absorption, double threshold, int branchingFactor, double maxleaves) {
       this.distance = distance;
       this.absorption = absorption;
       this.threshold = threshold;
       this.branchingFactor = branchingFactor;
+      this.maxleaves = maxleaves;
     }
 
     /**
      * Make a new tree.
      *
+     * @param ids DBIDs to insert
+     * @param relation Data relation
      * @return New tree
      */
-    public CFTree newTree() {
-      return new CFTree(distance, absorption, threshold, branchingFactor);
+    public CFTree newTree(DBIDs ids, Relation<? extends NumberVector> relation) {
+      CFTree tree = new CFTree(distance, absorption, threshold, branchingFactor);
+      final double max = maxleaves <= 1 ? maxleaves * ids.size() : maxleaves;
+      FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Building tree", relation.size(), LOG) : null;
+      for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
+        tree.insert(it, relation.get(it));
+        if(tree.leaves > max) {
+          if(LOG.isVerbose()) {
+            LOG.verbose("Compacting CF-tree.");
+          }
+          tree.rebuildTree();
+        }
+        LOG.incrementProcessed(prog);
+      }
+      LOG.ensureCompleted(prog);
+      return tree;
     }
 
     /**
@@ -664,6 +695,11 @@ public class CFTree {
       private static final OptionID BRANCHING_ID = new OptionID("cftree.branching", "Maximum branching factor of the CF-Tree");
 
       /**
+       * Maximum number of leaves.
+       */
+      private static final OptionID MAXLEAVES_ID = new OptionID("cftree.maxleaves", "Maximum number of leaves (if less than 1, the values is assumed to be relative)");
+
+      /**
        * BIRCH distance function to use
        */
       BIRCHDistance distance;
@@ -682,6 +718,11 @@ public class CFTree {
        * Maximum branching factor of CFTree.
        */
       int branchingFactor;
+
+      /**
+       * Maximum number of leaves (absolute or relative)
+       */
+      double maxleaves;
 
       @Override
       protected void makeOptions(Parameterization config) {
@@ -708,11 +749,18 @@ public class CFTree {
         if(config.grab(branchingP)) {
           branchingFactor = branchingP.intValue();
         }
+
+        DoubleParameter maxleavesP = new DoubleParameter(MAXLEAVES_ID) //
+            .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+            .setDefaultValue(0.05);
+        if(config.grab(maxleavesP)) {
+          maxleaves = maxleavesP.doubleValue();
+        }
       }
 
       @Override
       protected CFTree.Factory makeInstance() {
-        return new CFTree.Factory(distance, absorption, threshold, branchingFactor);
+        return new CFTree.Factory(distance, absorption, threshold, branchingFactor, maxleaves);
       }
     }
   }
