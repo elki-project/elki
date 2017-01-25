@@ -195,7 +195,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
       DoubleMinMax minmax = new DoubleMinMax();
       final double frac = 1. / relation.size(); // TODO: sampling?
       final int cols = numc + 1;
-      DoubleArrayStaticHistogram histogram = new DoubleArrayStaticHistogram(settings.bins, -.5, .5, cols);
+      DoubleArrayStaticHistogram histogram = new DoubleArrayStaticHistogram(settings.bins, 0, 1, cols);
 
       if(cspol != null) {
         for(int snum = 0; snum < numc; snum++) {
@@ -207,7 +207,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
               continue; // TODO: can we test more efficiently than this?
             }
             try {
-              double pos = proj.fastProjectDataToRenderSpace(relation.get(iter)) * Projection.INVSCALE;
+              double pos = proj.fastProjectDataToRenderSpace(relation.get(iter)) * Projection.INVSCALE + .5;
               histogram.increment(pos, inc);
             }
             catch(ObjectNotFoundException e) {
@@ -221,7 +221,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
         double[] inc = new double[cols];
         inc[0] = frac;
         for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-          double pos = proj.fastProjectDataToRenderSpace(relation.get(iditer)) * Projection.INVSCALE;
+          double pos = proj.fastProjectDataToRenderSpace(relation.get(iditer)) * Projection.INVSCALE + .5;
           histogram.increment(pos, inc);
         }
       }
@@ -233,7 +233,6 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
       }
 
       LinearScale yscale = new LinearScale(0, minmax.getMax());
-      LinearScale xscale = new LinearScale(histogram.getCoverMinimum(), histogram.getCoverMaximum());
 
       // Axis. TODO: Add an AxisVisualizer for this?
       try {
@@ -262,8 +261,8 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
       // Visualizing
       if(!settings.curves) {
         for(DoubleArrayStaticHistogram.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
-          double lpos = xscale.getScaled(iter.getLeft());
-          double rpos = xscale.getScaled(iter.getRight());
+          double lpos = iter.getLeft();
+          double rpos = iter.getRight();
           double stack = 0.0;
           final int start = numc > 0 ? 1 : 0;
           for(int key = start; key < cols; key++) {
@@ -276,7 +275,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
         }
       }
       else {
-        double left = xscale.getScaled(histogram.getCoverMinimum());
+        double left = histogram.getCoverMinimum();
         double right = left;
 
         SVGPath[] paths = new SVGPath[cols];
@@ -288,8 +287,8 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
         // draw histogram lines
         for(DoubleArrayStaticHistogram.Iter iter = histogram.iter(); iter.valid(); iter.advance()) {
-          left = xscale.getScaled(iter.getLeft());
-          right = xscale.getScaled(iter.getRight());
+          left = iter.getLeft();
+          right = iter.getRight();
           for(int i = 0; i < cols; i++) {
             double val = yscale.getScaled(iter.getValue()[i]);
             if(lasty[i] > val || lasty[i] < val) {
