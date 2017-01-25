@@ -130,14 +130,14 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
       return positions; // Return cached.
     }
     final ArrayDBIDs order = topologicalSort();
-    WritableIntegerDataStore siz = computeSubtreeSizes();
+    WritableIntegerDataStore siz = computeSubtreeSizes(order);
     WritableIntegerDataStore pos = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB, -1);
     WritableIntegerDataStore ins = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, -1);
-    
+
     int defins = 0; // Next root insertion position.
     DBIDVar v1 = DBIDUtil.newVar();
     // Place elements based on their successor
-    for(DBIDArrayIter it = order.iter(); it.valid(); it.retract()) {
+    for(DBIDArrayIter it = order.iter().seek(order.size() - 1); it.valid(); it.retract()) {
       final int size = siz.intValue(it);
       parent.assignVar(it, v1); // v1 = parent
       final int ipos = ins.intValue(v1); // Position of parent
@@ -161,12 +161,13 @@ public class PointerHierarchyRepresentationResult extends BasicResult {
   /**
    * Compute the size of all subtrees.
    *
+   * @param order Object order
    * @return Subtree sizes
    */
-  private WritableIntegerDataStore computeSubtreeSizes() {
+  private WritableIntegerDataStore computeSubtreeSizes(DBIDs order) {
     WritableIntegerDataStore siz = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_TEMP, 1);
     DBIDVar v1 = DBIDUtil.newVar();
-    for(DBIDIter it = ids.iter(); it.valid(); it.advance()) {
+    for(DBIDIter it = order.iter(); it.valid(); it.advance()) {
       if(DBIDUtil.equal(it, parent.assignVar(it, v1))) {
         continue;
       }
