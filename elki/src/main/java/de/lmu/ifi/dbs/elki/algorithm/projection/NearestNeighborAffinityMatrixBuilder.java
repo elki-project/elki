@@ -74,7 +74,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
   /**
    * Number of neighbors to use.
    */
-  private int numberOfNeighbours;
+  protected int numberOfNeighbours;
 
   /**
    * Constructor.

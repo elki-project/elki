@@ -59,7 +59,7 @@ public class SparseAffinityMatrix implements AffinityMatrix {
     int[] ind = indices[i];
     for(int y = 0; y < ind.length; y++) {
       if(ind[y] == j) {
-        return pij[i][j];
+        return pij[i][y];
       }
     }
     return 0;
