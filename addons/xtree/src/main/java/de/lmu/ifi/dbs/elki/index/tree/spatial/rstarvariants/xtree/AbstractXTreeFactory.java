@@ -1,27 +1,24 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
-
 /*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2017
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
@@ -46,7 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
  * @param <O> object type
  * @param <X> actual tree type
  */
-public abstract class AbstractXTreeFactory<O extends NumberVector, N extends AbstractXTreeNode<E, N>, E extends SpatialEntry, X extends AbstractRStarTree<N, E, XTreeSettings> & Index> extends AbstractRStarTreeFactory<O, N, E, X, XTreeSettings> {
+public abstract class AbstractXTreeFactory<O extends NumberVector, N extends AbstractXTreeNode<N>, X extends AbstractRStarTree<N, SpatialEntry, XTreeSettings> & Index> extends AbstractRStarTreeFactory<O, N, SpatialEntry, X, XTreeSettings> {
   /**
    * Constructor.
    * 

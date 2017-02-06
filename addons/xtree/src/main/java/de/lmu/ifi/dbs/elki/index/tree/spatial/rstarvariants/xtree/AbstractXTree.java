@@ -1,34 +1,26 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2017
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -44,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
-import de.lmu.ifi.dbs.elki.index.tree.TreeIndexPathComponent;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
@@ -72,13 +63,12 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  * @author Marisa Thoma
  * 
  * @param <N> Node type
- * @param <E> Entry type
  */
 @Reference(authors = "S. Berchtold, D. A. Keim, H.-P. Kriegel", //
 title = "The X-tree: An Index Structure for High-Dimensional Data", //
 booktitle = "Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96), Bombay, India, 1996", //
 url = "http://www.vldb.org/conf/1996/P028.PDF")
-public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends SpatialEntry> extends AbstractRStarTree<N, E, XTreeSettings> {
+public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends AbstractRStarTree<N, SpatialEntry, XTreeSettings> {
   /**
    * If <code>true</code>, the expensive call of
    * {@link #calculateOverlapIncrease(List, SpatialEntry, HyperBoundingBox)} is
@@ -185,7 +175,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
 
     // compute height
     while(!node.isLeaf() && node.getNumEntries() != 0) {
-      E entry = node.getEntry(0);
+      SpatialEntry entry = node.getEntry(0);
       node = getNode(entry);
       tHeight++;
     }
@@ -212,7 +202,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
   }
 
   @Override
-  protected void createEmptyRoot(E exampleLeaf) {
+  protected void createEmptyRoot(SpatialEntry exampleLeaf) {
     N root = createNewLeafNode();
     writeNode(root);
     setHeight(1);
@@ -230,7 +220,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
    * the constructor and should be overwritten by subclasses if necessary.
    */
   @Override
-  protected void bulkLoad(List<E> spatialObjects) {
+  protected void bulkLoad(List<SpatialEntry> spatialObjects) {
     throw new UnsupportedOperationException("Bulk Load not supported for XTree");
   }
 
@@ -320,11 +310,11 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
       throw new IllegalStateException("Trying to commit a non-persistent XTree");
     }
     long npid = file.getNextPageID();
-    XTreeHeader ph = (XTreeHeader) ((PersistentPageFile<N>) file).getHeader();
+    XTreeHeader ph = (XTreeHeader) ((PersistentPageFile<?>) file).getHeader();
     long offset = (ph.getReservedPages() + npid) * ph.getPageSize();
     ph.setSupernode_offset(npid * ph.getPageSize());
     ph.setNumberOfElements(num_elements);
-    RandomAccessFile ra_file = ((PersistentPageFile<N>) file).getFile();
+    RandomAccessFile ra_file = ((PersistentPageFile<?>) file).getFile();
     ph.writeHeader(ra_file);
     ra_file.seek(offset);
     long nBytes = 0;
@@ -357,7 +347,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
    * Raises the "number of elements" counter.
    */
   @Override
-  protected void preInsert(E entry) {
+  protected void preInsert(SpatialEntry entry) {
     // TODO: can we do this somewhere else?
     num_elements++;
   }
@@ -390,7 +380,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
 
     // read supernodes (if there are any)
     if(superNodeOffset > 0) {
-      RandomAccessFile ra_file = ((PersistentPageFile<N>) file).getFile();
+      RandomAccessFile ra_file = ((PersistentPageFile<?>) file).getFile();
       long offset = header.getReservedPages() * file.getPageSize() + superNodeOffset;
       int bs = 0 // omit this: 4 // EMPTY_PAGE or FILLED_PAGE ?
           + 4 // id
@@ -465,7 +455,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
   protected abstract Class<N> getNodeClass();
 
   @Override
-  protected void initializeCapacities(E exampleLeaf) {
+  protected void initializeCapacities(SpatialEntry exampleLeaf) {
     /* Simulate the creation of a leaf page to get the page capacity */
     try {
       int cap = 0;
@@ -566,28 +556,30 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
    *         <code>mbr</code>
    */
   @Override
-  protected IndexTreePath<E> choosePath(IndexTreePath<E> subtree, SpatialComparable mbr, int level) {
+  protected IndexTreePath<SpatialEntry> choosePath(IndexTreePath<SpatialEntry> subtree, SpatialComparable mbr, int level, int cur) {
     if(getLogger().isDebuggingFiner()) {
       getLogger().debugFiner("node " + subtree + ", level " + level);
     }
 
-    N node = getNode(subtree.getLastPathComponent().getEntry());
+    N node = getNode(subtree.getEntry());
+    if(node == null) {
+      throw new RuntimeException("Page file did not return node for node id: " + getPageID(subtree.getEntry()));
+    }
     if(node.isLeaf()) {
       return subtree;
     }
     // first test on containment
-    TreeIndexPathComponent<E> containingEntry = containedTest(node, mbr);
-    if(containingEntry != null) {
-      IndexTreePath<E> newSubtree = subtree.pathByAddingChild(containingEntry);
+    IndexTreePath<SpatialEntry> newSubtree = containedTest(subtree, node, mbr);
+    if(newSubtree != null) {
       if(height - subtree.getPathCount() == level) {
         return newSubtree;
       }
       else {
-        return choosePath(newSubtree, mbr, level);
+        return choosePath(newSubtree, mbr, level, ++cur);
       }
     }
 
-    TreeIndexPathComponent<E> optEntry = null;
+    int optEntry = -1;
     HyperBoundingBox optTestMBR = null;
     double optOverlapInc = 0;
     boolean isLeafContainer = false; // test overlap increase?
@@ -602,15 +594,13 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
     double optVolumeInc = Double.POSITIVE_INFINITY;
     double tempVolume, volume;
 
-    int index = 0;
-    List<E> entries = node.getChildren();
-    for(Iterator<E> iterator = entries.iterator(); iterator.hasNext(); index++) {
-      E child = iterator.next();
+    for (int index = 0; index < node.getNumEntries(); index++) {
+      SpatialEntry child = node.getEntry(index);
       SpatialComparable childMBR = child;
       HyperBoundingBox testMBR = SpatialUtil.union(childMBR, mbr);
       double pairwiseOverlapInc;
       if(isLeafContainer) {
-        pairwiseOverlapInc = calculateOverlapIncrease(entries, child, testMBR);
+        pairwiseOverlapInc = calculateOverlapIncrease(node, child, testMBR);
         if(Double.isInfinite(pairwiseOverlapInc) || Double.isNaN(pairwiseOverlapInc)) {
           throw new IllegalStateException("an entry's MBR is too large to calculate its overlap increase: " + pairwiseOverlapInc + "; \nplease re-scale your data s.t. it can be dealt with");
         }
@@ -637,20 +627,20 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
           double volumeInc = tempVolume - volume;
 
           if(Double.isNaN(optVolumeInc)) { // has not yet been calculated
-            optVolume = SpatialUtil.volume(optEntry.getEntry());
+            optVolume = SpatialUtil.volume(node.getEntry(optEntry));
             optVolumeInc = SpatialUtil.volume(optTestMBR) - optVolume;
           }
           if(volumeInc < optVolumeInc) {
             optVolumeInc = volumeInc;
             optVolume = volume;
-            optEntry = new TreeIndexPathComponent<>(child, index);
+            optEntry = index;
           }
           else if(volumeInc == optVolumeInc && volume < optVolume) {
             // TODO: decide whether to remove this option
             System.out.println("####\nEQUAL VOLUME INCREASE: HAPPENS!\n####");
             optVolumeInc = volumeInc;
             optVolume = volume;
-            optEntry = new TreeIndexPathComponent<>(child, index);
+            optEntry = index;
           }
         }
         else { // already better
@@ -658,17 +648,17 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
           optVolume = Double.NaN;
           optVolumeInc = Double.NaN;
           optTestMBR = testMBR; // for later calculations
-          optEntry = new TreeIndexPathComponent<>(child, index);
+          optEntry = index;
         }
       }
     }
-    assert optEntry != null;
-    IndexTreePath<E> newSubtree = subtree.pathByAddingChild(optEntry);
+    assert optEntry >= 0;
+    newSubtree = new IndexTreePath<>(subtree, node.getEntry(optEntry), optEntry);
     if(height - subtree.getPathCount() == level) {
       return newSubtree;
     }
     else {
-      return choosePath(newSubtree, mbr, level);
+      return choosePath(newSubtree, mbr, level, ++cur);
     }
   }
 
@@ -687,12 +677,12 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
    * <br>
    * However: hardly any difference in real runtime!
    * 
-   * @param entries entries to be tested on overlap
+   * @param node Node
    * @param ei current entry
    * @param testMBR extended MBR of <code>ei</code>
    * @return
    */
-  private double calculateOverlapIncrease(List<E> entries, E ei, SpatialComparable testMBR) {
+  private double calculateOverlapIncrease(N node, SpatialEntry ei, SpatialComparable testMBR) {
     ModifiableHyperBoundingBox eiMBR = new ModifiableHyperBoundingBox(ei);
     ModifiableHyperBoundingBox testMBRModifiable = new ModifiableHyperBoundingBox(testMBR);
 
@@ -712,7 +702,8 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
 
     double multiOverlapInc = 0, multiOverlapMult = 1, mOOld = 1, mONew = 1;
     double ol, olT; // dimensional overlap
-    for(E ej : entries) {
+    for (int j = 0; j < node.getNumEntries(); j++) {
+      SpatialEntry ej = node.getEntry(j);
       if(getPageID(ej) != getPageID(ei)) {
         multiOverlapMult = 1; // is constant for a unchanged dimension
         mOOld = 1; // overlap for old MBR on changed dimensions
@@ -771,8 +762,8 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
     }
     // choose the split dimension and the split point
 
-    XSplitter<E, N, AbstractXTree<N, E>> splitter = new XSplitter<>(this, node.getChildren());
-    XSplitter.SplitSorting<E> split = splitter.topologicalSplit();
+    XSplitter<N, AbstractXTree<N>> splitter = new XSplitter<>(this, node);
+    XSplitter.SplitSorting split = splitter.topologicalSplit();
     double minOv = splitter.getPastOverlap();
     if(split == null) { // topological split failed
       if(node.isLeaf()) {
@@ -842,7 +833,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
    *         in <code>splitAxis</code>, or <code>null</code>, if
    *         <code>node</code> has been converted into a supernode.
    */
-  private N overflowTreatment(N node, IndexTreePath<E> path, int[] splitAxis) {
+  private N overflowTreatment(N node, IndexTreePath<SpatialEntry> path, int[] splitAxis) {
     if(node.isSuperNode()) {
       // only extend supernode; no re-insertions
       assert node.getCapacity() == node.getNumEntries();
@@ -903,15 +894,15 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
    * @param entry the leaf entry to be inserted
    */
   @Override
-  protected void insertLeafEntry(E entry) {
+  protected void insertLeafEntry(SpatialEntry entry) {
     // choose subtree for insertion
-    IndexTreePath<E> subtree = choosePath(getRootPath(), entry, 1);
+    IndexTreePath<SpatialEntry> subtree = choosePath(getRootPath(), entry, height, 1);
 
     if(getLogger().isDebugging()) {
       getLogger().debugFine("insertion-subtree " + subtree + "\n");
     }
 
-    N parent = getNode(subtree.getLastPathComponent().getEntry());
+    N parent = getNode(subtree.getEntry());
     parent.addLeafEntry(entry);
     writeNode(parent);
 
@@ -919,7 +910,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
     if(!hasOverflow(parent) && // no overflow treatment
     (isRoot(parent) || // is root
     // below: no changes in the MBR
-    SpatialUtil.contains(subtree.getLastPathComponent().getEntry(), ((SpatialPointLeafEntry) entry).getValues()))) {
+    SpatialUtil.contains(subtree.getEntry(), entry))) {
       return; // no need to adapt subtree
     }
 
@@ -935,14 +926,14 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
    * @param level the level at which the directory entry is to be inserted
    */
   @Override
-  protected void insertDirectoryEntry(E entry, int level) {
+  protected void insertDirectoryEntry(SpatialEntry entry, int level) {
     // choose node for insertion of o
-    IndexTreePath<E> subtree = choosePath(getRootPath(), entry, level);
+    IndexTreePath<SpatialEntry> subtree = choosePath(getRootPath(), entry, height, level);
     if(getLogger().isDebugging()) {
       getLogger().debugFine("subtree " + subtree);
     }
 
-    N parent = getNode(subtree.getLastPathComponent().getEntry());
+    N parent = getNode(subtree.getEntry());
     parent.addDirectoryEntry(entry);
     writeNode(parent);
 
@@ -950,7 +941,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
     if(!hasOverflow(parent) && // no overflow treatment
     (isRoot(parent) || // is root
     // below: no changes in the MBR
-    SpatialUtil.contains(subtree.getLastPathComponent().getEntry(), entry))) {
+    SpatialUtil.contains(subtree.getEntry(), entry))) {
       return; // no need to adapt subtree
     }
 
@@ -964,13 +955,13 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
    * @param subtree the subtree to be adjusted
    */
   @Override
-  protected void adjustTree(IndexTreePath<E> subtree) {
+  protected void adjustTree(IndexTreePath<SpatialEntry> subtree) {
     if(getLogger().isDebugging()) {
       getLogger().debugFine("Adjust tree " + subtree);
     }
 
     // get the root of the subtree
-    N node = getNode(subtree.getLastPathComponent().getEntry());
+    N node = getNode(subtree.getEntry());
 
     // overflow in node
     if(hasOverflow(node)) {
@@ -981,8 +972,8 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
           node.adjustEntry(getRootEntry());
         }
         else {
-          N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
-          E e = parent.getEntry(subtree.getLastPathComponent().getIndex());
+          N parent = getNode(subtree.getParentPath().getEntry());
+          SpatialEntry e = parent.getEntry(subtree.getIndex());
           HyperBoundingBox mbr = new HyperBoundingBox(e);
           node.adjustEntry(e);
 
@@ -1003,24 +994,24 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
           // if the root was split: create a new root containing the two
           // split nodes
           if(isRoot(node)) {
-            IndexTreePath<E> newRootPath = createNewRoot(node, split, splitAxis[0]);
+            IndexTreePath<SpatialEntry> newRootPath = createNewRoot(node, split, splitAxis[0]);
             height++;
             adjustTree(newRootPath);
           }
           // node is not root
           else {
             // get the parent and add the new split node
-            N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
+            N parent = getNode(subtree.getParentPath().getEntry());
             if(getLogger().isDebugging()) {
               getLogger().debugFine("parent " + parent);
             }
-            E newEntry = createNewDirectoryEntry(split);
+            SpatialEntry newEntry = createNewDirectoryEntry(split);
             parent.addDirectoryEntry(newEntry);
 
             // The below variant does not work in the persistent version
-            // E oldEntry = subtree.getLastPathComponent().getEntry();
+            // E oldEntry = subtree.getEntry();
             // [reason: if oldEntry is modified, this must be permanent]
-            E oldEntry = parent.getEntry(subtree.getLastPathComponent().getIndex());
+            SpatialEntry oldEntry = parent.getEntry(subtree.getIndex());
 
             // adjust split history
             SplitHistory sh = ((SplitHistorySpatialEntry) oldEntry).getSplitHistory();
@@ -1055,8 +1046,8 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
     // node
     else {
       if(!isRoot(node)) {
-        N parent = getNode(subtree.getParentPath().getLastPathComponent().getEntry());
-        E e = parent.getEntry(subtree.getLastPathComponent().getIndex());
+        N parent = getNode(subtree.getParentPath().getEntry());
+        SpatialEntry e = parent.getEntry(subtree.getIndex());
         HyperBoundingBox mbr = new HyperBoundingBox(e);
         node.adjustEntry(e);
 
@@ -1084,7 +1075,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
    * @return the path to the new root node that points to the two specified
    *         child nodes
    */
-  protected IndexTreePath<E> createNewRoot(final N oldRoot, final N newNode, int splitAxis) {
+  protected IndexTreePath<SpatialEntry> createNewRoot(final N oldRoot, final N newNode, int splitAxis) {
     N root = createNewDirectoryNode();
     writeNode(root);
     // get split history
@@ -1112,8 +1103,8 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
     }
 
     root.setPageID(getRootID());
-    E oldRootEntry = createNewDirectoryEntry(oldRoot);
-    E newNodeEntry = createNewDirectoryEntry(newNode);
+    SpatialEntry oldRootEntry = createNewDirectoryEntry(oldRoot);
+    SpatialEntry newNodeEntry = createNewDirectoryEntry(newNode);
     ((SplitHistorySpatialEntry) oldRootEntry).setSplitHistory(sh);
     try {
       ((SplitHistorySpatialEntry) newNodeEntry).setSplitHistory((SplitHistory) sh.clone());
@@ -1135,7 +1126,7 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
       getLogger().debugFine(msg);
     }
     // the root entry still needs to be set to the new root node's MBR
-    return new IndexTreePath<>(new TreeIndexPathComponent<>(getRootEntry(), null));
+    return new IndexTreePath<>(null, getRootEntry(), 0);
   }
 
   /**
@@ -1159,16 +1150,16 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<E, N>, E extends
 
     while(!node.isLeaf()) {
       if(node.getNumEntries() > 0) {
-        E entry = node.getEntry(0);
+        SpatialEntry entry = node.getEntry(0);
         node = getNode(entry);
         levels++;
       }
     }
 
-    BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
+    BreadthFirstEnumeration<N, SpatialEntry> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
     while(enumeration.hasMoreElements()) {
-      IndexTreePath<E> indexPath = enumeration.nextElement();
-      E entry = indexPath.getLastPathComponent().getEntry();
+      IndexTreePath<SpatialEntry> indexPath = enumeration.nextElement();
+      SpatialEntry entry = indexPath.getEntry();
       if(entry.isLeafEntry()) {
         objects++;
       }

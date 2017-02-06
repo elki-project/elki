@@ -1,50 +1,48 @@
-package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
 /*
-This file is part of ELKI:
-Environment for Developing KDD-Applications Supported by Index-Structures
-
-Copyright (C) 2014
-Ludwig-Maximilians-Universität München
-Lehr- und Forschungseinheit für Datenbanksysteme
-ELKI Development Team
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as published by
-the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2017
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
 
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import de.lmu.ifi.dbs.elki.data.HyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
+import de.lmu.ifi.dbs.elki.index.tree.Entry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.logging.Logging;
 
 /**
  * XTree node extension for testing on supernodes
  * 
  * @author Marisa Thoma
  * 
- * @param <E> Type of the entries stored in this node
  * @param <N> Type of this node (for extendability)
  */
-public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends AbstractXTreeNode<E, N>> extends AbstractRStarTreeNode<N, E> {
+public abstract class AbstractXTreeNode<N extends AbstractXTreeNode<N>> extends AbstractRStarTreeNode<N, SpatialEntry> {
   /**
    * Is this node a supernode?
    */
@@ -57,8 +55,6 @@ public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends Abstra
    * {@link #fillSuperNode(AbstractXTree)}.
    */
   private int capacity_to_be_filled = 0;
-
-  private Class<? extends E> eclass;
 
   /**
    * @return <code>true</code> if this node is a supernode.
@@ -82,10 +78,8 @@ public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends Abstra
    *        overflow) of this node
    * @param isLeaf indicates whether this node is a leaf node
    */
-  @SuppressWarnings("unchecked")
-  public AbstractXTreeNode(int capacity, boolean isLeaf, Class<? extends E> eclass) {
-    super(capacity, isLeaf, (Class<? super E>) eclass);
-    this.eclass = eclass;
+  public AbstractXTreeNode(int capacity, boolean isLeaf) {
+    super(capacity, isLeaf, SpatialEntry.class);
   }
 
   /**
@@ -97,11 +91,10 @@ public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends Abstra
     if(getNumEntries() < getCapacity()) {
       throw new IllegalStateException("This node is not yet overflowing (only " + getNumEntries() + " of " + getCapacity() + " entries)");
     }
-    E[] old_nodes = super.entries.clone();
+    Entry[] old_nodes = super.entries.clone();
     assert old_nodes[old_nodes.length - 1] != null;
-    super.entries = (E[]) java.util.Arrays.copyOfRange(old_nodes, 0, getCapacity() * 2 - 1, entries.getClass());
+    super.entries = (Entry[]) java.util.Arrays.copyOfRange(old_nodes, 0, getCapacity() * 2 - 1, entries.getClass());
     assert super.entries.length == old_nodes.length * 2 - 1;
-    assert super.entries[0].getClass().equals(eclass) : "e[0] class = " + super.entries[0].getClass().getName() + "; eclass = " + eclass.getName();
     return getCapacity();
   }
 
@@ -137,7 +130,7 @@ public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends Abstra
     if(numEntries >= newCapacity) {
       throw new IllegalStateException("This node is not yet underflowing and cannot be shrunken yet.");
     }
-    E[] new_entries = java.util.Arrays.copyOfRange(super.entries, 0, newCapacity);
+    Entry[] new_entries = java.util.Arrays.copyOfRange(super.entries, 0, newCapacity);
     assert new_entries[newCapacity - 1] == null;
     super.entries = new_entries;
     if(dirCapacity == getCapacity()) {
@@ -162,7 +155,7 @@ public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends Abstra
     out.writeInt(entries.length);
     if(isSuperNode())
       return; // cannot fit this into out
-    for(SpatialEntry entry : entries) {
+    for(Entry entry : entries) {
       if(entry == null) {
         break;
       }
@@ -197,33 +190,13 @@ public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends Abstra
     // the following causes a null pointer -- something is obviously missing
     // entries = (E[]) java.lang.reflect.Array.newInstance(eclass, capacity);
     if(isLeaf()) {
-      entries = (E[]) new SpatialPointLeafEntry[capacity];
+      entries = (Entry[]) new SpatialPointLeafEntry[capacity];
     }
     else {
-      entries = (E[]) new XTreeDirectoryEntry[capacity];
+      entries = (Entry[]) new XTreeDirectoryEntry[capacity];
     }
     for(int i = 0; i < numEntries; i++) {
-      E s;
-      try {
-        // null pointer:
-        s = eclass.newInstance();
-      }
-      catch(InstantiationException e) {
-        e.printStackTrace();
-        throw new UnsupportedOperationException("Cannot instantiate class " + eclass.getName(), e);
-      }
-      catch(IllegalAccessException e) {
-        e.printStackTrace();
-        throw new UnsupportedOperationException("Cannot access class " + eclass.getName(), e);
-      }
-      catch(NullPointerException e) {
-        if(isLeaf()) {
-          s = (E) new SpatialPointLeafEntry();
-        }
-        else {
-          s = (E) new XTreeDirectoryEntry();
-        }
-      }
+      SpatialEntry s = isLeaf() ? new SpatialPointLeafEntry() : new XTreeDirectoryEntry();
       s.readExternal(in);
       entries[i] = s;
     }
@@ -240,7 +213,7 @@ public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends Abstra
     }
     // write header
     writeExternal(out);
-    for(SpatialEntry entry : entries) {
+    for(Entry entry : entries) {
       if(entry == null) {
         break;
       }
@@ -260,7 +233,7 @@ public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends Abstra
    * @throws IllegalStateException if the parameters of the file's supernode do
    *         not match this
    */
-  public <T extends AbstractXTree<N, E>> void readSuperNode(ObjectInput in, T tree) throws IOException, ClassNotFoundException {
+  public <T extends AbstractXTree<N>> void readSuperNode(ObjectInput in, T tree) throws IOException, ClassNotFoundException {
     readExternal(in);
     if(capacity_to_be_filled <= 0 || !isSuperNode()) {
       throw new IllegalStateException("This node does not appear to be a supernode");
@@ -269,30 +242,18 @@ public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends Abstra
       throw new IllegalStateException("A supernode is cannot be a leaf");
     }
     // TODO: verify
-    entries = ClassGenericsUtil.newArrayOfNull(capacity_to_be_filled, this.eclass);
+    entries = new Entry[capacity_to_be_filled];
     // old way:
     // entries = (E[]) new XDirectoryEntry[capacity_to_be_filled];
     capacity_to_be_filled = 0;
     for(int i = 0; i < numEntries; i++) {
-      // old way:
-      // SpatialDirectoryEntry s = new SpatialDirectoryEntry();
-      // s.readExternal(in);
-      E s;
-      try {
-        s = eclass.newInstance();
-      }
-      catch(InstantiationException e) {
-        throw new UnsupportedOperationException("Cannot instantiate class " + eclass.getName(), e);
-      }
-      catch(IllegalAccessException e) {
-        throw new UnsupportedOperationException("Cannot access class " + eclass.getName(), e);
-      }
+      SpatialEntry s = new SpatialDirectoryEntry();
       s.readExternal(in);
       entries[i] = s;
     }
     N n = tree.getSupernodes().put((long) getPageID(), (N) this);
     if(n != null) {
-      Logger.getLogger(this.getClass().getName()).fine("Warning: this supernode should only be read once. Now a node of size " + entries.length + " has replaced a node of size " + n.entries.length + " for id " + getPageID());
+      Logging.getLogger(this.getClass()).fine("Warning: this supernode should only be read once. Now a node of size " + entries.length + " has replaced a node of size " + n.entries.length + " for id " + getPageID());
     }
   }
 
@@ -303,8 +264,8 @@ public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends Abstra
    *         require multiple copies of a parent path as in
    *         {@link #children(de.lmu.ifi.dbs.elki.index.tree.TreeIndexPath)}.
    */
-  public List<E> getChildren() {
-    List<E> children = new ArrayList<>(getNumEntries());
+  public List<Entry> getChildren() {
+    List<Entry> children = new ArrayList<>(getNumEntries());
     for(int i = 0; i < getNumEntries(); i++) {
       children.add(entries[i]);
     }
@@ -321,7 +282,7 @@ public abstract class AbstractXTreeNode<E extends SpatialEntry, N extends Abstra
   @Override
   protected void integrityCheckParameters(N parent, int index) {
     // test if mbr is correctly set
-    E entry = parent.getEntry(index);
+    SpatialEntry entry = parent.getEntry(index);
     HyperBoundingBox mbr = computeMBR();
 
     if(/*entry.getMBR() == null && */ mbr == null) {

@@ -1,30 +1,26 @@
+/*
+ * This file is part of ELKI:
+ * Environment for Developing KDD-Applications Supported by Index-Structures
+ *
+ * Copyright (C) 2017
+ * ELKI Development Team
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree;
 
-/*
- This file is part of ELKI:
- Environment for Developing KDD-Applications Supported by Index-Structures
-
- Copyright (C) 2014
- Ludwig-Maximilians-Universität München
- Lehr- und Forschungseinheit für Datenbanksysteme
- ELKI Development Team
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as published by
- the Free Software Foundation, either version 3 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -50,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 title = "The X-tree: An Index Structure for High-Dimensional Data", //
 booktitle = "Proc. 22nd Int. Conf. on Very Large Data Bases (VLDB'96), Bombay, India, 1996", //
 url = "http://www.vldb.org/conf/1996/P028.PDF")
-public class XTree extends AbstractXTree<XTreeNode, SpatialEntry> {
+public class XTree extends AbstractXTree<XTreeNode> {
   /**
    * The logger for this class.
    */
@@ -86,7 +82,7 @@ public class XTree extends AbstractXTree<XTreeNode, SpatialEntry> {
    */
   @Override
   protected XTreeNode createNewLeafNode() {
-    return new XTreeNode(leafCapacity, true, SpatialPointLeafEntry.class);
+    return new XTreeNode(leafCapacity, true);
   }
 
   /**
@@ -96,12 +92,22 @@ public class XTree extends AbstractXTree<XTreeNode, SpatialEntry> {
    */
   @Override
   protected XTreeNode createNewDirectoryNode() {
-    return new XTreeNode(dirCapacity, false, XTreeDirectoryEntry.class);
+    return new XTreeNode(dirCapacity, false);
   }
 
   @Override
   protected Logging getLogger() {
     return LOG;
+  }
+  
+  @Override
+  public String getLongName() {
+    return "X-Tree";
+  }
+  
+  @Override
+  public String getShortName() {
+    return "x-tree";
   }
 
   @Override
