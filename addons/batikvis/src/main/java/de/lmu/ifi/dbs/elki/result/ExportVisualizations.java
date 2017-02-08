@@ -41,8 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter.FileType;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
@@ -68,6 +70,15 @@ public class ExportVisualizations implements ResultHandler {
    * Get a logger for this class.
    */
   private static final Logging LOG = Logging.getLogger(ExportVisualizations.class);
+
+  /**
+   * File format
+   *
+   * @author Erich Schubert
+   */
+  public static enum Format {
+    SVG, PNG, PDF, PS, EPS, JPEG
+  }
 
   /**
    * Output folder
@@ -100,17 +111,43 @@ public class ExportVisualizations implements ResultHandler {
   Map<String, Integer> counter = new HashMap<>();
 
   /**
+   * Output file format.
+   */
+  Format format;
+
+  /**
+   * Image width for pixel output.
+   */
+  int iwidth;
+
+  /**
    * Constructor.
    *
    * @param output Output folder
    * @param manager Parameterizer
    * @param ratio Canvas ratio
+   * @param format Output file format
    */
-  public ExportVisualizations(File output, VisualizerParameterizer manager, double ratio) {
+  public ExportVisualizations(File output, VisualizerParameterizer manager, double ratio, Format format) {
+    this(output, manager, ratio, format, 1000);
+  }
+
+  /**
+   * Constructor.
+   *
+   * @param output Output folder
+   * @param manager Parameterizer
+   * @param ratio Canvas ratio
+   * @param format Output file format
+   * @param iwidth Image width for pixel formats
+   */
+  public ExportVisualizations(File output, VisualizerParameterizer manager, double ratio, Format format, int iwidth) {
     super();
     this.output = output;
     this.manager = manager;
     this.ratio = ratio;
+    this.format = format;
+    this.iwidth = iwidth;
   }
 
   @Override
@@ -219,9 +256,39 @@ public class ExportVisualizations implements ResultHandler {
     // TODO: generate names...
     Integer count = counter.get(prefix);
     counter.put(prefix, count = count == null ? 1 : (count + 1));
-    File outname = new File(output, prefix + "-" + count + ".svg");
     try {
-      svgp.saveAsSVG(outname);
+      switch(format){
+      case SVG: {
+        File outname = new File(output, prefix + "-" + count + ".svg");
+        svgp.saveAsSVG(outname);
+        break;
+      }
+      case PNG: {
+        File outname = new File(output, prefix + "-" + count + ".png");
+        svgp.saveAsPNG(outname, (int) (iwidth * ratio), iwidth);
+        break;
+      }
+      case PDF: {
+        File outname = new File(output, prefix + "-" + count + ".pdf");
+        svgp.saveAsPDF(outname);
+        break;
+      }
+      case PS: {
+        File outname = new File(output, prefix + "-" + count + ".ps");
+        svgp.saveAsPS(outname);
+        break;
+      }
+      case EPS: {
+        File outname = new File(output, prefix + "-" + count + ".eps");
+        svgp.saveAsEPS(outname);
+        break;
+      }
+      case JPEG: {
+        File outname = new File(output, prefix + "-" + count + ".jpg");
+        svgp.saveAsJPEG(outname, (int) (iwidth * ratio), iwidth);
+        break;
+      }
+      }
     }
     catch(Exception e) {
       LOG.warning("Export of visualization failed.", e);
@@ -259,6 +326,22 @@ public class ExportVisualizations implements ResultHandler {
     public static final OptionID FOLDER_ID = new OptionID("vis.output", "The output folder.");
 
     /**
+     * Parameter to specify the output format
+     * <p>
+     * Key: {@code -vis.format}
+     * </p>
+     */
+    public static final OptionID FORMAT_ID = new OptionID("vis.format", "File format. Note that some formats requrie additional libraries, only SVG and PNG are default.");
+
+    /**
+     * Parameter to specify the image width of pixel formats
+     * <p>
+     * Key: {@code -vis.width}
+     * </p>
+     */
+    public static final OptionID IWIDTH_ID = new OptionID("vis.width", "Image width for pixel formats.");
+
+    /**
      * Visualization manager.
      */
     VisualizerParameterizer manager;
@@ -272,6 +355,16 @@ public class ExportVisualizations implements ResultHandler {
      * Ratio for canvas
      */
     double ratio;
+
+    /**
+     * Output file format.
+     */
+    Format format;
+
+    /**
+     * Width of pixel output formats.
+     */
+    int iwidth = 1000;
 
     @Override
     protected void makeOptions(Parameterization config) {
@@ -287,12 +380,23 @@ public class ExportVisualizations implements ResultHandler {
         ratio = ratioP.doubleValue();
       }
 
+      EnumParameter<Format> formatP = new EnumParameter<>(FORMAT_ID, Format.class, Format.SVG);
+      if(config.grab(formatP)) {
+        format = formatP.getValue();
+      }
+      if(format == Format.PNG || format == Format.JPEG) {
+        IntParameter iwidthP = new IntParameter(IWIDTH_ID, 1000);
+        if(config.grab(iwidthP)) {
+          iwidth = iwidthP.intValue();
+        }
+      }
+
       manager = config.tryInstantiate(VisualizerParameterizer.class);
     }
 
     @Override
     protected ExportVisualizations makeInstance() {
-      return new ExportVisualizations(output, manager, ratio);
+      return new ExportVisualizations(output, manager, ratio, format, iwidth);
     }
   }
 }
