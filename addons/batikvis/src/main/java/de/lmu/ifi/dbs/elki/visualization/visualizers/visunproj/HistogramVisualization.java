@@ -91,14 +91,8 @@ public class HistogramVisualization extends AbstractVisFactory {
     DoubleMinMax yminmax = new DoubleMinMax();
     for(double[] point : curve) {
       xminmax.put(point[0]);
-      if(dim < 0) {
-        dim = point.length;
-      }
-      else {
-        // TODO: test and throw always
-        assert (dim == point.length);
-      }
-      for(int i = 1; i < dim; i++) {
+      dim = dim < point.length ? point.length : dim;
+      for(int i = 1; i < point.length; i++) {
         yminmax.put(point[i]);
       }
     }

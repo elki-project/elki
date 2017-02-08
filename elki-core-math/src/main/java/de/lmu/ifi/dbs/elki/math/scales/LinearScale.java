@@ -23,7 +23,7 @@ package de.lmu.ifi.dbs.elki.math.scales;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.FastMath;
 
 /**
  * Class to handle a linear scale for an axis.
@@ -95,11 +95,11 @@ public class LinearScale {
       this.delta = 1.0;
     }
     log10res = (int) Math.ceil(Math.log10(this.delta) - ZOOMFACTOR);
-    res = MathUtil.powi(10, log10res);
+    res = FastMath.pow(10, log10res);
 
     // round min and max according to the resolution counters
-    this.min = Math.floor(min / res * 1.001) * res;
-    this.max = Math.ceil(max / res * .999) * res;
+    this.min = Math.floor(min / res + .001) * res;
+    this.max = Math.ceil(max / res - .001) * res;
     if(this.min == this.max) {
       this.max = this.min + res;
     }
