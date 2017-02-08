@@ -39,10 +39,10 @@ public class FlexiHistogramTest {
    */
   @Test
   public final void testObjHistogram() {
-    Double[] filled = { 0.0, 1.23, 4.56, 7.89, 0.0, null, null, null, null, null };
+    Double[] filled = { 0.0, 1.23, 4.56, 7.89, 0.0, 0.0, null, null, null, null };
     Double[] changed = { 0.0, 1.35, 8.01, 14.67, 9.01, 2.34, null, null, null, null };
     Double[] resized = { -1.23, 1.35, 22.68, 11.35, 0.0, 0.0, -4.56, null, null, null };
-    Double[] expanded = { 1., 0.0, 0.0, 0.0, 0.0, 0.0, 29.59, null, null, null };
+    Double[] expanded = { 1., 0.0, 0.0, 0.0, 0.0, 0.0, 34.15, -4.56, null, null };
     AbstractObjDynamicHistogram<Double> hist = new AbstractObjDynamicHistogram<Double>(5) {
       @Override
       public Double aggregate(Double first, Double second) {
@@ -115,7 +115,7 @@ public class FlexiHistogramTest {
     double[] filled = { 0.0, 1.23, 4.56, 7.89, 0.0, 0, 0, 0, 0, 0 };
     double[] changed = { 0.0, 1.35, 8.01, 14.67, 9.01, 2.34, 0, 0, 0, 0 };
     double[] resized = { -1.23, 1.35, 22.68, 11.35, 0.0, 0.0, -4.56, 0, 0, 0 };
-    double[] expanded = { 1., 0.0, 0.0, 0.0, 0.0, 0.0, 29.59, 0, 0, 0 };
+    double[] expanded = { 1., 0.0, 0.0, 0.0, 0.0, 0.0, 34.15, -4.56, 0, 0 };
     DoubleDynamicHistogram hist = new DoubleDynamicHistogram(5);
     hist.increment(0.0, 0.0);
     hist.increment(0.15, 1.23);
