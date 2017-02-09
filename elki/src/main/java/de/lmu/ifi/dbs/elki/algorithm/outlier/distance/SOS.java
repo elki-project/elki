@@ -130,29 +130,9 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
       // Compute affinities
       computePi(it, di, p, perplexity, logPerp);
       // Normalization factor:
-      double s = 0;
-      for(di.seek(0); di.valid(); di.advance()) {
-        if(DBIDUtil.equal(it, di)) {
-          continue;
-        }
-        final double v = p[di.getOffset()];
-        if(!(v > 0)) {
-          break;
-        }
-        s += v;
-      }
+      double s = sumOfProbabilities(it, di, p);
       if(s > 0) {
-        s = 1. / s; // Inverse
-        for(di.seek(0); di.valid(); di.advance()) {
-          if(DBIDUtil.equal(it, di)) {
-            continue;
-          }
-          double v = p[di.getOffset()] * s; // Normalize
-          if(!(v > 0)) {
-            break;
-          }
-          scores.putDouble(di, scores.doubleValue(di) * (1 - v));
-        }
+        nominateNeighbors(it, di, p, 1. / s, scores);
       }
       LOG.incrementProcessed(prog);
     }
@@ -165,6 +145,54 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
     DoubleRelation scoreres = new MaterializedDoubleRelation("Stoachastic Outlier Selection", "sos-outlier", scores, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(minmax.getMin(), minmax.getMax(), 0.);
     return new OutlierResult(meta, scoreres);
+  }
+
+  /**
+   * Compute the sum of probabilities, stop at first 0, ignore query object.
+   * 
+   * Note: while SOS ensures the 'ignore' object is not added in the first
+   * place, KNNSOS cannot do so efficiently (yet).
+   * 
+   * @param ignore Object to ignore.
+   * @param di Object list
+   * @param p Probabilities
+   * @return Sum.
+   */
+  protected static double sumOfProbabilities(DBIDIter ignore, DBIDArrayIter di, double[] p) {
+    double s = 0;
+    for(di.seek(0); di.valid(); di.advance()) {
+      if(DBIDUtil.equal(ignore, di)) {
+        continue;
+      }
+      final double v = p[di.getOffset()];
+      if(!(v > 0)) {
+        break;
+      }
+      s += v;
+    }
+    return s;
+  }
+
+  /**
+   * Vote for neighbors not being outliers. The key method of SOS.
+   * 
+   * @param ignore Object to ignore
+   * @param di Neighbor object IDs.
+   * @param p Probabilities
+   * @param norm Normalization factor (1/sum)
+   * @param scores Output score storage
+   */
+  protected static void nominateNeighbors(DBIDIter ignore, DBIDArrayIter di, double[] p, double norm, WritableDoubleDataStore scores) {
+    for(di.seek(0); di.valid(); di.advance()) {
+      if(DBIDUtil.equal(ignore, di)) {
+        continue;
+      }
+      double v = p[di.getOffset()] * norm; // Normalize
+      if(!(v > 0)) {
+        break;
+      }
+      scores.putDouble(di, scores.doubleValue(di) * (1 - v));
+    }
   }
 
   /**
@@ -214,7 +242,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
     double sum = 0.;
     int size = 0;
     for(it.seek(0); it.valid(); it.advance()) {
-      if (DBIDUtil.equal(ignore, it)) {
+      if(DBIDUtil.equal(ignore, it)) {
         continue;
       }
       sum += it.doubleValue() < Double.POSITIVE_INFINITY ? it.doubleValue() : 0.;
@@ -239,7 +267,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
     // Skip point "i", break loop in two:
     it.seek(0);
     for(int j = 0; it.valid(); j++, it.advance()) {
-      if (DBIDUtil.equal(ignore, it)) {
+      if(DBIDUtil.equal(ignore, it)) {
         p[j] = 0;
         continue;
       }
