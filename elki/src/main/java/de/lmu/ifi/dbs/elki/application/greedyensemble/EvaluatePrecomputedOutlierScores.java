@@ -37,10 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.evaluation.scores.AveragePrecisionEvaluation;
-import de.lmu.ifi.dbs.elki.evaluation.scores.MaximumF1Evaluation;
-import de.lmu.ifi.dbs.elki.evaluation.scores.PrecisionAtKEvaluation;
-import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
+import de.lmu.ifi.dbs.elki.evaluation.scores.*;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.AbstractVectorIter;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DecreasingVectorIter;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.IncreasingVectorIter;
@@ -150,10 +147,13 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
         fout.append(",\"Average Precision\"");
         fout.append(",\"R-Precision\"");
         fout.append(",\"Maximum F1\"");
+        fout.append(",\"DCG\"");
+        fout.append(",\"NDCG\"");
         fout.append(",\"Adjusted ROC AUC\"");
         fout.append(",\"Adjusted Average Precision\"");
         fout.append(",\"Adjusted R-Precision\"");
         fout.append(",\"Adjusted Maximum F1\"");
+        fout.append(",\"Adjusted DCG\"");
         fout.append('\n');
       }
       Matcher m = reverse.matcher("");
@@ -173,10 +173,14 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
         double avep = AveragePrecisionEvaluation.STATIC.evaluate(positive, iter.seek(0));
         double rprecision = PrecisionAtKEvaluation.RPRECISION.evaluate(positive, iter.seek(0));
         double maxf1 = MaximumF1Evaluation.STATIC.evaluate(positive, iter.seek(0));
+        double dcg = DCGEvaluation.STATIC.evaluate(positive, iter.seek(0));
+        double ndcg = NDCGEvaluation.STATIC.evaluate(positive, iter.seek(0));
+        double endcg = NDCGEvaluation.STATIC.expected(positive.numPositive(), refvec.getDimensionality());
         double adjauc = 2 * auc - 1;
         double adjrprecision = (rprecision - rate) / (1 - rate);
         double adjavep = (avep - rate) / (1 - rate);
         double adjmaxf1 = (maxf1 - rate) / (1 - rate);
+        double adjdcg = (ndcg - endcg) / (1 - endcg);
         String prefix = label.substring(0, label.lastIndexOf('-'));
         int k = Integer.valueOf(label.substring(label.lastIndexOf('-') + 1));
         // Write CSV
@@ -188,10 +192,13 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
         fout.append(',').append(Double.toString(avep));
         fout.append(',').append(Double.toString(rprecision));
         fout.append(',').append(Double.toString(maxf1));
+        fout.append(',').append(Double.toString(dcg));
+        fout.append(',').append(Double.toString(ndcg));
         fout.append(',').append(Double.toString(adjauc));
         fout.append(',').append(Double.toString(adjavep));
         fout.append(',').append(Double.toString(adjrprecision));
         fout.append(',').append(Double.toString(adjmaxf1));
+        fout.append(',').append(Double.toString(adjdcg));
         fout.append('\n');
       }
     }

@@ -29,22 +29,11 @@ import java.util.regex.Pattern;
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.DWOF;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.anglebased.FastABOD;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.LocalIsolationCoefficient;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ODIN;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.*;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IDOS;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.ISOS;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IntrinsicDimensionalityOutlier;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.COF;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.INFLO;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.KDEOS;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDF;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDOF;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LoOP;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleKernelDensityLOF;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF;
-import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.VarianceOfVolume;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.*;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.ByLabelOutlier;
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -80,6 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.workflow.InputStep;
+
 import net.jafama.FastMath;
 
 /**
@@ -427,6 +417,36 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
           }
         });
       }
+      // Run KNN SOS
+      runForEachK("KNNDD", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          KNNDD<O> knndd = new KNNDD<>(distf, k);
+          OutlierResult result = knndd.run(relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run KNN SOS
+      runForEachK("KNNSOS", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          KNNSOS<O> sos = new KNNSOS<>(distf, k);
+          OutlierResult result = sos.run(relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run ISOS
+      runForEachK("ISOS", startkmin2, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          ISOS<O> isos = new ISOS<>(distf, k, HillEstimator.STATIC);
+          OutlierResult result = isos.run(relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
     }
     catch(FileNotFoundException e) {
       throw new AbortException("Cannot create output file.", e);
