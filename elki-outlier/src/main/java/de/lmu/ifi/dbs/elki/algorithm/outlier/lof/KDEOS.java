@@ -98,10 +98,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <O> Object type
  */
 @Reference(authors = "Erich Schubert, Arthur Zimek, Hans-Peter Kriegel", //
-title = "Generalized Outlier Detection with Flexible Kernel Density Estimates", //
-booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM), Philadelphia, PA, 2014", //
-url = "http://dx.doi.org/10.1137/1.9781611973440.63")
-public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult>implements OutlierAlgorithm {
+    title = "Generalized Outlier Detection with Flexible Kernel Density Estimates", //
+    booktitle = "Proc. 14th SIAM International Conference on Data Mining (SDM), Philadelphia, PA, 2014", //
+    url = "http://dx.doi.org/10.1137/1.9781611973440.63")
+public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> implements OutlierAlgorithm {
   /**
    * Class logger.
    */
@@ -287,7 +287,7 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult>im
             scratch[k][i] = ndens[k];
           }
         }
-        assert(i == neighbors.size());
+        assert (i == neighbors.size());
       }
       // Compute means and stddevs for each k
       double score = 0.;
@@ -404,33 +404,34 @@ public class KDEOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult>im
       }
 
       IntParameter kminP = new IntParameter(KMIN_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kminP)) {
         kmin = kminP.intValue();
       }
 
       IntParameter kmaxP = new IntParameter(KMAX_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kmaxP)) {
         kmax = kmaxP.intValue();
       }
       config.checkConstraint(new LessEqualGlobalConstraint<>(kminP, kmaxP));
 
       DoubleParameter scaleP = new DoubleParameter(KERNEL_SCALE_ID)//
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
-      .setDefaultValue(.5);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE) //
+          .setDefaultValue(.25);
       if(config.grab(scaleP)) {
         // For simpler parameterization, scale kernels by their canonical
         // bandwidth, when the kernel is configured.
         scale = scaleP.doubleValue() * ((kernel != null) ? kernel.canonicalBandwidth() : 1.);
       }
       DoubleParameter minbwP = new DoubleParameter(KERNEL_MIN_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-      .setOptional(true);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .setOptional(true);
       if(config.grab(minbwP)) {
         minBandwidth = minbwP.doubleValue();
       }
-      IntParameter idimP = new IntParameter(IDIM_ID, -1);
+
+      IntParameter idimP = new IntParameter(IDIM_ID, 1);
       if(config.grab(idimP)) {
         idim = idimP.intValue();
       }
