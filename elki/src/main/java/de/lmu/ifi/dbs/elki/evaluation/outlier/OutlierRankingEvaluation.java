@@ -29,21 +29,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
-import de.lmu.ifi.dbs.elki.evaluation.scores.AveragePrecisionEvaluation;
-import de.lmu.ifi.dbs.elki.evaluation.scores.MaximumF1Evaluation;
-import de.lmu.ifi.dbs.elki.evaluation.scores.PrecisionAtKEvaluation;
-import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
+import de.lmu.ifi.dbs.elki.evaluation.scores.*;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DBIDsTest;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.OutlierScoreAdapter;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.SimpleAdapter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
-import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.*;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -91,7 +84,8 @@ public class OutlierRankingEvaluation implements Evaluator {
     EvaluationResult res = new EvaluationResult("Evaluation of ranking", "ranking-evaluation");
     DBIDsTest test = new DBIDsTest(positiveids);
 
-    double rate = positiveids.size() / (double) size;
+    final int pos = positiveids.size();
+    final double rate = pos / (double) size;
     MeasurementGroup g = res.newGroup("Evaluation measures:");
     double rocauc = ROCEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
     g.addMeasure("ROC AUC", rocauc, 0., 1., .5, false);
@@ -101,6 +95,11 @@ public class OutlierRankingEvaluation implements Evaluator {
     g.addMeasure("R-Precision", rprec, 0., 1., rate, false);
     double maxf1 = MaximumF1Evaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
     g.addMeasure("Maximum F1", maxf1, 0., 1., rate, false);
+    double maxdcg = DCGEvaluation.maximum(pos);
+    double dcg = DCGEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
+    g.addMeasure("DCG", dcg, 0., maxdcg, DCGEvaluation.STATIC.expected(pos, size), false);
+    double ndcg = NDCGEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
+    g.addMeasure("NDCG", ndcg, 0., 1., NDCGEvaluation.STATIC.expected(pos, size), false);
 
     g = res.newGroup("Adjusted for chance:");
     double adjauc = 2 * rocauc - 1;
@@ -111,6 +110,9 @@ public class OutlierRankingEvaluation implements Evaluator {
     g.addMeasure("Adjusted R-Prec", adjrprec, 0., 1., 0., false);
     double adjmaxf1 = (maxf1 - rate) / (1 - rate);
     g.addMeasure("Adjusted Max F1", adjmaxf1, 0., 1., 0., false);
+    double endcg = NDCGEvaluation.STATIC.expected(pos, size);
+    double adjndcg = (ndcg - endcg) / (1. - endcg);
+    g.addMeasure("Adjusted DCG", adjndcg, 0., 1., 0., false);
 
     if(LOG.isStatistics()) {
       LOG.statistics(new DoubleStatistic(key + ".rocauc", rocauc));
@@ -121,6 +123,9 @@ public class OutlierRankingEvaluation implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".precision.r.adjusted", adjrprec));
       LOG.statistics(new DoubleStatistic(key + ".f1.maximum", maxf1));
       LOG.statistics(new DoubleStatistic(key + ".f1.maximum.adjusted", adjmaxf1));
+      LOG.statistics(new DoubleStatistic(key + ".dcg", dcg));
+      LOG.statistics(new DoubleStatistic(key + ".dcg.normalized", ndcg));
+      LOG.statistics(new DoubleStatistic(key + ".dcg.adjusted", adjndcg));
     }
     return res;
   }
