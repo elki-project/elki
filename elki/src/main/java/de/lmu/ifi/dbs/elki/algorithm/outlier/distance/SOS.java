@@ -158,7 +158,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    * @param p Probabilities
    * @return Sum.
    */
-  protected static double sumOfProbabilities(DBIDIter ignore, DBIDArrayIter di, double[] p) {
+  public static double sumOfProbabilities(DBIDIter ignore, DBIDArrayIter di, double[] p) {
     double s = 0;
     for(di.seek(0); di.valid(); di.advance()) {
       if(DBIDUtil.equal(ignore, di)) {
@@ -182,7 +182,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    * @param norm Normalization factor (1/sum)
    * @param scores Output score storage
    */
-  protected static void nominateNeighbors(DBIDIter ignore, DBIDArrayIter di, double[] p, double norm, WritableDoubleDataStore scores) {
+  public static void nominateNeighbors(DBIDIter ignore, DBIDArrayIter di, double[] p, double norm, WritableDoubleDataStore scores) {
     for(di.seek(0); di.valid(); di.advance()) {
       if(DBIDUtil.equal(ignore, di)) {
         continue;
@@ -206,7 +206,7 @@ public class SOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> imp
    * @param logPerp Log of desired perplexity
    * @return Beta
    */
-  protected static double computePi(DBIDRef ignore, DoubleDBIDListIter it, double[] p, double perplexity, double logPerp) {
+  public static double computePi(DBIDRef ignore, DoubleDBIDListIter it, double[] p, double perplexity, double logPerp) {
     // Relation to paper: beta == 1. / (2*sigma*sigma)
     double beta = estimateInitialBeta(ignore, it, perplexity);
     double diff = computeH(ignore, it, p, -beta) - logPerp;
