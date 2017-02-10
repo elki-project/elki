@@ -63,9 +63,24 @@ public class DCGEvaluation implements ScoreEvaluation {
 
   @Override
   public double expected(int pos, int all) {
-    // Average rank (1..n) = .5 * (all + 1) = .5 * all + .5
-    // 1 / log2(r+1) = log(2) / log(r+1)
-    return pos * MathUtil.LOG2 / FastMath.log(.5 * all + 1.5);
+    // Expected value: every rank is positive with probability pos/all.
+    return sumInvLog1p(1, all) * pos / (double) all * MathUtil.LOG2;
+  }
+
+  /**
+   * Compute <code>\sum_{i=s}^e 1/log(1+i)</code>
+   * 
+   * @param s Start value
+   * @param e End value (inclusive!)
+   * @return Sum
+   */
+  public static double sumInvLog1p(int s, int e) {
+    double sum = 0.;
+    // Iterate e + 1 .. s + 1, descending for better precision
+    for(int i = e + 1; i > s; i--) {
+      sum += 1. / FastMath.log(i);
+    }
+    return sum;
   }
 
   /**
@@ -93,8 +108,8 @@ public class DCGEvaluation implements ScoreEvaluation {
       while(iter.valid() && iter.tiedToPrevious());
       // We only support binary labeling, and can ignore negative weight.
       if(positive > 0) {
-        final double avgrank = i - .5 * (tied - 1);
-        sum += positive / FastMath.log(avgrank + 1);
+        sum += tied == 1 ? 1. / FastMath.log(i + 1) : //
+            DCGEvaluation.sumInvLog1p(i - tied + 1, i) * positive / (double) tied;
       }
       positive = 0;
       tied = 0;
@@ -109,12 +124,7 @@ public class DCGEvaluation implements ScoreEvaluation {
    * @return Max
    */
   public static double maximum(int pos) {
-    double sum = 0.;
-    // TODO: closed form?
-    for(int i = 0; i < pos; i++) {
-      sum += 1 / FastMath.log(i + 2);
-    }
-    return sum * MathUtil.LOG2;
+    return sumInvLog1p(1, pos) * MathUtil.LOG2;
   }
 
   /**

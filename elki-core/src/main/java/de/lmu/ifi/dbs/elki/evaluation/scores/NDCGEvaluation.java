@@ -60,10 +60,10 @@ public class NDCGEvaluation implements ScoreEvaluation {
 
   @Override
   public double expected(int pos, int all) {
-    // Average rank (1..n) = .5 * (all + 1) = all + .5
-    // 1 / log2(r+1) = log(2) / log(r+1)
-    final double rdcg = pos / FastMath.log(.5 * all + 1.5);
-    final double idcg = maximumBaseE(pos);
+    // Expected value: every rank is positive with probability pos/all.
+    final double rdcg =  DCGEvaluation.sumInvLog1p(1, all) * pos / (double) all;
+    // Optimum value:
+    final double idcg = DCGEvaluation.sumInvLog1p(1, pos);
     return rdcg / idcg; // log(2) base would disappear
   }
 
@@ -92,30 +92,16 @@ public class NDCGEvaluation implements ScoreEvaluation {
       while(iter.valid() && iter.tiedToPrevious());
       // We only support binary labeling, and can ignore negative weight.
       if(positive > 0) {
-        final double avgrank = i - .5 * (tied - 1);
-        sum += positive / FastMath.log(avgrank + 1);
+        sum += tied == 1 ? 1. / FastMath.log(i + 1) : //
+            DCGEvaluation.sumInvLog1p(i - tied + 1, i) * positive / (double) tied;
         totalpos += positive;
       }
       positive = 0;
       tied = 0;
     }
-    double idcg = maximumBaseE(totalpos);
+    // Optimum value:
+    double idcg = DCGEvaluation.sumInvLog1p(1, totalpos);
     return sum / idcg; // log(2) base would disappear
-  }
-
-  /**
-   * Maximum DCG, in base e (multiply with <code>log(2)</code> to get base 2).
-   *
-   * @param pos Number of positive objects
-   * @return Max
-   */
-  private static double maximumBaseE(int pos) {
-    double sum = 0.;
-    // TODO: closed form?
-    for(int i = 0; i < pos; i++) {
-      sum += 1 / FastMath.log(i + 2);
-    }
-    return sum;
   }
 
   /**
