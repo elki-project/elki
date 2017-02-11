@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.kernel.PolynomialKernelFu
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
-import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.HillEstimator;
+import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -351,7 +351,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       runForEachK("Intrinsic", startkmin2, stepk, maxk, new AlgRunner() {
         @Override
         public void run(int k, String kstr) {
-          IntrinsicDimensionalityOutlier<O> sid = new IntrinsicDimensionalityOutlier<>(distf, k, HillEstimator.STATIC);
+          IntrinsicDimensionalityOutlier<O> sid = new IntrinsicDimensionalityOutlier<>(distf, k, AggregatedHillEstimator.STATIC);
           OutlierResult result = sid.run(database, relation);
           writeResult(fout, ids, result, scaling, kstr);
           database.getHierarchy().removeSubtree(result);
@@ -361,7 +361,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       runForEachK("IDOS", startkmin2, stepk, maxk, new AlgRunner() {
         @Override
         public void run(int k, String kstr) {
-          IDOS<O> idos = new IDOS<>(distf, HillEstimator.STATIC, k, k);
+          IDOS<O> idos = new IDOS<>(distf, AggregatedHillEstimator.STATIC, k, k);
           OutlierResult result = idos.run(database, relation);
           writeResult(fout, ids, result, scaling, kstr);
           database.getHierarchy().removeSubtree(result);
@@ -441,7 +441,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       runForEachK("ISOS", startkmin2, stepk, maxk, new AlgRunner() {
         @Override
         public void run(int k, String kstr) {
-          ISOS<O> isos = new ISOS<>(distf, k, HillEstimator.STATIC);
+          ISOS<O> isos = new ISOS<>(distf, k, AggregatedHillEstimator.STATIC);
           OutlierResult result = isos.run(relation);
           writeResult(fout, ids, result, scaling, kstr);
           database.getHierarchy().removeSubtree(result);
