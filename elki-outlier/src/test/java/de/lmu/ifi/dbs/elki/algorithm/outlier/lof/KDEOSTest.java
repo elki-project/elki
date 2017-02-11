@@ -46,7 +46,8 @@ public class KDEOSTest extends AbstractOutlierAlgorithmTest {
     params.addParameter(KDEOS.Parameterizer.KERNEL_ID, EpanechnikovKernelDensityFunction.class);
     params.addParameter(KDEOS.Parameterizer.KMIN_ID, 5);
     params.addParameter(KDEOS.Parameterizer.KMAX_ID, 20);
-    params.addParameter(KDEOS.Parameterizer.KERNEL_SCALE_ID, 1.0);
+    params.addParameter(KDEOS.Parameterizer.KERNEL_SCALE_ID, 1.);
+    params.addParameter(KDEOS.Parameterizer.IDIM_ID, -1);
 
     // setup Algorithm
     KDEOS<DoubleVector> kdeos = ClassGenericsUtil.parameterizeOrAbort(KDEOS.class, params);
