@@ -61,6 +61,9 @@ public abstract class AbstractIntrinsicDimensionalityEstimator implements Intrin
       }
       buf[p++] = it.doubleValue();
     }
+    if(p < 1) {
+      throw new ArithmeticException("ID estimation requires non-zero distances.");
+    }
     return estimate(buf, DoubleArrayAdapter.STATIC, p);
   }
 
@@ -74,6 +77,9 @@ public abstract class AbstractIntrinsicDimensionalityEstimator implements Intrin
       }
       buf.add(it.doubleValue());
       p++;
+    }
+    if(p < 1) {
+      throw new ArithmeticException("ID estimation requires non-zero distances.");
     }
     return estimate(buf, buf, p);
   }
