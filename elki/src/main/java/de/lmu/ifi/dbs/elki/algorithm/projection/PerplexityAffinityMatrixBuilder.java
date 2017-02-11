@@ -204,11 +204,10 @@ public class PerplexityAffinityMatrixBuilder<O> extends GaussianAffinityMatrixBu
   protected static double estimateInitialBeta(double[] dist_i, double perplexity) {
     double sum = 0.;
     for(double d : dist_i) {
-      sum += d < Double.POSITIVE_INFINITY ? d : 0.;
+      double d2 = d * d;
+      sum += d2 < Double.POSITIVE_INFINITY ? d2 : 0.;
     }
-    // TODO: fail gracefully if all distances are zero.
-    assert (sum > 0. && sum < Double.POSITIVE_INFINITY);
-    return .5 / sum * perplexity * (dist_i.length - 1.);
+    return sum > 0 && sum < Double.POSITIVE_INFINITY ? .5 / sum * perplexity * (dist_i.length - 1.) : 1.;
   }
 
   /**
