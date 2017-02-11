@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.distance.SOS;
@@ -117,15 +119,24 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
         p = new double[knns.size() + 10];
       }
       final DoubleDBIDListIter ki = knns.iter();
-      double id = estimateID(it, ki, p);
-      adjustDistances(it, ki, knns.getKNNDistance(), id, dists);
-      // We now continue with the modified distances:
-      // Compute affinities
-      SOS.computePi(it, di, p, perplexity, logPerp);
-      // Normalization factor:
-      double s = SOS.sumOfProbabilities(it, di, p);
-      if(s > 0) {
-        SOS.nominateNeighbors(it, di, p, 1. / s, scores);
+      try {
+        double id = estimateID(it, ki, p);
+        adjustDistances(it, ki, knns.getKNNDistance(), id, dists);
+        // We now continue with the modified distances:
+        // Compute affinities
+        SOS.computePi(it, di, p, perplexity, logPerp);
+        // Normalization factor:
+        double s = SOS.sumOfProbabilities(it, di, p);
+        if(s > 0) {
+          SOS.nominateNeighbors(it, di, p, 1. / s, scores);
+        }
+      }
+      catch(ArithmeticException e) {
+        // ID estimation failed, supposedly constant values.
+        if(knns.size() > 1) {
+          Arrays.fill(p, 1. / (knns.size() - 1));
+          SOS.nominateNeighbors(it, di, p, 1., scores);
+        }
       }
       LOG.incrementProcessed(prog);
     }
