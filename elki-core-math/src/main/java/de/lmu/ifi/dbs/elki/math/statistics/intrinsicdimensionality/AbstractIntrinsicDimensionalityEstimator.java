@@ -38,16 +38,26 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter
 public abstract class AbstractIntrinsicDimensionalityEstimator implements IntrinsicDimensionalityEstimator {
   @Override
   public <A> double estimate(A data, NumberArrayAdapter<?, ? super A> adapter) {
-    return estimate(data, adapter, adapter.size(data));
+    final int size = adapter.size(data);
+    if(size < 1) {
+      throw new ArithmeticException("ID estimation requires non-zero distances.");
+    }
+    return estimate(data, adapter, size);
   }
 
   @Override
   public double estimate(double[] distances) {
+    if(distances.length < 1) {
+      throw new ArithmeticException("ID estimation requires non-zero distances.");
+    }
     return estimate(distances, DoubleArrayAdapter.STATIC, distances.length);
   }
 
   @Override
   public double estimate(double[] distances, int size) {
+    if(size < 1) {
+      throw new ArithmeticException("ID estimation requires non-zero distances.");
+    }
     return estimate(distances, DoubleArrayAdapter.STATIC, size);
   }
 
