@@ -30,8 +30,12 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
+import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.Mean;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.IntrinsicDimensionalityEstimator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
@@ -107,6 +111,84 @@ public class IntrinsicNearestNeighborAffinityMatrixBuilder<O> extends NearestNei
     LOG.statistics(new DoubleStatistic(getClass() + ".empiric-average-id", m.getMean()));
     LOG.statistics(new DoubleStatistic(getClass() + ".adjusted-average-id", m2.getMean()));
     return mat;
+  }
+
+  /**
+   * Compute the sparse pij using the nearest neighbors only.
+   * 
+   * @param ids ID range
+   * @param knnq kNN query
+   * @param square Use squared distances
+   * @param numberOfNeighbours Number of neighbors to get
+   * @param sigma Desired perplexity
+   * @param pij Output of distances
+   * @param indices Output of indexes
+   * @param initialScale Initial scaling factor
+   */
+  protected void computePij(DBIDRange ids, KNNQuery<?> knnq, boolean square, int numberOfNeighbours, double[][] pij, int[][] indices, double initialScale) {
+    Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.neighborspijmatrix").begin() : null;
+    final double logPerp = FastMath.log(perplexity);
+    // Scratch arrays, resizable
+    DoubleArray dists = new DoubleArray(numberOfNeighbours + 10);
+    IntegerArray inds = new IntegerArray(numberOfNeighbours + 10);
+    // Compute nearest-neighbor sparse affinity matrix
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Finding neighbors and optimizing perplexity", ids.size(), LOG) : null;
+    MeanVariance mv = LOG.isStatistics() ? new MeanVariance() : null;
+    for(DBIDArrayIter ix = ids.iter(); ix.valid(); ix.advance()) {
+      dists.clear();
+      inds.clear();
+      KNNList neighbours = knnq.getKNNForDBID(ix, numberOfNeighbours + 1);
+      convertNeighbors(ids, ix, square, neighbours, dists, inds);
+      double beta = computeSigma(ix.getOffset(), dists, perplexity, logPerp, //
+          pij[ix.getOffset()] = new double[dists.size()]);
+      if(mv != null) {
+        mv.put(beta > 0 ? FastMath.sqrt(.5 / beta) : 0.); // Sigma
+      }
+      indices[ix.getOffset()] = inds.toArray();
+      LOG.incrementProcessed(prog);
+    }
+    LOG.ensureCompleted(prog);
+    // Sum of the sparse affinity matrix:
+    double sum = 0.;
+    for(int i = 0; i < pij.length; i++) {
+      final double[] pij_i = pij[i];
+      for(int offi = 0; offi < pij_i.length; offi++) {
+        int j = indices[i][offi];
+        if (j > i) {
+          continue; // Exploit symmetry.
+        }
+        assert (i != j);
+        int offj = containsIndex(indices[j], i);
+        if(offj >= 0) { // Found
+          sum += FastMath.sqrt(pij_i[offi] * pij[j][offj]);
+        }
+      }
+    }
+    final double scale = initialScale / (2 * sum);
+    for(int i = 0; i < pij.length; i++) {
+      final double[] pij_i = pij[i];
+      for(int offi = 0; offi < pij_i.length; offi++) {
+        int j = indices[i][offi];
+        assert (i != j);
+        int offj = containsIndex(indices[j], i);
+        if(offj >= 0) { // Found
+          assert (indices[j][offj] == i);
+          // Exploit symmetry:
+          if(i < j) {
+            final double val = FastMath.sqrt(pij_i[offi] * pij[j][offj]); // Symmetrize
+            pij_i[offi] = pij[j][offj] = MathUtil.max(val * scale, MIN_PIJ);
+          }
+        }
+        else { // Not found, so zero.
+          pij_i[offi] = 0;
+        }
+      }
+    }
+    if(LOG.isStatistics()) { // timer != null, mv != null
+      LOG.statistics(timer.end());
+      LOG.statistics(new DoubleStatistic(NearestNeighborAffinityMatrixBuilder.class.getName() + ".sigma.average", mv.getMean()));
+      LOG.statistics(new DoubleStatistic(NearestNeighborAffinityMatrixBuilder.class.getName() + ".sigma.stddev", mv.getSampleStddev()));
+    }
   }
 
   /**
