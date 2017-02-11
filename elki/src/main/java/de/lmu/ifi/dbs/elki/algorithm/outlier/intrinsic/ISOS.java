@@ -181,6 +181,9 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       }
       p[j++] = it.doubleValue();
     }
+    if(j < 2) {
+      throw new ArithmeticException("Too little data to estimate ID.");
+    }
     return estimator.estimate(p, j);
   }
 
