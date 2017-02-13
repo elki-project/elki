@@ -137,7 +137,7 @@ public class SimpleKernelDensityLOF<O extends NumberVector> extends AbstractDist
         sum += kernel.density(v) / MathUtil.powi(max, dim);
         count++;
       }
-      final double density = sum / count;
+      final double density = count > 0 ? sum / count : 0.;
       dens.putDouble(it, density);
       LOG.incrementProcessed(densProgress);
     }
