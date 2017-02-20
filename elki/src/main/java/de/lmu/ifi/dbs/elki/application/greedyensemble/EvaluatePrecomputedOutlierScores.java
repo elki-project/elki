@@ -20,23 +20,18 @@
  */
 package de.lmu.ifi.dbs.elki.application.greedyensemble;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.nio.channels.FileChannel;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleMeta;
+import de.lmu.ifi.dbs.elki.datasource.bundle.BundleStreamSource;
+import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
+import de.lmu.ifi.dbs.elki.datasource.parser.StreamingParser;
 import de.lmu.ifi.dbs.elki.evaluation.scores.*;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.AbstractVectorIter;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DecreasingVectorIter;
@@ -44,11 +39,12 @@ import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.IncreasingVectorIter;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.VectorNonZero;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.StringParameter;
-import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
  * Class to load an outlier detection summary file, as produced by
@@ -80,9 +76,14 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
   private static final Logging LOG = Logging.getLogger(EvaluatePrecomputedOutlierScores.class);
 
   /**
-   * The data input part.
+   * The data input file.
    */
-  InputStep inputstep;
+  File infile;
+
+  /**
+   * Parser to read input data.
+   */
+  StreamingParser parser;
 
   /**
    * Pattern to recognize reversed methods.
@@ -100,16 +101,28 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
   String name;
 
   /**
+   * Vector of positive values.
+   */
+  VectorNonZero positive;
+
+  /**
+   * Normalization term E[NDCG].
+   */
+  double endcg;
+
+  /**
    * Constructor.
    *
-   * @param inputstep Input step
+   * @param infile Input file
+   * @param parser Streaming input parser
    * @param reverse Pattern for reversed outlier scores.
    * @param outfile Output file name
    * @param name Constant column to prepend
    */
-  public EvaluatePrecomputedOutlierScores(InputStep inputstep, Pattern reverse, File outfile, String name) {
+  public EvaluatePrecomputedOutlierScores(File infile, StreamingParser parser, Pattern reverse, File outfile, String name) {
     super();
-    this.inputstep = inputstep;
+    this.infile = infile;
+    this.parser = parser;
     this.reverse = reverse;
     this.outfile = outfile;
     this.name = name;
@@ -117,94 +130,134 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
 
   @Override
   public void run() {
-    // Note: the database contains the *result vectors*, not the original data.
-    final Database database = inputstep.getDatabase();
-    final Relation<NumberVector> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
-    final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
-    final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
-    final String firstlabel = labels.get(firstid);
-    if(!firstlabel.matches("bylabel")) {
-      throw new AbortException("No 'by label' reference outlier found, which is needed for evaluation!");
-    }
-
-    // Reference vector
-    final NumberVector refvec = relation.get(firstid);
-    // Build the positive index set for ROC AUC.
-    VectorNonZero positive = new VectorNonZero(refvec);
-    double rate = positive.numPositive() / (double) refvec.getDimensionality();
-
-    try (FileOutputStream fosResult = new FileOutputStream(outfile, true);
+    try (FileInputStream fis = new FileInputStream(infile); //
+        InputStream is = new BufferedInputStream(FileUtil.tryGzipInput(fis)); //
+        FileOutputStream fosResult = new FileOutputStream(outfile, true);
         PrintStream fout = new PrintStream(fosResult);
         FileChannel chan = fosResult.getChannel()) {
+      // Setup the input stream.
+      parser.initStream(is);
+      // Lock the output file:
       chan.lock();
       if(chan.position() == 0L) {
-        // Write CSV header:
-        if(name != null) {
-          fout.append("\"Name\",");
-        }
-        fout.append("\"Algorithm\",\"k\"");
-        fout.append(",\"ROC AUC\"");
-        fout.append(",\"Average Precision\"");
-        fout.append(",\"R-Precision\"");
-        fout.append(",\"Maximum F1\"");
-        fout.append(",\"DCG\"");
-        fout.append(",\"NDCG\"");
-        fout.append(",\"Adjusted ROC AUC\"");
-        fout.append(",\"Adjusted Average Precision\"");
-        fout.append(",\"Adjusted R-Precision\"");
-        fout.append(",\"Adjusted Maximum F1\"");
-        fout.append(",\"Adjusted DCG\"");
-        fout.append('\n');
+        writeHeader(fout);
       }
-      Matcher m = reverse.matcher("");
-      // Compute individual scores
-      for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
-        if(DBIDUtil.equal(firstid, iditer)) {
-          continue;
+      else {
+        LOG.info("Appending to existing output " + outfile);
+      }
+      int lcol = -1, dcol = -1;
+      loop: while(true) {
+        BundleStreamSource.Event ev = parser.nextEvent();
+        switch(ev){
+        case END_OF_STREAM:
+          break loop;
+        case META_CHANGED:
+          BundleMeta meta = parser.getMeta();
+          lcol = -1;
+          dcol = -1;
+          for(int i = 0; i < meta.size(); i++) {
+            SimpleTypeInformation<?> m = meta.get(i);
+            if(TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH.isAssignableFromType(m)) {
+              if(dcol >= 0) {
+                throw new AbortException("More than one vector column.");
+              }
+              dcol = i;
+            }
+            else if(TypeUtil.GUESSED_LABEL.isAssignableFromType(m)) {
+              if(lcol >= 0) {
+                throw new AbortException("More than one label column.");
+              }
+              lcol = i;
+            }
+            else {
+              throw new AbortException("Unexpected data column type: " + m);
+            }
+          }
+          break;
+        case NEXT_OBJECT:
+          if(lcol < 0) {
+            throw new AbortException("No label column available.");
+          }
+          if(dcol < 0) {
+            throw new AbortException("No vector column available.");
+          }
+          processRow(fout, (NumberVector) parser.data(dcol), parser.data(lcol).toString());
+          break;
         }
-        String label = labels.get(iditer);
-        final NumberVector vec = relation.get(iditer);
-        if(checkForNaNs(vec)) {
-          LOG.warning("NaN value encountered in vector " + label);
-          continue;
-        }
-        AbstractVectorIter iter = m.reset(label).find() ? new IncreasingVectorIter(vec) : new DecreasingVectorIter(vec);
-        double auc = ROCEvaluation.STATIC.evaluate(positive, iter.seek(0));
-        double avep = AveragePrecisionEvaluation.STATIC.evaluate(positive, iter.seek(0));
-        double rprecision = PrecisionAtKEvaluation.RPRECISION.evaluate(positive, iter.seek(0));
-        double maxf1 = MaximumF1Evaluation.STATIC.evaluate(positive, iter.seek(0));
-        double dcg = DCGEvaluation.STATIC.evaluate(positive, iter.seek(0));
-        double ndcg = NDCGEvaluation.STATIC.evaluate(positive, iter.seek(0));
-        double endcg = NDCGEvaluation.STATIC.expected(positive.numPositive(), refvec.getDimensionality());
-        double adjauc = 2 * auc - 1;
-        double adjrprecision = (rprecision - rate) / (1 - rate);
-        double adjavep = (avep - rate) / (1 - rate);
-        double adjmaxf1 = (maxf1 - rate) / (1 - rate);
-        double adjdcg = (ndcg - endcg) / (1 - endcg);
-        String prefix = label.substring(0, label.lastIndexOf('-'));
-        int k = Integer.valueOf(label.substring(label.lastIndexOf('-') + 1));
-        // Write CSV
-        if(name != null) {
-          fout.append("\"" + name + "\",");
-        }
-        fout.append("\"" + prefix + "\"," + k);
-        fout.append(',').append(Double.toString(auc));
-        fout.append(',').append(Double.toString(avep));
-        fout.append(',').append(Double.toString(rprecision));
-        fout.append(',').append(Double.toString(maxf1));
-        fout.append(',').append(Double.toString(dcg));
-        fout.append(',').append(Double.toString(ndcg));
-        fout.append(',').append(Double.toString(adjauc));
-        fout.append(',').append(Double.toString(adjavep));
-        fout.append(',').append(Double.toString(adjrprecision));
-        fout.append(',').append(Double.toString(adjmaxf1));
-        fout.append(',').append(Double.toString(adjdcg));
-        fout.append('\n');
       }
     }
     catch(IOException e) {
-      LOG.exception(e);
+      throw new AbortException("IO error.", e);
     }
+  }
+
+  private void writeHeader(PrintStream fout) {
+    // Write CSV header:
+    if(name != null) {
+      fout.append("\"Name\",");
+    }
+    fout.append("\"Algorithm\",\"k\"");
+    fout.append(",\"ROC AUC\"");
+    fout.append(",\"Average Precision\"");
+    fout.append(",\"R-Precision\"");
+    fout.append(",\"Maximum F1\"");
+    fout.append(",\"DCG\"");
+    fout.append(",\"NDCG\"");
+    fout.append(",\"Adjusted ROC AUC\"");
+    fout.append(",\"Adjusted Average Precision\"");
+    fout.append(",\"Adjusted R-Precision\"");
+    fout.append(",\"Adjusted Maximum F1\"");
+    fout.append(",\"Adjusted DCG\"");
+    fout.append('\n');
+  }
+
+  private void processRow(PrintStream fout, NumberVector vec, String label) {
+    if(checkForNaNs(vec)) {
+      LOG.warning("NaN value encountered in vector " + label);
+      return;
+    }
+    if(positive == null) {
+      if(!label.matches("bylabel")) {
+        throw new AbortException("No 'by label' reference outlier found, which is needed for evaluation!");
+      }
+      positive = new VectorNonZero(vec);
+      endcg = NDCGEvaluation.STATIC.expected(positive.numPositive(), positive.getDimensionality());
+      return;
+    }
+    AbstractVectorIter iter = reverse.matcher(label).find() ? new IncreasingVectorIter(vec) : new DecreasingVectorIter(vec);
+    double rate = positive.numPositive() / (double) positive.getDimensionality();
+    double auc = ROCEvaluation.STATIC.evaluate(positive, iter.seek(0));
+    double avep = AveragePrecisionEvaluation.STATIC.evaluate(positive, iter.seek(0));
+    double rprecision = PrecisionAtKEvaluation.RPRECISION.evaluate(positive, iter.seek(0));
+    double maxf1 = MaximumF1Evaluation.STATIC.evaluate(positive, iter.seek(0));
+    double dcg = DCGEvaluation.STATIC.evaluate(positive, iter.seek(0));
+    double ndcg = NDCGEvaluation.STATIC.evaluate(positive, iter.seek(0));
+    double adjauc = 2 * auc - 1;
+    double adjrprecision = (rprecision - rate) / (1 - rate);
+    double adjavep = (avep - rate) / (1 - rate);
+    double adjmaxf1 = (maxf1 - rate) / (1 - rate);
+    double adjdcg = (ndcg - endcg) / (1 - endcg);
+    final int p = label.lastIndexOf('-');
+    String prefix = label.substring(0, p);
+    int k = Integer.valueOf(label.substring(p + 1));
+    // Write CSV
+    if(name != null) {
+      fout.append('"').append(name).append("\",");
+    }
+    fout.append('"').append(prefix).append('"');
+    fout.append(',').append(Integer.toString(k));
+    fout.append(',').append(Double.toString(auc));
+    fout.append(',').append(Double.toString(avep));
+    fout.append(',').append(Double.toString(rprecision));
+    fout.append(',').append(Double.toString(maxf1));
+    fout.append(',').append(Double.toString(dcg));
+    fout.append(',').append(Double.toString(ndcg));
+    fout.append(',').append(Double.toString(adjauc));
+    fout.append(',').append(Double.toString(adjavep));
+    fout.append(',').append(Double.toString(adjrprecision));
+    fout.append(',').append(Double.toString(adjmaxf1));
+    fout.append(',').append(Double.toString(adjdcg));
+    fout.append('\n');
   }
 
   /**
@@ -237,6 +290,11 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     public static final OptionID NAME_ID = new OptionID("name", "Data set name to use in a 'Name' CSV column.");
 
     /**
+     * Input parser.
+     */
+    public static final OptionID PARSER_ID = new OptionID("parser", "Input parser.");
+
+    /**
      * Pattern for reversed methods.
      */
     public static final OptionID REVERSED_ID = new OptionID("reversed", "Pattern to recognize reversed methods.");
@@ -244,7 +302,12 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     /**
      * Data source.
      */
-    InputStep inputstep;
+    File infile;
+
+    /**
+     * Parser to read input data.
+     */
+    StreamingParser parser;
 
     /**
      * Pattern to recognize reversed methods.
@@ -265,16 +328,20 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       // Data input
-      inputstep = config.tryInstantiate(InputStep.class);
-      outfile = super.getParameterOutputFile(config, "File to output the resulting score vectors to.");
+      infile = super.getParameterInputFile(config, "Input file containing the outlier score vectors.");
+      ObjectParameter<StreamingParser> parserP = new ObjectParameter<>(PARSER_ID, StreamingParser.class, NumberVectorLabelParser.class);
+      if(config.grab(parserP)) {
+        parser = parserP.instantiateClass(config);
+      }
+      outfile = super.getParameterOutputFile(config, "File to output the resulting evaluation vectors to.");
       // Row name prefix
-      StringParameter nameP = new StringParameter(NAME_ID);
-      nameP.setOptional(true);
+      StringParameter nameP = new StringParameter(NAME_ID) //
+          .setOptional(true);
       if(config.grab(nameP)) {
         name = nameP.getValue();
       }
       // Pattern for reversed methods:
-      PatternParameter reverseP = new PatternParameter(REVERSED_ID, "(ODIN|ABOD)");
+      PatternParameter reverseP = new PatternParameter(REVERSED_ID, "(ODIN|DWOF|gaussian-model|silhouette|OutRank|OUTRES|aggarwal.?yu|ABOD)");
       if(config.grab(reverseP)) {
         reverse = reverseP.getValue();
       }
@@ -282,7 +349,7 @@ public class EvaluatePrecomputedOutlierScores extends AbstractApplication {
 
     @Override
     protected EvaluatePrecomputedOutlierScores makeInstance() {
-      return new EvaluatePrecomputedOutlierScores(inputstep, reverse, outfile, name);
+      return new EvaluatePrecomputedOutlierScores(infile, parser, reverse, outfile, name);
     }
   }
 

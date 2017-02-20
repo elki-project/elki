@@ -75,4 +75,13 @@ public class VectorOverThreshold implements Predicate<AbstractVectorIter> {
   public int numPositive() {
     return numpos;
   }
+  
+  /**
+   * Dimensionality of the underlying truth vector (positive and negative values).
+   *
+   * @return Dimensionality
+   */
+  public int getDimensionality() {
+    return vec.getDimensionality();
+  }
 }
