@@ -79,6 +79,11 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
   IntrinsicDimensionalityEstimator estimator;
 
   /**
+   * Expected outlier rate.
+   */
+  protected double phi = 0.01;
+
+  /**
    * Constructor.
    *
    * @param distance Distance function
@@ -128,14 +133,14 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
         // Normalization factor:
         double s = SOS.sumOfProbabilities(it, di, p);
         if(s > 0) {
-          SOS.nominateNeighbors(it, di, p, 1. / s, scores);
+          nominateNeighbors(it, di, p, 1. / s, scores);
         }
       }
       catch(ArithmeticException e) {
         // ID estimation failed, supposedly constant values.
         if(knns.size() > 1) {
           Arrays.fill(p, 1. / (knns.size() - 1));
-          SOS.nominateNeighbors(it, di, p, 1., scores);
+          nominateNeighbors(it, di, p, 1., scores);
         }
       }
       LOG.incrementProcessed(prog);
@@ -143,8 +148,12 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
     LOG.ensureCompleted(prog);
     // Find minimum and maximum.
     DoubleMinMax minmax = new DoubleMinMax();
+    double adj = (1 - phi) / phi;
     for(DBIDIter it2 = relation.iterDBIDs(); it2.valid(); it2.advance()) {
-      minmax.put(scores.doubleValue(it2));
+      double or = FastMath.exp(-scores.doubleValue(it2) * logPerp) * adj;
+      double s = 1. / (1 + or);
+      scores.putDouble(it2, s);
+      minmax.put(s);
     }
     DoubleRelation scoreres = new MaterializedDoubleRelation("Intrinsic Stoachastic Outlier Selection", "isos-outlier", scores, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(minmax.getMin(), minmax.getMax(), 0.);
@@ -185,6 +194,28 @@ public class ISOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> im
       throw new ArithmeticException("Too little data to estimate ID.");
     }
     return estimator.estimate(p, j);
+  }
+
+  /**
+   * Vote for neighbors not being outliers. The key method of SOS.
+   * 
+   * @param ignore Object to ignore
+   * @param di Neighbor object IDs.
+   * @param p Probabilities
+   * @param norm Normalization factor (1/sum)
+   * @param scores Output score storage
+   */
+  public static void nominateNeighbors(DBIDIter ignore, DBIDArrayIter di, double[] p, double norm, WritableDoubleDataStore scores) {
+    for(di.seek(0); di.valid(); di.advance()) {
+      if(DBIDUtil.equal(ignore, di)) {
+        continue;
+      }
+      double v = p[di.getOffset()] * norm; // Normalize
+      if(!(v > 0)) {
+        break;
+      }
+      scores.increment(di, FastMath.log1p(-v));
+    }
   }
 
   @Override

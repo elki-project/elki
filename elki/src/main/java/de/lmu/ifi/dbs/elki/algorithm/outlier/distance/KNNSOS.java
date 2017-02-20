@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.ISOS;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
@@ -87,6 +88,11 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> 
   protected int k;
 
   /**
+   * Expected outlier rate.
+   */
+  protected double phi = 0.01;
+
+  /**
    * Constructor.
    *
    * @param distance Distance function
@@ -115,7 +121,7 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> 
     final double logPerp = FastMath.log(perplexity);
 
     double[] p = new double[k + 10];
-    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("SOS scores", relation.size(), LOG) : null;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("KNNSOS scores", relation.size(), LOG) : null;
     WritableDoubleDataStore scores = DataStoreUtil.makeDoubleStorage(relation.getDBIDs(), DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_DB, 1.);
     for(DBIDIter it = relation.iterDBIDs(); it.valid(); it.advance()) {
       KNNList knns = knnq.getKNNForDBID(it, k1);
@@ -128,17 +134,21 @@ public class KNNSOS<O> extends AbstractDistanceBasedAlgorithm<O, OutlierResult> 
       // Normalization factor:
       double s = SOS.sumOfProbabilities(it, ki, p);
       if(s > 0) {
-        SOS.nominateNeighbors(it, ki, p, 1. / s, scores);
+        ISOS.nominateNeighbors(it, ki, p, 1. / s, scores);
       }
       LOG.incrementProcessed(prog);
     }
     LOG.ensureCompleted(prog);
     // Find minimum and maximum.
     DoubleMinMax minmax = new DoubleMinMax();
+    double adj = (1 - phi) / phi;
     for(DBIDIter it2 = relation.iterDBIDs(); it2.valid(); it2.advance()) {
-      minmax.put(scores.doubleValue(it2));
+      double or = FastMath.exp(-scores.doubleValue(it2) * logPerp) * adj;
+      double s = 1. / (1 + or);
+      scores.putDouble(it2, s);
+      minmax.put(s);
     }
-    DoubleRelation scoreres = new MaterializedDoubleRelation("Stoachastic Outlier Selection", "sos-outlier", scores, relation.getDBIDs());
+    DoubleRelation scoreres = new MaterializedDoubleRelation("kNN Stoachastic Outlier Selection", "knnsos-outlier", scores, relation.getDBIDs());
     OutlierScoreMeta meta = new ProbabilisticOutlierScore(minmax.getMin(), minmax.getMax(), 0.);
     return new OutlierResult(meta, scoreres);
   }
