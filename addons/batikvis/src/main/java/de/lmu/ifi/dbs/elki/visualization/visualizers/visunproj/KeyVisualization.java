@@ -232,7 +232,7 @@ public class KeyVisualization extends AbstractVisFactory {
         for(Cluster<Model> c : allcs) {
           final int col = i / rows;
           final int row = i % rows;
-          ml.useMarker(svgp, layer, 0.3 + maxwidth * col, row + 1.5, i, 0.3);
+          ml.useMarker(svgp, layer, 0.3 + maxwidth * col, row + 1.5, i, 0.5);
           Element label = svgp.svgText(0.7 + maxwidth * col, row + 1.7, c.getNameAutomatic());
           SVGUtil.setCSSClass(label, KEY_ENTRY);
           layer.appendChild(label);

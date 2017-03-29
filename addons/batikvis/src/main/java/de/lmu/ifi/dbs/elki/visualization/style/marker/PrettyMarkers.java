@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.style.marker;
 
+import org.apache.batik.util.CSSConstants;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -217,14 +218,15 @@ public class PrettyMarkers implements MarkerLibrary {
     if(existing == null) {
       Element symbol = plot.svgElement(SVGConstants.SVG_SYMBOL_TAG);
       SVGUtil.setAtt(symbol, SVGConstants.SVG_ID_ATTRIBUTE, id);
-      plotMarker(plot, symbol, 2 * size, 2 * size, style, 2 * size);
+      SVGUtil.setAtt(symbol, CSSConstants.CSS_OVERFLOW_PROPERTY, CSSConstants.CSS_VISIBLE_VALUE);
+      plotMarker(plot, symbol, 0, 0, style, size);
       plot.getDefs().appendChild(symbol);
       plot.putIdElement(id, symbol);
     }
     Element use = plot.svgElement(SVGConstants.SVG_USE_TAG);
     use.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, "#" + id);
-    SVGUtil.setAtt(use, SVGConstants.SVG_X_ATTRIBUTE, x - 2 * size);
-    SVGUtil.setAtt(use, SVGConstants.SVG_Y_ATTRIBUTE, y - 2 * size);
+    SVGUtil.setAtt(use, SVGConstants.SVG_X_ATTRIBUTE, x);
+    SVGUtil.setAtt(use, SVGConstants.SVG_Y_ATTRIBUTE, y);
     if(parent != null) {
       parent.appendChild(use);
     }
