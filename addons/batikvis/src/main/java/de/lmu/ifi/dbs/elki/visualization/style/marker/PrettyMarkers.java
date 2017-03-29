@@ -20,11 +20,11 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.style.marker;
 
-import org.apache.batik.util.CSSConstants;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
+import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -32,6 +32,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 /**
  * Marker library achieving a larger number of styles by combining different
  * shapes with different colors. Uses object ID management by SVGPlot.
+ * 
+ * TODO: Add more styles
  *
  * @author Erich Schubert
  * @since 0.4.0
@@ -101,79 +103,134 @@ public class PrettyMarkers implements MarkerLibrary {
    */
   public void plotMarker(SVGPlot plot, Element parent, double x, double y, int style, double size) {
     assert (parent != null);
-    if (style == -1) {
+    if(style == -1) {
       plotUncolored(plot, parent, x, y, size);
       return;
     }
-    if (style == -2) {
+    if(style == -2) {
       plotGray(plot, parent, x, y, size);
       return;
     }
-    // TODO: add more styles.
-    String colorstr = colors.getColor(style);
-    String strokestyle = SVGConstants.CSS_STROKE_PROPERTY + ":" + colorstr + ";" + SVGConstants.CSS_STROKE_WIDTH_PROPERTY + ":" + SVGUtil.fmt(size / 6);
+    // No dot allowed!
+    String cssid = prefix + style + "_" + (int) (100 * size);
 
-    switch(style % 8){
+    switch(style & 0x7){
     case 0: {
       // + cross
+      if(!plot.getCSSClassManager().contains(cssid)) {
+        CSSClass c = new CSSClass(this, cssid);
+        String colorstr = colors.getColor(style);
+        c.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colorstr);
+        c.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, size / 6);
+        plot.addCSSClassOrLogError(c);
+      }
       Element line1 = plot.svgLine(x, y - size / 2.2, x, y + size / 2.2);
-      SVGUtil.setStyle(line1, strokestyle);
+      SVGUtil.setCSSClass(line1, cssid);
       parent.appendChild(line1);
       Element line2 = plot.svgLine(x - size / 2.2, y, x + size / 2.2, y);
-      SVGUtil.setStyle(line2, strokestyle);
+      SVGUtil.setCSSClass(line2, cssid);
       parent.appendChild(line2);
       break;
     }
     case 1: {
       // X cross
+      if(!plot.getCSSClassManager().contains(cssid)) {
+        CSSClass c = new CSSClass(this, cssid);
+        String colorstr = colors.getColor(style);
+        c.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colorstr);
+        c.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, size / 6);
+        plot.addCSSClassOrLogError(c);
+      }
       Element line1 = plot.svgLine(x - size / 2.828427, y - size / 2.828427, x + size / 2.828427, y + size / 2.828427);
-      SVGUtil.setStyle(line1, strokestyle);
+      SVGUtil.setCSSClass(line1, cssid);
       parent.appendChild(line1);
       Element line2 = plot.svgLine(x - size / 2.828427, y + size / 2.828427, x + size / 2.828427, y - size / 2.828427);
-      SVGUtil.setStyle(line2, strokestyle);
+      SVGUtil.setCSSClass(line2, cssid);
       parent.appendChild(line2);
       break;
     }
     case 2: {
       // O hollow circle
+      if(!plot.getCSSClassManager().contains(cssid)) {
+        CSSClass c = new CSSClass(this, cssid);
+        String colorstr = colors.getColor(style);
+        c.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colorstr);
+        c.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, size / 6);
+        c.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+        plot.addCSSClassOrLogError(c);
+      }
       Element circ = plot.svgCircle(x, y, size / 2.2);
-      SVGUtil.setStyle(circ, "fill: none;" + strokestyle);
+      SVGUtil.setCSSClass(circ, cssid);
       parent.appendChild(circ);
       break;
     }
     case 3: {
       // [] hollow rectangle
+      if(!plot.getCSSClassManager().contains(cssid)) {
+        CSSClass c = new CSSClass(this, cssid);
+        String colorstr = colors.getColor(style);
+        c.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colorstr);
+        c.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, size / 6);
+        c.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+        plot.addCSSClassOrLogError(c);
+      }
       Element rect = plot.svgRect(x - size / 2.4, y - size / 2.4, size / 1.2, size / 1.2);
-      SVGUtil.setStyle(rect, "fill: none;" + strokestyle);
+      SVGUtil.setCSSClass(rect, cssid);
       parent.appendChild(rect);
       break;
     }
     case 4: {
       // <> hollow diamond
+      if(!plot.getCSSClassManager().contains(cssid)) {
+        CSSClass c = new CSSClass(this, cssid);
+        String colorstr = colors.getColor(style);
+        c.setStatement(SVGConstants.CSS_STROKE_PROPERTY, colorstr);
+        c.setStatement(SVGConstants.CSS_STROKE_WIDTH_PROPERTY, size / 6);
+        c.setStatement(SVGConstants.CSS_FILL_PROPERTY, SVGConstants.CSS_NONE_VALUE);
+        plot.addCSSClassOrLogError(c);
+      }
       Element rect = plot.svgRect(x - size / 2.7, y - size / 2.7, size / 1.35, size / 1.35);
-      SVGUtil.setStyle(rect, "fill: none;" + strokestyle);
+      SVGUtil.setCSSClass(rect, cssid);
       SVGUtil.setAtt(rect, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
       parent.appendChild(rect);
       break;
     }
     case 5: {
       // O filled circle
+      if(!plot.getCSSClassManager().contains(cssid)) {
+        CSSClass c = new CSSClass(this, cssid);
+        String colorstr = colors.getColor(style);
+        c.setStatement(SVGConstants.CSS_FILL_PROPERTY, colorstr);
+        plot.addCSSClassOrLogError(c);
+      }
       Element circ = plot.svgCircle(x, y, size * .5);
-      SVGUtil.setStyle(circ, SVGConstants.CSS_FILL_PROPERTY + ":" + colorstr);
+      SVGUtil.setCSSClass(circ, cssid);
       parent.appendChild(circ);
       break;
     }
     case 6: {
       // [] filled rectangle
+      if(!plot.getCSSClassManager().contains(cssid)) {
+        CSSClass c = new CSSClass(this, cssid);
+        String colorstr = colors.getColor(style);
+        c.setStatement(SVGConstants.CSS_FILL_PROPERTY, colorstr);
+        plot.addCSSClassOrLogError(c);
+      }
       Element rect = plot.svgRect(x - size / 2.2, y - size / 2.2, size / 1.1, size / 1.1);
-      SVGUtil.setStyle(rect, "fill:" + colorstr);
+      SVGUtil.setCSSClass(rect, cssid);
       parent.appendChild(rect);
       break;
     }
     case 7: {
       // <> filled diamond
+      if(!plot.getCSSClassManager().contains(cssid)) {
+        CSSClass c = new CSSClass(this, cssid);
+        String colorstr = colors.getColor(style);
+        c.setStatement(SVGConstants.CSS_FILL_PROPERTY, colorstr);
+        plot.addCSSClassOrLogError(c);
+      }
       Element rect = plot.svgRect(x - size / 2.5, y - size / 2.5, size / 1.25, size / 1.25);
-      SVGUtil.setStyle(rect, "fill:" + colorstr);
+      SVGUtil.setCSSClass(rect, cssid);
       SVGUtil.setAtt(rect, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(45," + SVGUtil.fmt(x) + "," + SVGUtil.fmt(y) + ")");
       parent.appendChild(rect);
       break;
@@ -182,7 +239,8 @@ public class PrettyMarkers implements MarkerLibrary {
   }
 
   /**
-   * Plot a replacement marker when an object is to be plotted as "disabled", usually gray.
+   * Plot a replacement marker when an object is to be plotted as "disabled",
+   * usually gray.
    *
    * @param plot Plot to draw to
    * @param parent Parent element
@@ -213,20 +271,10 @@ public class PrettyMarkers implements MarkerLibrary {
 
   @Override
   public Element useMarker(SVGPlot plot, Element parent, double x, double y, int style, double size) {
-    String id = prefix + style + "_" + size;
-    Element existing = plot.getIdElement(id);
-    if(existing == null) {
-      Element symbol = plot.svgElement(SVGConstants.SVG_SYMBOL_TAG);
-      SVGUtil.setAtt(symbol, SVGConstants.SVG_ID_ATTRIBUTE, id);
-      SVGUtil.setAtt(symbol, CSSConstants.CSS_OVERFLOW_PROPERTY, CSSConstants.CSS_VISIBLE_VALUE);
-      plotMarker(plot, symbol, 0, 0, style, size);
-      plot.getDefs().appendChild(symbol);
-      plot.putIdElement(id, symbol);
-    }
-    Element use = plot.svgElement(SVGConstants.SVG_USE_TAG);
-    use.setAttributeNS(SVGConstants.XLINK_NAMESPACE_URI, SVGConstants.XLINK_HREF_QNAME, "#" + id);
-    SVGUtil.setAtt(use, SVGConstants.SVG_X_ATTRIBUTE, x);
-    SVGUtil.setAtt(use, SVGConstants.SVG_Y_ATTRIBUTE, y);
+    // Note: we used to use <symbol> and <use>, but Batik performance was much
+    // worse.
+    Element use = plot.svgElement(SVGConstants.SVG_G_TAG);
+    plotMarker(plot, use, x, y, style, size);
     if(parent != null) {
       parent.appendChild(use);
     }
