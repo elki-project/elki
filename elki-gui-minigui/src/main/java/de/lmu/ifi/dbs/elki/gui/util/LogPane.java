@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.gui.util;
 
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.util.logging.ErrorManager;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -28,9 +29,11 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 import de.lmu.ifi.dbs.elki.logging.ErrorFormatter;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
@@ -113,8 +116,10 @@ public class LogPane extends JTextPane {
    * Print a message as if it were logged, without going through the full
    * logger.
    * 
-   * @param message Message text
-   * @param level Message level
+   * @param message
+   *        Message text
+   * @param level
+   *        Message level
    */
   public void publish(String message, Level level) {
     try {
@@ -128,7 +133,8 @@ public class LogPane extends JTextPane {
   /**
    * Publish a log record to the logging pane.
    * 
-   * @param record Log record
+   * @param record
+   *        Log record
    * @throws Exception
    */
   protected synchronized void publish(LogRecord record) throws BadLocationException {
@@ -154,37 +160,41 @@ public class LogPane extends JTextPane {
     // format
     final String m;
     m = fmt.format(record);
+    StyledDocument doc = getStyledDocument();
     if(record instanceof ProgressLogRecord) {
-      if(lastNewlinePos < getStyledDocument().getLength()) {
-        getStyledDocument().remove(lastNewlinePos, getStyledDocument().getLength() - lastNewlinePos);
+      if(lastNewlinePos < doc.getLength()) {
+        doc.remove(lastNewlinePos, doc.getLength() - lastNewlinePos);
       }
     }
     else {
       // insert a newline, if we didn't see one yet.
-      if(lastNewlinePos < getStyledDocument().getLength()) {
-        getStyledDocument().insertString(getStyledDocument().getLength(), "\n", style);
-        lastNewlinePos = getStyledDocument().getLength();
+      if(lastNewlinePos < doc.getLength()) {
+        doc.insertString(doc.getLength(), "\n", style);
+        lastNewlinePos = doc.getLength();
       }
     }
     int tail = tailingNonNewline(m, 0, m.length());
     int headlen = m.length() - tail;
     if(headlen > 0) {
       String pre = m.substring(0, headlen);
-      getStyledDocument().insertString(getStyledDocument().getLength(), pre, style);
+      doc.insertString(doc.getLength(), pre, style);
     }
-    lastNewlinePos = getStyledDocument().getLength();
+    lastNewlinePos = doc.getLength();
     if(tail > 0) {
       String post = m.substring(m.length() - tail);
-      getStyledDocument().insertString(lastNewlinePos, post, style);
+      doc.insertString(lastNewlinePos, post, style);
     }
   }
 
   /**
    * Count the tailing non-newline characters.
    * 
-   * @param str String
-   * @param off Offset
-   * @param len Range
+   * @param str
+   *        String
+   * @param off
+   *        Offset
+   * @param len
+   *        Range
    * @return number of tailing non-newline character
    */
   private int tailingNonNewline(String str, int off, int len) {
@@ -240,11 +250,26 @@ public class LogPane extends JTextPane {
 
     @Override
     public void publish(LogRecord record) {
-      try {
-        LogPane.this.publish(record);
+      if(EventQueue.isDispatchThread()) {
+        try {
+          LogPane.this.publish(record);
+        }
+        catch(Exception e) {
+          reportError("Error printing output log message.", e, ErrorManager.GENERIC_FAILURE);
+        }
       }
-      catch(Exception e) {
-        reportError("Error printing output log message.", e, ErrorManager.GENERIC_FAILURE);
+      else {
+        SwingUtilities.invokeLater(new Runnable() {
+          @Override
+          public void run() {
+            try {
+              LogPane.this.publish(record);
+            }
+            catch(Exception e) {
+              reportError("Error printing output log message.", e, ErrorManager.GENERIC_FAILURE);
+            }
+          }
+        });
       }
     }
   }

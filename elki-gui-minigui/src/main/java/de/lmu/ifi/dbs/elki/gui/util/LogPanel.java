@@ -24,7 +24,6 @@ import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
 import javax.swing.BoxLayout;
@@ -87,27 +86,11 @@ public class LogPanel extends JPanel {
   }
 
   /**
-   * Print a message as if it were logged, without going through the full
-   * logger.
-   * 
-   * @param message Message text
-   * @param level Message level
-   */
-  public void publish(String message, Level level) {
-    try {
-      publish(new LogRecord(level, message));
-    }
-    catch(Exception e) {
-      throw new RuntimeException("Error writing a log-like message.", e);
-    }
-  }
-
-  /**
    * Publish a logging record.
    * 
    * @param record Log record to publish
    */
-  public void publish(final LogRecord record) {
+  protected void publish(final LogRecord record) {
     if(record instanceof ProgressLogRecord) {
       ProgressLogRecord preg = (ProgressLogRecord) record;
       Progress prog = preg.getProgress();
