@@ -101,13 +101,14 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
   /**
    * Constructor.
    *
-   * @param distanceFunction Distance function
+   * @param affinity Affinity matrix builder
    * @param dim Output dimensionality
    * @param finalMomentum Final momentum
    * @param learningRate Learning rate
    * @param maxIterations Maximum number of iterations
    * @param random Random generator
    * @param keep Keep the original data (or remove it)
+   * @param theta Theta parameter
    */
   public BarnesHutTSNE(AffinityMatrixBuilder<? super O> affinity, int dim, double finalMomentum, double learningRate, int maxIterations, RandomFactory random, boolean keep, double theta) {
     super(affinity, dim, finalMomentum, learningRate * 4, maxIterations, random, keep);
@@ -137,7 +138,6 @@ public class BarnesHutTSNE<O> extends TSNE<O> {
    * Perform the actual tSNE optimization.
    * 
    * @param pij Sparse initial affinity matrix
-   * @param indices Index array of affinity matrix
    * @param sol Solution output array (preinitialized)
    */
   protected void optimizetSNE(AffinityMatrix pij, double[][] sol) {

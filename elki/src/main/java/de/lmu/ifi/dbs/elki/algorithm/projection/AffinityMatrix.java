@@ -123,7 +123,7 @@ public interface AffinityMatrix {
   /**
    * Array iterator over the stored objects.
    * 
-   * @return
+   * @return DBID iterator
    */
   DBIDArrayIter iterDBIDs();
 }

@@ -106,11 +106,9 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
 
   /**
    * Build a distance matrix of squared distances.
-   * 
-   * @param size Data set size
+   *
+   * @param ids DBIDs
    * @param dq Distance query
-   * @param ix Data iterator
-   * @param iy Data iterator
    * @return Distance matrix
    */
   protected double[][] buildDistanceMatrix(ArrayDBIDs ids, DistanceQuery<?> dq) {

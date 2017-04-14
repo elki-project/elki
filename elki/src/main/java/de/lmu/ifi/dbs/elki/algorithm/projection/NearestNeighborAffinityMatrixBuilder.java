@@ -127,7 +127,6 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    * @param knnq kNN query
    * @param square Use squared distances
    * @param numberOfNeighbours Number of neighbors to get
-   * @param sigma Desired perplexity
    * @param pij Output of distances
    * @param indices Output of indexes
    * @param initialScale Initial scaling factor
@@ -222,9 +221,9 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    * obtain the desired perplexity.
    *
    * @param i Current point
-   * @param dist_i Distance matrix row pij[i]
+   * @param pij_row Distance matrix row pij[i]
    * @param perplexity Desired perplexity
-   * @param logPerp Log of desired perplexity
+   * @param log_perp Log of desired perplexity
    * @param pij_i Output row
    * @return beta
    */
@@ -252,7 +251,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    * Compute H (observed perplexity) for row i, and the row pij_i.
    * 
    * @param dist_i Distances to neighbors
-   * @param pij_i Row pij[i] (output)
+   * @param pij_row Row pij[i] (output)
    * @param mbeta {@code -1. / (2 * sigma * sigma)}
    * @return Observed perplexity
    */
@@ -281,6 +280,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
    * 
    * TODO: sort arrays, use binary search!
    * 
+   * @param is Array to search
    * @param i Index to search
    * @return Position of index i, or {@code -1} if not found.
    */
