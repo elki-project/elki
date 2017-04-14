@@ -20,9 +20,22 @@
  */
 package de.lmu.ifi.dbs.elki.math.geodesy;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
+import static de.lmu.ifi.dbs.elki.math.MathUtil.HALFPI;
+import static de.lmu.ifi.dbs.elki.math.MathUtil.TWOPI;
+import static de.lmu.ifi.dbs.elki.math.MathUtil.deg2rad;
+import static de.lmu.ifi.dbs.elki.math.MathUtil.rad2deg;
+import static net.jafama.FastMath.acos;
+import static net.jafama.FastMath.asin;
+import static net.jafama.FastMath.atan;
+import static net.jafama.FastMath.atan2;
+import static net.jafama.FastMath.cos;
+import static net.jafama.FastMath.sin;
+import static net.jafama.FastMath.sinAndCos;
+import static net.jafama.FastMath.sqrt;
+import static net.jafama.FastMath.tan;
+
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
-import net.jafama.FastMath;
+import net.jafama.DoubleWrapper;
 
 /**
  * Class with utility functions for distance computations on the sphere.
@@ -73,7 +86,7 @@ public final class SphereUtil {
    * Compute the approximate great-circle distance of two points using the
    * Haversine formula
    * 
-   * Complexity: 6 (2 of which emulated) trigonometric functions.
+   * Complexity: 6 trigonometric functions.
    * 
    * Reference:
    * <p>
@@ -89,15 +102,14 @@ public final class SphereUtil {
    * @return Distance on unit sphere
    */
   public static double cosineFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
-    return cosineFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
+    return cosineFormulaRad(deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2));
   }
 
   /**
    * Compute the approximate great-circle distance of two points using the
    * Spherical law of cosines.
    * 
-   * Complexity: 6 (2 of which emulated) trigonometric functions. Note that acos
+   * Complexity: 6 trigonometric functions. Note that acos
    * is rather expensive apparently - roughly atan + sqrt.
    * 
    * Reference:
@@ -114,18 +126,21 @@ public final class SphereUtil {
    * @return Distance on unit sphere
    */
   public static double cosineFormulaRad(double lat1, double lon1, double lat2, double lon2) {
-    final double slat1 = FastMath.sin(lat1),
-        clat1 = MathUtil.sinToCos(lat1, slat1);
-    final double slat2 = FastMath.sin(lat2),
-        clat2 = MathUtil.sinToCos(lat2, slat2);
-    return Math.acos(Math.min(1.0, slat1 * slat2 + clat1 * clat2 * FastMath.cos(Math.abs(lon2 - lon1))));
+    if(lat1 == lat2 && lon1 == lon2) {
+      return 0.;
+    }
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slat1 = sinAndCos(lat1, tmp), clat1 = tmp.value;
+    final double slat2 = sinAndCos(lat2, tmp), clat2 = tmp.value;
+    final double a = slat1 * slat2 + clat1 * clat2 * cos(lon2 - lon1);
+    return a < .9999_9999_9999_999 ? acos(a) : 0;
   }
 
   /**
    * Compute the approximate great-circle distance of two points using the
    * Haversine formula
    * 
-   * Complexity: 5 trigonometric functions, 2 sqrt.
+   * Complexity: 5 trigonometric functions, 1 sqrt.
    * 
    * Reference:
    * <p>
@@ -144,23 +159,22 @@ public final class SphereUtil {
       title = "Virtues of the Haversine", //
       booktitle = "Sky and telescope, 68-2, 1984")
   public static double haversineFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
-    return haversineFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
+    return haversineFormulaRad(deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2));
   }
 
   /**
    * Compute the approximate great-circle distance of two points using the
    * Haversine formula
-   * 
-   * Complexity: 5 trigonometric functions, 2 sqrt.
-   * 
+   *
+   * Complexity: 5 trigonometric functions, 1-2 sqrt.
+   *
    * Reference:
    * <p>
    * R. W. Sinnott,<br/>
    * Virtues of the Haversine<br />
    * Sky and telescope, 68-2, 1984
    * </p>
-   * 
+   *
    * @param lat1 Latitude of first point in degree
    * @param lon1 Longitude of first point in degree
    * @param lat2 Latitude of second point in degree
@@ -171,12 +185,58 @@ public final class SphereUtil {
       title = "Virtues of the Haversine", //
       booktitle = "Sky and telescope, 68-2, 1984")
   public static double haversineFormulaRad(double lat1, double lon1, double lat2, double lon2) {
+    if(lat1 == lat2 && lon1 == lon2) {
+      return 0.;
+    }
     // Haversine formula, higher precision at < 1 meters but maybe issues at
-    // antipodal points.
-    final double slat = FastMath.sin((lat1 - lat2) * .5);
-    final double slon = FastMath.sin((lon1 - lon2) * .5);
-    final double a = slat * slat + slon * slon * FastMath.cos(lat1) * FastMath.cos(lat2);
-    return 2 * FastMath.atan2(FastMath.sqrt(a), FastMath.sqrt(1 - a));
+    // antipodal points with asin, atan2 is supposedly better (but slower).
+    final double slat = sin((lat1 - lat2) * .5), slon = sin((lon1 - lon2) * .5);
+    double a = slat * slat + slon * slon * cos(lat1) * cos(lat2);
+    return a < .9 ? 2 * asin(sqrt(a)) : a < 1 ? 2 * atan2(sqrt(a), sqrt(1 - a)) : Math.PI;
+  }
+
+  /**
+   * Use cosine or haversine dynamically.
+   *
+   * Complexity: 4-5 trigonometric functions, 1 sqrt.
+   *
+   * @param lat1 Latitude of first point in degree
+   * @param lon1 Longitude of first point in degree
+   * @param lat2 Latitude of second point in degree
+   * @param lon2 Longitude of second point in degree
+   * @return Distance on unit sphere
+   */
+  public static double cosineOrHaversineDeg(double lat1, double lon1, double lat2, double lon2) {
+    return cosineOrHaversineRad(deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2));
+  }
+
+  /**
+   * Use cosine or haversine dynamically.
+   *
+   * Complexity: 4-5 trigonometric functions, 1 sqrt.
+   *
+   * @param lat1 Latitude of first point in degree
+   * @param lon1 Longitude of first point in degree
+   * @param lat2 Latitude of second point in degree
+   * @param lon2 Longitude of second point in degree
+   * @return Distance on unit sphere
+   */
+  public static double cosineOrHaversineRad(double lat1, double lon1, double lat2, double lon2) {
+    if(lat1 == lat2 && lon1 == lon2) {
+      return 0.;
+    }
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slat1 = sinAndCos(lat1, tmp), clat1 = tmp.value;
+    final double slat2 = sinAndCos(lat2, tmp), clat2 = tmp.value;
+    final double dlat = lat1 - lat2, dlon = lon1 - lon2;
+    // Use cosine, cheaper:
+    if(dlat > 0.01 || dlat < -0.01 || dlon > 0.01 || dlat < -0.01) {
+      final double a = slat1 * slat2 + clat1 * clat2 * cos(dlon);
+      return a < .9999_9999_9999_999 ? acos(a) : 0;
+    }
+    // Haversine formula, higher precision at < 1 meters
+    final double slat = sin(dlat * .5), slon = sin(dlon * .5);
+    return 2 * asin(sqrt(slat * slat + slon * slon * clat1 * clat2));
   }
 
   /**
@@ -203,10 +263,10 @@ public final class SphereUtil {
    */
   @Reference(authors = "T. Vincenty", //
       title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", //
-      booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
+      booktitle = "Survey review 23 176, 1975", //
+      url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double sphericalVincentyFormulaDeg(double lat1, double lon1, double lat2, double lon2) {
-    return sphericalVincentyFormulaRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
+    return sphericalVincentyFormulaRad(deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2));
   }
 
   /**
@@ -233,21 +293,20 @@ public final class SphereUtil {
    */
   @Reference(authors = "T. Vincenty", //
       title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", //
-      booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
+      booktitle = "Survey review 23 176, 1975", //
+      url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double sphericalVincentyFormulaRad(double lat1, double lon1, double lat2, double lon2) {
     // Half delta longitude.
-    final double dlnh = Math.abs(lon1 - lon2);
+    final double dlnh = (lon1 > lon2) ? (lon1 - lon2) : (lon2 - lon1);
 
     // Spherical special case of Vincenty's formula - no iterations needed
-    final double slat1 = FastMath.sin(lat1),
-        clat1 = MathUtil.sinToCos(lat1, slat1);
-    final double slat2 = FastMath.sin(lat2),
-        clat2 = MathUtil.sinToCos(lat2, slat2);
-    final double slond = FastMath.sin(dlnh),
-        clond = MathUtil.sinToCos(dlnh, slond);
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slat1 = sinAndCos(lat1, tmp), clat1 = tmp.value;
+    final double slat2 = sinAndCos(lat2, tmp), clat2 = tmp.value;
+    final double slond = sinAndCos(dlnh, tmp), clond = tmp.value;
     final double a = clat2 * slond;
     final double b = (clat1 * slat2) - (slat1 * clat2 * clond);
-    return FastMath.atan2(FastMath.sqrt(a * a + b * b), slat1 * slat2 + clat1 * clat2 * clond);
+    return atan2(sqrt(a * a + b * b), slat1 * slat2 + clat1 * clat2 * clond);
   }
 
   /**
@@ -270,10 +329,10 @@ public final class SphereUtil {
    */
   @Reference(authors = "T. Vincenty", //
       title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", //
-      booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
+      booktitle = "Survey review 23 176, 1975", //
+      url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double ellipsoidVincentyFormulaDeg(double f, double lat1, double lon1, double lat2, double lon2) {
-    return ellipsoidVincentyFormulaRad(f, MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2));
+    return ellipsoidVincentyFormulaRad(f, deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2));
   }
 
   /**
@@ -298,7 +357,7 @@ public final class SphereUtil {
       title = "Direct and inverse solutions of geodesics on the ellipsoid with application of nested equations", //
       booktitle = "Survey review 23 176, 1975", url = "http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf")
   public static double ellipsoidVincentyFormulaRad(double f, double lat1, double lon1, double lat2, double lon2) {
-    final double dlon = Math.abs(lon2 - lon1);
+    final double dlon = (lon2 >= lon1) ? (lon2 - lon1) : (lon1 - lon2);
     final double onemf = 1 - f; // = 1 - (a-b)/a = b/a
 
     // Second eccentricity squared
@@ -306,26 +365,26 @@ public final class SphereUtil {
     final double ecc2 = (a_b + 1) * (a_b - 1); // (a^2-b^2)/(b^2)
 
     // Reduced latitudes:
-    final double u1 = Math.atan(onemf * FastMath.tan(lat1));
-    final double u2 = Math.atan(onemf * FastMath.tan(lat2));
+    final double u1 = atan(onemf * tan(lat1));
+    final double u2 = atan(onemf * tan(lat2));
     // Trigonometric values
-    final double su1 = FastMath.sin(u1), cu1 = MathUtil.sinToCos(u1, su1);
-    final double su2 = FastMath.sin(u2), cu2 = MathUtil.sinToCos(u2, su2);
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double su1 = sinAndCos(u1, tmp), cu1 = tmp.value;
+    final double su2 = sinAndCos(u2, tmp), cu2 = tmp.value;
 
     // Eqn (13) - initial value
     double lambda = dlon;
 
     for(int i = 0;; i++) {
-      final double slon = FastMath.sin(lambda),
-          clon = MathUtil.sinToCos(lambda, slon);
+      final double slon = sinAndCos(lambda, tmp), clon = tmp.value;
 
       // Eqn (14) - \sin \sigma
       final double term1 = cu2 * slon, term2 = cu1 * su2 - su1 * cu2 * clon;
-      final double ssig = FastMath.sqrt(term1 * term1 + term2 * term2);
+      final double ssig = sqrt(term1 * term1 + term2 * term2);
       // Eqn (15) - \cos \sigma
       final double csig = su1 * su2 + cu1 * cu2 * clon;
       // Eqn (16) - \sigma from \tan \sigma
-      final double sigma = FastMath.atan2(ssig, csig);
+      final double sigma = atan2(ssig, csig);
 
       // Two identical points?
       if(!(ssig > 0)) {
@@ -377,9 +436,7 @@ public final class SphereUtil {
    * @return Cross-track distance in km. May be negative - this gives the side.
    */
   public static double crossTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ) {
-    return crossTrackDistanceRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2), //
-        MathUtil.deg2rad(latQ), MathUtil.deg2rad(lonQ));
+    return crossTrackDistanceRad(deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2), deg2rad(latQ), deg2rad(lonQ));
   }
 
   /**
@@ -400,20 +457,15 @@ public final class SphereUtil {
     final double dlon1Q = lonQ - lon1;
 
     // Compute trigonometric functions only once.
-    final double slat1 = FastMath.sin(lat1),
-        clat1 = MathUtil.sinToCos(lat1, slat1);
-    final double slatQ = FastMath.sin(latQ),
-        clatQ = MathUtil.sinToCos(latQ, slatQ);
-    final double slat2 = FastMath.sin(lat2),
-        clat2 = MathUtil.sinToCos(lat2, slat2);
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slat1 = sinAndCos(lat1, tmp), clat1 = tmp.value;
+    final double slatQ = sinAndCos(latQ, tmp), clatQ = tmp.value;
+    final double slat2 = sinAndCos(lat2, tmp), clat2 = tmp.value;
 
     // / Compute the course
     // y = sin(dlon) * cos(lat2)
-    final double sdlon12 = FastMath.sin(dlon12),
-        cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
-    final double sdlon1Q = FastMath.sin(dlon1Q),
-        cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
-
+    final double sdlon12 = sinAndCos(dlon12, tmp), cdlon12 = tmp.value;
+    final double sdlon1Q = sinAndCos(dlon1Q, tmp), cdlon1Q = tmp.value;
     final double yE = sdlon12 * clat2;
     final double yQ = sdlon1Q * clatQ;
 
@@ -421,11 +473,11 @@ public final class SphereUtil {
     final double xE = clat1 * slat2 - slat1 * clat2 * cdlon12;
     final double xQ = clat1 * slatQ - slat1 * clatQ * cdlon1Q;
 
-    final double crs12 = FastMath.atan2(yE, xE);
-    final double crs1Q = FastMath.atan2(yQ, xQ);
+    final double crs12 = atan2(yE, xE);
+    final double crs1Q = atan2(yQ, xQ);
 
     // / Calculate cross-track distance
-    return Math.asin(FastMath.sin(dist1Q) * FastMath.sin(crs1Q - crs12));
+    return asin(sin(dist1Q) * sin(crs1Q - crs12));
   }
 
   /**
@@ -443,10 +495,7 @@ public final class SphereUtil {
    *         the side.
    */
   public static double crossTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q) {
-    return crossTrackDistanceRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), //
-        MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2), //
-        MathUtil.deg2rad(latQ), MathUtil.deg2rad(lonQ), //
-        dist1Q);
+    return crossTrackDistanceRad(deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2), deg2rad(latQ), deg2rad(lonQ), dist1Q);
   }
 
   /**
@@ -468,26 +517,15 @@ public final class SphereUtil {
     final double dlat1Q = latQ - lat1;
 
     // Compute trigonometric functions only once.
-    final double clat1 = FastMath.cos(lat1),
-        slat1 = MathUtil.cosToSin(lat1, clat1);
-    final double clatQ = FastMath.cos(latQ),
-        slatQ = MathUtil.cosToSin(latQ, clatQ);
-    final double clat2 = FastMath.cos(lat2),
-        slat2 = MathUtil.cosToSin(lat2, clat2);
-
-    // Haversine formula, higher precision at < 1 meters but maybe issues at
-    // antipodal points - we do not yet multiply with the radius!
-    final double slat = FastMath.sin(dlat1Q * .5);
-    final double slon = FastMath.sin(dlon1Q * .5);
-    final double a = slat * slat + slon * slon * clat1 * clatQ;
-    final double angDist1Q = 2 * FastMath.atan2(FastMath.sqrt(a), FastMath.sqrt(1 - a));
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slat1 = sinAndCos(lat1, tmp), clat1 = tmp.value;
+    final double slatQ = sinAndCos(latQ, tmp), clatQ = tmp.value;
+    final double slat2 = sinAndCos(lat2, tmp), clat2 = tmp.value;
 
     // Compute the course
     // y = sin(dlon) * cos(lat2)
-    final double sdlon12 = FastMath.sin(dlon12),
-        cdlon12 = MathUtil.sinToCos(dlon12, sdlon12);
-    final double sdlon1Q = FastMath.sin(dlon1Q),
-        cdlon1Q = MathUtil.sinToCos(dlon1Q, sdlon1Q);
+    final double sdlon12 = sinAndCos(dlon12, tmp), cdlon12 = tmp.value;
+    final double sdlon1Q = sinAndCos(dlon1Q, tmp), cdlon1Q = tmp.value;
     final double yE = sdlon12 * clat2;
     final double yQ = sdlon1Q * clatQ;
 
@@ -495,11 +533,21 @@ public final class SphereUtil {
     final double xE = clat1 * slat2 - slat1 * clat2 * cdlon12;
     final double xQ = clat1 * slatQ - slat1 * clatQ * cdlon1Q;
 
-    final double crs12 = FastMath.atan2(yE, xE);
-    final double crs1Q = FastMath.atan2(yQ, xQ);
+    final double crs12 = atan2(yE, xE);
+    final double crs1Q = atan2(yQ, xQ);
 
     // Calculate cross-track distance
-    return Math.asin(FastMath.sin(angDist1Q) * FastMath.sin(crs1Q - crs12));
+    // Haversine formula, higher precision at < 1 meters but maybe issues at
+    // antipodal points - we do not yet multiply with the radius!
+    final double slat = sin(dlat1Q * .5);
+    final double slon = sin(dlon1Q * .5);
+    final double a = slat * slat + slon * slon * clat1 * clatQ;
+    if(a > 0.9999_9999_9999_999 || a < -0.9999_9999_9999_999 || a == 0.) {
+      return 0.;
+    }
+    return asin(sqrt(a) * sqrt(1 - a) * 2 * sin(crs1Q - crs12));
+    // final double angDist1Q = a < 1 ? 2 * asin(sqrt(a)) : 0;
+    // return asin(sin(angDist1Q) * sin(crs1Q - crs12));
   }
 
   /**
@@ -520,10 +568,7 @@ public final class SphereUtil {
    *         side.
    */
   public static double alongTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ) {
-    // TODO: inline and share some of the trigonometric computations!
-    double dist1Q = haversineFormulaDeg(lat1, lon1, latQ, lonQ);
-    double ctd = crossTrackDistanceDeg(lat1, lon1, lat2, lon2, latQ, lonQ, dist1Q);
-    return alongTrackDistanceDeg(lat1, lon1, lat2, lon2, latQ, lonQ, dist1Q, ctd);
+    return alongTrackDistanceRad(deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2), deg2rad(latQ), deg2rad(lonQ));
   }
 
   /**
@@ -568,7 +613,7 @@ public final class SphereUtil {
    *         side.
    */
   public static double alongTrackDistanceDeg(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q, double ctd) {
-    return alongTrackDistanceRad(MathUtil.deg2rad(lat1), MathUtil.deg2rad(lon1), MathUtil.deg2rad(lat2), MathUtil.deg2rad(lon2), MathUtil.deg2rad(latQ), MathUtil.deg2rad(lonQ), dist1Q, ctd);
+    return alongTrackDistanceRad(deg2rad(lat1), deg2rad(lon1), deg2rad(lat2), deg2rad(lon2), deg2rad(latQ), deg2rad(lonQ), dist1Q, ctd);
   }
 
   /**
@@ -592,8 +637,8 @@ public final class SphereUtil {
    */
   public static double alongTrackDistanceRad(double lat1, double lon1, double lat2, double lon2, double latQ, double lonQ, double dist1Q, double ctd) {
     // FIXME: optimize the sign computation!
-    int sign = Math.abs(bearingRad(lat1, lon1, lat2, lon2) - bearingRad(lat1, lon1, latQ, lonQ)) < MathUtil.HALFPI ? +1 : -1;
-    return sign * Math.acos(FastMath.cos(dist1Q) / FastMath.cos(ctd));
+    int sign = Math.abs(bearingRad(lat1, lon1, lat2, lon2) - bearingRad(lat1, lon1, latQ, lonQ)) < HALFPI ? +1 : -1;
+    return sign * acos(cos(dist1Q) / cos(ctd));
     // TODO: for short distances, use this instead?
     // asin(sqrt( (sin(dist_1Q))^2 - (sin(XTD))^2 )/cos(XTD))
   }
@@ -605,7 +650,7 @@ public final class SphereUtil {
    * <ul>
    * <li>Trivial cases (on longitude slice): no trigonometric functions.</li>
    * <li>Cross-track case: 10+2 trig</li>
-   * <li>Corner case: 10+3 trig, 2 sqrt</li>
+   * <li>Corner case: 10+3 trig, 1 sqrt</li>
    * </ul>
    * 
    * Reference:
@@ -628,9 +673,7 @@ public final class SphereUtil {
       booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
       url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
   public static double latlngMinDistDeg(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
-    return latlngMinDistRad(MathUtil.deg2rad(plat), MathUtil.deg2rad(plng), //
-        MathUtil.deg2rad(rminlat), MathUtil.deg2rad(rminlng), //
-        MathUtil.deg2rad(rmaxlat), MathUtil.deg2rad(rmaxlng));
+    return latlngMinDistRad(deg2rad(plat), deg2rad(plng), deg2rad(rminlat), deg2rad(rminlng), deg2rad(rmaxlat), deg2rad(rmaxlng));
   }
 
   /**
@@ -639,9 +682,12 @@ public final class SphereUtil {
    * Complexity:
    * <ul>
    * <li>Trivial cases (on longitude slice): no trigonometric functions.</li>
-   * <li>Corner case: 3/4 trig + (haversine:) 5 trig, 2 sqrt</li>
-   * <li>Cross-track case: 4+3 trig</li>
+   * <li>Corner case: 3/4 trig + 4-5 trig, 1 sqrt</li>
+   * <li>Cross-track case: 4+2 trig</li>
    * </ul>
+   * 
+   * <b>Important:</b> Rectangles must be in -pi:+pi, and must have min &lt;
+   * max, so they cannot cross the date line.
    * 
    * Reference:
    * <p>
@@ -663,88 +709,45 @@ public final class SphereUtil {
       booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
       url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
   public static double latlngMinDistRad(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
-    // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
+    // FIXME: add support for rectangles crossing the +-180 deg boundary!
 
     // Degenerate rectangles:
     if((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
-      return haversineFormulaRad(rminlat, rminlng, plat, plng);
+      return cosineOrHaversineRad(rminlat, rminlng, plat, plng);
     }
 
     // The simplest case is when the query point is in the same "slice":
     if(rminlng <= plng && plng <= rmaxlng) {
-      // Inside rectangle:
-      if(rminlat <= plat && plat <= rmaxlat) {
-        return 0;
-      }
-      // South:
-      if(plat < rminlat) {
-        return rminlat - plat;
-      }
-      else {
-        // plat > rmaxlat
-        return plat - rmaxlat;
-      }
+      return (rminlat <= plat && plat <= rmaxlat) ? 0 // Inside
+          : (plat < rminlat) ? rminlat - plat : plat - rmaxlat; // S, N
     }
 
     // Determine whether going east or west is shorter.
-    double lngE = rminlng - plng;
-    if(lngE < 0) {
-      lngE += MathUtil.TWOPI;
-    }
-    double lngW = rmaxlng - plng; // we keep this negative!
-    if(lngW > 0) {
-      lngW -= MathUtil.TWOPI;
-    }
+    double lngE = rminlng - plng, lngW = plng - rmaxlng;
+    // Ensure delta to be in 0 to 2pi.
+    lngE = lngE >= 0 ? lngE : lngE + TWOPI;
+    lngW = lngW >= 0 ? lngW : lngW + TWOPI;
 
-    // East, to min edge:
-    if(lngE <= -lngW) {
-      final double clngD = FastMath.cos(lngE);
-      final double tlatQ = FastMath.tan(plat);
-      if(lngE > MathUtil.HALFPI) {
-        final double tlatm = FastMath.tan((rmaxlat + rminlat) * .5);
-        if(tlatQ >= tlatm * clngD) {
-          return haversineFormulaRad(plat, plng, rmaxlat, rminlng);
-        }
-        else {
-          return haversineFormulaRad(plat, plng, rminlat, rminlng);
-        }
-      }
-      final double tlatN = FastMath.tan(rmaxlat);
-      if(tlatQ >= tlatN * clngD) { // North corner
-        return haversineFormulaRad(plat, plng, rmaxlat, rminlng);
-      }
-      final double tlatS = FastMath.tan(rminlat);
-      if(tlatQ <= tlatS * clngD) { // South corner
-        return haversineFormulaRad(plat, plng, rminlat, rminlng);
-      }
-      // Cross-track-distance to longitude line.
-      final double slngD = MathUtil.cosToSin(lngE, clngD);
-      return Math.asin(FastMath.cos(plat) * slngD);
+    // Case distinction east or west:
+    final double lngD = (lngE <= lngW) ? lngE : lngW;
+    final double rlng = (lngE <= lngW) ? rminlng : rmaxlng;
+
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slngD = sinAndCos(lngD, tmp), clngD = tmp.value;
+    final double tlatQ = tan(plat);
+    if(lngD >= HALFPI) { // XTD disappears at 90°
+      return cosineOrHaversineRad(plat, plng, //
+          tlatQ >= tan((rmaxlat + rminlat) * .5) * clngD // N/S
+              ? rmaxlat : rminlat, rlng);
     }
-    else { // West, to max edge:
-      final double clngD = FastMath.cos(lngW);
-      final double tlatQ = FastMath.tan(plat);
-      if(-lngW > MathUtil.HALFPI) {
-        final double tlatm = FastMath.tan((rmaxlat + rminlat) * .5);
-        if(tlatQ >= tlatm * clngD) {
-          return haversineFormulaRad(plat, plng, rmaxlat, rmaxlng);
-        }
-        else {
-          return haversineFormulaRad(plat, plng, rminlat, rmaxlng);
-        }
-      }
-      final double tlatN = FastMath.tan(rmaxlat);
-      if(tlatQ >= tlatN * clngD) { // North corner
-        return haversineFormulaRad(plat, plng, rmaxlat, rmaxlng);
-      }
-      final double tlatS = FastMath.tan(rminlat);
-      if(tlatQ <= tlatS * clngD) { // South corner
-        return haversineFormulaRad(plat, plng, rminlat, rmaxlng);
-      }
-      // Cross-track-distance to longitude line.
-      final double slngD = MathUtil.cosToSin(lngW, clngD);
-      return Math.asin(-FastMath.cos(plat) * slngD);
+    if(tlatQ >= tan(rmaxlat) * clngD) { // North corner
+      return cosineOrHaversineRad(plat, plng, rmaxlat, rlng);
     }
+    if(tlatQ <= tan(rminlat) * clngD) { // South corner
+      return cosineOrHaversineRad(plat, plng, rminlat, rlng);
+    }
+    // Cross-track-distance to longitude line.
+    return asin(cos(plat) * slngD);
   }
 
   /**
@@ -756,7 +759,7 @@ public final class SphereUtil {
    * <ul>
    * <li>Trivial cases (on longitude slice): no trigonometric functions.</li>
    * <li>Cross-track case: 10+2 trig</li>
-   * <li>Corner case: 10+3 trig, 2 sqrt</li>
+   * <li>Corner case: 10+3 trig, 1 sqrt</li>
    * </ul>
    * 
    * Reference:
@@ -779,7 +782,7 @@ public final class SphereUtil {
       booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
       url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
   public static double latlngMinDistRadFull(double plat, double plng, double rminlat, double rminlng, double rmaxlat, double rmaxlng) {
-    // FIXME: handle rectangles crossing the +-180 deg boundary correctly!
+    // FIXME: add support for rectangles crossing the +-180 deg boundary!
 
     // Degenerate rectangles:
     if((rminlat >= rmaxlat) && (rminlng >= rmaxlng)) {
@@ -788,108 +791,86 @@ public final class SphereUtil {
 
     // The simplest case is when the query point is in the same "slice":
     if(rminlng <= plng && plng <= rmaxlng) {
-      // Inside rectangle:
-      if(rminlat <= plat && plat <= rmaxlat) {
-        return 0;
-      }
-      // South:
-      if(plat < rminlat) {
-        return rminlat - plat;
-      }
-      else {
-        // plat > rmaxlat
-        return plat - rmaxlat;
-      }
+      return (rminlat <= plat && plat <= rmaxlat) ? 0 // Inside
+          : (plat < rminlat) ? rminlat - plat : plat - rmaxlat; // S, N
     }
 
     // Determine whether going east or west is shorter.
     double lngE = rminlng - plng;
-    if(lngE < 0) {
-      lngE += MathUtil.TWOPI;
-    }
-    double lngW = rmaxlng - plng; // we keep this negative!
-    if(lngW > 0) {
-      lngW -= MathUtil.TWOPI;
-    }
+    lngE = lngE >= 0 ? lngE : lngE + TWOPI;
+    double lngW = plng - rmaxlng; // we keep this negative!
+    lngW = lngW >= 0 ? lngW : lngW + TWOPI;
 
     // Compute sine and cosine values we will certainly need below:
-    final double slatQ = FastMath.sin(plat),
-        clatQ = MathUtil.sinToCos(plat, slatQ);
-    final double slatN = FastMath.sin(rmaxlat),
-        clatN = MathUtil.sinToCos(rmaxlat, slatN);
-    final double slatS = FastMath.sin(rminlat),
-        clatS = MathUtil.sinToCos(rminlat, slatS);
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slatQ = sinAndCos(plat, tmp), clatQ = tmp.value;
+    final double slatN = sinAndCos(rmaxlat, tmp), clatN = tmp.value;
+    final double slatS = sinAndCos(rminlat, tmp), clatS = tmp.value;
 
-    // East, to min edge:
-    if(lngE <= -lngW) {
-      final double slngD = FastMath.sin(lngE);
-      final double clngD = MathUtil.sinToCos(lngE, slngD);
+    // Head east, to min edge:
+    if(lngE <= lngW) {
+      final double slngD = sinAndCos(lngE, tmp), clngD = tmp.value;
 
       // Bearing to south
-      // FastMath.atan2(slngD * clatS, clatQ * slatS - slatQ * clatS * clngD);
+      // atan2(slngD * clatS, clatQ * slatS - slatQ * clatS * clngD);
       // Bearing from south
-      final double bs = FastMath.atan2(slngD * clatQ, clatS * slatQ - slatS * clatQ * clngD);
+      final double bs = atan2(slngD * clatQ, clatS * slatQ - slatS * clatQ * clngD);
       // Bearing to north
-      // FastMath.atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
+      // atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
       // Bearing from north
-      final double bn = FastMath.atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
-      if(bs < MathUtil.HALFPI && bn > MathUtil.HALFPI) {
+      final double bn = atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
+      if(bs < HALFPI && bn > HALFPI) {
         // Radians from south pole = abs(ATD)
-        final double radFromS = -MathUtil.HALFPI - plat;
+        final double radFromS = -HALFPI - plat;
 
         // Cross-track-distance to longitude line.
-        return Math.asin(FastMath.sin(radFromS) * -slngD);
+        return asin(sin(radFromS) * -slngD);
       }
-      if(bs - MathUtil.HALFPI < MathUtil.HALFPI - bn) {
+      if(bs - HALFPI < HALFPI - bn) {
         // Haversine to north corner.
-        final double slatN2 = FastMath.sin((plat - rmaxlat) * .5);
-        final double slon = FastMath.sin(lngE * .5);
+        final double slatN2 = sin((plat - rmaxlat) * .5);
+        final double slon = sin(lngE * .5);
         final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
-        final double distN = 2 * FastMath.atan2(FastMath.sqrt(aN), FastMath.sqrt(1 - aN));
-        return distN;
+        return 2 * atan2(sqrt(aN), sqrt(1 - aN));
       }
       else {
         // Haversine to south corner.
-        final double slatS2 = FastMath.sin((plat - rminlat) * .5);
-        final double slon = FastMath.sin(lngE * .5);
+        final double slatS2 = sin((plat - rminlat) * .5);
+        final double slon = sin(lngE * .5);
         final double aS = slatS2 * slatS2 + slon * slon * clatQ * clatS;
-        final double distS = 2 * FastMath.atan2(FastMath.sqrt(aS), FastMath.sqrt(1 - aS));
-        return distS;
+        return 2 * atan2(sqrt(aS), sqrt(1 - aS));
       }
     }
-    else { // West, to max edge
-      final double slngD = FastMath.sin(lngW);
-      final double clngD = MathUtil.sinToCos(lngW, slngD);
+    else { // Head west, to max edge
+      final double slngD = -sinAndCos(lngW, tmp), clngD = tmp.value;
 
       // Bearing to south
-      // FastMath.atan2(slngD * clatS, clatQ * slatS - slatQ * clatS * clngD);
+      // atan2(slngD * clatS, clatQ * slatS - slatQ * clatS * clngD);
       // Bearing from south
-      final double bs = FastMath.atan2(slngD * clatQ, clatS * slatQ - slatS * clatQ * clngD);
+      final double bs = atan2(slngD * clatQ, clatS * slatQ - slatS * clatQ * clngD);
       // Bearing to north
-      // FastMath.atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
+      // atan2(slngD * clatN, clatQ * slatN - slatQ * clatN * clngD);
       // Bearing from north
-      final double bn = FastMath.atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
-      if(bs > -MathUtil.HALFPI && bn < -MathUtil.HALFPI) {
+      final double bn = atan2(slngD * clatQ, clatN * slatQ - slatN * clatQ * clngD);
+      if(bs > -HALFPI && bn < -HALFPI) {
         // Radians from south = abs(ATD) = distance from pole
-        final double radFromS = -MathUtil.HALFPI - plat;
+        final double radFromS = -HALFPI - plat;
         // Cross-track-distance to longitude line.
-        return Math.asin(FastMath.sin(radFromS) * slngD);
+        return asin(sin(radFromS) * slngD);
       }
-      if(-MathUtil.HALFPI - bs < bn + MathUtil.HALFPI) {
+      if(-HALFPI - bs < bn + HALFPI) {
         // Haversine to north corner.
-        final double slatN2 = FastMath.sin((plat - rmaxlat) * .5);
-        final double slon = FastMath.sin(lngW * .5);
+        final double slatN2 = sin((plat - rmaxlat) * .5);
+        final double slon = sin(lngW * .5);
         final double aN = slatN2 * slatN2 + slon * slon * clatQ * clatN;
-        final double distN = 2 * FastMath.atan2(FastMath.sqrt(aN), FastMath.sqrt(1 - aN));
-        return distN;
+        return 2 * atan2(sqrt(aN), sqrt(1 - aN));
       }
       else {
         // Haversine to south corner.
-        final double slatS2 = FastMath.sin((plat - rminlat) * .5);
-        final double slon = FastMath.sin(lngW * .5);
+        final double slatS2 = sin((plat - rminlat) * .5);
+        final double slon = sin(lngW * .5);
         final double aS = slatS2 * slatS2 + slon * slon * clatQ * clatS;
-        final double distS = 2 * FastMath.atan2(FastMath.sqrt(aS), FastMath.sqrt(1 - aS));
-        return distS;
+        return 2 * atan2(sqrt(aS), sqrt(1 - aS));
       }
     }
   }
@@ -904,7 +885,7 @@ public final class SphereUtil {
    * @return Bearing in degree
    */
   public static double bearingDegDeg(double latS, double lngS, double latE, double lngE) {
-    return MathUtil.rad2deg(bearingRad(MathUtil.deg2rad(latS), MathUtil.deg2rad(lngS), MathUtil.deg2rad(latE), MathUtil.deg2rad(lngE)));
+    return rad2deg(bearingRad(deg2rad(latS), deg2rad(lngS), deg2rad(latE), deg2rad(lngE)));
   }
 
   /**
@@ -917,10 +898,9 @@ public final class SphereUtil {
    * @return Bearing in degree
    */
   public static double bearingRad(double latS, double lngS, double latE, double lngE) {
-    final double slatS = FastMath.sin(latS),
-        clatS = MathUtil.sinToCos(latS, slatS);
-    final double slatE = FastMath.sin(latE),
-        clatE = MathUtil.sinToCos(latE, slatE);
-    return FastMath.atan2(-FastMath.sin(lngS - lngE) * clatE, clatS * slatE - slatS * clatE * FastMath.cos(lngS - lngE));
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slatS = sinAndCos(latS, tmp), clatS = tmp.value;
+    final double slatE = sinAndCos(latE, tmp), clatE = tmp.value;
+    return atan2(-sin(lngS - lngE) * clatE, clatS * slatE - slatS * clatE * cos(lngS - lngE));
   }
 }

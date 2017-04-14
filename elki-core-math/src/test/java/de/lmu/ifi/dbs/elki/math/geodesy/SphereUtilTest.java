@@ -24,6 +24,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import de.lmu.ifi.dbs.elki.math.MathUtil;
+
 /**
  * Unit tests for SphereUtil.
  *
@@ -53,6 +55,8 @@ public class SphereUtilTest {
     };
     for(double[] t : tests) {
       assertEquals("Distance does not match", t[2], SphereUtil.latlngMinDistDeg(t[0], t[1], a[0], a[1], a[2], a[3]) * t[4], t[5] * t[4]);
+      assertEquals("Distance does not match", t[2], SphereUtil.latlngMinDistRadFull( MathUtil.deg2rad(t[0]), MathUtil.deg2rad(t[1]),
+          MathUtil.deg2rad(a[0]), MathUtil.deg2rad(a[1]), MathUtil.deg2rad(a[2]), MathUtil.deg2rad(a[3])) * t[4], t[5] * t[4]);
       assertEquals("Distance does not match", t[3], SphereUtil.haversineFormulaDeg(t[0], t[1], a[2], a[3]) * t[4], t[5] * t[4]);
     }
   }

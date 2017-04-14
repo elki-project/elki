@@ -333,11 +333,11 @@ public class EarthModelsTest {
   @Test
   public void testCosineEarth() {
     // Spherical Cosine to WGS84 Haversine: 0% error on test set.
-    testEarthModel(SphericalCosineEarthModel.STATIC, R_SP_WGS84, .005674, 0.0);
+    testEarthModel(SphericalCosineEarthModel.STATIC, R_SP_WGS84, .005674, 0);
     // Spherical Cosine to WGS84 Vincenty: 0% error on test set.
-    testEarthModel(SphericalCosineEarthModel.STATIC, SDM_WGS84, .00405, 0.0);
+    testEarthModel(SphericalCosineEarthModel.STATIC, SDM_WGS84, .00405, 0.);
     // Spherical Cosine to Cosine: with "geosphere" we have a high agreement.
-    testEarthModel(SphericalCosineEarthModel.STATIC, GEOSPHERE_COSINE, 4.4409e-16, 1e-12);
+    testEarthModel(SphericalCosineEarthModel.STATIC, GEOSPHERE_COSINE, 4.4409e-16, 3.060705e-7);
   }
 
   @Test
@@ -348,7 +348,7 @@ public class EarthModelsTest {
     testEarthModel(SphericalVincentyEarthModel.STATIC, SDM_WGS84, .00405, 1e-12);
     // Spherical Vincenty to Spherical Vincenty: with "geosphere" we have a high
     // agreement.
-    testEarthModel(SphericalVincentyEarthModel.STATIC, GEOSPHERE_VINCENTY_SPHERE, 4.441e-15, 1e-12);
+    testEarthModel(SphericalVincentyEarthModel.STATIC, GEOSPHERE_VINCENTY_SPHERE, 1.044e-14, 1e-12);
   }
 
   protected void testEarthModel(EarthModel model, final double[][] ref, final double relerror, final double abserror) {
@@ -360,13 +360,13 @@ public class EarthModelsTest {
         }
         double d = model.distanceDeg(DATA[i][0], DATA[i][1], DATA[j][0], DATA[j][1]);
         assertFalse("NaN in distance " + NAMES[i] + " to " + NAMES[j], Double.isNaN(d));
-        double test = (d > 0) ? (ref[i][j] / d) : (ref[i][j] - d + 1.0);
+        double test = (d > 0) ? (ref[i][j] / d - 1.) : (ref[i][j] - d);
         if (Math.abs(d - ref[i][j]) > abserror) {
-          if (Math.abs(test - 1.0) > relerror) {
-            assertEquals("Distances do not agree for " + NAMES[i] + " to " + NAMES[j] + " " + Math.abs(test - 1.0), ref[i][j], d, abserror);
+          if (Math.abs(test) > relerror) {
+            assertEquals("Distances do not agree for " + NAMES[i] + " to " + NAMES[j] + " " + Math.abs(test), ref[i][j], d, abserror);
           }
-          if (Math.abs(test - 1.0) > maxrel) {
-            maxrel = Math.abs(test - 1.0);
+          if (Math.abs(test) > maxrel) {
+            maxrel = Math.abs(test);
           }
         } else {
           if (Math.abs(ref[i][j] - d) > maxabs) {
