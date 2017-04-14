@@ -404,40 +404,6 @@ public final class MathUtil {
   }
 
   /**
-   * <b>Fast</b> way of computing cos(x) from x and sin(x).
-   *
-   * @param angle Input angle x
-   * @param sin Sine of x.
-   * @return Cosine of x
-   */
-  public static double sinToCos(double angle, double sin) {
-    // Numerics of the formula below aren't too good.
-    if((-1e-5 < sin && sin < 1e-5) || sin > 0.99999 || sin < -0.99999) {
-      return FastMath.cos(angle);
-    }
-    angle = normAngle(angle);
-    final double s = FastMath.sqrt(1 - sin * sin);
-    return (angle < HALFPI || angle > ONEHALFPI) ? s : -s;
-  }
-
-  /**
-   * <b>Fast</b> way of computing sin(x) from x and cos(x).
-   *
-   * @param angle Input angle x
-   * @param cos Cosine of x.
-   * @return Sine of x
-   */
-  public static double cosToSin(double angle, double cos) {
-    // Numerics of the formula below aren't too good.
-    if((-1e-5 < cos && cos < 1e-5) || cos > 0.99999 || cos < -0.99999) {
-      return FastMath.sin(angle);
-    }
-    angle = normAngle(angle);
-    final double s = FastMath.sqrt(1 - cos * cos);
-    return (angle < Math.PI) ? s : -s;
-  }
-
-  /**
    * Find the next power of 2.
    *
    * Classic bit operation, for signed 32-bit. Valid for positive integers only

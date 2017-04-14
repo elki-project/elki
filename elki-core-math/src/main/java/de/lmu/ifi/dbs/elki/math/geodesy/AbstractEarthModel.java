@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.math.geodesy;
 
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
 /**
@@ -96,8 +97,9 @@ public abstract class AbstractEarthModel implements EarthModel {
   @Override
   public double[] latLngRadToECEF(double lat, double lng) {
     // Sine and cosines:
-    final double clat = FastMath.cos(lat), slat = MathUtil.cosToSin(lat, clat);
-    final double clng = FastMath.cos(lng), slng = MathUtil.cosToSin(lng, clng);
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slat = FastMath.sinAndCos(lat, tmp), clat = tmp.value;
+    final double slng = FastMath.sinAndCos(lng, tmp), clng = tmp.value;
 
     final double v = a / FastMath.sqrt(1 - esq * slat * slat);
     return new double[] { v * clat * clng, v * clat * slng, (1 - esq) * v * slat };
@@ -106,8 +108,9 @@ public abstract class AbstractEarthModel implements EarthModel {
   @Override
   public double[] latLngRadToECEF(double lat, double lng, double h) {
     // Sine and cosines:
-    final double clat = FastMath.cos(lat), slat = MathUtil.cosToSin(lat, clat);
-    final double clng = FastMath.cos(lng), slng = MathUtil.cosToSin(lng, clng);
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slat = FastMath.sinAndCos(lat, tmp), clat = tmp.value;
+    final double slng = FastMath.sinAndCos(lng, tmp), clng = tmp.value;
 
     final double v = a / FastMath.sqrt(1 - esq * slat * slat);
     return new double[] { (v + h) * clat * clng, (v + h) * clat * slng, ((1 - esq) * v + h) * slat };

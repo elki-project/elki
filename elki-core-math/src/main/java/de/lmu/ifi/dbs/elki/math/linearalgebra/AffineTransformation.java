@@ -20,11 +20,14 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.inverse;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.times;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.unitMatrix;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.zeroMatrix;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
 /**
@@ -217,7 +220,8 @@ public class AffineTransformation {
       ht[i][i] = 1.0;
     }
     // insert rotation values
-    double c = FastMath.cos(angle), s = MathUtil.cosToSin(angle, c);
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    double s = FastMath.sinAndCos(angle, tmp), c = tmp.value;
     ht[axis1][axis1] = +c;
     ht[axis1][axis2] = -s;
     ht[axis2][axis1] = +s;

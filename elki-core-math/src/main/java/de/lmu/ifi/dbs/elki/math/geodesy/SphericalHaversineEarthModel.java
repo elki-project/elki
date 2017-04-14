@@ -20,8 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.math.geodesy;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
 /**
@@ -54,8 +54,9 @@ public class SphericalHaversineEarthModel extends AbstractEarthModel {
   @Override
   public double[] latLngRadToECEF(double lat, double lng) {
     // Then to sine and cosines:
-    final double clat = FastMath.cos(lat), slat = MathUtil.cosToSin(lat, clat);
-    final double clng = FastMath.cos(lng), slng = MathUtil.cosToSin(lng, clng);
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slat = FastMath.sinAndCos(lat, tmp), clat = tmp.value;
+    final double slng = FastMath.sinAndCos(lng, tmp), clng = tmp.value;
 
     return new double[] { EARTH_RADIUS * clat * clng, EARTH_RADIUS * clat * slng, EARTH_RADIUS * slat };
   }
@@ -63,8 +64,9 @@ public class SphericalHaversineEarthModel extends AbstractEarthModel {
   @Override
   public double[] latLngRadToECEF(double lat, double lng, double h) {
     // Then to sine and cosines:
-    final double clat = FastMath.cos(lat), slat = MathUtil.cosToSin(lat, clat);
-    final double clng = FastMath.cos(lng), slng = MathUtil.cosToSin(lng, clng);
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    final double slat = FastMath.sinAndCos(lat, tmp), clat = tmp.value;
+    final double slng = FastMath.sinAndCos(lng, tmp), clng = tmp.value;
 
     return new double[] { (EARTH_RADIUS + h) * clat * clng, (EARTH_RADIUS + h) * clat * slng, (EARTH_RADIUS + h) * slat };
   }

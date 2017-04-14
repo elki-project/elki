@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.math;
 
+import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
 /**
@@ -95,9 +96,10 @@ public abstract class SinCosTable {
       this.costable = new double[steps];
       this.sintable = new double[steps];
       double ang = 0.;
+      final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
       for (int i = 0; i < steps; i++, ang += radstep) {
-        this.costable[i] = FastMath.cos(ang);
-        this.sintable[i] = MathUtil.cosToSin(ang, this.costable[i]);
+        this.sintable[i] = FastMath.sinAndCos(ang, tmp);
+        this.costable[i] = tmp.value;
       }
     }
 

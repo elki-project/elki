@@ -49,7 +49,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -68,6 +67,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
+import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
 /**
@@ -190,8 +190,8 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
       double l1 = scalarProduct(pm, p1), l2 = scalarProduct(pm, p2);
       // Rotate projection by + and - angle
       // Using sin(-x) = -sin(x) and cos(-x)=cos(x)
-      final double cangle = FastMath.cos(angle),
-          sangle = MathUtil.cosToSin(angle, cangle);
+      final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+      final double sangle = FastMath.sinAndCos(angle, tmp), cangle = tmp.value;
       double r11 = +cangle * l1 - sangle * l2, r12 = +sangle * l1 + cangle * l2;
       double r21 = +cangle * l1 + sangle * l2, r22 = -sangle * l1 + cangle * l2;
       // Build rotated vectors - remove projected component, add rotated

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListSizeConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
+import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
 /**
@@ -76,6 +77,7 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
    */
   public static double[][] computeWeightMatrix(final int quanth, final int quants, final int quantb) {
     final int dim = quanth * quants * quantb;
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
     assert (dim > 0);
     final double[][] m = new double[dim][dim];
     for(int x = 0; x < dim; x++) {
@@ -87,12 +89,10 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
         final int sy = (y / quantb) % quants;
         final int by = y % quantb;
 
-        final double chx = FastMath.cos((hx + .5) / quanth * MathUtil.TWOPI);
-        final double chy = FastMath.cos((hy + .5) / quanth * MathUtil.TWOPI);
-        // final double shx = FastMath.sin((hx + .5) / quanth * MathUtil.TWOPI);
-        final double shx = MathUtil.cosToSin((hx + .5) / quanth * MathUtil.TWOPI, chx);
-        // final double shy = FastMath.sin((hy + .5) / quanth * MathUtil.TWOPI);
-        final double shy = MathUtil.cosToSin((hy + .5) / quanth * MathUtil.TWOPI, chy);
+        final double shx = FastMath.sinAndCos((hx + .5) / quanth * MathUtil.TWOPI, tmp);
+        final double chx = tmp.value;
+        final double shy = FastMath.sinAndCos((hy + .5) / quanth * MathUtil.TWOPI, tmp);
+        final double chy = tmp.value;
         final double cos = chx * (sx + .5) / quants - chy * (sy + .5) / quants;
         final double sin = shx * (sx + .5) / quants - shy * (sy + .5) / quants;
         final double db = (bx - by) / (double) quantb;

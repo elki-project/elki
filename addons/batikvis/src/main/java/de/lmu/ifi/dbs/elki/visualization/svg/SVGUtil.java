@@ -38,8 +38,8 @@ import org.w3c.dom.svg.SVGMatrix;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import gnu.trove.map.hash.TObjectIntHashMap;
+import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
 /**
@@ -668,11 +668,12 @@ public final class SVGUtil {
    * @return SVG element representing this circle segment
    */
   public static Element svgCircleSegment(SVGPlot svgp, double centerx, double centery, double angleStart, double angleDelta, double innerRadius, double outerRadius) {
-    double sin1st = FastMath.sin(angleStart);
-    double cos1st = MathUtil.sinToCos(angleStart, sin1st);
+    final DoubleWrapper tmp = new DoubleWrapper(); // To return cosine
+    double sin1st = FastMath.sinAndCos(angleStart, tmp);
+    double cos1st = tmp.value;
 
-    double sin2nd = FastMath.sin(angleStart + angleDelta);
-    double cos2nd = MathUtil.sinToCos(angleStart + angleDelta, sin2nd);
+    double sin2nd = FastMath.sinAndCos(angleStart + angleDelta, tmp);
+    double cos2nd = tmp.value;
 
     double inner1stx = centerx + (innerRadius * sin1st);
     double inner1sty = centery - (innerRadius * cos1st);
