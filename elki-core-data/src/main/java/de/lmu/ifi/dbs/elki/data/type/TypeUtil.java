@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.data.type;
 
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.ExternalID;
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
@@ -33,7 +32,6 @@ import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.SparseDoubleVector;
 import de.lmu.ifi.dbs.elki.data.SparseFloatVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
-import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.spatial.PolygonsObject;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -222,19 +220,9 @@ public final class TypeUtil {
   public static final SimpleTypeInformation<double[][]> MATRIX = new SimpleTypeInformation<>(double[][].class);
 
   /**
-   * Cluster model type.
-   */
-  public static final SimpleTypeInformation<Model> MODEL = new SimpleTypeInformation<>(Model.class);
-
-  /**
    * Any feature vector type.
    */
   public static final VectorTypeInformation<FeatureVector<?>> FEATURE_VECTORS = VectorTypeInformation.typeRequest(FeatureVector.class);
-
-  /**
-   * Clustering.
-   */
-  public static final SimpleTypeInformation<Clustering<?>> CLUSTERING = new SimpleTypeInformation<>(Clustering.class);
 
   /**
    * Spatial objects.

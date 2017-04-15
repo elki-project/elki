@@ -31,7 +31,6 @@ import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorSingleCluster;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.GeneratorXMLDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.logging.Logging;
@@ -39,7 +38,6 @@ import de.lmu.ifi.dbs.elki.math.statistics.distribution.Distribution;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
-
 import gnu.trove.iterator.TIntIterator;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
@@ -122,7 +120,7 @@ public class GeneratorXMLSpec extends AbstractApplication {
     int modelcol = -1;
     { // Find model column
       for(int i = 0; i < data.metaLength(); i++) {
-        if(TypeUtil.MODEL.isAssignableFromType(data.meta(i))) {
+        if(Model.TYPE.isAssignableFromType(data.meta(i))) {
           modelcol = i;
           break;
         }

@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -52,6 +53,11 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarch
  * @param <M> Model type
  */
 public class Clustering<M extends Model> extends BasicResult {
+  /**
+   * Type information, for relation matching.
+   */
+  public static final SimpleTypeInformation<Clustering<?>> TYPE = new SimpleTypeInformation<>(Clustering.class);
+
   /**
    * Keep a list of top level clusters.
    */

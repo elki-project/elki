@@ -233,7 +233,7 @@ public class ClusteringVectorParser extends AbstractStreamingParser {
   public BundleMeta getMeta() {
     if(meta == null) {
       meta = new BundleMeta(haslbl ? 2 : 1);
-      meta.add(TypeUtil.CLUSTERING);
+      meta.add(Clustering.TYPE);
       if(haslbl) {
         meta.add(TypeUtil.LABELLIST);
       }

@@ -216,7 +216,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     assert (rids.size() == clusterings.size());
 
     // Build a relation, and a distance matrix.
-    Relation<Clustering<?>> crel = new MaterializedRelation<Clustering<?>>(TypeUtil.CLUSTERING, rids, "Clusterings", datastore);
+    Relation<Clustering<?>> crel = new MaterializedRelation<Clustering<?>>(Clustering.TYPE, rids, "Clusterings", datastore);
     PrecomputedDistanceMatrix<Clustering<?>> mat = new PrecomputedDistanceMatrix<>(crel, distance);
     mat.initialize();
     ProxyDatabase d = new ProxyDatabase(rids, crel);
@@ -468,7 +468,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       if(chain.grab(malgorithm)) {
         metaAlgorithm = malgorithm.instantiateClass(chain);
         if(metaAlgorithm != null && metaAlgorithm.getInputTypeRestriction().length > 0 && //
-        !metaAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.CLUSTERING)) {
+        !metaAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(Clustering.TYPE)) {
           config.reportError(new WrongParameterValueException(malgorithm, malgorithm.getValueAsString(), "The meta clustering algorithm (as configured) does not accept clustering results."));
         }
       }

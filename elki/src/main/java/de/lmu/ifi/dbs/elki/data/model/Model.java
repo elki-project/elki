@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.data.model;
 
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
@@ -31,6 +32,11 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  * @apiviz.landmark
  */
 public interface Model {
+  /**
+   * Type information, for relation selection.
+   */
+  public static final SimpleTypeInformation<Model> TYPE = new SimpleTypeInformation<>(Model.class);
+
   /**
    * Default implementation of
    * {@link de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable#writeToText}.

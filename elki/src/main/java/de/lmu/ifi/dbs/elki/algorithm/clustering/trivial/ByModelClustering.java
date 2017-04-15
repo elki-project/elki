@@ -121,7 +121,7 @@ public class ByModelClustering extends AbstractAlgorithm<Clustering<Model>> impl
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
-    return TypeUtil.array(TypeUtil.MODEL);
+    return TypeUtil.array(Model.TYPE);
   }
 
   @Override

@@ -124,7 +124,7 @@ public class GeneratorMain {
     VectorFieldTypeInformation<DoubleVector> type = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
     bundle.appendColumn(type, new ArrayList<>());
     bundle.appendColumn(TypeUtil.CLASSLABEL, new ArrayList<>());
-    bundle.appendColumn(TypeUtil.MODEL, new ArrayList<Model>());
+    bundle.appendColumn(Model.TYPE, new ArrayList<Model>());
 
     // generate clusters
     ClassLabel[] labels = new ClassLabel[generators.size()];
