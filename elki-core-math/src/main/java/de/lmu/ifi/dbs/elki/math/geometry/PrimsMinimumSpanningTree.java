@@ -103,7 +103,7 @@ public class PrimsMinimumSpanningTree {
           best[j] = dist;
           src[j] = current;
         }
-        if(best[j] < newbestd) {
+        if(best[j] < newbestd || newbesti == -1) {
           newbestd = best[j];
           newbesti = j;
         }
