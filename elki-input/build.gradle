@@ -1,0 +1,8 @@
+description = 'ELKI - Data Input'
+dependencies {
+  compile project(':elki-core-api')
+  compile project(':elki-core-data')
+  compile project(':elki-core-math')
+  // For length normalization, MDS:
+  compile project(':elki-core-distance')
+}
