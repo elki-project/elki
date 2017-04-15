@@ -1,0 +1,9 @@
+description = 'ELKI - Data Generator'
+dependencies {
+  compile project(':elki-core-api')
+  compile project(':elki-core-data')
+  compile project(':elki-core-distance')
+  compile project(':elki-input')
+  compile project(':elki-clustering')
+  compile project(':elki-outlier')
+}

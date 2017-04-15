@@ -1,0 +1,14 @@
+description = 'ELKI - Outlier Detection Algorithms'
+dependencies {
+  compile project(':elki-core-api')
+  compile project(':elki-core-data')
+  compile project(':elki-core-distance')
+  compile project(':elki-core-math')
+  compile project(':elki-core-parallel')
+  compile project(':elki-core')
+  compile project(':elki-database')
+  compile project(':elki-input')
+  compile project(':elki-index')
+  compile project(':elki-index-rtree')
+}
+

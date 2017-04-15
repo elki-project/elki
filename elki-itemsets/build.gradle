@@ -1,0 +1,7 @@
+description = 'ELKI - Itemset Mining'
+dependencies {
+  compile project(':elki-core-api')
+  compile project(':elki-core-data')
+  compile project(':elki-core')
+}
+

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.APIViolationException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
@@ -153,4 +154,12 @@ public abstract class AbstractAlgorithm<R extends Result> implements Algorithm {
   public static <F extends DistanceFunction<?>> ObjectParameter<F> makeParameterDistanceFunction(Class<?> defaultDistanceFunction, Class<?> restriction) {
     return new ObjectParameter<>(DistanceBasedAlgorithm.DISTANCE_FUNCTION_ID, restriction, defaultDistanceFunction);
   }
+
+  /**
+   * Parameter to specify the algorithm to run.
+   * <p>
+   * Key: {@code -algorithm}
+   * </p>
+   */
+  public static final OptionID ALGORITHM_ID = new OptionID("algorithm", "Algorithm to run.");
 }

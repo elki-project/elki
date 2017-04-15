@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
 
 import java.util.Arrays;
+
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
@@ -33,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.DoubleArrayStaticHistogram;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -162,7 +162,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
     public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height, proj);
       this.relation = task.getRelation();
-      this.sample = ResultUtil.getSamplingResult(relation);
+      this.sample = SamplingResult.getSamplingResult(relation);
       addListeners();
     }
 

@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.workflow;
 
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.Index;
@@ -165,7 +166,7 @@ public class AlgorithmStep implements WorkflowStep {
      * Key: {@code -algorithm}
      * </p>
      */
-    public static final OptionID ALGORITHM_ID = new OptionID("algorithm", "Algorithm to run.");
+    public static final OptionID ALGORITHM_ID = AbstractAlgorithm.ALGORITHM_ID;
 
     @Override
     protected void makeOptions(Parameterization config) {

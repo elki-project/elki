@@ -20,6 +20,10 @@
  */
 package de.lmu.ifi.dbs.elki.result;
 
+import java.util.List;
+
+import de.lmu.ifi.dbs.elki.database.Database;
+
 /**
  * Selection result wrapper.
  * 
@@ -66,5 +70,21 @@ public class SelectionResult implements Result {
   @Override
   public String getShortName() {
     return "selection";
+  }
+
+  /**
+   * Ensure that there also is a selection container object.
+   *
+   * @param db Database
+   * @return selection result
+   */
+  public static SelectionResult ensureSelectionResult(final Database db) {
+    List<SelectionResult> selections = ResultUtil.filterResults(db.getHierarchy(), db, SelectionResult.class);
+    if(!selections.isEmpty()) {
+      return selections.get(0);
+    }
+    SelectionResult sel = new SelectionResult();
+    ResultUtil.addChildResult(db, sel);
+    return sel;
   }
 }

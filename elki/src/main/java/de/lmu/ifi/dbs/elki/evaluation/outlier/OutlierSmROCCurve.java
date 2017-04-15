@@ -187,7 +187,7 @@ public class OutlierSmROCCurve implements Evaluator {
       return;
     }
 
-    List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
+    List<OutlierResult> oresults = OutlierResult.getOutlierResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     for(OutlierResult o : oresults) {
       db.getHierarchy().add(o, computeSmROCResult(positiveids, o));

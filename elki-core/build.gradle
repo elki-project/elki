@@ -1,0 +1,10 @@
+description = 'ELKI - Core Miscellaneous'
+dependencies {
+  compile project(':elki-core-api')
+  compile project(':elki-core-data')
+  compile project(':elki-core-distance')
+  compile project(':elki-core-math')
+  compile project(':elki-input')
+  compile project(':elki-database')
+}
+

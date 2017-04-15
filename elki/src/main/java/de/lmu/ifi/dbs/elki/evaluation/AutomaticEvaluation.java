@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.regex.Pattern;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.type.NoSupportedDataTypeException;
@@ -78,7 +79,7 @@ public class AutomaticEvaluation implements Evaluator {
     }
     if(!outliers.isEmpty()) {
       Database db = ResultUtil.findDatabase(hier);
-      ResultUtil.ensureClusteringResult(db, db);
+      ensureClusteringResult(db, db);
       Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, db, Clustering.class);
       if(clusterings.isEmpty()) {
         LOG.warning("Could not find a clustering result, even after running 'ensureClusteringResult'?!?");
@@ -151,6 +152,19 @@ public class AutomaticEvaluation implements Evaluator {
       catch(NoSupportedDataTypeException e) {
         // Pass - the data probably did not have labels.
       }
+    }
+  }
+
+  /**
+   * Ensure that the result contains at least one Clustering.
+   *
+   * @param db Database to process
+   * @param result result
+   */
+  public static void ensureClusteringResult(final Database db, final Result result) {
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(db.getHierarchy(), result, Clustering.class);
+    if(clusterings.isEmpty()) {
+      ResultUtil.addChildResult(db, new ByLabelOrAllInOneClustering().run(db));
     }
   }
 

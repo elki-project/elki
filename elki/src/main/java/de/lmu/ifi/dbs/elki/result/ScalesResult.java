@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.result;
 
+import java.util.Collection;
+
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
@@ -88,5 +90,21 @@ public class ScalesResult extends BasicResult {
    */
   public LinearScale[] getScales() {
     return scales;
+  }
+
+  /**
+   * Get (or create) a scales result for a relation.
+   *
+   * @param rel Relation
+   * @return associated scales result
+   */
+  public static ScalesResult getScalesResult(final Relation<? extends SpatialComparable> rel) {
+    Collection<ScalesResult> scas = ResultUtil.filterResults(rel.getHierarchy(), rel, ScalesResult.class);
+    if(scas.isEmpty()) {
+      final ScalesResult newsca = new ScalesResult(rel);
+      ResultUtil.addChildResult(rel, newsca);
+      return newsca;
+    }
+    return scas.iterator().next();
   }
 }

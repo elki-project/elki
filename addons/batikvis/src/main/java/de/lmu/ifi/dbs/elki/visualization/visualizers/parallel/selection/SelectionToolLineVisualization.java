@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -240,7 +240,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
         selection = DBIDUtil.newHashSet(selContext.getSelectedIds());
       }
       int[] axisrange = getAxisRange(Math.min(p1.getX(), p2.getX()), Math.max(p1.getX(), p2.getX()));
-      DBIDs ids = ResultUtil.getSamplingResult(relation).getSample();
+      DBIDs ids = SamplingResult.getSamplingResult(relation).getSample();
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         double[] yPos = proj.fastProjectDataToRenderSpace(relation.get(iter));
         if(checkSelected(axisrange, yPos, Math.max(p1.getX(), p2.getX()), Math.min(p1.getX(), p2.getX()), Math.max(p1.getY(), p2.getY()), Math.min(p1.getY(), p2.getY()))) {

@@ -35,13 +35,9 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreEvent;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultListener;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.SelectionResult;
+import de.lmu.ifi.dbs.elki.result.*;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -130,15 +126,15 @@ public class VisualizerContext implements DataStoreListener, Result {
       LOG.warning("No database reachable from " + hier);
       return;
     }
-    ResultUtil.ensureClusteringResult(db, db);
-    this.selection = ResultUtil.ensureSelectionResult(db);
+    AutomaticEvaluation.ensureClusteringResult(db, db);
+    this.selection = SelectionResult.ensureSelectionResult(db);
     for(Relation<?> rel : ResultUtil.getRelations(db)) {
-      ResultUtil.getSamplingResult(rel);
+      SamplingResult.getSamplingResult(rel);
       // FIXME: this is a really ugly workaround. :-(
       if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         @SuppressWarnings("unchecked")
         Relation<? extends NumberVector> vrel = (Relation<? extends NumberVector>) rel;
-        ResultUtil.getScalesResult(vrel);
+        ScalesResult.getScalesResult(vrel);
       }
     }
     makeStyleResult(stylelib);
@@ -176,7 +172,7 @@ public class VisualizerContext implements DataStoreListener, Result {
   protected void makeStyleResult(StyleLibrary stylelib) {
     final Database db = ResultUtil.findDatabase(hier);
     stylelibrary = stylelib;
-    List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(db);
+    List<Clustering<? extends Model>> clusterings = Clustering.getClusteringResults(db);
     if(!clusterings.isEmpty()) {
       stylepolicy = new ClusterStylingPolicy(clusterings.get(0), stylelib);
     }

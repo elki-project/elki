@@ -25,7 +25,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -76,7 +75,7 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
     super(task, plot, width, height);
     this.proj = (Projection2D) proj;
     this.rel = task.getRelation();
-    this.sample = task.updateOnAny(VisualizationTask.ON_SAMPLE) ? ResultUtil.getSamplingResult(rel) : null;
+    this.sample = task.updateOnAny(VisualizationTask.ON_SAMPLE) ? SamplingResult.getSamplingResult(rel) : null;
   }
 
   /**

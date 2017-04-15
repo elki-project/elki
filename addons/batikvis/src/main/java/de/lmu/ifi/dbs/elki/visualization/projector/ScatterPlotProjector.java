@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -79,7 +78,7 @@ public class ScatterPlotProjector<V extends SpatialComparable> implements Projec
     List<PlotItem> layout = new ArrayList<>(1);
     List<VisualizationTask> tasks = context.getVisTasks(this);
     if(!tasks.isEmpty()) {
-      ScalesResult scales = ResultUtil.getScalesResult(rel);
+      ScalesResult scales = ScalesResult.getScalesResult(rel);
       final PlotItem master;
       if(dmax == 2) {
         // In 2d, make the plot twice as big.

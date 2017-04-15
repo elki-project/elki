@@ -27,7 +27,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -66,7 +65,7 @@ public class ParallelPlotProjector<V extends SpatialComparable> implements Proje
     List<PlotItem> col = new ArrayList<>(1);
     List<VisualizationTask> tasks = context.getVisTasks(this);
     if(!tasks.isEmpty()) {
-      ScalesResult scales = ResultUtil.getScalesResult(rel);
+      ScalesResult scales = ScalesResult.getScalesResult(rel);
       ProjectionParallel proj = new SimpleParallel(this, scales.getScales());
 
       final double width = Math.max(.5, Math.ceil(MathUtil.log2(scales.getScales().length - 1)));

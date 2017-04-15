@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.result;
 
+import java.util.Collection;
+
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 /**
@@ -70,5 +72,21 @@ public class SamplingResult implements Result {
   @Override
   public String getShortName() {
     return "sample";
+  }
+
+  /**
+   * Get the sampling result attached to a relation
+   *
+   * @param rel Relation
+   * @return Sampling result.
+   */
+  public static SamplingResult getSamplingResult(final Relation<?> rel) {
+    Collection<SamplingResult> selections = ResultUtil.filterResults(rel.getHierarchy(), rel, SamplingResult.class);
+    if(selections.isEmpty()) {
+      final SamplingResult newsam = new SamplingResult(rel);
+      ResultUtil.addChildResult(rel, newsam);
+      return newsam;
+    }
+    return selections.iterator().next();
   }
 }

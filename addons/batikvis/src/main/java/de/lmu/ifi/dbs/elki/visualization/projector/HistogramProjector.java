@@ -27,7 +27,6 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -81,7 +80,7 @@ public class HistogramProjector<V extends NumberVector> implements Projector {
       final double hheight = .5;
       final double lheight = .1;
       PlotItem master = new PlotItem(dmax + xoff, hheight + lheight, null);
-      ScalesResult scales = ResultUtil.getScalesResult(rel);
+      ScalesResult scales = ScalesResult.getScalesResult(rel);
       for(int d1 = 0; d1 < dmax; d1++) {
         Projection1D proj = new Simple1D(this, scales.getScales(), d1);
         final PlotItem it = new PlotItem(d1 + xoff, lheight, 1., hheight, proj);

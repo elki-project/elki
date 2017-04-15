@@ -57,16 +57,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.SimpleEnumeratingScheme;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterConfusionMatrixResult;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDoubleArray;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDoubleDoublePair;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterIgnore;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterIntArray;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectArray;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterObjectInline;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterPair;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterTextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterXYCurve;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.*;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
@@ -132,6 +123,11 @@ public class TextWriter {
    * For producing unique filenames.
    */
   protected Map<String, Object> filenames = new HashMap<>();
+
+  /**
+   * Fallback writer for unknown objects.
+   */
+  private TextWriterWriterInterface<?> fallback = new TextWriterObjectComment();
 
   /**
    * Try to find a unique file name.
@@ -289,7 +285,7 @@ public class TextWriter {
     }
 
     PrintStream outStream = streamOpener.openStream(getFilename(clus, filename));
-    TextWriterStream out = new TextWriterStream(outStream, writers);
+    TextWriterStream out = new TextWriterStream(outStream, writers, fallback);
 
     // Write cluster information
     out.commentPrintLn("Cluster: " + naming.getNameFor(clus));
@@ -323,7 +319,7 @@ public class TextWriter {
 
   private void writeIterableResult(StreamFactory streamOpener, IterableResult<?> ri) throws IOException {
     PrintStream outStream = streamOpener.openStream(getFilename(ri, ri.getShortName()));
-    TextWriterStream out = new TextWriterStream(outStream, writers);
+    TextWriterStream out = new TextWriterStream(outStream, writers, fallback);
 
     // hack to print collectionResult header information
     if(ri instanceof CollectionResult<?>) {
@@ -350,7 +346,7 @@ public class TextWriter {
 
   private void writeOrderingResult(Database db, StreamFactory streamOpener, OrderingResult or, List<Relation<?>> ra) throws IOException {
     PrintStream outStream = streamOpener.openStream(getFilename(or, or.getShortName()));
-    TextWriterStream out = new TextWriterStream(outStream, writers);
+    TextWriterStream out = new TextWriterStream(outStream, writers, fallback);
 
     for(DBIDIter i = or.order(or.getDBIDs()).iter(); i.valid(); i.advance()) {
       printObject(out, db, i, ra);
@@ -365,7 +361,7 @@ public class TextWriter {
     }
     SettingsResult r = rs.get(0);
     PrintStream outStream = streamOpener.openStream(getFilename(r, r.getShortName()));
-    TextWriterStream out = new TextWriterStream(outStream, writers);
+    TextWriterStream out = new TextWriterStream(outStream, writers, fallback);
     // Write settings preamble
     out.commentPrintLn("Settings:");
 
@@ -416,7 +412,7 @@ public class TextWriter {
   private void writeOtherResult(StreamFactory streamOpener, Result r) throws IOException {
     if(writers.getHandler(r) != null) {
       PrintStream outStream = streamOpener.openStream(getFilename(r, r.getShortName()));
-      TextWriterStream out = new TextWriterStream(outStream, writers);
+      TextWriterStream out = new TextWriterStream(outStream, writers, fallback );
       TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
       if(owriter == null) {
         throw new IOException("No handler for result class: " + r.getClass().getSimpleName());

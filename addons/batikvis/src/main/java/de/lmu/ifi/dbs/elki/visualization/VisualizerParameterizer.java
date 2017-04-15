@@ -152,7 +152,7 @@ public class VisualizerParameterizer {
    */
   public static String getTitle(Database db, Result result) {
     List<TrackedParameter> settings = new ArrayList<>();
-    for(SettingsResult sr : ResultUtil.getSettingsResults(result)) {
+    for(SettingsResult sr : SettingsResult.getSettingsResults(result)) {
       settings.addAll(sr.getSettings());
     }
     String algorithm = null;

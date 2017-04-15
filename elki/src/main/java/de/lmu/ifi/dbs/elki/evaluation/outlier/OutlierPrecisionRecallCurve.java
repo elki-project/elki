@@ -87,7 +87,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
       return;
     }
 
-    List<OutlierResult> oresults = ResultUtil.getOutlierResults(result);
+    List<OutlierResult> oresults = OutlierResult.getOutlierResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {

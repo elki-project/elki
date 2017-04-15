@@ -165,7 +165,7 @@ public abstract class AbstractSimpleAlgorithmTest {
    * @return Clustering
    */
   protected Clustering<?> findSingleClustering(Result result) {
-    List<Clustering<? extends Model>> clusterresults = ResultUtil.getClusteringResults(result);
+    List<Clustering<? extends Model>> clusterresults = Clustering.getClusteringResults(result);
     assertTrue("No unique clustering found in result.", clusterresults.size() == 1);
     Clustering<? extends Model> clustering = clusterresults.get(0);
     return clustering;
