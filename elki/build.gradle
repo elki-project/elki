@@ -9,6 +9,7 @@ dependencies {
   compile project(':elki-core-dbids')
   compile project(':elki-core-parallel')
   compile project(':elki-persistent')
+  compile project(':elki-classification')
   compile project(':elki-index')
   compile project(':elki-index-rtree')
   compile project(':elki-index-mtree')

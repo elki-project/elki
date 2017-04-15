@@ -21,8 +21,6 @@
 package de.lmu.ifi.dbs.elki.evaluation.classification;
 
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
 
 /**
  * Provides the prediction performance measures for a classifier based on the
@@ -35,16 +33,16 @@ import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
  *
  * @apiviz.composedOf ConfusionMatrix
  */
-public class ConfusionMatrixEvaluationResult implements Result, TextWriteable {
+public class ConfusionMatrixEvaluationResult implements Result {
   /**
    * Holds the confusion matrix.
    */
-  private ConfusionMatrix confusionmatrix;
+  public final ConfusionMatrix confusionmatrix;
 
   /**
    * Holds the used EvaluationProcedure.
    */
-  private String evaluationName;
+  public final String evaluationName;
 
   /**
    * Provides an evaluation based on the given confusion matrix.
@@ -57,27 +55,6 @@ public class ConfusionMatrixEvaluationResult implements Result, TextWriteable {
     super();
     this.confusionmatrix = confusionmatrix;
     this.evaluationName = evaluationName;
-  }
-
-  @Override
-  public void writeToText(TextWriterStream out, String label) {
-    out.commentPrintLn("Evaluation:");
-    out.commentPrintLn(evaluationName);
-    // out.println(evaluationProcedure.setting());
-    out.commentPrintLn("Accuracy: \n  correctly classified instances: ");
-    out.commentPrintLn(confusionmatrix.truePositives());
-    out.commentPrintLn("true positive rate:         ");
-    double tpr = confusionmatrix.truePositiveRate();
-    out.commentPrintLn(tpr);
-    out.commentPrintLn("false positive rate:        ");
-    out.commentPrintLn(confusionmatrix.falsePositiveRate());
-    out.commentPrintLn("positive predicted value:   ");
-    double ppv = confusionmatrix.positivePredictedValue();
-    out.commentPrintLn(ppv);
-    out.commentPrintLn("F1-measure:                 ");
-    out.commentPrintLn((2 * ppv * tpr) / (ppv + tpr));
-    out.commentPrintLn("\nconfusion matrix:\n");
-    out.commentPrintLn(confusionmatrix.toString());
   }
 
   @Override

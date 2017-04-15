@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
+import de.lmu.ifi.dbs.elki.evaluation.classification.ConfusionMatrixEvaluationResult;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
@@ -56,6 +57,7 @@ import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.SimpleEnumeratingScheme;
+import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterConfusionMatrixResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDoubleArray;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterDoubleDoublePair;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterIgnore;
@@ -123,6 +125,7 @@ public class TextWriter {
     writers.insertHandler(XYCurve.class, new TextWriterXYCurve());
     // Objects that have an own writeToText method.
     writers.insertHandler(TextWriteable.class, new TextWriterTextWriteable());
+    writers.insertHandler(ConfusionMatrixEvaluationResult.class, new TextWriterConfusionMatrixResult());
   }
 
   /**

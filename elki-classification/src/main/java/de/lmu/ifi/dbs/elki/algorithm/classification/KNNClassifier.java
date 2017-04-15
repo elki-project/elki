@@ -27,7 +27,8 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractDistanceBasedAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
+import de.lmu.ifi.dbs.elki.algorithm.DistanceBasedAlgorithm;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -38,15 +39,18 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
 
 /**
  * KNNClassifier classifies instances based on the class distribution among the
@@ -58,7 +62,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  */
 @Title("kNN-classifier")
 @Description("Lazy classifier classifies a given instance to the majority class of the k-nearest neighbors.")
-public class KNNClassifier<O> extends AbstractDistanceBasedAlgorithm<O, Result> implements Classifier<O> {
+public class KNNClassifier<O> extends AbstractAlgorithm<Result> implements DistanceBasedAlgorithm<O>, Classifier<O> {
   /**
    * The logger for this class.
    */
@@ -80,13 +84,19 @@ public class KNNClassifier<O> extends AbstractDistanceBasedAlgorithm<O, Result> 
   protected Relation<? extends ClassLabel> labelrep;
 
   /**
+   * Distance function
+   */
+  protected DistanceFunction<? super O> distanceFunction;
+
+  /**
    * Constructor.
    * 
    * @param distanceFunction Distance function
    * @param k Number of nearest neighbors to access.
    */
   public KNNClassifier(DistanceFunction<? super O> distanceFunction, int k) {
-    super(distanceFunction);
+    super();
+    this.distanceFunction = distanceFunction;
     this.k = k;
   }
 
@@ -145,6 +155,11 @@ public class KNNClassifier<O> extends AbstractDistanceBasedAlgorithm<O, Result> 
   public Result run(Database database) throws IllegalStateException {
     throw new AbortException("Classifiers cannot auto-run on a database, but need to be trained and can then predict.");
   }
+  
+  @Override
+  public DistanceFunction<? super O> getDistanceFunction() {
+    return distanceFunction;
+  }
 
   @Override
   public TypeInformation[] getInputTypeRestriction() {
@@ -165,8 +180,7 @@ public class KNNClassifier<O> extends AbstractDistanceBasedAlgorithm<O, Result> 
    *
    * @param <O> Object type
    */
-  public static class Parameterizer<O> extends AbstractDistanceBasedAlgorithm.Parameterizer<O> {
-
+  public static class Parameterizer<O> extends AbstractParameterizer {
     /**
      * Parameter to specify the number of neighbors to take into account for
      * classification, must be an integer greater than 0.
@@ -180,6 +194,11 @@ public class KNNClassifier<O> extends AbstractDistanceBasedAlgorithm<O, Result> 
     public static final OptionID K_ID = new OptionID("knnclassifier.k", "The number of neighbors to take into account for classification.");
 
     /**
+     * Distance function
+     */
+    protected DistanceFunction<? super O> distanceFunction;
+
+    /**
      * Holds the value of @link #K_PARAM}.
      */
     protected int k;
@@ -187,8 +206,12 @@ public class KNNClassifier<O> extends AbstractDistanceBasedAlgorithm<O, Result> 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
+      ObjectParameter<DistanceFunction<? super O>> distP = AbstractAlgorithm.makeParameterDistanceFunction(EuclideanDistanceFunction.class, DistanceFunction.class);
+      if(config.grab(distP)) {
+        distanceFunction = distP.instantiateClass(config);
+      }
       IntParameter kP = new IntParameter(K_ID, 1)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         k = kP.intValue();
       }
