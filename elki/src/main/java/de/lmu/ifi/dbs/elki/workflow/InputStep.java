@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.workflow;
 
+import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -82,7 +83,7 @@ public class InputStep implements WorkflowStep {
      * {@code -db}
      * </p>
      */
-    public static final OptionID DATABASE_ID = new OptionID("db", "Database class.");
+    public static final OptionID DATABASE_ID = AbstractApplication.Parameterizer.DATABASE_ID;
 
     @Override
     protected void makeOptions(Parameterization config) {

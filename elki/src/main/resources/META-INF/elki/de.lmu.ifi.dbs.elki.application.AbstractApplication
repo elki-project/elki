@@ -1,10 +1,6 @@
 de.lmu.ifi.dbs.elki.application.KDDCLIApplication cli kddtask
 de.lmu.ifi.dbs.elki.application.ClassifierHoldoutEvaluationTask
 de.lmu.ifi.dbs.elki.application.ConvertToBundleApplication
-de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceInOnDiskMatrix
-de.lmu.ifi.dbs.elki.application.cache.CacheFloatDistanceInOnDiskMatrix
-de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceKNNLists
-de.lmu.ifi.dbs.elki.application.cache.CacheDoubleDistanceRangeQueries
 de.lmu.ifi.dbs.elki.application.geo.VisualizeGeodesicDistances
 de.lmu.ifi.dbs.elki.application.greedyensemble.ComputeKNNOutlierScores
 de.lmu.ifi.dbs.elki.application.greedyensemble.GreedyEnsembleExperiment

@@ -29,6 +29,7 @@ import java.nio.channels.FileLock;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
@@ -48,7 +49,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
  * Precompute the k nearest neighbors in a disk cache.
@@ -69,7 +69,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
   /**
    * Data source to process.
    */
-  private InputStep input;
+  private Database database;
 
   /**
    * Distance function that is to be cached.
@@ -97,14 +97,14 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
   /**
    * Constructor.
    *
-   * @param input Data source
+   * @param database Data source
    * @param distance Distance function
    * @param radius Query radius
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceRangeQueries(InputStep input, DistanceFunction<O> distance, double radius, File out) {
+  public CacheDoubleDistanceRangeQueries(Database database, DistanceFunction<O> distance, double radius, File out) {
     super();
-    this.input = input;
+    this.database = database;
     this.distance = distance;
     this.radius = radius;
     this.out = out;
@@ -112,7 +112,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
 
   @Override
   public void run() {
-    Database database = input.getDatabase();
+    database.initialize();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distance);
     RangeQuery<O> rangeQ = database.getRangeQuery(distanceQuery, radius, DatabaseQuery.HINT_HEAVY_USE);
@@ -211,7 +211,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
     /**
      * Data source to process.
      */
-    private InputStep input = null;
+    private Database database = null;
 
     /**
      * Distance function that is to be cached.
@@ -231,7 +231,10 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      input = config.tryInstantiate(InputStep.class);
+      final ObjectParameter<Database> dbP = new ObjectParameter<>(DATABASE_ID, Database.class, StaticArrayDatabase.class);
+      if (config.grab(dbP)) {
+        database = dbP.instantiateClass(config);
+      }
       // Distance function parameter
       final ObjectParameter<DistanceFunction<O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
       if(config.grab(dpar)) {
@@ -251,7 +254,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
 
     @Override
     protected CacheDoubleDistanceRangeQueries<O> makeInstance() {
-      return new CacheDoubleDistanceRangeQueries<>(input, distance, radius, out);
+      return new CacheDoubleDistanceRangeQueries<>(database, distance, radius, out);
     }
   }
 

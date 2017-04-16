@@ -29,6 +29,7 @@ import java.nio.channels.FileLock;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
 import de.lmu.ifi.dbs.elki.database.ids.KNNList;
@@ -47,7 +48,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
  * Precompute the k nearest neighbors in a disk cache.
@@ -68,7 +68,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
   /**
    * Data source to process.
    */
-  private InputStep input;
+  private Database database;
 
   /**
    * Distance function that is to be cached.
@@ -96,14 +96,14 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
   /**
    * Constructor.
    * 
-   * @param input Data source
+   * @param database Data source
    * @param distance Distance function
    * @param k Number of nearest neighbors
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceKNNLists(InputStep input, DistanceFunction<O> distance, int k, File out) {
+  public CacheDoubleDistanceKNNLists(Database database, DistanceFunction<O> distance, int k, File out) {
     super();
-    this.input = input;
+    this.database = database;
     this.distance = distance;
     this.k = k;
     this.out = out;
@@ -111,7 +111,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
 
   @Override
   public void run() {
-    Database database = input.getDatabase();
+    database.initialize();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distance);
     KNNQuery<O> knnQ = database.getKNNQuery(distanceQuery, DatabaseQuery.HINT_HEAVY_USE);
@@ -201,7 +201,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
     /**
      * Data source to process.
      */
-    private InputStep input = null;
+    private Database database = null;
 
     /**
      * Distance function that is to be cached.
@@ -221,7 +221,10 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      input = config.tryInstantiate(InputStep.class);
+      final ObjectParameter<Database> dbP = new ObjectParameter<>(DATABASE_ID, Database.class, StaticArrayDatabase.class);
+      if (config.grab(dbP)) {
+        database = dbP.instantiateClass(config);
+      }
       // Distance function parameter
       final ObjectParameter<DistanceFunction<O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
       if(config.grab(dpar)) {
@@ -241,7 +244,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
 
     @Override
     protected CacheDoubleDistanceKNNLists<O> makeInstance() {
-      return new CacheDoubleDistanceKNNLists<>(input, distance, k, out);
+      return new CacheDoubleDistanceKNNLists<>(database, distance, k, out);
     }
   }
 

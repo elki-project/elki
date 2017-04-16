@@ -7,7 +7,6 @@ de.lmu.ifi.dbs.elki.index.invertedlist.InMemoryInvertedIndex$Factory
 de.lmu.ifi.dbs.elki.index.lsh.InMemoryLSHIndex
 de.lmu.ifi.dbs.elki.index.vafile.VAFile$Factory
 de.lmu.ifi.dbs.elki.index.vafile.PartialVAFile$Factory
-de.lmu.ifi.dbs.elki.index.preprocessed.knn.CachedDoubleDistanceKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.NNDescent$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNJoinMaterializeKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.MetricalIndexApproximationMaterializeKNNPreprocessor$Factory

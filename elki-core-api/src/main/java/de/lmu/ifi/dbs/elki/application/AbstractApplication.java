@@ -279,6 +279,16 @@ public abstract class AbstractApplication {
     public static final OptionID INPUT_ID = new OptionID("app.in", "");
 
     /**
+     * Option ID to specify the database type
+     * 
+     * Key:
+     * <p>
+     * {@code -db}
+     * </p>
+     */
+    public static final OptionID DATABASE_ID = new OptionID("db", "Database class.");
+
+    /**
      * Flag to obtain help-message.
      * <p>
      * Key: {@code -h}

@@ -20,7 +20,7 @@ dependencies {
   compile project(':elki-index')
   compile project(':elki-index-rtree')
   compile project(':elki-index-mtree')
-  compile group: 'net.sf.trove4j', name: 'trove4j', version:'[3.0.3,)'
+  compile project(':elki-precomputed')
   runtime project(':elki-core-dbids-int')
   testCompile project(':elki-docutil')
   testCompile group: 'junit', name: 'junit', version:'[4.8,)'

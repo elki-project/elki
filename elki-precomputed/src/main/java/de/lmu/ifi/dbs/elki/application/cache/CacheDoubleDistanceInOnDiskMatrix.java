@@ -25,6 +25,7 @@ import java.io.IOException;
 
 import de.lmu.ifi.dbs.elki.application.AbstractApplication;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.StaticArrayDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -40,7 +41,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.workflow.InputStep;
 
 /**
  * Precompute an on-disk distance matrix, using double precision.
@@ -67,7 +67,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
   /**
    * Data source to process.
    */
-  private InputStep input;
+  private Database database;
 
   /**
    * Distance function that is to be cached.
@@ -82,51 +82,50 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
   /**
    * Constructor.
    * 
-   * @param input Data source
+   * @param database Data source
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceInOnDiskMatrix(InputStep input, DistanceFunction<O> distance, File out) {
+  public CacheDoubleDistanceInOnDiskMatrix(Database database, DistanceFunction<O> distance, File out) {
     super();
-    this.input = input;
+    this.database = database;
     this.distance = distance;
     this.out = out;
   }
 
   @Override
   public void run() {
-    Database database = input.getDatabase();
+    database.initialize();
     Relation<O> relation = database.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distance);
 
     DBIDRange ids = DBIDUtil.assertRange(relation.getDBIDs());
     int matrixsize = ids.size();
 
-    OnDiskUpperTriangleMatrix matrix;
-    try {
-      matrix = new OnDiskUpperTriangleMatrix(out, DiskCacheBasedDoubleDistanceFunction.DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, matrixsize);
-    }
-    catch(IOException e) {
-      throw new AbortException("Error creating output matrix.", e);
-    }
+    try (OnDiskUpperTriangleMatrix matrix = //
+        new OnDiskUpperTriangleMatrix(out, DiskCacheBasedDoubleDistanceFunction.DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, matrixsize)) {
 
-    DBIDArrayIter id1 = ids.iter(), id2 = ids.iter();
-    for(; id1.valid(); id1.advance()) {
-      for(id2.seek(id1.getOffset()); id2.valid(); id2.advance()) {
-        double d = distanceQuery.distance(id1, id2);
-        if(debugExtraCheckSymmetry) {
-          double d2 = distanceQuery.distance(id2, id1);
-          if(Math.abs(d - d2) > 0.0000001) {
-            LOG.warning("Distance function doesn't appear to be symmetric!");
+      DBIDArrayIter id1 = ids.iter(), id2 = ids.iter();
+      for(; id1.valid(); id1.advance()) {
+        for(id2.seek(id1.getOffset()); id2.valid(); id2.advance()) {
+          double d = distanceQuery.distance(id1, id2);
+          if(debugExtraCheckSymmetry) {
+            double d2 = distanceQuery.distance(id2, id1);
+            if(Math.abs(d - d2) > 0.0000001) {
+              LOG.warning("Distance function doesn't appear to be symmetric!");
+            }
+          }
+          try {
+            matrix.getRecordBuffer(id1.getOffset(), id2.getOffset()).putDouble(d);
+          }
+          catch(IOException e) {
+            throw new AbortException("Error writing distance record " + DBIDUtil.toString(id1) + "," + DBIDUtil.toString(id2) + " to matrix.", e);
           }
         }
-        try {
-          matrix.getRecordBuffer(id1.getOffset(), id2.getOffset()).putDouble(d);
-        }
-        catch(IOException e) {
-          throw new AbortException("Error writing distance record " + DBIDUtil.toString(id1) + "," + DBIDUtil.toString(id2) + " to matrix.", e);
-        }
       }
+    }
+    catch(IOException e) {
+      throw new AbortException("Error precomputing distance matrix.", e);
     }
   }
 
@@ -157,7 +156,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
     /**
      * Data source to process.
      */
-    private InputStep input = null;
+    private Database database = null;
 
     /**
      * Distance function that is to be cached.
@@ -172,7 +171,10 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      input = config.tryInstantiate(InputStep.class);
+      final ObjectParameter<Database> dbP = new ObjectParameter<>(DATABASE_ID, Database.class, StaticArrayDatabase.class);
+      if (config.grab(dbP)) {
+        database = dbP.instantiateClass(config);
+      }
       // Distance function parameter
       final ObjectParameter<DistanceFunction<O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
       if(config.grab(dpar)) {
@@ -187,7 +189,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
 
     @Override
     protected CacheDoubleDistanceInOnDiskMatrix<O> makeInstance() {
-      return new CacheDoubleDistanceInOnDiskMatrix<>(input, distance, out);
+      return new CacheDoubleDistanceInOnDiskMatrix<>(database, distance, out);
     }
   }
 
