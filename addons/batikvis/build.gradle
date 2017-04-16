@@ -1,7 +1,5 @@
-
 description = 'ELKI - Batik Visualization'
 dependencies {
-  compile group: 'net.sf.trove4j', name: 'trove4j', version:'[3.0.3,)'
   compile group: 'org.apache.xmlgraphics', name: 'batik-swing', version:'[1.7,1.9)'
   compile group: 'org.apache.xmlgraphics', name: 'batik-rasterizer', version:'[1.7,1.9)'
   compile group: 'org.apache.xmlgraphics', name: 'batik-ext', version:'[1.7,1.9)'
@@ -11,6 +9,5 @@ dependencies {
   compile project(':elki')
   compile project(':elki-gui-minigui')
   compile project(':elki-uncertain')
-  compile project(':elki-index-rtree')
   testCompile project(':elki-docutil')
 }

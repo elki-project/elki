@@ -1,5 +1,4 @@
 description = 'ELKI - Parallel Processing Core'
 dependencies {
-  compile project(':elki-core-api')
   compile project(':elki-core-math')
 }

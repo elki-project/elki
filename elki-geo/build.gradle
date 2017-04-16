@@ -1,6 +1,5 @@
-description = 'ELKI - Itemset Mining'
+description = 'ELKI - Geography Module'
 dependencies {
   compile project(':elki-core')
   testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }
-

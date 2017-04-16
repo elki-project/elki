@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.uncertain;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
@@ -33,7 +34,6 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Run k-means on the centers of each uncertain object.
@@ -109,7 +109,7 @@ public class CKMeans extends CenterOfMassMetaClustering<Clustering<KMeansModel>>
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<KMeans<?, KMeansModel>> kmeansP = new ObjectParameter<>(AlgorithmStep.Parameterizer.ALGORITHM_ID, KMeans.class, KMeansHamerly.class);
+      ObjectParameter<KMeans<?, KMeansModel>> kmeansP = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, KMeans.class, KMeansHamerly.class);
       if(config.grab(kmeansP)) {
         kmeans = kmeansP.instantiateClass(config);
       }

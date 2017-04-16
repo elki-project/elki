@@ -1,7 +1,5 @@
-
 description = 'ELKI - Tutorial Algorithms'
 dependencies {
-    compile group: 'net.sf.trove4j', name: 'trove4j', version:'[3.0.3,)'
   compile project(':elki')
   compile project(':elki-batik-visualization')
 }

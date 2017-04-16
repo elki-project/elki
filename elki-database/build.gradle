@@ -1,8 +1,5 @@
 description = 'ELKI - Database'
 dependencies {
-  compile project(':elki-core-api')
-  compile project(':elki-core-data')
-  compile project(':elki-core-distance')
   compile project(':elki-index')
   compile project(':elki-input')
 }

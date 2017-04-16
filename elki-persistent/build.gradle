@@ -1,9 +1,6 @@
-
 description = 'ELKI - Persistence Layer'
 dependencies {
-  compile project(':elki-logging')
-  compile project(':elki-core-api')
-  compile project(':elki-core-util')
+  // We require integer ids here, for now.
   compile project(':elki-core-dbids-int')
-    testCompile group: 'junit', name: 'junit', version:'[4.8,)'
+  testCompile group: 'junit', name: 'junit', version:'[4.8,)'
 }

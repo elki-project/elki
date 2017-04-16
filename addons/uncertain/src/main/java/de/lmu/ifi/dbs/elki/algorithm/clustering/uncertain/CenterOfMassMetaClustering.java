@@ -48,7 +48,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Center-of-mass meta clustering reduces uncertain objects to their center of
@@ -161,7 +160,7 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<ClusteringAlgorithm<C>> palgorithm = new ObjectParameter<>(AlgorithmStep.Parameterizer.ALGORITHM_ID, ClusteringAlgorithm.class);
+      ObjectParameter<ClusteringAlgorithm<C>> palgorithm = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, ClusteringAlgorithm.class);
       if(config.grab(palgorithm)) {
         inner = palgorithm.instantiateClass(config);
         if(inner != null && inner.getInputTypeRestriction().length > 0 && //
