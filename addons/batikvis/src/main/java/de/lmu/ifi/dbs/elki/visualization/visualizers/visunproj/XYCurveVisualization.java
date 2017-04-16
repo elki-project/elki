@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
+import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionRecallCurve;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierPrecisionRecallCurve.PRCurve;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve.ROCResult;
@@ -143,7 +144,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
     }
     if(curve instanceof PRCurve) {
       double prauc = ((PRCurve) curve).getAUC();
-      String lt = PRCurve.PRAUC_LABEL + ": " + FormatUtil.NF.format(prauc);
+      String lt = OutlierPrecisionRecallCurve.PRAUC_LABEL + ": " + FormatUtil.NF.format(prauc);
       if(prauc <= 0.5) {
         Element auclbl = plot.svgText(sizex * 0.5, sizey * 0.10, lt);
         SVGUtil.setCSSClass(auclbl, CSS_AXIS_LABEL);

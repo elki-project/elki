@@ -68,26 +68,6 @@ public class JudgeOutlierScores implements Evaluator {
   private static final Logging LOG = Logging.getLogger(JudgeOutlierScores.class);
 
   /**
-   * The distance function to determine the reachability distance between
-   * database objects.
-   * <p>
-   * Default value: {@link EuclideanDistanceFunction}
-   * </p>
-   * <p>
-   * Key: {@code -comphist.positive}
-   * </p>
-   */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("comphist.positive", "Class label for the 'positive' class.");
-
-  /**
-   * Parameter to specify a scaling function to use.
-   * <p>
-   * Key: {@code -comphist.scaling}
-   * </p>
-   */
-  public static final OptionID SCALING_ID = new OptionID("comphist.scaling", "Class to use as scaling function.");
-
-  /**
    * Stores the "positive" class.
    */
   private Pattern positiveClassName;
@@ -205,6 +185,26 @@ public class JudgeOutlierScores implements Evaluator {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The distance function to determine the reachability distance between
+     * database objects.
+     * <p>
+     * Default value: {@link EuclideanDistanceFunction}
+     * </p>
+     * <p>
+     * Key: {@code -comphist.positive}
+     * </p>
+     */
+    public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("comphist.positive", "Class label for the 'positive' class.");
+
+    /**
+     * Parameter to specify a scaling function to use.
+     * <p>
+     * Key: {@code -comphist.scaling}
+     * </p>
+     */
+    public static final OptionID SCALING_ID = new OptionID("comphist.scaling", "Class to use as scaling function.");
+
     /**
      * Stores the "positive" class.
      */

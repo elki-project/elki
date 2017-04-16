@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering;
 import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -112,12 +113,13 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
     }
     FiniteProgress progress = LOG.isVerbose() ? new FiniteProgress("Computing ROC AUC values", relation.size(), LOG) : null;
 
+    ROCEvaluation roc = new ROCEvaluation();
     MeanVariance mv = new MeanVariance();
     // sort neighbors
     for(Cluster<?> clus : split) {
       for(DBIDIter iter = clus.getIDs().iter(); iter.valid(); iter.advance()) {
         KNNList knn = knnQuery.getKNNForDBID(iter, relation.size());
-        double result = new ROCEvaluation().evaluate(clus, knn);
+        double result = EvaluateClustering.evaluateRanking(roc, clus, knn);
 
         mv.put(result);
         hist.increment(result, 1. / relation.size());
@@ -161,6 +163,7 @@ public class RankingQualityHistogram<O> extends AbstractDistanceBasedAlgorithm<O
      * Option to configure the number of bins to use.
      */
     public static final OptionID HISTOGRAM_BINS_ID = new OptionID("rankqual.bins", "Number of bins to use in the histogram");
+
     /**
      * Number of bins.
      */

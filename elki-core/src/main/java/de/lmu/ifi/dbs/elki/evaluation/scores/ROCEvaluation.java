@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @apiviz.has XYCurve
  */
-public class ROCEvaluation extends AbstractScoreEvaluation {
+public class ROCEvaluation implements ScoreEvaluation {
   /**
    * Static instance
    */

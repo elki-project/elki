@@ -28,7 +28,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class MaximumF1Evaluation extends AbstractScoreEvaluation {
+public class MaximumF1Evaluation implements ScoreEvaluation {
   /**
    * Static instance
    */

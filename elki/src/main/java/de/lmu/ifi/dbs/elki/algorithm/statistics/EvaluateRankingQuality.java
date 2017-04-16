@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
+import de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering;
 import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
@@ -132,6 +133,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
     }
     FiniteProgress rocloop = LOG.isVerbose() ? new FiniteProgress("Computing ROC AUC values", relation.size(), LOG) : null;
 
+    ROCEvaluation roc = new ROCEvaluation();
     // sort neighbors
     for(Cluster<?> clus : split) {
       ModifiableDoubleDBIDList cmem = DBIDUtil.newDistanceDBIDList(clus.size());
@@ -146,7 +148,7 @@ public class EvaluateRankingQuality<V extends NumberVector> extends AbstractDist
 
       for(DBIDArrayIter it = cmem.iter(); it.valid(); it.advance()) {
         KNNList knn = knnQuery.getKNNForDBID(it, relation.size());
-        double result = new ROCEvaluation().evaluate(clus, knn);
+        double result = EvaluateClustering.evaluateRanking(roc, clus, knn);
 
         hist.put(((double) it.getOffset()) / clus.size(), result);
 

@@ -25,9 +25,15 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.ClusteringAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelOrAllInOneClustering;
+import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
+import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DBIDsTest;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DistanceResultAdapter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
@@ -102,6 +108,18 @@ public class EvaluateClustering implements Evaluator {
     this.referencealg = referencealg;
     this.noiseSpecialHandling = noiseSpecialHandling;
     this.selfPairing = selfPairing;
+  }
+  
+  /**
+   * Evaluate given a cluster (of positive elements) and a scoring list.
+   *
+   * @param eval Evaluation method
+   * @param clus Cluster object
+   * @param ranking Object ranking
+   * @return Score
+   */
+  public static double evaluateRanking(ScoreEvaluation eval, Cluster<?> clus, DoubleDBIDList ranking) {
+    return eval.evaluate(new DBIDsTest(DBIDUtil.ensureSet(clus.getIDs())), new DistanceResultAdapter(ranking.iter()));
   }
 
   @Override

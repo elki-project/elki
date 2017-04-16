@@ -35,14 +35,9 @@ import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.OutlierScoreAdapter;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.SimpleAdapter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.*;
+import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterXYCurve;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -69,12 +64,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @apiviz.has ROCResult oneway - - «create»
  */
 @Alias({ "de.lmu.ifi.dbs.elki.evaluation.roc.ComputeROCCurve", //
-"de.lmu.ifi.dbs.elki.evaluation.ComputeROCCurve" })
+    "de.lmu.ifi.dbs.elki.evaluation.ComputeROCCurve" })
 public class OutlierROCCurve implements Evaluator {
   /**
    * The label we use for marking ROCAUC values.
    */
-  public static final String ROCAUC_LABEL = "ROCAUC";
+  public static final String ROCAUC_LABEL = "ROC AUC";
 
   /**
    * The logger.
@@ -127,8 +122,14 @@ public class OutlierROCCurve implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
-      db.getHierarchy().add(o, computeROCResult(o.getScores().size(), positiveids, o));
-      // Process them only once.
+      ROCResult rocres = computeROCResult(o.getScores().size(), positiveids, o);
+      db.getHierarchy().add(o, rocres);
+      EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), o, "Evaluation of ranking", "ranking-evaluation");
+      MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");
+      if(!g.hasMeasure(ROCAUC_LABEL)) {
+        g.addMeasure(ROCAUC_LABEL, rocres.auc, 0., 1., false);
+      }
+      // Process each ordering only once.
       orderings.remove(o.getOrdering());
       nonefound = false;
     }
@@ -137,7 +138,13 @@ public class OutlierROCCurve implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
-      db.getHierarchy().add(or, computeROCResult(or.getDBIDs().size(), positiveids, sorted));
+      ROCResult rocres = computeROCResult(or.getDBIDs().size(), positiveids, sorted);
+      db.getHierarchy().add(or, rocres);
+      EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), or, "Evaluation of ranking", "ranking-evaluation");
+      MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");
+      if(!g.hasMeasure(ROCAUC_LABEL)) {
+        g.addMeasure(ROCAUC_LABEL, rocres.auc, 0., 1., false);
+      }
       nonefound = false;
     }
 
@@ -153,7 +160,7 @@ public class OutlierROCCurve implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class ROCResult extends XYCurve implements TextWriteable {
+  public static class ROCResult extends XYCurve {
     /**
      * AUC value
      */
@@ -185,13 +192,6 @@ public class OutlierROCCurve implements Evaluator {
     @Override
     public String getShortName() {
       return "roc-curve";
-    }
-
-    @Override
-    public void writeToText(TextWriterStream out, String label) {
-      out.commentPrintLn(ROCAUC_LABEL + ": " + auc);
-      out.flush();
-      new TextWriterXYCurve().write(out, label, this);
     }
   }
 

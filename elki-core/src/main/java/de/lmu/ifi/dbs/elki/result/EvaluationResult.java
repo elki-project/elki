@@ -222,6 +222,21 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
       return this;
     }
 
+    /**
+     * Check if a measurement already exists.
+     *
+     * @param name Measurement name
+     * @return {@code true} if measurement exists
+     */
+    public boolean hasMeasure(String name) {
+      for(Measurement m : measurements) {
+        if(m.name.equals(name)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
     @Override
     public Iterator<Measurement> iterator() {
       return measurements.iterator();

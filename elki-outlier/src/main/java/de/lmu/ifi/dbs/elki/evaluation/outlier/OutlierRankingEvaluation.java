@@ -81,14 +81,16 @@ public class OutlierRankingEvaluation implements Evaluator {
   }
 
   private EvaluationResult evaluateOutlierResult(int size, SetDBIDs positiveids, OutlierResult or) {
-    EvaluationResult res = new EvaluationResult("Evaluation of ranking", "ranking-evaluation");
+    EvaluationResult res = EvaluationResult.findOrCreate(or.getHierarchy(), or, "Evaluation of ranking", "ranking-evaluation");
     DBIDsTest test = new DBIDsTest(positiveids);
 
     final int pos = positiveids.size();
     final double rate = pos / (double) size;
-    MeasurementGroup g = res.newGroup("Evaluation measures:");
+    MeasurementGroup g = res.findOrCreateGroup("Evaluation measures");
     double rocauc = ROCEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
-    g.addMeasure("ROC AUC", rocauc, 0., 1., .5, false);
+    if(!g.hasMeasure("ROC AUC")) {
+      g.addMeasure("ROC AUC", rocauc, 0., 1., .5, false);
+    }
     double avep = AveragePrecisionEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
     g.addMeasure("Average Precision", avep, 0., 1., rate, false);
     double rprec = PrecisionAtKEvaluation.RPRECISION.evaluate(test, new OutlierScoreAdapter(or));
@@ -101,7 +103,7 @@ public class OutlierRankingEvaluation implements Evaluator {
     double ndcg = NDCGEvaluation.STATIC.evaluate(test, new OutlierScoreAdapter(or));
     g.addMeasure("NDCG", ndcg, 0., 1., NDCGEvaluation.STATIC.expected(pos, size), false);
 
-    g = res.newGroup("Adjusted for chance:");
+    g = res.findOrCreateGroup("Adjusted for chance");
     double adjauc = 2 * rocauc - 1;
     g.addMeasure("Adjusted AUC", adjauc, 0., 1., 0., false);
     double adjavep = (avep - rate) / (1 - rate);

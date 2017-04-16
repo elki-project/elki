@@ -33,14 +33,8 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.*;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriteable;
-import de.lmu.ifi.dbs.elki.result.textwriter.TextWriterStream;
-import de.lmu.ifi.dbs.elki.result.textwriter.writers.TextWriterXYCurve;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -56,6 +50,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.PatternParameter;
  * @apiviz.has PRCurve
  */
 public class OutlierPrecisionRecallCurve implements Evaluator {
+  /**
+   * AUC value for PR curve
+   */
+  public static final String PRAUC_LABEL = "PR AUC";
+
   /**
    * The logger.
    */
@@ -92,8 +91,10 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       DBIDs sorted = o.getOrdering().order(o.getOrdering().getDBIDs());
-      XYCurve curve = computePrecisionResult(o.getScores().size(), positiveids, sorted.iter(), o.getScores());
+      PRCurve curve = computePrecisionResult(o.getScores().size(), positiveids, sorted.iter(), o.getScores());
       db.getHierarchy().add(o, curve);
+      EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), o, "Evaluation of ranking", "ranking-evaluation");
+      ev.findOrCreateGroup("Evaluation measures").addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
       // Process them only once.
       orderings.remove(o.getOrdering());
     }
@@ -102,15 +103,17 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
-      XYCurve curve = computePrecisionResult(or.getDBIDs().size(), positiveids, sorted.iter(), null);
+      PRCurve curve = computePrecisionResult(or.getDBIDs().size(), positiveids, sorted.iter(), null);
       db.getHierarchy().add(or, curve);
+      EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), or, "Evaluation of ranking", "ranking-evaluation");
+      ev.findOrCreateGroup("Evaluation measures").addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
     }
   }
 
-  private XYCurve computePrecisionResult(int size, SetDBIDs ids, DBIDIter iter, DoubleRelation scores) {
+  private PRCurve computePrecisionResult(int size, SetDBIDs ids, DBIDIter iter, DoubleRelation scores) {
     final int postot = ids.size();
     int poscnt = 0, total = 0;
-    XYCurve curve = new PRCurve(postot + 2, postot);
+    PRCurve curve = new PRCurve(postot + 2, postot);
 
     double prevscore = Double.NaN;
     for(; iter.valid(); iter.advance()) {
@@ -150,12 +153,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
    *
    * @author Erich Schubert
    */
-  public static class PRCurve extends XYCurve implements TextWriteable {
-    /**
-     * AUC value for PR curve
-     */
-    public static final String PRAUC_LABEL = "PR-AUC";
-
+  public static class PRCurve extends XYCurve {
     /**
      * Area under curve
      */
@@ -198,13 +196,6 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
         auc = areaUnderCurve(this) / max;
       }
       return auc;
-    }
-
-    @Override
-    public void writeToText(TextWriterStream out, String label) {
-      out.commentPrintLn(PRAUC_LABEL + ": " + getAUC());
-      out.flush();
-      new TextWriterXYCurve().write(out, label, this);
     }
   }
 

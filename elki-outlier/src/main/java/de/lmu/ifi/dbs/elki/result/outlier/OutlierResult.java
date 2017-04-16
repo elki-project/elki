@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DBIDsTest;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.OutlierScoreAdapter;
+import de.lmu.ifi.dbs.elki.result.*;
 
 /**
  * Wrap a typical Outlier result, keeping direct references to the main result
@@ -118,5 +118,15 @@ public class OutlierResult extends BasicResult {
       return ResultUtil.filterResults(((HierarchicalResult) r).getHierarchy(), r, OutlierResult.class);
     }
     return Collections.emptyList();
+  }
+
+  /**
+   * Evaluate given a set of positives and a scoring.
+   *
+   * @param eval Evaluation measure
+   * @return Score
+   */
+  double evaluateBy(ScoreEvaluation eval) {
+    return eval.evaluate(new DBIDsTest(DBIDUtil.ensureSet(scores.getDBIDs())), new OutlierScoreAdapter(this));
   }
 }

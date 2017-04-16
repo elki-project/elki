@@ -47,7 +47,7 @@ import net.jafama.FastMath;
     title = "Cumulated gain-based evaluation of IR techniques", //
     booktitle = "ACM Transactions on Information Systems (TOIS)", //
     url = "http://dx.doi.org/10.1145/582415.582418")
-public class NDCGEvaluation extends AbstractScoreEvaluation {
+public class NDCGEvaluation implements ScoreEvaluation {
   /**
    * Static instance
    */

@@ -20,10 +20,11 @@
  */
 package de.lmu.ifi.dbs.elki.evaluation.scores;
 
-import de.lmu.ifi.dbs.elki.data.Cluster;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDList;
-import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DBIDsTest;
+import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DistanceResultAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.Iter;
 
 /**
@@ -51,31 +52,15 @@ public interface ScoreEvaluation {
   <I extends ScoreIter> double evaluate(Predicate<? super I> predicate, I iter);
 
   /**
-   * Evaluate given a cluster (of positive elements) and a scoring list.
-   *
-   * @param clus Cluster object
-   * @param nei Query result
-   * @return Score
-   */
-  double evaluate(Cluster<?> clus, DoubleDBIDList nei);
-
-  /**
    * Evaluate given a list of positives and a scoring.
    *
    * @param ids Positive IDs, usually a set.
    * @param nei Query Result
    * @return Score
    */
-  double evaluate(DBIDs ids, DoubleDBIDList nei);
-
-  /**
-   * Evaluate given a set of positives and a scoring.
-   *
-   * @param ids Positive IDs, usually a set.
-   * @param outlier Outlier detection result
-   * @return Score
-   */
-  double evaluate(DBIDs ids, OutlierResult outlier);
+  default double evaluate(DBIDs ids, DoubleDBIDList nei) {
+    return evaluate(new DBIDsTest(DBIDUtil.ensureSet(ids)), new DistanceResultAdapter(nei.iter()));
+  }
 
   /**
    * Expected score for a random result.
