@@ -1,0 +1,8 @@
+description = 'ELKI - Unit Test Core'
+dependencies {
+  compile project(':elki-core-distance')
+  compile project(':elki-database')
+  compile project(':elki-core')
+  // Since this is a test-only module, we want to export the core classes.
+  compile group: 'junit', name: 'junit', version:'[4.8,)'
+}

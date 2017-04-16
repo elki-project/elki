@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public abstract class AbstractIndexStructureTest {
   // the following values depend on the data set used!
-  String dataset = "data/testdata/unittests/hierarchical-3d2d1d.csv";
+  String dataset = "elki/testdata/unittests/hierarchical-3d2d1d.csv";
 
   // size of the data set
   int shoulds = 600;

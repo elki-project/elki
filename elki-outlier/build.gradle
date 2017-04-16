@@ -10,5 +10,6 @@ dependencies {
   compile project(':elki-input')
   compile project(':elki-index')
   compile project(':elki-index-rtree')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }
 

@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public class KNNJoinTest {
   // the following values depend on the data set used!
-  String dataset = "data/testdata/unittests/uebungsblatt-2d-mini.csv";
+  String dataset = "elki/testdata/unittests/uebungsblatt-2d-mini.csv";
 
   // size of the data set
   int shoulds = 20;

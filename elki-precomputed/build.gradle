@@ -7,5 +7,9 @@ dependencies {
   compile project(':elki-database')
   compile project(':elki-input')
   compile project(':elki-index')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+  // We use clustering algorithms in testing.
+  testCompile project(':elki-clustering')
+  testCompile project(path: ':elki-clustering', configuration: 'testOutput')
 }
 

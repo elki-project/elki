@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
  * 
  */
 public class RelationSortingTest {
-  public static final String filename = "data/testdata/unittests/hierarchical-3d2d1d.csv";
+  public static final String filename = "elki/testdata/unittests/hierarchical-3d2d1d.csv";
 
   @Test
   public void testSorting() {

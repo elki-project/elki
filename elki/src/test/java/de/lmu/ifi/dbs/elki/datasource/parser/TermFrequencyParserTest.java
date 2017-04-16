@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public class TermFrequencyParserTest {
   /** Test data set to use. */
-  public static String DBLP_DATA = "data/testdata/parsing/termfreq-dblp.ascii.gz";
+  public static String DBLP_DATA = "elki/testdata/parsing/termfreq-dblp.ascii.gz";
 
   @Test
   public void testDBLPData() throws IOException {

@@ -29,6 +29,7 @@ module 'elki-index-rtree'
 module 'elki-index-mtree'
 module 'elki-precomputed'
 module 'elki-gui-minigui'
+module 'elki-test-core'
 module 'elki'
 module 'elki-docutil'
 // Addons:

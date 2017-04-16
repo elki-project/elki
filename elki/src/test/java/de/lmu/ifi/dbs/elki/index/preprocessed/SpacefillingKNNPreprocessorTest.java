@@ -48,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  */
 public class SpacefillingKNNPreprocessorTest {
   // the following values depend on the data set used!
-  static String dataset = "data/testdata/unittests/3clusters-and-noise-2d.csv";
+  static String dataset = "elki/testdata/unittests/3clusters-and-noise-2d.csv";
 
   // number of kNN to query
   int k = 10;

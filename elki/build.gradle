@@ -23,6 +23,9 @@ dependencies {
   compile project(':elki-precomputed')
   runtime project(':elki-core-dbids-int')
   testCompile project(':elki-docutil')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+  testCompile project(path: ':elki-outlier', configuration: 'testOutput')
+  testCompile project(path: ':elki-clustering', configuration: 'testOutput')
   testCompile group: 'junit', name: 'junit', version:'[4.8,)'
 }
 

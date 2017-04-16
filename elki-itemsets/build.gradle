@@ -3,5 +3,6 @@ dependencies {
   compile project(':elki-core-api')
   compile project(':elki-core-data')
   compile project(':elki-core')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }
 
