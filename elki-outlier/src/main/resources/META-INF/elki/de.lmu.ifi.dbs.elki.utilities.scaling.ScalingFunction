@@ -1,8 +1,3 @@
-de.lmu.ifi.dbs.elki.utilities.scaling.IdentityScaling
-de.lmu.ifi.dbs.elki.utilities.scaling.ClipScaling
-de.lmu.ifi.dbs.elki.utilities.scaling.GammaScaling
-de.lmu.ifi.dbs.elki.utilities.scaling.LinearScaling
-de.lmu.ifi.dbs.elki.utilities.scaling.MinusLogScaling
 de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierLinearScaling
 de.lmu.ifi.dbs.elki.utilities.scaling.outlier.TopKOutlierScaling
 de.lmu.ifi.dbs.elki.utilities.scaling.outlier.COPOutlierScaling

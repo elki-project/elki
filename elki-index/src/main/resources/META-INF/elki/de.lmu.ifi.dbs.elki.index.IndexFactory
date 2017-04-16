@@ -1,0 +1,4 @@
+de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix$Factory
+de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedSimilarityMatrix$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor$Factory

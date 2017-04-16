@@ -1,73 +1,8 @@
-de.lmu.ifi.dbs.elki.algorithm.clustering.CanopyPreClustering
-de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN
-de.lmu.ifi.dbs.elki.algorithm.clustering.NaiveMeanShiftClustering
-de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.LSDBC
-de.lmu.ifi.dbs.elki.algorithm.clustering.GriDBSCAN
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK de.lmu.ifi.dbs.elki.algorithm.clustering.SLINK clustering.SLINK single-link single-linkage
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AnderbergHierarchicalClustering
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NNChain
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.AGNES HAC NaiveAgglomerativeHierarchicalClustering de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.NaiveAgglomerativeHierarchicalClustering
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CLINK Defays
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.HDBSCANLinearMemory
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINKHDBSCANLinearMemory
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMaxAnderberg
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMaxNNChain
-de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MiniMax
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansSort
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansCompare
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHamerly
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansElkan
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd de.lmu.ifi.dbs.elki.algorithm.clustering.KMeans de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.parallel.ParallelLloydKMeans
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMacQueen
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansMinusMinus
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMediansLloyd
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsPAM
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMedoidsEM
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.CLARA
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.BestOfMultipleKMeans
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBisecting
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansBatchedLloyd
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansHybridLloydMacQueen
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans
-de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.XMeans
-de.lmu.ifi.dbs.elki.algorithm.clustering.Leader
-de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSHeap de.lmu.ifi.dbs.elki.algorithm.clustering.OPTICS
-de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSList
 de.lmu.ifi.dbs.elki.algorithm.clustering.optics.DeLiClu de.lmu.ifi.dbs.elki.algorithm.clustering.DeLiClu
 de.lmu.ifi.dbs.elki.algorithm.outlier.clustering.SilhouetteOutlierDetection
 de.lmu.ifi.dbs.elki.algorithm.outlier.clustering.CBLOF
-de.lmu.ifi.dbs.elki.algorithm.outlier.COP
-de.lmu.ifi.dbs.elki.algorithm.outlier.distance.DBOutlierDetection de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierDetection
-de.lmu.ifi.dbs.elki.algorithm.outlier.distance.DBOutlierScore de.lmu.ifi.dbs.elki.algorithm.outlier.DBOutlierScore
-de.lmu.ifi.dbs.elki.algorithm.outlier.distance.HilOut de.lmu.ifi.dbs.elki.algorithm.outlier.HilOut
-de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNOutlier de.lmu.ifi.dbs.elki.algorithm.outlier.KNNOutlier knno
-de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNWeightOutlier de.lmu.ifi.dbs.elki.algorithm.outlier.KNNWeightOutlier knnw
-de.lmu.ifi.dbs.elki.algorithm.outlier.distance.KNNDD
-de.lmu.ifi.dbs.elki.algorithm.outlier.distance.LocalIsolationCoefficient
-de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ODIN de.lmu.ifi.dbs.elki.algorithm.outlier.ODIN
-de.lmu.ifi.dbs.elki.algorithm.outlier.distance.ReferenceBasedOutlierDetection de.lmu.ifi.dbs.elki.algorithm.outlier.ReferenceBasedOutlierDetection
-de.lmu.ifi.dbs.elki.algorithm.outlier.distance.parallel.ParallelKNNOutlier
-de.lmu.ifi.dbs.elki.algorithm.outlier.distance.parallel.ParallelKNNWeightOutlier
-de.lmu.ifi.dbs.elki.algorithm.outlier.DWOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.OPTICSOF
 de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleCOP
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF de.lmu.ifi.dbs.elki.algorithm.outlier.LOF
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel.ParallelLOF
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.COF
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.INFLO de.lmu.ifi.dbs.elki.algorithm.outlier.INFLO
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.KDEOS
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDF de.lmu.ifi.dbs.elki.algorithm.outlier.LDF
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LDOF de.lmu.ifi.dbs.elki.algorithm.outlier.LDOF
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOCI de.lmu.ifi.dbs.elki.algorithm.outlier.LOCI
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimplifiedLOF de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleLOF
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel.ParallelSimplifiedLOF
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.SimpleKernelDensityLOF de.lmu.ifi.dbs.elki.algorithm.outlier.SimpleKernelDensityLOF
-de.lmu.ifi.dbs.elki.algorithm.outlier.lof.VarianceOfVolume
-de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuGLSBackwardSearchAlgorithm
-de.lmu.ifi.dbs.elki.algorithm.outlier.spatial.CTLuRandomWalkEC
-de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IDOS
-de.lmu.ifi.dbs.elki.algorithm.outlier.intrinsic.IntrinsicDimensionalityOutlier
 de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceQuantileSampler
 de.lmu.ifi.dbs.elki.algorithm.statistics.DistanceStatisticsWithClasses
@@ -80,7 +15,6 @@ de.lmu.ifi.dbs.elki.algorithm.statistics.RankingQualityHistogram
 de.lmu.ifi.dbs.elki.algorithm.benchmark.KNNBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.RangeQueryBenchmarkAlgorithm
 de.lmu.ifi.dbs.elki.algorithm.benchmark.ValidateApproximativeKNNIndex
-de.lmu.ifi.dbs.elki.algorithm.classification.KNNClassifier
 de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator
 de.lmu.ifi.dbs.elki.algorithm.KNNDistancesSampler de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder
 de.lmu.ifi.dbs.elki.algorithm.KNNJoin

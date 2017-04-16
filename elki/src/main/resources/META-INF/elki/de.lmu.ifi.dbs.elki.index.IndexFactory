@@ -1,5 +1,3 @@
-de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix$Factory
-de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedSimilarityMatrix$Factory
 de.lmu.ifi.dbs.elki.index.tree.metrical.covertree.CoverTree$Factory
 de.lmu.ifi.dbs.elki.index.tree.metrical.covertree.SimplifiedCoverTree$Factory
 de.lmu.ifi.dbs.elki.index.tree.spatial.kd.SmallMemoryKDTree$Factory smallkd kd
@@ -10,8 +8,6 @@ de.lmu.ifi.dbs.elki.index.lsh.InMemoryLSHIndex
 de.lmu.ifi.dbs.elki.index.vafile.VAFile$Factory
 de.lmu.ifi.dbs.elki.index.vafile.PartialVAFile$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.CachedDoubleDistanceKNNPreprocessor$Factory
-de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor$Factory
-de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.NNDescent$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.KNNJoinMaterializeKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.MetricalIndexApproximationMaterializeKNNPreprocessor$Factory
@@ -21,10 +17,7 @@ de.lmu.ifi.dbs.elki.index.preprocessed.knn.RandomSampleKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingMaterializeKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.NaiveProjectedKNNPreprocessor$Factory
-de.lmu.ifi.dbs.elki.index.preprocessed.localpca.KNNQueryFilteredPCAIndex$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex$Factory
-de.lmu.ifi.dbs.elki.index.preprocessed.preference.HiSCPreferenceVectorIndex$Factory
-de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.projected.LatLngAsECEFIndex$Factory
 de.lmu.ifi.dbs.elki.index.projected.LngLatAsECEFIndex$Factory
 de.lmu.ifi.dbs.elki.index.projected.ProjectedIndex$Factory

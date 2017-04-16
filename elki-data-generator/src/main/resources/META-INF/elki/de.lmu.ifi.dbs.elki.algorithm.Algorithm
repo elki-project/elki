@@ -1,0 +1,2 @@
+de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByModelClustering
+de.lmu.ifi.dbs.elki.algorithm.outlier.trivial.TrivialGeneratedOutlier

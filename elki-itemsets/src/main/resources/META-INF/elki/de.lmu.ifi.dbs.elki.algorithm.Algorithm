@@ -1,0 +1,4 @@
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.associationrules.AssociationRuleGeneration
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.APRIORI de.lmu.ifi.dbs.elki.algorithm.APRIORI
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.Eclat
+de.lmu.ifi.dbs.elki.algorithm.itemsetmining.FPGrowth

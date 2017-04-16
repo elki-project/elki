@@ -1,6 +1,5 @@
 de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection de.lmu.ifi.dbs.elki.database.connection.FileBasedDatabaseConnection
 de.lmu.ifi.dbs.elki.datasource.BundleDatabaseConnection
-de.lmu.ifi.dbs.elki.datasource.GeneratorXMLDatabaseConnection
 de.lmu.ifi.dbs.elki.datasource.RandomDoubleVectorDatabaseConnection
 de.lmu.ifi.dbs.elki.datasource.DBIDRangeDatabaseConnection
 de.lmu.ifi.dbs.elki.datasource.ExternalIDJoinDatabaseConnection
