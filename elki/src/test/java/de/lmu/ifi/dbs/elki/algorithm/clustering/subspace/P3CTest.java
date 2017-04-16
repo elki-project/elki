@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.subspace;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.3
  */
-public class P3CTest extends AbstractSimpleAlgorithmTest {
+public class P3CTest extends AbstractClusterAlgorithmTest {
   /**
    * Run P3C with fixed parameters and compare the result to a golden standard.
    */

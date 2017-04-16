@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.index.preprocessed.fastoptics.RandomProjectedNeighborsAndDensities;
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class FastOPTICSTest extends AbstractSimpleAlgorithmTest {
+public class FastOPTICSTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testFastOPTICS() {
     Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710);

@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.lof.parallel;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.lof.LOF;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class ParallelSimplifiedLOFTest extends AbstractSimpleAlgorithmTest {
+public class ParallelSimplifiedLOFTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testParallelSimplifiedLOF() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-axis-subspaces-6d.ascii", 1345);

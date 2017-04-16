@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.subspace;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Lucia Cichella
  * @since 0.4.0
  */
-public class AggarwalYuNaiveTest extends AbstractSimpleAlgorithmTest {
+public class AggarwalYuNaiveTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testAggarwalYuNaive() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);

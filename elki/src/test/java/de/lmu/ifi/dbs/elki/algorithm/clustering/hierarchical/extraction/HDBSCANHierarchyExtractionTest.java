@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  *
  * @author Erich Schubert
  */
-public class HDBSCANHierarchyExtractionTest extends AbstractSimpleAlgorithmTest {
+public class HDBSCANHierarchyExtractionTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testSLINKResults() {
     Database db = makeSimpleDatabase(UNITTEST + "3clusters-and-noise-2d.csv", 330);

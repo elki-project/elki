@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.gdbscan.parallel;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.7.2
  */
-public class ParallelGeneralizedDBSCANTest extends AbstractSimpleAlgorithmTest {
+public class ParallelGeneralizedDBSCANTest extends AbstractClusterAlgorithmTest {
   /**
    * Run Generalized DBSCAN with fixed parameters and compare the result to a
    * golden standard.

@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  *
  * @author Erich Schubert
  */
-public class LeaderTest extends AbstractSimpleAlgorithmTest {
+public class LeaderTest extends AbstractClusterAlgorithmTest {
   /**
    * Run Leader with fixed parameters and compare the result to a golden
    * standard.

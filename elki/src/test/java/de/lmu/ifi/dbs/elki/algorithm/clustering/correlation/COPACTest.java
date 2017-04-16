@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.correlation;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.DBSCAN;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Katharina Rausch
  * @since 0.3
  */
-public class COPACTest extends AbstractSimpleAlgorithmTest {
+public class COPACTest extends AbstractClusterAlgorithmTest {
   /**
    * Run COPAC with fixed parameters and compare the result to a golden
    * standard.

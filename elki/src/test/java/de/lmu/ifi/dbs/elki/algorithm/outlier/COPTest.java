@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.AutotuningPCA;
@@ -40,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.7.1
  */
-public class COPTest extends AbstractSimpleAlgorithmTest {
+public class COPTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testCOP() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);

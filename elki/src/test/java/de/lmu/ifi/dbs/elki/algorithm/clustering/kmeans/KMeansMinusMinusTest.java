@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.7.2
  */
-public class KMeansMinusMinusTest extends AbstractSimpleAlgorithmTest {
+public class KMeansMinusMinusTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testKMeansMinusMinusRateZero() {
     Database db = makeSimpleDatabase(UNITTEST + "different-densities-2d-no-noise.ascii", 1000);

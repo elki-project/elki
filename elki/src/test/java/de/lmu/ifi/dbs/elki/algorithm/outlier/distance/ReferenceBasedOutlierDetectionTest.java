@@ -22,16 +22,12 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.distance;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
-import de.lmu.ifi.dbs.elki.utilities.referencepoints.AxisBasedReferencePoints;
-import de.lmu.ifi.dbs.elki.utilities.referencepoints.GridBasedReferencePoints;
-import de.lmu.ifi.dbs.elki.utilities.referencepoints.RandomGeneratedReferencePoints;
-import de.lmu.ifi.dbs.elki.utilities.referencepoints.RandomSampleReferencePoints;
-import de.lmu.ifi.dbs.elki.utilities.referencepoints.StarBasedReferencePoints;
+import de.lmu.ifi.dbs.elki.utilities.referencepoints.*;
 
 /**
  * Tests the ReferenceBasedOutlierDetection algorithm.
@@ -40,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.referencepoints.StarBasedReferencePoints;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class ReferenceBasedOutlierDetectionTest extends AbstractSimpleAlgorithmTest {
+public class ReferenceBasedOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testReferenceBasedOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-3d-3clusters.ascii", 960);

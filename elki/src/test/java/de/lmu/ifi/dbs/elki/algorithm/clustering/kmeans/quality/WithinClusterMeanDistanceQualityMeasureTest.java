@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.AbstractKMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeansLloyd;
@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Stephan Baier
  * @since 0.6.0
  */
-public class WithinClusterMeanDistanceQualityMeasureTest extends AbstractSimpleAlgorithmTest {
+public class WithinClusterMeanDistanceQualityMeasureTest extends AbstractClusterAlgorithmTest {
   /**
    * Test cluster average overall distance.
    */

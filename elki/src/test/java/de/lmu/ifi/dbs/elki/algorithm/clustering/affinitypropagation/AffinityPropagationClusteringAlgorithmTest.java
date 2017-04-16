@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.affinitypropagation;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.MedoidModel;
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.7.1
  */
-public class AffinityPropagationClusteringAlgorithmTest extends AbstractSimpleAlgorithmTest {
+public class AffinityPropagationClusteringAlgorithmTest extends AbstractClusterAlgorithmTest {
   /**
    * Run AffinityPropagationClusteringAlgorithm with fixed parameters and
    * compare the result to a golden standard.

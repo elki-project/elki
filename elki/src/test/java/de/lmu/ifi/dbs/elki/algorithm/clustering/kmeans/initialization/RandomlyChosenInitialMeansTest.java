@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.initialization;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.AbstractKMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.SingleAssignmentKMeans;
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class RandomlyChosenInitialMeansTest extends AbstractSimpleAlgorithmTest {
+public class RandomlyChosenInitialMeansTest extends AbstractClusterAlgorithmTest {
   /**
    * Run KMeans with fixed parameters and compare the result to a golden
    * standard.

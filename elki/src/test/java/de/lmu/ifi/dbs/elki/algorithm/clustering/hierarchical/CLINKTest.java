@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class CLINKTest extends AbstractSimpleAlgorithmTest {
+public class CLINKTest extends AbstractClusterAlgorithmTest {
   /**
    * Run CLINK with fixed parameters and compare the result to a golden
    * standard.

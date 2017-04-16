@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.3
  */
-public class GriDBSCANTest extends AbstractSimpleAlgorithmTest {
+public class GriDBSCANTest extends AbstractClusterAlgorithmTest {
   /**
    * Run DBSCAN with fixed parameters and compare the result to a golden
    * standard.

@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.optics;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class OPTICSHeapTest extends AbstractSimpleAlgorithmTest {
+public class OPTICSHeapTest extends AbstractClusterAlgorithmTest {
   /**
    * Run OPTICS with fixed parameters and compare the result to a golden
    * standard.

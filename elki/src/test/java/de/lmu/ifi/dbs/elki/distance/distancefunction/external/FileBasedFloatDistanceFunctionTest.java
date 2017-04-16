@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByHeight;
 import de.lmu.ifi.dbs.elki.data.Clustering;
@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class FileBasedFloatDistanceFunctionTest extends AbstractSimpleAlgorithmTest {
+public class FileBasedFloatDistanceFunctionTest extends AbstractClusterAlgorithmTest {
   final static String FILENAME = "data/testdata/unittests/distance/AsciiDistanceMatrix.ascii";
 
   @Test

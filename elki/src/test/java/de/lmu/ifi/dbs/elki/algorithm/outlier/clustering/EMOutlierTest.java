@@ -22,9 +22,9 @@ package de.lmu.ifi.dbs.elki.algorithm.outlier.clustering;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.em.EM;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.kmeans.KMeans;
+import de.lmu.ifi.dbs.elki.algorithm.outlier.AbstractOutlierAlgorithmTest;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class EMOutlierTest extends AbstractSimpleAlgorithmTest {
+public class EMOutlierTest extends AbstractOutlierAlgorithmTest {
   @Test
   public void testEMOutlierDetection() {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-parabolic.ascii", 530);

@@ -24,7 +24,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.trivial.ByLabelClustering;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class DeLiCluTest extends AbstractSimpleAlgorithmTest {
+public class DeLiCluTest extends AbstractClusterAlgorithmTest {
   /**
    * Run DeLiClu with fixed parameters and compare the result to a golden
    * standard.

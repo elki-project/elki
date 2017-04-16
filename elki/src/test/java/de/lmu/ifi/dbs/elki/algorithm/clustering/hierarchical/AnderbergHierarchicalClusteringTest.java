@@ -22,7 +22,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.algorithm.AbstractSimpleAlgorithmTest;
+import de.lmu.ifi.dbs.elki.algorithm.clustering.AbstractClusterAlgorithmTest;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.extraction.CutDendrogramByNumberOfClusters;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class AnderbergHierarchicalClusteringTest extends AbstractSimpleAlgorithmTest {
+public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorithmTest {
   // TODO: add more data sets.
 
   /**
