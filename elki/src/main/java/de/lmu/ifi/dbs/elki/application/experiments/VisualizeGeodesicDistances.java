@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.application.geo;
+package de.lmu.ifi.dbs.elki.application.experiments;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphereUtil;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
@@ -50,6 +51,7 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.5.5
  */
+@Alias({ "de.lmu.ifi.dbs.elki.application.geo.VisualizeGeodesicDistances" })
 public class VisualizeGeodesicDistances extends AbstractApplication {
   /**
    * Get a logger for this class.
@@ -140,34 +142,37 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
     int green = 0xff00ff00;
 
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("columns", width, LOG) : null;
-    for (int x = 0; x < width; x++) {
+    for(int x = 0; x < width; x++) {
       final double lon = x * 360. / width - 180.;
-      for (int y = 0; y < height; y++) {
+      for(int y = 0; y < height; y++) {
         final double lat = y * -180. / height + 90.;
-        switch(mode) {
+        switch(mode){
         case ATD: {
           final double atd = model.getEquatorialRadius() * SphereUtil.alongTrackDistanceDeg(stap.doubleValue(0), stap.doubleValue(1), endp.doubleValue(0), endp.doubleValue(1), lat, lon);
-          if (atd < 0) {
+          if(atd < 0) {
             img.setRGB(x, y, colorMultiply(red, -atd / max, false));
-          } else {
+          }
+          else {
             img.setRGB(x, y, colorMultiply(green, atd / max, false));
           }
           break;
         }
         case XTD: {
           final double ctd = model.getEquatorialRadius() * SphereUtil.crossTrackDistanceDeg(stap.doubleValue(0), stap.doubleValue(1), endp.doubleValue(0), endp.doubleValue(1), lat, lon);
-          if (ctd < 0) {
+          if(ctd < 0) {
             img.setRGB(x, y, colorMultiply(red, -ctd / max, false));
-          } else {
+          }
+          else {
             img.setRGB(x, y, colorMultiply(green, ctd / max, false));
           }
           break;
         }
         case MINDIST: {
           final double dist = model.minDistDeg(lat, lon, bb.getMin(0), bb.getMin(1), bb.getMax(0), bb.getMax(1));
-          if (dist < 0) {
+          if(dist < 0) {
             img.setRGB(x, y, colorMultiply(red, -dist / max, true));
-          } else {
+          }
+          else {
             img.setRGB(x, y, colorMultiply(green, dist / max, true));
           }
           break;
@@ -180,23 +185,26 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
 
     try {
       ImageIO.write(img, "png", out);
-    } catch (IOException e) {
+    }
+    catch(IOException e) {
       LOG.exception(e);
     }
   }
 
   private int colorMultiply(int col, double reldist, boolean ceil) {
-    if (steps > 0) {
-      if (!ceil) {
+    if(steps > 0) {
+      if(!ceil) {
         reldist = FastMath.round(reldist * steps) / steps;
-      } else {
+      }
+      else {
         reldist = FastMath.ceil(reldist * steps) / steps;
       }
-    } else if (steps < 0 && reldist > 0.) {
+    }
+    else if(steps < 0 && reldist > 0.) {
       double s = reldist * -steps;
       double off = Math.abs(s - FastMath.round(s));
       double factor = -steps * 1. / 1000; // height;
-      if (off < factor) { // Blend with black:
+      if(off < factor) { // Blend with black:
         factor = (off / factor);
         int a = (col >> 24) & 0xFF;
         a = (int) (a * FastMath.sqrt(reldist)) & 0xFF;
@@ -207,7 +215,8 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
         return a << 24 | r << 16 | g << 8 | b;
       }
     }
-    int a = (col >> 24) & 0xFF, r = (col >> 16) & 0xFF, g = (col >> 8) & 0xFF, b = (col) & 0xFF;
+    int a = (col >> 24) & 0xFF, r = (col >> 16) & 0xFF, g = (col >> 8) & 0xFF,
+        b = (col) & 0xFF;
     a = (int) (a * FastMath.sqrt(reldist)) & 0xFF;
     return a << 24 | r << 16 | g << 8 | b;
   }
@@ -275,19 +284,19 @@ public class VisualizeGeodesicDistances extends AbstractApplication {
       out = super.getParameterOutputFile(config, "Output image file name.");
       IntParameter stepsP = new IntParameter(STEPS_ID);
       stepsP.setOptional(true);
-      if (config.grab(stepsP)) {
+      if(config.grab(stepsP)) {
         steps = stepsP.intValue();
       }
       IntParameter resolutionP = new IntParameter(RESOLUTION_ID, 2000);
-      if (config.grab(resolutionP)) {
+      if(config.grab(resolutionP)) {
         resolution = resolutionP.intValue();
       }
       EnumParameter<Mode> modeP = new EnumParameter<>(MODE_ID, Mode.class, Mode.XTD);
-      if (config.grab(modeP)) {
+      if(config.grab(modeP)) {
         mode = modeP.getValue();
       }
       ObjectParameter<EarthModel> modelP = new ObjectParameter<>(EarthModel.MODEL_ID, EarthModel.class, SphericalVincentyEarthModel.class);
-      if (config.grab(modelP)) {
+      if(config.grab(modelP)) {
         model = modelP.instantiateClass(config);
       }
     }

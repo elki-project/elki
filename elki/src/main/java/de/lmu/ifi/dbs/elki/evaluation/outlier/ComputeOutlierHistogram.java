@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.evaluation.histogram;
+package de.lmu.ifi.dbs.elki.evaluation.outlier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjDynamicHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.AbstractObjStaticHistogram;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.histogram.ObjHistogram;
@@ -69,42 +70,8 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
  * @apiviz.has ScalingFunction
  * @apiviz.has HistogramResult oneway - - «create»
  */
+@Alias({ "de.lmu.ifi.dbs.elki.evaluation.histogram.ComputeOutlierHistogram" })
 public class ComputeOutlierHistogram implements Evaluator {
-  /**
-   * The object pattern to identify positive classes
-   * <p>
-   * Key: {@code -comphist.positive}
-   * </p>
-   */
-  public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("comphist.positive", "Class label for the 'positive' class.");
-
-  /**
-   * number of bins for the histogram
-   * <p>
-   * Default value: {@link EuclideanDistanceFunction}
-   * </p>
-   * <p>
-   * Key: {@code -comphist.bins}
-   * </p>
-   */
-  public static final OptionID BINS_ID = new OptionID("comphist.bins", "number of bins");
-
-  /**
-   * Parameter to specify a scaling function to use.
-   * <p>
-   * Key: {@code -comphist.scaling}
-   * </p>
-   */
-  public static final OptionID SCALING_ID = new OptionID("comphist.scaling", "Class to use as scaling function.");
-
-  /**
-   * Flag to count frequencies of outliers and non-outliers separately
-   * <p>
-   * Key: {@code -histogram.splitfreq}
-   * </p>
-   */
-  public static final OptionID SPLITFREQ_ID = new OptionID("histogram.splitfreq", "Use separate frequencies for outliers and non-outliers.");
-
   /**
    * Stores the "positive" class.
    */
@@ -249,7 +216,8 @@ public class ComputeOutlierHistogram implements Evaluator {
     final Database db = ResultUtil.findDatabase(hier);
     List<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
     if(ors == null || ors.isEmpty()) {
-      // logger.warning("No outlier results found for "+ComputeOutlierHistogram.class.getSimpleName());
+      // logger.warning("No outlier results found for
+      // "+ComputeOutlierHistogram.class.getSimpleName());
       return;
     }
 
@@ -266,6 +234,41 @@ public class ComputeOutlierHistogram implements Evaluator {
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * The object pattern to identify positive classes
+     * <p>
+     * Key: {@code -comphist.positive}
+     * </p>
+     */
+    public static final OptionID POSITIVE_CLASS_NAME_ID = new OptionID("comphist.positive", "Class label for the 'positive' class.");
+
+    /**
+     * number of bins for the histogram
+     * <p>
+     * Default value: {@link EuclideanDistanceFunction}
+     * </p>
+     * <p>
+     * Key: {@code -comphist.bins}
+     * </p>
+     */
+    public static final OptionID BINS_ID = new OptionID("comphist.bins", "number of bins");
+
+    /**
+     * Parameter to specify a scaling function to use.
+     * <p>
+     * Key: {@code -comphist.scaling}
+     * </p>
+     */
+    public static final OptionID SCALING_ID = new OptionID("comphist.scaling", "Class to use as scaling function.");
+
+    /**
+     * Flag to count frequencies of outliers and non-outliers separately
+     * <p>
+     * Key: {@code -histogram.splitfreq}
+     * </p>
+     */
+    public static final OptionID SPLITFREQ_ID = new OptionID("histogram.splitfreq", "Use separate frequencies for outliers and non-outliers.");
+
     /**
      * Stores the "positive" class.
      */
