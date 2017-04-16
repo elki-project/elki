@@ -36,7 +36,5 @@ de.lmu.ifi.dbs.elki.datasource.filter.transform.ClassicMultidimensionalScalingTr
 de.lmu.ifi.dbs.elki.datasource.filter.transform.LinearDiscriminantAnalysisFilter lda
 de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorFeatureSelectionFilter
 de.lmu.ifi.dbs.elki.datasource.filter.transform.NumberVectorRandomFeatureSelectionFilter
-de.lmu.ifi.dbs.elki.datasource.filter.transform.LatLngToECEFFilter
-de.lmu.ifi.dbs.elki.datasource.filter.transform.LngLatToECEFFilter
 de.lmu.ifi.dbs.elki.datasource.filter.transform.PerturbationFilter
 de.lmu.ifi.dbs.elki.datasource.filter.transform.HistogramJitterFilter de.lmu.ifi.dbs.elki.datasource.filter.HistogramJitterFilter

@@ -1,0 +1,3 @@
+de.lmu.ifi.dbs.elki.distance.distancefunction.geo.DimensionSelectingLatLngDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction
+de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LngLatDistanceFunction

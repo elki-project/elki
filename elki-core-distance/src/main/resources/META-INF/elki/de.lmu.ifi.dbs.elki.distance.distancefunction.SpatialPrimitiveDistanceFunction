@@ -19,9 +19,6 @@ de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedManhattanDistanc
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedMaximumDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.WeightedSquaredEuclideanDistanceFunction de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedSquaredEuclideanDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram.HistogramIntersectionDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LatLngDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.geo.LngLatDistanceFunction
-de.lmu.ifi.dbs.elki.distance.distancefunction.geo.DimensionSelectingLatLngDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.histogram.HistogramMatchDistanceFunction
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.ChiSquaredDistanceFunction chisq
 de.lmu.ifi.dbs.elki.distance.distancefunction.probabilistic.JeffreyDivergenceDistanceFunction

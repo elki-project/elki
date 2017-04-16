@@ -17,7 +17,4 @@ de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingMaterializeKNNPreprocesso
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.knn.NaiveProjectedKNNPreprocessor$Factory
 de.lmu.ifi.dbs.elki.index.preprocessed.preference.DiSHPreferenceVectorIndex$Factory
-de.lmu.ifi.dbs.elki.index.projected.LatLngAsECEFIndex$Factory
-de.lmu.ifi.dbs.elki.index.projected.LngLatAsECEFIndex$Factory
-de.lmu.ifi.dbs.elki.index.projected.ProjectedIndex$Factory
 de.lmu.ifi.dbs.elki.index.projected.PINN
