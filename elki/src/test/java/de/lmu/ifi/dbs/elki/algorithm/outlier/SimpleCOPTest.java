@@ -30,6 +30,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 
 /**
  * Tests the SimpleCOP algorithm.
+ * 
+ * Note: this test is quite fragile to numeric differences in the EVD.
  *
  * @author Erich Schubert
  * @since 0.4.0
@@ -41,7 +43,7 @@ public class SimpleCOPTest extends AbstractOutlierAlgorithmTest {
 
     // Parameterization
     ListParameterization params = new ListParameterization();
-    params.addParameter(SimpleCOP.Parameterizer.K_ID, 50);
+    params.addParameter(SimpleCOP.Parameterizer.K_ID, 55);
 
     // setup Algorithm
     SimpleCOP<DoubleVector> cop = ClassGenericsUtil.parameterizeOrAbort(SimpleCOP.class, params);
@@ -49,7 +51,7 @@ public class SimpleCOPTest extends AbstractOutlierAlgorithmTest {
 
     OutlierResult result = cop.run(db);
 
-    testAUC(db, "Noise", result, 0.833);
-    testSingleScore(result, 416, 0.);
+    testAUC(db, "Noise", result, 0.82323);
+    testSingleScore(result, 416, 0.28814843615);
   }
 }

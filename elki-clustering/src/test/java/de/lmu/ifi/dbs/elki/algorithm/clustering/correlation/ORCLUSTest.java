@@ -64,8 +64,8 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
 
-    testFMeasure(db, result, 0.6276831);
-    testClusterSizes(result, new int[] { 28, 31, 391 });
+    testFMeasure(db, result, 0.61389521);
+    testClusterSizes(result, new int[] { 20, 32, 398 });
   }
 
   /**
@@ -82,14 +82,14 @@ public class ORCLUSTest extends AbstractClusterAlgorithmTest {
     ListParameterization params = new ListParameterization();
     params.addParameter(ORCLUS.Parameterizer.K_ID, 3);
     params.addParameter(ORCLUS.Parameterizer.L_ID, 4);
-    params.addParameter(ORCLUS.Parameterizer.SEED_ID, 9);
+    params.addParameter(ORCLUS.Parameterizer.SEED_ID, 0);
 
     ORCLUS<DoubleVector> orclus = ClassGenericsUtil.parameterizeOrAbort(ORCLUS.class, params);
     testParameterizationOk(params);
 
     // run ORCLUS on database
     Clustering<Model> result = orclus.run(db);
-    testFMeasure(db, result, 0.900396);
-    testClusterSizes(result, new int[] { 188, 200, 213 });
+    testFMeasure(db, result, 0.848054);
+    testClusterSizes(result, new int[] { 189, 200, 212 });
   }
 }

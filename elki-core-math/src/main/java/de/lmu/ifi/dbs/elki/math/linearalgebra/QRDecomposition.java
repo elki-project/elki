@@ -20,7 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
+import net.jafama.FastMath;
 
 /**
  * QR Decomposition.
@@ -97,28 +97,29 @@ public class QRDecomposition implements java.io.Serializable {
       // Compute 2-norm of k-th column without under/overflow.
       double nrm = 0;
       for(int i = k; i < m; i++) {
-        nrm = MathUtil.fastHypot(nrm, QR[i][k]);
+        nrm = FastMath.hypot(nrm, QR[i][k]);
       }
 
       if(nrm != 0.0) {
+        final double[] QRk = QR[k];
         // Form k-th Householder vector.
-        if(QR[k][k] < 0) {
-          nrm = -nrm;
-        }
+        nrm = (QRk[k] < 0) ? -nrm : nrm;
         for(int i = k; i < m; i++) {
           QR[i][k] /= nrm;
         }
-        QR[k][k] += 1.0;
+        QRk[k] += 1.0;
 
         // Apply transformation to remaining columns.
         for(int j = k + 1; j < n; j++) {
           double s = 0.0;
           for(int i = k; i < m; i++) {
-            s += QR[i][k] * QR[i][j];
+            final double[] QRi = QR[i];
+            s += QRi[k] * QRi[j];
           }
-          s = -s / QR[k][k];
+          s = -s / QRk[k];
           for(int i = k; i < m; i++) {
-            QR[i][j] += s * QR[i][k];
+            final double[] QRi = QR[i];
+            QRi[j] += s * QRi[k];
           }
         }
       }

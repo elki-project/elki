@@ -183,69 +183,6 @@ public final class MathUtil {
   }
 
   /**
-   * Computes the square root of the sum of the squared arguments without under
-   * or overflow.
-   *
-   * Note: this code is <em>not</em> redundant to {@link Math#hypot}, since the
-   * latter is significantly slower (but maybe has a higher precision).
-   *
-   * @param a first cathetus
-   * @param b second cathetus
-   * @return {@code sqrt(a<sup>2</sup> + b<sup>2</sup>)}
-   */
-  public static double fastHypot(double a, double b) {
-    if(a < 0) {
-      a = -a;
-    }
-    if(b < 0) {
-      b = -b;
-    }
-    if(a > b) {
-      final double r = b / a;
-      return a * FastMath.sqrt(1 + r * r);
-    }
-    else if(b != 0) {
-      final double r = a / b;
-      return b * FastMath.sqrt(1 + r * r);
-    }
-    else {
-      return 0.0;
-    }
-  }
-
-  /**
-   * Computes the square root of the sum of the squared arguments without under
-   * or overflow.
-   *
-   * Note: this code is <em>not</em> redundant to {@link Math#hypot}, since the
-   * latter is significantly slower (but has a higher precision).
-   *
-   * @param a first cathetus
-   * @param b second cathetus
-   * @param c second cathetus
-   * @return {@code sqrt(a<sup>2</sup> + b<sup>2</sup> + c<sup>2</sup>)}
-   */
-  public static double fastHypot3(double a, double b, double c) {
-    if(a < 0) {
-      a = -a;
-    }
-    if(b < 0) {
-      b = -b;
-    }
-    if(c < 0) {
-      c = -c;
-    }
-    double m = (a > b) ? ((a > c) ? a : c) : ((b > c) ? b : c);
-    if(m <= 0) {
-      return 0.0;
-    }
-    a = a / m;
-    b = b / m;
-    c = c / m;
-    return m * FastMath.sqrt(a * a + b * b + c * c);
-  }
-
-  /**
    * Compute the Factorial of n, often written as <code>c!</code> in
    * mathematics.
    * <p>
