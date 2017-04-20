@@ -3,3 +3,4 @@ de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkapp.MkAppTreeFac
 # de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkcop.MkCopTreeFactory
 de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mkmax.MkMaxTreeFactory
 de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab.MkTabTreeFactory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.MetricalIndexApproximationMaterializeKNNPreprocessor$Factory

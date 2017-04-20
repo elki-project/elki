@@ -1,0 +1,14 @@
+de.lmu.ifi.dbs.elki.index.tree.metrical.covertree.CoverTree$Factory
+de.lmu.ifi.dbs.elki.index.tree.metrical.covertree.SimplifiedCoverTree$Factory
+de.lmu.ifi.dbs.elki.index.tree.spatial.kd.SmallMemoryKDTree$Factory smallkd kd
+de.lmu.ifi.dbs.elki.index.tree.spatial.kd.MinimalisticMemoryKDTree$Factory minikd
+de.lmu.ifi.dbs.elki.index.invertedlist.InMemoryInvertedIndex$Factory
+de.lmu.ifi.dbs.elki.index.vafile.VAFile$Factory
+de.lmu.ifi.dbs.elki.index.vafile.PartialVAFile$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.NNDescent$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.PartitionApproximationMaterializeKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.RandomSampleKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingMaterializeKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.NaiveProjectedKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.projected.PINN

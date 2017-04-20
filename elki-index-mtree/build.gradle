@@ -1,5 +1,6 @@
 description = 'ELKI - M-Tree Variants'
 dependencies {
   compile project(':elki-index')
-  testCompile group: 'junit', name: 'junit', version:'[4.8,)'
+  compile project(':elki-core')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }
