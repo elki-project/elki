@@ -12,8 +12,6 @@ de.lmu.ifi.dbs.elki.algorithm.outlier.subspace.OutRankS1
 de.lmu.ifi.dbs.elki.algorithm.projection.BarnesHutTSNE
 de.lmu.ifi.dbs.elki.algorithm.projection.TSNE
 de.lmu.ifi.dbs.elki.algorithm.projection.SNE
-de.lmu.ifi.dbs.elki.algorithm.timeseries.OfflineChangePointDetectionAlgorithm
-de.lmu.ifi.dbs.elki.algorithm.timeseries.SigniTrendChangeDetection
 de.lmu.ifi.dbs.elki.algorithm.statistics.AddSingleScale
 de.lmu.ifi.dbs.elki.algorithm.statistics.AddUniformScale
 de.lmu.ifi.dbs.elki.algorithm.statistics.AveragePrecisionAtK

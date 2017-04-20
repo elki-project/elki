@@ -5,6 +5,7 @@ dependencies {
   compile project(':elki-outlier')
   compile project(':elki-itemsets')
   compile project(':elki-classification')
+  compile project(':elki-timeseries')
   compile project(':elki-index-rtree')
   compile project(':elki-index-mtree')
   compile project(':elki-index-lsh')

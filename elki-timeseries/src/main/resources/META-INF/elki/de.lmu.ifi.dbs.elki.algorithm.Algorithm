@@ -1,0 +1,2 @@
+de.lmu.ifi.dbs.elki.algorithm.timeseries.OfflineChangePointDetectionAlgorithm
+de.lmu.ifi.dbs.elki.algorithm.timeseries.SigniTrendChangeDetection
