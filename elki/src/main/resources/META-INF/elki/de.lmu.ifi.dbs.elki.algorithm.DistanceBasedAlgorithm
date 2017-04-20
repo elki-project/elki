@@ -18,4 +18,3 @@ de.lmu.ifi.dbs.elki.algorithm.benchmark.ValidateApproximativeKNNIndex
 de.lmu.ifi.dbs.elki.algorithm.DependencyDerivator
 de.lmu.ifi.dbs.elki.algorithm.KNNDistancesSampler de.lmu.ifi.dbs.elki.algorithm.KNNDistanceOrder
 de.lmu.ifi.dbs.elki.algorithm.KNNJoin
-de.lmu.ifi.dbs.elki.algorithm.MaterializeDistances
