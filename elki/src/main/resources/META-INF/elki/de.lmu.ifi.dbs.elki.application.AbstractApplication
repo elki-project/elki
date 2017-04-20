@@ -1,5 +1,4 @@
 de.lmu.ifi.dbs.elki.application.KDDCLIApplication cli kddtask
-de.lmu.ifi.dbs.elki.application.ClassifierHoldoutEvaluationTask
 de.lmu.ifi.dbs.elki.application.greedyensemble.ComputeKNNOutlierScores
 de.lmu.ifi.dbs.elki.application.greedyensemble.GreedyEnsembleExperiment
 de.lmu.ifi.dbs.elki.application.greedyensemble.EvaluatePrecomputedOutlierScores

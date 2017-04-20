@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
+import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.classification.Classifier;
 import de.lmu.ifi.dbs.elki.data.ClassLabel;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
@@ -47,7 +48,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.workflow.AlgorithmStep;
 
 /**
  * Evaluate a classifier.
@@ -199,7 +199,7 @@ public class ClassifierHoldoutEvaluationTask<O> extends AbstractApplication {
       if(config.grab(indexFactoryP)) {
         indexFactories = indexFactoryP.instantiateClasses(config);
       }
-      ObjectParameter<Classifier<O>> algorithmP = new ObjectParameter<>(AlgorithmStep.Parameterizer.ALGORITHM_ID, Classifier.class);
+      ObjectParameter<Classifier<O>> algorithmP = new ObjectParameter<>(AbstractAlgorithm.ALGORITHM_ID, Classifier.class);
       if(config.grab(algorithmP)) {
         algorithm = algorithmP.instantiateClass(config);
       }
