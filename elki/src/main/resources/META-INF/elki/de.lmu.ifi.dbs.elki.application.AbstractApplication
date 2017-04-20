@@ -3,4 +3,3 @@ de.lmu.ifi.dbs.elki.application.greedyensemble.ComputeKNNOutlierScores
 de.lmu.ifi.dbs.elki.application.greedyensemble.GreedyEnsembleExperiment
 de.lmu.ifi.dbs.elki.application.greedyensemble.EvaluatePrecomputedOutlierScores
 de.lmu.ifi.dbs.elki.application.experiments.EvaluateIntrinsicDimensionalityEstimators
-de.lmu.ifi.dbs.elki.application.experiments.VisualizeGeodesicDistances de.lmu.ifi.dbs.elki.application.geo.VisualizeGeodesicDistances
