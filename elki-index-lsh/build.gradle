@@ -1,0 +1,5 @@
+description = 'ELKI - Locality Sensitive Hashing'
+dependencies {
+  compile project(':elki-index')
+  testCompile group: 'junit', name: 'junit', version:'[4.8,)'
+}

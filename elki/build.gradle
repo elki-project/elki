@@ -7,6 +7,7 @@ dependencies {
   compile project(':elki-classification')
   compile project(':elki-index-rtree')
   compile project(':elki-index-mtree')
+  compile project(':elki-index-lsh')
   compile project(':elki-precomputed')
   compile project(':elki-geo')
   runtime project(':elki-core-dbids-int')
