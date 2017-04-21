@@ -180,6 +180,7 @@ public final class VectorUtil {
       while(d2 < d1 && d2 < dim2) {
         final double val = v2.doubleValue(d2);
         l2 += val;
+        ++d2;
       }
       if(d2 < dim2) {
         final double val1 = v1.iterDoubleValue(i1);
@@ -189,12 +190,11 @@ public final class VectorUtil {
         cross += val1 * val2;
         i1 = v1.iterAdvance(i1);
         ++d2;
+      } else {
+        final double val = v1.iterDoubleValue(i1);
+        l1 += val * val;
+        i1 = v1.iterAdvance(i1);
       }
-    }
-    while(v1.iterValid(i1)) {
-      final double val = v1.iterDoubleValue(i1);
-      l1 += val * val;
-      i1 = v1.iterAdvance(i1);
     }
     while(d2 < dim2) {
       final double val = v2.doubleValue(d2);

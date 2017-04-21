@@ -122,6 +122,8 @@ public class VectorUtilTest {
     SparseNumberVector s2 = new SparseFloatVector(new float[] { 3.f, 2.f, 1.f });
     SparseNumberVector s3 = new SparseDoubleVector(new double[] { 1.0, 2.0, 3.0, 4.0 });
     SparseNumberVector s4 = new SparseFloatVector(new float[] { 3.f, 2.f, 1.f, 4.f });
+    SparseNumberVector s5 = new SparseFloatVector(new float[] { 0.f, 0.f, 0.f, 0.f, 5.f });
+    SparseNumberVector s6 = new SparseFloatVector(new float[] { });
     assertEquals("Angle not exact.", 1., VectorUtil.angleDense(s2, d2), 0.);
     assertEquals("Angle not exact.", 1., VectorUtil.angleSparseDense(s2, d2), 0.);
     assertEquals("Angle not exact.", 1., VectorUtil.angleDense(s1, d1), 0.);
@@ -147,6 +149,11 @@ public class VectorUtilTest {
     assertEquals("Angle not exact.", 0.4879500364742666, VectorUtil.cosAngle(s3, d2), 0.);
     assertEquals("Angle not exact.", 0.4879500364742666, VectorUtil.angleDense(s3, d2), 0.);
     assertEquals("Angle not exact.", 0.4879500364742666, VectorUtil.angleSparseDense(s3, d2), 0.);
+    // Note: this used to trigger a bug, sparse vectors with leading zeros.
+    assertEquals("Angle not exact.", 0., VectorUtil.angleSparseDense(s5, d1), 0.);
+    assertEquals("Angle not exact.", 0., VectorUtil.angleSparseDense(s5, d2), 0.);
+    assertEquals("Angle not exact.", 0., VectorUtil.angleSparseDense(s6, d1), 0.);
+    assertEquals("Angle not exact.", 0., VectorUtil.angleSparseDense(s6, d2), 0.);
   }
 
   @Test
