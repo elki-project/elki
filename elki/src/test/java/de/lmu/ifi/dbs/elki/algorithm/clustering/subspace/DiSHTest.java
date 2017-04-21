@@ -87,7 +87,7 @@ public class DiSHTest extends AbstractClusterAlgorithmTest {
 
     // run DiSH on database
     Clustering<SubspaceModel> result = dish.run(db);
-    testFMeasure(db, result, 0.65368779);
-    testClusterSizes(result, new int[] { 60, 84, 148, 188, 290, 330 });
+    testFMeasure(db, result, 0.653797548);
+    testClusterSizes(result, new int[] { 61, 84, 148, 188, 289, 330 });
   }
 }

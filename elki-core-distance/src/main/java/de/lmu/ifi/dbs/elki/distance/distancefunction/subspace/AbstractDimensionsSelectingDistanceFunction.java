@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
@@ -77,13 +79,13 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<V extends Feat
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null || !this.getClass().equals(obj.getClass())) {
       return false;
     }
-    if(!this.getClass().equals(obj.getClass())) {
-      return false;
-    }
-    return this.dimensions.equals(((AbstractDimensionsSelectingDistanceFunction<?>) obj).dimensions);
+    return Arrays.equals(this.dimensions, ((AbstractDimensionsSelectingDistanceFunction<?>) obj).dimensions);
   }
 
   /**
@@ -108,8 +110,8 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<V extends Feat
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntListParameter dimsP = new IntListParameter(DIMS_ID)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
-      .setOptional(true);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST) //
+          .setOptional(true);
       if(config.grab(dimsP)) {
         dimensions = dimsP.getValueAsBitSet();
       }

@@ -216,7 +216,7 @@ public class VAFile<V extends NumberVector> extends AbstractRefiningIndex<V> imp
    */
   public long getScannedPages() {
     int vacapacity = pageSize / VectorApproximation.byteOnDisk(splitPositions.length, partitions);
-    int vasize = (int) Math.ceil((vectorApprox.size()) / (1.0 * vacapacity));
+    long vasize = (long) Math.ceil((vectorApprox.size()) / (1.0 * vacapacity));
     return vasize * scans;
   }
 

@@ -425,10 +425,8 @@ public class GriDBSCAN<V extends NumberVector> extends AbstractDistanceBasedAlgo
         total *= c;
         if(total < 0) {
           LOG.warning("Excessive amount of grid cells (long overflow)! Use larger grid cells.");
-          if (total < 0) {
-            overflown = true;
-            total &= 0x7FFF_FFFF_FFFF_FFFFL;
-          }
+          overflown = true;
+          total &= 0x7FFF_FFFF_FFFF_FFFFL;
         }
         if(buf != null) {
           buf.append(d).append(": min=").append(mi).append(" max=").append(ma);

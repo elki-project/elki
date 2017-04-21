@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -29,6 +30,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.ListSizeConstraint;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
+
 import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
@@ -108,13 +110,10 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
     if(this == obj) {
       return true;
     }
-    if(obj == null) {
+    if(obj == null || !this.getClass().equals(obj.getClass())) {
       return false;
     }
-    if(!this.getClass().equals(obj.getClass())) {
-      return false;
-    }
-    return this.weightMatrix.equals(((HSBHistogramQuadraticDistanceFunction) obj).weightMatrix);
+    return VMath.equals(this.weightMatrix, ((HSBHistogramQuadraticDistanceFunction) obj).weightMatrix);
   }
 
   /**

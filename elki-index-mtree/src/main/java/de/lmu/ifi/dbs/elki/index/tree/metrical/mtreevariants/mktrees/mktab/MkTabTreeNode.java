@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
@@ -98,7 +100,7 @@ class MkTabTreeNode<O> extends AbstractMTreeNode<O, MkTabTreeNode<O>, MkTabEntry
     // test knn distances
     MkTabEntry entry = parent.getEntry(index);
     double[] knnDistances = kNNDistances();
-    if(!entry.getKnnDistances().equals(knnDistances)) {
+    if(!Arrays.equals(entry.getKnnDistances(), knnDistances)) {
       String soll = knnDistances.toString();
       String ist = entry.getKnnDistances().toString();
       throw new RuntimeException("Wrong knnDistances in node " + parent.getPageID() + " at index " + index + " (child " + entry + ")" + "\nsoll: " + soll + ",\n ist: " + ist);

@@ -195,11 +195,9 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
    * 
    * @param in the stream to read data from in order to restore the object
    * @throws java.io.IOException if I/O errors occur
-   * @throws ClassNotFoundException If the class for an object being restored
-   *         cannot be found.
    */
   @Override
-  public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+  public void readExternal(ObjectInput in) throws IOException {
     int dim = in.readInt();
     min = new double[dim];
     max = new double[dim];

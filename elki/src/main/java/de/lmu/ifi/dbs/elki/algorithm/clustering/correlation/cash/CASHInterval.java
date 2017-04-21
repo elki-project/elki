@@ -52,7 +52,7 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
   /**
    * Holds the unique id of this interval.
    */
-  private final Integer intervalID;
+  private final int intervalID;
 
   /**
    * The level of this interval, 0 indicates the root level.
@@ -264,12 +264,7 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
       return 1;
     }
 
-    if(other.intervalID.compareTo(this.intervalID) < 0) {
-      return -1;
-    }
-    else {
-      return 1;
-    }
+    return Integer.compare(other.intervalID, this.intervalID);
   }
 
   @Override
@@ -290,7 +285,7 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
 
   @Override
   public int hashCode() {
-    return intervalID.hashCode();
+    return intervalID;
   }
 
   /**

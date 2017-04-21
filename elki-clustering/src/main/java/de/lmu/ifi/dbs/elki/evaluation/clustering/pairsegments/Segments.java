@@ -114,7 +114,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
   /**
    * Pairs actually present in the data set
    */
-  private int actualPairs;
+  private long actualPairs;
 
   /**
    * The actual segments
@@ -337,7 +337,7 @@ public class Segments extends BasicResult implements Iterable<Segment> {
    *        removed
    * @return pair count, with or without unclusted (non-existant) pairs
    */
-  public int getPairCount(boolean withUnclusteredPairs) {
+  public long getPairCount(boolean withUnclusteredPairs) {
     if(withUnclusteredPairs) {
       return (totalObjects * (totalObjects - 1)); // / 2;
     }

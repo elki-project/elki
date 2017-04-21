@@ -237,7 +237,7 @@ public class Subspace {
    */
   @Override
   public int hashCode() {
-    return dimensions.hashCode();
+    return BitsUtil.hashCode(dimensions);
   }
 
   /**
@@ -252,10 +252,7 @@ public class Subspace {
     if(this == obj) {
       return true;
     }
-    if(obj == null) {
-      return false;
-    }
-    if(getClass() != obj.getClass()) {
+    if(obj == null || getClass() != obj.getClass()) {
       return false;
     }
     Subspace other = (Subspace) obj;

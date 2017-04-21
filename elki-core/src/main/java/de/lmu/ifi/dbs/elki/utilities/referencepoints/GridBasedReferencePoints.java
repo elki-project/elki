@@ -93,7 +93,7 @@ public class GridBasedReferencePoints implements ReferencePointsHeuristic {
     if(gridpoints < 0) {
       throw new AbortException("Grids with more than 2^31 are not supported, or meaningful.");
     }
-    if(gridpoints < 0 || gridpoints > db.size()) {
+    if(gridpoints > db.size()) {
       LOG.warning("Grid has " + gridpoints + " points, but you only have " + db.size() + " observations.");
     }
     ArrayList<DoubleVector> result = new ArrayList<>(gridpoints);

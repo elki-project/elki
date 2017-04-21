@@ -212,7 +212,7 @@ public class RandomProjectedNeighborsAndDensities<V extends NumberVector> {
     }
     LOG.ensureCompleted(projp);
     // Log the number of scalar projections performed.
-    long numprod = nProject1d * ptList.size();
+    long numprod = nProject1d * (long) ptList.size();
     LOG.statistics(new LongStatistic(PREFIX + ".num-scalar-products", numprod));
 
     // split entire point set, reuse projections by shuffling them

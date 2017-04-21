@@ -455,7 +455,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       }
 
       long[] pv = BitsUtil.andCMin(childPV, parentPV);
-      if(pv.equals(parentPV)) {
+      if(BitsUtil.equal(pv, parentPV)) {
         List<ArrayModifiableDBIDs> parentList = clustersMap.get(parentPV);
         for(ArrayModifiableDBIDs parent : parentList) {
           NumberVector parent_centroid = ProjectedCentroid.make(parentPV, relation, parent);

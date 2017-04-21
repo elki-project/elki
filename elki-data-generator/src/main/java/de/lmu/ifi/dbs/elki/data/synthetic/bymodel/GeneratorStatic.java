@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.data.synthetic.bymodel;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class GeneratorStatic implements GeneratorInterface {
   @Override
   public double getDensity(double[] p) {
     for(double[] my : points) {
-      if(my.equals(p)) {
+      if(Arrays.equals(my, p)) {
         return Double.POSITIVE_INFINITY;
       }
     }

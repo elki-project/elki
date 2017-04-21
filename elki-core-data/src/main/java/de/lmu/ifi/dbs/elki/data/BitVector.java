@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.data;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.ArrayAdapter;
@@ -311,12 +312,9 @@ public class BitVector extends AbstractNumberVector implements SparseNumberVecto
   public boolean equals(Object obj) {
     if(obj instanceof BitVector) {
       BitVector bv = (BitVector) obj;
-      return this.getDimensionality() == bv.getDimensionality() && this.bits.equals(bv.bits);
-
+      return this.getDimensionality() == bv.getDimensionality() && Arrays.equals(this.bits, bv.bits);
     }
-    else {
-      return false;
-    }
+    return false;
   }
 
   /**

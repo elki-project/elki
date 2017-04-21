@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeDirectoryEntry;
@@ -77,7 +78,7 @@ class MkTabDirectoryEntry extends MTreeDirectoryEntry implements MkTabEntry {
 
   @Override
   public double getKnnDistance(int k) {
-    if (k >= this.knnDistances.length) {
+    if(k >= this.knnDistances.length) {
       throw new IllegalArgumentException("Parameter k = " + k + " is not supported!");
     }
 
@@ -96,7 +97,7 @@ class MkTabDirectoryEntry extends MTreeDirectoryEntry implements MkTabEntry {
     super.writeExternal(out);
     int k_max = knnDistances.length;
     out.writeInt(k_max);
-    for (int i = 0; i < k_max; i++) {
+    for(int i = 0; i < k_max; i++) {
       out.writeDouble(knnDistances[i]);
     }
   }
@@ -115,7 +116,7 @@ class MkTabDirectoryEntry extends MTreeDirectoryEntry implements MkTabEntry {
     super.readExternal(in);
     int k_max = in.readInt();
     knnDistances = new double[k_max];
-    for (int i = 0; i < k_max; i++) {
+    for(int i = 0; i < k_max; i++) {
       knnDistances[i] = in.readDouble();
     }
   }
@@ -130,21 +131,14 @@ class MkTabDirectoryEntry extends MTreeDirectoryEntry implements MkTabEntry {
    */
   @Override
   public boolean equals(Object o) {
-    if (this == o) {
+    if(this == o) {
       return true;
     }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
+    if(o == null || getClass() != o.getClass() || !super.equals(o)) {
       return false;
     }
 
     final MkTabDirectoryEntry that = (MkTabDirectoryEntry) o;
-
-    if (knnDistances.length != that.knnDistances.length) {
-      return false;
-    }
-    return !(knnDistances != null ? !knnDistances.equals(that.knnDistances) : that.knnDistances != null);
+    return Arrays.equals(knnDistances, that.knnDistances);
   }
 }
