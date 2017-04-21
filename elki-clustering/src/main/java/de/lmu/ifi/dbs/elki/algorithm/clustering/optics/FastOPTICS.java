@@ -181,7 +181,7 @@ public class FastOPTICS<V extends NumberVector> extends AbstractAlgorithm<Cluste
    */
   protected void expandClusterOrder(DBID ipt, ClusterOrder order, DistanceQuery<V> dq, FiniteProgress prog) {
     UpdatableHeap<OPTICSHeapEntry> heap = new UpdatableHeap<>();
-    heap.add(new OPTICSHeapEntry(ipt, null, 1e6f));
+    heap.add(new OPTICSHeapEntry(ipt, null, Double.POSITIVE_INFINITY));
     while(!heap.isEmpty()) {
       final OPTICSHeapEntry current = heap.poll();
       DBID currPt = current.objectID;
