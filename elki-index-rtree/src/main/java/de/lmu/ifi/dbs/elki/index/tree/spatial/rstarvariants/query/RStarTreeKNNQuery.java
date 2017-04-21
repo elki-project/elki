@@ -205,7 +205,7 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
 
           if(minDist <= knn_q_maxDist) {
             SpatialEntry entry = distEntry.entry;
-            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry) entry).getPageID().intValue());
+            AbstractRStarTreeNode<?, ?> child = tree.getNode(((DirectoryEntry) entry).getPageID());
             batchNN(child, knnLists);
             break;
           }

@@ -70,7 +70,7 @@ public class IndexPurity implements Evaluator {
       MeanVariance mv = new MeanVariance();
       for(SpatialEntry e : leaves) {
         SpatialDirectoryEntry leaf = (SpatialDirectoryEntry) e;
-        Node<?> n = index.getNode(leaf.getEntryID());
+        Node<?> n = index.getNode(leaf.getPageID());
 
         final int total = n.getNumEntries();
         HashMap<String, Integer> map = new HashMap<>(total);

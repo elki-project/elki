@@ -37,5 +37,5 @@ public interface Entry extends Externalizable {
    * 
    * @return true if this entry is an entry in a leaf node, false otherwise
    */
-  public boolean isLeafEntry();
+  boolean isLeafEntry();
 }

@@ -34,7 +34,7 @@ public abstract class AbstractDirectoryEntry implements DirectoryEntry {
   /**
    * Holds the id of the object (node or data object) represented by this entry.
    */
-  private Integer id;
+  private int id;
 
   /**
    * Empty constructor for serialization purposes.
@@ -49,7 +49,7 @@ public abstract class AbstractDirectoryEntry implements DirectoryEntry {
    * @param id the id of the object (node or data object) represented by this
    *        entry.
    */
-  protected AbstractDirectoryEntry(Integer id) {
+  protected AbstractDirectoryEntry(int id) {
     this.id = id;
   }
 
@@ -65,30 +65,9 @@ public abstract class AbstractDirectoryEntry implements DirectoryEntry {
    * @return the id of the node or data object that is represented by this entry
    */
   @Override
-  public final Integer getPageID() {
+  public final int getPageID() {
     return id;
   }
-
-  /**
-   * Returns the id of the node or data object that is represented by this
-   * entry.
-   * 
-   * @return the id of the node or data object that is represented by this entry
-   */
-  @Override
-  public final Integer getEntryID() {
-    return id;
-  }
-  
-  /**
-   * Sets the id of the node or data object that is represented by this entry.
-   * 
-   * @param id the id to be set
-   */
-  // Should be set by the constructor, then final.
-  /*public final void setPageID(Integer id) {
-    this.id = id;
-  }*/
 
   /**
    * Writes the id of the object (node or data object) that is represented by
@@ -125,9 +104,7 @@ public abstract class AbstractDirectoryEntry implements DirectoryEntry {
     if(o == null || getClass() != o.getClass()) {
       return false;
     }
-
-    final AbstractDirectoryEntry that = (AbstractDirectoryEntry) o;
-    return id == that.id || (id != null && id.equals(that.id));
+    return id == ((AbstractDirectoryEntry) o).id;
   }
 
   /**

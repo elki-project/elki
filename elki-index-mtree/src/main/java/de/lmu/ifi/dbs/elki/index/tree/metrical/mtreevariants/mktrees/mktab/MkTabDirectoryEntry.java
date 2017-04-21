@@ -61,7 +61,7 @@ class MkTabDirectoryEntry extends MTreeDirectoryEntry implements MkTabEntry {
    * @param coveringRadius the covering radius of the entry
    * @param knnDistances the aggregated knn distances of the underlying node
    */
-  public MkTabDirectoryEntry(DBID objectID, double parentDistance, Integer nodeID, double coveringRadius, double[] knnDistances) {
+  public MkTabDirectoryEntry(DBID objectID, double parentDistance, int nodeID, double coveringRadius, double[] knnDistances) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.knnDistances = knnDistances;
   }

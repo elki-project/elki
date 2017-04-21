@@ -138,7 +138,7 @@ public class RStarTreeRangeQuery<O extends SpatialComparable> implements RangeQu
             if(ps == pq.length) {
               pq = Arrays.copyOf(pq, pq.length + (pq.length >>> 1));
             }
-            pq[ps++] = entry.getEntryID();
+            pq[ps++] = entry.getPageID();
           }
         }
       }

@@ -63,7 +63,7 @@ class MkCoPDirectoryEntry extends MTreeDirectoryEntry implements MkCoPEntry {
    * @param conservativeApproximation the conservative approximation of the knn
    *        distances
    */
-  public MkCoPDirectoryEntry(DBID objectID, double parentDistance, Integer nodeID, double coveringRadius, ApproximationLine conservativeApproximation) {
+  public MkCoPDirectoryEntry(DBID objectID, double parentDistance, int nodeID, double coveringRadius, ApproximationLine conservativeApproximation) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.conservativeApproximation = conservativeApproximation;
   }

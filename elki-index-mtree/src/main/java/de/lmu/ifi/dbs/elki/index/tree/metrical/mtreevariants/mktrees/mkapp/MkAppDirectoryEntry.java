@@ -62,7 +62,7 @@ class MkAppDirectoryEntry extends MTreeDirectoryEntry implements MkAppEntry {
    * @param coveringRadius the covering radius of the entry
    * @param approximation the polynomial approximation of the knn distances
    */
-  public MkAppDirectoryEntry(DBID objectID, double parentDistance, Integer nodeID, double coveringRadius, PolynomialApproximation approximation) {
+  public MkAppDirectoryEntry(DBID objectID, double parentDistance, int nodeID, double coveringRadius, PolynomialApproximation approximation) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.approximation = approximation;
   }

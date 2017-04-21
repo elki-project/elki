@@ -105,7 +105,7 @@ public class EuclideanRStarTreeRangeQuery<O extends NumberVector> extends RStarT
             if(ps == pq.length) { // Resize:
               pq = Arrays.copyOf(pq, pq.length + (pq.length >>> 1));
             }
-            pq[ps++] = entry.getEntryID();
+            pq[ps++] = entry.getPageID();
           }
         }
       }

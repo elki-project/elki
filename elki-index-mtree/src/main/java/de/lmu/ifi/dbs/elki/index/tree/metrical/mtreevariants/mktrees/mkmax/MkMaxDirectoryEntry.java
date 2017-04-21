@@ -65,7 +65,7 @@ class MkMaxDirectoryEntry extends MTreeDirectoryEntry implements MkMaxEntry {
    * @param knnDistance the aggregated knn distance of the underlying MkMax-Tree
    *        node
    */
-  public MkMaxDirectoryEntry(DBID objectID, double parentDistance, Integer nodeID, double coveringRadius, double knnDistance) {
+  public MkMaxDirectoryEntry(DBID objectID, double parentDistance, int nodeID, double coveringRadius, double knnDistance) {
     super(objectID, parentDistance, nodeID, coveringRadius);
     this.knnDistance = knnDistance;
   }

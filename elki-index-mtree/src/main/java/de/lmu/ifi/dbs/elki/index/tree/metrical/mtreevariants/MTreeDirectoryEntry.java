@@ -72,7 +72,7 @@ public class MTreeDirectoryEntry extends AbstractDirectoryEntry implements MTree
    * @param nodeID the id of the underlying node
    * @param coveringRadius the covering radius of the entry
    */
-  public MTreeDirectoryEntry(DBID objectID, double parentDistance, Integer nodeID, double coveringRadius) {
+  public MTreeDirectoryEntry(DBID objectID, double parentDistance, int nodeID, double coveringRadius) {
     super(nodeID);
     this.routingObjectID = objectID;
     this.parentDistance = parentDistance;
