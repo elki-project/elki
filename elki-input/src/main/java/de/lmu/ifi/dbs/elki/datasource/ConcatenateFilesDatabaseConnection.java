@@ -85,10 +85,8 @@ public class ConcatenateFilesDatabaseConnection extends AbstractDatabaseConnecti
     objects.appendColumn(TypeUtil.STRING, new ArrayList<>());
     for(File file : files) {
       String filestr = file.getPath();
-      try {
-        InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
-        inputStream = FileUtil.tryGzipInput(inputStream);
-
+      try (InputStream inputStream = FileUtil.tryGzipInput(//
+          new BufferedInputStream(new FileInputStream(file)))) {
         final BundleStreamSource source;
         if(parser instanceof StreamingParser) {
           final StreamingParser streamParser = (StreamingParser) parser;

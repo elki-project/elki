@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
  */
 @Title("Input-Stream based database connection")
 @Description("Parse an input stream such as STDIN into a database.")
-public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
+public class InputStreamDatabaseConnection extends AbstractDatabaseConnection implements AutoCloseable {
   /**
    * The logger for this class.
    */
@@ -115,6 +115,11 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection {
       }
       return objects;
     }
+  }
+
+  @Override
+  public void close() throws Exception {
+    in.close();
   }
 
   @Override

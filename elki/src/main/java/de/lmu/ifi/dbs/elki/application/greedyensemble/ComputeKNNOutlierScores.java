@@ -108,8 +108,8 @@ import net.jafama.FastMath;
  * @param <O> Vector type
  */
 @Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", //
-title = "On Evaluation of Outlier Rankings and Outlier Scores", //
-booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
+    title = "On Evaluation of Outlier Rankings and Outlier Scores", //
+    booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.")
 public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApplication {
   /**
    * Our logger class.
@@ -213,225 +213,223 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
 
     final DBIDs ids = relation.getDBIDs();
 
-    final PrintStream fout;
-    try {
-      fout = new PrintStream(outfile);
-    }
-    catch(FileNotFoundException e) {
-      throw new AbortException("Cannot create output file.", e);
-    }
-    // Control: print the DBIDs in case we are seeing an odd iteration
-    fout.append("# Data set size: " + relation.size());
-    fout.append(" data type: " + relation.getDataTypeInformation());
-    fout.append(FormatUtil.NEWLINE);
+    try (PrintStream fout = new PrintStream(outfile)) {
+      // Control: print the DBIDs in case we are seeing an odd iteration
+      fout.append("# Data set size: " + relation.size());
+      fout.append(" data type: " + relation.getDataTypeInformation());
+      fout.append(FormatUtil.NEWLINE);
 
-    // Label outlier result (reference)
-    {
-      OutlierResult bylabelresult = bylabel.run(database);
-      writeResult(fout, ids, bylabelresult, new IdentityScaling(), "bylabel");
-    }
+      // Label outlier result (reference)
+      {
+        OutlierResult bylabelresult = bylabel.run(database);
+        writeResult(fout, ids, bylabelresult, new IdentityScaling(), "bylabel");
+      }
 
-    final int startk = (this.startk > 0) ? this.startk : this.stepk;
-    final int startkmin2 = (startk >= 2) ? startk : (startk + stepk);
-    final int startkmin3 = (startk >= 3) ? startk : (startkmin2 >= 3) ? startkmin2 : (startkmin2 + stepk);
+      final int startk = (this.startk > 0) ? this.startk : this.stepk;
+      final int startkmin2 = (startk >= 2) ? startk : (startk + stepk);
+      final int startkmin3 = (startk >= 3) ? startk : (startkmin2 >= 3) ? startkmin2 : (startkmin2 + stepk);
 
-    // KNN
-    runForEachK("KNN", startk, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        KNNOutlier<O> knn = new KNNOutlier<>(distf, k);
-        OutlierResult result = knn.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // KNN Weight
-    runForEachK("KNNW", startk, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        KNNWeightOutlier<O> knnw = new KNNWeightOutlier<>(distf, k);
-        OutlierResult result = knnw.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run LOF
-    runForEachK("LOF", startk, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        LOF<O> lof = new LOF<>(k, distf);
-        OutlierResult result = lof.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run Simplified-LOF
-    runForEachK("SimplifiedLOF", startk, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        SimplifiedLOF<O> lof = new SimplifiedLOF<>(k, distf);
-        OutlierResult result = lof.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // LoOP
-    runForEachK("LoOP", startk, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        LoOP<O> loop = new LoOP<>(k, k, distf, distf, 1.0);
-        OutlierResult result = loop.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // LDOF
-    runForEachK("LDOF", startkmin2, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        if(k == startkmin2 && maxk > 100) {
-          LOG.verbose("Note: LODF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " LDOF to disable.");
-        }
-        LDOF<O> ldof = new LDOF<>(distf, k);
-        OutlierResult result = ldof.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run ODIN
-    runForEachK("ODIN", startk, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        ODIN<O> odin = new ODIN<>(distf, k);
-        OutlierResult result = odin.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run FastABOD
-    runForEachK("FastABOD", startkmin3, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        if(k == startkmin3 && maxk > 100) {
-          LOG.verbose("Note: FastABOD needs quadratic memory. Use -" + Parameterizer.DISABLE_ID.getName() + " FastABOD to disable.");
-        }
-        FastABOD<O> fabod = new FastABOD<>(new PolynomialKernelFunction(2), k);
-        OutlierResult result = fabod.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run KDEOS with intrinsic dimensionality 2.
-    runForEachK("KDEOS", startkmin2, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        KDEOS<O> kdeos = new KDEOS<>(distf, k, k, //
-        GaussianKernelDensityFunction.KERNEL, 0., //
-        .5 * GaussianKernelDensityFunction.KERNEL.canonicalBandwidth(), 2);
-        OutlierResult result = kdeos.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run LDF
-    runForEachK("LDF", startk, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        LDF<O> ldf = new LDF<>(k, distf, GaussianKernelDensityFunction.KERNEL, 1., .1);
-        OutlierResult result = ldf.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run INFLO
-    runForEachK("INFLO", startk, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        INFLO<O> inflo = new INFLO<>(distf, 1.0, k);
-        OutlierResult result = inflo.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run COF
-    runForEachK("COF", startk, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        COF<O> cof = new COF<>(k, distf);
-        OutlierResult result = cof.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run simple Intrinsic dimensionality
-    runForEachK("Intrinsic", startkmin2, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        IntrinsicDimensionalityOutlier<O> sid = new IntrinsicDimensionalityOutlier<>(distf, k, HillEstimator.STATIC);
-        OutlierResult result = sid.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run IDOS
-    runForEachK("IDOS", startkmin2, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        IDOS<O> idos = new IDOS<>(distf, HillEstimator.STATIC, k, k);
-        OutlierResult result = idos.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run simple kernel-density LOF variant
-    runForEachK("KDLOF", startkmin2, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        SimpleKernelDensityLOF<O> kdlof = new SimpleKernelDensityLOF<>(k, distf, //
-        GaussianKernelDensityFunction.KERNEL);
-        OutlierResult result = kdlof.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run DWOF (need pairwise distances, too)
-    runForEachK("DWOF", startkmin2, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        if(k == startkmin2 && maxk > 100) {
-          LOG.verbose("Note: DWOF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " DWOF to disable.");
-        }
-        DWOF<O> dwof = new DWOF<>(distf, k, 1.1);
-        OutlierResult result = dwof.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run LIC
-    runForEachK("LIC", startk, stepk, maxk, new AlgRunner() {
-      @Override
-      public void run(int k, String kstr) {
-        LocalIsolationCoefficient<O> lic = new LocalIsolationCoefficient<>(distf, k);
-        OutlierResult result = lic.run(database, relation);
-        writeResult(fout, ids, result, scaling, kstr);
-        database.getHierarchy().removeSubtree(result);
-      }
-    });
-    // Run VOV (requires a vector field).
-    if(TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(relation.getDataTypeInformation())) {
-      @SuppressWarnings("unchecked")
-      final DistanceFunction<? super DoubleVector> df = (DistanceFunction<? super DoubleVector>) distf;
-      @SuppressWarnings("unchecked")
-      final Relation<DoubleVector> rel = (Relation<DoubleVector>) (Relation<?>) relation;
-      runForEachK("VOV", startk, stepk, maxk, new AlgRunner() {
+      // KNN
+      runForEachK("KNN", startk, stepk, maxk, new AlgRunner() {
         @Override
         public void run(int k, String kstr) {
-          VarianceOfVolume<DoubleVector> vov = new VarianceOfVolume<>(k, df);
-          OutlierResult result = vov.run(database, rel);
+          KNNOutlier<O> knn = new KNNOutlier<>(distf, k);
+          OutlierResult result = knn.run(database, relation);
           writeResult(fout, ids, result, scaling, kstr);
           database.getHierarchy().removeSubtree(result);
         }
       });
+      // KNN Weight
+      runForEachK("KNNW", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          KNNWeightOutlier<O> knnw = new KNNWeightOutlier<>(distf, k);
+          OutlierResult result = knnw.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run LOF
+      runForEachK("LOF", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          LOF<O> lof = new LOF<>(k, distf);
+          OutlierResult result = lof.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run Simplified-LOF
+      runForEachK("SimplifiedLOF", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          SimplifiedLOF<O> lof = new SimplifiedLOF<>(k, distf);
+          OutlierResult result = lof.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // LoOP
+      runForEachK("LoOP", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          LoOP<O> loop = new LoOP<>(k, k, distf, distf, 1.0);
+          OutlierResult result = loop.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // LDOF
+      runForEachK("LDOF", startkmin2, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          if(k == startkmin2 && maxk > 100) {
+            LOG.verbose("Note: LODF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " LDOF to disable.");
+          }
+          LDOF<O> ldof = new LDOF<>(distf, k);
+          OutlierResult result = ldof.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run ODIN
+      runForEachK("ODIN", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          ODIN<O> odin = new ODIN<>(distf, k);
+          OutlierResult result = odin.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run FastABOD
+      runForEachK("FastABOD", startkmin3, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          if(k == startkmin3 && maxk > 100) {
+            LOG.verbose("Note: FastABOD needs quadratic memory. Use -" + Parameterizer.DISABLE_ID.getName() + " FastABOD to disable.");
+          }
+          FastABOD<O> fabod = new FastABOD<>(new PolynomialKernelFunction(2), k);
+          OutlierResult result = fabod.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run KDEOS with intrinsic dimensionality 2.
+      runForEachK("KDEOS", startkmin2, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          KDEOS<O> kdeos = new KDEOS<>(distf, k, k, //
+              GaussianKernelDensityFunction.KERNEL, 0., //
+              .5 * GaussianKernelDensityFunction.KERNEL.canonicalBandwidth(), 2);
+          OutlierResult result = kdeos.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run LDF
+      runForEachK("LDF", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          LDF<O> ldf = new LDF<>(k, distf, GaussianKernelDensityFunction.KERNEL, 1., .1);
+          OutlierResult result = ldf.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run INFLO
+      runForEachK("INFLO", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          INFLO<O> inflo = new INFLO<>(distf, 1.0, k);
+          OutlierResult result = inflo.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run COF
+      runForEachK("COF", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          COF<O> cof = new COF<>(k, distf);
+          OutlierResult result = cof.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run simple Intrinsic dimensionality
+      runForEachK("Intrinsic", startkmin2, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          IntrinsicDimensionalityOutlier<O> sid = new IntrinsicDimensionalityOutlier<>(distf, k, HillEstimator.STATIC);
+          OutlierResult result = sid.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run IDOS
+      runForEachK("IDOS", startkmin2, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          IDOS<O> idos = new IDOS<>(distf, HillEstimator.STATIC, k, k);
+          OutlierResult result = idos.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run simple kernel-density LOF variant
+      runForEachK("KDLOF", startkmin2, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          SimpleKernelDensityLOF<O> kdlof = new SimpleKernelDensityLOF<>(k, distf, //
+              GaussianKernelDensityFunction.KERNEL);
+          OutlierResult result = kdlof.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run DWOF (need pairwise distances, too)
+      runForEachK("DWOF", startkmin2, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          if(k == startkmin2 && maxk > 100) {
+            LOG.verbose("Note: DWOF needs O(k^2) distance computations. Use -" + Parameterizer.DISABLE_ID.getName() + " DWOF to disable.");
+          }
+          DWOF<O> dwof = new DWOF<>(distf, k, 1.1);
+          OutlierResult result = dwof.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run LIC
+      runForEachK("LIC", startk, stepk, maxk, new AlgRunner() {
+        @Override
+        public void run(int k, String kstr) {
+          LocalIsolationCoefficient<O> lic = new LocalIsolationCoefficient<>(distf, k);
+          OutlierResult result = lic.run(database, relation);
+          writeResult(fout, ids, result, scaling, kstr);
+          database.getHierarchy().removeSubtree(result);
+        }
+      });
+      // Run VOV (requires a vector field).
+      if(TypeUtil.DOUBLE_VECTOR_FIELD.isAssignableFromType(relation.getDataTypeInformation())) {
+        @SuppressWarnings("unchecked")
+        final DistanceFunction<? super DoubleVector> df = (DistanceFunction<? super DoubleVector>) distf;
+        @SuppressWarnings("unchecked")
+        final Relation<DoubleVector> rel = (Relation<DoubleVector>) (Relation<?>) relation;
+        runForEachK("VOV", startk, stepk, maxk, new AlgRunner() {
+          @Override
+          public void run(int k, String kstr) {
+            VarianceOfVolume<DoubleVector> vov = new VarianceOfVolume<>(k, df);
+            OutlierResult result = vov.run(database, rel);
+            writeResult(fout, ids, result, scaling, kstr);
+            database.getHierarchy().removeSubtree(result);
+          }
+        });
+      }
+    }
+    catch(FileNotFoundException e) {
+      throw new AbortException("Cannot create output file.", e);
     }
   }
 
@@ -601,7 +599,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       }
       // k parameters
       IntParameter stepkP = new IntParameter(STEPK_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(stepkP)) {
         stepk = stepkP.getValue();
       }
@@ -614,7 +612,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
         startk = stepk;
       }
       IntParameter maxkP = new IntParameter(MAXK_ID)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(maxkP)) {
         maxk = maxkP.getValue();
       }
@@ -629,7 +627,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
       }
 
       PatternParameter disableP = new PatternParameter(DISABLE_ID) //
-      .setOptional(true);
+          .setOptional(true);
       if(config.grab(disableP)) {
         disable = disableP.getValue();
       }

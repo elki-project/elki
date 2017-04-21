@@ -29,6 +29,7 @@ import java.io.PrintStream;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -164,25 +165,22 @@ public class CheckELKIServices {
       while(us.hasMoreElements()) {
         URL u = us.nextElement();
         boolean injar = "jar".equals(u.getProtocol());
-        BufferedReader r = new BufferedReader(new InputStreamReader(u.openStream(), "utf-8"));
-        for(String line;;) {
-          line = r.readLine();
-          // End of stream:
-          if(line == null) {
-            break;
-          }
-          m.reset(line);
-          if(!m.matches()) {
-            LOG.warning("Line: " + line + " didn't match regexp.");
-            continue;
-          }
-          String stripped = m.group(1);
-          if(stripped.length() > 0) {
-            String[] parts = stripped.split(" ");
-            if(!names.remove(parts[0]) && !injar) {
-              LOG.warning("Name " + parts[0] + " found for property " + prop + " but no class discovered (or listed twice).");
+        try (
+            BufferedReader r = new BufferedReader(new InputStreamReader(u.openStream(), StandardCharsets.UTF_8))) {
+          for(String line; (line = r.readLine()) != null;) {
+            m.reset(line);
+            if(!m.matches()) {
+              LOG.warning("Line: " + line + " didn't match regexp.");
+              continue;
             }
-            checkAliases(cls, parts[0], parts);
+            String stripped = m.group(1);
+            if(stripped.length() > 0) {
+              String[] parts = stripped.split(" ");
+              if(!names.remove(parts[0]) && !injar) {
+                LOG.warning("Name " + parts[0] + " found for property " + prop + " but no class discovered (or listed twice).");
+              }
+              checkAliases(cls, parts[0], parts);
+            }
           }
         }
       }
@@ -233,7 +231,7 @@ public class CheckELKIServices {
   @SuppressWarnings("unchecked")
   private void checkAliases(Class<?> parent, String classname, String[] parts) {
     Class<?> c = ELKIServiceRegistry.findImplementation((Class<Object>) parent, classname);
-    if (c == null) {
+    if(c == null) {
       return;
     }
     Alias ann = c.getAnnotation(Alias.class);
