@@ -38,19 +38,24 @@ public class ErrorFormatter extends Formatter {
    * 
    * TODO: make configurable via logging.properties
    */
-  public static final String[] PRUNE = {//
-  "de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI", //
-  "de.lmu.ifi.dbs.elki.KDDTask", //
-  "java.awt.event.", //
-  "java.awt.EventDispatchThread",//
-  "java.awt.EventQueue",//
-  "java.security.",//
-  "java.lang.Thread",//
-  "java.util.concurrent.",//
-  "javax.swing.SwingWorker", //
-  "java.util.concurrent.FutureTask", //
-  "org.apache.batik.", //
+  public static final String[] PRUNE = { //
+      "de.lmu.ifi.dbs.elki.gui.minigui.MiniGUI", //
+      "de.lmu.ifi.dbs.elki.KDDTask", //
+      "java.awt.event.", //
+      "java.awt.EventDispatchThread", //
+      "java.awt.EventQueue", //
+      "java.security.", //
+      "java.lang.Thread", //
+      "java.util.concurrent.", //
+      "javax.swing.SwingWorker", //
+      "java.util.concurrent.FutureTask", //
+      "org.apache.batik.", //
   };
+
+  /**
+   * Null error message.
+   */
+  private final String NULLMSG = "null" + OutputStreamLogger.NEWLINE;
 
   /**
    * Constructor.
@@ -61,22 +66,21 @@ public class ErrorFormatter extends Formatter {
 
   @Override
   public String format(LogRecord record) {
-    if (record instanceof ProgressLogRecord) {
+    if(record instanceof ProgressLogRecord) {
       return record.getMessage();
     }
     String msg = record.getMessage();
-    StringBuilder buf = new StringBuilder();
-    if (msg != null) {
-      buf.append(msg);
-      if (!msg.endsWith(OutputStreamLogger.NEWLINE)) {
-        buf.append(OutputStreamLogger.NEWLINE);
-      }
-    } else {
-      buf.append("null" + OutputStreamLogger.NEWLINE);
+    msg = msg != null ? msg : NULLMSG;
+    if(record.getThrown() == null) {
+      return msg.endsWith(OutputStreamLogger.NEWLINE) ? msg : (msg + OutputStreamLogger.NEWLINE);
     }
-    if (record.getThrown() != null) {
-      appendCauses(buf, record.getThrown());
+    // Enough space for some stack traces.
+    StringBuilder buf = new StringBuilder(msg.length() + 500);
+    buf.append(msg);
+    if(!msg.endsWith(OutputStreamLogger.NEWLINE)) {
+      buf.append(OutputStreamLogger.NEWLINE);
     }
+    appendCauses(buf, record.getThrown());
     return buf.toString();
   }
 
@@ -90,25 +94,25 @@ public class ErrorFormatter extends Formatter {
     buf.append(thrown.toString()).append(OutputStreamLogger.NEWLINE);
     StackTraceElement[] stack = thrown.getStackTrace();
     int end = stack.length - 1;
-    prune: for (; end >= 0; end--) {
+    prune: for(; end >= 0; end--) {
       String cn = stack[end].getClassName();
-      for (String pat : PRUNE) {
-        if (cn.startsWith(pat)) {
+      for(String pat : PRUNE) {
+        if(cn.startsWith(pat)) {
           continue prune;
         }
       }
       break;
     }
-    if (end <= 0) {
+    if(end <= 0) {
       end = stack.length - 1;
     }
-    for (int i = 0; i <= end; i++) {
+    for(int i = 0; i <= end; i++) {
       buf.append("\tat ").append(stack[i]).append(OutputStreamLogger.NEWLINE);
     }
-    if (end < stack.length - 1) {
+    if(end < stack.length - 1) {
       buf.append("\tat [...]").append(OutputStreamLogger.NEWLINE);
     }
-    if (thrown.getCause() != null) {
+    if(thrown.getCause() != null) {
       buf.append("Caused by: ");
       appendCauses(buf, thrown.getCause());
     }
