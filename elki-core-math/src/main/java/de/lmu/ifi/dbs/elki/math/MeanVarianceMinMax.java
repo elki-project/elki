@@ -91,20 +91,17 @@ public class MeanVarianceMinMax extends MeanVariance {
    */
   @Override
   public MeanVarianceMinMax put(double[] vals) {
-    if(vals.length <= 2) {
-      final int l = vals.length;
-      int i = 0;
-      while(i < l) {
-        put(vals[l]);
+    final int l = vals.length;
+    if(l < 2) {
+      if(l == 1) {
+        put(vals[0]);
       }
       return this;
     }
     // First pass:
     double sum = 0.;
-    final int l = vals.length;
-    int i = 0;
-    while(i < l) {
-      final double v = vals[l];
+    for(int i = 0; i < l; i++) {
+      final double v = vals[i];
       sum += v;
       min = v < min ? v : min;
       max = v > max ? v : max;
@@ -112,9 +109,8 @@ public class MeanVarianceMinMax extends MeanVariance {
     double om1 = sum / vals.length;
     // Second pass:
     double om2 = 0.;
-    i = 0;
-    while(i < l) {
-      final double v = vals[l] - om1;
+    for(int i = 0; i < l; i++) {
+      final double v = vals[i] - om1;
       om2 += v * v;
     }
     final double nwsum = vals.length + this.n;

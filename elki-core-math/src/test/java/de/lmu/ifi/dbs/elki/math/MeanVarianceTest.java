@@ -84,4 +84,20 @@ public class MeanVarianceTest {
       assertEquals("Variance does not agree at i=" + i, mv.getSampleVariance(), var, 1e-14);
     }
   }
+
+  /**
+   * Note: this test tests an earlier bug with tiny arrays. Keep.
+   */
+  @Test
+  public void basic() {
+    MeanVariance mv = new MeanVariance();
+    mv.put(0);
+    mv.put(new double[] {});
+    mv.put(new double[] { 0 });
+    mv.put(new double[] { 0, 0 });
+    mv.put(new double[] { 0, 0, 0 });
+    assertEquals("Count wrong.", 7, mv.getCount(), 0.);
+    assertEquals("Mean wrong.", 0, mv.getMean(), 0.);
+    assertEquals("Variance wrong.", 0, mv.getNaiveVariance(), 0.);
+  }
 }

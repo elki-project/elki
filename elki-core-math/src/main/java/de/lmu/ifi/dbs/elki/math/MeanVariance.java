@@ -57,8 +57,8 @@ import net.jafama.FastMath;
  * @since 0.2
  */
 @Reference(authors = "B. P. Welford", //
-title = "Note on a method for calculating corrected sums of squares and products", //
-booktitle = "Technometrics 4(3)")
+    title = "Note on a method for calculating corrected sums of squares and products", //
+    booktitle = "Technometrics 4(3)")
 public class MeanVariance extends Mean {
   /**
    * nVariance
@@ -108,8 +108,8 @@ public class MeanVariance extends Mean {
    */
   @Override
   @Reference(authors = "D.H.D. West", //
-  title = "Updating Mean and Variance Estimates: An Improved Method", //
-  booktitle = "Communications of the ACM, Volume 22 Issue 9")
+      title = "Updating Mean and Variance Estimates: An Improved Method", //
+      booktitle = "Communications of the ACM, Volume 22 Issue 9")
   public void put(double val, double weight) {
     final double nwsum = weight + n;
     final double delta = val - m1;
@@ -151,27 +151,23 @@ public class MeanVariance extends Mean {
    */
   @Override
   public MeanVariance put(double[] vals) {
-    if(vals.length <= 2) {
-      final int l = vals.length;
-      int i = 0;
-      while(i < l) {
-        put(vals[l]);
+    final int l = vals.length;
+    if(l < 2) {
+      if(l == 1) {
+        put(vals[0]);
       }
       return this;
     }
     // First pass:
     double sum = 0.;
-    final int l = vals.length;
-    int i = 0;
-    while(i < l) {
-      sum += vals[l];
+    for(int i = 0; i < l; i++) {
+      sum += vals[i];
     }
     double om1 = sum / vals.length;
     // Second pass:
     double om2 = 0.;
-    i = 0;
-    while(i < l) {
-      final double v = vals[l] - om1;
+    for(int i = 0; i < l; i++) {
+      final double v = vals[i] - om1;
       om2 += v * v;
     }
     final double nwsum = vals.length + this.n;

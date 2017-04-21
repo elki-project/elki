@@ -91,9 +91,8 @@ public class IntegerMinMax {
    */
   public void put(int[] data) {
     final int l = data.length;
-    int i = 0;
-    while(i < l) {
-      final int val = data[l];
+    for(int i = 0; i < l; i++) {
+      final int val = data[i];
       min = val < min ? val : min;
       max = val > max ? val : max;
     }

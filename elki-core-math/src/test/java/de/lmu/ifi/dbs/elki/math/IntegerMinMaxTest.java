@@ -25,39 +25,24 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
- * Test the Mean class.
+ * Test the IntegerMinMax class.
  *
  * @author Erich Schubert
- * @since 0.4.0
  */
-public class MeanTest {
-  @Test
-  public void testInfinity() {
-    Mean m = new Mean();
-    m.put(Double.POSITIVE_INFINITY);
-    m.put(0.);
-    assertEquals(2, m.getCount(), 0);
-    assertEquals("Sensitive to infinity", Double.POSITIVE_INFINITY, m.getMean(), 0);
-    m = new Mean();
-    m.put(Double.NEGATIVE_INFINITY);
-    m.put(0.);
-    assertEquals(2, m.getCount(), 0);
-    assertEquals("Sensitive to infinity", Double.NEGATIVE_INFINITY, m.getMean(), 0);
-  }
-
-
+public class IntegerMinMaxTest {
   /**
    * Note: this test tests an earlier bug with tiny arrays. Keep.
    */
   @Test
   public void basic() {
-    Mean m = new Mean();
+    IntegerMinMax m = new IntegerMinMax();
     m.put(0);
-    m.put(new double[] {});
-    m.put(new double[] { 0 });
-    m.put(new double[] { 0, 0 });
-    m.put(new double[] { 0, 0, 0 });
-    assertEquals("Count wrong.", 7, m.getCount(), 0.);
-    assertEquals("Mean wrong.", 0, m.getMean(), 0.);
+    m.put(new int[] {});
+    m.put(new int[] { 0 });
+    m.put(new int[] { -1, +2 });
+    m.put(new int[] { 0, 0, 0 });
+    assertEquals("Min wrong.", -1, m.getMin(), 0.);
+    assertEquals("Max wrong.", +2, m.getMax(), 0.);
+    assertEquals("Diff wrong.", 3, m.getDiff(), 0.);
   }
 }
