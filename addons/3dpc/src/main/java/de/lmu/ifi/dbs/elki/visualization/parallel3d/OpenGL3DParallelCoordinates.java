@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
 import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
@@ -139,7 +140,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       }
       @SuppressWarnings("unchecked")
       Relation<? extends O> vrel = (Relation<? extends O>) rel;
-      ScalesResult scales = ResultUtil.getScalesResult(vrel);
+      ScalesResult scales = ScalesResult.getScalesResult(vrel);
       ProjectionParallel proj = new SimpleParallel(null, scales.getScales());
       PropertiesBasedStyleLibrary stylelib = new PropertiesBasedStyleLibrary();
       StylingPolicy stylepol = getStylePolicy(hier, stylelib);
@@ -158,8 +159,8 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
    */
   public StylingPolicy getStylePolicy(ResultHierarchy hier, StyleLibrary stylelib) {
     Database db = ResultUtil.findDatabase(hier);
-    ResultUtil.ensureClusteringResult(db, db);
-    List<Clustering<? extends Model>> clusterings = ResultUtil.getClusteringResults(db);
+    AutomaticEvaluation.ensureClusteringResult(db, db);
+    List<Clustering<? extends Model>> clusterings = Clustering.getClusteringResults(db);
     if(clusterings.size() > 0) {
       return new ClusterStylingPolicy(clusterings.get(0), stylelib);
     }
