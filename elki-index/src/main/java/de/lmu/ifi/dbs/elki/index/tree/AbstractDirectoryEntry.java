@@ -128,7 +128,7 @@ public abstract class AbstractDirectoryEntry implements DirectoryEntry {
 
     final AbstractDirectoryEntry that = (AbstractDirectoryEntry) o;
 
-    return id == that.id;
+    return id.intValue() == that.id.intValue();
   }
 
   /**

@@ -282,7 +282,7 @@ public class CASHInterval extends HyperBoundingBox implements Comparable<CASHInt
     }
 
     final CASHInterval interval = (CASHInterval) o;
-    if(intervalID != interval.intervalID) {
+    if(intervalID.intValue() != interval.intervalID.intValue()) {
       return false;
     }
     return super.equals(o);
