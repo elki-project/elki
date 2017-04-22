@@ -1,6 +1,5 @@
 description = 'ELKI - Classification Algorithms'
 dependencies {
-  compile project(':elki-core-distance')
-  compile project(':elki-index')
-  compile project(':elki-database')
+  compile project(':elki-core')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }

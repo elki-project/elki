@@ -1,6 +1,5 @@
 description = 'ELKI - Persistence Layer'
 dependencies {
-  // We require integer ids here, for now.
-  compile project(':elki-core-dbids-int')
+  compile project(':elki-core-api')
   testCompile group: 'junit', name: 'junit', version:'[4.8,)'
 }

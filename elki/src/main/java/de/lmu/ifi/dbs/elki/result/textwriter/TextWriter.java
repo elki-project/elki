@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
 import de.lmu.ifi.dbs.elki.data.LabelList;
 import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.data.synthetic.bymodel.GeneratorSingleCluster;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
@@ -112,7 +111,6 @@ public class TextWriter {
     writers.insertHandler(HierarchicalClassLabel.class, trivialwriter);
     writers.insertHandler(LabelList.class, trivialwriter);
     writers.insertHandler(DBID.class, trivialwriter);
-    writers.insertHandler(GeneratorSingleCluster.class, ignorewriter);
     writers.insertHandler(XYCurve.class, new TextWriterXYCurve());
     // Objects that have an own writeToText method.
     writers.insertHandler(TextWriteable.class, new TextWriterTextWriteable());

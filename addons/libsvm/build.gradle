@@ -1,6 +1,5 @@
-
 description = 'ELKI - LibSVM based extensions'
 dependencies {
-  compile project(':elki')
-    compile group: 'tw.edu.ntu.csie', name: 'libsvm', version:'3.17'
+  compile project(':elki-outlier')
+  compile group: 'tw.edu.ntu.csie', name: 'libsvm', version:'3.17'
 }

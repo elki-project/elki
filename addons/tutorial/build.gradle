@@ -1,5 +1,4 @@
 description = 'ELKI - Tutorial Algorithms'
 dependencies {
   compile project(':elki')
-  compile project(':elki-batik-visualization')
 }

@@ -1,7 +1,4 @@
-
 description = 'ELKI - MiniGUI Command Line Builder'
 dependencies {
-  compile project(':elki-logging')
   compile project(':elki')
-    testCompile group: 'junit', name: 'junit', version:'[4.8,)'
 }

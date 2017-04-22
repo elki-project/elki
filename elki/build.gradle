@@ -1,6 +1,5 @@
 description = 'ELKI - Main Module'
 dependencies {
-  compile project(':elki-data-generator')
   compile project(':elki-clustering')
   compile project(':elki-outlier')
   compile project(':elki-itemsets')
@@ -17,7 +16,6 @@ dependencies {
   testCompile project(path: ':elki-test-core', configuration: 'testOutput')
   testCompile project(path: ':elki-outlier', configuration: 'testOutput')
   testCompile project(path: ':elki-clustering', configuration: 'testOutput')
-  testCompile group: 'junit', name: 'junit', version:'[4.8,)'
 }
 
 jar {

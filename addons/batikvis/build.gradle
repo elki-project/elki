@@ -9,5 +9,4 @@ dependencies {
   compile project(':elki')
   compile project(':elki-gui-minigui')
   compile project(':elki-uncertain')
-  testCompile project(':elki-docutil')
 }
