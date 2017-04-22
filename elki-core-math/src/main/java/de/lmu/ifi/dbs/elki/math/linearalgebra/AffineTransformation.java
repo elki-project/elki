@@ -48,7 +48,7 @@ public class AffineTransformation {
   /**
    * the dimensionality of the transformation
    */
-  private int dim;
+  private final int dim;
 
   /**
    * The transformation matrix of dim+1 x dim+1 for homogeneous coordinates
@@ -58,7 +58,7 @@ public class AffineTransformation {
   /**
    * the inverse transformation
    */
-  private double[][] inv = null;
+  private double[][] inv;
 
   /**
    * Constructor for an identity transformation.
@@ -75,8 +75,8 @@ public class AffineTransformation {
    * Trivial constructor with all fields, mostly for cloning
    *
    * @param dim dimensionality
-   * @param trans transformation matrix
-   * @param inv inverse matrix
+   * @param trans transformation matrix (will NOT be copied!)
+   * @param inv inverse matrix (will NOT be copied!)
    */
   public AffineTransformation(int dim, double[][] trans, double[][] inv) {
     super();
@@ -98,7 +98,7 @@ public class AffineTransformation {
    * @param axes (Partial) list of axes
    * @return new transformation to do the requested reordering
    */
-  public static AffineTransformation reorderAxesTransformation(int dim, int[] axes) {
+  public static AffineTransformation reorderAxesTransformation(int dim, int... axes) {
     double[][] m = zeroMatrix(dim + 1);
     // insert ones appropriately:
     for(int i = 0; i < axes.length; i++) {
@@ -269,18 +269,18 @@ public class AffineTransformation {
   }
 
   /**
-   * Get a copy of the transformation matrix
+   * Get the transformation matrix
    *
-   * @return copy of the transformation matrix
+   * @return the transformation matrix
    */
   public double[][] getTransformation() {
     return trans;
   }
 
   /**
-   * Get a copy of the inverse matrix
+   * Get a the inverse matrix
    *
-   * @return a copy of the inverse transformation matrix
+   * @return the inverse transformation matrix
    */
   public double[][] getInverse() {
     if(inv == null) {

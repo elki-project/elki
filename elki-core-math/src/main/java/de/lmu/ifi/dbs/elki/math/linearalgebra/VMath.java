@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.math.linearalgebra;
 
 import java.util.Arrays;
 
-import de.lmu.ifi.dbs.elki.math.MathUtil;
 import net.jafama.FastMath;
 
 /**
@@ -111,7 +110,7 @@ public final class VMath {
    * @return a copy of this vector
    */
   public static double[] copy(final double[] v) {
-    return Arrays.copyOf(v, v.length);
+    return v.clone();
   }
 
   /**

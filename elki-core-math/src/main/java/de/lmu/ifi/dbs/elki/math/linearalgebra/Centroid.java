@@ -29,11 +29,8 @@ import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 /**
  * Class to compute the centroid of some data.
  * 
- * Note: this class abstracts the efficient and numerical stable computation of
- * centroids.
- * 
- * See {@link de.lmu.ifi.dbs.elki.database.DatabaseUtil DatabaseUtil} for easier
- * to use APIs.
+ * This is a more numerically stable approach than simply taking the sum divided
+ * by the count.
  * 
  * @author Erich Schubert
  * @since 0.4.0

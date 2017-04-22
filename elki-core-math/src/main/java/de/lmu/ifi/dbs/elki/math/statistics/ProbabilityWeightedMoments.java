@@ -44,8 +44,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @author Erich Schubert
  * @since 0.6.0
  */
-@Reference(authors = "J.R.M. Hosking, J. R. Wallis, and E. F. Wood", title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", booktitle = "Technometrics 27.3", url = "http://dx.doi.org/10.1080/00401706.1985.10488049")
-public class ProbabilityWeightedMoments {
+@Reference(authors = "J.R.M. Hosking, J. R. Wallis, and E. F. Wood", //
+    title = "Estimation of the generalized extreme-value distribution by the method of probability-weighted moments.", //
+    booktitle = "Technometrics 27.3", //
+    url = "http://dx.doi.org/10.1080/00401706.1985.10488049")
+public final class ProbabilityWeightedMoments {
+  /**
+   * Private constructor, use static methods!
+   */
+  private ProbabilityWeightedMoments() {
+    // Static utility class - do not instantiate!
+  }
+
   /**
    * Compute the alpha_r factors using the method of probability-weighted
    * moments.
@@ -154,16 +164,7 @@ public class ProbabilityWeightedMoments {
       z *= n - j;
       sum[j] /= z;
     }
-    for(int k = nmom - 1; k >= 1; --k) {
-      double p = ((k & 1) == 0) ? +1 : -1;
-      double temp = p * sum[0];
-      for(int i = 0; i < k; i++) {
-        double ai = i + 1.;
-        p *= -(k + ai) * (k - i) / (ai * ai);
-        temp += p * sum[i + 1];
-      }
-      sum[k] = temp;
-    }
+    normalizeLMR(sum, nmom);
     // Handle case when lambda2 == 0, by setting tau3...tauN = 0:
     if(sum[1] == 0) {
       for(int i = 2; i < nmom; i++) {
@@ -176,5 +177,24 @@ public class ProbabilityWeightedMoments {
       sum[i] /= sum[1];
     }
     return sum;
+  }
+
+  /**
+   * Normalize the moments
+   * 
+   * @param sum Sums
+   * @param nmom Number of moments
+   */
+  private static void normalizeLMR(double[] sum, int nmom) {
+    for(int k = nmom - 1; k >= 1; --k) {
+      double p = ((k & 1) == 0) ? +1 : -1;
+      double temp = p * sum[0];
+      for(int i = 0; i < k; i++) {
+        double ai = i + 1.;
+        p *= -(k + ai) * (k - i) / (ai * ai);
+        temp += p * sum[i + 1];
+      }
+      sum[k] = temp;
+    }
   }
 }

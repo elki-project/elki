@@ -42,5 +42,5 @@ public interface DimensionSimilarity<V> {
    * @param subset DBID subset (for sampling / selection)
    * @param matrix Matrix to fill
    */
-  public void computeDimensionSimilarites(Relation<? extends V> relation, DBIDs subset, DimensionSimilarityMatrix matrix);
+  void computeDimensionSimilarites(Relation<? extends V> relation, DBIDs subset, DimensionSimilarityMatrix matrix);
 }

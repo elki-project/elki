@@ -261,7 +261,7 @@ public class LUDecomposition implements java.io.Serializable {
    * @param B A Matrix with as many rows as A and any number of columns.
    * @return X so that L*U*X = B(piv,:)
    * @exception IllegalArgumentException Matrix row dimensions must agree.
-   * @exception RuntimeException Matrix is singular.
+   * @exception ArithmeticException Matrix is singular.
    */
   public double[][] solve(double[][] B) {
     int mx = B.length;
@@ -270,7 +270,7 @@ public class LUDecomposition implements java.io.Serializable {
       throw new IllegalArgumentException("Matrix row dimensions must agree.");
     }
     if (!this.isNonsingular()) {
-      throw new RuntimeException("Matrix is singular.");
+      throw new ArithmeticException("Matrix is singular.");
     }
     double[][] Xmat = VMath.getMatrix(B, piv, 0, nx - 1);
     solveInplace(Xmat, nx);

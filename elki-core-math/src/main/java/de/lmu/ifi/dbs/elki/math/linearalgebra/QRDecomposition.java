@@ -206,7 +206,7 @@ public class QRDecomposition implements java.io.Serializable {
    * @param B A Matrix with as many rows as A and any number of columns.
    * @return X that minimizes the two norm of Q*R*X-B.
    * @exception IllegalArgumentException Matrix row dimensions must agree.
-   * @exception RuntimeException Matrix is rank deficient.
+   * @exception ArithmeticException Matrix is rank deficient.
    */
   public double[][] solve(double[][] B) {
     int rows = B.length;
@@ -215,7 +215,7 @@ public class QRDecomposition implements java.io.Serializable {
       throw new IllegalArgumentException("Matrix row dimensions must agree.");
     }
     if(!this.isFullRank()) {
-      throw new RuntimeException("Matrix is rank deficient.");
+      throw new ArithmeticException("Matrix is rank deficient.");
     }
 
     // Copy right hand side

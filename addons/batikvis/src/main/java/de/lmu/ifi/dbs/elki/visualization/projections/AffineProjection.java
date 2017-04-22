@@ -147,7 +147,7 @@ public class AffineProjection extends AbstractFullProjection implements Projecti
   public static AffineTransformation axisProjection(int dim, int ax1, int ax2) {
     // setup a projection to get the data into the interval -1:+1 in each
     // dimension with the intended-to-see dimensions first.
-    AffineTransformation proj = AffineTransformation.reorderAxesTransformation(dim, new int[] { ax1, ax2 });
+    AffineTransformation proj = AffineTransformation.reorderAxesTransformation(dim, ax1, ax2);
     // Assuming that the data was normalized on [0:1], center it:
     double[] trans = new double[dim];
     for(int i = 0; i < dim; i++) {

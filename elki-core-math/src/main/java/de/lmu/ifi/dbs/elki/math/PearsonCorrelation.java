@@ -38,23 +38,28 @@ public class PearsonCorrelation {
   /**
    * Aggregation for squared residuals - we are not using sum-of-squares!
    */
-  private double sumXX = 0., sumYY = 0., sumXY = 0.;
+  private double sumXX, sumYY, sumXY;
 
   /**
    * Current mean for X and Y.
    */
-  private double meanX = 0., meanY = 0.;
+  private double meanX, meanY;
 
   /**
    * Weight sum.
    */
-  private double sumWe = 0.;
+  private double sumWe;
 
   /**
    * Constructor.
    */
   public PearsonCorrelation() {
-    super();
+    sumXX = 0.;
+    sumYY = 0.;
+    sumXY = 0.;
+    meanX = 0.;
+    meanY = 0.;
+    sumWe = 0.;
   }
 
   /**

@@ -383,13 +383,12 @@ public final class SphereUtil {
       final double ssig = sqrt(term1 * term1 + term2 * term2);
       // Eqn (15) - \cos \sigma
       final double csig = su1 * su2 + cu1 * cu2 * clon;
-      // Eqn (16) - \sigma from \tan \sigma
-      final double sigma = atan2(ssig, csig);
-
       // Two identical points?
       if(!(ssig > 0)) {
         return 0.;
       }
+      // Eqn (16) - \sigma from \tan \sigma
+      final double sigma = atan2(ssig, csig);
       // Eqn (17) - \sin \alpha, and this way \cos^2 \alpha
       final double salp = cu1 * cu2 * slon / ssig;
       final double c2alp = (1. + salp) * (1. - salp);
@@ -533,9 +532,6 @@ public final class SphereUtil {
     final double xE = clat1 * slat2 - slat1 * clat2 * cdlon12;
     final double xQ = clat1 * slatQ - slat1 * clatQ * cdlon1Q;
 
-    final double crs12 = atan2(yE, xE);
-    final double crs1Q = atan2(yQ, xQ);
-
     // Calculate cross-track distance
     // Haversine formula, higher precision at < 1 meters but maybe issues at
     // antipodal points - we do not yet multiply with the radius!
@@ -545,6 +541,8 @@ public final class SphereUtil {
     if(a > 0.9999_9999_9999_999 || a < -0.9999_9999_9999_999 || a == 0.) {
       return 0.;
     }
+    final double crs12 = atan2(yE, xE);
+    final double crs1Q = atan2(yQ, xQ);  
     return asin(sqrt(a) * sqrt(1 - a) * 2 * sin(crs1Q - crs12));
     // final double angDist1Q = a < 1 ? 2 * asin(sqrt(a)) : 0;
     // return asin(sin(angDist1Q) * sin(crs1Q - crs12));

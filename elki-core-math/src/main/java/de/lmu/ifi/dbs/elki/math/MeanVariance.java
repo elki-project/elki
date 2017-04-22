@@ -61,15 +61,15 @@ import net.jafama.FastMath;
     booktitle = "Technometrics 4(3)")
 public class MeanVariance extends Mean {
   /**
-   * nVariance
+   * n times Variance
    */
-  protected double m2 = 0.0;
+  protected double m2;
 
   /**
    * Empty constructor
    */
   public MeanVariance() {
-    // nothing to do here, initialization done above.
+    m2 = 0.;
   }
 
   /**
