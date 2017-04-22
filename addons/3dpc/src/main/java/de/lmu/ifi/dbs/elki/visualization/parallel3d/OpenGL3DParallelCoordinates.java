@@ -52,8 +52,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
+import de.lmu.ifi.dbs.elki.math.statistics.dependence.DependenceMeasure;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
@@ -70,10 +69,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.EmptyParame
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
-import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layout;
-import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layouter3DPC;
-import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.SimilarityBasedLayouter3DPC;
-import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.SimpleCircularMSTLayout3DPC;
+import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.*;
 import de.lmu.ifi.dbs.elki.visualization.parallel3d.util.Arcball1DOFAdapter;
 import de.lmu.ifi.dbs.elki.visualization.parallel3d.util.Simple1DOFCamera;
 import de.lmu.ifi.dbs.elki.visualization.parallel3d.util.Simple1DOFCamera.CameraListener;
@@ -180,7 +176,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
     /**
      * Similarity measure in use.
      */
-    public DimensionSimilarity<? super O> sim;
+    public DependenceMeasure sim;
 
     /**
      * Layouting method.
@@ -340,7 +336,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       /**
        * Current similarity matrix.
        */
-      DimensionSimilarityMatrix mat;
+      double[] mat;
     };
 
     Shared<O> shared = new Shared<>();
@@ -410,7 +406,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
         if(options.size() > 0) {
           options.add(null); // Spacer.
         }
-        for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(DimensionSimilarity.class)) {
+        for(Class<?> clz : ELKIServiceRegistry.findAllImplementations(DependenceMeasure.class)) {
           options.add(clz.getSimpleName());
         }
       }
@@ -454,9 +450,9 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
         // Try with Dimension Similarity instead.
       }
       try {
-        final Class<?> simc = ELKIServiceRegistry.findImplementation(DimensionSimilarity.class, parname);
+        final Class<?> simc = ELKIServiceRegistry.findImplementation(DependenceMeasure.class, parname);
         if(simc != null) {
-          shared.settings.sim = ClassGenericsUtil.tryInstantiate(DimensionSimilarity.class, simc, new EmptyParameterization());
+          shared.settings.sim = ClassGenericsUtil.tryInstantiate(DependenceMeasure.class, simc, new EmptyParameterization());
           if(!(shared.settings.layout instanceof SimilarityBasedLayouter3DPC)) {
             ListParameterization params = new ListParameterization();
             params.addParameter(SimilarityBasedLayouter3DPC.SIM_ID, shared.settings.sim);
@@ -482,12 +478,10 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
         public void run() {
           messageOverlay.setMessage("Computing axis similarities and layout...");
           if(shared.settings.sim != null && shared.settings.layout instanceof SimilarityBasedLayouter3DPC) {
-            @SuppressWarnings("unchecked")
-            final SimilarityBasedLayouter3DPC<O> layouter = (SimilarityBasedLayouter3DPC<O>) shared.settings.layout;
+            final SimilarityBasedLayouter3DPC layouter = (SimilarityBasedLayouter3DPC) shared.settings.layout;
             if(shared.mat == null) {
               messageOverlay.setMessage("Recomputing similarity matrix.");
-              shared.mat = DimensionSimilarityMatrix.make(shared.dim);
-              shared.settings.sim.computeDimensionSimilarites(shared.rel, shared.rel.getDBIDs(), shared.mat);
+              shared.mat = AbstractLayout3DPC.computeSimilarityMatrix(shared.settings.sim, shared.rel);
             }
             messageOverlay.setMessage("Recomputing layout using similarity matrix.");
             final Layout newlayout = layouter.layout(shared.dim, shared.mat);

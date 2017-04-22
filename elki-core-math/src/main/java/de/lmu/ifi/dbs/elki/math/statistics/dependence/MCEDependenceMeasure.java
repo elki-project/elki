@@ -197,7 +197,7 @@ public class MCEDependenceMeasure extends AbstractDependenceMeasure {
   private int intersectionSize(int[] px, int[] py) {
     int i = 0, j = 0, c = 0;
     while(i < px.length && j < py.length) {
-      final int vx = px[i], vy = py[i];
+      final int vx = px[i], vy = py[j];
       if(vx < vy) {
         ++i;
       }

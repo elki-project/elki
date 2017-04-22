@@ -20,8 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
 
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
+import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.math.statistics.dependence.DependenceMeasure;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
@@ -29,10 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * 
  * @author Erich Schubert
  * @since 0.6.0
- * 
- * @param <V> Data type
  */
-public interface SimilarityBasedLayouter3DPC<V> extends Layouter3DPC<V> {
+public interface SimilarityBasedLayouter3DPC extends Layouter3DPC<NumberVector> {
   /**
    * Option for similarity measure.
    */
@@ -43,7 +41,7 @@ public interface SimilarityBasedLayouter3DPC<V> extends Layouter3DPC<V> {
    * 
    * @return Similarity measure.
    */
-  DimensionSimilarity<? super V> getSimilarity();
+  DependenceMeasure getSimilarity();
 
   /**
    * Main analysis method.
@@ -52,5 +50,5 @@ public interface SimilarityBasedLayouter3DPC<V> extends Layouter3DPC<V> {
    * @param mat Similarity matrix
    * @return Layout
    */
-  Layout layout(final int dim, DimensionSimilarityMatrix mat);
+  Layout layout(final int dim, double[] mat);
 }

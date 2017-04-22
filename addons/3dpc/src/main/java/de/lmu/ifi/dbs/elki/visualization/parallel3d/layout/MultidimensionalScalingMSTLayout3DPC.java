@@ -22,11 +22,10 @@ package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.SingularValueDecomposition;
+import de.lmu.ifi.dbs.elki.math.statistics.dependence.DependenceMeasure;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
@@ -53,7 +52,7 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
    * 
    * @param sim Similarity measure
    */
-  public MultidimensionalScalingMSTLayout3DPC(DimensionSimilarity<NumberVector> sim) {
+  public MultidimensionalScalingMSTLayout3DPC(DependenceMeasure sim) {
     super(sim);
   }
 
@@ -80,28 +79,24 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
   }
 
   @Override
-  public Layout layout(int dim, DimensionSimilarityMatrix mat) {
+  public Layout layout(int dim, double[] mat) {
     // Find maximum of |cij|
     double max = 0;
-    for(int i = 0; i < dim; i++) {
-      for(int j = i + 1; j < dim; j++) {
-        double v = Math.abs(mat.get(j, i));
-        if(v > max) {
-          max = v;
-        }
-      }
+    for(double v : mat) {
+      v = (v > 0) ? v : -v;
+      max = (v > max) ? v : max;
     }
     // Assume that "max - |cij|" is now a distance.
     // We use sqrt(v) instead of v*v, since this makes the method
     // less aggressive overall, and we are not using euclidean anyway.
     double means[] = new double[dim];
     double mean = 0.0;
-    for(int i = 0; i < dim; i++) {
-      for(int j = i + 1; j < dim; j++) {
-        double v = max - Math.abs(mat.get(i, j));
+    for(int y = 1, o = 0; y < dim; y++) {
+      for(int x = 0; x < y; x++, o++) {
+        double v = max - Math.abs(mat[o]);
         v = -.5 * FastMath.sqrt(v);
-        means[i] += v;
-        means[j] += v;
+        means[x] += v;
+        means[y] += v;
         mean += 2 * v;
       }
     }
@@ -111,12 +106,12 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
     mean /= (dim * dim);
     // Build double centered matrix:
     double[][] d = new double[dim][dim];
-    for(int i = 0; i < dim; i++) {
-      d[i][i] = -2 * means[i] + mean;
-      for(int j = i + 1; j < dim; j++) {
-        double v = max - Math.abs(mat.get(i, j));
-        v = -.5 * FastMath.sqrt(v) - means[i] - means[j] + mean;
-        d[i][j] = d[j][i] = v;
+    for(int y = 1, o = 0; y < dim; y++) {
+      d[y][y] = -2 * means[y] + mean;
+      for(int x = 0; x < y; x++, o++) {
+        double v = max - Math.abs(mat[o]);
+        v = -.5 * FastMath.sqrt(v) - means[x] - means[y] + mean;
+        d[x][y] = d[y][x] = v;
       }
     }
 
@@ -127,7 +122,7 @@ public class MultidimensionalScalingMSTLayout3DPC extends AbstractLayout3DPC<Mul
     lambda[1] = FastMath.sqrt(Math.abs(lambda[1]));
 
     Layout l = new Layout();
-    buildSpanningTree(mat, l);
+    buildSpanningTree(dim, mat, l);
 
     double maxabs = 0;
     for(int i = 0; i < dim; i++) {

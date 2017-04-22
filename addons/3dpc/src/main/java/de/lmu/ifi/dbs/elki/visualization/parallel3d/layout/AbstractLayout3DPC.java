@@ -26,12 +26,13 @@ import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.CovarianceDimensionSimilarity;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
 import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
+import de.lmu.ifi.dbs.elki.math.statistics.dependence.CorrelationDependenceMeasure;
+import de.lmu.ifi.dbs.elki.math.statistics.dependence.DependenceMeasure;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
@@ -43,37 +44,84 @@ import de.lmu.ifi.dbs.elki.visualization.parallel3d.layout.Layout.Edge;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public abstract class AbstractLayout3DPC<N extends Layout.Node> implements SimilarityBasedLayouter3DPC<NumberVector> {
+public abstract class AbstractLayout3DPC<N extends Layout.Node> implements SimilarityBasedLayouter3DPC {
   /**
    * Similarity measure
    */
-  DimensionSimilarity<? super NumberVector> sim = CovarianceDimensionSimilarity.STATIC;
+  DependenceMeasure sim = CorrelationDependenceMeasure.STATIC;
 
   /**
    * Constructor.
    *
    * @param sim Similarity measure
    */
-  public AbstractLayout3DPC(DimensionSimilarity<? super NumberVector> sim) {
+  public AbstractLayout3DPC(DependenceMeasure sim) {
     super();
     this.sim = sim;
   }
 
   @Override
-  public DimensionSimilarity<? super NumberVector> getSimilarity() {
+  public DependenceMeasure getSimilarity() {
     return sim;
   }
 
   @Override
   public Layout layout(Relation<? extends NumberVector> rel) {
-    int dim = RelationUtil.dimensionality(rel);
-    DimensionSimilarityMatrix mat = DimensionSimilarityMatrix.make(dim);
-    sim.computeDimensionSimilarites(rel, rel.getDBIDs(), mat);
-    return layout(dim, mat);
+    final int dim = RelationUtil.dimensionality(rel);
+    return layout(dim, computeSimilarityMatrix(sim, rel));
+  }
+
+  /**
+   * Compute a column-wise dependency matrix for the given relation.
+   * 
+   * @param sim Dependence measure
+   * @param rel Vector relation
+   * @return Similarity matrix (lower triangular form)
+   */
+  public static double[] computeSimilarityMatrix(DependenceMeasure sim, Relation<? extends NumberVector> rel) {
+    final int dim = RelationUtil.dimensionality(rel);
+    final int size = rel.size();
+    // TODO: we could use less memory (no copy), but this would likely be
+    // slower. Maybe as a fallback option?
+    double[][] data = new double[dim][size];
+    int r = 0;
+    for(DBIDIter it = rel.iterDBIDs(); it.valid(); it.advance(), r++) {
+      NumberVector v = rel.get(it);
+      for(int d = 0; d < dim; d++) {
+        data[d][r] = v.doubleValue(d);
+      }
+    }
+    return sim.dependence(DoubleArrayAdapter.STATIC, Arrays.asList(data));
   }
 
   @Override
-  public abstract Layout layout(final int dim, DimensionSimilarityMatrix mat);
+  public abstract Layout layout(final int dim, double[] mat);
+
+  /**
+   * Class to use a lower-triangular similarity matrix for distance-based Prim's
+   * spanning tree.
+   * 
+   * @author Erich Schubert
+   */
+  private static class LowerTriangularAdapter implements PrimsMinimumSpanningTree.Adapter<double[]> {
+    int dim;
+
+    public LowerTriangularAdapter(int dim) {
+      this.dim = dim;
+    }
+
+    @Override
+    public double distance(double[] data, int i, int j) {
+      // Ensure i < j
+      return (i == j) ? 0. : (j < i) ? distance(data, j, i) : //
+          -Math.abs(data[((j * (j - 1)) >> 1) + i]);
+    }
+
+    @Override
+    public int size(double[] data) {
+      return dim;
+    }
+  }
 
   /**
    * Build the minimum spanning tree.
@@ -82,9 +130,9 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
    * @param layout Layout to write to
    * @return Root node id
    */
-  protected N buildSpanningTree(DimensionSimilarityMatrix mat, Layout layout) {
-    assert(layout.edges == null || layout.edges.size() == 0);
-    int[] iedges = PrimsMinimumSpanningTree.processDense(mat, DimensionSimilarityMatrix.PRIM_ADAPTER);
+  protected N buildSpanningTree(int dim, double[] mat, Layout layout) {
+    assert (layout.edges == null || layout.edges.size() == 0);
+    int[] iedges = PrimsMinimumSpanningTree.processDense(mat, new LowerTriangularAdapter(dim));
     int root = findOptimalRoot(iedges);
 
     // Convert edges:
@@ -95,8 +143,8 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
     layout.edges = edges;
 
     // Prefill nodes array with nulls.
-    ArrayList<N> nodes = new ArrayList<>(mat.size());
-    for(int i = 0; i < mat.size(); i++) {
+    ArrayList<N> nodes = new ArrayList<>(dim);
+    for(int i = 0; i < dim; i++) {
       nodes.add(null);
     }
     layout.nodes = nodes;
@@ -145,7 +193,7 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
         children.add(buildTree(msg, msg[i], cur, nodes));
       }
     }
-    assert(c == 0);
+    assert (c == 0);
     N node = makeNode(cur, children);
     nodes.set(cur, node);
     return node;
@@ -281,12 +329,12 @@ public abstract class AbstractLayout3DPC<N extends Layout.Node> implements Simil
     /**
      * Similarity measure
      */
-    DimensionSimilarity<NumberVector> sim;
+    DependenceMeasure sim;
 
     @Override
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
-      ObjectParameter<DimensionSimilarity<NumberVector>> simP = new ObjectParameter<>(SIM_ID, DimensionSimilarity.class, CovarianceDimensionSimilarity.class);
+      ObjectParameter<DependenceMeasure> simP = new ObjectParameter<>(SIM_ID, DependenceMeasure.class, CorrelationDependenceMeasure.class);
       if(config.grab(simP)) {
         sim = simP.instantiateClass(config);
       }

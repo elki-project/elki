@@ -22,11 +22,10 @@ package de.lmu.ifi.dbs.elki.visualization.parallel3d.layout;
 
 import java.util.List;
 
-import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarity;
-import de.lmu.ifi.dbs.elki.math.dimensionsimilarity.DimensionSimilarityMatrix;
+import de.lmu.ifi.dbs.elki.math.statistics.dependence.DependenceMeasure;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 import net.jafama.FastMath;
 
 /**
@@ -50,7 +49,7 @@ public class CompactCircularMSTLayout3DPC extends AbstractLayout3DPC<CompactCirc
    * 
    * @param sim Similarity measure
    */
-  public CompactCircularMSTLayout3DPC(DimensionSimilarity<NumberVector> sim) {
+  public CompactCircularMSTLayout3DPC(DependenceMeasure sim) {
     super(sim);
   }
 
@@ -77,9 +76,9 @@ public class CompactCircularMSTLayout3DPC extends AbstractLayout3DPC<CompactCirc
   }
 
   @Override
-  public Layout layout(int dim, DimensionSimilarityMatrix mat) {
+  public Layout layout(int dim, double[] mat) {
     Layout l = new Layout();
-    Node rootnode = buildSpanningTree(mat, l);
+    Node rootnode = buildSpanningTree(dim, mat, l);
     int maxdepth = maxDepth(rootnode);
     computeWeights(rootnode);
     computePositions(rootnode, 0, 0, MathUtil.TWOPI, 0.0, 1.0 / (maxdepth - 1));
