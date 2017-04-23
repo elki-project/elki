@@ -1,6 +1,6 @@
 description = 'ELKI - M-Tree Variants'
 dependencies {
   compile project(':elki-index')
-  compile project(':elki-core')
+  // Currently in elki-index: compile project(':elki-index-preprocessed')
   testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }

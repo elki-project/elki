@@ -1,8 +1,9 @@
 description = 'ELKI - Clustering Algorithms'
 dependencies {
-  compile project(':elki-core-parallel')
   compile project(':elki-core')
-  compile project(':elki-index-rtree')
+  // compile project(':elki-precomputed') // For distance matrixes
+  // via core: compile project(':elki-index-preprocessed') // For SNN clustering
+  // compile project(':elki-index-rtree')
   testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }
 

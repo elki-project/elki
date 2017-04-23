@@ -1,0 +1,2 @@
+de.lmu.ifi.dbs.elki.distance.distancefunction.SharedNearestNeighborJaccardDistanceFunction
+# de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction

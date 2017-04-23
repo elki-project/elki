@@ -20,15 +20,10 @@
  */
 package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -39,10 +34,11 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.result.Result;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
+
 import gnu.trove.impl.Constants;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 
@@ -151,17 +147,24 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @return Metrical index
    * @throws IllegalStateException when the cast fails.
    */
+  @SuppressWarnings("unchecked")
   private MetricalIndexTree<O, N, E> getMetricalIndex(Relation<O> relation) throws IllegalStateException {
-    Class<MetricalIndexTree<O, N, E>> mcls = ClassGenericsUtil.uglyCastIntoSubclass(MetricalIndexTree.class);
-    ArrayList<MetricalIndexTree<O, N, E>> indexes = ResultUtil.filterResults(relation.getHierarchy(), relation, mcls);
-    // FIXME: check we got the right the representation
-    if(indexes.size() == 1) {
-      return indexes.get(0);
+    MetricalIndexTree<O, N, E> ret = null;
+    for(Hierarchy.Iter<Result> iter = relation.getHierarchy().iterDescendants(relation); iter.valid(); iter.advance()) {
+      Result r = iter.get();
+      if(!(r instanceof MetricalIndexTree)) {
+        continue;
+      }
+      if(ret != null) {
+        throw new IllegalStateException("More than one metrical index found - this is not supported!");
+      }
+      // FIXME: check we got the right the representation
+      ret = (MetricalIndexTree<O, N, E>) r;
     }
-    if(indexes.size() > 1) {
-      throw new IllegalStateException("More than one metrical index found - this is not supported!");
+    if(ret == null) {
+      throw new IllegalStateException("No metrical index found!");
     }
-    throw new IllegalStateException("No metrical index found!");
+    return ret;
   }
 
   @Override

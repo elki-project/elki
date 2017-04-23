@@ -1,10 +1,11 @@
 description = 'ELKI - Main Module'
 dependencies {
   compile project(':elki-clustering')
-  compile project(':elki-outlier')
+  // Also via elki-timeseries: compile project(':elki-outlier')
   compile project(':elki-itemsets')
   compile project(':elki-classification')
   compile project(':elki-timeseries')
+  compile project(':elki-data-generator')
   compile project(':elki-index-rtree')
   compile project(':elki-index-mtree')
   compile project(':elki-index-lsh')

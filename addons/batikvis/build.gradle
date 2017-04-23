@@ -6,7 +6,6 @@ dependencies {
   compile group: 'org.apache.xmlgraphics', name: 'batik-codec', version:'[1.7,1.9)'
   compile group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version:'[2,3)'
   compile group: 'xalan', name: 'xalan', version:'[2.7.2,3)'
-  compile project(':elki')
-  compile project(':elki-gui-minigui')
+  compile project(':elki-gui-minigui') // For GUIUtil, otherwise elki would be enough
   compile project(':elki-uncertain')
 }

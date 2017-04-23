@@ -50,12 +50,7 @@ public final class ArrayLikeUtil {
   /**
    * Static instance.
    */
-  private static final IdentityArrayAdapter<?> IDENTITYADAPTER = new IdentityArrayAdapter<>();
-
-  /**
-   * Static instance.
-   */
-  public static final FeatureVectorAdapter<?> FEATUREVECTORADAPTER = new FeatureVectorAdapter<Number>();
+  public static final FeatureVectorAdapter<?> FEATUREVECTORADAPTER = FeatureVectorAdapter.STATIC;
 
   /**
    * Use a number vector in the array API.
@@ -104,42 +99,12 @@ public final class ArrayLikeUtil {
   /**
    * Get the static instance.
    *
-   * @param dummy Dummy object for type inference
-   * @return Static instance
-   */
-  @SuppressWarnings("unchecked")
-  public static <T> IdentityArrayAdapter<T> identityAdapter(T dummy) {
-    return (IdentityArrayAdapter<T>) IDENTITYADAPTER;
-  }
-
-  /**
-   * Get the static instance.
-   *
    * @param prototype Prototype value, for type inference
    * @return Instance
    */
   @SuppressWarnings("unchecked")
   public static <F> FeatureVectorAdapter<F> featureVectorAdapter(FeatureVector<F> prototype) {
     return (FeatureVectorAdapter<F>) FEATUREVECTORADAPTER;
-  }
-
-  /**
-   * Get the static instance.
-   *
-   * @param prototype Prototype value, for type inference
-   * @return Instance
-   */
-  public static NumberVectorAdapter numberVectorAdapter(NumberVector prototype) {
-    return NUMBERVECTORADAPTER;
-  }
-
-  /**
-   * Get the adapter for double arrays.
-   *
-   * @return double array adapter
-   */
-  public static NumberArrayAdapter<Double, double[]> doubleArrayAdapter() {
-    return DOUBLEARRAYADAPTER;
   }
 
   /**
@@ -213,7 +178,7 @@ public final class ArrayLikeUtil {
    * @return primitive double array
    */
   public static double[] toPrimitiveDoubleArray(NumberVector obj) {
-    return toPrimitiveDoubleArray(obj, numberVectorAdapter(obj));
+    return toPrimitiveDoubleArray(obj, NUMBERVECTORADAPTER);
   }
 
   /**
@@ -251,7 +216,7 @@ public final class ArrayLikeUtil {
    * @return primitive float array
    */
   public static float[] toPrimitiveFloatArray(NumberVector obj) {
-    return toPrimitiveFloatArray(obj, numberVectorAdapter(obj));
+    return toPrimitiveFloatArray(obj, NUMBERVECTORADAPTER);
   }
 
   /**
@@ -286,6 +251,6 @@ public final class ArrayLikeUtil {
    * @return primitive double array
    */
   public static int[] toPrimitiveIntegerArray(NumberVector obj) {
-    return toPrimitiveIntegerArray(obj, numberVectorAdapter(obj));
+    return toPrimitiveIntegerArray(obj, NUMBERVECTORADAPTER);
   }
 }

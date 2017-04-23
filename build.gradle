@@ -263,18 +263,25 @@ if(project.hasProperty('jacoco')) {
   check.dependsOn codeCoverageReport
 }
 
-task showDependencies << {
+task dependencyPlot << {
+  def includeTest = false
+  def includeExternal = false
   def depsExclude = [ rootProject.path, ":elki-bundle" ]
   def projs = rootProject.subprojects.findAll { !depsExclude.contains(it.path) }.sort()
   new File("dep.dot").withWriter { out ->
     out.println "digraph dependencies {"
-    out.println "graph[rankdir=TB,compound=true,nodesep=.25,ranksep=.25];"
-    out.println "node[shape=box];"
+    out.println "graph[rankdir=TB,nodesep=.25,ranksep=.25,ratio=compress,margin=0];"
+    out.println "node[shape=box,margin=.05,height=0,width=0];"
 
-    projs.collectMany { Project p -> p.configurations.compile.allDependencies }.findAll { !(it instanceof ProjectDependency) }.unique().sort().each { dep ->
-      def n = "${dep.group}:${dep.name}"
-      out.println "\"${n}\" [label=\"${dep.group}\\n${dep.name}\" color=blue fontcolor=blue];"
-    }
+    // External dependencies, nodes:
+    if (includeExternal)
+      projs.collectMany {
+        Project p -> p.configurations.compile.allDependencies }.findAll {
+        !(it instanceof ProjectDependency) }.unique().sort().each { dep ->
+        def n = "${dep.group}:${dep.name}"
+        out.println "\"${n}\" [label=\"${dep.group}\\n${dep.name}\",color=blue,fontcolor=blue];"
+      }
+    // Internal depdenencies, nodes:
     projs.each { dep ->
       def n = "${dep.group}:${dep.name}"
       out.println "\"${n}\" [label=\"${dep.name}\"];"
@@ -286,13 +293,13 @@ task showDependencies << {
       def seen = new HashSet()
       p.configurations.compile.allDependencies.each { dep ->
         def t = "${dep.group}:${dep.name}"
-        if(seen.add(t)) {
+        if(seen.add(t) && (dep instanceof ProjectDependency || includeExternal)) {
           out.println "\"${s}\" -> \"${t}\";"
         }
       }
       p.configurations.testCompile.allDependencies.each { dep ->
         def t = "${dep.group}:${dep.name}"
-        if(seen.add(t)) {
+        if(seen.add(t) && includeTest && (dep instanceof ProjectDependency || includeExternal)) {
           out.println "\"${s}\" -> \"${t}\" [color=grey];"
         }
       }

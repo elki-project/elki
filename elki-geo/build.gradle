@@ -1,5 +1,6 @@
 description = 'ELKI - Geography Module'
 dependencies {
-  compile project(':elki-core')
+  // compile project(':elki-core')
+  compile project(':elki-index') // For projected indexes
   testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }

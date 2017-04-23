@@ -1,5 +1,7 @@
 description = 'ELKI - Core Miscellaneous'
 dependencies {
-  compile project(':elki-database')
+  // compile project(':elki-database')
+  compile project(':elki-index-preprocessed')
+  compile project(':elki-core-parallel')
 }
 

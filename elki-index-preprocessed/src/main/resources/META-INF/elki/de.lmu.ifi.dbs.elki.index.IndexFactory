@@ -1,0 +1,9 @@
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.NNDescent$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNAndRKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.PartitionApproximationMaterializeKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.RandomSampleKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingMaterializeKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.SpacefillingKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.knn.NaiveProjectedKNNPreprocessor$Factory
+de.lmu.ifi.dbs.elki.index.preprocessed.snn.SharedNearestNeighborPreprocessor$Factory

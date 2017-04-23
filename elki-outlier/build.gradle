@@ -1,8 +1,6 @@
 description = 'ELKI - Outlier Detection Algorithms'
 dependencies {
-  compile project(':elki-core-parallel')
   compile project(':elki-core')
-  //compile project(':elki-index-rtree')
   testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }
 

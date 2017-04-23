@@ -20,18 +20,12 @@
  */
 package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 
-import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -42,11 +36,12 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+
 import gnu.trove.impl.Constants;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 
@@ -89,12 +84,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
   @Override
   protected void preprocess() {
     DistanceQuery<O> distanceQuery = relation.getDistanceQuery(distanceFunction);
-
-    Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(relation.getHierarchy(), relation, SpatialIndexTree.class);
-    if(indexes.size() != 1) {
-      throw new AbortException(SpatialApproximationMaterializeKNNPreprocessor.class.getSimpleName() + " found " + indexes.size() + " spatial indexes, expected exactly one.");
-    }
-    SpatialIndexTree<N, E> index = indexes.iterator().next();
+    SpatialIndexTree<N, E> index = getSpatialIndex(relation);
 
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     MeanVariance pagesize = new MeanVariance();
@@ -149,6 +139,26 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
       getLogger().verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getSampleStddev());
       getLogger().verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  protected SpatialIndexTree<N, E> getSpatialIndex(Relation<O> relation) {
+    SpatialIndexTree<N, E> ret = null;
+    for(Hierarchy.Iter<Result> iter = relation.getHierarchy().iterDescendants(relation); iter.valid(); iter.advance()) {
+      Result r = iter.get();
+      if(!(r instanceof SpatialIndexTree)) {
+        continue;
+      }
+      if(ret != null) {
+        throw new IllegalStateException("More than one spatial index found - this is not supported!");
+      }
+      // FIXME: check we got the right the representation
+      ret = (SpatialIndexTree<N, E>) r;
+    }
+    if(ret == null) {
+      throw new IllegalStateException("No spatial index found!");
+    }
+    return ret;
   }
 
   @Override

@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.datasource.filter.transform;
 import de.lmu.ifi.dbs.elki.data.DoubleVector;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.VectorUtil;
+import de.lmu.ifi.dbs.elki.data.projection.FeatureSelection;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -124,7 +125,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
      * Key: <code>-projectionfilter.selectedattributes</code>
      * </p>
      */
-    public static final OptionID SELECTED_ATTRIBUTES_ID = new OptionID("projectionfilter.selectedattributes", "a comma separated array of integer values d_i, where 0 <= d_i < the dimensionality of the feature space specifying the dimensions to be considered for projection. If this parameter is not set, no dimensions will be considered, i.e. the projection is a zero-dimensional feature space");
+    public static final OptionID SELECTED_ATTRIBUTES_ID = FeatureSelection.Parameterizer.SELECTED_ATTRIBUTES_ID;
 
     /**
      * Selected attributes.
@@ -135,7 +136,7 @@ public class NumberVectorFeatureSelectionFilter<V extends NumberVector> extends 
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       IntListParameter selectedAttributesP = new IntListParameter(SELECTED_ATTRIBUTES_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT_LIST);
       if(config.grab(selectedAttributesP)) {
         selectedAttributes = selectedAttributesP.getValueAsBitSet();
       }

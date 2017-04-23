@@ -1,6 +1,6 @@
-description = 'ELKI - Index API'
+description = 'ELKI - Index Core'
 dependencies {
-  compile project(':elki-core-distance') // For Euclidean distance optimizations
+  compile project(':elki-index-preprocessed') // Used by m-tree, r-tree approximations, otherwise elki-database would be enough.
   compile project(':elki-persistent')
   testCompile group: 'junit', name: 'junit', version:'[4.8,)'
 }

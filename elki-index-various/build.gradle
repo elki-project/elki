@@ -1,6 +1,6 @@
 description = 'ELKI - Various indexes'
 dependencies {
+  // compile project(':elki-core')
   compile project(':elki-index')
-  compile project(':elki-core')
   testCompile project(path: ':elki-test-core', configuration: 'testOutput')
 }

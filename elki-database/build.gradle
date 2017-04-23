@@ -1,6 +1,6 @@
 description = 'ELKI - Database'
 dependencies {
-  compile project(':elki-index')
+  // compile project(':elki-core-distance') // For Euclidean distance optimizations
   compile project(':elki-input')
 }
 

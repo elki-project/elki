@@ -1,0 +1,5 @@
+description = 'ELKI - Indexes based on preprocessing'
+dependencies {
+  compile project(':elki-database')
+  testCompile project(path: ':elki-test-core', configuration: 'testOutput')
+}
