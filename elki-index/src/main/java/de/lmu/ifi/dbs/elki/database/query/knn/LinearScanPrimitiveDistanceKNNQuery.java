@@ -64,11 +64,13 @@ public class LinearScanPrimitiveDistanceKNNQuery<O> extends AbstractDistanceKNNQ
 
   @Override
   public KNNList getKNNForDBID(DBIDRef id, int k) {
+    final Relation<? extends O> relation = getRelation();
     return linearScan(relation, relation.iterDBIDs(), relation.get(id), DBIDUtil.newHeap(k)).toKNNList();
   }
 
   @Override
   public KNNList getKNNForObject(O obj, int k) {
+    final Relation<? extends O> relation = getRelation();
     return linearScan(relation, relation.iterDBIDs(), obj, DBIDUtil.newHeap(k)).toKNNList();
   }
 
@@ -82,6 +84,7 @@ public class LinearScanPrimitiveDistanceKNNQuery<O> extends AbstractDistanceKNNQ
    * @return Heap
    */
   private KNNHeap linearScan(Relation<? extends O> relation, DBIDIter iter, final O obj, KNNHeap heap) {
+    final PrimitiveDistanceFunction<? super O> rawdist = this.rawdist;
     double max = Double.POSITIVE_INFINITY;
     while(iter.valid()) {
       final double dist = rawdist.distance(obj, relation.get(iter));
@@ -95,6 +98,7 @@ public class LinearScanPrimitiveDistanceKNNQuery<O> extends AbstractDistanceKNNQ
 
   @Override
   public List<KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    final Relation<? extends O> relation = getRelation();
     final int size = ids.size();
     final List<KNNHeap> heaps = new ArrayList<>(size);
     List<O> objs = new ArrayList<>(size);
@@ -118,6 +122,8 @@ public class LinearScanPrimitiveDistanceKNNQuery<O> extends AbstractDistanceKNNQ
    * @param heaps Heaps array
    */
   protected void linearScanBatchKNN(List<O> objs, List<KNNHeap> heaps) {
+    final PrimitiveDistanceFunction<? super O> rawdist = this.rawdist;
+    final Relation<? extends O> relation = getRelation();
     final int size = objs.size();
     // Linear scan style KNN.
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {

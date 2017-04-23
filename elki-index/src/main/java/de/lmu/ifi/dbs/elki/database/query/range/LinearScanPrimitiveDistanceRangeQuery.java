@@ -60,6 +60,7 @@ public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRa
 
   @Override
   public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
+    final Relation<? extends O> relation = getRelation();
     // Note: subtle optimization. Get "id" only once!
     final O obj = relation.get(id);
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
@@ -70,6 +71,7 @@ public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRa
 
   @Override
   public DoubleDBIDList getRangeForObject(O obj, double range) {
+    final Relation<? extends O> relation = getRelation();
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
     linearScan(relation, relation.iterDBIDs(), obj, range, result);
     result.sort();
@@ -78,11 +80,13 @@ public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRa
 
   @Override
   public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
+    final Relation<? extends O> relation = getRelation();
     linearScan(relation, relation.iterDBIDs(), relation.get(id), range, neighbors);
   }
 
   @Override
   public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList neighbors) {
+    final Relation<? extends O> relation = getRelation();
     linearScan(relation, relation.iterDBIDs(), obj, range, neighbors);
   }
 
@@ -96,6 +100,7 @@ public class LinearScanPrimitiveDistanceRangeQuery<O> extends AbstractDistanceRa
    * @param result Output data structure
    */
   private void linearScan(Relation<? extends O> relation, DBIDIter iter, O obj, double range, ModifiableDoubleDBIDList result) {
+    final PrimitiveDistanceFunction<? super O> rawdist = this.rawdist;
     while(iter.valid()) {
       final double distance = rawdist.distance(obj, relation.get(iter));
       if(distance <= range) {

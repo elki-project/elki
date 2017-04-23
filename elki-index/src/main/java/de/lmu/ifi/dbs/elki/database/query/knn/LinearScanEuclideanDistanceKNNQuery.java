@@ -51,11 +51,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanD
  */
 public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends LinearScanPrimitiveDistanceKNNQuery<O> implements LinearScanQuery {
   /**
-   * Squared Euclidean distance function.
-   */
-  private static final SquaredEuclideanDistanceFunction SQUARED = SquaredEuclideanDistanceFunction.STATIC;
-
-  /**
    * Constructor.
    *
    * @param distanceQuery Distance function to use
@@ -67,11 +62,13 @@ public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends
 
   @Override
   public KNNList getKNNForDBID(DBIDRef id, int k) {
-    return linearScan(relation, relation.iterDBIDs(), relation.get(id), DBIDUtil.newHeap(k)).toKNNListSqrt();
+    final Relation<? extends O> relation = getRelation();
+    return linearScan(relation , relation.iterDBIDs(), relation.get(id), DBIDUtil.newHeap(k)).toKNNListSqrt();
   }
 
   @Override
   public KNNList getKNNForObject(O obj, int k) {
+    final Relation<? extends O> relation = getRelation();
     return linearScan(relation, relation.iterDBIDs(), obj, DBIDUtil.newHeap(k)).toKNNListSqrt();
   }
 
@@ -85,9 +82,10 @@ public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends
    * @return Heap
    */
   private KNNHeap linearScan(Relation<? extends O> relation, DBIDIter iter, final O obj, KNNHeap heap) {
+    final SquaredEuclideanDistanceFunction squared = SquaredEuclideanDistanceFunction.STATIC;
     double max = Double.POSITIVE_INFINITY;
     while(iter.valid()) {
-      final double dist = SQUARED.distance(obj, relation.get(iter));
+      final double dist = squared.distance(obj, relation.get(iter));
       if(dist <= max) {
         max = heap.insert(dist, iter);
       }
@@ -98,6 +96,7 @@ public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends
 
   @Override
   public List<KNNList> getKNNForBulkDBIDs(ArrayDBIDs ids, int k) {
+    final Relation<? extends O> relation = getRelation();
     final int size = ids.size();
     final List<KNNHeap> heaps = new ArrayList<>(size);
     List<O> objs = new ArrayList<>(size);
@@ -122,13 +121,15 @@ public class LinearScanEuclideanDistanceKNNQuery<O extends NumberVector> extends
    */
   @Override
   protected void linearScanBatchKNN(List<O> objs, List<KNNHeap> heaps) {
+    final SquaredEuclideanDistanceFunction squared = SquaredEuclideanDistanceFunction.STATIC;
+    final Relation<? extends O> relation = getRelation();
     final int size = objs.size();
     // Linear scan style KNN.
     for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
       O candidate = relation.get(iter);
       for(int index = 0; index < size; index++) {
         final KNNHeap heap = heaps.get(index);
-        final double dist = SQUARED.distance(objs.get(index), candidate);
+        final double dist = squared.distance(objs.get(index), candidate);
         if(dist <= heap.getKNNDistance()) {
           heap.insert(dist, iter);
         }

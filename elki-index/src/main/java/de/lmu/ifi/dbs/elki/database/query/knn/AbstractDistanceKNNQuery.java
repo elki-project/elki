@@ -38,11 +38,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  */
 public abstract class AbstractDistanceKNNQuery<O> implements KNNQuery<O> {
   /**
-   * The data to use for this query
-   */
-  final protected Relation<? extends O> relation;
-
-  /**
    * Hold the distance function to be used.
    */
   final protected DistanceQuery<O> distanceQuery;
@@ -54,7 +49,6 @@ public abstract class AbstractDistanceKNNQuery<O> implements KNNQuery<O> {
    */
   public AbstractDistanceKNNQuery(DistanceQuery<O> distanceQuery) {
     super();
-    this.relation = distanceQuery.getRelation();
     this.distanceQuery = distanceQuery;
   }
 
@@ -72,7 +66,16 @@ public abstract class AbstractDistanceKNNQuery<O> implements KNNQuery<O> {
 
   @Override
   public KNNList getKNNForDBID(DBIDRef id, int k) {
-    return getKNNForObject(relation.get(id), k);
+    return getKNNForObject(getRelation().get(id), k);
+  }
+
+  /**
+   * Get the relation to query.
+   *
+   * @return Relation
+   */
+  protected Relation<? extends O> getRelation() {
+    return distanceQuery.getRelation();
   }
 
   @Override

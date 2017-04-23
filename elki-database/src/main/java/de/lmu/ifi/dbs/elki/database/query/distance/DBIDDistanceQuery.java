@@ -34,7 +34,12 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction;
  * @apiviz.landmark
  * @apiviz.uses DBIDDistanceFunction
  */
-public class DBIDDistanceQuery extends AbstractDatabaseDistanceQuery<DBID> {
+public class DBIDDistanceQuery implements DatabaseDistanceQuery<DBID> {
+  /**
+   * Relation to query.
+   */
+  final protected Relation<DBID> relation;
+
   /**
    * The distance function we use.
    */
@@ -47,19 +52,19 @@ public class DBIDDistanceQuery extends AbstractDatabaseDistanceQuery<DBID> {
    * @param distanceFunction Our distance function
    */
   public DBIDDistanceQuery(Relation<DBID> relation, DBIDDistanceFunction distanceFunction) {
-    super(relation);
+    super();
+    this.relation = relation;
     this.distanceFunction = distanceFunction;
   }
 
   @Override
   public double distance(DBIDRef id1, DBIDRef id2) {
-    if(id1 == null) {
-      throw new UnsupportedOperationException("This distance function can only be used for objects stored in the database.");
-    }
-    if(id2 == null) {
-      throw new UnsupportedOperationException("This distance function can only be used for objects stored in the database.");
-    }
     return distanceFunction.distance(id1, id2);
+  }
+
+  @Override
+  public Relation<? extends DBID> getRelation() {
+    return relation;
   }
 
   @Override

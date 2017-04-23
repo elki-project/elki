@@ -53,10 +53,11 @@ public class LinearScanDistanceKNNQuery<O> extends AbstractDistanceKNNQuery<O> i
 
   @Override
   public KNNList getKNNForDBID(DBIDRef id, int k) {
+    final DistanceQuery<O> dq = distanceQuery;
     KNNHeap heap = DBIDUtil.newHeap(k);
     double max = Double.POSITIVE_INFINITY;
-    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      final double dist = distanceQuery.distance(id, iter);
+    for(DBIDIter iter = getRelation().getDBIDs().iter(); iter.valid(); iter.advance()) {
+      final double dist = dq.distance(id, iter);
       if(dist <= max) {
         max = heap.insert(dist, iter);
       }
@@ -66,10 +67,11 @@ public class LinearScanDistanceKNNQuery<O> extends AbstractDistanceKNNQuery<O> i
 
   @Override
   public KNNList getKNNForObject(O obj, int k) {
+    final DistanceQuery<O> dq = distanceQuery;
     KNNHeap heap = DBIDUtil.newHeap(k);
     double max = Double.POSITIVE_INFINITY;
-    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
-      final double dist = distanceQuery.distance(obj, iter);
+    for(DBIDIter iter = getRelation().getDBIDs().iter(); iter.valid(); iter.advance()) {
+      final double dist = dq.distance(obj, iter);
       if(dist <= max) {
         max = heap.insert(dist, iter);
       }
@@ -100,13 +102,13 @@ public class LinearScanDistanceKNNQuery<O> extends AbstractDistanceKNNQuery<O> i
    * @param heaps Heaps to store the results in
    */
   private void linearScanBatchKNN(ArrayDBIDs ids, List<KNNHeap> heaps) {
+    final DistanceQuery<O> dq = distanceQuery;
     // The distance is computed on database IDs
-    for(DBIDIter iter = relation.getDBIDs().iter(); iter.valid(); iter.advance()) {
+    for(DBIDIter iter = getRelation().getDBIDs().iter(); iter.valid(); iter.advance()) {
       int index = 0;
-      for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance()) {
+      for(DBIDIter iter2 = ids.iter(); iter2.valid(); iter2.advance(), index++) {
         KNNHeap heap = heaps.get(index);
-        heap.insert(distanceQuery.distance(iter2, iter), iter);
-        index++;
+        heap.insert(dq.distance(iter2, iter), iter);
       }
     }
   }

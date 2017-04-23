@@ -35,7 +35,12 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
  * 
  * @param <O> Database object type.
  */
-public class PrimitiveDistanceQuery<O> extends AbstractDistanceQuery<O> {
+public class PrimitiveDistanceQuery<O> implements DistanceQuery<O> {
+  /**
+   * The data to use for this query
+   */
+  final protected Relation<? extends O> relation;
+
   /**
    * The distance function we use.
    */
@@ -48,38 +53,34 @@ public class PrimitiveDistanceQuery<O> extends AbstractDistanceQuery<O> {
    * @param distanceFunction Our distance function
    */
   public PrimitiveDistanceQuery(Relation<? extends O> relation, PrimitiveDistanceFunction<? super O> distanceFunction) {
-    super(relation);
+    super();
+    this.relation = relation;
     this.distanceFunction = distanceFunction;
   }
 
   @Override
-  public double distance(DBIDRef id1, DBIDRef id2) {
-    O o1 = relation.get(id1);
-    O o2 = relation.get(id2);
-    return distance(o1, o2);
+  public final double distance(DBIDRef id1, DBIDRef id2) {
+    return distance(relation.get(id1), relation.get(id2));
   }
 
   @Override
-  public double distance(O o1, DBIDRef id2) {
-    O o2 = relation.get(id2);
-    return distance(o1, o2);
+  public final double distance(O o1, DBIDRef id2) {
+    return distance(o1, relation.get(id2));
   }
 
   @Override
-  public double distance(DBIDRef id1, O o2) {
-    O o1 = relation.get(id1);
-    return distance(o1, o2);
+  public final double distance(DBIDRef id1, O o2) {
+    return distance(relation.get(id1), o2);
   }
 
   @Override
   public double distance(O o1, O o2) {
-    if(o1 == null) {
-      throw new UnsupportedOperationException("This distance function can only be used for object instances.");
-    }
-    if(o2 == null) {
-      throw new UnsupportedOperationException("This distance function can only be used for object instances.");
-    }
     return distanceFunction.distance(o1, o2);
+  }
+
+  @Override
+  public Relation<? extends O> getRelation() {
+    return relation;
   }
 
   @Override

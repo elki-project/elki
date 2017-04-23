@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDatabaseDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -85,7 +84,12 @@ public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index> ext
    * @param <I> Index type
    * @param <F> Distance function type
    */
-  abstract public static class Instance<O, I extends Index, F extends DistanceFunction<? super O>> extends AbstractDatabaseDistanceQuery<O> implements IndexBasedDistanceFunction.Instance<O, I> {
+  abstract public static class Instance<O, I extends Index, F extends DistanceFunction<? super O>> implements IndexBasedDistanceFunction.Instance<O, I> {
+    /**
+     * Relation to query.
+     */
+    protected final Relation<O> relation;
+
     /**
      * Index we use
      */
@@ -99,14 +103,20 @@ public abstract class AbstractIndexBasedDistanceFunction<O, I extends Index> ext
     /**
      * Constructor.
      * 
-     * @param database Database
+     * @param relation Database
      * @param index Index to use
      * @param parent Parent distance function
      */
-    public Instance(Relation<O> database, I index, F parent) {
-      super(database);
+    public Instance(Relation<O> relation, I index, F parent) {
+      super();
+      this.relation = relation;
       this.index = index;
       this.parent = parent;
+    }
+    
+    @Override
+    public Relation<? extends O> getRelation() {
+      return relation;
     }
 
     @Override

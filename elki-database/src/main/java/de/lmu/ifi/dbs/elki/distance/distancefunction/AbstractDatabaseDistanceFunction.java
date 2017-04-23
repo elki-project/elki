@@ -20,7 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.database.query.distance.AbstractDatabaseDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DatabaseDistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
@@ -57,21 +57,32 @@ public abstract class AbstractDatabaseDistanceFunction<O> implements DistanceFun
    * 
    * @author Erich Schubert
    */
-  abstract public static class Instance<O> extends AbstractDatabaseDistanceQuery<O> {
+  abstract public static class Instance<O> implements DatabaseDistanceQuery<O> {
+    /**
+     * Relation to query.
+     */
+    protected final Relation<O> relation;
+
     /**
      * Parent distance
      */
-    DistanceFunction<? super O> parent;
-    
+    protected final DistanceFunction<? super O> parent;
+
     /**
      * Constructor.
      * 
-     * @param database Database
+     * @param relation Data relation
      * @param parent Parent distance
      */
-    public Instance(Relation<O> database, DistanceFunction<? super O> parent) {
-      super(database);
+    public Instance(Relation<O> relation, DistanceFunction<? super O> parent) {
+      super();
+      this.relation = relation;
       this.parent = parent;
+    }
+
+    @Override
+    public Relation<? extends O> getRelation() {
+      return relation;
     }
 
     @Override

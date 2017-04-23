@@ -20,7 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
-import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.DatabaseDistanceQuery;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * 
  * @apiviz.landmark
  * @apiviz.stereotype factory
- * @apiviz.has Instance oneway - - «create»
+ * @apiviz.has Instance oneway - - «create»F
  * 
  * @param <O> Object type
  */
@@ -49,12 +49,12 @@ public interface IndexBasedDistanceFunction<O> extends DistanceFunction<O> {
    * 
    * @param <T> Object type
    */
-  public static interface Instance<T, I extends Index> extends DistanceQuery<T> {
+  public static interface Instance<T, I extends Index> extends DatabaseDistanceQuery<T> {
     /**
      * Get the index used.
      * 
      * @return the index used
      */
-    public I getIndex();
+    I getIndex();
   }
 }

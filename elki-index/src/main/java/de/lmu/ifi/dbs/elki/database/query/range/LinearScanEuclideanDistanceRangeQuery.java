@@ -43,11 +43,6 @@ import net.jafama.FastMath;
  */
 public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> extends LinearScanPrimitiveDistanceRangeQuery<O> {
   /**
-   * Squared Euclidean distance function.
-   */
-  private static final SquaredEuclideanDistanceFunction SQUARED = SquaredEuclideanDistanceFunction.STATIC;
-
-  /**
    * Constructor.
    * 
    * @param distanceQuery Distance function to use
@@ -58,6 +53,7 @@ public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> exten
 
   @Override
   public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
+    final Relation<? extends O> relation = getRelation();
     // Note: subtle optimization. Get "id" only once!
     final O obj = relation.get(id);
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
@@ -68,6 +64,7 @@ public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> exten
 
   @Override
   public DoubleDBIDList getRangeForObject(O obj, double range) {
+    final Relation<? extends O> relation = getRelation();
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
     linearScan(relation, relation.iterDBIDs(), obj, range, result);
     result.sort();
@@ -76,11 +73,13 @@ public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> exten
 
   @Override
   public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
+    final Relation<? extends O> relation = getRelation();
     linearScan(relation, relation.iterDBIDs(), relation.get(id), range, neighbors);
   }
 
   @Override
   public void getRangeForObject(O obj, double range, ModifiableDoubleDBIDList neighbors) {
+    final Relation<? extends O> relation = getRelation();
     linearScan(relation, relation.iterDBIDs(), obj, range, neighbors);
   }
 
@@ -94,13 +93,14 @@ public class LinearScanEuclideanDistanceRangeQuery<O extends NumberVector> exten
    * @param result Output data structure
    */
   private void linearScan(Relation<? extends O> relation, DBIDIter iter, O obj, double range, ModifiableDoubleDBIDList result) {
+    final SquaredEuclideanDistanceFunction squared = SquaredEuclideanDistanceFunction.STATIC;
     // Avoid a loss in numerical precision when using the squared radius:
     final double upper = range * 1.0000001;
     // This should be more precise, but slower:
     // upper = MathUtil.floatToDoubleUpper((float)range);
     final double sqrange = upper * upper;
     while(iter.valid()) {
-      final double sqdistance = SQUARED.distance(obj, relation.get(iter));
+      final double sqdistance = squared.distance(obj, relation.get(iter));
       if(sqdistance <= sqrange) {
         final double dist = FastMath.sqrt(sqdistance);
         if(dist <= range) { // double check, as we increased the radius above

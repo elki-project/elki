@@ -38,11 +38,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  */
 public abstract class AbstractDistanceRangeQuery<O> implements RangeQuery<O> {
   /**
-   * The data to use for this query
-   */
-  final protected Relation<? extends O> relation;
-
-  /**
    * Hold the distance function to be used.
    */
   final protected DistanceQuery<O> distanceQuery;
@@ -54,14 +49,13 @@ public abstract class AbstractDistanceRangeQuery<O> implements RangeQuery<O> {
    */
   public AbstractDistanceRangeQuery(DistanceQuery<O> distanceQuery) {
     super();
-    this.relation = distanceQuery.getRelation();
     this.distanceQuery = distanceQuery;
   }
 
   @Override
   public DoubleDBIDList getRangeForDBID(DBIDRef id, double range) {
     ModifiableDoubleDBIDList ret = DBIDUtil.newDistanceDBIDList();
-    getRangeForObject(relation.get(id), range, ret);
+    getRangeForObject(getRelation().get(id), range, ret);
     ret.sort();
     return ret;
   }
@@ -76,6 +70,15 @@ public abstract class AbstractDistanceRangeQuery<O> implements RangeQuery<O> {
 
   @Override
   public void getRangeForDBID(DBIDRef id, double range, ModifiableDoubleDBIDList neighbors) {
-    getRangeForObject(relation.get(id), range, neighbors);
+    getRangeForObject(getRelation().get(id), range, neighbors);
+  }
+
+  /**
+   * Get the relation to query.
+   *
+   * @return Relation
+   */
+  protected Relation<? extends O> getRelation() {
+    return distanceQuery.getRelation();
   }
 }

@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
-import de.lmu.ifi.dbs.elki.database.query.similarity.AbstractDBIDSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
@@ -43,14 +42,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * @param <I> index type
  */
 public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index> implements IndexBasedSimilarityFunction<O> {
-  /**
-   * Parameter to specify the preprocessor to be used.
-   * <p>
-   * Key: {@code -similarityfunction.preprocessor}
-   * </p>
-   */
-  public static final OptionID INDEX_ID = new OptionID("similarityfunction.preprocessor", "Preprocessor to use.");
-
   /**
    * Parameter to specify the preprocessor to be used.
    * <p>
@@ -92,7 +83,12 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index> i
    * @param <O> Object type
    * @param <I> Index type
    */
-  abstract public static class Instance<O, I extends Index> extends AbstractDBIDSimilarityQuery<O> implements IndexBasedSimilarityFunction.Instance<O, I> {
+  abstract public static class Instance<O, I extends Index> implements IndexBasedSimilarityFunction.Instance<O, I> {
+    /**
+     * Relation to query.
+     */
+    protected final Relation<O> relation;
+
     /**
      * Parent index
      */
@@ -101,12 +97,18 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index> i
     /**
      * Constructor.
      * 
-     * @param database Database
+     * @param relation Data relation
      * @param index Index to use
      */
-    public Instance(Relation<O> database, I index) {
-      super(database);
+    public Instance(Relation<O> relation, I index) {
+      super();
+      this.relation = relation;
       this.index = index;
+    }
+
+    @Override
+    public Relation<? extends O> getRelation() {
+      return relation;
     }
 
     @Override
@@ -123,6 +125,14 @@ public abstract class AbstractIndexBasedSimilarityFunction<O, I extends Index> i
    * @apiviz.exclude
    */
   public abstract static class Parameterizer<F extends IndexFactory<?, ?>> extends AbstractParameterizer {
+    /**
+     * Parameter to specify the preprocessor to be used.
+     * <p>
+     * Key: {@code -similarityfunction.preprocessor}
+     * </p>
+     */
+    public static final OptionID INDEX_ID = new OptionID("similarityfunction.preprocessor", "Preprocessor to use.");
+
     /**
      * The index factory we use.
      */

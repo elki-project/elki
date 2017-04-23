@@ -18,41 +18,40 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.database.query.similarity;
+package de.lmu.ifi.dbs.elki.database.query.distance;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
  * Run a database query in a database context.
  * 
  * @author Erich Schubert
- * @since 0.4.0
  * 
  * @param <O> Database object type.
  */
-public abstract class AbstractDBIDSimilarityQuery<O> extends AbstractSimilarityQuery<O> {
-  /**
-   * Constructor.
-   * 
-   * @param relation Relation to use.
-   */
-  public AbstractDBIDSimilarityQuery(Relation<? extends O> relation) {
-    super(relation);
+public interface DatabaseDistanceQuery<O> extends DistanceQuery<O> {
+  @Override
+  default double distance(O o1, DBIDRef id2) {
+    if(o1 instanceof DBIDRef) {
+      return distance((DBIDRef) o1, id2);
+    }
+    throw new UnsupportedOperationException("This distance function is only defined for known DBIDs.");
   }
 
   @Override
-  public double similarity(O o1, DBIDRef id2) {
-    throw new UnsupportedOperationException("This distance function can only be used for objects when referenced by ID.");
+  default double distance(DBIDRef id1, O o2) {
+    if(o2 instanceof DBIDRef) {
+      return distance(id1, (DBIDRef) o2);
+    }
+    throw new UnsupportedOperationException("This distance function is only defined for known DBIDs.");
   }
 
   @Override
-  public double similarity(DBIDRef id1, O o2) {
-    throw new UnsupportedOperationException("This distance function can only be used for objects when referenced by ID.");
+  default double distance(O o1, O o2) {
+    if(o1 instanceof DBIDRef && o2 instanceof DBIDRef) {
+      return distance((DBIDRef) o1, (DBIDRef) o2);
+    }
+    throw new UnsupportedOperationException("This distance function is only defined for known DBIDs.");
   }
 
-  @Override
-  public double similarity(O o1, O o2) {
-    throw new UnsupportedOperationException("This distance function can only be used for objects when referenced by ID.");
-  }
 }

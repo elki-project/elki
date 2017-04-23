@@ -34,7 +34,12 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  * 
  * @param <O> Database object type.
  */
-public class PrimitiveSimilarityQuery<O> extends AbstractSimilarityQuery<O> {
+public class PrimitiveSimilarityQuery<O> implements SimilarityQuery<O> {
+  /**
+   * The data to use for this query
+   */
+  final protected Relation<? extends O> relation;
+
   /**
    * The distance function we use.
    */
@@ -47,28 +52,34 @@ public class PrimitiveSimilarityQuery<O> extends AbstractSimilarityQuery<O> {
    * @param similarityFunction Our similarity function
    */
   public PrimitiveSimilarityQuery(Relation<? extends O> relation, PrimitiveSimilarityFunction<? super O> similarityFunction) {
-    super(relation);
+    super();
+    this.relation = relation;
     this.similarityFunction = similarityFunction;
   }
 
   @Override
-  public double similarity(DBIDRef id1, DBIDRef id2) {
+  public final double similarity(DBIDRef id1, DBIDRef id2) {
     return similarity(relation.get(id1), relation.get(id2));
   }
 
   @Override
-  public double similarity(O o1, DBIDRef id2) {
+  public final double similarity(O o1, DBIDRef id2) {
     return similarity(o1, relation.get(id2));
   }
 
   @Override
-  public double similarity(DBIDRef id1, O o2) {
+  public final double similarity(DBIDRef id1, O o2) {
     return similarity(relation.get(id1), o2);
   }
 
   @Override
   public double similarity(O o1, O o2) {
     return similarityFunction.similarity(o1, o2);
+  }
+
+  @Override
+  public Relation<? extends O> getRelation() {
+    return relation;
   }
 
   @Override

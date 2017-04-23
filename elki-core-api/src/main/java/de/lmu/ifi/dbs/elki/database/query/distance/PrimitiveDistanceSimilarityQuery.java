@@ -57,22 +57,18 @@ public class PrimitiveDistanceSimilarityQuery<O> extends PrimitiveDistanceQuery<
   }
 
   @Override
-  public double similarity(DBIDRef id1, DBIDRef id2) {
-    O o1 = relation.get(id1);
-    O o2 = relation.get(id2);
-    return similarity(o1, o2);
+  public final double similarity(DBIDRef id1, DBIDRef id2) {
+    return similarity(relation.get(id1), relation.get(id2));
   }
 
   @Override
-  public double similarity(O o1, DBIDRef id2) {
-    O o2 = relation.get(id2);
-    return similarity(o1, o2);
+  public final double similarity(O o1, DBIDRef id2) {
+    return similarity(o1, relation.get(id2));
   }
 
   @Override
-  public double similarity(DBIDRef id1, O o2) {
-    O o1 = relation.get(id1);
-    return similarity(o1, o2);
+  public final double similarity(DBIDRef id1, O o2) {
+    return similarity(relation.get(id1), o2);
   }
 
   @Override
