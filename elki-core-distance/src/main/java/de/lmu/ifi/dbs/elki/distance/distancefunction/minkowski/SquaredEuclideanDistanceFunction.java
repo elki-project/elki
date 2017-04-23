@@ -24,9 +24,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorNorm;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.*;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -39,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.2
  */
 @Alias({ "squaredeuclidean", "de.lmu.ifi.dbs.elki.distance.distancefunction.SquaredEuclideanDistanceFunction" })
-public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorNorm implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
+public class SquaredEuclideanDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector>, Norm<NumberVector> {
   /**
    * Static instance. Use this!
    */

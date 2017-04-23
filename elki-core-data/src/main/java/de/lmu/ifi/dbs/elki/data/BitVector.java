@@ -41,7 +41,7 @@ import gnu.trove.map.TIntDoubleMap;
  * 
  * @apiviz.composedOf Bit
  */
-public class BitVector extends AbstractNumberVector implements SparseNumberVector {
+public class BitVector implements SparseNumberVector {
   /**
    * Static instance.
    */
@@ -324,7 +324,7 @@ public class BitVector extends AbstractNumberVector implements SparseNumberVecto
    * 
    * @apiviz.has BitVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<BitVector> implements SparseNumberVector.Factory<BitVector> {
+  public static class Factory implements SparseNumberVector.Factory<BitVector> {
     @Override
     public <A> BitVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);

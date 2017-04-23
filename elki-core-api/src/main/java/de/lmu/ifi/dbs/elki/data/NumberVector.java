@@ -23,7 +23,9 @@ package de.lmu.ifi.dbs.elki.data;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArrayAdapter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberArrayAdapter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberVectorAdapter;
 
 /**
  * Interface NumberVector defines the methods that should be implemented by any
@@ -187,7 +189,9 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
      * @param values the values of the NumberVector
      * @return a new NumberVector of N for the given values
      */
-    V newNumberVector(double[] values);
+    default V newNumberVector(double[] values) {
+      return newNumberVector(values, DoubleArrayAdapter.STATIC);
+    }
 
     /**
      * Returns a new NumberVector of N for the given values.
@@ -195,7 +199,9 @@ public interface NumberVector extends FeatureVector<Number>, SpatialComparable {
      * @param values Existing number vector
      * @return a new NumberVector of N for the given values
      */
-    V newNumberVector(NumberVector values);
+    default V newNumberVector(NumberVector values) {
+      return newNumberVector(values, NumberVectorAdapter.STATIC);
+    }
 
     /**
      * Instantiate from any number-array like object.

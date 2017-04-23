@@ -43,7 +43,7 @@ import gnu.trove.map.TIntFloatMap;
  * @author Arthur Zimek
  * @since 0.2
  */
-public class SparseFloatVector extends AbstractNumberVector implements SparseNumberVector {
+public class SparseFloatVector implements SparseNumberVector {
   /**
    * Static instance.
    */
@@ -254,7 +254,7 @@ public class SparseFloatVector extends AbstractNumberVector implements SparseNum
    * .
    * 
    * The returned String is a single line with entries separated by
-   * {@link AbstractNumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
+   * {@link NumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
    * number of values actually not zero. Following entries are pairs of Integer
    * and Float where the Integer gives the index of the dimensionality and the
    * Float gives the corresponding value.
@@ -310,7 +310,7 @@ public class SparseFloatVector extends AbstractNumberVector implements SparseNum
    * 
    * @apiviz.has SparseFloatVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<SparseFloatVector> implements SparseNumberVector.Factory<SparseFloatVector> {
+  public static class Factory implements SparseNumberVector.Factory<SparseFloatVector> {
     @Override
     public <A> SparseFloatVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);

@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public class OneDimensionalDoubleVector extends AbstractNumberVector {
+public class OneDimensionalDoubleVector implements NumberVector {
   /**
    * Static factory instance.
    */
@@ -82,7 +82,7 @@ public class OneDimensionalDoubleVector extends AbstractNumberVector {
    * 
    * @apiviz.has OneDimensionalDoubleVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<OneDimensionalDoubleVector> {
+  public static class Factory implements NumberVector.Factory<OneDimensionalDoubleVector> {
     @Override
     public <A> OneDimensionalDoubleVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       assert (adapter.size(array) == 1) : "Incorrect dimensionality for 1-dimensional vector.";

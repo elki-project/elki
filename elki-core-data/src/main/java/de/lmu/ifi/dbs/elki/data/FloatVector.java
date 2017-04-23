@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Elke Achtert
  * @since 0.2
  */
-public class FloatVector extends AbstractNumberVector {
+public class FloatVector implements NumberVector {
   /**
    * Static factory instance.
    */
@@ -135,7 +135,7 @@ public class FloatVector extends AbstractNumberVector {
    * 
    * @apiviz.has FloatVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<FloatVector> {
+  public static class Factory implements NumberVector.Factory<FloatVector> {
     @Override
     public <A> FloatVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);

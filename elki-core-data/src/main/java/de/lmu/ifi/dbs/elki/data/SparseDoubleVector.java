@@ -41,7 +41,7 @@ import gnu.trove.map.TIntDoubleMap;
  * @author Arthur Zimek
  * @since 0.2
  */
-public class SparseDoubleVector extends AbstractNumberVector implements SparseNumberVector {
+public class SparseDoubleVector implements SparseNumberVector {
   /**
    * Static instance.
    */
@@ -246,7 +246,7 @@ public class SparseDoubleVector extends AbstractNumberVector implements SparseNu
    * .
    * 
    * The returned String is a single line with entries separated by
-   * {@link AbstractNumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
+   * {@link NumberVector#ATTRIBUTE_SEPARATOR}. The first entry gives the
    * number of values actually not zero. Following entries are pairs of Integer
    * and Double where the Integer gives the index of the dimensionality and the
    * Double gives the corresponding value.
@@ -297,7 +297,7 @@ public class SparseDoubleVector extends AbstractNumberVector implements SparseNu
    * 
    * @apiviz.has SparseDoubleVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<SparseDoubleVector> implements SparseNumberVector.Factory<SparseDoubleVector> {
+  public static class Factory implements SparseNumberVector.Factory<SparseDoubleVector> {
     @Override
     public <A> SparseDoubleVector newFeatureVector(A array, ArrayAdapter<? extends Number, A> adapter) {
       int dim = adapter.size(array);

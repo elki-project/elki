@@ -24,7 +24,8 @@ import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedNumberVectorDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -40,7 +41,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * @since 0.4.0
  */
 @Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.WeightedSquaredEuclideanDistanceFunction")
-public class WeightedSquaredEuclideanDistanceFunction extends AbstractNumberVectorNorm implements SpatialPrimitiveDistanceFunction<NumberVector>, WeightedNumberVectorDistanceFunction<NumberVector> {
+public class WeightedSquaredEuclideanDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, WeightedNumberVectorDistanceFunction<NumberVector>, Norm<NumberVector> {
   /**
    * Weight array
    */

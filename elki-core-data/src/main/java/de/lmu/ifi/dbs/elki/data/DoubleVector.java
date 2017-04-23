@@ -38,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  *
  * @apiviz.landmark
  */
-public class DoubleVector extends AbstractNumberVector {
+public class DoubleVector implements NumberVector {
   /**
    * Static factory instance.
    */
@@ -145,7 +145,7 @@ public class DoubleVector extends AbstractNumberVector {
    *
    * @apiviz.has DoubleVector
    */
-  public static class Factory extends AbstractNumberVector.Factory<DoubleVector> {
+  public static class Factory implements NumberVector.Factory<DoubleVector> {
     @Override
     public DoubleVector newNumberVector(double[] values) {
       return new DoubleVector(values);
