@@ -70,25 +70,18 @@ Our primary "support" medium is this *community* mailing list. We appreciate if 
 
 ## Building ELKI
 
-ELKI is built using [Maven](https://maven.apache.org/) and Python:
+ELKI is built using the [Gradle](https://gradle.org/) wrapper:
 
-    mvn -P svg,svm,uncertain,tutorial,bundle package
+    ./gradlew shadowJar
 
-or simply (on Linux and probably Mac OSX):
+will produce a single executable `jar` file named `elki-bundle-<VERSION>.jar`.
 
-    sh util/compile.sh
+Individual jar files can be built using:
 
-will produce an executable `jar` file named `elki-bundle-<VERSION>.jar`.
+    ./gradlew jar
 
-You can also build a modular version using
+A complete build (with tests and JavaDoc, it will take a few minutes) can be triggered as:
 
-    mvn package
+    ./gradlew build
 
-The jar files are located in `*/target` and `addons/*/target`.
-Required dependencies can be found in the folder `dependency` next to each `jar` file.
-
-When using IntelliJ, it seems that the best strategy is to run within the
-bundle project, as IntelliJ then manages to set up the classpath correctly
-(feel free to discuss and suggest better solutions for IntelliJ or NetBeans
-support - we are using Eclipse, so we need expert recommendations for
-effectively using other IDEs)
+Eclipse can build ELKI, and the easiest way is to use `elki-bundle` as classpath, which includes everything enabled.
