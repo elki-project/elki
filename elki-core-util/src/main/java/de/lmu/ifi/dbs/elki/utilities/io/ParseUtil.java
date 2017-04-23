@@ -441,8 +441,8 @@ public final class ParseUtil {
    */
   private static boolean matchInf(byte[] str, byte firstchar, int start, int end) {
     final int len = end - start;
-    // The wonders of unicode. This is more than one byte on UTF-8
-    if(len == 1 && firstchar == '∞') {
+    // The wonders of unicode. The infinity symbol \u221E is three bytes:
+    if(len == 3 && firstchar == -0x1E && str[start + 1] == -0x78 && str[start + 2] == -0x62) {
       return true;
     }
     if(len != 3 && len != INFINITY_LENGTH) {
@@ -475,8 +475,8 @@ public final class ParseUtil {
    */
   private static boolean matchInf(CharSequence str, char firstchar, int start, int end) {
     final int len = end - start;
-    // The wonders of unicode. This is more than one byte on UTF-8
-    if(len == 1 && firstchar == '∞') {
+    // The wonders of unicode: infinity symbol
+    if(len == 1 && firstchar == '\u221E') {
       return true;
     }
     if(len != 3 && len != INFINITY_LENGTH) {
@@ -561,5 +561,4 @@ public final class ParseUtil {
     }
     return true;
   }
-
 }

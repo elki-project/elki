@@ -78,11 +78,69 @@ public class ParseUtilTest {
 
     assertEquals(Double.POSITIVE_INFINITY, ParseUtil.parseDouble("inf"), 0.);
     assertEquals(Double.NEGATIVE_INFINITY, ParseUtil.parseDouble("-inf"), 0.);
-    assertEquals(Double.POSITIVE_INFINITY, ParseUtil.parseDouble("∞"), 0.);
-    assertEquals(Double.NEGATIVE_INFINITY, ParseUtil.parseDouble("-∞"), 0.);
+    assertEquals(Double.POSITIVE_INFINITY, ParseUtil.parseDouble("\u221E"), 0.);
+    assertEquals(Double.NEGATIVE_INFINITY, ParseUtil.parseDouble("-\u221E"), 0.);
     assertTrue(Double.isNaN(ParseUtil.parseDouble("nan")));
 
     assertEquals(1, ParseUtil.parseDouble("+1"), 0.);
+  }
+
+  @Test
+  public void testBytes() {
+    assertEquals(0., parseBytes("0"), 0.);
+    assertEquals(0., parseBytes("0.0"), 0.);
+    assertEquals(0., parseBytes("0."), 0.);
+    assertEquals(0., parseBytes("0e10"), 0.);
+    assertEquals(0., parseBytes("0E10"), 0.);
+    assertEquals(0., parseBytes("0e-10"), 0.);
+    assertEquals(0., parseBytes("0E-10"), 0.);
+    assertEquals(1., parseBytes("1"), 0.);
+    assertEquals(1., parseBytes("1.0"), 0.);
+    assertEquals(1., parseBytes("1."), 0.);
+    assertEquals(1., parseBytes("1e0"), 0.);
+    assertEquals(1., parseBytes("1E0"), 0.);
+    assertEquals(1., parseBytes("1e-0"), 0.);
+    assertEquals(1., parseBytes("1E-0"), 0.);
+    assertEquals(2., parseBytes("2"), 0.);
+    assertEquals(2., parseBytes("2.0"), 0.);
+    assertEquals(2., parseBytes("2."), 0.);
+    assertEquals(2., parseBytes("2e0"), 0.);
+    assertEquals(2., parseBytes("2E0"), 0.);
+    assertEquals(2., parseBytes("2e-0"), 0.);
+    assertEquals(2., parseBytes("2E-0"), 0.);
+    assertEquals(-1., parseBytes("-1"), 0.);
+    assertEquals(-1., parseBytes("-1.0"), 0.);
+    assertEquals(.2, parseBytes("0.2"), 0.);
+    assertEquals(-.2, parseBytes("-0.2"), 0.);
+    assertEquals(.2, parseBytes(".2"), 0.);
+    assertEquals(-.2, parseBytes("-.2"), 0.);
+    assertEquals(2000., parseBytes("2.0e3"), 0.);
+    assertEquals(2000., parseBytes("2.0E3"), 0.);
+    assertEquals(-2000., parseBytes("-2.0e3"), 0.);
+    assertEquals(-2000., parseBytes("-2.0E3"), 0.);
+    assertEquals(.002, parseBytes("2.0e-3"), 0.);
+    assertEquals(.002, parseBytes("2.0E-3"), 0.);
+    assertEquals(-.002, parseBytes("-2.0e-3"), 0.);
+    assertEquals(-.002, parseBytes("-2.0E-3"), 0.);
+
+    // Case where the JDK had a serious bug, in a few variations
+    assertEquals(2.2250738585072012e-308, parseBytes("2.2250738585072012e-308"), 0.);
+    assertEquals(0.00022250738585072012e-304, parseBytes("0.00022250738585072012e-304"), 0.);
+    assertEquals(00000000002.2250738585072012e-308, parseBytes("00000000002.2250738585072012e-308"), 0.);
+    assertEquals(2.2250738585072012e-00308, parseBytes("2.2250738585072012e-00308"), 0.);
+
+    assertEquals(Double.POSITIVE_INFINITY, parseBytes("inf"), 0.);
+    assertEquals(Double.NEGATIVE_INFINITY, parseBytes("-inf"), 0.);
+    assertEquals(Double.POSITIVE_INFINITY, parseBytes("\u221E"), 0.);
+    assertEquals(Double.NEGATIVE_INFINITY, parseBytes("-\u221E"), 0.);
+    assertTrue(Double.isNaN(parseBytes("nan")));
+
+    assertEquals(1, parseBytes("+1"), 0.);
+  }
+
+  private static double parseBytes(String string) {
+    byte[] bytes = string.getBytes();
+    return ParseUtil.parseDouble(bytes, 0, bytes.length);
   }
 
   @Test(expected = NumberFormatException.class)
