@@ -164,6 +164,11 @@ public class JaccardSimilarityDistanceFunction extends AbstractSetDistanceFuncti
     }
     return 1. - similarityNumberVector(o1, o2);
   }
+  
+  @Override
+  public boolean isSymmetric() {
+    return true;
+  }
 
   @Override
   public boolean isMetric() {

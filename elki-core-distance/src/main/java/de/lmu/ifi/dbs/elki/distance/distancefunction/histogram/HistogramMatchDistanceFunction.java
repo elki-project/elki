@@ -22,7 +22,9 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.histogram;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -50,10 +52,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.4.0
  */
 @Reference(authors = "L.N. Vaserstein", //
-title = "Markov processes over denumerable products of spaces describing large systems of automata", //
-booktitle = "Problemy Peredachi Informatsii 5.3 / Problems of Information Transmission, 5:3", //
-url = "http://mi.mathnet.ru/eng/ppi1811")
-public class HistogramMatchDistanceFunction extends AbstractSpatialDistanceFunction {
+    title = "Markov processes over denumerable products of spaces describing large systems of automata", //
+    booktitle = "Problemy Peredachi Informatsii 5.3 / Problems of Information Transmission, 5:3", //
+    url = "http://mi.mathnet.ru/eng/ppi1811")
+public class HistogramMatchDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance. Use this!
    */

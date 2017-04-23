@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * @apiviz.landmark
  * @apiviz.uses DBID oneway - - defined on
  */
-public interface DBIDSimilarityFunction extends SimilarityFunction<DBID> {
+public interface DBIDSimilarityFunction extends PrimitiveSimilarityFunction<DBID> {
   /**
    * Computes the similarity between two given DatabaseObjects according to this
    * similarity function.

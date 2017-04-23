@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.geo;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.geodesy.EarthModel;
 import de.lmu.ifi.dbs.elki.math.geodesy.SphericalVincentyEarthModel;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -51,7 +52,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @apiviz.composedOf EarthModel
  */
-public class LatLngDistanceFunction extends AbstractSpatialDistanceFunction {
+public class LatLngDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Earth model to use.
    */
@@ -72,9 +73,9 @@ public class LatLngDistanceFunction extends AbstractSpatialDistanceFunction {
 
   @Override
   @Reference(authors = "Erich Schubert, Arthur Zimek and Hans-Peter Kriegel", //
-  title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
-  booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
-  url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
+      title = "Geodetic Distance Queries on R-Trees for Indexing Geographic Data", //
+      booktitle = "13th Int. Symposium on Advances in Spatial and Temporal Databases", //
+      url = "http://dx.doi.org/10.1007/978-3-642-40235-7_9")
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     if(mbr1 instanceof NumberVector) {
       if(mbr2 instanceof NumberVector) {
@@ -103,33 +104,13 @@ public class LatLngDistanceFunction extends AbstractSpatialDistanceFunction {
 
   @Override
   public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((model == null) ? 0 : model.hashCode());
-    return result;
+    return model.hashCode() + getClass().hashCode();
   }
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj == null) {
-      return false;
-    }
-    if(getClass() != obj.getClass()) {
-      return false;
-    }
-    LatLngDistanceFunction other = (LatLngDistanceFunction) obj;
-    if(model == null) {
-      if(other.model != null) {
-        return false;
-      }
-    }
-    else if(!model.equals(other.model)) {
-      return false;
-    }
-    return true;
+    return (this == obj) || (obj != null && obj instanceof LatLngDistanceFunction && //
+        this.model.equals(((LatLngDistanceFunction) obj).model));
   }
 
   /**

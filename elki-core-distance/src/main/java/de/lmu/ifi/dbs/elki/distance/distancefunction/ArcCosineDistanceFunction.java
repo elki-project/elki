@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.2
  */
 @Alias({ "arccos" })
-public class ArcCosineDistanceFunction extends AbstractSpatialDistanceFunction {
+public class ArcCosineDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance
    */

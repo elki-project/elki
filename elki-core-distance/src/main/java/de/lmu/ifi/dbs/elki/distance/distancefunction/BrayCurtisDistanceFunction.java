@@ -68,10 +68,10 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 @Alias({ "bray-curtis", "braycurtis", "sorensen", "dice", "sorensen-dice" })
 @Reference(authors = "J. R. Bray and J. T. Curtis", //
-title = "An ordination of the upland forest communities of southern Wisconsin", //
-booktitle = "Ecological monographs 27.4", //
-url = "http://dx.doi.org/10.2307/1942268")
-public class BrayCurtisDistanceFunction extends AbstractSpatialDistanceFunction {
+    title = "An ordination of the upland forest communities of southern Wisconsin", //
+    booktitle = "Ecological monographs 27.4", //
+    url = "http://dx.doi.org/10.2307/1942268")
+public class BrayCurtisDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance.
    */
@@ -91,8 +91,8 @@ public class BrayCurtisDistanceFunction extends AbstractSpatialDistanceFunction 
    * Dummy method, just to attach a second reference.
    */
   @Reference(authors = "T. Sørensen", //
-  title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", //
-  booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)")
+      title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", //
+      booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)")
   static void secondReference() {
     // Empty, just to attach a second reference
   };
@@ -101,8 +101,8 @@ public class BrayCurtisDistanceFunction extends AbstractSpatialDistanceFunction 
    * Dummy method, just to attach a third reference.
    */
   @Reference(authors = "L. R. Dice", //
-  title = "Measures of the Amount of Ecologic Association Between Species", //
-  booktitle = "Ecology 26 (3)")
+      title = "Measures of the Amount of Ecologic Association Between Species", //
+      booktitle = "Ecology 26 (3)")
   static void thirdReference() {
     // Empty, just to attach a second reference
   };

@@ -21,7 +21,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.set;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 
 /**
  * Abstract base class for set distance functions.
@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFu
  *
  * @param <O> Vector type
  */
-public abstract class AbstractSetDistanceFunction<O> extends AbstractPrimitiveDistanceFunction<O> {
+public abstract class AbstractSetDistanceFunction<O> implements PrimitiveDistanceFunction<O> {
   /**
    * Constants for checking null.
    */

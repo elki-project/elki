@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
  * @author Elke Achtert
  * @since 0.4.0
  */
-public abstract class AbstractDBIDSimilarityFunction extends AbstractPrimitiveSimilarityFunction<DBID> implements DBIDSimilarityFunction {
+public abstract class AbstractDBIDSimilarityFunction implements DBIDSimilarityFunction {
   /**
    * The database we work on
    */

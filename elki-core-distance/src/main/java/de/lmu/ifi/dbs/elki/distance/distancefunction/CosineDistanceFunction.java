@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.2
  */
 @Alias({ "cosine" })
-public class CosineDistanceFunction extends AbstractSpatialDistanceFunction {
+public class CosineDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance
    */

@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -41,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntListParameter;
  * @since 0.2
  * @param <V> the type of FeatureVector to compute the distances in between
  */
-public abstract class AbstractDimensionsSelectingDistanceFunction<V extends FeatureVector<?>> extends AbstractPrimitiveDistanceFunction<V> implements PrimitiveDistanceFunction<V>, DimensionSelectingSubspaceDistanceFunction<V> {
+public abstract class AbstractDimensionsSelectingDistanceFunction<V extends FeatureVector<?>> implements PrimitiveDistanceFunction<V>, DimensionSelectingSubspaceDistanceFunction<V> {
   /**
    * The dimensions to be considered for distance computation.
    */

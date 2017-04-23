@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "P. Jaccard", //
 title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
 booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles")
-public class ClusterJaccardSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Cluster<?>> implements PrimitiveDistanceFunction<Cluster<?>> {
+public class ClusterJaccardSimilarityFunction implements PrimitiveDistanceFunction<Cluster<?>>, PrimitiveSimilarityFunction<Cluster<?>> {
   /**
    * Static instance.
    */
@@ -72,6 +72,11 @@ public class ClusterJaccardSimilarityFunction extends AbstractPrimitiveSimilarit
     int i = DBIDUtil.intersectionSize(o1.getIDs(), o2.getIDs());
     int union = o1.size() + o2.size() - i;
     return 1. - i / (double) union;
+  }
+
+  @Override
+  public boolean isSymmetric() {
+    return true;
   }
 
   @Override

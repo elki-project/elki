@@ -27,7 +27,7 @@ import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
+import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class ClusterIntersectionSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Cluster<?>> implements PrimitiveDistanceFunction<Cluster<?>> {
+public class ClusterIntersectionSimilarityFunction implements PrimitiveDistanceFunction<Cluster<?>>, PrimitiveSimilarityFunction<Cluster<?>> {
   /**
    * Static instance.
    */
@@ -58,6 +58,11 @@ public class ClusterIntersectionSimilarityFunction extends AbstractPrimitiveSimi
   public double distance(Cluster<?> o1, Cluster<?> o2) {
     int i = DBIDUtil.intersectionSize(o1.getIDs(), o2.getIDs());
     return Math.max(o1.size(), o2.size()) - i;
+  }
+
+  @Override
+  public boolean isSymmetric() {
+    return true;
   }
 
   @Override

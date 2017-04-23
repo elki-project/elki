@@ -84,16 +84,13 @@ public class WeightedPearsonCorrelationDistanceFunction extends AbstractNumberVe
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj == null) {
-      return false;
-    }
-    if(!this.getClass().equals(obj.getClass())) {
-      return false;
-    }
-    return Arrays.equals(this.weights, ((WeightedPearsonCorrelationDistanceFunction) obj).weights);
+    return this == obj || (obj != null && this.getClass().equals(obj.getClass()) && //
+        Arrays.equals(this.weights, ((WeightedPearsonCorrelationDistanceFunction) obj).weights));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode() + Arrays.hashCode(weights);
   }
 
   @Override

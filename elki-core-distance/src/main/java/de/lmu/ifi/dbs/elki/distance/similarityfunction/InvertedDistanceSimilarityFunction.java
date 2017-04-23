@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * 
  * @param <O> Object type
  */
-public class InvertedDistanceSimilarityFunction<O> extends AbstractPrimitiveSimilarityFunction<O> {
+public class InvertedDistanceSimilarityFunction<O> implements PrimitiveSimilarityFunction<O> {
   /**
    * Parameter to specify the similarity function to derive the distance between
    * database objects from. Must extend

@@ -22,13 +22,14 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -39,7 +40,7 @@ import net.jafama.FastMath;
  */
 // TODO: implement SpatialDistanceFunction
 @Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.SparseLPNormDistanceFunction")
-public class SparseLPNormDistanceFunction extends AbstractPrimitiveDistanceFunction<SparseNumberVector> implements Norm<SparseNumberVector> {
+public class SparseLPNormDistanceFunction implements PrimitiveDistanceFunction<SparseNumberVector>, Norm<SparseNumberVector> {
   /**
    * P parameter and its inverse.
    */

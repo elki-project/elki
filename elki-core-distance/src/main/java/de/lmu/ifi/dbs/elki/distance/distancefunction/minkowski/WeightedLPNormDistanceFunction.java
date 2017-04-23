@@ -71,9 +71,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
     for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
-      if(delta < 0.) {
-        delta = value - mbr.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : value - mbr.getMax(d);
       if(delta > 0.) {
         agg += FastMath.pow(delta, p) * weights[d];
       }
@@ -85,9 +83,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      if(delta < 0.) {
-        delta = mbr1.getMin(d) - mbr2.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : mbr1.getMin(d) - mbr2.getMax(d);
       if(delta > 0.) {
         agg += FastMath.pow(delta, p) * weights[d];
       }
@@ -109,9 +105,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      if(delta < 0.) {
-        delta = -mbr.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : -mbr.getMax(d);
       if(delta > 0.) {
         agg += FastMath.pow(delta, p) * weights[d];
       }
@@ -168,19 +162,13 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
     if(obj == null) {
       return false;
     }
-    if(!(obj instanceof WeightedLPNormDistanceFunction)) {
-      if(obj instanceof LPNormDistanceFunction && super.equals(obj)) {
-        for(double d : weights) {
-          if(d != 1.) {
-            return false;
-          }
-        }
-        return true;
-      }
-      return false;
-    }
     WeightedLPNormDistanceFunction other = (WeightedLPNormDistanceFunction) obj;
-    return Arrays.equals(this.weights, other.weights);
+    return this.p == other.p && Arrays.equals(this.weights, other.weights);
+  }
+
+  @Override
+  public int hashCode() {
+    return Double.hashCode(p) * 31 + Arrays.hashCode(weights) + getClass().hashCode();
   }
 
   @Override

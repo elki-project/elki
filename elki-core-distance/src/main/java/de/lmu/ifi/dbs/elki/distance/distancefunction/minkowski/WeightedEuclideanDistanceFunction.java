@@ -20,13 +20,12 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -60,9 +59,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
-      if(delta < 0.) {
-        delta = value - mbr.getMax(d);
-      }
+      delta = (delta >= 0) ? delta :  value - mbr.getMax(d);
       if(delta > 0.) {
         agg += delta * delta * weights[d];
       }
@@ -74,9 +71,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      if(delta < 0.) {
-        delta = mbr1.getMin(d) - mbr2.getMax(d);
-      }
+      delta = (delta >= 0) ? delta :  mbr1.getMin(d) - mbr2.getMax(d);
       if(delta > 0.) {
         agg += delta * delta * weights[d];
       }
@@ -97,9 +92,7 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      if(delta < 0.) {
-        delta = -mbr.getMax(d);
-      }
+      delta = (delta >= 0) ? delta :  -mbr.getMax(d);
       if(delta > 0.) {
         agg += delta * delta * weights[d];
       }
@@ -146,32 +139,6 @@ public class WeightedEuclideanDistanceFunction extends WeightedLPNormDistanceFun
       agg += (v2 != null) ? preNorm(v2, mindim, dim2) : preNormMBR(mbr2, mindim, dim2);
     }
     return FastMath.sqrt(agg);
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj == null) {
-      return false;
-    }
-    if(!(obj instanceof WeightedEuclideanDistanceFunction)) {
-      if(obj.getClass().equals(WeightedLPNormDistanceFunction.class)) {
-        return super.equals(obj);
-      }
-      if(obj.getClass().equals(EuclideanDistanceFunction.class)) {
-        for(double d : weights) {
-          if(d != 1.0) {
-            return false;
-          }
-        }
-        return true;
-      }
-      return false;
-    }
-    WeightedEuclideanDistanceFunction other = (WeightedEuclideanDistanceFunction) obj;
-    return Arrays.equals(this.weights, other.weights);
   }
 
   /**

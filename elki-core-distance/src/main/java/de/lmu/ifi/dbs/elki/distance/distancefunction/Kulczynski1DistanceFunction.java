@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "M.-M. Deza and E. Deza", //
 title = "Dictionary of distances", //
 booktitle = "Dictionary of distances")
-public class Kulczynski1DistanceFunction extends AbstractSpatialDistanceFunction {
+public class Kulczynski1DistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance.
    */

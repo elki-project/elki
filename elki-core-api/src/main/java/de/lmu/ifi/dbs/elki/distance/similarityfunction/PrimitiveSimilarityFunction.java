@@ -20,7 +20,9 @@
  */
 package de.lmu.ifi.dbs.elki.distance.similarityfunction;
 
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.database.query.similarity.PrimitiveSimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
  * Interface SimilarityFunction describes the requirements of any similarity
@@ -47,5 +49,7 @@ public interface PrimitiveSimilarityFunction<O> extends SimilarityFunction<O> {
   double similarity(O o1, O o2);
 
   @Override
-  abstract public SimpleTypeInformation<? super O> getInputTypeRestriction();
+  default <T extends O> SimilarityQuery<T> instantiate(Relation<T> relation) {
+    return new PrimitiveSimilarityQuery<>(relation, this);
+  }
 }

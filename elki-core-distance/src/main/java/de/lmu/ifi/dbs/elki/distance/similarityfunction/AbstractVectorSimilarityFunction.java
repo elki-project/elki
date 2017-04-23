@@ -29,7 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
  * @author Erich Schubert
  * @since 0.4.0
  */
-public abstract class AbstractVectorSimilarityFunction extends AbstractPrimitiveSimilarityFunction<NumberVector> implements PrimitiveSimilarityFunction<NumberVector> {
+public abstract class AbstractVectorSimilarityFunction implements PrimitiveSimilarityFunction<NumberVector> {
   // FIXME: Do not default, but every similarity function should be explicit
   // about its requirements.
   @Override

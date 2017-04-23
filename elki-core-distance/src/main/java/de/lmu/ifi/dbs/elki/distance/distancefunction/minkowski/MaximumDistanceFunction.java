@@ -63,9 +63,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
     for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
-      if(delta < 0.) {
-        delta = value - mbr.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : value - mbr.getMax(d);
       agg = (delta < agg) ? agg : delta;
     }
     return agg;
@@ -75,9 +73,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      if(delta < 0.) {
-        delta = mbr1.getMin(d) - mbr2.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : mbr1.getMin(d) - mbr2.getMax(d);
       agg = (delta < agg) ? agg : delta;
     }
     return agg;
@@ -97,9 +93,7 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      if(delta < 0.) {
-        delta = -mbr.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : -mbr.getMax(d);
       agg = (delta < agg) ? agg : delta;
     }
     return agg;
@@ -162,16 +156,12 @@ public class MaximumDistanceFunction extends LPNormDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    if(obj == this) {
-      return true;
-    }
-    if(this.getClass().equals(obj.getClass())) {
-      return true;
-    }
-    return super.equals(obj);
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
   /**

@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 
-import java.util.Arrays;
-
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -60,9 +58,7 @@ public class WeightedMaximumDistanceFunction extends WeightedLPNormDistanceFunct
     for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
-      if(delta < 0.) {
-        delta = value - mbr.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : value - mbr.getMax(d);
       delta *= weights[d];
       agg = delta < agg ? agg : delta;
     }
@@ -73,9 +69,7 @@ public class WeightedMaximumDistanceFunction extends WeightedLPNormDistanceFunct
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      if(delta < 0.) {
-        delta = mbr1.getMin(d) - mbr2.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : mbr1.getMin(d) - mbr2.getMax(d);
       delta *= weights[d];
       agg = delta < agg ? agg : delta;
     }
@@ -96,9 +90,7 @@ public class WeightedMaximumDistanceFunction extends WeightedLPNormDistanceFunct
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      if(delta < 0.) {
-        delta = -mbr.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : -mbr.getMax(d);
       delta *= weights[d];
       agg = delta < agg ? agg : delta;
     }
@@ -148,24 +140,6 @@ public class WeightedMaximumDistanceFunction extends WeightedLPNormDistanceFunct
       agg = agg >= b ? agg : b;
     }
     return agg;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj == null) {
-      return false;
-    }
-    if(!(obj instanceof WeightedMaximumDistanceFunction)) {
-      if(obj instanceof WeightedLPNormDistanceFunction) {
-        return super.equals(obj);
-      }
-      return false;
-    }
-    WeightedMaximumDistanceFunction other = (WeightedMaximumDistanceFunction) obj;
-    return Arrays.equals(this.weights, other.weights);
   }
 
   /**

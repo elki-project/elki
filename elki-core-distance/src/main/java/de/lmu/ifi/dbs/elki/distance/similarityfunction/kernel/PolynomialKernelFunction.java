@@ -89,6 +89,11 @@ public class PolynomialKernelFunction extends AbstractVectorSimilarityFunction i
     }
     return MathUtil.powi(sim + bias, degree);
   }
+  
+  @Override
+  public boolean isSymmetric() {
+    return true;
+  }
 
   @Override
   public boolean isMetric() {

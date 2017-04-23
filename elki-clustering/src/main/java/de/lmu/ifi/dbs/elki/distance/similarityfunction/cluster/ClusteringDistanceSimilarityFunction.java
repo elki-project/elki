@@ -34,5 +34,10 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.PrimitiveSimilarityFuncti
  */
 public interface ClusteringDistanceSimilarityFunction extends PrimitiveSimilarityFunction<Clustering<?>>, PrimitiveDistanceFunction<Clustering<?>> {
   @Override
+  default boolean isSymmetric() {
+    return true;
+  }
+
+  @Override
   <T extends Clustering<?>> DistanceSimilarityQuery<T> instantiate(Relation<T> relation);
 }

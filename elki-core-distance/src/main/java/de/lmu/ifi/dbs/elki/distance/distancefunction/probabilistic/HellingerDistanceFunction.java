@@ -55,9 +55,9 @@ import net.jafama.FastMath;
  * @since 0.7.0
  */
 @Reference(authors = "E. Hellinger", //
-title = "Neue Begründung der Theorie quadratischer Formen von unendlichvielen Veränderlichen", //
-booktitle = "Journal für die reine und angewandte Mathematik ", //
-url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002166941")
+    title = "Neue Begründung der Theorie quadratischer Formen von unendlichvielen Veränderlichen", //
+    booktitle = "Journal für die reine und angewandte Mathematik ", //
+    url = "http://resolver.sub.uni-goettingen.de/purl?GDZPPN002166941")
 @Alias({ "hellinger", "bhattacharyya" })
 public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunction implements PrimitiveSimilarityFunction<NumberVector> {
   /**
@@ -101,6 +101,11 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
       agg += FastMath.sqrt(o1.doubleValue(d) * o2.doubleValue(d));
     }
     return agg;
+  }
+  
+  @Override
+  public boolean isSymmetric() {
+    return true;
   }
 
   @Override

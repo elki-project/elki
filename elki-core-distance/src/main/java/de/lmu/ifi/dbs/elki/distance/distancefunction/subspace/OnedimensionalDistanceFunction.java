@@ -24,7 +24,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractNumberVectorNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -41,7 +42,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
  * @since 0.2
  */
 @Alias("de.lmu.ifi.dbs.elki.distance.distancefunction.subspace.DimensionSelectingDistanceFunction")
-public class OnedimensionalDistanceFunction extends AbstractSpatialNorm implements DimensionSelectingSubspaceDistanceFunction<NumberVector> {
+public class OnedimensionalDistanceFunction extends AbstractNumberVectorNorm implements SpatialPrimitiveDistanceFunction<NumberVector>, DimensionSelectingSubspaceDistanceFunction<NumberVector> {
   /**
    * The dimension to be considered for distance computation.
    */
@@ -156,7 +157,7 @@ public class OnedimensionalDistanceFunction extends AbstractSpatialNorm implemen
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final IntParameter dimP = new IntParameter(DIM_ID)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_INT);
       if(config.grab(dimP)) {
         dim = dimP.getValue();
       }

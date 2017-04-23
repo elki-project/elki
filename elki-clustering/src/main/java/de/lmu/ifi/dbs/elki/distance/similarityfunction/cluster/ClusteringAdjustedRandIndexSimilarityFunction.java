@@ -25,7 +25,6 @@ import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.database.query.DistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceSimilarityQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.distance.similarityfunction.AbstractPrimitiveSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.NormalizedSimilarityFunction;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.ClusterContingencyTable;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -48,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 title = "Objective Criteria for the Evaluation of Clustering Methods", //
 booktitle = "Journal of the American Statistical Association, Vol. 66 Issue 336", //
 url = "http://www.jstor.org/stable/10.2307/2284239")
-public class ClusteringAdjustedRandIndexSimilarityFunction extends AbstractPrimitiveSimilarityFunction<Clustering<?>>implements ClusteringDistanceSimilarityFunction, NormalizedSimilarityFunction<Clustering<?>> {
+public class ClusteringAdjustedRandIndexSimilarityFunction implements ClusteringDistanceSimilarityFunction, NormalizedSimilarityFunction<Clustering<?>> {
   /**
    * Static instance.
    */
@@ -74,7 +73,7 @@ public class ClusteringAdjustedRandIndexSimilarityFunction extends AbstractPrimi
     ct.process(o1, o2);
     return 1. - ct.getPaircount().adjustedRandIndex();
   }
-
+  
   @Override
   public boolean isMetric() {
     return false;

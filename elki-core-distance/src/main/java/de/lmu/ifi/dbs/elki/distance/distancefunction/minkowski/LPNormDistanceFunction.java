@@ -23,13 +23,16 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractSpatialNorm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -41,7 +44,7 @@ import net.jafama.FastMath;
  * @apiviz.landmark
  */
 @Alias({ "lp", "minkowski", "p", "de.lmu.ifi.dbs.elki.distance.distancefunction.LPNormDistanceFunction" })
-public class LPNormDistanceFunction extends AbstractSpatialNorm {
+public class LPNormDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector>, Norm<NumberVector> {
   /**
    * p parameter and its inverse.
    */
@@ -91,9 +94,7 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
     for(int d = start; d < end; d++) {
       final double value = v.doubleValue(d), min = mbr.getMin(d);
       double delta = min - value;
-      if(delta < 0.) {
-        delta = value - mbr.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : value - mbr.getMax(d);
       if(delta > 0.) {
         agg += FastMath.pow(delta, p);
       }
@@ -114,9 +115,7 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      if(delta < 0.) {
-        delta = mbr1.getMin(d) - mbr2.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : mbr1.getMin(d) - mbr2.getMax(d);
       if(delta > 0.) {
         agg += FastMath.pow(delta, p);
       }
@@ -154,9 +153,7 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      if(delta < 0.) {
-        delta = -mbr.getMax(d);
-      }
+      delta = (delta >= 0) ? delta : -mbr.getMax(d);
       if(delta > 0.) {
         agg += FastMath.pow(delta, p);
       }
@@ -226,13 +223,13 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    if(obj instanceof LPNormDistanceFunction) {
-      return this.p == ((LPNormDistanceFunction) obj).p;
-    }
-    return false;
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) //
+        && this.p == ((LPNormDistanceFunction) obj).p);
+  }
+
+  @Override
+  public int hashCode() {
+    return Double.hashCode(p) * 31 + getClass().hashCode();
   }
 
   @Override
@@ -279,7 +276,7 @@ public class LPNormDistanceFunction extends AbstractSpatialNorm {
       if(p == Double.POSITIVE_INFINITY) {
         return MaximumDistanceFunction.STATIC;
       }
-      if(p == Math.round(p)) {
+      if(p == (double) (int) p) {
         return new LPIntegerNormDistanceFunction((int) p);
       }
       return new LPNormDistanceFunction(p);

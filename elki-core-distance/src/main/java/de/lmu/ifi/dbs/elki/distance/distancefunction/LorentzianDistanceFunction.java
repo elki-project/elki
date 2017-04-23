@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 import net.jafama.FastMath;
 
 /**
@@ -41,7 +42,7 @@ import net.jafama.FastMath;
 @Reference(authors = "M.-M. Deza and E. Deza", //
 title = "Dictionary of distances", //
 booktitle = "Dictionary of distances")
-public class LorentzianDistanceFunction extends AbstractSpatialNorm {
+public class LorentzianDistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, Norm<NumberVector> {
   /**
    * Static instance.
    */

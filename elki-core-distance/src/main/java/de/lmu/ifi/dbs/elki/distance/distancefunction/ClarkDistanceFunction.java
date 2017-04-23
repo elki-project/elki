@@ -42,7 +42,7 @@ import net.jafama.FastMath;
 @Reference(authors = "M.-M. Deza and E. Deza", //
 title = "Dictionary of distances", //
 booktitle = "Dictionary of distances")
-public class ClarkDistanceFunction extends AbstractSpatialDistanceFunction {
+public class ClarkDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance.
    */

@@ -21,7 +21,7 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.strings;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.AbstractPrimitiveDistanceFunction;
+import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -51,7 +51,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 @Reference(authors = "V. I. Levenshtein", //
     title = "Binary codes capable of correcting deletions, insertions and reversals.", //
     booktitle = "Soviet physics doklady. Vol. 10. 1966.")
-public class NormalizedLevenshteinDistanceFunction extends AbstractPrimitiveDistanceFunction<String> {
+public class NormalizedLevenshteinDistanceFunction implements PrimitiveDistanceFunction<String> {
   /**
    * Static instance, case sensitive.
    */

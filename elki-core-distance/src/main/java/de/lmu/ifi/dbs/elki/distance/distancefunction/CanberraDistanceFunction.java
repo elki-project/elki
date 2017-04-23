@@ -46,7 +46,7 @@ title = "Computer programs for hierarchical polythetic classification (similarit
 booktitle = "Computer Journal, Volume 9, Issue 1", //
 url = "http://comjnl.oxfordjournals.org/content/9/1/60.short")
 @Alias({ "canberra" })
-public class CanberraDistanceFunction extends AbstractSpatialDistanceFunction {
+public class CanberraDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance. Use this!
    */

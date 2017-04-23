@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -157,6 +158,17 @@ public class LPIntegerNormDistanceFunction extends LPNormDistanceFunction {
       agg += (v2 != null) ? preNorm(v2, mindim, dim2) : preNormMBR(mbr2, mindim, dim2);
     }
     return FastMath.pow(agg, invp);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) //
+        && this.intp == ((LPIntegerNormDistanceFunction) obj).intp);
+  }
+
+  @Override
+  public int hashCode() {
+    return intp * 31 + getClass().hashCode();
   }
 
   /**

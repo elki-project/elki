@@ -42,15 +42,18 @@ public interface DistanceFunction<O> {
    * 
    * @return {@code true} when symmetric
    */
-  boolean isSymmetric();
+  default boolean isSymmetric() {
+    return true;
+  }
 
   /**
-   * Is this distance function metric (in particular, does it satisfy the
-   * triangle equation?)
+   * Is this distance function metric (satisfy the triangle inequality)
    * 
    * @return {@code true} when metric.
    */
-  boolean isMetric();
+  default boolean isMetric() {
+    return false;
+  }
 
   /**
    * Get the input data type of the function.
@@ -65,5 +68,5 @@ public interface DistanceFunction<O> {
    * @param relation The representation to use
    * @return Actual distance query.
    */
-  public <T extends O> DistanceQuery<T> instantiate(Relation<T> relation);
+  <T extends O> DistanceQuery<T> instantiate(Relation<T> relation);
 }

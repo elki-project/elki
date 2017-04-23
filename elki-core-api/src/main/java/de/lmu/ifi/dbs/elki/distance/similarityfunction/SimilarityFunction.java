@@ -41,7 +41,9 @@ public interface SimilarityFunction<O> {
    * 
    * @return {@code true} when symmetric
    */
-  boolean isSymmetric();
+  default boolean isSymmetric() {
+    return true;
+  }
 
   /**
    * Get the input data type of the function.
@@ -54,5 +56,5 @@ public interface SimilarityFunction<O> {
    * @param relation Representation to use
    * @return Actual distance query.
    */
-  public <T extends O> SimilarityQuery<T> instantiate(Relation<T> relation);
+  <T extends O> SimilarityQuery<T> instantiate(Relation<T> relation);
 }

@@ -21,6 +21,9 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
+import de.lmu.ifi.dbs.elki.database.query.distance.PrimitiveDistanceQuery;
+import de.lmu.ifi.dbs.elki.database.relation.Relation;
 
 /**
  * Primitive distance function that is defined on some kind of object.
@@ -46,4 +49,9 @@ public interface PrimitiveDistanceFunction<O> extends DistanceFunction<O> {
 
   @Override
   SimpleTypeInformation<? super O> getInputTypeRestriction();
+
+  @Override
+  default <T extends O> DistanceQuery<T> instantiate(Relation<T> relation) {
+    return new PrimitiveDistanceQuery<>(relation, this);
+  }
 }

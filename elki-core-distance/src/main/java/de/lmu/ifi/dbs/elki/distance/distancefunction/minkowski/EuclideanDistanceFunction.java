@@ -53,8 +53,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
   private final double preDistance(NumberVector v1, NumberVector v2, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
-      final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
-      final double delta = xd - yd;
+      final double delta = v1.doubleValue(d) - v2.doubleValue(d);
       agg += delta * delta;
     }
     return agg;
@@ -63,11 +62,9 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
   private final double preDistanceVM(NumberVector v, SpatialComparable mbr, int start, int end) {
     double agg = 0.;
     for(int d = start; d < end; d++) {
-      final double value = v.doubleValue(d), min = mbr.getMin(d);
-      double delta = min - value;
-      if(delta < 0.) {
-        delta = value - mbr.getMax(d);
-      }
+      final double value = v.doubleValue(d);
+      double delta = mbr.getMin(d) - value;
+      delta = (delta >= 0.) ? delta : value - mbr.getMax(d);
       if(delta > 0.) {
         agg += delta * delta;
       }
@@ -79,9 +76,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr2.getMin(d) - mbr1.getMax(d);
-      if(delta < 0.) {
-        delta = mbr1.getMin(d) - mbr2.getMax(d);
-      }
+      delta = (delta >= 0.) ? delta : mbr1.getMin(d) - mbr2.getMax(d);
       if(delta > 0.) {
         agg += delta * delta;
       }
@@ -102,9 +97,7 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
     double agg = 0.;
     for(int d = start; d < end; d++) {
       double delta = mbr.getMin(d);
-      if(delta < 0.) {
-        delta = -mbr.getMax(d);
-      }
+      delta = (delta >= 0.) ? delta : -mbr.getMax(d);
       if(delta > 0.) {
         agg += delta * delta;
       }
@@ -195,16 +188,12 @@ public class EuclideanDistanceFunction extends LPIntegerNormDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    if(obj == this) {
-      return true;
-    }
-    if(this.getClass().equals(obj.getClass())) {
-      return true;
-    }
-    return super.equals(obj);
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
   /**
