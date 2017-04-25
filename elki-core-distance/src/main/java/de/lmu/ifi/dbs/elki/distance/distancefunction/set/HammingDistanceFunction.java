@@ -45,9 +45,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.7.0
  */
 @Reference(authors = "R. W. Hamming", //
-title = "Error detecting and error correcting codes", //
-booktitle = "Bell System technical journal, 29(2)", //
-url = "http://dx.doi.org/10.1002/j.1538-7305.1950.tb00463.x")
+    title = "Error detecting and error correcting codes", //
+    booktitle = "Bell System technical journal, 29(2)", //
+    url = "http://dx.doi.org/10.1002/j.1538-7305.1950.tb00463.x")
 public class HammingDistanceFunction extends AbstractSetDistanceFunction<FeatureVector<?>> implements NumberVectorDistanceFunction<FeatureVector<?>> {
   /**
    * Static instance.
@@ -154,6 +154,16 @@ public class HammingDistanceFunction extends AbstractSetDistanceFunction<Feature
   @Override
   public SimpleTypeInformation<? super FeatureVector<?>> getInputTypeRestriction() {
     return FeatureVector.TYPE;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
   /**

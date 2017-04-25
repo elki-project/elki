@@ -87,6 +87,16 @@ public class Kulczynski1DistanceFunction extends AbstractNumberVectorDistanceFun
     return sumdiff / summin;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
+  }
+
   /**
    * Parameterization class.
    * 

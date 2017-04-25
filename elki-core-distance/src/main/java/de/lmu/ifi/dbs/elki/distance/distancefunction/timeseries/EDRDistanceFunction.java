@@ -46,9 +46,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Edit Distance on Real Sequence")
 @Reference(authors = "L. Chen and M. T. Özsu and V. Oria", //
-title = "Robust and fast similarity search for moving object trajectories", //
-booktitle = "SIGMOD '05: Proceedings of the 2005 ACM SIGMOD international conference on Management of data", //
-url = "http://dx.doi.org/10.1145/1066157.1066213")
+    title = "Robust and fast similarity search for moving object trajectories", //
+    booktitle = "SIGMOD '05: Proceedings of the 2005 ACM SIGMOD international conference on Management of data", //
+    url = "http://dx.doi.org/10.1145/1066157.1066213")
 public class EDRDistanceFunction extends DTWDistanceFunction {
   /**
    * Delta parameter, similarity threshold for attributes.
@@ -130,10 +130,12 @@ public class EDRDistanceFunction extends DTWDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if(!super.equals(obj)) {
-      return false;
-    }
-    return this.delta == ((EDRDistanceFunction) obj).delta;
+    return super.equals(obj) && this.delta == ((EDRDistanceFunction) obj).delta;
+  }
+
+  @Override
+  public int hashCode() {
+    return super.hashCode() * 31 + Double.hashCode(delta);
   }
 
   /**
@@ -158,7 +160,7 @@ public class EDRDistanceFunction extends DTWDistanceFunction {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 1.0) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(deltaP)) {
         delta = deltaP.doubleValue();
       }

@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -53,11 +52,6 @@ import net.jafama.FastMath;
     booktitle = "Proceedings of the fourth ACM international conference on Multimedia 1997", //
     url = "http://dx.doi.org/10.1145/244130.244151")
 public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanceFunction {
-  /**
-   * Parameter for the kernel dimensionality.
-   */
-  public static final OptionID BPP_ID = new OptionID("hsbhist.bpp", "The dimensionality of the histogram in hue, saturation and brightness.");
-
   /**
    * Constructor.
    *
@@ -105,17 +99,6 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
     return m;
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj == null || !this.getClass().equals(obj.getClass())) {
-      return false;
-    }
-    return VMath.equals(this.weightMatrix, ((HSBHistogramQuadraticDistanceFunction) obj).weightMatrix);
-  }
-
   /**
    * Parameterization class.
    *
@@ -124,6 +107,11 @@ public class HSBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter for the kernel dimensionality.
+     */
+    public static final OptionID BPP_ID = new OptionID("hsbhist.bpp", "The dimensionality of the histogram in hue, saturation and brightness.");
+
     int quanth = 0;
 
     int quants = 0;

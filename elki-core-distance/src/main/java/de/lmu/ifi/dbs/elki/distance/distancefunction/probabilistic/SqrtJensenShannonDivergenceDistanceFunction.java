@@ -40,9 +40,9 @@ import net.jafama.FastMath;
  * @since 0.4.0
  */
 @Reference(authors = "D. M. Endres, J. E. Schindelin", //
-title = "A new metric for probability distributions", //
-booktitle = "IEEE Transactions on Information Theory, 49(7)", //
-url = "http://dx.doi.org/10.1109/TIT.2003.813506")
+    title = "A new metric for probability distributions", //
+    booktitle = "IEEE Transactions on Information Theory, 49(7)", //
+    url = "http://dx.doi.org/10.1109/TIT.2003.813506")
 public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * Static instance. Use this!
@@ -94,16 +94,12 @@ public class SqrtJensenShannonDivergenceDistanceFunction extends AbstractNumberV
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    if(obj == this) {
-      return true;
-    }
-    if(this.getClass().equals(obj.getClass())) {
-      return true;
-    }
-    return super.equals(obj);
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
   /**

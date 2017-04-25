@@ -96,9 +96,7 @@ public class TriangularDiscriminationDistanceFunction extends AbstractNumberVect
         continue;
       }
       double delta = min2 - max1;
-      if(delta < 0.) {
-        delta = min1 - max2;
-      }
+      delta = (delta >= 0.) ? delta : (min1 - max2);
       if(delta > 0.) {
         agg += delta * delta / sum;
       }
@@ -113,10 +111,12 @@ public class TriangularDiscriminationDistanceFunction extends AbstractNumberVect
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    return obj == this || this.getClass().equals(obj.getClass());
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
   /**

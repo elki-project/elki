@@ -59,8 +59,8 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @param <O> Vector type
  */
 @Reference(authors = "P. Jaccard", //
-title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
-booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles")
+    title = "Distribution de la florine alpine dans la Bassin de Dranses et dans quelques regiones voisines", //
+    booktitle = "Bulletin del la Société Vaudoise des Sciences Naturelles")
 @Alias("de.lmu.ifi.dbs.elki.distance.similarityfunction.JaccardPrimitiveSimilarityFunction")
 public class JaccardSimilarityDistanceFunction extends AbstractSetDistanceFunction<FeatureVector<?>> implements NormalizedPrimitiveSimilarityFunction<FeatureVector<?>>, NumberVectorDistanceFunction<FeatureVector<?>>, PrimitiveDistanceFunction<FeatureVector<?>> {
   /**
@@ -85,7 +85,7 @@ public class JaccardSimilarityDistanceFunction extends AbstractSetDistanceFuncti
       Object v1 = o1.getValue(d), v2 = o2.getValue(d);
       final boolean n1 = isNull(v1), n2 = isNull(v2);
       if(v1 instanceof Double && Double.isNaN((Double) v1) //
-      || v2 instanceof Double && Double.isNaN((Double) v2)) {
+          || v2 instanceof Double && Double.isNaN((Double) v2)) {
         continue;
       }
       if(!n1 || !n2) {
@@ -164,7 +164,7 @@ public class JaccardSimilarityDistanceFunction extends AbstractSetDistanceFuncti
     }
     return 1. - similarityNumberVector(o1, o2);
   }
-  
+
   @Override
   public boolean isSymmetric() {
     return true;
@@ -183,5 +183,15 @@ public class JaccardSimilarityDistanceFunction extends AbstractSetDistanceFuncti
   @Override
   public <T extends FeatureVector<?>> DistanceSimilarityQuery<T> instantiate(Relation<T> relation) {
     return new PrimitiveDistanceSimilarityQuery<>(relation, this, this);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 }

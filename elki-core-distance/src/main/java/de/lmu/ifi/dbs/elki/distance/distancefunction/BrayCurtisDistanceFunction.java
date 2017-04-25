@@ -88,24 +88,20 @@ public class BrayCurtisDistanceFunction extends AbstractNumberVectorDistanceFunc
   }
 
   /**
-   * Dummy method, just to attach a second reference.
+   * Additional reference.
    */
   @Reference(authors = "T. Sørensen", //
       title = "A method of establishing groups of equal amplitude in plant sociology based on similarity of species and its application to analyses of the vegetation on Danish commons", //
       booktitle = "Kongelige Danske Videnskabernes Selskab 5 (4)")
-  static void secondReference() {
-    // Empty, just to attach a second reference
-  };
+  private static Void SECOND_REFERENCE = null;
 
   /**
-   * Dummy method, just to attach a third reference.
+   * Additional referene.
    */
   @Reference(authors = "L. R. Dice", //
       title = "Measures of the Amount of Ecologic Association Between Species", //
       booktitle = "Ecology 26 (3)")
-  static void thirdReference() {
-    // Empty, just to attach a second reference
-  };
+  private static Void THIRD_REFERENCE = null;
 
   @Override
   public double distance(NumberVector v1, NumberVector v2) {
@@ -138,6 +134,16 @@ public class BrayCurtisDistanceFunction extends AbstractNumberVectorDistanceFunc
       sumsum += Math.max(-min1, max1) + Math.max(-min2, max2);
     }
     return sumdiff / sumsum;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
   /**

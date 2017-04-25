@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
@@ -152,6 +154,18 @@ public class SubspaceLPNormDistanceFunction extends AbstractDimensionsSelectingD
   @Override
   public boolean isMetric() {
     return true;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) && //
+        Arrays.equals(this.dimensions, ((SubspaceLPNormDistanceFunction) obj).dimensions) //
+        && this.p == ((SubspaceLPNormDistanceFunction) obj).p);
+  }
+
+  @Override
+  public int hashCode() {
+    return this.getClass().hashCode() + BitsUtil.hashCode(dimensions) + Double.hashCode(p);
   }
 
   /**

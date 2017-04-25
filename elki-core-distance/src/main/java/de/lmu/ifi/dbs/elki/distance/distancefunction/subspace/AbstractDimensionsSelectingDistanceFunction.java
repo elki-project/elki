@@ -78,13 +78,13 @@ public abstract class AbstractDimensionsSelectingDistanceFunction<V extends Feat
 
   @Override
   public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj == null || !this.getClass().equals(obj.getClass())) {
-      return false;
-    }
-    return Arrays.equals(this.dimensions, ((AbstractDimensionsSelectingDistanceFunction<?>) obj).dimensions);
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) && //
+        Arrays.equals(this.dimensions, ((AbstractDimensionsSelectingDistanceFunction<?>) obj).dimensions));
+  }
+
+  @Override
+  public int hashCode() {
+    return this.getClass().hashCode() + BitsUtil.hashCode(dimensions);
   }
 
   /**

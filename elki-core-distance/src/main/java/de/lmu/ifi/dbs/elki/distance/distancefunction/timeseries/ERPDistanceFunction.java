@@ -146,10 +146,12 @@ public class ERPDistanceFunction extends DTWDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if(!super.equals(obj)) {
-      return false;
-    }
-    return this.g == ((ERPDistanceFunction) obj).g;
+    return super.equals(obj) && this.g == ((ERPDistanceFunction) obj).g;
+  }
+  
+  @Override
+  public int hashCode() {
+    return super.hashCode() * 31 + Double.hashCode(g);
   }
 
   /**

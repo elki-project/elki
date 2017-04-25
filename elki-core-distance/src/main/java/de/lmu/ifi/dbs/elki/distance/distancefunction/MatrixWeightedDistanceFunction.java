@@ -22,8 +22,11 @@ package de.lmu.ifi.dbs.elki.distance.distancefunction;
 
 import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.mahalanobisDistance;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 
 /**
  * Weighted distance for feature vectors.
@@ -53,6 +56,18 @@ public class MatrixWeightedDistanceFunction extends AbstractNumberVectorDistance
   public double distance(NumberVector o1, NumberVector o2) {
     dimensionality(o1, o2, weightMatrix.length);
     return mahalanobisDistance(weightMatrix, o1.toArray(), o2.toArray());
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return this == obj || (obj != null && this.getClass().equals(obj.getClass()) && //
+        VMath.equals(this.weightMatrix, ((MatrixWeightedDistanceFunction) obj).weightMatrix));
+  }
+
+  // TODO: fairly expensive - cache the hash code?
+  @Override
+  public int hashCode() {
+    return this.getClass().hashCode() * 31 + Arrays.deepHashCode(weightMatrix);
   }
 
   @Override

@@ -68,9 +68,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  */
 @Title("Longest Common Subsequence distance function")
 @Reference(authors = "M. Vlachos, M. Hadjieleftheriou, D. Gunopulos, E. Keogh", //
-title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", //
-booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", //
-url = "http://dx.doi.org/10.1145/956750.956777")
+    title = "Indexing Multi-Dimensional Time-Series with Support for Multiple Distance Measures", //
+    booktitle = "Proceedings of the ninth ACM SIGKDD international conference on Knowledge discovery and data mining", //
+    url = "http://dx.doi.org/10.1145/956750.956777")
 public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
    * Keeps the currently set pDelta.
@@ -160,16 +160,9 @@ public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == this) {
-      return true;
-    }
-    if(obj == null) {
-      return false;
-    }
-    if(!this.getClass().equals(obj.getClass())) {
-      return false;
-    }
-    return (this.pDelta == ((LCSSDistanceFunction) obj).pDelta) && (this.pEpsilon == ((LCSSDistanceFunction) obj).pEpsilon);
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) //
+        && this.pDelta == ((LCSSDistanceFunction) obj).pDelta //
+        && this.pEpsilon == ((LCSSDistanceFunction) obj).pEpsilon);
   }
 
   /**
@@ -204,15 +197,15 @@ public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter pDeltaP = new DoubleParameter(PDELTA_ID, 0.1)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE)//
-      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE)//
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(pDeltaP)) {
         pDelta = pDeltaP.doubleValue();
       }
 
       final DoubleParameter pEpsilonP = new DoubleParameter(PEPSILON_ID, 0.05)//
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
-      .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_EQUAL_ONE_DOUBLE);
       if(config.grab(pEpsilonP)) {
         pEpsilon = pEpsilonP.doubleValue();
       }

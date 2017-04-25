@@ -127,13 +127,13 @@ public class OnedimensionalDistanceFunction extends AbstractNumberVectorDistance
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    if(!this.getClass().equals(obj.getClass())) {
-      return false;
-    }
-    return this.dim == ((OnedimensionalDistanceFunction) obj).dim;
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) && //
+        this.dim == ((OnedimensionalDistanceFunction) obj).dim);
+  }
+
+  @Override
+  public int hashCode() {
+    return this.getClass().hashCode() + dim * 31;
   }
 
   /**

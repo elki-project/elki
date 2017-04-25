@@ -53,7 +53,7 @@ public class KolmogorovSmirnovDistanceFunction extends AbstractNumberVectorDista
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double xs = 0., ys = 0., agg = 0.;
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       xs += v1.doubleValue(i);
       ys += v2.doubleValue(i);
       double diff = Math.abs(xs - ys);
@@ -69,16 +69,12 @@ public class KolmogorovSmirnovDistanceFunction extends AbstractNumberVectorDista
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
-      return false;
-    }
-    if (obj == this) {
-      return true;
-    }
-    if (this.getClass().equals(obj.getClass())) {
-      return true;
-    }
-    return super.equals(obj);
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
   /**

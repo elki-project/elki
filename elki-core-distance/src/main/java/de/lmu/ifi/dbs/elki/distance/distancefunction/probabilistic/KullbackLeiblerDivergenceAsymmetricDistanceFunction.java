@@ -47,8 +47,8 @@ import net.jafama.FastMath;
  * @since 0.4.0
  */
 @Reference(authors = "S. Kullback", //
-title = "Information theory and statistics", //
-booktitle = "Information theory and statistics, Courier Dover Publications, 1997.")
+    title = "Information theory and statistics", //
+    booktitle = "Information theory and statistics, Courier Dover Publications, 1997.")
 @Alias("kl")
 public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends AbstractNumberVectorDistanceFunction {
   /**
@@ -94,16 +94,12 @@ public class KullbackLeiblerDivergenceAsymmetricDistanceFunction extends Abstrac
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    if(obj == this) {
-      return true;
-    }
-    if(this.getClass().equals(obj.getClass())) {
-      return true;
-    }
-    return super.equals(obj);
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
   /**

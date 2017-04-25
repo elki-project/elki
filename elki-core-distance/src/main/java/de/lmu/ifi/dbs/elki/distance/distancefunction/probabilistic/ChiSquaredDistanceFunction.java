@@ -153,16 +153,12 @@ public class ChiSquaredDistanceFunction extends AbstractNumberVectorDistanceFunc
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    if(obj == this) {
-      return true;
-    }
-    if(this.getClass().equals(obj.getClass())) {
-      return true;
-    }
-    return super.equals(obj);
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
   @Override

@@ -98,10 +98,12 @@ public class HistogramIntersectionDistanceFunction extends AbstractNumberVectorD
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    return this.getClass().equals(obj.getClass());
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
   }
 
   /**

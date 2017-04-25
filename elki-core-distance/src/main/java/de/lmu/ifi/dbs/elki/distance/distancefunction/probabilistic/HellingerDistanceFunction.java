@@ -123,6 +123,16 @@ public class HellingerDistanceFunction extends AbstractNumberVectorDistanceFunct
     return NumberVector.VARIABLE_LENGTH;
   }
 
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()));
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode();
+  }
+
   /**
    * Parameterization class.
    * 

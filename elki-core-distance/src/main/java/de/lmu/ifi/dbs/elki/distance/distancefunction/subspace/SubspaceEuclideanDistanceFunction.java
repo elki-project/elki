@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.distance.distancefunction.subspace;
 
+import java.util.Arrays;
+
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -130,6 +132,17 @@ public class SubspaceEuclideanDistanceFunction extends SubspaceLPNormDistanceFun
       sqrDist += delta * delta;
     }
     return FastMath.sqrt(sqrDist);
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return obj == this || (obj != null && this.getClass().equals(obj.getClass()) && //
+        Arrays.equals(this.dimensions, ((SubspaceEuclideanDistanceFunction) obj).dimensions));
+  }
+
+  @Override
+  public int hashCode() {
+    return this.getClass().hashCode() + BitsUtil.hashCode(dimensions);
   }
 
   /**

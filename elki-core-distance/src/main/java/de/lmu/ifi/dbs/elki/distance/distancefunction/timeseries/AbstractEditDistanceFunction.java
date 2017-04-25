@@ -76,13 +76,13 @@ public abstract class AbstractEditDistanceFunction extends AbstractNumberVectorD
 
   @Override
   public boolean equals(Object obj) {
-    if(obj == null) {
-      return false;
-    }
-    if(!this.getClass().equals(obj.getClass())) {
-      return false;
-    }
-    return this.bandSize == ((AbstractEditDistanceFunction) obj).bandSize;
+    return this == obj || (obj != null && this.getClass().equals(obj.getClass()) //
+        && this.bandSize == ((AbstractEditDistanceFunction) obj).bandSize);
+  }
+
+  @Override
+  public int hashCode() {
+    return getClass().hashCode() * 31 + Double.hashCode(bandSize);
   }
 
   /**
@@ -97,9 +97,9 @@ public abstract class AbstractEditDistanceFunction extends AbstractNumberVectorD
      * Bandsize parameter.
      */
     public static final OptionID BANDSIZE_ID = new OptionID("edit.bandsize", //
-    "The band size for time series alignment. By default, no constraint is used. "//
-        + "If the value is larger than 0, it will be considered absolute, otherwise relative to the longer sequence. " //
-        + "Note that 0 does not make sense: use Euclidean distance then instead.");
+        "The band size for time series alignment. By default, no constraint is used. "//
+            + "If the value is larger than 0, it will be considered absolute, otherwise relative to the longer sequence. " //
+            + "Note that 0 does not make sense: use Euclidean distance then instead.");
 
     /**
      * Keeps the currently set bandSize.
@@ -110,8 +110,8 @@ public abstract class AbstractEditDistanceFunction extends AbstractNumberVectorD
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final DoubleParameter bandSizeP = new DoubleParameter(BANDSIZE_ID) //
-      .setOptional(true) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .setOptional(true) //
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(bandSizeP)) {
         bandSize = bandSizeP.doubleValue();
       }

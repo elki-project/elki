@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.distance.distancefunction.colorhistogram;
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.MatrixWeightedDistanceFunction;
-import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -50,11 +49,6 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
     booktitle = "IEEE Trans. on Pattern Analysis and Machine Intelligence, Vol. 17, No. 7, July 1995", //
     url = "http://dx.doi.org/10.1109/34.391417")
 public class RGBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanceFunction {
-  /**
-   * Parameter for the kernel dimensionality.
-   */
-  public static final OptionID BPP_ID = new OptionID("rgbhist.bpp", "The dimensionality of the histogram in each color");
-
   /**
    * Constructor.
    * 
@@ -96,17 +90,6 @@ public class RGBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
     return m;
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if(this == obj) {
-      return true;
-    }
-    if(obj == null || !this.getClass().equals(obj.getClass())) {
-      return false;
-    }
-    return VMath.equals(this.weightMatrix, ((RGBHistogramQuadraticDistanceFunction) obj).weightMatrix);
-  }
-
   /**
    * Parameterization class.
    * 
@@ -115,6 +98,10 @@ public class RGBHistogramQuadraticDistanceFunction extends MatrixWeightedDistanc
    * @apiviz.exclude
    */
   public static class Parameterizer extends AbstractParameterizer {
+    /**
+     * Parameter for the kernel dimensionality.
+     */
+    public static final OptionID BPP_ID = new OptionID("rgbhist.bpp", "The dimensionality of the histogram in each color");
     int bpp = 0;
 
     @Override
