@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
@@ -210,11 +211,11 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
       SVGUtil.addCSSClass(intervals, INDEX + depth);
       layer.appendChild(intervals);
 
-      if(!entry.isLeafEntry()) {
+      if(!(entry instanceof LeafEntry)) {
         N node = rtree.getNode(entry);
         for(int i = 0; i < node.getNumEntries(); i++) {
           E child = node.getEntry(i);
-          if(!child.isLeafEntry()) {
+          if(!(child instanceof LeafEntry)) {
             visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1, ++step);
           }
         }

@@ -20,7 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.index.tree;
 
-import java.util.Enumeration;
+import java.util.Iterator;
 
 import de.lmu.ifi.dbs.elki.persistent.Page;
 
@@ -44,7 +44,7 @@ public interface Node<E extends Entry> extends Page {
    * @param parentPath the path to this node
    * @return an enumeration of the children paths of this node
    */
-  Enumeration<IndexTreePath<E>> children(IndexTreePath<E> parentPath);
+  Iterator<IndexTreePath<E>> children(IndexTreePath<E> parentPath);
 
   /**
    * Returns the number of entries of this node.

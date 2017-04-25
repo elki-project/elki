@@ -23,11 +23,7 @@ package de.lmu.ifi.dbs.elki.index.tree;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
@@ -81,17 +77,17 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   }
 
   @Override
-  public final Enumeration<IndexTreePath<E>> children(final IndexTreePath<E> parentPath) {
-    return new Enumeration<IndexTreePath<E>>() {
+  public final Iterator<IndexTreePath<E>> children(final IndexTreePath<E> parentPath) {
+    return new Iterator<IndexTreePath<E>>() {
       int count = 0;
 
       @Override
-      public boolean hasMoreElements() {
+      public boolean hasNext() {
         return count < numEntries;
       }
 
       @Override
-      public IndexTreePath<E> nextElement() {
+      public IndexTreePath<E> next() {
         synchronized(AbstractNode.this) {
           if(count < numEntries) {
             return new IndexTreePath<>(parentPath, getEntry(count), count++);
@@ -202,7 +198,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   @Override
   public final int addLeafEntry(E entry) {
     // entry is not a leaf entry
-    if(!entry.isLeafEntry()) {
+    if(!(entry instanceof LeafEntry)) {
       throw new UnsupportedOperationException("Entry is not a leaf entry!");
     }
     // this is a not a leaf node
@@ -228,7 +224,7 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   @Override
   public final int addDirectoryEntry(E entry) {
     // entry is not a directory entry
-    if(entry.isLeafEntry()) {
+    if(entry instanceof LeafEntry) {
       throw new UnsupportedOperationException("Entry is not a directory entry!");
     }
     // this is a not a directory node

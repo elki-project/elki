@@ -26,7 +26,8 @@ import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 
 /**
  * Represents an entry in a leaf node of a spatial index. A SpatialLeafEntry
@@ -36,11 +37,16 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
  * @author Elke Achtert
  * @since 0.2
  */
-public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialEntry, NumberVector {
+public class SpatialPointLeafEntry implements LeafEntry, SpatialEntry, NumberVector {
   /**
    * Serial version.
    */
-  private static final long serialVersionUID = 1;
+  private static final long serialVersionUID = 2;
+
+  /**
+   * Holds the id of the object (node or data object) represented by this entry.
+   */
+  private DBID id;
 
   /**
    * The values of the underlying data object.
@@ -61,7 +67,8 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
    * @param values the values of the underlying data object
    */
   public SpatialPointLeafEntry(DBID id, double[] values) {
-    super(id);
+    super();
+    this.id = id;
     this.values = values;
   }
 
@@ -72,12 +79,18 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
    * @param vector Number vector
    */
   public SpatialPointLeafEntry(DBID id, NumberVector vector) {
-    super(id);
+    super();
+    this.id = id;
     int dim = vector.getDimensionality();
     this.values = new double[dim];
-    for (int i = 0; i < dim; i++) {
+    for(int i = 0; i < dim; i++) {
       values[i] = vector.doubleValue(i);
     }
+  }
+
+  @Override
+  public DBID getDBID() {
+    return id;
   }
 
   @Override
@@ -94,9 +107,9 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
    */
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
-    super.writeExternal(out);
+    out.writeInt(DBIDUtil.asInteger(id));
     out.writeInt(values.length);
-    for (double v : values) {
+    for(double v : values) {
       out.writeDouble(v);
     }
   }
@@ -112,9 +125,9 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
    */
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    super.readExternal(in);
+    id = DBIDUtil.importInteger(in.read());
     values = new double[in.readInt()];
-    for (int d = 0; d < values.length; d++) {
+    for(int d = 0; d < values.length; d++) {
       values[d] = in.readDouble();
     }
   }
@@ -132,5 +145,17 @@ public class SpatialPointLeafEntry extends AbstractLeafEntry implements SpatialE
   @Override
   public double[] toArray() {
     return values.clone();
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    // Compare ID only.
+    return this == obj || (obj != null && this.getClass() == obj.getClass() && //
+        DBIDUtil.equal(this.id, ((SpatialPointLeafEntry) obj).id));
+  }
+
+  @Override
+  public int hashCode() {
+    return id.hashCode();
   }
 }

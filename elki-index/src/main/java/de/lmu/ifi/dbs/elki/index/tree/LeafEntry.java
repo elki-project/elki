@@ -34,5 +34,5 @@ public interface LeafEntry extends Entry {
   /**
    * Get the DBID of this leaf entry.
    */
-  public DBID getDBID();
+  DBID getDBID();
 }

@@ -25,8 +25,9 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
+import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 
 /**
  * Represents an entry in a directory node of an M-Tree. A MTreeDirectoryEntry
@@ -37,8 +38,16 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
  * @author Elke Achtert
  * @since 0.2
  */
-public class MTreeDirectoryEntry extends AbstractDirectoryEntry implements MTreeEntry {
-  private static final long serialVersionUID = 2;
+public class MTreeDirectoryEntry implements DirectoryEntry, MTreeEntry {
+  /**
+   * Serialization version.
+   */
+  private static final long serialVersionUID = 3;
+
+  /**
+   * Holds the id of the object (node or data object) represented by this entry.
+   */
+  private int id;
 
   /**
    * The id of routing object of this entry.
@@ -73,10 +82,16 @@ public class MTreeDirectoryEntry extends AbstractDirectoryEntry implements MTree
    * @param coveringRadius the covering radius of the entry
    */
   public MTreeDirectoryEntry(DBID objectID, double parentDistance, int nodeID, double coveringRadius) {
-    super(nodeID);
+    super();
+    this.id = nodeID;
     this.routingObjectID = objectID;
     this.parentDistance = parentDistance;
     this.coveringRadius = coveringRadius;
+  }
+
+  @Override
+  public int getPageID() {
+    return id;
   }
 
   /**
@@ -159,7 +174,7 @@ public class MTreeDirectoryEntry extends AbstractDirectoryEntry implements MTree
    */
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
-    super.writeExternal(out);
+    out.writeInt(id);
     out.writeInt(DBIDUtil.asInteger(routingObjectID));
     out.writeDouble(parentDistance);
     out.writeDouble(coveringRadius);
@@ -171,50 +186,25 @@ public class MTreeDirectoryEntry extends AbstractDirectoryEntry implements MTree
    */
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    super.readExternal(in);
+    this.id = in.readInt();
     this.routingObjectID = DBIDUtil.importInteger(in.readInt());
     this.parentDistance = in.readDouble();
     this.coveringRadius = in.readDouble();
   }
 
-  /**
-   * Returns the id as a string representation of this entry.
-   * 
-   * @return a string representation of this entry
-   */
   @Override
   public String toString() {
-    return super.toString() + " (o.id = " + getRoutingObjectID() + ")";
+    return "MTreeNode(" + id + " dbid=" + DBIDUtil.toString((DBIDRef) routingObjectID) + ")";
   }
 
-  /**
-   * Indicates whether some other object is "equal to" this one.
-   * 
-   * @param o the object to be tested
-   * @return true, if the super method returns true and o is an
-   *         MTreeDirectoryEntry and has the same coveringRadius, parentDistance
-   *         and routingObjectID as this entry.
-   */
   @Override
   public boolean equals(Object o) {
-    if(this == o) {
-      return true;
-    }
-    if(o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if(!super.equals(o)) {
-      return false;
-    }
+    // We deliberately use the ID ONLY for equality testing!
+    return this == o || (o != null && getClass() == o.getClass() && id == ((MTreeDirectoryEntry) o).id);
+  }
 
-    final MTreeDirectoryEntry that = (MTreeDirectoryEntry) o;
-
-    if(Math.abs(coveringRadius - that.coveringRadius) < Double.MIN_NORMAL) {
-      return false;
-    }
-    if(Math.abs(parentDistance - that.parentDistance) < Double.MIN_NORMAL) {
-      return false;
-    }
-    return !(routingObjectID != null ? !DBIDUtil.equal(routingObjectID, that.routingObjectID) : that.routingObjectID != null);
+  @Override
+  public int hashCode() {
+    return id;
   }
 }

@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -213,7 +214,7 @@ public abstract class NonFlatRStarTree<N extends AbstractRStarTreeNode<N, E>, E 
   private N createRoot(N root, List<E> objects) {
     // insert data
     for(E entry : objects) {
-      if (entry.isLeafEntry()) {
+      if (entry instanceof LeafEntry) {
         root.addLeafEntry(entry);
       }
       else {

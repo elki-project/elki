@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.LPNormDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.ManhattanDistanceFunction;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
@@ -274,11 +275,11 @@ public class TreeSphereVisualization extends AbstractVisFactory {
         layer.appendChild(r);
       }
 
-      if(!entry.isLeafEntry()) {
+      if(!(entry instanceof LeafEntry)) {
         N node = mtree.getNode(entry);
         for(int i = 0; i < node.getNumEntries(); i++) {
           E child = node.getEntry(i);
-          if(!child.isLeafEntry()) {
+          if(!(child instanceof LeafEntry)) {
             visualizeMTreeEntry(svgp, layer, proj, mtree, child, depth + 1);
           }
         }

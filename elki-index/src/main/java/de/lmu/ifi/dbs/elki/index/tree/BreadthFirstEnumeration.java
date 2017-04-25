@@ -20,10 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.index.tree;
 
-import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import java.util.Queue;
+import java.util.*;
 
 /**
  * Breadth first enumeration over the nodes of an index structure.
@@ -37,18 +34,18 @@ import java.util.Queue;
  * @param <N> the type of Node used in the index
  * @param <E> the type of Entry used in the index
  */
-public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> implements Enumeration<IndexTreePath<E>> {
+public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> implements Iterator<IndexTreePath<E>> {
   /**
    * Represents an empty enumeration.
    */
-  public final Enumeration<IndexTreePath<E>> EMPTY_ENUMERATION = new Enumeration<IndexTreePath<E>>() {
+  public final Iterator<IndexTreePath<E>> EMPTY_ENUMERATION = new Iterator<IndexTreePath<E>>() {
     @Override
-    public boolean hasMoreElements() {
+    public boolean hasNext() {
       return false;
     }
 
     @Override
-    public IndexTreePath<E> nextElement() {
+    public IndexTreePath<E> next() {
       throw new NoSuchElementException("No more children");
     }
   };
@@ -56,7 +53,7 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
   /**
    * The queue for the enumeration.
    */
-  private Queue<Enumeration<IndexTreePath<E>>> queue;
+  private Queue<Iterator<IndexTreePath<E>>> queue;
 
   /**
    * The index storing the nodes.
@@ -75,16 +72,16 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
     this.queue = new LinkedList<>();
     this.index = index;
 
-    Enumeration<IndexTreePath<E>> root_enum = new Enumeration<IndexTreePath<E>>() {
+    Iterator<IndexTreePath<E>> root_enum = new Iterator<IndexTreePath<E>>() {
       boolean hasNext = true;
 
       @Override
-      public boolean hasMoreElements() {
+      public boolean hasNext() {
         return hasNext;
       }
 
       @Override
-      public IndexTreePath<E> nextElement() {
+      public IndexTreePath<E> next() {
         hasNext = false;
         return rootPath;
       }
@@ -100,8 +97,8 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
    *         at least one more element to provide; <code>false</code> otherwise.
    */
   @Override
-  public boolean hasMoreElements() {
-    return (!queue.isEmpty() && (queue.peek()).hasMoreElements());
+  public boolean hasNext() {
+    return (!queue.isEmpty() && (queue.peek()).hasNext());
   }
 
   /**
@@ -112,12 +109,12 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
    * @throws java.util.NoSuchElementException if no more elements exist.
    */
   @Override
-  public IndexTreePath<E> nextElement() {
-    Enumeration<IndexTreePath<E>> enumeration = queue.peek();
-    IndexTreePath<E> nextPath = enumeration.nextElement();
+  public IndexTreePath<E> next() {
+    Iterator<IndexTreePath<E>> enumeration = queue.peek();
+    IndexTreePath<E> nextPath = enumeration.next();
 
-    Enumeration<IndexTreePath<E>> children;
-    if(nextPath.getEntry().isLeafEntry()) {
+    Iterator<IndexTreePath<E>> children;
+    if(nextPath.getEntry() instanceof LeafEntry) {
       children = EMPTY_ENUMERATION;
     }
     else {
@@ -125,10 +122,10 @@ public class BreadthFirstEnumeration<N extends Node<E>, E extends Entry> impleme
       children = node.children(nextPath);
     }
 
-    if(!enumeration.hasMoreElements()) {
+    if(!enumeration.hasNext()) {
       queue.remove();
     }
-    if(children.hasMoreElements()) {
+    if(children.hasNext()) {
       queue.offer(children);
     }
     return nextPath;

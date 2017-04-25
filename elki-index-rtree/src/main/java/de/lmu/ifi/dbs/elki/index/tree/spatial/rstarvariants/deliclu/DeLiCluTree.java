@@ -20,16 +20,15 @@
  */
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.deliclu;
 
+import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
+import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.persistent.PageFile;
+
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
-import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
-import de.lmu.ifi.dbs.elki.index.tree.Entry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.RTreeSettings;
-import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.NonFlatRStarTree;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.persistent.PageFile;
 
 /**
  * DeLiCluTree is a spatial index structure based on an R-Tree. DeLiCluTree is
@@ -104,25 +103,6 @@ public abstract class DeLiCluTree extends NonFlatRStarTree<DeLiCluNode, DeLiCluE
       return exp;
     }
     return new TIntHashSet();
-  }
-
-  /**
-   * Determines and returns the number of nodes in this index.
-   *
-   * @return the number of nodes in this index
-   */
-  public int numNodes() {
-    int numNodes = 0;
-
-    BreadthFirstEnumeration<DeLiCluNode, DeLiCluEntry> bfs = new BreadthFirstEnumeration<>(this, getRootPath());
-    while(bfs.hasMoreElements()) {
-      Entry entry = bfs.nextElement().getEntry();
-      if(!entry.isLeafEntry()) {
-        numNodes++;
-      }
-    }
-
-    return numNodes;
   }
 
   /**

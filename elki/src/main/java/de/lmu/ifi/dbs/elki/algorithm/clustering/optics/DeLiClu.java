@@ -316,7 +316,7 @@ public class DeLiClu<NV extends NumberVector> extends AbstractDistanceBasedAlgor
     DeLiCluNode parentNode = index.getNode(parentEntry);
     SpatialEntry entry2 = path.get(pos).getEntry();
 
-    if(entry2.isLeafEntry()) {
+    if(entry2 instanceof LeafEntry) {
       assert (pos == 0);
       for(int i = 0; i < parentNode.getNumEntries(); i++) {
         DeLiCluEntry entry1 = parentNode.getEntry(i);

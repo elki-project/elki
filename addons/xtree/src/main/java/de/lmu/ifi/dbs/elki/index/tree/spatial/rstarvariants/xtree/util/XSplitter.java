@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.AbstractXTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.xtree.AbstractXTreeNode;
@@ -545,7 +546,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
         }
       }
     }
-    if(node.getEntry(0).isLeafEntry() || tree.get_max_overlap() >= 1) {
+    if(node.getEntry(0) instanceof LeafEntry || tree.get_max_overlap() >= 1) {
       pastOverlap = Double.NaN; // overlap is not computed
       return optDistribution;
     }
@@ -636,7 +637,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    * @return distribution resulting from the minimum overlap split
    */
   public SplitSorting minimumOverlapSplit() {
-    if(node.getEntry(0).isLeafEntry()) {
+    if(node.getEntry(0) instanceof LeafEntry) {
       throw new IllegalArgumentException("The minimum overlap split will only be performed on directory nodes");
     }
     if(node.getNumEntries() < 2) {
@@ -647,7 +648,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
     if(node.getNumEntries() < maxEntries) {
       throw new IllegalArgumentException("This entry list has not yet reached the maximum limit: " + node.getNumEntries() + "<=" + maxEntries);
     }
-    assert !node.getEntry(0).isLeafEntry();
+    assert !(node.getEntry(0) instanceof LeafEntry);
 
     if(minFanout >= tree.getDirMinimum()) {
       // minFanout not set for allowing underflowing nodes
@@ -717,8 +718,8 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
     if(node.getNumEntries() < 2) {
       throw new IllegalArgumentException("Splitting less than two entries is pointless.");
     }
-    int minEntries = (node.getEntry(0).isLeafEntry() ? tree.getLeafMinimum() : tree.getDirMinimum());
-    int maxEntries = (node.getEntry(0).isLeafEntry() ? tree.getLeafCapacity() - 1 : tree.getDirCapacity() - 1);
+    int minEntries = (node.getEntry(0) instanceof LeafEntry ? tree.getLeafMinimum() : tree.getDirMinimum());
+    int maxEntries = (node.getEntry(0) instanceof LeafEntry ? tree.getLeafCapacity() - 1 : tree.getDirCapacity() - 1);
     if(node.getNumEntries() < maxEntries) {
       throw new IllegalArgumentException("This entry list has not yet reached the maximum limit: " + node.getNumEntries() + "<=" + maxEntries);
     }
@@ -784,7 +785,7 @@ public class XSplitter<N extends AbstractXTreeNode<N>, T extends AbstractXTree<N
    */
   private int[] countXingDataEntries(final Collection<SpatialEntry> entries, final HyperBoundingBox mbr, int[] numOf) {
     for(SpatialEntry entry : entries) {
-      if(entry.isLeafEntry()) {
+      if(entry instanceof LeafEntry) {
         numOf[0]++;
         if(SpatialUtil.intersects(mbr, entry)) {
           numOf[1]++;

@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.MetricalIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.Assignments;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.strategies.split.DistanceEntry;
@@ -112,10 +113,10 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
     }
 
     BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
-    while(enumeration.hasMoreElements()) {
-      IndexTreePath<E> path = enumeration.nextElement();
+    while(enumeration.hasNext()) {
+      IndexTreePath<E> path = enumeration.next();
       E entry = path.getEntry();
-      if(entry.isLeafEntry()) {
+      if(entry instanceof LeafEntry) {
         objects++;
         result.append("\n    ").append(entry.toString());
       }
@@ -444,10 +445,10 @@ public abstract class AbstractMTree<O, N extends AbstractMTreeNode<O, N, E>, E e
   public List<E> getLeaves() {
     List<E> result = new ArrayList<>();
     BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
-    while(enumeration.hasMoreElements()) {
-      IndexTreePath<E> path = enumeration.nextElement();
+    while(enumeration.hasNext()) {
+      IndexTreePath<E> path = enumeration.next();
       E entry = path.getEntry();
-      if(!entry.isLeafEntry()) {
+      if(!(entry instanceof LeafEntry)) {
         // TODO: any way to skip unnecessary reads?
         N node = getNode(entry);
         if(node.isLeaf()) {

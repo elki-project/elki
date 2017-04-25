@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.data.spatial.SpatialUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.index.tree.BreadthFirstEnumeration;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.TreeIndexHeader;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
@@ -1157,10 +1158,10 @@ public abstract class AbstractXTree<N extends AbstractXTreeNode<N>> extends Abst
     }
 
     BreadthFirstEnumeration<N, SpatialEntry> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
-    while(enumeration.hasMoreElements()) {
-      IndexTreePath<SpatialEntry> indexPath = enumeration.nextElement();
+    while(enumeration.hasNext()) {
+      IndexTreePath<SpatialEntry> indexPath = enumeration.next();
       SpatialEntry entry = indexPath.getEntry();
-      if(entry.isLeafEntry()) {
+      if(entry instanceof LeafEntry) {
         objects++;
       }
       else {

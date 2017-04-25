@@ -31,11 +31,5 @@ import java.io.Externalizable;
  * @apiviz.excludeSubtypes
  */
 public interface Entry extends Externalizable {
-  /**
-   * Returns true if this entry is an entry in a leaf node (i.e. this entry
-   * represents a data object), false otherwise.
-   * 
-   * @return true if this entry is an entry in a leaf node, false otherwise
-   */
-  boolean isLeafEntry();
+  // No specific methods.
 }

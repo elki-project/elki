@@ -937,10 +937,10 @@ public abstract class AbstractRStarTree<N extends AbstractRStarTreeNode<N, E>, E
       }
 
       BreadthFirstEnumeration<N, E> enumeration = new BreadthFirstEnumeration<>(this, getRootPath());
-      while(enumeration.hasMoreElements()) {
-        IndexTreePath<E> indexPath = enumeration.nextElement();
+      while(enumeration.hasNext()) {
+        IndexTreePath<E> indexPath = enumeration.next();
         E entry = indexPath.getEntry();
-        if(entry.isLeafEntry()) {
+        if(entry instanceof LeafEntry) {
           objects++;
         }
         else {

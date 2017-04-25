@@ -25,7 +25,8 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 
 /**
  * Represents an entry in a leaf node of an M-Tree. A MTreeLeafEntry consists of
@@ -36,11 +37,16 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractLeafEntry;
  * @author Elke Achtert
  * @since 0.2
  */
-public class MTreeLeafEntry extends AbstractLeafEntry implements MTreeEntry {
+public class MTreeLeafEntry implements LeafEntry, MTreeEntry {
   /**
    * Serialization version ID.
    */
-  private static final long serialVersionUID = 2;
+  private static final long serialVersionUID = 3;
+
+  /**
+   * Holds the id of the object (node or data object) represented by this entry.
+   */
+  private DBID id;
 
   /**
    * The distance from the underlying data object to its parent's routing
@@ -63,8 +69,14 @@ public class MTreeLeafEntry extends AbstractLeafEntry implements MTreeEntry {
    *        parent's routing object
    */
   public MTreeLeafEntry(DBID objectID, double parentDistance) {
-    super(objectID);
+    super();
+    this.id = objectID;
     this.parentDistance = parentDistance;
+  }
+
+  @Override
+  public DBID getDBID() {
+    return id;
   }
 
   /**
@@ -78,7 +90,8 @@ public class MTreeLeafEntry extends AbstractLeafEntry implements MTreeEntry {
   }
 
   /**
-   * todo ok
+   * Throws an UnsupportedOperationException, as leaves may not have routing
+   * objects.
    * 
    * @throws UnsupportedOperationException since leaf entries should not be
    *         assigned a routing object.
@@ -137,47 +150,27 @@ public class MTreeLeafEntry extends AbstractLeafEntry implements MTreeEntry {
     throw new UnsupportedOperationException("This entry is not a directory entry!");
   }
 
-  /**
-   * Calls the super method and writes the parentDistance of this entry to the
-   * specified stream.
-   */
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
-    super.writeExternal(out);
+    out.writeInt(DBIDUtil.asInteger(id));
     out.writeDouble(parentDistance);
   }
 
-  /**
-   * Calls the super method and reads the parentDistance of this entry from the
-   * specified input stream.
-   */
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    super.readExternal(in);
+    this.id = DBIDUtil.importInteger(in.readInt());
     this.parentDistance = in.readDouble();
   }
 
-  /**
-   * Indicates whether some other object is "equal to" this one.
-   * 
-   * @param o the object to be tested
-   * @return true, if the super method returns true and o is an MTreeLeafEntry
-   *         and has the same parentDistance as this entry.
-   */
   @Override
   public boolean equals(Object o) {
-    if(this == o) {
-      return true;
-    }
-    if(o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if(!super.equals(o)) {
-      return false;
-    }
+    // Compare ID only!
+    return this == o || (o != null && getClass() == o.getClass() && //
+        DBIDUtil.equal(id, ((MTreeLeafEntry) o).id));
+  }
 
-    final MTreeLeafEntry that = (MTreeLeafEntry) o;
-
-    return Math.abs(parentDistance - that.parentDistance) < Double.MIN_NORMAL;
+  @Override
+  public int hashCode() {
+    return id.hashCode();
   }
 }

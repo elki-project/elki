@@ -151,7 +151,7 @@ public abstract class IndexTree<N extends Node<E>, E extends Entry> implements I
    * @return Page ID
    */
   protected int getPageID(Entry entry) {
-    if (entry.isLeafEntry()) {
+    if (entry instanceof LeafEntry) {
       throw new AbortException("Leafs do not have page ids!");
     }
     return ((DirectoryEntry) entry).getPageID();

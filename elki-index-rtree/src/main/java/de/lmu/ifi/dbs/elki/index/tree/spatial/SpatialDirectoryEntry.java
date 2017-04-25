@@ -26,7 +26,7 @@ import java.io.ObjectOutput;
 
 import de.lmu.ifi.dbs.elki.data.ModifiableHyperBoundingBox;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
+import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 
 /**
  * Represents an entry in a directory node of a spatial index.
@@ -38,8 +38,16 @@ import de.lmu.ifi.dbs.elki.index.tree.AbstractDirectoryEntry;
  * @author Elke Achtert
  * @since 0.2
  */
-public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements SpatialEntry {
-  private static final long serialVersionUID = 1;
+public class SpatialDirectoryEntry implements DirectoryEntry, SpatialEntry {
+  /**
+   * Serialization version.
+   */
+  private static final long serialVersionUID = 2;
+
+  /**
+   * Holds the id of the object (node or data object) represented by this entry.
+   */
+  private int id;
 
   /**
    * The minimum bounding rectangle of the underlying spatial node.
@@ -60,8 +68,14 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
    * @param mbr the minimum bounding rectangle of the underlying spatial node
    */
   public SpatialDirectoryEntry(int id, ModifiableHyperBoundingBox mbr) {
-    super(id);
+    super();
+    this.id = id;
     this.mbr = mbr;
+  }
+
+  @Override
+  public int getPageID() {
+    return id;
   }
 
   @Override
@@ -114,7 +128,7 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
    */
   @Override
   public void writeExternal(ObjectOutput out) throws IOException {
-    super.writeExternal(out);
+    out.writeInt(id);
     mbr.writeExternal(out);
   }
 
@@ -129,7 +143,7 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
    */
   @Override
   public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
-    super.readExternal(in);
+    this.id = in.readInt();
     this.mbr = new ModifiableHyperBoundingBox();
     this.mbr.readExternal(in);
   }
@@ -142,5 +156,21 @@ public class SpatialDirectoryEntry extends AbstractDirectoryEntry implements Spa
    */
   public boolean extendMBR(SpatialComparable responsibleMBR) {
     return this.mbr.extend(responsibleMBR);
+  }
+
+  @Override
+  public String toString() {
+    return "SpatialDirectoryEntry(" + id + " mbr=" + mbr.toString() + ")";
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    // Note: we deliberately use the ID only for comparison.
+    return this == o || (o != null && getClass() == o.getClass() && id == ((SpatialDirectoryEntry) o).id);
+  }
+
+  @Override
+  public int hashCode() {
+    return id;
   }
 }

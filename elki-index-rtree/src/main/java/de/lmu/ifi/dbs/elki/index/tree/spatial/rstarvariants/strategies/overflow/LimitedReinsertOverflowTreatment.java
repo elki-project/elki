@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.overflow
 
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTreePath;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
@@ -86,7 +87,7 @@ public class LimitedReinsertOverflowTreatment implements OverflowTreatment {
 
     BitsUtil.setI(reinsertions, depthm1);
     final E entry = path.getEntry();
-    assert (!entry.isLeafEntry()) : "Unexpected leaf entry";
+    assert (!(entry instanceof LeafEntry)) : "Unexpected leaf entry";
     int[] cands = reinsertStrategy.computeReinserts(node, NodeArrayAdapter.STATIC, entry);
     if(cands == null || cands.length == 0) {
       return false;

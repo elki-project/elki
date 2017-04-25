@@ -25,6 +25,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
+import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
@@ -196,11 +197,11 @@ public class TreeMBRVisualization extends AbstractVisFactory {
         layer.appendChild(r);
       }
 
-      if(!entry.isLeafEntry()) {
+      if(!(entry instanceof LeafEntry)) {
         N node = rtree.getNode(entry);
         for(int i = 0; i < node.getNumEntries(); i++) {
           E child = node.getEntry(i);
-          if(!child.isLeafEntry()) {
+          if(!(child instanceof LeafEntry)) {
             visualizeRTreeEntry(svgp, layer, proj, rtree, child, depth + 1);
           }
         }
