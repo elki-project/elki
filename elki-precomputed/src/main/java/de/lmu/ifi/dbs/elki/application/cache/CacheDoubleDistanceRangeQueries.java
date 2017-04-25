@@ -74,7 +74,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<O> distance;
+  private DistanceFunction<? super O> distance;
 
   /**
    * Query radius.
@@ -102,7 +102,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
    * @param radius Query radius
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceRangeQueries(Database database, DistanceFunction<O> distance, double radius, File out) {
+  public CacheDoubleDistanceRangeQueries(Database database, DistanceFunction<? super O> distance, double radius, File out) {
     super();
     this.database = database;
     this.distance = distance;
@@ -216,7 +216,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
     /**
      * Distance function that is to be cached.
      */
-    private DistanceFunction<O> distance = null;
+    private DistanceFunction<? super O> distance = null;
 
     /**
      * Number of neighbors to precompute.
@@ -236,7 +236,7 @@ public class CacheDoubleDistanceRangeQueries<O> extends AbstractApplication {
         database = dbP.instantiateClass(config);
       }
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+      final ObjectParameter<DistanceFunction<? super O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }

@@ -73,7 +73,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<O> distance;
+  private DistanceFunction<? super O> distance;
 
   /**
    * Number of neighbors to precompute.
@@ -101,7 +101,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
    * @param k Number of nearest neighbors
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceKNNLists(Database database, DistanceFunction<O> distance, int k, File out) {
+  public CacheDoubleDistanceKNNLists(Database database, DistanceFunction<? super O> distance, int k, File out) {
     super();
     this.database = database;
     this.distance = distance;
@@ -206,7 +206,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
     /**
      * Distance function that is to be cached.
      */
-    private DistanceFunction<O> distance = null;
+    private DistanceFunction<? super O> distance = null;
 
     /**
      * Number of neighbors to precompute.
@@ -226,7 +226,7 @@ public class CacheDoubleDistanceKNNLists<O> extends AbstractApplication {
         database = dbP.instantiateClass(config);
       }
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+      final ObjectParameter<DistanceFunction<? super O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }

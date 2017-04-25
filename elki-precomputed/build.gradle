@@ -1,6 +1,6 @@
 description = 'ELKI - External Distances'
 dependencies {
-  compile project(':elki-core') // For CollectionResult etc.
+  compile project(':elki-index-preprocessed')
   compile project(':elki-persistent')
   testCompile project(path: ':elki-test-core', configuration: 'testOutput')
   // We use clustering algorithms in testing.

@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.external.DiskCacheBasedDoubleDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.persistent.OnDiskUpperTriangleMatrix;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ByteArrayUtil;
@@ -72,7 +73,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
   /**
    * Distance function that is to be cached.
    */
-  private DistanceFunction<O> distance;
+  private DistanceFunction<? super O> distance;
 
   /**
    * Output file.
@@ -86,7 +87,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
    * @param distance Distance function
    * @param out Matrix output file
    */
-  public CacheDoubleDistanceInOnDiskMatrix(Database database, DistanceFunction<O> distance, File out) {
+  public CacheDoubleDistanceInOnDiskMatrix(Database database, DistanceFunction<? super O> distance, File out) {
     super();
     this.database = database;
     this.distance = distance;
@@ -100,10 +101,11 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
     DistanceQuery<O> distanceQuery = database.getDistanceQuery(relation, distance);
 
     DBIDRange ids = DBIDUtil.assertRange(relation.getDBIDs());
-    int matrixsize = ids.size();
+    int size = ids.size();
 
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Precomputing distances", (int) (((size + 1) * (long) size) >>> 1), LOG) : null;
     try (OnDiskUpperTriangleMatrix matrix = //
-        new OnDiskUpperTriangleMatrix(out, DiskCacheBasedDoubleDistanceFunction.DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, matrixsize)) {
+        new OnDiskUpperTriangleMatrix(out, DiskCacheBasedDoubleDistanceFunction.DOUBLE_CACHE_MAGIC, 0, ByteArrayUtil.SIZE_DOUBLE, size)) {
 
       DBIDArrayIter id1 = ids.iter(), id2 = ids.iter();
       for(; id1.valid(); id1.advance()) {
@@ -122,11 +124,15 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
             throw new AbortException("Error writing distance record " + DBIDUtil.toString(id1) + "," + DBIDUtil.toString(id2) + " to matrix.", e);
           }
         }
+        if(prog != null) {
+          prog.setProcessed(prog.getProcessed() + (size - id1.getOffset()), LOG);
+        }
       }
     }
     catch(IOException e) {
       throw new AbortException("Error precomputing distance matrix.", e);
     }
+    LOG.ensureCompleted(prog);
   }
 
   /**
@@ -161,7 +167,7 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
     /**
      * Distance function that is to be cached.
      */
-    private DistanceFunction<O> distance = null;
+    private DistanceFunction<? super O> distance = null;
 
     /**
      * Output file.
@@ -172,11 +178,11 @@ public class CacheDoubleDistanceInOnDiskMatrix<O> extends AbstractApplication {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       final ObjectParameter<Database> dbP = new ObjectParameter<>(DATABASE_ID, Database.class, StaticArrayDatabase.class);
-      if (config.grab(dbP)) {
+      if(config.grab(dbP)) {
         database = dbP.instantiateClass(config);
       }
       // Distance function parameter
-      final ObjectParameter<DistanceFunction<O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
+      final ObjectParameter<DistanceFunction<? super O>> dpar = new ObjectParameter<>(DISTANCE_ID, DistanceFunction.class);
       if(config.grab(dpar)) {
         distance = dpar.instantiateClass(config);
       }
