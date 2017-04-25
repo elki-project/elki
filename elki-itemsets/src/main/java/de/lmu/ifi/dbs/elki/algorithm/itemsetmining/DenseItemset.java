@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.APIViolationException;
 
 /**
  * APRIORI itemset, dense representation.
@@ -67,35 +68,37 @@ public class DenseItemset extends Itemset {
   }
 
   @Override
-  public
-  int iter() {
+  public int iter() {
     return BitsUtil.nextSetBit(items, 0);
   }
 
   @Override
-  public
-  boolean iterValid(int iter) {
+  public boolean iterValid(int iter) {
     return iter >= 0;
   }
 
   @Override
-  public
-  int iterAdvance(int iter) {
+  public int iterAdvance(int iter) {
     return BitsUtil.nextSetBit(items, iter + 1);
   }
 
   @Override
-  public
-  int iterDim(int iter) {
+  public int iterDim(int iter) {
     return iter;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if(obj instanceof DenseItemset) {
-      return BitsUtil.equal(items, ((DenseItemset) obj).items);
-    }
-    return super.equals(obj);
+    return this == obj || (obj instanceof DenseItemset && BitsUtil.equal(items, ((DenseItemset) obj).items)) || super.equals(obj);
+  }
+
+  /**
+   * @deprecated Itemsets MUST NOT BE USED IN HASH MAPS.
+   */
+  @Deprecated
+  @Override
+  public int hashCode() {
+    throw new APIViolationException("Itemsets may not be used in hash maps.");
   }
 
   @Override

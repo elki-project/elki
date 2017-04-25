@@ -72,10 +72,7 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
     if(this == obj) {
       return true;
     }
-    if(obj == null) {
-      return false;
-    }
-    if(getClass() != obj.getClass()) {
+    if(obj == null || getClass() != obj.getClass()) {
       return false;
     }
 
@@ -95,7 +92,7 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
     secondhash = secondhash ^ (secondhash >> 32);
     // primitive hash function mixing the two integers.
     // this number does supposedly not have any factors in common with 2^32
-    return (int) (firsthash * 2654435761L + secondhash);
+    return (int) (firsthash * 0x9e3779b1 + secondhash);
   }
 
   /**
@@ -145,10 +142,10 @@ public class DoubleDoublePair implements Comparable<DoubleDoublePair> {
   public final void setSecond(double second) {
     this.second = second;
   }
-  
+
   @Override
   public String toString() {
-    return "DoubleDoublePair("+first+","+second+")";
+    return "DoubleDoublePair(" + first + "," + second + ")";
   }
 
   /**

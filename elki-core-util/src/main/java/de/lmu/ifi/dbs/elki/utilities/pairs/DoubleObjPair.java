@@ -57,18 +57,20 @@ public class DoubleObjPair<O> implements Comparable<DoubleObjPair<O>> {
 
   @Override
   public boolean equals(Object obj) {
-    if(!(obj instanceof DoubleObjPair)) {
-      // TODO: allow comparison with arbitrary pairs?
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null || this.getClass() != obj.getClass()) {
       return false;
     }
     DoubleObjPair<?> other = (DoubleObjPair<?>) obj;
-    if(first != other.first) {
-      return false;
-    }
-    if(second == null) {
-      return (other.second == null);
-    }
-    return second.equals(other.second);
+    return (first == other.first) && //
+        (second == other.second || second != null && second.equals(other.second));
+  }
+
+  @Override
+  public int hashCode() {
+    return Double.hashCode(first) * 0x9e3779b1 + (second != null ? second.hashCode() : 0);
   }
 
   /**

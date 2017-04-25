@@ -63,10 +63,7 @@ public class DoubleIntPair implements Comparable<DoubleIntPair> {
     if(this == obj) {
       return true;
     }
-    if(obj == null) {
-      return false;
-    }
-    if(getClass() != obj.getClass()) {
+    if(obj == null || getClass() != obj.getClass()) {
       return false;
     }
 
@@ -83,7 +80,7 @@ public class DoubleIntPair implements Comparable<DoubleIntPair> {
     firsthash = firsthash ^ (firsthash >> 32);
     // primitive hash function mixing the two integers.
     // this number does supposedly not have any factors in common with 2^32
-    return (int) (firsthash * 2654435761L + second);
+    return (int) (firsthash * 0x9e3779b1 + second);
   }
 
   /**

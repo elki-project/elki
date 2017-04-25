@@ -115,6 +115,11 @@ public class IndexTreePath<E extends Entry> {
     return true;
   }
 
+  @Override
+  public int hashCode() {
+    return System.identityHashCode(this);
+  }
+
   /**
    * Returns a path containing all the elements of this object, except the last
    * path component.

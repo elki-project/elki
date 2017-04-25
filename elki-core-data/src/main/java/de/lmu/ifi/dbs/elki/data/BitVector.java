@@ -317,6 +317,11 @@ public class BitVector implements SparseNumberVector {
     return false;
   }
 
+  @Override
+  public int hashCode() {
+    return BitsUtil.hashCode(bits);
+  }
+
   /**
    * Factory for bit vectors.
    * 

@@ -112,41 +112,18 @@ public class Pair<FIRST, SECOND> {
    *
    * @param obj Object to compare to
    */
-  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
     if(this == obj) {
       return true;
     }
-    if(obj == null) {
+    if(obj == null || this.getClass() != obj.getClass()) {
       return false;
     }
-    if(!(obj instanceof Pair)) {
-      return false;
-    }
-    Pair<FIRST, SECOND> other = (Pair<FIRST, SECOND>) obj;
+    Pair<?, ?> other = (Pair<?, ?>) obj;
     // Handle "null" values appropriately
-    if(this.first == null) {
-      if(other.first != null) {
-        return false;
-      }
-    }
-    else {
-      if(!this.first.equals(other.first)) {
-        return false;
-      }
-    }
-    if(this.second == null) {
-      if(other.second != null) {
-        return false;
-      }
-    }
-    else {
-      if(!this.second.equals(other.second)) {
-        return false;
-      }
-    }
-    return true;
+    return (this.first == other.first || (this.first != null && this.first.equals(other.first))) //
+        && (this.second == other.second || (this.second != null && this.second.equals(other.second)));
   }
 
   /**

@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.itemsetmining;
 import de.lmu.ifi.dbs.elki.data.BitVector;
 import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
 import de.lmu.ifi.dbs.elki.data.type.VectorFieldTypeInformation;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.APIViolationException;
 
 /**
  * APRIORI itemset.
@@ -69,36 +70,38 @@ public class OneItemset extends Itemset {
   }
 
   @Override
-  public
-  int iter() {
+  public int iter() {
     return 0;
   }
 
   @Override
-  public
-  boolean iterValid(int iter) {
+  public boolean iterValid(int iter) {
     return iter == 0;
   }
 
   @Override
-  public
-  int iterAdvance(int iter) {
+  public int iterAdvance(int iter) {
     return 1;
   }
 
   @Override
-  public
-  int iterDim(int iter) {
+  public int iterDim(int iter) {
     assert (iter == 0);
     return item;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if(obj instanceof OneItemset) {
-      return item == ((OneItemset) obj).item;
-    }
-    return super.equals(obj);
+    return this == obj || (obj instanceof OneItemset && item == ((OneItemset) obj).item) || super.equals(obj);
+  }
+
+  /**
+   * @deprecated Itemsets MUST NOT BE USED IN HASH MAPS.
+   */
+  @Deprecated
+  @Override
+  public int hashCode() {
+    throw new APIViolationException("Itemsets may not be used in hash maps.");
   }
 
   @Override
