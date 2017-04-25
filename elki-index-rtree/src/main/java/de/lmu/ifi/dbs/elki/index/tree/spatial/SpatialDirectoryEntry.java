@@ -160,7 +160,7 @@ public class SpatialDirectoryEntry implements DirectoryEntry, SpatialEntry {
 
   @Override
   public String toString() {
-    return "SpatialDirectoryEntry(" + id + " mbr=" + mbr.toString() + ")";
+    return "SpatialDirectoryEntry(" + id + " mbr=" + (mbr != null ? mbr.toString() : null) + ")";
   }
 
   @Override
