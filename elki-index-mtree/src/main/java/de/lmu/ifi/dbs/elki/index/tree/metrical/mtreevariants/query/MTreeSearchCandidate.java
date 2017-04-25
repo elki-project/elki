@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.index.tree.query;
+package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 
@@ -32,7 +32,17 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
  * @author Elke Achtert
  * @since 0.4.0
  */
-public class DoubleMTreeDistanceSearchCandidate extends DoubleDistanceSearchCandidate {
+public class MTreeSearchCandidate implements Comparable<MTreeSearchCandidate> {
+  /**
+   * Distance value
+   */
+  public double mindist;
+
+  /**
+   * Page id
+   */
+  public int nodeID;
+
   /**
    * The id of the routing object.
    */
@@ -52,9 +62,22 @@ public class DoubleMTreeDistanceSearchCandidate extends DoubleDistanceSearchCand
    * @param routingDistance the distance from the query object to the query
    *        object
    */
-  public DoubleMTreeDistanceSearchCandidate(final double mindist, final int nodeID, final DBID routingObjectID, double routingDistance) {
-    super(mindist, nodeID);
+  public MTreeSearchCandidate(final double mindist, final int nodeID, final DBID routingObjectID, double routingDistance) {
+    super();
+    this.mindist = mindist;
+    this.nodeID = nodeID;
     this.routingObjectID = routingObjectID;
     this.routingDistance = routingDistance;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    return (obj instanceof MTreeSearchCandidate) //
+        && this.nodeID == ((MTreeSearchCandidate) obj).nodeID;
+  }
+
+  @Override
+  public int compareTo(MTreeSearchCandidate o) {
+    return Double.compare(this.mindist, o.mindist);
   }
 }

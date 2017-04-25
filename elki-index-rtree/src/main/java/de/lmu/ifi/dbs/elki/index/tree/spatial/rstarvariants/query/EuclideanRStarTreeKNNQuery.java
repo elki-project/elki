@@ -26,21 +26,15 @@ import java.util.List;
 import java.util.Map;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
-import de.lmu.ifi.dbs.elki.index.tree.query.DoubleDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -60,9 +54,9 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @apiviz.uses SquaredEuclideanDistanceFunction
  */
 @Reference(authors = "G. R. Hjaltason, H. Samet", //
-title = "Ranking in spatial databases", //
-booktitle = "Advances in Spatial Databases - 4th Symposium, SSD'95", //
-url = "http://dx.doi.org/10.1007/3-540-60159-7_6")
+    title = "Ranking in spatial databases", //
+    booktitle = "Advances in Spatial Databases - 4th Symposium, SSD'95", //
+    url = "http://dx.doi.org/10.1007/3-540-60159-7_6")
 public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTreeKNNQuery<O> {
   /**
    * Squared euclidean distance function.
@@ -87,24 +81,25 @@ public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTre
     tree.statistics.countKNNQuery();
 
     final KNNHeap knnList = DBIDUtil.newHeap(k);
-    final ComparableMinHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>(Math.min(knnList.getK() << 1, 21));
+    final DoubleIntegerMinHeap pq = new DoubleIntegerMinHeap(Math.min(knnList.getK() << 1, 21));
 
     // expand root
     double maxDist = expandNode(obj, knnList, pq, Double.MAX_VALUE, tree.getRootID());
 
     // search in tree
     while(!pq.isEmpty()) {
-      DoubleDistanceSearchCandidate pqNode = pq.poll();
-
-      if(pqNode.mindist > maxDist) {
+      double mindist = pq.peekKey();
+      if(mindist > maxDist) {
         break;
       }
-      maxDist = expandNode(obj, knnList, pq, maxDist, pqNode.nodeID);
+      int nodeID = pq.peekValue();
+      pq.poll(); // Remove from heap.
+      maxDist = expandNode(obj, knnList, pq, maxDist, nodeID);
     }
     return knnList.toKNNListSqrt();
   }
 
-  private double expandNode(O object, KNNHeap knnList, final ComparableMinHeap<DoubleDistanceSearchCandidate> pq, double maxDist, final int nodeID) {
+  private double expandNode(O object, KNNHeap knnList, DoubleIntegerMinHeap pq, double maxDist, final int nodeID) {
     AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
     // data node
     if(node.isLeaf()) {
@@ -129,7 +124,7 @@ public class EuclideanRStarTreeKNNQuery<O extends NumberVector> extends RStarTre
         }
         else {
           if(distance <= maxDist) {
-            pq.add(new DoubleDistanceSearchCandidate(distance, entry.getPageID()));
+            pq.add(distance, entry.getPageID());
           }
         }
       }

@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
-import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeSearchCandidate;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.PolynomialRegression;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
@@ -142,14 +142,14 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
   @Override
   public DoubleDBIDList reverseKNNQuery(DBIDRef id, int k) {
     ModifiableDoubleDBIDList result = DBIDUtil.newDistanceDBIDList();
-    final Heap<GenericMTreeDistanceSearchCandidate> pq = new UpdatableHeap<>();
+    final Heap<MTreeSearchCandidate> pq = new UpdatableHeap<>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate(0., getRootID(), null));
+    pq.add(new MTreeSearchCandidate(0., getRootID(), null, Double.NaN));
 
     // search in tree
     while(!pq.isEmpty()) {
-      GenericMTreeDistanceSearchCandidate pqNode = pq.poll();
+      MTreeSearchCandidate pqNode = pq.poll();
       // FIXME: cache the distance to the routing object in the queue node!
 
       MkAppTreeNode<O> node = getNode(pqNode.nodeID);
@@ -167,7 +167,7 @@ public abstract class MkAppTree<O> extends AbstractMkTree<O, MkAppTreeNode<O>, M
           }
 
           if(minDist <= approxValue) {
-            pq.add(new GenericMTreeDistanceSearchCandidate(minDist, getPageID(entry), entry.getRoutingObjectID()));
+            pq.add(new MTreeSearchCandidate(minDist, getPageID(entry), entry.getRoutingObjectID(), Double.NaN));
           }
         }
       }

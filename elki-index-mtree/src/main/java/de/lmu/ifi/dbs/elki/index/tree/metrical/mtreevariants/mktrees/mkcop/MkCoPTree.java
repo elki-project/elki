@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDoubleDBIDList;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.AbstractMkTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.MkTreeSettings;
-import de.lmu.ifi.dbs.elki.index.tree.query.GenericMTreeDistanceSearchCandidate;
+import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.query.MTreeSearchCandidate;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.persistent.PageFile;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
@@ -244,14 +244,14 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
    *        refinement)
    */
   private void doReverseKNNQuery(int k, DBIDRef q, ModifiableDoubleDBIDList result, ModifiableDBIDs candidates) {
-    final ComparableMinHeap<GenericMTreeDistanceSearchCandidate> pq = new ComparableMinHeap<>();
+    final ComparableMinHeap<MTreeSearchCandidate> pq = new ComparableMinHeap<>();
 
     // push root
-    pq.add(new GenericMTreeDistanceSearchCandidate(0., getRootID(), null));
+    pq.add(new MTreeSearchCandidate(0., getRootID(), null, Double.NaN));
 
     // search in tree
     while(!pq.isEmpty()) {
-      GenericMTreeDistanceSearchCandidate pqNode = pq.poll();
+      MTreeSearchCandidate pqNode = pq.poll();
       // FIXME: cache the distance to the routing object in the queue node!
 
       MkCoPTreeNode<O> node = getNode(pqNode.nodeID);
@@ -265,7 +265,7 @@ public abstract class MkCoPTree<O> extends AbstractMkTree<O, MkCoPTreeNode<O>, M
           double approximatedKnnDist_cons = entry.approximateConservativeKnnDistance(k);
 
           if(minDist <= approximatedKnnDist_cons) {
-            pq.add(new GenericMTreeDistanceSearchCandidate(minDist, getPageID(entry), entry.getRoutingObjectID()));
+            pq.add(new MTreeSearchCandidate(minDist, getPageID(entry), entry.getRoutingObjectID(), Double.NaN));
           }
         }
       }

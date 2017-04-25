@@ -20,35 +20,22 @@
  */
 package de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.query;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.SpatialPrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.tree.DirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.LeafEntry;
-import de.lmu.ifi.dbs.elki.index.tree.query.DoubleDistanceSearchCandidate;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialDirectoryEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleIntegerMinHeap;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 
 /**
@@ -115,24 +102,26 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
     tree.statistics.countKNNQuery();
 
     final KNNHeap knnList = DBIDUtil.newHeap(k);
-    final ComparableMinHeap<DoubleDistanceSearchCandidate> pq = new ComparableMinHeap<>(Math.min(knnList.getK() << 1, 21));
+    final DoubleIntegerMinHeap pq = new DoubleIntegerMinHeap(Math.min(knnList.getK() << 1, 21));
 
     // expand root
     double maxDist = expandNode(obj, knnList, pq, Double.MAX_VALUE, tree.getRootID());
 
     // search in tree
     while(!pq.isEmpty()) {
-      DoubleDistanceSearchCandidate pqNode = pq.poll();
+      double mindist = pq.peekKey();
 
-      if(pqNode.mindist > maxDist) {
+      if(mindist > maxDist) {
         break;
       }
-      maxDist = expandNode(obj, knnList, pq, maxDist, pqNode.nodeID);
+      int nodeID = pq.peekValue();
+      pq.poll(); // Remove from heap.
+      maxDist = expandNode(obj, knnList, pq, maxDist, nodeID);
     }
     return knnList.toKNNList();
   }
 
-  private double expandNode(O object, KNNHeap knnList, final ComparableMinHeap<DoubleDistanceSearchCandidate> pq, double maxDist, final int nodeID) {
+  private double expandNode(O object, KNNHeap knnList, DoubleIntegerMinHeap pq, double maxDist, final int nodeID) {
     AbstractRStarTreeNode<?, ?> node = tree.getNode(nodeID);
     // data node
     if(node.isLeaf()) {
@@ -157,7 +146,7 @@ public class RStarTreeKNNQuery<O extends SpatialComparable> implements KNNQuery<
         }
         else {
           if(distance <= maxDist) {
-            pq.add(new DoubleDistanceSearchCandidate(distance, entry.getPageID()));
+            pq.add(distance, entry.getPageID());
           }
         }
       }
