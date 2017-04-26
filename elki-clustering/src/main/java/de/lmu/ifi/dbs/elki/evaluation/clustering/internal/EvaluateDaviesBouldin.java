@@ -105,12 +105,12 @@ public class EvaluateDaviesBouldin implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param db Database
+   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
    * @return DB-index
    */
-  public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
+  public double evaluateClustering(ResultHierarchy hier, Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     NumberVector[] centroids = new NumberVector[clusters.size()];
     int noisecount = EvaluateSimplifiedSilhouette.centroids(rel, clusters, centroids, noiseOption);
@@ -172,10 +172,10 @@ public class EvaluateDaviesBouldin implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".db-index", daviesBouldinMean));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Davies Bouldin Index", daviesBouldinMean, 0., Double.POSITIVE_INFINITY, 0., true);
-    db.getHierarchy().resultChanged(ev);
+    hier.resultChanged(ev);
     return daviesBouldinMean;
   }
 
@@ -208,7 +208,7 @@ public class EvaluateDaviesBouldin implements Evaluator {
     Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
-      evaluateClustering(db, (Relation<? extends NumberVector>) rel, c);
+      evaluateClustering(hier, (Relation<? extends NumberVector>) rel, c);
     }
   }
 

@@ -116,12 +116,12 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param db Database
+   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
    * @return Gamma index
    */
-  public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
+  public double evaluateClustering(ResultHierarchy hier, Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
 
     int ignorednoise = 0, withinPairs = 0;
@@ -205,11 +205,11 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".tau", tau));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Concordance-based Evaluation");
     g.addMeasure("Gamma", gamma, -1., 1., 0., false);
     g.addMeasure("Tau", tau, -1., +1., 0., false);
-    db.getHierarchy().resultChanged(ev);
+    hier.resultChanged(ev);
     return gamma;
   }
 
@@ -297,7 +297,7 @@ public class EvaluateConcordantPairs<O> implements Evaluator {
     Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
-      evaluateClustering(db, (Relation<? extends NumberVector>) rel, c);
+      evaluateClustering(hier, (Relation<? extends NumberVector>) rel, c);
     }
   }
 

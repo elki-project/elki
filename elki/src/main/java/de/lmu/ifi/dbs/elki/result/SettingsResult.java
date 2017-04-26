@@ -22,7 +22,6 @@ package de.lmu.ifi.dbs.elki.result;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
@@ -66,14 +65,7 @@ public class SettingsResult extends BasicResult {
    * @return List of settings results
    */
   public static List<SettingsResult> getSettingsResults(Result r) {
-    if(r instanceof SettingsResult) {
-      List<SettingsResult> ors = new ArrayList<>(1);
-      ors.add((SettingsResult) r);
-      return ors;
-    }
-    if(r instanceof HierarchicalResult) {
-      return ResultUtil.filterResults(((HierarchicalResult) r).getHierarchy(), r, SettingsResult.class);
-    }
-    return Collections.emptyList();
+    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+        .filter(SettingsResult.class).collect(new ArrayList<>());
   }
 }

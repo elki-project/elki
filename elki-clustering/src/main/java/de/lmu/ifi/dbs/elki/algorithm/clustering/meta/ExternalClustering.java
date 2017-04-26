@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.parser.CSVReaderFormat;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
@@ -191,7 +192,7 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
       boolean noise = entry.getIntKey() < 0;
       result.addToplevelCluster(new Cluster<>(entry.getValue(), noise, ClusterModel.CLUSTER));
     }
-    database.getHierarchy().add(r, result);
+    Metadata.of(r).hierarchy().addChild(result);
   }
 
   @Override

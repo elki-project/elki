@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.DendrogramModel;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -67,7 +68,7 @@ public class CutDendrogramByNumberOfClusters extends AbstractCutDendrogram imple
   @Override
   public Clustering<DendrogramModel> run(PointerHierarchyRepresentationResult pointerresult) {
     Clustering<DendrogramModel> result = new Instance(pointerresult).extractClusters();
-    result.addChildResult(pointerresult);
+    Metadata.of(result).hierarchy().addChild(pointerresult);
     return result;
   }
 

@@ -113,12 +113,12 @@ public class EvaluateCIndex<O> implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param db Database
+   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
    * @return C-Index
    */
-  public double evaluateClustering(Database db, Relation<? extends O> rel, DistanceQuery<O> dq, Clustering<?> c) {
+  public double evaluateClustering(ResultHierarchy hier, Relation<? extends O> rel, DistanceQuery<O> dq, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
 
     // Count ignored noise, and within-cluster distances
@@ -194,10 +194,10 @@ public class EvaluateCIndex<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".c-index", cIndex));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("C-Index", cIndex, 0., 1., 0., true);
-    db.getHierarchy().resultChanged(ev);
+    hier.resultChanged(ev);
     return cIndex;
   }
 
@@ -258,7 +258,7 @@ public class EvaluateCIndex<O> implements Evaluator {
     DistanceQuery<O> dq = db.getDistanceQuery(rel, distance);
 
     for(Clustering<?> c : crs) {
-      evaluateClustering(db, rel, dq, c);
+      evaluateClustering(hier, rel, dq, c);
     }
   }
 

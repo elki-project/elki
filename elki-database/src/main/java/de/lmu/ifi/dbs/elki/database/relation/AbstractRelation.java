@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.DBIDSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -47,7 +46,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  *
  * @param <O> Data type
  */
-public abstract class AbstractRelation<O> extends AbstractHierarchicalResult implements Relation<O> {
+public abstract class AbstractRelation<O> implements Relation<O> {
   /**
    * Constructor.
    */

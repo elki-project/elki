@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 
 /**
@@ -78,8 +79,8 @@ public class ClusterOrder extends BasicResult implements OrderingResult {
     reachability = DataStoreUtil.makeDoubleStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT, Double.POSITIVE_INFINITY);
     predecessor = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_HOT);
 
-    addChildResult(new MaterializedDoubleRelation("Reachability distance", "reachdist", reachability, ids));
-    addChildResult(new MaterializedRelation<DBID>("OPTICS predecessor", "predecessor", TypeUtil.DBID, predecessor, ids));
+    Metadata.of(this).hierarchy().addChild(new MaterializedDoubleRelation("Reachability distance", "reachdist", reachability, ids));
+    Metadata.of(this).hierarchy().addChild(new MaterializedRelation<DBID>("OPTICS predecessor", "predecessor", TypeUtil.DBID, predecessor, ids));
   }
 
   /**
@@ -95,9 +96,9 @@ public class ClusterOrder extends BasicResult implements OrderingResult {
     this.reachability = reachability;
     this.predecessor = predecessor;
 
-    addChildResult(new MaterializedDoubleRelation("Reachability distance", "reachdist", reachability, ids));
+    Metadata.of(this).hierarchy().addChild(new MaterializedDoubleRelation("Reachability distance", "reachdist", reachability, ids));
     if(predecessor != null) {
-      addChildResult(new MaterializedRelation<DBID>("OPTICS predecessor", "predecessor", TypeUtil.DBID, predecessor, ids));
+      Metadata.of(this).hierarchy().addChild(new MaterializedRelation<DBID>("OPTICS predecessor", "predecessor", TypeUtil.DBID, predecessor, ids));
     }
   }
 

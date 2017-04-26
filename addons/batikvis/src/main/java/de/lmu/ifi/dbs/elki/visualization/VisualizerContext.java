@@ -125,7 +125,7 @@ public class VisualizerContext implements DataStoreListener, Result {
       LOG.warning("No database reachable from " + hier);
       return;
     }
-    AutomaticEvaluation.ensureClusteringResult(db, db);
+    AutomaticEvaluation.ensureClusteringResult(db);
     this.selection = SelectionResult.ensureSelectionResult(db);
     for(Relation<?> rel : ResultUtil.getRelations(db)) {
       SamplingResult.getSamplingResult(rel);

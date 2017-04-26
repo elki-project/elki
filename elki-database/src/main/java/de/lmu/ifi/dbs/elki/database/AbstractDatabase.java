@@ -40,7 +40,6 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
@@ -58,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
  * @composed - - - DatabaseEventManager
  * @has - - - IndexFactory
  */
-public abstract class AbstractDatabase extends AbstractHierarchicalResult implements Database {
+public abstract class AbstractDatabase implements Database {
   /**
    * The event manager, collects events and fires them on demand.
    */

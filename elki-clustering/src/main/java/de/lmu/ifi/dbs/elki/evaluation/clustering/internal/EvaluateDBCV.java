@@ -93,13 +93,13 @@ public class EvaluateDBCV<O> implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param db Database
+   * @param hier Result hierarchy
    * @param rel Data relation
    * @param cl Clustering
    *
    * @return dbcv DBCV-index
    */
-  public double evaluateClustering(Database db, Relation<O> rel, Clustering<?> cl) {
+  public double evaluateClustering(ResultHierarchy hier, Relation<O> rel, Clustering<?> cl) {
     final DistanceQuery<O> dq = rel.getDistanceQuery(distanceFunction);
 
     List<? extends Cluster<?>> clusters = cl.getAllClusters();
@@ -242,10 +242,10 @@ public class EvaluateDBCV<O> implements Evaluator {
       dbcv += weight * vc;
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), cl, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(hier, cl, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Density Based Clustering Validation", dbcv, 0., Double.POSITIVE_INFINITY, 0., true);
-    db.getHierarchy().resultChanged(ev);
+    hier.resultChanged(ev);
     return dbcv;
   }
 
@@ -261,7 +261,7 @@ public class EvaluateDBCV<O> implements Evaluator {
 
     if(rel != null) {
       for(Clustering<?> cl : crs) {
-        evaluateClustering(db, rel, cl);
+        evaluateClustering(hier, rel, cl);
       }
     }
   }

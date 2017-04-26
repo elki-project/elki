@@ -29,6 +29,7 @@ import org.w3c.dom.svg.SVGPoint;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -257,7 +258,7 @@ public class OPTICSPlotCutVisualization implements VisFactory {
         // FIXME: replace an existing optics cut result!
         final ClusterOrder order = optics.getResult();
         Clustering<Model> cl = OPTICSCut.makeOPTICSCut(order, epsilon);
-        order.addChildResult(cl);
+        Metadata.of(order).hierarchy().addChild(cl);
       }
       svgp.requestRedraw(this.task, this);
       return true;

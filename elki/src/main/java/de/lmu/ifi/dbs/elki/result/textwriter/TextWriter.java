@@ -51,7 +51,6 @@ import de.lmu.ifi.dbs.elki.result.CollectionResult;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
 import de.lmu.ifi.dbs.elki.result.OrderingResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.SimpleEnumeratingScheme;
@@ -175,39 +174,35 @@ public class TextWriter {
 
     // Split result objects in different known types:
     {
-      List<Result> results = ResultUtil.filterResults(db.getHierarchy(), r, Result.class);
-      for(Result res : results) {
+      Metadata.of(r).hierarchy().iterDescendantsSelf().filter(Result.class).forEach(res -> {
         if(filter != null) {
           final String nam = res.getShortName();
           if(nam == null || !filter.matcher(nam).find()) {
-            continue;
+            return;
           }
         }
         if(res instanceof Database) {
-          continue;
+          return;
         }
-        if(res instanceof Relation) {
+        else if(res instanceof Relation) {
           ra.add((Relation<?>) res);
-          continue;
         }
-        if(res instanceof OrderingResult) {
+        else if(res instanceof OrderingResult) {
           ro.add((OrderingResult) res);
-          continue;
         }
-        if(res instanceof Clustering) {
+        else if(res instanceof Clustering) {
           rc.add((Clustering<?>) res);
-          continue;
         }
-        if(res instanceof IterableResult) {
+        else if(res instanceof IterableResult) {
           ri.add((IterableResult<?>) res);
-          continue;
         }
-        if(res instanceof SettingsResult) {
+        else if(res instanceof SettingsResult) {
           rs.add((SettingsResult) res);
-          continue;
         }
-        otherres.add(res);
-      }
+        else {
+          otherres.add(res);
+        }
+      });
     }
 
     writeSettingsResult(streamOpener, rs);

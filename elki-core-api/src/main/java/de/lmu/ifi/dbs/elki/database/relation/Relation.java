@@ -34,7 +34,7 @@ import de.lmu.ifi.dbs.elki.database.query.rknn.RKNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.similarity.SimilarityQuery;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
  * An object representation from a database.
@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
  *
  * @param <O> Object type
  */
-public interface Relation<O> extends DatabaseQuery, HierarchicalResult {
+public interface Relation<O> extends DatabaseQuery, Result {
   /**
    * Get the representation of an object.
    *

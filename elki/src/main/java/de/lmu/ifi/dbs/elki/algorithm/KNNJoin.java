@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.algorithm;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
@@ -30,11 +29,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -47,9 +42,10 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.progress.IndefiniteProgress;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.ComparableMinHeap;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.MissingPrerequisitesException;
@@ -130,11 +126,14 @@ public class KNNJoin<V extends NumberVector, N extends SpatialNode<N, E>, E exte
     if(!(getDistanceFunction() instanceof SpatialPrimitiveDistanceFunction)) {
       throw new IllegalStateException("Distance Function must be an instance of " + SpatialPrimitiveDistanceFunction.class.getName());
     }
-    Collection<SpatialIndexTree<N, E>> indexes = ResultUtil.filterResults(relation.getHierarchy(), relation, SpatialIndexTree.class);
-    if(indexes.size() != 1) {
-      throw new MissingPrerequisitesException("KNNJoin found " + indexes.size() + " spatial indexes, expected exactly one.");
+    It<SpatialIndexTree<N, E>> indexes = Metadata.of(relation).hierarchy().iterDescendants().filter(SpatialIndexTree.class);
+    if(!indexes.valid()) {
+      throw new MissingPrerequisitesException("KNNJoin found no spatial indexes, expected exactly one.");
     }
-    SpatialIndexTree<N, E> index = indexes.iterator().next();
+    SpatialIndexTree<N, E> index = indexes.get();
+    if(indexes.advance().valid()) {
+      throw new MissingPrerequisitesException("KNNJoin found more than one spatial indexes, expected exactly one.");
+    }
     return run(index, ids);
   }
 

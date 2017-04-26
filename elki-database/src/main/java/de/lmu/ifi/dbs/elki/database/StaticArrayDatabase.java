@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectListParameter;
@@ -140,7 +141,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
     // DBIDView at all)
     this.idrep = new DBIDView(this.ids);
     relations.add(this.idrep);
-    getHierarchy().add(this, idrep);
+    Metadata.of(this).hierarchy().addChild(idrep);
 
     DBIDArrayIter it = this.ids.iter();
 
@@ -155,7 +156,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
       }
       Relation<?> relation = new MaterializedRelation<>(ometa, ids, null, store);
       relations.add(relation);
-      getHierarchy().add(this, relation);
+      Metadata.of(this).hierarchy().addChild(relation);
 
       // Try to add indexes where appropriate
       for(IndexFactory<?> factory : indexFactories) {
@@ -170,7 +171,7 @@ public class StaticArrayDatabase extends AbstractDatabase {
           if(duration != null) {
             LOG.statistics(duration.end());
           }
-          getHierarchy().add(relation, index);
+          Metadata.of(relation).hierarchy().addChild(index);
         }
       }
     }

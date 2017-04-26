@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.clustering.EvaluateClustering;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
@@ -75,7 +76,7 @@ public class AutomaticEvaluation implements Evaluator {
     }
     if(!outliers.isEmpty()) {
       Database db = ResultUtil.findDatabase(hier);
-      ensureClusteringResult(db, db);
+      ensureClusteringResult(db);
       Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, db, Clustering.class);
       if(clusterings.isEmpty()) {
         LOG.warning("Could not find a clustering result, even after running 'ensureClusteringResult'?!?");
@@ -155,12 +156,10 @@ public class AutomaticEvaluation implements Evaluator {
    * Ensure that the result contains at least one Clustering.
    *
    * @param db Database to process
-   * @param result result
    */
-  public static void ensureClusteringResult(final Database db, final Result result) {
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(db.getHierarchy(), result, Clustering.class);
-    if(clusterings.isEmpty()) {
-      ResultUtil.addChildResult(db, new ByLabelOrAllInOneClustering().run(db));
+  public static void ensureClusteringResult(final Database db) {
+    if(!Metadata.of(db).hierarchy().iterDescendantsSelf().filter(Clustering.class).valid()) {
+      Metadata.of(db).hierarchy().addChild(new ByLabelOrAllInOneClustering().run(db));
     }
   }
 

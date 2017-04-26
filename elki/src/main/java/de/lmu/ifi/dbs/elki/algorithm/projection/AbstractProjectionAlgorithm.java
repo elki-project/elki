@@ -78,7 +78,7 @@ public abstract class AbstractProjectionAlgorithm<R extends Result> extends Abst
       }
       it.get().logStatistics();
     }
-    ResultUtil.removeRecursive(relation.getHierarchy(), relation);
+    ResultUtil.removeRecursive(relation);
   }
 
 }

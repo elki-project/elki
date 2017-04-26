@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.result.outlier;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
@@ -29,7 +28,11 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.evaluation.scores.ScoreEvaluation;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.DBIDsTest;
 import de.lmu.ifi.dbs.elki.evaluation.scores.adapter.OutlierScoreAdapter;
-import de.lmu.ifi.dbs.elki.result.*;
+import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
+import de.lmu.ifi.dbs.elki.result.Metadata.Hierarchy;
+import de.lmu.ifi.dbs.elki.result.OrderingResult;
+import de.lmu.ifi.dbs.elki.result.Result;
 
 /**
  * Wrap a typical Outlier result, keeping direct references to the main result
@@ -70,9 +73,10 @@ public class OutlierResult extends BasicResult {
     this.meta = meta;
     this.scores = scores;
     this.ordering = new OrderingFromRelation(scores, meta instanceof InvertedOutlierScoreMeta);
-    this.addChildResult(scores);
-    this.addChildResult(ordering);
-    this.addChildResult(meta);
+    Hierarchy hier = Metadata.of(this).hierarchy();
+    hier.addChild(scores);
+    hier.addChild(ordering);
+    hier.addChild(meta);
   }
 
   /**
@@ -109,15 +113,8 @@ public class OutlierResult extends BasicResult {
    * @return List of outlier results
    */
   public static List<OutlierResult> getOutlierResults(Result r) {
-    if(r instanceof OutlierResult) {
-      List<OutlierResult> ors = new ArrayList<>(1);
-      ors.add((OutlierResult) r);
-      return ors;
-    }
-    if(r instanceof HierarchicalResult) {
-      return ResultUtil.filterResults(((HierarchicalResult) r).getHierarchy(), r, OutlierResult.class);
-    }
-    return Collections.emptyList();
+    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+        .filter(OutlierResult.class).collect(new ArrayList<>());
   }
 
   /**

@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
 
+import java.util.Collection;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -100,5 +101,18 @@ public interface It<O> extends Iter {
       action.accept(get());
       advance();
     }
+  }
+
+  /**
+   * Collect the output in a colection.
+   *
+   * @param c Collection
+   */
+  default <T extends Collection<? super O>> T collect(T c) {
+    while(valid()) {
+      c.add(get());
+      advance();
+    }
+    return c;
   }
 }

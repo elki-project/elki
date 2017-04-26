@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.outlier.InvertedOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -137,7 +138,7 @@ public class OutRankS1 extends AbstractAlgorithm<OutlierResult> implements Outli
     DoubleRelation scoreResult = new MaterializedDoubleRelation("OutRank-S1", "OUTRANK_S1", score, ids);
     OutlierScoreMeta meta = new InvertedOutlierScoreMeta(minmax.getMin(), minmax.getMax(), 0, Double.POSITIVE_INFINITY);
     OutlierResult res = new OutlierResult(meta, scoreResult);
-    res.addChildResult(clustering);
+    Metadata.of(res).hierarchy().addChild(clustering);
     return res;
   }
 

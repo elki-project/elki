@@ -26,10 +26,7 @@ import java.util.Collection;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.index.tree.IndexTree;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.*;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 
 /**
@@ -64,7 +61,7 @@ public class IndexStatistics implements Evaluator {
     }
     Collection<Pair<String, String>> col = new ArrayList<>();
     IndexMetaResult analysis = new IndexMetaResult(col, header);
-    db.getHierarchy().add(db, analysis);
+    Metadata.of(db).hierarchy().addChild(analysis);
   }
 
   /**

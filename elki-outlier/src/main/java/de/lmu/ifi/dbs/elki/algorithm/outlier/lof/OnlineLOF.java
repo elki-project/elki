@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.StepProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -133,7 +134,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       kNNRefer = preproc.getKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE);
       rkNNRefer = preproc.getRKNNQuery(drefQ, krefer, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
-      database.getHierarchy().add(relation, preproc);
+      Metadata.of(relation).hierarchy().addChild(preproc);
     }
     else {
       if(stepprog != null) {
@@ -155,7 +156,7 @@ public class OnlineLOF<O> extends FlexibleLOF<O> {
       kNNReach = preproc.getKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE);
       rkNNReach = preproc.getRKNNQuery(dreachQ, kreach, DatabaseQuery.HINT_HEAVY_USE);
       // add as index
-      database.getHierarchy().add(relation, preproc);
+      Metadata.of(relation).hierarchy().addChild(preproc);
     }
 
     Pair<KNNQuery<O>, KNNQuery<O>> kNNPair = new Pair<>(kNNRefer, kNNReach);

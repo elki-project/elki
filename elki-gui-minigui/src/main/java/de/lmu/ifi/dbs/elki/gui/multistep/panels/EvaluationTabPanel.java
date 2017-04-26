@@ -76,7 +76,7 @@ public class EvaluationTabPanel extends ParameterTabPanel {
   @Override
   protected synchronized void configureStep(Parameterization config) {
     evals = config.tryInstantiate(EvaluationStep.class);
-    if (config.getErrors().size() > 0) {
+    if(config.getErrors().size() > 0) {
       evals = null;
     }
     basedOnResult = null;
@@ -84,19 +84,19 @@ public class EvaluationTabPanel extends ParameterTabPanel {
 
   @Override
   protected void executeStep() {
-    if (input.canRun() && !input.isComplete()) {
+    if(input.canRun() && !input.isComplete()) {
       input.execute();
     }
-    if (algs.canRun() && !algs.isComplete()) {
+    if(algs.canRun() && !algs.isComplete()) {
       algs.execute();
     }
-    if (!input.isComplete() || !algs.isComplete()) {
+    if(!input.isComplete() || !algs.isComplete()) {
       throw new AbortException("Input data not available.");
     }
     // Get the database and run the algorithms
     Database database = input.getInputStep().getDatabase();
     Result res = algs.getAlgorithmStep().getResult();
-    evals.runEvaluators(database.getHierarchy(), database);
+    evals.runEvaluators(database);
     basedOnResult = new WeakReference<Object>(res);
   }
 
@@ -106,7 +106,7 @@ public class EvaluationTabPanel extends ParameterTabPanel {
    * @return Evaluation step
    */
   public EvaluationStep getEvaluationStep() {
-    if (evals == null) {
+    if(evals == null) {
       throw new AbortException("Evaluators not configured.");
     }
     return evals;
@@ -114,14 +114,14 @@ public class EvaluationTabPanel extends ParameterTabPanel {
 
   @Override
   protected Status getStatus() {
-    if (evals == null) {
+    if(evals == null) {
       return Status.STATUS_UNCONFIGURED;
     }
-    if (!input.canRun() || !algs.canRun()) {
+    if(!input.canRun() || !algs.canRun()) {
       return Status.STATUS_CONFIGURED;
     }
     checkDependencies();
-    if (input.isComplete() && algs.isComplete() && basedOnResult != null) {
+    if(input.isComplete() && algs.isComplete() && basedOnResult != null) {
       // if(evals.getResult() == null) {
       // return STATUS_FAILED;
       // }
@@ -134,7 +134,7 @@ public class EvaluationTabPanel extends ParameterTabPanel {
 
   @Override
   public void panelUpdated(ParameterTabPanel o) {
-    if (o == input || o == algs) {
+    if(o == input || o == algs) {
       checkDependencies();
       updateStatus();
     }
@@ -144,8 +144,8 @@ public class EvaluationTabPanel extends ParameterTabPanel {
    * Test if the dependencies are still valid.
    */
   private void checkDependencies() {
-    if (basedOnResult != null) {
-      if (!input.isComplete() || !algs.isComplete() || basedOnResult.get() != algs.getAlgorithmStep().getResult()) {
+    if(basedOnResult != null) {
+      if(!input.isComplete() || !algs.isComplete() || basedOnResult.get() != algs.getAlgorithmStep().getResult()) {
         // We've become invalidated, notify.
         basedOnResult = null;
         firePanelUpdated();

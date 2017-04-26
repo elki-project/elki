@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.database.relation.ProxyView;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 
 /**
  * A proxy database to use e.g. for projections and partitions.
@@ -54,7 +55,7 @@ public class ProxyDatabase extends AbstractDatabase {
     super();
     this.idrep = new DBIDView(ids);
     this.relations.add(idrep);
-    this.addChildResult(idrep);
+    Metadata.of(this).hierarchy().addChild(idrep);
   }
 
   /**
@@ -67,11 +68,11 @@ public class ProxyDatabase extends AbstractDatabase {
     super();
     this.idrep = new DBIDView(ids);
     this.relations.add(idrep);
-    this.addChildResult(idrep);
+    Metadata.of(this).hierarchy().addChild(idrep);
     for (Relation<?> orel : relations) {
       Relation<?> relation = new ProxyView<>(ids, orel);
       this.relations.add(relation);
-      this.addChildResult(relation);
+      Metadata.of(this).hierarchy().addChild(relation);
     }
   }
 

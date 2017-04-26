@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.HilbertSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 
 /**
  * Regression test for space-filling curve NN search
@@ -84,7 +85,7 @@ public class SpacefillingMaterializeKNNPreprocessorTest {
             .build().instantiate(rel);
     preproc.initialize();
     // add as index
-    db.getHierarchy().add(rel, preproc);
+    Metadata.of(rel).hierarchy().addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
