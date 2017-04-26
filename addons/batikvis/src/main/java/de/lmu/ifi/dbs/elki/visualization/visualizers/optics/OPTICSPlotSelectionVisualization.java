@@ -27,14 +27,10 @@ import org.w3c.dom.events.Event;
 import org.w3c.dom.svg.SVGPoint;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -86,8 +82,7 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class); it.valid(); it.advance()) {
       OPTICSProjector p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;

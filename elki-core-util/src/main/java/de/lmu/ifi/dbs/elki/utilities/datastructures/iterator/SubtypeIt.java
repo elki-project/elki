@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
 
 /**
  * Filtered iterator.
@@ -26,11 +26,11 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  * @author Erich Schubert
  * @since 0.7.0
  *
- * @apiviz.composedOf Hierarchy.Iter
+ * @apiviz.composedOf It
  *
  * @param <O> Object type
  */
-public class FilteredIter<O> implements Hierarchy.Iter<O> {
+public class SubtypeIt<O> implements It<O> {
   /**
    * Class filter.
    */
@@ -39,12 +39,12 @@ public class FilteredIter<O> implements Hierarchy.Iter<O> {
   /**
    * Current object, if valid.
    */
-  Object current;
+  O current;
 
   /**
    * Iterator in primary hierarchy.
    */
-  private Hierarchy.Iter<?> it;
+  private It<?> it;
 
   /**
    * Constructor.
@@ -52,45 +52,40 @@ public class FilteredIter<O> implements Hierarchy.Iter<O> {
    * @param it Iterator in primary hierarchy
    * @param clazz Class filter
    */
-  public FilteredIter(Hierarchy.Iter<?> it, Class<? super O> clazz) {
+  public SubtypeIt(It<?> it, Class<? super O> clazz) {
     this.it = it;
     this.filter = clazz;
-    this.next();
+    this.current = null;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public O get() {
-    return (O) current;
+    if(current == null && it.valid()) {
+      advance();
+    }
+    return current;
   }
 
   @Override
   public boolean valid() {
+    if(current == null && it.valid()) {
+      advance();
+    }
     return current != null;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public FilteredIter<O> advance() {
-    if(!it.valid()) {
-      current = null;
-      return this;
-    }
-    next();
-    return this;
-  }
-
-  /**
-   * Java iterator style, because we need to "peek" the next element.
-   */
-  private void next() {
+  public SubtypeIt<O> advance() {
+    current = null;
     while(it.valid()) {
       Object o = it.get();
       it.advance();
       if(filter.isInstance(o)) {
-        current = filter.cast(o);
-        return;
+        current = (O) filter.cast(o);
+        break;
       }
     }
-    current = null;
+    return this;
   }
 }

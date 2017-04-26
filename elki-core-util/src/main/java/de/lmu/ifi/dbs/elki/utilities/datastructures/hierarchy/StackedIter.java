@@ -20,6 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
 
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
+
 /**
  * Filtered iterator.
  *
@@ -27,16 +29,16 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy;
  * @since 0.7.0
  *
  * @apiviz.composedOf Hierarchy
- * @apiviz.composedOf Hierarchy.Iter
+ * @apiviz.composedOf It
  *
  * @param <A> Type of first hierarchy
  * @param <B> Type of second level hierarchy
  */
-public class StackedIter<B, A extends B> implements Hierarchy.Iter<B> {
+public class StackedIter<B, A extends B> implements It<B> {
   /**
    * Iterator in primary hierarchy.
    */
-  private Hierarchy.Iter<? extends A> it1;
+  private It<? extends A> it1;
 
   /**
    * Secondary hierarchy.
@@ -46,7 +48,7 @@ public class StackedIter<B, A extends B> implements Hierarchy.Iter<B> {
   /**
    * Iterator in secondary hierarchy.
    */
-  private Hierarchy.Iter<B> it2;
+  private It<B> it2;
 
   /**
    * Constructor.
@@ -54,7 +56,7 @@ public class StackedIter<B, A extends B> implements Hierarchy.Iter<B> {
    * @param it1 Iterator in primary hierarchy
    * @param hier2 Iterator in secondary hierarchy
    */
-  public StackedIter(Hierarchy.Iter<? extends A> it1, Hierarchy<B> hier2) {
+  public StackedIter(It<? extends A> it1, Hierarchy<B> hier2) {
     this.it1 = it1;
     this.hier2 = hier2;
     if(it1.valid()) {

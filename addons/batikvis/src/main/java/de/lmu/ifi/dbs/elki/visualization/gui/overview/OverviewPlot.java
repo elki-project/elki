@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
@@ -195,12 +196,8 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
     RectangleArranger<PlotItem> plotmap = new RectangleArranger<>(width, height);
 
     Hierarchy<Object> vistree = context.getVisHierarchy();
-    for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
-      if(!(iter2.get() instanceof Projector)) {
-        continue;
-      }
-      Projector p = (Projector) iter2.get();
-      Collection<PlotItem> projs = p.arrange(context);
+    for(It<Projector> iter2 = vistree.iterAll().filter(Projector.class); iter2.valid(); iter2.advance()) {
+      Collection<PlotItem> projs = iter2.get().arrange(context);
       for(PlotItem it : projs) {
         if(it.w <= 0.0 || it.h <= 0.0) {
           LOG.warning("Plot item with improper size information: " + it);
@@ -210,18 +207,13 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
       }
     }
 
-    nextTask: for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
-      if(!(iter2.get() instanceof VisualizationTask)) {
-        continue;
-      }
-      VisualizationTask task = (VisualizationTask) iter2.get();
+    nextTask: for(It<VisualizationTask> iter2 = vistree.iterAll().filter(VisualizationTask.class); iter2.valid(); iter2.advance()) {
+      VisualizationTask task = iter2.get();
       if(!task.visible) {
         continue;
       }
-      for(Hierarchy.Iter<?> iter = vistree.iterParents(task); iter.valid(); iter.advance()) {
-        if(iter.get() instanceof Projector) {
-          continue nextTask;
-        }
+      if(vistree.iterParents(task).filter(Projector.class).valid()) {
+        continue nextTask;
       }
       if(task.reqwidth <= 0.0 || task.reqheight <= 0.0) {
         LOG.warning("Task with improper size information: " + task);
@@ -643,15 +635,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
 
   @Override
   public void visualizationChanged(VisualizationItem child) {
-    boolean isProjected = false;
-    for(Hierarchy.Iter<Object> iter = context.getVisHierarchy().iterParents(child); iter.valid(); iter.advance()) {
-      final Object o = iter.get();
-      if(o instanceof Projector) {
-        isProjected = true;
-        break;
-      }
-    }
-    if(!isProjected) {
+    if(!context.getVisHierarchy().iterParents(child).filter(Projector.class).valid()) {
       reinitOnRefresh = true;
     }
     lazyRefresh();

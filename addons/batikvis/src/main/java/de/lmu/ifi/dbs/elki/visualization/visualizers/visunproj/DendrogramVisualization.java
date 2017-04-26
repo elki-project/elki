@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -106,8 +106,7 @@ public class DendrogramVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     // Ensure there is a clustering result:
-    Hierarchy.Iter<PointerHierarchyRepresentationResult> it = VisualizationTree.filterResults(context, start, PointerHierarchyRepresentationResult.class);
-    for(; it.valid(); it.advance()) {
+    for(It<PointerHierarchyRepresentationResult> it = VisualizationTree.filterResults(context, start, PointerHierarchyRepresentationResult.class); it.valid(); it.advance()) {
       PointerHierarchyRepresentationResult pi = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, pi, null, this);
       task.level = VisualizationTask.LEVEL_STATIC;

@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.result;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 
 /**
@@ -79,7 +80,7 @@ public class LogResultStructureResultHandler implements ResultHandler {
     buf.append(result.getClass().getSimpleName()).append(": ").append(result.getLongName());
     buf.append(" (").append(result.getShortName()).append(")\n");
     if(hier.numChildren(result) > 0) {
-      for(Hierarchy.Iter<Result> iter = hier.iterChildren(result); iter.valid(); iter.advance()) {
+      for(It<Result> iter = hier.iterChildren(result); iter.valid(); iter.advance()) {
         recursiveLogResult(buf, hier, iter.get(), depth + 1);
       }
     }

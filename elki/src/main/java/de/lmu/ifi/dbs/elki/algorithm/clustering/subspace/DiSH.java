@@ -65,7 +65,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.ProjectedCentroid;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -85,7 +85,8 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  *
  * Reference:
  * <p>
- * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek:<br />
+ * E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A.
+ * Zimek:<br />
  * Detection and Visualization of Subspace Cluster Hierarchies. <br />
  * In Proc. 12th International Conference on Database Systems for Advanced
  * Applications (DASFAA), Bangkok, Thailand, 2007.
@@ -102,10 +103,10 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
  */
 @Title("DiSH: Detecting Subspace cluster Hierarchies")
 @Description("Algorithm to find hierarchical correlation clusters in subspaces.")
-@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek",//
-title = "Detection and Visualization of Subspace Cluster Hierarchies", //
-booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", //
-url = "http://dx.doi.org/10.1007/978-3-540-71703-4_15")
+@Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, I. Müller-Gorman, A. Zimek", //
+    title = "Detection and Visualization of Subspace Cluster Hierarchies", //
+    booktitle = "Proc. 12th International Conference on Database Systems for Advanced Applications (DASFAA), Bangkok, Thailand, 2007", //
+    url = "http://dx.doi.org/10.1007/978-3-540-71703-4_15")
 public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<SubspaceModel>> implements SubspaceClusteringAlgorithm<SubspaceModel> {
   /**
    * The logger for this class.
@@ -221,10 +222,10 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       StringBuilder msg = new StringBuilder("Step 4: build hierarchy");
       for(Cluster<SubspaceModel> c : clusters) {
         msg.append('\n').append(BitsUtil.toStringLow(c.getModel().getSubspace().getDimensions(), dimensionality)).append(" ids ").append(c.size());
-        for(Iter<Cluster<SubspaceModel>> iter = clustering.getClusterHierarchy().iterParents(c); iter.valid(); iter.advance()) {
+        for(It<Cluster<SubspaceModel>> iter = clustering.getClusterHierarchy().iterParents(c); iter.valid(); iter.advance()) {
           msg.append("\n   parent ").append(iter.get());
         }
-        for(Iter<Cluster<SubspaceModel>> iter = clustering.getClusterHierarchy().iterChildren(c); iter.valid(); iter.advance()) {
+        for(It<Cluster<SubspaceModel>> iter = clustering.getClusterHierarchy().iterChildren(c); iter.valid(); iter.advance()) {
           msg.append("\n   child ").append(iter.get());
         }
       }
@@ -317,7 +318,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
           continue;
         }
         if(clusterOrder.getCorrelationValue(pre) < clusterOrder.getCorrelationValue(cur) || //
-        clusterOrder.getReachability(pre) < clusterOrder.getReachability(cur)) {
+            clusterOrder.getReachability(pre) < clusterOrder.getReachability(cur)) {
           continue;
         }
 
@@ -567,7 +568,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(Relation<V> relation, Cluster<SubspaceModel> parent, Iter<Cluster<SubspaceModel>> iter, int db_dim) {
+  private boolean isParent(Relation<V> relation, Cluster<SubspaceModel> parent, It<Cluster<SubspaceModel>> iter, int db_dim) {
     Subspace s_p = parent.getModel().getSubspace();
     NumberVector parent_centroid = ProjectedCentroid.make(s_p.getDimensions(), relation, parent.getIDs());
     int subspaceDim_parent = db_dim - s_p.dimensionality();
@@ -726,7 +727,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
     @Override
     protected DiSHClusterOrder buildResult() {
       return new DiSHClusterOrder("DiSH Cluster Order", "dish-cluster-order", //
-      clusterOrder, reachability, predecessor, correlationValue, commonPreferenceVectors);
+          clusterOrder, reachability, predecessor, correlationValue, commonPreferenceVectors);
     }
 
     @Override
@@ -809,9 +810,10 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
 
     @Override
     public int compare(DBIDRef o1, DBIDRef o2) {
-      int c1 = correlationValue.intValue(o1), c2 = correlationValue.intValue(o2);
+      int c1 = correlationValue.intValue(o1),
+          c2 = correlationValue.intValue(o2);
       return (c1 < c2) ? -1 : (c1 > c2) ? +1 : //
-      super.compare(o1, o2);
+          super.compare(o1, o2);
     }
 
     /**
@@ -826,7 +828,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
       public int compare(DBIDRef o1, DBIDRef o2) {
         int c1 = tmpCorrelation.intValue(o1), c2 = tmpCorrelation.intValue(o2);
         return (c1 < c2) ? -1 : (c1 > c2) ? +1 : //
-        Double.compare(tmpDistance.doubleValue(o1), tmpDistance.doubleValue(o2));
+            Double.compare(tmpDistance.doubleValue(o1), tmpDistance.doubleValue(o2));
       }
     }
 
@@ -897,8 +899,8 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
      * </p>
      */
     public static final OptionID EPSILON_ID = new OptionID("dish.epsilon", //
-    "The maximum radius of the neighborhood to be considered in each " //
-        + " dimension for determination of the preference vector.");
+        "The maximum radius of the neighborhood to be considered in each " //
+            + " dimension for determination of the preference vector.");
 
     /**
      * Parameter that specifies the a minimum number of points as a smoothing
@@ -912,7 +914,7 @@ public class DiSH<V extends NumberVector> extends AbstractAlgorithm<Clustering<S
      * </p>
      */
     public static final OptionID MU_ID = new OptionID("dish.mu", //
-    "The minimum number of points as a smoothing factor to avoid the single-link-effekt.");
+        "The minimum number of points as a smoothing factor to avoid the single-link-effekt.");
 
     protected double epsilon = 0.0;
 

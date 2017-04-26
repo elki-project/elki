@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixImage.SimilarityMatrix;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -67,8 +67,7 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<SimilarityMatrix> it = VisualizationTree.filterResults(context, start, SimilarityMatrix.class);
-    for(; it.valid(); it.advance()) {
+    for(It<SimilarityMatrix> it = VisualizationTree.filterResults(context, start, SimilarityMatrix.class); it.valid(); it.advance()) {
       SimilarityMatrix pr = it.get();
       // Add plots, attach visualizer
       final VisualizationTask task = new VisualizationTask(NAME, context, pr, null, SimilarityMatrixVisualizer.this);

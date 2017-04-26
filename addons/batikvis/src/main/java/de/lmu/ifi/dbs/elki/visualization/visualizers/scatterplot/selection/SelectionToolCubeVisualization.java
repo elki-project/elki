@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -89,8 +89,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
       final Relation<?> rel = p.getRelation();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {

@@ -23,23 +23,11 @@ package de.lmu.ifi.dbs.elki.visualization.gui;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import javax.swing.ImageIcon;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
 import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
 import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
@@ -50,13 +38,8 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuAction;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuToggle;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
-import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
+import de.lmu.ifi.dbs.elki.visualization.*;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.JSVGSynchronizedCanvas;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.LazyCanvasResizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.detail.DetailView;
@@ -64,6 +47,7 @@ import de.lmu.ifi.dbs.elki.visualization.gui.overview.DetailViewSelectedEvent;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.OverviewPlot;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.savedialog.SVGSaveDialog;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 
@@ -221,14 +205,14 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       Result start = context.getBaseResult();
       ArrayList<JMenuItem> items = new ArrayList<>();
       if(start == null) {
-        for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
+        for(It<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
           if(hier.numParents(iter.get()) == 0) {
             recursiveBuildMenu(items, iter.get(), hier, vistree, proj);
           }
         }
       }
       else {
-        for(Hierarchy.Iter<Result> iter = hier.iterChildren(start); iter.valid(); iter.advance()) {
+        for(It<Result> iter = hier.iterChildren(start); iter.valid(); iter.advance()) {
           recursiveBuildMenu(items, iter.get(), hier, vistree, proj);
         }
       }
@@ -255,12 +239,12 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       ArrayList<JMenuItem> subitems = new ArrayList<>();
       // Add menus for any child results
       if(r instanceof Result) {
-        for(Hierarchy.Iter<Result> iter = hier.iterChildren((Result) r); iter.valid(); iter.advance()) {
+        for(It<Result> iter = hier.iterChildren((Result) r); iter.valid(); iter.advance()) {
           recursiveBuildMenu(subitems, iter.get(), hier, vistree, proj);
         }
       }
       // Add visualizers:
-      for(Hierarchy.Iter<Object> iter = vistree.iterChildren(r); iter.valid(); iter.advance()) {
+      for(It<Object> iter = vistree.iterChildren(r); iter.valid(); iter.advance()) {
         recursiveBuildMenu(subitems, iter.get(), hier, vistree, proj);
       }
 
@@ -271,7 +255,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       }
       else {
         // Only include items that belong to different projections:
-        for(Hierarchy.Iter<Object> iter = vistree.iterAncestorsSelf(r); iter.valid(); iter.advance()) {
+        for(It<Projector> iter = vistree.iterAncestorsSelf(r).filter(Projector.class); iter.valid(); iter.advance()) {
           if(iter.get() == proj.getProjector()) {
             item = makeMenuItemForVisualizer(r);
             break;

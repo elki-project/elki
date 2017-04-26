@@ -41,8 +41,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.geometry.AlphaShape;
 import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -108,8 +108,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
   public void processNewResult(VisualizerContext context, Object start) {
     // We attach ourselves to the style library, not the clustering, so there is
     // only one hull.
-    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
       final Relation<?> rel = p.getRelation();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
@@ -283,7 +282,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
       if(hier != null && hulls != null) {
         final int numc = hier.numChildren(clu);
         if(numc > 0) {
-          for(Iter<Cluster<Model>> iter = hier.iterChildren(clu); iter.valid(); iter.advance()) {
+          for(It<Cluster<Model>> iter = hier.iterChildren(clu); iter.valid(); iter.advance()) {
             final Cluster<Model> iclu = iter.get();
             DoubleObjPair<Polygon> poly = hulls.get(iclu);
             if(poly == null) {
@@ -333,7 +332,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
         }
         hull.add(projP);
       }
-      for(Iter<Cluster<Model>> iter = hier.iterChildren(clus); iter.valid(); iter.advance()) {
+      for(It<Cluster<Model>> iter = hier.iterChildren(clus); iter.valid(); iter.advance()) {
         weight += .5 * addRecursively(hull, hier, iter.get());
       }
       return weight;

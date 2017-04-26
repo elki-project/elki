@@ -29,9 +29,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -71,9 +69,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @apiviz.uses Instance oneway - - «create»
  */
 @Reference(authors = "E. Achtert, H.-P. Kriegel, L. Reichert, E. Schubert, R. Wojdanowski, A. Zimek", //
-title = "Visual Evaluation of Outlier Detection Models", //
-booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010", //
-url = "http://dx.doi.org/10.1007/978-3-642-12098-5_34")
+    title = "Visual Evaluation of Outlier Detection Models", //
+    booktitle = "Proceedings of the 15th International Conference on Database Systems for Advanced Applications (DASFAA), Tsukuba, Japan, 2010", //
+    url = "http://dx.doi.org/10.1007/978-3-642-12098-5_34")
 public class BubbleVisualization extends AbstractVisFactory {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
@@ -121,11 +119,8 @@ public class BubbleVisualization extends AbstractVisFactory {
         boolean vis = true;
         // Quick and dirty hack: hide if parent result is also an outlier result
         // Since that probably is already visible and we're redundant.
-        for(Hierarchy.Iter<Result> r = o.getHierarchy().iterParents(o); r.valid(); r.advance()) {
-          if(r.get() instanceof OutlierResult) {
-            vis = false;
-            break;
-          }
+        if(o.getHierarchy().iterParents(o).filter(OutlierResult.class).valid()) {
+          vis = false;
         }
         final VisualizationTask task = new VisualizationTask(NAME, context, o, rel, BubbleVisualization.this);
         task.level = VisualizationTask.LEVEL_DATA;

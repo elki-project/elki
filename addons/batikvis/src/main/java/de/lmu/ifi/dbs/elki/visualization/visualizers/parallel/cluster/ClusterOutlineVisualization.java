@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -99,8 +99,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     // We use the style library, not individual clusterings!
-    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class); it.valid(); it.advance()) {
       ParallelPlotProjector<?> p = it.get();
       Relation<?> rel = p.getRelation();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
@@ -126,7 +125,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
    * @author Robert Rödler
    * @author Erich Schubert
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector>implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
     /**
      * Generic tags to indicate the type of element. Used in IDs, CSS-Classes
      * etc.

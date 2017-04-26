@@ -36,7 +36,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -127,8 +127,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), VoronoiVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA + 3;
@@ -292,7 +291,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
         }
         if(mode == Mode.DELAUNAY || mode == Mode.V_AND_D) {
           Element path = new SVGPath(proj.fastProjectDataToRenderSpace(means.get(0)))//
-          .drawTo(proj.fastProjectDataToRenderSpace(means.get(1))).makeElement(svgp);
+              .drawTo(proj.fastProjectDataToRenderSpace(means.get(1))).makeElement(svgp);
           SVGUtil.addCSSClass(path, KMEANSBORDER);
           layer.appendChild(path);
         }

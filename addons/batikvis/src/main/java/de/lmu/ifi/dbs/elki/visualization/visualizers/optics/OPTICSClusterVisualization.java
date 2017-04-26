@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -75,8 +75,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class); it.valid(); it.advance()) {
       OPTICSProjector p = it.get();
       final Clustering<OPTICSModel> ocl = findOPTICSClustering(context, p.getResult());
       if(ocl != null) {
@@ -110,8 +109,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
    */
   @SuppressWarnings("unchecked")
   protected static Clustering<OPTICSModel> findOPTICSClustering(VisualizerContext context, Result start) {
-    Hierarchy.Iter<Clustering<?>> it1 = VisualizationTree.filterResults(context, start, Clustering.class);
-    for(; it1.valid(); it1.advance()) {
+    for(It<Clustering<?>> it1 = VisualizationTree.filterResults(context, start, Clustering.class); it1.valid(); it1.advance()) {
       Clustering<?> clus = it1.get();
       if(clus.getToplevelClusters().size() == 0) {
         continue;
@@ -185,7 +183,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
      * @param depth Recursion depth
      * @param colormap Color mapping
      */
-    private void drawClusters(Clustering<OPTICSModel> clustering, Hierarchy.Iter<Cluster<OPTICSModel>> clusters, int depth, Map<Cluster<?>, String> colormap) {
+    private void drawClusters(Clustering<OPTICSModel> clustering, It<Cluster<OPTICSModel>> clusters, int depth, Map<Cluster<?>, String> colormap) {
       final double scale = StyleLibrary.SCALE;
 
       for(; clusters.valid(); clusters.advance()) {
@@ -207,7 +205,7 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
           LOG.warning("Expected OPTICSModel, got: " + cluster.getModel().getClass().getSimpleName());
         }
         // Descend
-        final Hierarchy.Iter<Cluster<OPTICSModel>> children = clustering.getClusterHierarchy().iterChildren(cluster);
+        final It<Cluster<OPTICSModel>> children = clustering.getClusterHierarchy().iterChildren(cluster);
         if(children != null) {
           drawClusters(clustering, children, depth + 1, colormap);
         }

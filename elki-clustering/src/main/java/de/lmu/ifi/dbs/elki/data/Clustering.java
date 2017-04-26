@@ -33,8 +33,8 @@ import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
  * Result class for clusterings. Can be used for both hierarchical and
@@ -142,7 +142,7 @@ public class Clustering<M extends Model> extends BasicResult {
    */
   public List<Cluster<M>> getAllClusters() {
     ArrayList<Cluster<M>> res = new ArrayList<>(hierarchy.size());
-    for(Hierarchy.Iter<Cluster<M>> iter = hierarchy.iterAll(); iter.valid(); iter.advance()) {
+    for(It<Cluster<M>> iter = hierarchy.iterAll(); iter.valid(); iter.advance()) {
       res.add(iter.get());
     }
     Collections.sort(res, Cluster.BY_NAME_SORTER);
@@ -154,8 +154,8 @@ public class Clustering<M extends Model> extends BasicResult {
    * 
    * @return Iterator
    */
-  public Iter<Cluster<M>> iterToplevelClusters() {
-    return new Hierarchy.Iter<Cluster<M>>() {
+  public It<Cluster<M>> iterToplevelClusters() {
+    return new It<Cluster<M>>() {
       Iterator<Cluster<M>> iter;
 
       Cluster<M> cur;
@@ -171,7 +171,7 @@ public class Clustering<M extends Model> extends BasicResult {
       }
 
       @Override
-      public Iter<Cluster<M>> advance() {
+      public It<Cluster<M>> advance() {
         if(iter.hasNext()) {
           cur = iter.next();
         }

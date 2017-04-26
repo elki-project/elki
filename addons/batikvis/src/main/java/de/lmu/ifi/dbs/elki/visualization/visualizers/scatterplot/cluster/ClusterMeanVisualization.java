@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.model.PrototypeModel;
 import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -77,8 +77,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(final VisualizerContext context, Object start) {
-    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterMeanVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA + 1;

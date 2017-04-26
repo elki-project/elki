@@ -53,7 +53,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.FirstNEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -92,11 +92,11 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  */
 @Title("ERiC: Exploring Relationships among Correlation Clusters")
 @Description("Performs the DBSCAN algorithm on the data using a special distance function taking into account correlations among attributes and builds " //
-+ "a hierarchy that allows multiple inheritance from the correlation clustering result.")
+    + "a hierarchy that allows multiple inheritance from the correlation clustering result.")
 @Reference(authors = "E. Achtert, C. Böhm, H.-P. Kriegel, P. Kröger, and A. Zimek", //
-title = "On Exploring Complex Relationships of Correlation Clusters", //
-booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", //
-url = "http://dx.doi.org/10.1109/SSDBM.2007.21")
+    title = "On Exploring Complex Relationships of Correlation Clusters", //
+    booktitle = "Proc. 19th International Conference on Scientific and Statistical Database Management (SSDBM 2007), Banff, Canada, 2007", //
+    url = "http://dx.doi.org/10.1109/SSDBM.2007.21")
 public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<CorrelationModel>> implements ClusteringAlgorithm<Clustering<CorrelationModel>> {
   /**
    * The logger for this class.
@@ -175,10 +175,10 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
           msg.append("\n  cluster ").append(cluster).append(", ids: ").append(cluster.getIDs().size());
           // .append(", level: ").append(cluster.getLevel()).append(", index:
           // ").append(cluster.getLevelIndex());
-          for(Iter<Cluster<CorrelationModel>> iter = clustering.getClusterHierarchy().iterParents(cluster); iter.valid(); iter.advance()) {
+          for(It<Cluster<CorrelationModel>> iter = clustering.getClusterHierarchy().iterParents(cluster); iter.valid(); iter.advance()) {
             msg.append("\n   parent ").append(iter.get());
           }
-          for(Iter<Cluster<CorrelationModel>> iter = clustering.getClusterHierarchy().iterChildren(cluster); iter.valid(); iter.advance()) {
+          for(It<Cluster<CorrelationModel>> iter = clustering.getClusterHierarchy().iterChildren(cluster); iter.valid(); iter.advance()) {
             msg.append("\n   child ").append(iter.get());
           }
         }
@@ -252,7 +252,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
       List<Cluster<CorrelationModel>> correlationClusters = clusterMap.get(dimensionality);
       EigenPairFilter filter = new FirstNEigenPairFilter(dimensionality);
       SortedEigenPairs epairs = settings.pca.processIds(noise.getIDs(), relation).getEigenPairs();
-      int numstrong  = filter.filter(epairs.eigenValues());
+      int numstrong = filter.filter(epairs.eigenValues());
       PCAFilteredResult pcares = new PCAFilteredResult(epairs, numstrong, 1., 0.);
 
       double[] centroid = Centroid.make(relation, noise.getIDs()).getArrayRef();
@@ -323,7 +323,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
    * @return true, if the specified parent cluster is a parent of one child of
    *         the children clusters, false otherwise
    */
-  private boolean isParent(ERiCNeighborPredicate<V>.Instance npred, Cluster<CorrelationModel> parent, Iter<Cluster<CorrelationModel>> iter) {
+  private boolean isParent(ERiCNeighborPredicate<V>.Instance npred, Cluster<CorrelationModel> parent, It<Cluster<CorrelationModel>> iter) {
     StringBuilder msg = LOG.isDebugging() ? new StringBuilder() : null;
 
     for(; iter.valid(); iter.advance()) {
@@ -377,7 +377,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
      * Class to compute PCA.
      */
     public PCARunner pca;
-    
+
     /**
      * Filter for Eigenvectors.
      */
@@ -457,7 +457,7 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
     protected void makeOptions(Parameterization config) {
       settings = new Settings();
       IntParameter kP = new IntParameter(K_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(kP)) {
         settings.k = kP.intValue();
       }
@@ -470,17 +470,17 @@ public class ERiC<V extends NumberVector> extends AbstractAlgorithm<Clustering<C
         settings.filter = filterP.instantiateClass(config);
       }
       DoubleParameter deltaP = new DoubleParameter(DELTA_ID, 0.1) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(deltaP)) {
         settings.delta = deltaP.doubleValue();
       }
       DoubleParameter tauP = new DoubleParameter(TAU_ID, 0.1) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ZERO_DOUBLE);
       if(config.grab(tauP)) {
         settings.tau = tauP.doubleValue();
       }
       IntParameter minptsP = new IntParameter(DBSCAN.Parameterizer.MINPTS_ID) //
-      .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
+          .addConstraint(CommonConstraints.GREATER_EQUAL_ONE_INT);
       if(config.grab(minptsP)) {
         settings.minpts = minptsP.intValue();
       }

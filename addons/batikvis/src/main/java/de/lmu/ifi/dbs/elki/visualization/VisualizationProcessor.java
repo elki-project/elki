@@ -29,8 +29,9 @@ package de.lmu.ifi.dbs.elki.visualization;
 public interface VisualizationProcessor {
   /**
    * Add visualization items for the given result (tree) to the result tree.
+   * 
    * @param context Visualization context
    * @param start Result to process
    */
-  public void processNewResult(VisualizerContext context, Object start);
+  void processNewResult(VisualizerContext context, Object start);
 }

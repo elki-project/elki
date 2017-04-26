@@ -25,7 +25,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -64,8 +64,7 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class); it.valid(); it.advance()) {
       OPTICSProjector p = it.get();
       // Add plots, attach visualizer
       final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);

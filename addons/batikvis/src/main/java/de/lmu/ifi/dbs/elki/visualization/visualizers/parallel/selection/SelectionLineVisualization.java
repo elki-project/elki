@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -76,8 +76,7 @@ public class SelectionLineVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class); it.valid(); it.advance()) {
       ParallelPlotProjector<?> p = it.get();
       Relation<?> rel = p.getRelation();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
@@ -98,7 +97,7 @@ public class SelectionLineVisualization extends AbstractVisFactory {
    *
    * @apiviz.has DBIDSelection oneway - - visualizes
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector>implements DataStoreListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector> implements DataStoreListener {
     /**
      * CSS Class for the range marker
      */

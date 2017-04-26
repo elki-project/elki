@@ -33,8 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
 import de.lmu.ifi.dbs.elki.index.DynamicIndex;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
 /**
@@ -49,7 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
  *
  * @param <O> Data type
  */
-public class MaterializedRelation<O> extends AbstractRelation<O>implements ModifiableRelation<O> {
+public class MaterializedRelation<O> extends AbstractRelation<O> implements ModifiableRelation<O> {
   /**
    * Class logger.
    */
@@ -149,17 +148,14 @@ public class MaterializedRelation<O> extends AbstractRelation<O>implements Modif
 
   @Override
   public void insert(DBIDRef id, O val) {
-    assert(ids.contains(id)) : "Object not yet in DBIDs.";
+    assert (ids.contains(id)) : "Object not yet in DBIDs.";
     if(!(content instanceof WritableDataStore)) {
       throw new AbortException("Data is stored in a non-writable data store. Modifications are not possible.");
     }
     ((WritableDataStore<O>) content).put(id, val);
-    for(Iter<Result> it = this.getHierarchy().iterDescendants(this); it.valid(); it.advance()) {
+    for(It<Index> it = this.getHierarchy().iterDescendants(this).filter(Index.class); it.valid(); it.advance()) {
       if(!(it.get() instanceof DynamicIndex)) {
-        if(it.get() instanceof Index) {
-          throw new AbortException("A non-dynamic index was added to this database. Modifications are not allowed, unless this index is removed.");
-        }
-        continue;
+        throw new AbortException("A non-dynamic index was added to this database. Modifications are not allowed, unless this index is removed.");
       }
       ((DynamicIndex) it.get()).insert(id);
     }
@@ -172,16 +168,13 @@ public class MaterializedRelation<O> extends AbstractRelation<O>implements Modif
    */
   @Override
   public void delete(DBIDRef id) {
-    assert(!ids.contains(id)) : "Object still in DBIDs.";
+    assert (!ids.contains(id)) : "Object still in DBIDs.";
     if(!(content instanceof WritableDataStore)) {
       throw new AbortException("Data is stored in a non-writable data store. Modifications are not possible.");
     }
-    for(Iter<Result> it = this.getHierarchy().iterDescendants(this); it.valid(); it.advance()) {
+    for(It<Index> it = this.getHierarchy().iterDescendants(this).filter(Index.class); it.valid(); it.advance()) {
       if(!(it.get() instanceof DynamicIndex)) {
-        if(it.get() instanceof Index) {
-          throw new AbortException("A non-dynamic index was added to this database. Modifications are not allowed, unless this index is removed.");
-        }
-        continue;
+        throw new AbortException("A non-dynamic index was added to this database. Modifications are not allowed, unless this index is removed.");
       }
       ((DynamicIndex) it.get()).delete(id);
     }

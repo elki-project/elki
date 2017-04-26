@@ -28,7 +28,7 @@ import java.util.HashSet;
 
 import org.junit.Test;
 
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
  * Test the main hierarchy implementation.
@@ -69,7 +69,7 @@ public class HashMapHierarchyTest {
     validate(hier.iterDescendantsSelf(d), new String[] { d });
   }
 
-  private <O> void validate(Iter<O> iter, O[] all) {
+  private <O> void validate(It<O> iter, O[] all) {
     HashSet<O> seen = new HashSet<>(all.length);
     for(; iter.valid(); iter.advance()) {
       O cur = iter.get();

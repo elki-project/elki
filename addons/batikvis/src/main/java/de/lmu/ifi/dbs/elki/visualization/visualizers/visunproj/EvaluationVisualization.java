@@ -25,9 +25,7 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -85,12 +83,10 @@ public class EvaluationVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<EvaluationResult> it = VisualizationTree.filterResults(context, start, EvaluationResult.class);
-    candidate: for(; it.valid(); it.advance()) {
+    candidate: for(It<EvaluationResult> it = VisualizationTree.filterResults(context, start, EvaluationResult.class); it.valid(); it.advance()) {
       EvaluationResult sr = it.get();
       // Avoid duplicates:
-      Hierarchy.Iter<VisualizationTask> it2 = VisualizationTree.filter(context, sr, VisualizationTask.class);
-      for(; it2.valid(); it2.advance()) {
+      for(It<VisualizationTask> it2 = VisualizationTree.filter(context, sr, VisualizationTask.class); it2.valid(); it2.advance()) {
         if(it2.get().getFactory() instanceof EvaluationVisualization) {
           continue candidate;
         }
@@ -99,13 +95,8 @@ public class EvaluationVisualization extends AbstractVisFactory {
       if(sr.visualizeSingleton()) {
         Class<? extends EvaluationResult> c = sr.getClass();
         // Ensure singleton.
-        Hierarchy.Iter<?> it3 = context.getVisHierarchy().iterChildren(context.getBaseResult());
-        for(; it3.valid(); it3.advance()) {
-          Object o = it3.get();
-          if(!(o instanceof VisualizationTask)) {
-            continue;
-          }
-          final VisualizationTask otask = (VisualizationTask) o;
+        for(It<VisualizationTask> it3 = context.getVisHierarchy().iterChildren(context.getBaseResult()).filter(VisualizationTask.class); it3.valid(); it3.advance()) {
+          final VisualizationTask otask = it3.get();
           if(otask.getFactory() instanceof EvaluationVisualization && otask.getResult() == c) {
             continue candidate;
           }
@@ -166,13 +157,11 @@ public class EvaluationVisualization extends AbstractVisFactory {
         ClusterStylingPolicy cpol = (ClusterStylingPolicy) spol;
         @SuppressWarnings("unchecked")
         final Class<Object> c = (Class<Object>) o;
-        Iter<?> it = VisualizationTree.filterResults(context, cpol.getClustering(), c);
-        candidates: for(; it.valid(); it.advance()) {
+        candidates: for(It<?> it = VisualizationTree.filterResults(context, cpol.getClustering(), c); it.valid(); it.advance()) {
           // This could be attached to a child clustering, in which case we
           // may end up displaying the wrong evaluation.
-          Iter<Result> it2 = context.getHierarchy().iterAncestors((EvaluationResult) it.get());
-          for(; it2.valid(); it2.advance()) {
-            if(it2.get() instanceof Clustering && it2.get() != cpol.getClustering()) {
+          for(It<Clustering<?>> it2 = context.getHierarchy().iterAncestors((EvaluationResult) it.get()).filter(Clustering.class); it2.valid(); it2.advance()) {
+            if(it2.get() != cpol.getClustering()) {
               continue candidates;
             }
           }

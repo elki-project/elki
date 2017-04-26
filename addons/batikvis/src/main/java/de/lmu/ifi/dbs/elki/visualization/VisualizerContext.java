@@ -38,7 +38,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.*;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.visualization.style.ClusterStylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
@@ -410,12 +409,7 @@ public class VisualizerContext implements DataStoreListener, Result {
 
   public List<VisualizationTask> getVisTasks(VisualizationItem item) {
     List<VisualizationTask> out = new ArrayList<>();
-    for(Hierarchy.Iter<?> iter = vistree.iterDescendants(item); iter.valid(); iter.advance()) {
-      Object o = iter.get();
-      if(o instanceof VisualizationTask) {
-        out.add((VisualizationTask) o);
-      }
-    }
+    vistree.iterDescendants(item).filter(VisualizationTask.class).forEach(out::add);
     return out;
   }
 

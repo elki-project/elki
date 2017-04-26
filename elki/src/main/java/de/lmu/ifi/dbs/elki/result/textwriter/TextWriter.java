@@ -23,20 +23,10 @@ package de.lmu.ifi.dbs.elki.result.textwriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
-import de.lmu.ifi.dbs.elki.data.Cluster;
-import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.data.FeatureVector;
-import de.lmu.ifi.dbs.elki.data.HierarchicalClassLabel;
-import de.lmu.ifi.dbs.elki.data.LabelList;
-import de.lmu.ifi.dbs.elki.data.SimpleClassLabel;
+import de.lmu.ifi.dbs.elki.data.*;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -48,17 +38,12 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.evaluation.classification.ConfusionMatrixEvaluationResult;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.IterableResult;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.result.SettingsResult;
+import de.lmu.ifi.dbs.elki.result.*;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.NamingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.naming.SimpleEnumeratingScheme;
 import de.lmu.ifi.dbs.elki.result.textwriter.writers.*;
 import de.lmu.ifi.dbs.elki.utilities.HandlerList;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.SerializedParameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
@@ -94,7 +79,6 @@ public class TextWriter {
    */
   static {
     TextWriterObjectInline trivialwriter = new TextWriterObjectInline();
-    TextWriterWriterInterface<Object> ignorewriter = new TextWriterIgnore();
     writers.insertHandler(Pair.class, new TextWriterPair());
     writers.insertHandler(DoubleDoublePair.class, new TextWriterDoubleDoublePair());
     writers.insertHandler(FeatureVector.class, trivialwriter);
@@ -291,7 +275,7 @@ public class TextWriter {
     if(clustering.getClusterHierarchy().numParents(clus) > 0) {
       StringBuilder buf = new StringBuilder();
       buf.append("Parents:");
-      for(Hierarchy.Iter<Cluster<Model>> iter = clustering.getClusterHierarchy().iterParents(clus); iter.valid(); iter.advance()) {
+      for(It<Cluster<Model>> iter = clustering.getClusterHierarchy().iterParents(clus); iter.valid(); iter.advance()) {
         buf.append(' ').append(naming.getNameFor(iter.get()));
       }
       out.commentPrintLn(buf.toString());
@@ -299,7 +283,7 @@ public class TextWriter {
     if(clustering.getClusterHierarchy().numChildren(clus) > 0) {
       StringBuilder buf = new StringBuilder();
       buf.append("Children:");
-      for(Hierarchy.Iter<Cluster<Model>> iter = clustering.getClusterHierarchy().iterChildren(clus); iter.valid(); iter.advance()) {
+      for(It<Cluster<Model>> iter = clustering.getClusterHierarchy().iterChildren(clus); iter.valid(); iter.advance()) {
         buf.append(' ').append(naming.getNameFor(iter.get()));
       }
       out.commentPrintLn(buf.toString());
@@ -410,7 +394,7 @@ public class TextWriter {
   private void writeOtherResult(StreamFactory streamOpener, Result r) throws IOException {
     if(writers.getHandler(r) != null) {
       PrintStream outStream = streamOpener.openStream(getFilename(r, r.getShortName()));
-      TextWriterStream out = new TextWriterStream(outStream, writers, fallback );
+      TextWriterStream out = new TextWriterStream(outStream, writers, fallback);
       TextWriterWriterInterface<?> owriter = out.getWriterFor(r);
       if(owriter == null) {
         throw new IOException("No handler for result class: " + r.getClass().getSimpleName());

@@ -27,10 +27,8 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi.SteepAreaResult;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -68,15 +66,15 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class); it.valid(); it.advance()) {
       OPTICSProjector p = it.get();
-      final SteepAreaResult steep = findSteepAreaResult(p.getResult());
-      if(steep != null) {
+      ClusterOrder co = p.getResult();
+      It<OPTICSXi.SteepAreaResult> r = co.getHierarchy().iterChildren(co).filter(OPTICSXi.SteepAreaResult.class);
+      if(r.valid()) {
         final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
         task.level = VisualizationTask.LEVEL_DATA + 1;
         context.addVis(p, task);
-        context.addVis(steep, task);
+        context.addVis(r.get(), task);
       }
     }
   }
@@ -90,21 +88,6 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
   public boolean allowThumbnails(VisualizationTask task) {
     // Don't use thumbnails
     return false;
-  }
-
-  /**
-   * Find the OPTICS clustering child of a cluster order.
-   *
-   * @param co Cluster order
-   * @return OPTICS clustering
-   */
-  protected static OPTICSXi.SteepAreaResult findSteepAreaResult(ClusterOrder co) {
-    for(Hierarchy.Iter<Result> r = co.getHierarchy().iterChildren(co); r.valid(); r.advance()) {
-      if(OPTICSXi.SteepAreaResult.class.isInstance(r.get())) {
-        return (OPTICSXi.SteepAreaResult) r.get();
-      }
-    }
-    return null;
   }
 
   /**
@@ -141,7 +124,8 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
      */
     public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(task, plot, width, height, proj);
-      this.areas = findSteepAreaResult(this.optics.getResult());
+      ClusterOrder co = this.optics.getResult();
+      this.areas = co.getHierarchy().iterChildren(co).filter(OPTICSXi.SteepAreaResult.class).get();
     }
 
     @Override

@@ -29,8 +29,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -79,8 +78,7 @@ public class UncertainInstancesVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
       // Find a scatter plot visualizing uncertain objects:
       ScatterPlotProjector<?> p = it.get();
       Relation<?> r = p.getRelation();
@@ -139,16 +137,15 @@ public class UncertainInstancesVisualization extends AbstractVisFactory {
       // If this is a sample from the uncertain database, it must have a parent
       // relation containing vectors, which is a child to the uncertain
       // database.
-      Hierarchy.Iter<Result> it = context.getHierarchy().iterAncestors(c);
       Relation<? extends NumberVector> srel = null;
       boolean isChild = false;
-      for(; it.valid(); it.advance()) {
-        Result r = it.get();
+      for(It<Relation<?>> it = context.getHierarchy().iterAncestors(c).filter(Relation.class); it.valid(); it.advance()) {
+        Relation<?> r = it.get();
         if(r == this.rel) {
           isChild = true;
         }
-        else if(r instanceof Relation) {
-          final SimpleTypeInformation<?> type = ((Relation<?>) r).getDataTypeInformation();
+        else {
+          final SimpleTypeInformation<?> type = r.getDataTypeInformation();
           if(TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(type)) {
             @SuppressWarnings("unchecked")
             Relation<? extends NumberVector> vr = (Relation<? extends NumberVector>) r;

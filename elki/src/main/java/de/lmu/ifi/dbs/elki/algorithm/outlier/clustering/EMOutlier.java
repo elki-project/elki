@@ -36,13 +36,12 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -97,14 +96,9 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
     emClustering.setSoft(true);
     Clustering<?> emresult = emClustering.run(database, relation);
     Relation<double[]> soft = null;
-    for(Iter<Result> iter = emresult.getHierarchy().iterChildren(emresult); iter.valid(); iter.advance()) {
-      if(!(iter.get() instanceof Relation)) {
-        continue;
-      }
-      if(((Relation<?>) iter.get()).getDataTypeInformation() == EM.SOFT_TYPE) {
-        @SuppressWarnings("unchecked")
-        Relation<double[]> rel = (Relation<double[]>) iter.get();
-        soft = rel;
+    for(It<Relation<double[]>> iter = emresult.getHierarchy().iterChildren(emresult).filter(Relation.class); iter.valid(); iter.advance()) {
+      if(iter.get().getDataTypeInformation() == EM.SOFT_TYPE) {
+        soft = iter.get();
       }
     }
 

@@ -31,7 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -60,9 +60,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  */
 @Title("COP: Correlation Outlier Probability")
 @Reference(authors = "Hans-Peter Kriegel, Peer Kröger, Erich Schubert, Arthur Zimek", //
-title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
-booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)", //
-url = "http://dx.doi.org/10.1109/ICDM.2012.21")
+    title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
+    booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)", //
+    url = "http://dx.doi.org/10.1109/ICDM.2012.21")
 public class COPVectorVisualization extends AbstractVisFactory {
   /**
    * A short name characterizing this Visualizer.
@@ -90,8 +90,7 @@ public class COPVectorVisualization extends AbstractVisFactory {
         if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel2.getDataTypeInformation())) {
           return;
         }
-        Hierarchy.Iter<Relation<?>> it1 = VisualizationTree.filterResults(context, o, Relation.class);
-        for(; it1.valid(); it1.advance()) {
+        for(It<Relation<?>> it1 = VisualizationTree.filterResults(context, o, Relation.class); it1.valid(); it1.advance()) {
           Relation<?> rel = it1.get();
           if(!rel.getShortName().equals(COP.COP_ERRORVEC)) {
             continue;

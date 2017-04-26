@@ -36,9 +36,8 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 
@@ -89,18 +88,19 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
     storage = DataStoreUtil.makeStorage(relation.getDBIDs(), DataStoreFactory.HINT_STATIC, KNNList.class);
     MeanVariance pagesize = new MeanVariance();
     MeanVariance ksize = new MeanVariance();
-    if(getLogger().isVerbose()) {
-      getLogger().verbose("Approximating nearest neighbor lists to database objects");
+    final Logging log = getLogger();
+    if(log.isVerbose()) {
+      log.verbose("Approximating nearest neighbor lists to database objects");
     }
 
     List<E> leaves = index.getLeaves();
-    FiniteProgress progress = getLogger().isVerbose() ? new FiniteProgress("Processing leaf nodes", leaves.size(), getLogger()) : null;
+    FiniteProgress progress = log.isVerbose() ? new FiniteProgress("Processing leaf nodes", leaves.size(), log) : null;
     for(E leaf : leaves) {
       N node = index.getNode(leaf);
       int size = node.getNumEntries();
       pagesize.put(size);
-      if(getLogger().isDebuggingFinest()) {
-        getLogger().debugFinest("NumEntires = " + size);
+      if(log.isDebuggingFinest()) {
+        log.debugFinest("NumEntires = " + size);
       }
       // Collect the ids in this node.
       ArrayModifiableDBIDs ids = DBIDUtil.newArray(size);
@@ -129,31 +129,26 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
         ksize.put(kNN.size());
         storage.put(id, kNN.toKNNList());
       }
-      if(getLogger().isDebugging() && cache.size() > 0) {
-        getLogger().warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
+      if(log.isDebugging() && cache.size() > 0) {
+        log.warning("Cache should be empty after each run, but still has " + cache.size() + " elements.");
       }
-      getLogger().incrementProcessed(progress);
+      log.incrementProcessed(progress);
     }
-    getLogger().ensureCompleted(progress);
-    if(getLogger().isVerbose()) {
-      getLogger().verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getSampleStddev());
-      getLogger().verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");
+    log.ensureCompleted(progress);
+    if(log.isVerbose()) {
+      log.verbose("Average page size = " + pagesize.getMean() + " +- " + pagesize.getSampleStddev());
+      log.verbose("On average, " + ksize.getMean() + " +- " + ksize.getSampleStddev() + " neighbors returned.");
     }
   }
 
-  @SuppressWarnings("unchecked")
   protected SpatialIndexTree<N, E> getSpatialIndex(Relation<O> relation) {
     SpatialIndexTree<N, E> ret = null;
-    for(Hierarchy.Iter<Result> iter = relation.getHierarchy().iterDescendants(relation); iter.valid(); iter.advance()) {
-      Result r = iter.get();
-      if(!(r instanceof SpatialIndexTree)) {
-        continue;
-      }
+    for(It<SpatialIndexTree<N, E>> iter = relation.getHierarchy().iterDescendants(relation).filter(SpatialIndexTree.class); iter.valid(); iter.advance()) {
       if(ret != null) {
         throw new IllegalStateException("More than one spatial index found - this is not supported!");
       }
       // FIXME: check we got the right the representation
-      ret = (SpatialIndexTree<N, E>) r;
+      ret = (SpatialIndexTree<N, E>) iter.get();
     }
     if(ret == null) {
       throw new IllegalStateException("No spatial index found!");

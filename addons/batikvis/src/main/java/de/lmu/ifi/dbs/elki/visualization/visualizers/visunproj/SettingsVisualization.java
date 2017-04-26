@@ -26,7 +26,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.TrackedParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ClassParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -133,8 +133,7 @@ public class SettingsVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<SettingsResult> it = VisualizationTree.filterResults(context, start, SettingsResult.class);
-    for(; it.valid(); it.advance()) {
+    for(It<SettingsResult> it = VisualizationTree.filterResults(context, start, SettingsResult.class); it.valid(); it.advance()) {
       SettingsResult sr = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, SettingsVisualization.this);
       task.reqwidth = 1.0;

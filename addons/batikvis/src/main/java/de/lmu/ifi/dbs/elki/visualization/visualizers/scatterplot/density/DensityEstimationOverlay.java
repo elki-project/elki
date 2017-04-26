@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.KMLOutputHandler;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -80,8 +80,7 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
       ScatterPlotProjector<?> p = it.get();
       final Relation<?> rel = p.getRelation();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
@@ -149,8 +148,8 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
     }
 
     @Reference(authors = "D. W. Scott", title = "Multivariate density estimation: Theory, Practice, and Visualization", //
-    booktitle = "Multivariate Density Estimation: Theory, Practice, and Visualization", //
-    url = "http://dx.doi.org/10.1002/9780470316849")
+        booktitle = "Multivariate Density Estimation: Theory, Practice, and Visualization", //
+        url = "http://dx.doi.org/10.1002/9780470316849")
     private double[] initializeBandwidth(double[][] data) {
       MeanVariance mv0 = new MeanVariance();
       MeanVariance mv1 = new MeanVariance();

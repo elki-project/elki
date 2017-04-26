@@ -34,7 +34,7 @@ import org.w3c.dom.Node;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
+import de.lmu.ifi.dbs.elki.visualization.projector.Projector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGEffects;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
@@ -356,8 +357,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
     Visualization vis = taskmap.get(task);
     if(vis == null) { // Unknown only.
       boolean include = false;
-      Hierarchy.Iter<Object> it = context.getVisHierarchy().iterAncestors(current);
-      for(; it.valid(); it.advance()) {
+      for(It<Projector> it = context.getVisHierarchy().iterAncestors(current).filter(Projector.class); it.valid(); it.advance()) {
         if((item.proj != null && item.proj.getProjector() == it.get()) || taskmap.containsKey(it.get())) {
           include = true;
           break;

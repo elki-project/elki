@@ -24,8 +24,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.FilteredIter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.SubtypeIt;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -59,17 +59,15 @@ public class HistogramFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<Relation<?>> it1 = VisualizationTree.filterResults(context, start, Relation.class);
-    candidate: for(; it1.valid(); it1.advance()) {
+    candidate: for(It<Relation<?>> it1 = VisualizationTree.filterResults(context, start, Relation.class); it1.valid(); it1.advance()) {
       Relation<?> rel = it1.get();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         continue;
       }
       // Do not enable nested relations by default:
-      Hierarchy.Iter<Relation<?>> it2 = new FilteredIter<>(context.getHierarchy().iterAncestors(rel), Relation.class);
-      for(; it2.valid(); it2.advance()) {
+      for(It<Relation<?>> it2 = new SubtypeIt<>(context.getHierarchy().iterAncestors(rel), Relation.class); it2.valid(); it2.advance()) {
         // Parent relation
-        final Relation<?> rel2 = (Relation<?>) it2.get();
+        final Relation<?> rel2 = it2.get();
         if(TypeUtil.SPATIAL_OBJECT.isAssignableFromType(rel2.getDataTypeInformation())) {
           continue candidate;
         }

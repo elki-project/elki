@@ -26,8 +26,7 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.FilteredIter;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -69,20 +68,16 @@ public class ScatterPlotFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<Relation<?>> it = VisualizationTree.filterResults(context, start, Relation.class);
-    candidate: for(; it.valid(); it.advance()) {
+    candidate: for(It<Relation<?>> it = VisualizationTree.filterResults(context, start, Relation.class); it.valid(); it.advance()) {
       Relation<?> rel = it.get();
       final int dim = dimensionality(rel);
       if(dim < 1) {
         continue;
       }
       // Do not enable nested relations by default:
-      Hierarchy.Iter<Relation<?>> it2 = new FilteredIter<>(context.getHierarchy().iterAncestors(rel), Relation.class);
-      for(; it2.valid(); it2.advance()) {
+      for(It<Relation<?>> it2 = context.getHierarchy().iterAncestors(rel).filter(Relation.class); it2.valid(); it2.advance()) {
         // Parent relation
-        final Relation<?> rel2 = (Relation<?>) it2.get();
-        final int odim = dimensionality(rel2);
-        if(odim == dim) {
+        if(dimensionality(it2.get()) == dim) {
           // TODO: add Actions instead?
           continue candidate;
         }

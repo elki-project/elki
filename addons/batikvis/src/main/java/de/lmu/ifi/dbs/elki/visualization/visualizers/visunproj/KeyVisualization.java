@@ -33,7 +33,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -73,12 +73,10 @@ public class KeyVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     // Ensure there is a clustering result:
-    Hierarchy.Iter<Clustering<?>> it = VisualizationTree.filterResults(context, start, Clustering.class);
-    if(!it.valid()) {
+    if(!VisualizationTree.filterResults(context, start, Clustering.class).valid()) {
       return;
     }
-    Hierarchy.Iter<VisualizationTask> i2 = VisualizationTree.filter(context, VisualizationTask.class);
-    for(; i2.valid(); i2.advance()) {
+    for(It<VisualizationTask> i2 = VisualizationTree.filter(context, VisualizationTask.class); i2.valid(); i2.advance()) {
       if(i2.get().getFactory() instanceof KeyVisualization) {
         return; // At most one key per plot.
       }
@@ -100,7 +98,7 @@ public class KeyVisualization extends AbstractVisFactory {
   protected static <M extends Model> int[] findDepth(Clustering<M> c) {
     final Hierarchy<Cluster<M>> hier = c.getClusterHierarchy();
     int[] size = { 0, 0 };
-    for(Iter<Cluster<M>> iter = c.iterToplevelClusters(); iter.valid(); iter.advance()) {
+    for(It<Cluster<M>> iter = c.iterToplevelClusters(); iter.valid(); iter.advance()) {
       findDepth(hier, iter.get(), size);
     }
     return size;
@@ -115,7 +113,7 @@ public class KeyVisualization extends AbstractVisFactory {
    */
   private static <M extends Model> void findDepth(Hierarchy<Cluster<M>> hier, Cluster<M> cluster, int[] size) {
     if(hier.numChildren(cluster) > 0) {
-      for(Iter<Cluster<M>> iter = hier.iterChildren(cluster); iter.valid(); iter.advance()) {
+      for(It<Cluster<M>> iter = hier.iterChildren(cluster); iter.valid(); iter.advance()) {
         findDepth(hier, iter.get(), size);
       }
       size[0] += 1; // Depth
@@ -250,7 +248,8 @@ public class KeyVisualization extends AbstractVisFactory {
           i++;
         }
         // Hierarchical clustering. Draw recursively.
-        DoubleDoublePair size = new DoubleDoublePair(0., 1.), pos = new DoubleDoublePair(0., 1.);
+        DoubleDoublePair size = new DoubleDoublePair(0., 1.),
+            pos = new DoubleDoublePair(0., 1.);
         Hierarchy<Cluster<Model>> hier = clustering.getClusterHierarchy();
         for(Cluster<Model> cluster : topcs) {
           drawHierarchy(svgp, ml, size, pos, 0, cluster, cnum, hier);
@@ -271,7 +270,7 @@ public class KeyVisualization extends AbstractVisFactory {
       double posy;
       if(numc > 0) {
         double[] mids = new double[numc];
-        Iter<Cluster<Model>> iter = hier.iterChildren(cluster);
+        It<Cluster<Model>> iter = hier.iterChildren(cluster);
         for(int i = 0; iter.valid(); iter.advance(), i++) {
           mids[i] = drawHierarchy(svgp, ml, size, subpos, depth, iter.get(), cnum, hier);
         }

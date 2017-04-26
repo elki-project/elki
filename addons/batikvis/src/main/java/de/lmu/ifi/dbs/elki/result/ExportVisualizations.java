@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.result.ResultHandler;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -170,30 +171,16 @@ public class ExportVisualizations implements ResultHandler {
 
     // Projected visualizations
     Hierarchy<Object> vistree = context.getVisHierarchy();
-    for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
-      if(!(iter2.get() instanceof Projector)) {
-        continue;
-      }
-      Projector proj = (Projector) iter2.get();
+    for(It<Projector> iter2 = vistree.iterAll().filter(Projector.class); iter2.valid(); iter2.advance()) {
       // TODO: allow selecting individual projections only.
-      Collection<PlotItem> items = proj.arrange(context);
+      Collection<PlotItem> items = iter2.get().arrange(context);
       for(PlotItem item : items) {
         processItem(item);
       }
     }
-    for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
-      if(!(iter2.get() instanceof VisualizationTask)) {
-        continue;
-      }
-      VisualizationTask task = (VisualizationTask) iter2.get();
-      boolean isprojected = false;
-      for(Hierarchy.Iter<?> iter = vistree.iterParents(task); iter.valid(); iter.advance()) {
-        if(iter.get() instanceof Projector) {
-          isprojected = true;
-          break;
-        }
-      }
-      if(isprojected) {
+    for(It<VisualizationTask> iter2 = vistree.iterAll().filter(VisualizationTask.class); iter2.valid(); iter2.advance()) {
+      VisualizationTask task = iter2.get();
+      if(vistree.iterParents(task).filter(Projector.class).valid()) {
         continue;
       }
       PlotItem pi = new PlotItem(ratio, 1.0, null);

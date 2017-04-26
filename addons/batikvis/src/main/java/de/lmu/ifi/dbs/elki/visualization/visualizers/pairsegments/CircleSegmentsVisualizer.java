@@ -43,7 +43,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
@@ -117,11 +117,11 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<Segments> it1 = VisualizationTree.filterResults(context, start, Segments.class);
+    It<Segments> it1 = VisualizationTree.filterResults(context, start, Segments.class);
     for(; it1.valid(); it1.advance()) {
       Segments segmentResult = it1.get();
       SegmentsStylingPolicy policy;
-      Hierarchy.Iter<SegmentsStylingPolicy> it = VisualizationTree.filter(context, segmentResult, SegmentsStylingPolicy.class);
+      It<SegmentsStylingPolicy> it = VisualizationTree.filter(context, segmentResult, SegmentsStylingPolicy.class);
       if(it.valid()) {
         policy = it.get();
       }

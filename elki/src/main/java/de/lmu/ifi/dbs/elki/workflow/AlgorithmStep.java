@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -85,15 +85,12 @@ public class AlgorithmStep implements WorkflowStep {
     ResultHierarchy hier = database.getHierarchy();
     if(LOG.isStatistics()) {
       boolean first = true;
-      for(Iter<Result> it = hier.iterDescendants(database); it.valid(); it.advance()) {
-        if(!(it.get() instanceof Index)) {
-          continue;
-        }
+      for(It<Index> it = hier.iterDescendants(database).filter(Index.class); it.valid(); it.advance()) {
         if(first) {
           LOG.statistics("Index statistics before running algorithms:");
           first = false;
         }
-        ((Index) it.get()).logStatistics();
+        it.get().logStatistics();
       }
     }
     stepresult = new BasicResult("Algorithm Step", "algorithm-step");
@@ -106,15 +103,12 @@ public class AlgorithmStep implements WorkflowStep {
       }
       if(LOG.isStatistics()) {
         boolean first = true;
-        for(Iter<Result> it = hier.iterDescendants(database); it.valid(); it.advance()) {
-          if(!(it.get() instanceof Index)) {
-            continue;
-          }
+        for(It<Index> it = hier.iterDescendants(database).filter(Index.class); it.valid(); it.advance()) {
           if(first) {
             LOG.statistics("Index statistics after running algorithm " + algorithm.toString() + ":");
             first = false;
           }
-          ((Index) it.get()).logStatistics();
+          it.get().logStatistics();
         }
       }
       if(res != null) {

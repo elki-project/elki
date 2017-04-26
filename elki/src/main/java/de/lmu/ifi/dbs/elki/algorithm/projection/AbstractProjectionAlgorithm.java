@@ -26,7 +26,7 @@ import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 
 /**
@@ -41,6 +41,7 @@ public abstract class AbstractProjectionAlgorithm<R extends Result> extends Abst
    * Keep the original data relation.
    */
   private boolean keep;
+
   /**
    * Flag to keep the original projection
    */
@@ -68,15 +69,12 @@ public abstract class AbstractProjectionAlgorithm<R extends Result> extends Abst
       return;
     }
     boolean first = true;
-    for(Iter<Result> it = relation.getHierarchy().iterDescendants(relation); it.valid(); it.advance()) {
-      if(!(it.get() instanceof Index)) {
-        continue;
-      }
+    for(It<Index> it = relation.getHierarchy().iterDescendants(relation).filter(Index.class); it.valid(); it.advance()) {
       if(first) {
         Logging.getLogger(getClass()).statistics("Index statistics when removing initial data relation.");
         first = false;
       }
-      ((Index) it.get()).logStatistics();
+      it.get().logStatistics();
     }
     ResultUtil.removeRecursive(relation.getHierarchy(), relation);
   }

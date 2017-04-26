@@ -24,8 +24,8 @@ import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
  * Class to store a hierarchy of result objects.
@@ -61,7 +61,7 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
       // Merge hierarchy
       hr.setHierarchy(this);
       // Add children of child
-      for(Hierarchy.Iter<Result> iter = h.iterChildren(hr); iter.valid(); iter.advance()) {
+      for(It<Result> iter = h.iterChildren(hr); iter.valid(); iter.advance()) {
         Result desc = iter.get();
         this.add(hr, desc);
         if(desc instanceof HierarchicalResult) {

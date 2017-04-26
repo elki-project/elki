@@ -40,7 +40,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.parser.ClusteringVectorParser;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -146,29 +146,23 @@ public class ClusteringVectorDumper implements ResultHandler {
    */
   protected void dumpClusteringOutput(PrintStream writer, ResultHierarchy hierarchy, Clustering<?> c) {
     DBIDRange ids = null;
-    for(Iter<Result> iter = hierarchy.iterParents(c); iter.valid(); iter.advance()) {
-      Result parent = iter.get();
-      if(parent instanceof Relation) {
-        DBIDs pids = ((Relation<?>) parent).getDBIDs();
+    for(It<Relation<?>> iter = hierarchy.iterParents(c).filter(Relation.class); iter.valid(); iter.advance()) {
+      DBIDs pids = iter.get().getDBIDs();
+      if(pids instanceof DBIDRange) {
+        ids = (DBIDRange) pids;
+        break;
+      }
+      LOG.warning("Parent result " + iter.get().getLongName() + " has DBID type " + pids.getClass());
+    }
+    // Fallback: try to locate a database.
+    if(ids == null) {
+      for(It<Database> iter = hierarchy.iterAll().filter(Database.class); iter.valid(); iter.advance()) {
+        DBIDs pids = iter.get().getRelation(TypeUtil.ANY).getDBIDs();
         if(pids instanceof DBIDRange) {
           ids = (DBIDRange) pids;
           break;
         }
-        LOG.warning("Parent result " + parent.getLongName() + " has DBID type " + pids.getClass());
-      }
-    }
-    // Fallback: try to locate a database.
-    if(ids == null) {
-      for(Iter<Result> iter = hierarchy.iterAll(); iter.valid(); iter.advance()) {
-        Result parent = iter.get();
-        if(parent instanceof Database) {
-          DBIDs pids = ((Database) parent).getRelation(TypeUtil.ANY).getDBIDs();
-          if(pids instanceof DBIDRange) {
-            ids = (DBIDRange) pids;
-            break;
-          }
-          LOG.warning("Parent result " + parent.getLongName() + " has DBID type " + pids.getClass());
-        }
+        LOG.warning("Parent result " + iter.get().getLongName() + " has DBID type " + pids.getClass());
       }
     }
     if(ids == null) {
@@ -243,7 +237,7 @@ public class ClusteringVectorDumper implements ResultHandler {
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       FileParameter outputP = new FileParameter(OUT_ID, FileParameter.FileType.OUTPUT_FILE) //
-      .setOptional(true);
+          .setOptional(true);
       if(config.grab(outputP)) {
         outputFile = outputP.getValue();
       }
@@ -254,7 +248,7 @@ public class ClusteringVectorDumper implements ResultHandler {
       }
 
       StringParameter labelP = new StringParameter(FORCE_LABEL_ID) //
-      .setOptional(true);
+          .setOptional(true);
       if(config.grab(labelP)) {
         forceLabel = labelP.getValue();
       }
@@ -264,6 +258,5 @@ public class ClusteringVectorDumper implements ResultHandler {
     protected ClusteringVectorDumper makeInstance() {
       return new ClusteringVectorDumper(outputFile, append, forceLabel);
     }
-
   }
 }

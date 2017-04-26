@@ -64,7 +64,7 @@ import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -108,9 +108,9 @@ import net.jafama.FastMath;
  * @apiviz.has RepresentativenessEvaluation
  */
 @Reference(authors = "Andreas Züfle, Tobias Emrich, Klaus Arthur Schmid, Nikos Mamoulis, Arthur Zimek, Mathias Renz", //
-title = "Representative clustering of uncertain data", //
-booktitle = "Proc. 20th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining", //
-url = "http://dx.doi.org/10.1145/2623330.2623725")
+    title = "Representative clustering of uncertain data", //
+    booktitle = "Proc. 20th ACM SIGKDD International Conference on Knowledge Discovery and Data Mining", //
+    url = "http://dx.doi.org/10.1145/2623330.2623725")
 public class RepresentativeUncertainClustering extends AbstractAlgorithm<Clustering<Model>> implements ClusteringAlgorithm<Clustering<Model>> {
   /**
    * Initialize a Logger.
@@ -270,11 +270,8 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     Collections.sort(evaluated, Collections.reverseOrder());
     for(DoubleObjPair<Clustering<?>> pair : evaluated) {
       // Attach parent relation (= sample) to the representative samples.
-      Hierarchy.Iter<Result> it = hierarchy.iterParents(pair.second);
-      for(; it.valid(); it.advance()) {
-        if(it.get() instanceof Relation) {
-          hierarchy.add(reps, it.get());
-        }
+      for(It<Relation<?>> it = hierarchy.iterParents(pair.second).filter(Relation.class); it.valid(); it.advance()) {
+        hierarchy.add(reps, it.get());
       }
     }
     // Add the random samples below the representative results only:
@@ -468,7 +465,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       if(chain.grab(malgorithm)) {
         metaAlgorithm = malgorithm.instantiateClass(chain);
         if(metaAlgorithm != null && metaAlgorithm.getInputTypeRestriction().length > 0 && //
-        !metaAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(Clustering.TYPE)) {
+            !metaAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(Clustering.TYPE)) {
           config.reportError(new WrongParameterValueException(malgorithm, malgorithm.getValueAsString(), "The meta clustering algorithm (as configured) does not accept clustering results."));
         }
       }
@@ -476,7 +473,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       if(config.grab(palgorithm)) {
         samplesAlgorithm = palgorithm.instantiateClass(config);
         if(samplesAlgorithm != null && samplesAlgorithm.getInputTypeRestriction().length > 0 && //
-        !samplesAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
+            !samplesAlgorithm.getInputTypeRestriction()[0].isAssignableFromType(TypeUtil.NUMBER_VECTOR_FIELD)) {
           config.reportError(new WrongParameterValueException(palgorithm, palgorithm.getValueAsString(), "The inner clustering algorithm (as configured) does not accept numerical vectors: " + samplesAlgorithm.getInputTypeRestriction()[0]));
         }
       }
@@ -493,8 +490,8 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
         random = randomP.getValue();
       }
       DoubleParameter palpha = new DoubleParameter(ALPHA_ID, 0.95) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
-      .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ONE_DOUBLE) //
+          .addConstraint(CommonConstraints.LESS_THAN_ONE_DOUBLE);
       if(config.grab(palpha)) {
         alpha = palpha.doubleValue();
       }

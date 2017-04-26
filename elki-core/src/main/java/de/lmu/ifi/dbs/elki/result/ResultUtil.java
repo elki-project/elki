@@ -26,7 +26,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
  * Utilities for handling result objects
@@ -118,19 +118,10 @@ public class ResultUtil {
    * @param restrictionClass Class restriction
    * @return filtered results list
    */
-  // We can't ensure that restrictionClass matches C exactly.
-  @SuppressWarnings("unchecked")
   public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Result r, Class<? super C> restrictionClass) {
     ArrayList<C> res = new ArrayList<>();
-    if(restrictionClass.isInstance(r)) {
-      res.add((C) restrictionClass.cast(r));
-    }
-    for(Hierarchy.Iter<Result> iter = hier.iterDescendants(r); iter.valid(); iter.advance()) {
-      Result result = iter.get();
-      if(restrictionClass.isInstance(result)) {
-        res.add((C) restrictionClass.cast(result));
-      }
-    }
+    final It<C> it = hier.iterDescendantsSelf(r).filter(restrictionClass);
+    it.forEach(res::add);
     return res;
   }
 
@@ -142,16 +133,10 @@ public class ResultUtil {
    * @param restrictionClass Class restriction
    * @return filtered results list
    */
-  // We can't ensure that restrictionClass matches C exactly.
-  @SuppressWarnings("unchecked")
   public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Class<? super C> restrictionClass) {
     ArrayList<C> res = new ArrayList<>();
-    for(Hierarchy.Iter<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
-      Result result = iter.get();
-      if(restrictionClass.isInstance(result)) {
-        res.add((C) restrictionClass.cast(result));
-      }
-    }
+    It<C> it = hier.iterAll().filter(restrictionClass);
+    it.forEach(res::add);
     return res;
   }
 
@@ -194,10 +179,10 @@ public class ResultUtil {
    * @param child Result to remove
    */
   public static void removeRecursive(ResultHierarchy hierarchy, Result child) {
-    for(Hierarchy.Iter<Result> iter = hierarchy.iterParents(child); iter.valid(); iter.advance()) {
+    for(It<Result> iter = hierarchy.iterParents(child); iter.valid(); iter.advance()) {
       hierarchy.remove(iter.get(), child);
     }
-    for(Hierarchy.Iter<Result> iter = hierarchy.iterChildren(child); iter.valid(); iter.advance()) {
+    for(It<Result> iter = hierarchy.iterChildren(child); iter.valid(); iter.advance()) {
       removeRecursive(hierarchy, iter.get());
     }
   }

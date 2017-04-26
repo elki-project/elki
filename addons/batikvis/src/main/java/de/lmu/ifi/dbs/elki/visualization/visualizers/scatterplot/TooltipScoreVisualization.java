@@ -30,10 +30,8 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -116,10 +114,8 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
     VisualizationTree.findNewSiblings(context, result, DoubleRelation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<DoubleRelation, ScatterPlotProjector<?>>() {
       @Override
       public void process(VisualizerContext context, DoubleRelation r, ScatterPlotProjector<?> p) {
-        for(Iter<Result> it = hier.iterParents(r); it.valid(); it.advance()) {
-          if(it.get() instanceof OutlierResult) {
-            return; // Handled by above case already.
-          }
+        if(hier.iterParents(r).filter(OutlierResult.class).valid()) {
+          return; // Handled by above case already.
         }
         final Relation<?> rel = p.getRelation();
         if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {

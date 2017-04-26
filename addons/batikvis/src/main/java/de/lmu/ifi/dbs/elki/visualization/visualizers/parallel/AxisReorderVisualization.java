@@ -27,7 +27,7 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -72,8 +72,7 @@ public class AxisReorderVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class); it.valid(); it.advance()) {
       ParallelPlotProjector<?> p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), AxisReorderVisualization.this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;

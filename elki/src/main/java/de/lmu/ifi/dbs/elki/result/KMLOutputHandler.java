@@ -60,8 +60,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
@@ -97,9 +97,9 @@ import net.jafama.FastMath;
  */
 // TODO: make configurable color scheme
 @Reference(authors = "E. Achtert, A. Hettab, H.-P. Kriegel, E. Schubert, A. Zimek", //
-booktitle = "Proc. 12th International Symposium on Spatial and Temporal Databases (SSTD), Minneapolis, MN, 2011", //
-title = "Spatial Outlier Detection: Data, Algorithms, Visualizations", //
-url = "http://dx.doi.org/10.1007/978-3-642-22922-0_41")
+    booktitle = "Proc. 12th International Symposium on Spatial and Temporal Databases (SSTD), Minneapolis, MN, 2011", //
+    title = "Spatial Outlier Detection: Data, Algorithms, Visualizations", //
+    url = "http://dx.doi.org/10.1007/978-3-642-22922-0_41")
 public class KMLOutputHandler implements ResultHandler {
   /**
    * Logger class to use.
@@ -522,7 +522,7 @@ public class KMLOutputHandler implements ResultHandler {
     if(hier != null && hulls != null) {
       final int numc = hier.numChildren(clu);
       if(numc > 0) {
-        for(Iter<Cluster<Model>> iter = hier.iterChildren(clu); iter.valid(); iter.advance()) {
+        for(It<Cluster<Model>> iter = hier.iterChildren(clu); iter.valid(); iter.advance()) {
           final Cluster<Model> iclu = iter.get();
           DoubleObjPair<Polygon> poly = hulls.get(iclu);
           if(poly == null) {

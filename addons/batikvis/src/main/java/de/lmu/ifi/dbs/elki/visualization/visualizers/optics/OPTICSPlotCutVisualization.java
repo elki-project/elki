@@ -29,7 +29,7 @@ import org.w3c.dom.svg.SVGPoint;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.Model;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -72,8 +72,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    Hierarchy.Iter<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class); it.valid(); it.advance()) {
       OPTICSProjector p = it.get();
       final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
@@ -195,7 +194,7 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
 
       if(eventarea == null) {
         eventarea = new DragableArea(svgp, StyleLibrary.SCALE, -StyleLibrary.SCALE * 0.01, //
-        StyleLibrary.SCALE * 0.1, plotheight + StyleLibrary.SCALE * 0.02, this);
+            StyleLibrary.SCALE * 0.1, plotheight + StyleLibrary.SCALE * 0.02, this);
         layer.appendChild(eventarea.getElement());
       }
     }

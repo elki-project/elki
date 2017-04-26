@@ -32,7 +32,7 @@ import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy.Iter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
  * This class will log simple statistics on the clusters detected, such as the
@@ -80,7 +80,7 @@ public class LogClusterSizes implements Evaluator {
       if(h.numChildren(clu) > 0) {
         // TODO: this only works if we have cluster names!
         StringBuilder buf = new StringBuilder();
-        for(Iter<Cluster<C>> it = h.iterChildren(clu); it.valid(); it.advance()) {
+        for(It<Cluster<C>> it = h.iterChildren(clu); it.valid(); it.advance()) {
           if(buf.length() > 0) {
             buf.append(", ");
           }

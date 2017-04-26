@@ -23,7 +23,11 @@ package de.lmu.ifi.dbs.elki.index.preprocessed.knn;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
-import de.lmu.ifi.dbs.elki.database.ids.*;
+import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDPair;
+import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.KNNHeap;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -34,11 +38,9 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
-
 import gnu.trove.impl.Constants;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
 
@@ -147,19 +149,14 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    * @return Metrical index
    * @throws IllegalStateException when the cast fails.
    */
-  @SuppressWarnings("unchecked")
   private MetricalIndexTree<O, N, E> getMetricalIndex(Relation<O> relation) throws IllegalStateException {
     MetricalIndexTree<O, N, E> ret = null;
-    for(Hierarchy.Iter<Result> iter = relation.getHierarchy().iterDescendants(relation); iter.valid(); iter.advance()) {
-      Result r = iter.get();
-      if(!(r instanceof MetricalIndexTree)) {
-        continue;
-      }
+    for(It<MetricalIndexTree<O, N, E>> iter = relation.getHierarchy().iterDescendants(relation).filter(MetricalIndexTree.class); iter.valid(); iter.advance()) {
       if(ret != null) {
         throw new IllegalStateException("More than one metrical index found - this is not supported!");
       }
       // FIXME: check we got the right the representation
-      ret = (MetricalIndexTree<O, N, E>) r;
+      ret = iter.get();
     }
     if(ret == null) {
       throw new IllegalStateException("No metrical index found!");

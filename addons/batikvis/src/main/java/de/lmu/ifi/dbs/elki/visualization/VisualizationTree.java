@@ -23,10 +23,11 @@ package de.lmu.ifi.dbs.elki.visualization;
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.FilteredIter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.StackedIter;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.EmptyIterator;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
  * Tree - actually a forest - to manage visualizations.
@@ -92,6 +93,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    *
    * @param <A> Object type
    */
+  @FunctionalInterface
   public static interface Handler1<A> {
     /**
      * Process a new result.
@@ -110,6 +112,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @param <A> Object type
    * @param <B> Object type
    */
+  @FunctionalInterface
   public static interface Handler2<A, B> {
     /**
      * Process a new result.
@@ -130,6 +133,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @param <B> Object type
    * @param <C> Object type
    */
+  @FunctionalInterface
   public static interface Handler3<A, B, C> {
     /**
      * Process a new result.
@@ -152,14 +156,8 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @param <O> Object type
    * @return Iterator of results.
    */
-  @SuppressWarnings("unchecked")
-  public static <O extends VisualizationItem> Hierarchy.Iter<O> filter(VisualizerContext context, Class<? super O> clazz) {
-    Hierarchy.Iter<Result> it1 = context.getHierarchy().iterAll();
-    StackedIter<Object, Result> it2 = new StackedIter<>(it1, context.getVisHierarchy());
-    if(!it2.valid()) {
-      return HashMapHierarchy.emptyIterator();
-    }
-    return new FilteredIter<O>(it2, (Class<O>) clazz);
+  public static <O extends VisualizationItem> It<O> filter(VisualizerContext context, Class<? super O> clazz) {
+    return new StackedIter<>(context.getHierarchy().iterAll(), context.getVisHierarchy()).filter(clazz);
   }
 
   /**
@@ -173,21 +171,12 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @param <O> Object type
    * @return Iterator of results.
    */
-  @SuppressWarnings("unchecked")
-  public static <O extends VisualizationItem> Hierarchy.Iter<O> filter(VisualizerContext context, Object start, Class<? super O> clazz) {
+  public static <O extends VisualizationItem> It<O> filter(VisualizerContext context, Object start, Class<? super O> clazz) {
     if(start instanceof Result) { // In first hierarchy.
-      Hierarchy.Iter<Result> it1 = context.getHierarchy().iterDescendantsSelf((Result) start);
-      StackedIter<Object, Result> it2 = new StackedIter<>(it1, context.getVisHierarchy());
-      if(!it2.valid()) {
-        return HashMapHierarchy.emptyIterator();
-      }
-      return new FilteredIter<O>(it2, (Class<O>) clazz);
+      It<Result> it1 = context.getHierarchy().iterDescendantsSelf((Result) start);
+      return new StackedIter<>(it1, context.getVisHierarchy()).filter(clazz);
     }
-    Hierarchy.Iter<Object> it2 = context.getVisHierarchy().iterDescendantsSelf(start);
-    if(!it2.valid()) {
-      return HashMapHierarchy.emptyIterator();
-    }
-    return new FilteredIter<O>(it2, (Class<O>) clazz);
+    return context.getVisHierarchy().iterDescendantsSelf(start).filter(clazz);
   }
 
   /**
@@ -199,13 +188,11 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @param <O> Result type type
    * @return Iterator of results.
    */
-  @SuppressWarnings("unchecked")
-  public static <O extends Result> Hierarchy.Iter<O> filterResults(VisualizerContext context, Object start, Class<? super O> clazz) {
+  public static <O extends Result> It<O> filterResults(VisualizerContext context, Object start, Class<? super O> clazz) {
     if(start instanceof Result) { // In first hierarchy.
-      Hierarchy.Iter<Result> it1 = context.getHierarchy().iterDescendantsSelf((Result) start);
-      return new FilteredIter<O>(it1, (Class<O>) clazz);
+      return context.getHierarchy().iterDescendantsSelf((Result) start).filter(clazz);
     }
-    return HashMapHierarchy.emptyIterator();
+    return EmptyIterator.empty();
   }
 
   /**
@@ -219,29 +206,18 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @param type1 First type
    * @param handler Handler
    */
-  @SuppressWarnings("unchecked")
   public static <A> void findNew(VisualizerContext context, Object start, Class<? super A> type1, Handler1<A> handler) {
     final Hierarchy<Object> hier = context.getVisHierarchy();
     // Children of start in first hierarchy:
     if(start instanceof Result) {
-      Hierarchy.Iter<Result> it1 = context.getHierarchy().iterDescendantsSelf((Result) start);
-      for(; it1.valid(); it1.advance()) {
-        final Result o1 = it1.get();
-        if(!(type1.isInstance(o1))) {
-          continue;
-        }
-        handler.process(context, (A) o1);
+      for(It<A> it1 = context.getHierarchy().iterDescendantsSelf((Result) start).filter(type1); it1.valid(); it1.advance()) {
+        handler.process(context, it1.get());
       }
     }
     // Children of start in second hierarchy:
     if(start instanceof VisualizationItem) {
-      Iter<Object> it1 = hier.iterDescendantsSelf(start);
-      for(; it1.valid(); it1.advance()) {
-        final Object o1 = it1.get();
-        if(!(type1.isInstance(o1))) {
-          continue;
-        }
-        handler.process(context, (A) start);
+      for(It<A> it1 = hier.iterDescendantsSelf(start).filter(type1); it1.valid(); it1.advance()) {
+        handler.process(context, it1.get());
       }
     }
   }
@@ -259,42 +235,21 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @param type2 Second type, in second hierarchy
    * @param handler Handler
    */
-  @SuppressWarnings("unchecked")
   public static <A extends Result, B extends VisualizationItem> void findNewSiblings(VisualizerContext context, Object start, Class<? super A> type1, Class<? super B> type2, Handler2<A, B> handler) {
     final Hierarchy<Object> vistree = context.getVisHierarchy();
     // Search start in first hierarchy:
     if(start instanceof Result) {
-      Hierarchy.Iter<Result> it1 = context.getHierarchy().iterDescendantsSelf((Result) start);
-      for(; it1.valid(); it1.advance()) {
-        final Result o1 = it1.get();
-        if(!(type1.isInstance(o1))) {
-          continue;
-        }
-        Iter<Object> it2 = vistree.iterDescendantsSelf(context.getBaseResult());
-        for(; it2.valid(); it2.advance()) {
-          final Object o2 = it2.get();
-          if(!(type2.isInstance(o2))) {
-            continue;
-          }
-          handler.process(context, (A) o1, (B) o2);
+      for(It<A> it1 = context.getHierarchy().iterDescendantsSelf((Result) start).filter(type1); it1.valid(); it1.advance()) {
+        for(It<B> it2 = vistree.iterDescendantsSelf(context.getBaseResult()).filter(type2); it2.valid(); it2.advance()) {
+          handler.process(context, it1.get(), it2.get());
         }
       }
     }
     // Search start in second hierarchy:
     if(start instanceof VisualizationItem) {
-      Iter<Object> it2 = vistree.iterDescendantsSelf(start);
-      for(; it2.valid(); it2.advance()) {
-        final Object o2 = it2.get();
-        if(!(type2.isInstance(o2))) {
-          continue;
-        }
-        Iter<Result> it1 = context.getHierarchy().iterAll();
-        for(; it1.valid(); it1.advance()) {
-          final Result o1 = it1.get();
-          if(!(type1.isInstance(o1))) {
-            continue;
-          }
-          handler.process(context, (A) o1, (B) o2);
+      for(It<B> it2 = vistree.iterDescendantsSelf(start).filter(type2); it2.valid(); it2.advance()) {
+        for(It<A> it1 = context.getHierarchy().iterAll().filter(type1); it1.valid(); it1.advance()) {
+          handler.process(context, it1.get(), it2.get());
         }
       }
     }
@@ -313,53 +268,27 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @param type2 Second type, in second hierarchy
    * @param handler Handler
    */
-  @SuppressWarnings("unchecked")
   public static <A extends Result, B extends VisualizationItem> void findNewResultVis(VisualizerContext context, Object start, Class<? super A> type1, Class<? super B> type2, Handler2<A, B> handler) {
     final Hierarchy<Object> hier = context.getVisHierarchy();
     // Search start in first hierarchy:
     if(start instanceof Result) {
-      Hierarchy.Iter<Result> it1 = context.getHierarchy().iterDescendantsSelf((Result) start);
-      for(; it1.valid(); it1.advance()) {
-        final Result o1 = it1.get();
-        if(!(type1.isInstance(o1))) {
-          continue;
-        }
+      for(It<A> it1 = context.getHierarchy().iterDescendantsSelf((Result) start).filter(type1); it1.valid(); it1.advance()) {
         // Nasty: we now need to search backwards for crossover points:
-        Iter<Result> it3 = context.getHierarchy().iterDescendantsSelf(o1);
-        for(; it3.valid(); it3.advance()) {
-          Iter<Object> it2 = hier.iterDescendantsSelf(it3.get());
-          for(; it2.valid(); it2.advance()) {
-            final Object o2 = it2.get();
-            if(!(type2.isInstance(o2))) {
-              continue;
-            }
-            handler.process(context, (A) o1, (B) o2);
+        for(It<Result> it3 = context.getHierarchy().iterDescendantsSelf(it1.get()); it3.valid(); it3.advance()) {
+          for(It<B> it2 = hier.iterDescendantsSelf(it3.get()).filter(type2); it2.valid(); it2.advance()) {
+            handler.process(context, it1.get(), it2.get());
           }
         }
       }
     }
     // Search start in second hierarchy:
     if(start instanceof VisualizationItem) {
-      Iter<Object> it2 = hier.iterDescendantsSelf(start);
-      for(; it2.valid(); it2.advance()) {
-        final Object o2 = it2.get();
-        if(!(type2.isInstance(o2))) {
-          continue;
-        }
+      for(It<B> it2 = hier.iterDescendantsSelf(start).filter(type2); it2.valid(); it2.advance()) {
         // Nasty: we now need to search backwards for crossover points:
-        Iter<Object> it3 = hier.iterAncestorsSelf(start);
-        for(; it3.valid(); it3.advance()) {
-          if(!(it3.get() instanceof Result)) {
-            continue;
-          }
+        for(It<Object> it3 = hier.iterAncestorsSelf(start); it3.valid(); it3.advance()) {
           // Now cross-over into primary hierarchy:
-          Iter<Result> it1 = context.getHierarchy().iterAncestorsSelf((Result) it3.get());
-          for(; it1.valid(); it1.advance()) {
-            final Result o1 = it1.get();
-            if(!(type1.isInstance(o1))) {
-              continue;
-            }
-            handler.process(context, (A) o1, (B) o2);
+          for(It<A> it1 = context.getHierarchy().iterAncestorsSelf((Result) it3.get()).filter(type1); it1.valid(); it1.advance()) {
+            handler.process(context, it1.get(), it2.get());
           }
         }
       }
@@ -377,11 +306,8 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
     // Hide other tools
     if(visibility && task.tool) {
       Hierarchy<Object> vistree = context.getVisHierarchy();
-      for(Hierarchy.Iter<?> iter2 = vistree.iterAll(); iter2.valid(); iter2.advance()) {
-        if(!(iter2.get() instanceof VisualizationTask)) {
-          continue;
-        }
-        VisualizationTask other = (VisualizationTask) iter2.get();
+      for(It<VisualizationTask> iter2 = vistree.iterAll().filter(VisualizationTask.class); iter2.valid(); iter2.advance()) {
+        VisualizationTask other = iter2.get();
         if(other != task && other.tool && other.visible) {
           other.visible = false;
           context.visChanged(other);

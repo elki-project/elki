@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVoting;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingMean;
@@ -89,9 +89,9 @@ import de.lmu.ifi.dbs.elki.workflow.InputStep;
  * @apiviz.composedOf SimilarityMatrixVisualizer
  */
 @Reference(authors = "E. Schubert, R. Wojdanowski, A. Zimek, H.-P. Kriegel", //
-title = "On Evaluation of Outlier Rankings and Outlier Scores", //
-booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.", //
-url = "http://dx.doi.org/10.1137/1.9781611972825.90")
+    title = "On Evaluation of Outlier Rankings and Outlier Scores", //
+    booktitle = "Proc. 12th SIAM International Conference on Data Mining (SDM), Anaheim, CA, 2012.", //
+    url = "http://dx.doi.org/10.1137/1.9781611972825.90")
 public class VisualizePairwiseGainMatrix extends AbstractApplication {
   /**
    * Get static logger.
@@ -254,8 +254,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     SimilarityMatrixVisualizer factory = new SimilarityMatrixVisualizer();
     factory.processNewResult(context, database);
 
-    Hierarchy.Iter<VisualizationTask> it = VisualizationTree.filter(context, VisualizationTask.class);
-    for(; it.valid(); it.advance()) {
+    for(It<VisualizationTask> it = VisualizationTree.filter(context, VisualizationTask.class); it.valid(); it.advance()) {
       VisualizationTask task = it.get();
       if(task.getFactory() == factory) {
         showVisualization(factory, task);

@@ -1,50 +1,67 @@
 /*
  * This file is part of ELKI:
  * Environment for Developing KDD-Applications Supported by Index-Structures
- *
+ * 
  * Copyright (C) 2017
  * ELKI Development Team
- *
+ * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU Affero General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package de.lmu.ifi.dbs.elki.visualization.projector;
-
-import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
-import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
-import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
 
 /**
- * Produce OPTICS plot projections
- *
+ * Empty object iterator.
+ * 
  * @author Erich Schubert
- * @since 0.2
  *
- * @apiviz.has OPTICSProjector
+ * @param <O> Object
  */
-public class OPTICSProjectorFactory implements ProjectorFactory {
+public class EmptyIterator<O> implements It<O> {
   /**
-   * Constructor.
+   * Static instance.
    */
-  public OPTICSProjectorFactory() {
-    super();
+  private static final It<Object> STATIC = new EmptyIterator<>();
+
+  /**
+   * Get an empty hierarchy iterator.
+   *
+   * @return Empty iterator
+   */
+  @SuppressWarnings("unchecked")
+  public static <O> It<O> empty() {
+    return (It<O>) STATIC;
+  }
+
+  /**
+   * Private constructor, use static {@link #empty()} instead.
+   */
+  private EmptyIterator() {
+    // Use static instance.
   }
 
   @Override
-  public void processNewResult(VisualizerContext context, Object start) {
-    for(It<ClusterOrder> it1 = VisualizationTree.filterResults(context, start, ClusterOrder.class); it1.valid(); it1.advance()) {
-      context.addVis(it1.get(), new OPTICSProjector(it1.get()));
-    }
+  public boolean valid() {
+    return false;
+  }
+
+  @Override
+  public It<O> advance() {
+    throw new UnsupportedOperationException("Empty iterators must not be advanced.");
+  }
+
+  @Override
+  public O get() {
+    throw new UnsupportedOperationException("Iterator is empty.");
   }
 }

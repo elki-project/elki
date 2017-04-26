@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -91,8 +91,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Hierarchy.Iter<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class);
-    for(; it.valid(); it.advance()) {
+    for(It<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class); it.valid(); it.advance()) {
       ParallelPlotProjector<?> p = it.get();
       Relation<?> rel = p.getRelation();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
@@ -116,7 +115,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
    *
    * @apiviz.has DBIDSelection oneway - - updates
    */
-  public class Instance extends AbstractParallelVisualization<NumberVector>implements DragableArea.DragListener {
+  public class Instance extends AbstractParallelVisualization<NumberVector> implements DragableArea.DragListener {
     /**
      * CSS class of the selection rectangle while selecting.
      */
