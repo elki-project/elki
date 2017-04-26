@@ -73,10 +73,10 @@ public class KeyVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     // Ensure there is a clustering result:
-    if(!VisualizationTree.filterResults(context, start, Clustering.class).valid()) {
+    if(!VisualizationTree.findNewResults(context, start).filter(Clustering.class).valid()) {
       return;
     }
-    for(It<VisualizationTask> i2 = VisualizationTree.filter(context, VisualizationTask.class); i2.valid(); i2.advance()) {
+    for(It<VisualizationTask> i2 = VisualizationTree.findVis(context).filter(VisualizationTask.class); i2.valid(); i2.advance()) {
       if(i2.get().getFactory() instanceof KeyVisualization) {
         return; // At most one key per plot.
       }

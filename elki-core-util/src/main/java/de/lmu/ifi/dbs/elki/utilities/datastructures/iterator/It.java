@@ -73,6 +73,23 @@ public interface It<O> extends Iter {
   }
 
   /**
+   * Find a given object in the iterator; consumes the iterator.
+   * 
+   * @param o Object to find
+   * @return {@code true} if found
+   */
+  default boolean find(Object o) {
+    while(valid()) {
+      final O cur = get();
+      if(o == cur || o.equals(cur)) {
+        return true;
+      }
+      advance();
+    }
+    return false;
+  }
+
+  /**
    * Process the remaining elements - this will invalidate the iterator.
    *
    * @param action Action to perform

@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.visualization.projector;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 
@@ -43,8 +42,8 @@ public class OPTICSProjectorFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    for(It<ClusterOrder> it1 = VisualizationTree.filterResults(context, start, ClusterOrder.class); it1.valid(); it1.advance()) {
-      context.addVis(it1.get(), new OPTICSProjector(it1.get()));
-    }
+    VisualizationTree.findNewResults(context, start).filter(ClusterOrder.class).forEach(co -> {
+      context.addVis(co, new OPTICSProjector(co));
+    });
   }
 }

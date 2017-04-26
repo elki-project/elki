@@ -30,11 +30,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.DatabaseUtil;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBID;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.evaluation.scores.ROCEvaluation;
@@ -46,7 +42,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVoting;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingMean;
@@ -254,12 +249,11 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
     SimilarityMatrixVisualizer factory = new SimilarityMatrixVisualizer();
     factory.processNewResult(context, database);
 
-    for(It<VisualizationTask> it = VisualizationTree.filter(context, VisualizationTask.class); it.valid(); it.advance()) {
-      VisualizationTask task = it.get();
+    VisualizationTree.findVis(context).filter(VisualizationTask.class).forEach(task -> {
       if(task.getFactory() == factory) {
         showVisualization(factory, task);
       }
-    }
+    });
   }
 
   /**

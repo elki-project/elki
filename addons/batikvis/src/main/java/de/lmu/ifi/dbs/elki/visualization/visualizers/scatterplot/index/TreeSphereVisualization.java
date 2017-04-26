@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mtree.MTreeNode;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -105,19 +104,16 @@ public class TreeSphereVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewSiblings(context, start, AbstractMTree.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<AbstractMTree<?, ?, ?, ?>, ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, AbstractMTree<?, ?, ?, ?> tree, ScatterPlotProjector<?> p) {
-        Relation<?> rel = p.getRelation();
-        if(!canVisualize(rel, tree)) {
-          return;
-        }
-        final VisualizationTask task = new VisualizationTask(NAME, context, tree, rel, TreeSphereVisualization.this);
-        task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
-        task.initDefaultVisibility(false);
-        context.addVis((Result) tree, task);
-        context.addVis(p, task);
+    VisualizationTree.findNewSiblings(context, start, AbstractMTree.class, ScatterPlotProjector.class, (tree, p) -> {
+      Relation<?> rel = p.getRelation();
+      if(!canVisualize(rel, tree)) {
+        return;
       }
+      final VisualizationTask task = new VisualizationTask(NAME, context, tree, rel, TreeSphereVisualization.this);
+      task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
+      task.initDefaultVisibility(false);
+      context.addVis(tree, task);
+      context.addVis(p, task);
     });
   }
 

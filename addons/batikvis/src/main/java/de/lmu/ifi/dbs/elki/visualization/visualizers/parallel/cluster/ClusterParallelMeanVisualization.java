@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -82,17 +81,16 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    for(It<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class); it.valid(); it.advance()) {
-      ParallelPlotProjector<?> p = it.get();
+    VisualizationTree.findVis(context, start).filter(ParallelPlotProjector.class).forEach(p -> {
       Relation<?> rel = p.getRelation();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        continue;
+        return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterParallelMeanVisualization.this);
+      final VisualizationTask task = new VisualizationTask(NAME, context, p, rel, ClusterParallelMeanVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA + 1;
       task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY);
       context.addVis(p, task);
-    }
+    });
   }
 
   @Override

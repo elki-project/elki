@@ -89,9 +89,9 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @apiviz.uses Instance oneway - - «create»
  */
 @Reference(title = "Evaluation of Clusterings – Metrics and Visual Support", //
-authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
-booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", //
-url = "http://dx.doi.org/10.1109/ICDE.2012.128")
+    authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
+    booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", //
+    url = "http://dx.doi.org/10.1109/ICDE.2012.128")
 public class CircleSegmentsVisualizer extends AbstractVisFactory {
   /**
    * Class logger
@@ -117,11 +117,9 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    It<Segments> it1 = VisualizationTree.filterResults(context, start, Segments.class);
-    for(; it1.valid(); it1.advance()) {
-      Segments segmentResult = it1.get();
+    VisualizationTree.findNewResults(context, start).filter(Segments.class).forEach(segmentResult -> {
       SegmentsStylingPolicy policy;
-      It<SegmentsStylingPolicy> it = VisualizationTree.filter(context, segmentResult, SegmentsStylingPolicy.class);
+      It<SegmentsStylingPolicy> it = VisualizationTree.findVis(context, segmentResult).filter(SegmentsStylingPolicy.class);
       if(it.valid()) {
         policy = it.get();
       }
@@ -136,7 +134,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
       task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
       context.addVis(segmentResult, task);
-    }
+    });
   }
 
   /**

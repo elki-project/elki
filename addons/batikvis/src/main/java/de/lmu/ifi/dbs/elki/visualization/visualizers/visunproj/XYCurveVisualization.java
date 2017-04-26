@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve.ROCResult;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -185,14 +184,13 @@ public class XYCurveVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    for(It<XYCurve> it = VisualizationTree.filterResults(context, start, XYCurve.class); it.valid(); it.advance()) {
-      XYCurve curve = it.get();
+    VisualizationTree.findNewResults(context, start).filter(XYCurve.class).forEach(curve -> {
       final VisualizationTask task = new VisualizationTask(NAME, context, curve, null, XYCurveVisualization.this);
       task.reqwidth = 1.0;
       task.reqheight = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
       context.addVis(curve, task);
-    }
+    });
   }
 
   @Override

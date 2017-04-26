@@ -26,7 +26,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.PixmapResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -62,15 +61,14 @@ public class PixmapVisualizer extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    for(It<PixmapResult> it = VisualizationTree.filterResults(context, start, PixmapResult.class); it.valid(); it.advance()) {
-      PixmapResult pr = it.get();
+    VisualizationTree.findNewResults(context, start).filter(PixmapResult.class).forEach(pr -> {
       // Add plots, attach visualizer
       final VisualizationTask task = new VisualizationTask(NAME, context, pr, null, PixmapVisualizer.this);
       task.reqwidth = pr.getImage().getWidth() / (double) pr.getImage().getHeight();
       task.reqheight = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
       context.addVis(pr, task);
-    }
+    });
   }
 
   @Override

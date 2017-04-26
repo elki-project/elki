@@ -27,7 +27,6 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.result.HistogramResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -153,14 +152,13 @@ public class HistogramVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    for(It<HistogramResult> it = VisualizationTree.filterResults(context, start, HistogramResult.class); it.valid(); it.advance()) {
-      HistogramResult histogram = it.get();
+    VisualizationTree.findNewResults(context, start).filter(HistogramResult.class).forEach(histogram -> {
       final VisualizationTask task = new VisualizationTask(NAME, context, histogram, null, HistogramVisualization.this);
       task.reqwidth = 2.0;
       task.reqheight = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
       context.addVis(histogram, task);
-    }
+    });
   }
 
   @Override

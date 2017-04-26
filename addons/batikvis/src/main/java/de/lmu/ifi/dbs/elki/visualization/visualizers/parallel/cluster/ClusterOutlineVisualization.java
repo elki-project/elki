@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -99,18 +98,17 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     // We use the style library, not individual clusterings!
-    for(It<ParallelPlotProjector<?>> it = VisualizationTree.filter(context, start, ParallelPlotProjector.class); it.valid(); it.advance()) {
-      ParallelPlotProjector<?> p = it.get();
+    VisualizationTree.findVis(context, start).filter(ParallelPlotProjector.class).forEach(p -> {
       Relation<?> rel = p.getRelation();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        continue;
+        return;
       }
       final VisualizationTask task = new VisualizationTask(NAME, context, p, rel, ClusterOutlineVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA - 1;
       task.initDefaultVisibility(false);
       task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY);
       context.addVis(p, task);
-    }
+    });
   }
 
   @Override

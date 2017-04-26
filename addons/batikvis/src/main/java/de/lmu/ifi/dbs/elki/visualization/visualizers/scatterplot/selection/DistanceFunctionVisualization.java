@@ -104,21 +104,17 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewSiblings(context, start, AbstractMaterializeKNNPreprocessor.class, ScatterPlotProjector.class, //
-        new VisualizationTree.Handler2<AbstractMaterializeKNNPreprocessor<?>, ScatterPlotProjector<?>>() {
-          @Override
-          public void process(VisualizerContext context, AbstractMaterializeKNNPreprocessor<?> kNN, ScatterPlotProjector<?> p) {
-            final Relation<?> rel = p.getRelation();
-            if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-              return;
-            }
-            final VisualizationTask task = new VisualizationTask(NAME, context, kNN, rel, DistanceFunctionVisualization.this);
-            task.level = VisualizationTask.LEVEL_DATA - 1;
-            task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_SELECTION);
-            context.addVis(kNN, task);
-            context.addVis(p, task);
-          }
-        });
+    VisualizationTree.findNewSiblings(context, start, AbstractMaterializeKNNPreprocessor.class, ScatterPlotProjector.class, (kNN, p) -> {
+      final Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        return;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, context, kNN, rel, DistanceFunctionVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA - 1;
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_SELECTION);
+      context.addVis(kNN, task);
+      context.addVis(p, task);
+    });
   }
 
   /**

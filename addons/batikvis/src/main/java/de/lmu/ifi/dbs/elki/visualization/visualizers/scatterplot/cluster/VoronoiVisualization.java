@@ -36,7 +36,6 @@ import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D;
 import de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -127,14 +126,13 @@ public class VoronoiVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
-      ScatterPlotProjector<?> p = it.get();
+    VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
       final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), VoronoiVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA + 3;
       task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
       context.addVis(p, task);
       context.addVis(p, new SwitchModeAction(task, context));
-    }
+    });
   }
 
   /**

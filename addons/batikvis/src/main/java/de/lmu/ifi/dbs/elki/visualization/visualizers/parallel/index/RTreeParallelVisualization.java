@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTreeNode;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.rstar.RStarTreeNode;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
@@ -95,17 +94,13 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewSiblings(context, start, AbstractRStarTree.class, ParallelPlotProjector.class, //
-        new VisualizationTree.Handler2<AbstractRStarTree<RStarTreeNode, SpatialEntry, ?>, ParallelPlotProjector<?>>() {
-          @Override
-          public void process(VisualizerContext context, AbstractRStarTree<RStarTreeNode, SpatialEntry, ?> tree, ParallelPlotProjector<?> p) {
-            final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, p.getRelation(), RTreeParallelVisualization.this);
-            task.level = VisualizationTask.LEVEL_BACKGROUND + 2;
-            task.default_visibility = false;
-            context.addVis((Result) tree, task);
-            context.addVis(p, task);
-          }
-        });
+    VisualizationTree.findNewSiblings(context, start, AbstractRStarTree.class, ParallelPlotProjector.class, (tree, p) -> {
+      final VisualizationTask task = new VisualizationTask(NAME, context, tree, p.getRelation(), RTreeParallelVisualization.this);
+      task.level = VisualizationTask.LEVEL_BACKGROUND + 2;
+      task.default_visibility = false;
+      context.addVis(tree, task);
+      context.addVis(p, task);
+    });
   }
 
   /**

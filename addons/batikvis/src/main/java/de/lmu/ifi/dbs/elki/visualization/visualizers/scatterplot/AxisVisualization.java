@@ -24,7 +24,6 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -38,6 +37,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+
 import net.jafama.FastMath;
 
 /**
@@ -70,12 +70,11 @@ public class AxisVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
-      ScatterPlotProjector<?> p = it.get();
+    VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
       final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), AxisVisualization.this);
       task.level = VisualizationTask.LEVEL_BACKGROUND;
       context.addVis(p, task);
-    }
+    });
   }
 
   @Override

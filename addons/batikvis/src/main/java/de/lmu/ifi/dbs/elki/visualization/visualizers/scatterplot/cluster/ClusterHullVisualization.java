@@ -108,18 +108,17 @@ public class ClusterHullVisualization extends AbstractVisFactory {
   public void processNewResult(VisualizerContext context, Object start) {
     // We attach ourselves to the style library, not the clustering, so there is
     // only one hull.
-    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
-      ScatterPlotProjector<?> p = it.get();
+    VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
       final Relation<?> rel = p.getRelation();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        continue;
+        return;
       }
       final VisualizationTask task = new VisualizationTask(NAME, context, p, rel, ClusterHullVisualization.this);
       task.level = VisualizationTask.LEVEL_DATA - 1;
       task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
       task.initDefaultVisibility(false);
       context.addVis(p, task);
-    }
+    });
   }
 
   /**

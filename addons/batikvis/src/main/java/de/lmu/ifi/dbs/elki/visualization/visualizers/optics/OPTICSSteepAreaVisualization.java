@@ -66,8 +66,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    for(It<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class); it.valid(); it.advance()) {
-      OPTICSProjector p = it.get();
+    VisualizationTree.findVis(context, result).filter(OPTICSProjector.class).forEach(p -> {
       ClusterOrder co = p.getResult();
       It<OPTICSXi.SteepAreaResult> r = co.getHierarchy().iterChildren(co).filter(OPTICSXi.SteepAreaResult.class);
       if(r.valid()) {
@@ -76,7 +75,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
         context.addVis(p, task);
         context.addVis(r.get(), task);
       }
-    }
+    });
   }
 
   @Override

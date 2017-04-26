@@ -20,68 +20,53 @@
  */
 package de.lmu.ifi.dbs.elki.utilities.datastructures.iterator;
 
-import java.util.function.Consumer;
-import java.util.function.Predicate;
-
 /**
- * Empty object iterator.
+ * Concatenate multiple iterators.
  * 
  * @author Erich Schubert
  *
- * @param <O> Object
+ * @param <O> Data type
  */
-public class EmptyIterator<O> implements It<O> {
+public class ConcatIt<O> implements It<O> {
   /**
-   * Static instance.
+   * Iterators
    */
-  private static final It<Object> STATIC = new EmptyIterator<>();
+  private It<? extends O>[] its;
 
   /**
-   * Get an empty hierarchy iterator.
+   * Current iterator.
+   */
+  private int it = 0;
+
+  /**
+   * Constructor.
    *
-   * @return Empty iterator
+   * @param its Iterators to concatenate
    */
-  @SuppressWarnings("unchecked")
-  public static <O> It<O> empty() {
-    return (It<O>) STATIC;
-  }
-
-  /**
-   * Private constructor, use static {@link #empty()} instead.
-   */
-  private EmptyIterator() {
-    // Use static instance.
+  @SafeVarargs
+  public ConcatIt(It<? extends O>... its) {
+    this.its = its;
   }
 
   @Override
   public boolean valid() {
+    while(it < its.length) {
+      if(its[it].valid()) {
+        return true;
+      }
+      ++it;
+    }
     return false;
   }
 
   @Override
-  public It<O> advance() {
-    throw new UnsupportedOperationException("Empty iterators must not be advanced.");
-  }
-
-  @Override
   public O get() {
-    throw new UnsupportedOperationException("Iterator is empty.");
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> It<T> filter(Class<? super T> clz) {
-    return (It<T>) this;
+    return its[it].get();
   }
 
   @Override
-  public It<O> filter(Predicate<? super O> predicate) {
+  public It<O> advance() {
+    its[it].advance();
     return this;
   }
-
-  @Override
-  public void forEach(Consumer<? super O> action) {
-    // Empty!
-  }
-
 }

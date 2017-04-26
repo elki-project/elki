@@ -89,48 +89,34 @@ public class TooltipStringVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    VisualizationTree.findNewSiblings(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, Relation<?> rep, ScatterPlotProjector<?> p) {
-        final Relation<?> rel = p.getRelation();
-        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-          return;
-        }
-        final Class<?> clz = rep.getDataTypeInformation().getRestrictionClass();
-        if(DBID.class.isAssignableFrom(clz)) {
-          final VisualizationTask task = new VisualizationTask(NAME_ID, context, rep, rel, TooltipStringVisualization.this);
-          task.tool = true;
-          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
-          task.initDefaultVisibility(false);
-          context.addVis(rep, task);
-          context.addVis(p, task);
-        }
-        if(ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          final VisualizationTask task = new VisualizationTask(NAME_CLASS, context, rep, rel, TooltipStringVisualization.this);
-          task.tool = true;
-          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
-          task.initDefaultVisibility(false);
-          context.addVis(rep, task);
-          context.addVis(p, task);
-        }
-        if(LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          final VisualizationTask task = new VisualizationTask(NAME_LABEL, context, rep, rel, TooltipStringVisualization.this);
-          task.tool = true;
-          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
-          task.initDefaultVisibility(false);
-          context.addVis(rep, task);
-          context.addVis(p, task);
-        }
-        if(ExternalID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
-          final VisualizationTask task = new VisualizationTask(NAME_EID, context, rep, rel, TooltipStringVisualization.this);
-          task.tool = true;
-          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
-          task.initDefaultVisibility(false);
-          context.addVis(rep, task);
-          context.addVis(p, task);
-        }
+    VisualizationTree.findNewSiblings(context, result, Relation.class, ScatterPlotProjector.class, (rep, p) -> {
+      final Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        return;
+      }
+      final Class<?> clz = rep.getDataTypeInformation().getRestrictionClass();
+      if(DBID.class.isAssignableFrom(clz)) {
+        addTooltips(NAME_ID, rel, context, rep, p);
+      }
+      else if(ClassLabel.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+        addTooltips(NAME_CLASS, rel, context, rep, p);
+      }
+      else if(LabelList.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+        addTooltips(NAME_LABEL, rel, context, rep, p);
+      }
+      else if(ExternalID.class.isAssignableFrom(rep.getDataTypeInformation().getRestrictionClass())) {
+        addTooltips(NAME_EID, rel, context, rep, p);
       }
     });
+  }
+
+  private void addTooltips(final String name, final Relation<?> rel, VisualizerContext context, Relation<?> rep, ScatterPlotProjector<?> p) {
+    final VisualizationTask task = new VisualizationTask(name, context, rep, rel, TooltipStringVisualization.this);
+    task.tool = true;
+    task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
+    task.initDefaultVisibility(false);
+    context.addVis(rep, task);
+    context.addVis(p, task);
   }
 
   /**

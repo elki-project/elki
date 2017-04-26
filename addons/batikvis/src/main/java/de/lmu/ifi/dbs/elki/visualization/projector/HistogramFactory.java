@@ -24,7 +24,6 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.SubtypeIt;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -59,17 +58,16 @@ public class HistogramFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    candidate: for(It<Relation<?>> it1 = VisualizationTree.filterResults(context, start, Relation.class); it1.valid(); it1.advance()) {
-      Relation<?> rel = it1.get();
+    VisualizationTree.findNewResults(context, start).filter(Relation.class).forEach(rel -> {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        continue;
+        return;
       }
       // Do not enable nested relations by default:
-      for(It<Relation<?>> it2 = new SubtypeIt<>(context.getHierarchy().iterAncestors(rel), Relation.class); it2.valid(); it2.advance()) {
+      for(It<Relation<?>> it2 = context.getHierarchy().iterAncestors(rel).filter(Relation.class); it2.valid(); it2.advance()) {
         // Parent relation
         final Relation<?> rel2 = it2.get();
         if(TypeUtil.SPATIAL_OBJECT.isAssignableFromType(rel2.getDataTypeInformation())) {
-          continue candidate;
+          return;
         }
         // TODO: add Actions instead.
       }
@@ -78,7 +76,7 @@ public class HistogramFactory implements ProjectorFactory {
       final int dim = RelationUtil.dimensionality(vrel);
       HistogramProjector<NumberVector> proj = new HistogramProjector<>(vrel, Math.min(dim, maxdim));
       context.addVis(vrel, proj);
-    }
+    });
   }
 
   /**

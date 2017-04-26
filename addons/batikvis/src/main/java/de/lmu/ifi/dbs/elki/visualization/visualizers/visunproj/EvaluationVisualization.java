@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
-import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
@@ -83,12 +82,11 @@ public class EvaluationVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    candidate: for(It<EvaluationResult> it = VisualizationTree.filterResults(context, start, EvaluationResult.class); it.valid(); it.advance()) {
-      EvaluationResult sr = it.get();
+    VisualizationTree.findNewResults(context, start).filter(EvaluationResult.class).forEach(sr -> {
       // Avoid duplicates:
-      for(It<VisualizationTask> it2 = VisualizationTree.filter(context, sr, VisualizationTask.class); it2.valid(); it2.advance()) {
+      for(It<VisualizationTask> it2 = VisualizationTree.findVis(context, sr).filter(VisualizationTask.class); it2.valid(); it2.advance()) {
         if(it2.get().getFactory() instanceof EvaluationVisualization) {
-          continue candidate;
+          return;
         }
       }
       // Hack: for clusterings, only show the currently visible clustering.
@@ -98,7 +96,7 @@ public class EvaluationVisualization extends AbstractVisFactory {
         for(It<VisualizationTask> it3 = context.getVisHierarchy().iterChildren(context.getBaseResult()).filter(VisualizationTask.class); it3.valid(); it3.advance()) {
           final VisualizationTask otask = it3.get();
           if(otask.getFactory() instanceof EvaluationVisualization && otask.getResult() == c) {
-            continue candidate;
+            return;
           }
         }
         final VisualizationTask task = new VisualizationTask(NAME, context, c, null, EvaluationVisualization.this);
@@ -107,14 +105,14 @@ public class EvaluationVisualization extends AbstractVisFactory {
         task.level = VisualizationTask.LEVEL_STATIC;
         task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
         context.addVis(context.getBaseResult(), task);
-        continue candidate;
+        return;
       }
       final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, EvaluationVisualization.this);
       task.reqwidth = .5;
       task.reqheight = sr.numLines() * .05;
       task.level = VisualizationTask.LEVEL_STATIC;
       context.addVis(sr, task);
-    }
+    });
   }
 
   private double addBarChart(SVGPlot svgp, Element parent, double ypos, String label, double value, double minValue, double maxValue, double baseValue, boolean reversed) {
@@ -149,24 +147,21 @@ public class EvaluationVisualization extends AbstractVisFactory {
     if(o instanceof EvaluationResult) {
       sr = (EvaluationResult) o;
     }
-    else if(o instanceof Class) {
+    else if(o instanceof Class && EvaluationResult.class.isAssignableFrom((Class<?>) o)) {
       // Use cluster evaluation of current style instead.
       VisualizerContext context = task.getContext();
       StylingPolicy spol = context.getStylingPolicy();
       if(spol instanceof ClusterStylingPolicy) {
         ClusterStylingPolicy cpol = (ClusterStylingPolicy) spol;
-        @SuppressWarnings("unchecked")
-        final Class<Object> c = (Class<Object>) o;
-        candidates: for(It<?> it = VisualizationTree.filterResults(context, cpol.getClustering(), c); it.valid(); it.advance()) {
+        @SuppressWarnings("unchecked") // will be a subtype, actually!
+        Class<EvaluationResult> c = (Class<EvaluationResult>) o;
+        for(It<EvaluationResult> it = VisualizationTree.findNewResults(context, cpol.getClustering()).filter(c); it.valid(); it.advance()) {
           // This could be attached to a child clustering, in which case we
           // may end up displaying the wrong evaluation.
-          for(It<Clustering<?>> it2 = context.getHierarchy().iterAncestors((EvaluationResult) it.get()).filter(Clustering.class); it2.valid(); it2.advance()) {
-            if(it2.get() != cpol.getClustering()) {
-              continue candidates;
-            }
+          if(context.getHierarchy().iterAncestors(it.get()).find(cpol.getClustering())) {
+            sr = it.get();
+            break;
           }
-          sr = (EvaluationResult) it.get();
-          break;
         }
       }
     }

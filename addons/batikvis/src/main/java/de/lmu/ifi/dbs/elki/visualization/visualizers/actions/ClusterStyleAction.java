@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.visualization.visualizers.actions;
 
 import de.lmu.ifi.dbs.elki.data.Clustering;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuAction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -50,13 +49,12 @@ public class ClusterStyleAction extends AbstractVisFactory {
 
   @Override
   public void processNewResult(final VisualizerContext context, Object start) {
-    for(It<Clustering<?>> it = VisualizationTree.filterResults(context, start, Clustering.class); it.valid(); it.advance()) {
-      final Clustering<?> c = it.get();
-      if(VisualizationTree.filter(context, c, SetStyleAction.class).valid()) {
-        continue; // There already is a style button.
+    VisualizationTree.findNewResults(context, start).filter(Clustering.class).forEach(c -> {
+      if(VisualizationTree.findVis(context, c).filter(SetStyleAction.class).valid()) {
+        return; // There already is a style button.
       }
       context.addVis(c, new SetStyleAction(c, context));
-    }
+    });
   }
 
   @Override

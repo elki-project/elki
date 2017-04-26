@@ -60,6 +60,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+
 /**
  * Generates a SVG-Element containing a histogram representing the distribution
  * of the database's objects.
@@ -104,16 +105,12 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNew(context, start, HistogramProjector.class, //
-    new VisualizationTree.Handler1<HistogramProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, HistogramProjector<?> p) {
-        // register self
-        final VisualizationTask task = new VisualizationTask(CNAME, context, p, p.getRelation(), ColoredHistogramVisualizer.this);
-        task.level = VisualizationTask.LEVEL_DATA;
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY);
-        context.addVis(p, task);
-      }
+    VisualizationTree.findNewResults(context, start).filter(HistogramProjector.class).forEach(p -> {
+      // register self
+      final VisualizationTask task = new VisualizationTask(CNAME, context, p, p.getRelation(), ColoredHistogramVisualizer.this);
+      task.level = VisualizationTask.LEVEL_DATA;
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY);
+      context.addVis(p, task);
     });
   }
 

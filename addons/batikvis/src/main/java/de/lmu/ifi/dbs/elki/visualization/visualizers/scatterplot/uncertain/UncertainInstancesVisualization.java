@@ -78,19 +78,17 @@ public class UncertainInstancesVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
+    VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
       // Find a scatter plot visualizing uncertain objects:
-      ScatterPlotProjector<?> p = it.get();
       Relation<?> r = p.getRelation();
       if(!UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r.getDataTypeInformation())) {
-        continue;
+        return;
       }
       final VisualizationTask task = new VisualizationTask(NAME, context, p, r, this);
       task.level = VisualizationTask.LEVEL_DATA;
       task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
       context.addVis(p, task);
-      continue;
-    }
+    });
   }
 
   /**

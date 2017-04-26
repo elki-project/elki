@@ -37,7 +37,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
@@ -89,11 +88,10 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
-      ScatterPlotProjector<?> p = it.get();
-      final Relation<?> rel = p.getRelation();
+    VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
+      Relation<?> rel = p.getRelation();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        continue;
+        return;
       }
       final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionToolCubeVisualization.this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
@@ -103,7 +101,7 @@ public class SelectionToolCubeVisualization extends AbstractVisFactory {
       task.initDefaultVisibility(false);
       context.addVis(context.getSelectionResult(), task);
       context.addVis(p, task);
-    }
+    });
   }
 
   /**

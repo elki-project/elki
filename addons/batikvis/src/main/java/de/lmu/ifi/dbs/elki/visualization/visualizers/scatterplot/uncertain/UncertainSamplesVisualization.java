@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -47,6 +46,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
+
 import net.jafama.FastMath;
 
 /**
@@ -88,29 +88,17 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
-      ScatterPlotProjector<?> p = it.get();
-      Relation<?> r = p.getRelation();
-      if(UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r.getDataTypeInformation())) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p, r, this);
-        task.level = VisualizationTask.LEVEL_DATA;
-        task.initDefaultVisibility(false);
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
-        context.addVis(p, task);
-        continue;
-      }
-      for(It<Relation<?>> it2 = context.getHierarchy().iterParents(r).filter(Relation.class); it2.valid(); it2.advance()) {
-        Relation<?> r2 = it2.get();
+    VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
+      context.getHierarchy().iterAncestorsSelf((Relation<?>) p.getRelation()).filter(Relation.class).forEach(r2 -> {
         if(UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r2.getDataTypeInformation())) {
           final VisualizationTask task = new VisualizationTask(NAME, context, p, r2, this);
           task.level = VisualizationTask.LEVEL_DATA;
           task.initDefaultVisibility(false);
           task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
           context.addVis(p, task);
-          continue;
         }
-      }
-    }
+      });
+    });
   }
 
   /**

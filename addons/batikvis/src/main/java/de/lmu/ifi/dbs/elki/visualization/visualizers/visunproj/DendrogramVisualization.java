@@ -28,14 +28,9 @@ import de.lmu.ifi.dbs.elki.database.datastore.DBIDDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DoubleDataStore;
 import de.lmu.ifi.dbs.elki.database.datastore.IntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayModifiableDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -59,6 +54,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+
 import net.jafama.FastMath;
 
 /**
@@ -106,8 +102,7 @@ public class DendrogramVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     // Ensure there is a clustering result:
-    for(It<PointerHierarchyRepresentationResult> it = VisualizationTree.filterResults(context, start, PointerHierarchyRepresentationResult.class); it.valid(); it.advance()) {
-      PointerHierarchyRepresentationResult pi = it.get();
+    VisualizationTree.findNewResults(context, start).filter(PointerHierarchyRepresentationResult.class).forEach(pi -> {
       final VisualizationTask task = new VisualizationTask(NAME, context, pi, null, this);
       task.level = VisualizationTask.LEVEL_STATIC;
       task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
@@ -115,7 +110,7 @@ public class DendrogramVisualization extends AbstractVisFactory {
       task.reqheight = 1.;
       context.addVis(context.getStylingPolicy(), task);
       context.addVis(pi, new SwitchStyleAction(task, context));
-    }
+    });
   }
 
   @Override

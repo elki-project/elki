@@ -30,7 +30,6 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -75,16 +74,26 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    for(It<OPTICSProjector> it = VisualizationTree.filter(context, result, OPTICSProjector.class); it.valid(); it.advance()) {
-      OPTICSProjector p = it.get();
-      final Clustering<OPTICSModel> ocl = findOPTICSClustering(context, p.getResult());
-      if(ocl != null) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, ocl, null, this);
-        task.level = VisualizationTask.LEVEL_DATA;
-        context.addVis(p, task);
-        // TODO: use and react to style policy!
-      }
-    }
+    VisualizationTree.findVis(context, result).filter(OPTICSProjector.class).forEach(p -> {
+      VisualizationTree.findNewResults(context, p.getResult()).filter(Clustering.class).forEach(clus -> {
+        if(clus.getToplevelClusters().size() == 0) {
+          return;
+        }
+        try {
+          Cluster<?> firstcluster = ((Clustering<?>) clus).getToplevelClusters().iterator().next();
+          if(firstcluster.getModel() instanceof OPTICSModel) {
+            final VisualizationTask task = new VisualizationTask(NAME, context, clus, null, this);
+            task.level = VisualizationTask.LEVEL_DATA;
+            context.addVis(p, task);
+            // TODO: use and react to style policy!
+          }
+        }
+        catch(Exception e) {
+          // Empty clustering? Shouldn't happen.
+          LOG.warning("Clustering with no cluster detected.", e);
+        }
+      });
+    });
     // TODO: also run when a new clustering is added, instead of just new
     // projections?
   }
@@ -98,34 +107,6 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
   public boolean allowThumbnails(VisualizationTask task) {
     // Don't use thumbnails
     return false;
-  }
-
-  /**
-   * Find the first OPTICS clustering child of a result.
-   *
-   * @param context Result context
-   * @param start Result to start searching at
-   * @return OPTICS clustering
-   */
-  @SuppressWarnings("unchecked")
-  protected static Clustering<OPTICSModel> findOPTICSClustering(VisualizerContext context, Result start) {
-    for(It<Clustering<?>> it1 = VisualizationTree.filterResults(context, start, Clustering.class); it1.valid(); it1.advance()) {
-      Clustering<?> clus = it1.get();
-      if(clus.getToplevelClusters().size() == 0) {
-        continue;
-      }
-      try {
-        Cluster<?> firstcluster = clus.getToplevelClusters().iterator().next();
-        if(firstcluster.getModel() instanceof OPTICSModel) {
-          return (Clustering<OPTICSModel>) clus;
-        }
-      }
-      catch(Exception e) {
-        // Empty clustering? Shouldn't happen.
-        LOG.warning("Clustering with no cluster detected.", e);
-      }
-    }
-    return null;
   }
 
   /**

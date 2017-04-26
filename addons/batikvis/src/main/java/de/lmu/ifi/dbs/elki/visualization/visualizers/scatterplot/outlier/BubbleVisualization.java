@@ -109,26 +109,23 @@ public class BubbleVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewSiblings(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
-        final Relation<?> rel = p.getRelation();
-        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-          return;
-        }
-        boolean vis = true;
-        // Quick and dirty hack: hide if parent result is also an outlier result
-        // Since that probably is already visible and we're redundant.
-        if(o.getHierarchy().iterParents(o).filter(OutlierResult.class).valid()) {
-          vis = false;
-        }
-        final VisualizationTask task = new VisualizationTask(NAME, context, o, rel, BubbleVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA;
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
-        task.initDefaultVisibility(vis);
-        context.addVis(o, task);
-        context.addVis(p, task);
+    VisualizationTree.findNewSiblings(context, start, OutlierResult.class, ScatterPlotProjector.class, (o, p) -> {
+      final Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        return;
       }
+      boolean vis = true;
+      // Quick and dirty hack: hide if parent result is also an outlier
+      // result since that probably is already visible and we're redundant.
+      if(o.getHierarchy().iterParents(o).filter(OutlierResult.class).valid()) {
+        vis = false;
+      }
+      final VisualizationTask task = new VisualizationTask(NAME, context, o, rel, BubbleVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA;
+      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
+      task.initDefaultVisibility(vis);
+      context.addVis(o, task);
+      context.addVis(p, task);
     });
   }
 

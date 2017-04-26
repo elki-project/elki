@@ -28,7 +28,6 @@ import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -96,60 +95,44 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
   public void processNewResult(VisualizerContext context, Object result) {
     final ResultHierarchy hier = context.getHierarchy();
     // TODO: we can also visualize other scores!
-    VisualizationTree.findNewSiblings(context, result, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
-        final Relation<?> rel = p.getRelation();
-        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-          return;
-        }
-        final VisualizationTask task = new VisualizationTask(o.getLongName() + NAME_GEN, context, o.getScores(), rel, TooltipScoreVisualization.this);
-        task.tool = true;
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
-        task.initDefaultVisibility(false);
-        context.addVis(o.getScores(), task);
-        context.addVis(p, task);
+    VisualizationTree.findNewSiblings(context, result, OutlierResult.class, ScatterPlotProjector.class, (o, p) -> {
+      final Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        return;
       }
+      addTooltips(o.getLongName() + NAME_GEN, o.getScores(), context, p, rel);
     });
-    VisualizationTree.findNewSiblings(context, result, DoubleRelation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<DoubleRelation, ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, DoubleRelation r, ScatterPlotProjector<?> p) {
-        if(hier.iterParents(r).filter(OutlierResult.class).valid()) {
-          return; // Handled by above case already.
-        }
-        final Relation<?> rel = p.getRelation();
-        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-          return;
-        }
-        final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, context, r, rel, TooltipScoreVisualization.this);
-        task.tool = true;
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
-        task.initDefaultVisibility(false);
-        context.addVis(r, task);
-        context.addVis(p, task);
+    VisualizationTree.findNewSiblings(context, result, Relation.class, ScatterPlotProjector.class, (r, p) -> {
+      if(hier.iterParents(r).filter(OutlierResult.class).valid()) {
+        return; // Handled by above case already.
       }
-    });
-    VisualizationTree.findNewSiblings(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, Relation<?> r, ScatterPlotProjector<?> p) {
-        if(r instanceof DoubleRelation) {
-          return; // Handled above already.
-        }
-        if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation()) && !TypeUtil.INTEGER.isAssignableFromType(r.getDataTypeInformation())) {
-          return;
-        }
-        final Relation<?> rel = p.getRelation();
-        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-          return;
-        }
-        final VisualizationTask task = new VisualizationTask(r.getLongName() + NAME_GEN, context, r, rel, TooltipScoreVisualization.this);
-        task.tool = true;
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
-        task.initDefaultVisibility(false);
-        context.addVis(r, task);
-        context.addVis(p, task);
+      if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation()) && !TypeUtil.INTEGER.isAssignableFromType(r.getDataTypeInformation())) {
+        return;
       }
+      final Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        return;
+      }
+      addTooltips(r.getLongName() + NAME_GEN, r, context, p, rel);
     });
+  }
+
+  /**
+   * Add tooltips.
+   * 
+   * @param nam Name
+   * @param val Value relation
+   * @param context Visualization context
+   * @param p Projector
+   * @param rel Data projection relation
+   */
+  private void addTooltips(String nam, Relation<?> val, VisualizerContext context, ScatterPlotProjector<?> p, Relation<?> rel) {
+    final VisualizationTask task = new VisualizationTask(nam, context, val, rel, TooltipScoreVisualization.this);
+    task.tool = true;
+    task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
+    task.initDefaultVisibility(false);
+    context.addVis(val, task);
+    context.addVis(p, task);
   }
 
   /**

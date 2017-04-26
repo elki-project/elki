@@ -72,25 +72,23 @@ public class PolygonVisualization extends AbstractVisFactory {
     return new Instance(task, plot, width, height, proj);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    VisualizationTree.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<Relation<?>, ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, Relation<?> rel, ScatterPlotProjector<?> p) {
-        if(!TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
-          return;
-        }
-        if(RelationUtil.dimensionality(p.getRelation()) != 2) {
-          return;
-        }
-        // Assume that a 2d projector is using the same coordinates as the
-        // polygons.
-        final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel, PolygonVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA - 10;
-        task.addUpdateFlags(VisualizationTask.ON_DATA);
-        context.addVis(rel, task);
-        context.addVis(p, task);
+    VisualizationTree.findNewResultVis(context, result, Relation.class, ScatterPlotProjector.class, (rel, p) -> {
+      if(!TypeUtil.POLYGON_TYPE.isAssignableFromType(rel.getDataTypeInformation())) {
+        return;
       }
+      if(RelationUtil.dimensionality((Relation<? extends PolygonsObject>) rel) != 2) {
+        return;
+      }
+      // Assume that a 2d projector is using the same coordinates as the
+      // polygons.
+      final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel, PolygonVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA - 10;
+      task.addUpdateFlags(VisualizationTask.ON_DATA);
+      context.addVis(rel, task);
+      context.addVis(p, task);
     });
   }
 

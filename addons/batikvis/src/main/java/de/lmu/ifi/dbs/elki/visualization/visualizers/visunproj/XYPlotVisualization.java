@@ -26,7 +26,6 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.XYPlot;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -157,14 +156,13 @@ public class XYPlotVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    for(It<XYPlot> it = VisualizationTree.filterResults(context, start, XYPlot.class); it.valid(); it.advance()) {
-      XYPlot plot = it.get();
+    VisualizationTree.findNewResults(context, start).filter(XYPlot.class).forEach(plot -> {
       final VisualizationTask task = new VisualizationTask(NAME, context, plot, null, XYPlotVisualization.this);
       task.reqwidth = 1.0;
       task.reqheight = 1.0;
       task.level = VisualizationTask.LEVEL_STATIC;
       context.addVis(plot, task);
-    }
+    });
   }
 
   @Override

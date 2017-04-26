@@ -48,27 +48,25 @@ public class ParallelPlotFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    It<Relation<?>> it = VisualizationTree.filterResults(context, start, Relation.class);
-    candidate: for(; it.valid(); it.advance()) {
-      Relation<?> rel = it.get();
+    VisualizationTree.findNewResults(context, start).filter(Relation.class).forEach(rel -> {
       // TODO: multi-relational parallel plots?
       final int dim = dimensionality(rel);
       if(dim <= 1) {
-        continue;
+        return;
       }
       // Do not enable nested relations by default:
       for(It<Relation<?>> it2 = context.getHierarchy().iterAncestors(rel).filter(Relation.class); it2.valid(); it2.advance()) {
         // Parent relation
         if(dimensionality(it2.get()) == dim) {
           // TODO: add Actions instead?
-          continue candidate;
+          return;
         }
       }
       @SuppressWarnings("unchecked")
       Relation<SpatialComparable> vrel = (Relation<SpatialComparable>) rel;
       ParallelPlotProjector<SpatialComparable> proj = new ParallelPlotProjector<>(vrel);
       context.addVis(vrel, proj);
-    }
+    });
   }
 
   private int dimensionality(Relation<?> rel) {

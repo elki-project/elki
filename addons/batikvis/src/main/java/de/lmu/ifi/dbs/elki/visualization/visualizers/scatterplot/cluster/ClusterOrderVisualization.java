@@ -73,21 +73,17 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewSiblings(context, start, ClusterOrder.class, ScatterPlotProjector.class, //
-    new VisualizationTree.Handler2<ClusterOrder, ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ClusterOrder co, ScatterPlotProjector<?> p) {
-        final Relation<?> rel = p.getRelation();
-        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-          return;
-        }
-        final VisualizationTask task = new VisualizationTask(NAME, context, co, rel, ClusterOrderVisualization.this);
-        task.initDefaultVisibility(false);
-        task.level = VisualizationTask.LEVEL_DATA - 1;
-        task.addUpdateFlags(VisualizationTask.ON_DATA);
-        context.addVis(co, task);
-        context.addVis(p, task);
+    VisualizationTree.findNewSiblings(context, start, ClusterOrder.class, ScatterPlotProjector.class, (co, p) -> {
+      final Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        return;
       }
+      final VisualizationTask task = new VisualizationTask(NAME, context, co, rel, ClusterOrderVisualization.this);
+      task.initDefaultVisibility(false);
+      task.level = VisualizationTask.LEVEL_DATA - 1;
+      task.addUpdateFlags(VisualizationTask.ON_DATA);
+      context.addVis(co, task);
+      context.addVis(p, task);
     });
   }
 

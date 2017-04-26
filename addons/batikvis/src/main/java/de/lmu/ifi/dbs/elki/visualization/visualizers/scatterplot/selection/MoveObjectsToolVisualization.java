@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.UpdatableDatabase;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -83,11 +82,10 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
     if(!(db instanceof UpdatableDatabase)) {
       return;
     }
-    for(It<ScatterPlotProjector<?>> it = VisualizationTree.filter(context, start, ScatterPlotProjector.class); it.valid(); it.advance()) {
-      ScatterPlotProjector<?> p = it.get();
+    VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
       final Relation<?> rel = p.getRelation();
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-        continue;
+        return;
       }
       final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), rel, MoveObjectsToolVisualization.this);
       task.level = VisualizationTask.LEVEL_INTERACTIVE;
@@ -97,7 +95,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
       task.initDefaultVisibility(false);
       // baseResult.getHierarchy().add(p.getRelation(), task);
       context.addVis(p, task);
-    }
+    });
   }
 
   /**

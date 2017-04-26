@@ -68,25 +68,24 @@ public class ScatterPlotFactory implements ProjectorFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    candidate: for(It<Relation<?>> it = VisualizationTree.filterResults(context, start, Relation.class); it.valid(); it.advance()) {
-      Relation<?> rel = it.get();
+    VisualizationTree.findNewResults(context, start).filter(Relation.class).forEach(rel -> {
       final int dim = dimensionality(rel);
       if(dim < 1) {
-        continue;
+        return;
       }
       // Do not enable nested relations by default:
       for(It<Relation<?>> it2 = context.getHierarchy().iterAncestors(rel).filter(Relation.class); it2.valid(); it2.advance()) {
         // Parent relation
         if(dimensionality(it2.get()) == dim) {
           // TODO: add Actions instead?
-          continue candidate;
+          return;
         }
       }
       @SuppressWarnings("unchecked")
       Relation<SpatialComparable> vrel = (Relation<SpatialComparable>) rel;
       ScatterPlotProjector<SpatialComparable> proj = new ScatterPlotProjector<>(vrel, Math.min(maxdim, dim));
       context.addVis(vrel, proj);
-    }
+    });
   }
 
   private int dimensionality(Relation<?> rel) {

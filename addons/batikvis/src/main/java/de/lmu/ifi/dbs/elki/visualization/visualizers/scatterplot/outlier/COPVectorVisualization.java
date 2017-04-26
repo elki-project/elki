@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -83,25 +82,21 @@ public class COPVectorVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    VisualizationTree.findNewSiblings(context, start, OutlierResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<OutlierResult, ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, OutlierResult o, ScatterPlotProjector<?> p) {
-        final Relation<?> rel2 = p.getRelation();
-        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel2.getDataTypeInformation())) {
+    VisualizationTree.findNewSiblings(context, start, OutlierResult.class, ScatterPlotProjector.class, (o, p) -> {
+      final Relation<?> rel2 = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel2.getDataTypeInformation())) {
+        return;
+      }
+      VisualizationTree.findNewResults(context, o).filter(Relation.class).forEach(rel -> {
+        if(!rel.getShortName().equals(COP.COP_ERRORVEC)) {
           return;
         }
-        for(It<Relation<?>> it1 = VisualizationTree.filterResults(context, o, Relation.class); it1.valid(); it1.advance()) {
-          Relation<?> rel = it1.get();
-          if(!rel.getShortName().equals(COP.COP_ERRORVEC)) {
-            continue;
-          }
-          final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel2, COPVectorVisualization.this);
-          task.level = VisualizationTask.LEVEL_DATA;
-          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
-          context.addVis(o, task);
-          context.addVis(p, task);
-        }
-      }
+        final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel2, COPVectorVisualization.this);
+        task.level = VisualizationTask.LEVEL_DATA;
+        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
+        context.addVis(o, task);
+        context.addVis(p, task);
+      });
     });
   }
 

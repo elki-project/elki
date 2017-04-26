@@ -67,18 +67,17 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    VisualizationTree.findNewResultVis(context, result, ReferencePointsResult.class, ScatterPlotProjector.class, new VisualizationTree.Handler2<ReferencePointsResult<?>, ScatterPlotProjector<?>>() {
-      @Override
-      public void process(VisualizerContext context, ReferencePointsResult<?> rp, ScatterPlotProjector<?> p) {
-        final Relation<?> rel = p.getRelation();
-        if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
-          return;
-        }
-        final VisualizationTask task = new VisualizationTask(NAME, context, rp, rel, ReferencePointsVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA;
-        context.addVis(rp, task);
-        context.addVis(p, task);
+    VisualizationTree.findNewSiblings(context, result, ReferencePointsResult.class, ScatterPlotProjector.class, (rp, p) -> {
+      final Relation<?> rel = p.getRelation();
+      if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
+        return;
       }
+      // FIXME: Make sure the reference points belong to this relation, and have
+      // the same dimensionality. How can we encode this information?
+      final VisualizationTask task = new VisualizationTask(NAME, context, rp, rel, ReferencePointsVisualization.this);
+      task.level = VisualizationTask.LEVEL_DATA;
+      context.addVis(rp, task);
+      context.addVis(p, task);
     });
   }
 
