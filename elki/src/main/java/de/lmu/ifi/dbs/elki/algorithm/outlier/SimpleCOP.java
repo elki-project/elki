@@ -31,16 +31,8 @@ import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.QueryUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
-import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
+import de.lmu.ifi.dbs.elki.database.datastore.*;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
@@ -54,6 +46,7 @@ import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.PCARunner;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.EigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.pca.filter.PercentageEigenPairFilter;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -163,10 +156,10 @@ public class SimpleCOP<V extends NumberVector> extends AbstractDistanceBasedAlgo
     OutlierScoreMeta scoreMeta = new ProbabilisticOutlierScore();
     OutlierResult result = new OutlierResult(scoreMeta, scoreResult);
     // extra results
-    result.addChildResult(new MaterializedRelation<>("Local Dimensionality", COP.COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
-    result.addChildResult(new MaterializedRelation<>("Error vectors", COP.COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, cop_err_v, ids));
-    result.addChildResult(new MaterializedRelation<>("Data vectors", "cop-datavec", TypeUtil.DOUBLE_ARRAY, cop_datav, ids));
-    result.addChildResult(new MaterializedRelation<>("Correlation analysis", "cop-sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), cop_sol, ids));
+    Metadata.of(result).hierarchy().addChild(new MaterializedRelation<>("Local Dimensionality", COP.COP_DIM, TypeUtil.INTEGER, cop_dim, ids));
+    Metadata.of(result).hierarchy().addChild(new MaterializedRelation<>("Error vectors", COP.COP_ERRORVEC, TypeUtil.DOUBLE_ARRAY, cop_err_v, ids));
+    Metadata.of(result).hierarchy().addChild(new MaterializedRelation<>("Data vectors", "cop-datavec", TypeUtil.DOUBLE_ARRAY, cop_datav, ids));
+    Metadata.of(result).hierarchy().addChild(new MaterializedRelation<>("Correlation analysis", "cop-sol", new SimpleTypeInformation<CorrelationAnalysisSolution<?>>(CorrelationAnalysisSolution.class), cop_sol, ids));
     return result;
   }
 

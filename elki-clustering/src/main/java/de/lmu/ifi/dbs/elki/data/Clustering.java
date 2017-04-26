@@ -26,10 +26,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.data.model.Model;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
-import de.lmu.ifi.dbs.elki.result.HierarchicalResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.*;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
@@ -165,14 +162,8 @@ public class Clustering<M extends Model> extends BasicResult {
    * @return List of clustering results
    */
   public static List<Clustering<? extends Model>> getClusteringResults(Result r) {
-    if(r instanceof Clustering<?>) {
-      List<Clustering<?>> crs = new ArrayList<>(1);
-      crs.add((Clustering<?>) r);
-      return crs;
-    }
-    if(r instanceof HierarchicalResult) {
-      return ResultUtil.filterResults(((HierarchicalResult) r).getHierarchy(), r, Clustering.class);
-    }
-    return Collections.emptyList();
+    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+        .<Clustering<? extends Model>> filter(Clustering.class)//
+        .collect(new ArrayList<Clustering<? extends Model>>());
   }
 }

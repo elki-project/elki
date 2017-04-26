@@ -44,11 +44,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.PixmapResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.*;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -199,7 +195,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     for(OutlierResult o : oresults) {
       final OrderingResult or = o.getOrdering();
       Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
-      db.getHierarchy().add(or, computeSimilarityMatrixImage(relation, or.order(relation.getDBIDs()).iter()));
+      Metadata.of(or).hierarchy().addChild(computeSimilarityMatrixImage(relation, or.order(relation.getDBIDs()).iter()));
       // Process them only once.
       orderings.remove(or);
       nonefound = false;
@@ -210,7 +206,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     for(OrderingResult or : orderings) {
       Relation<O> relation = db.getRelation(distanceFunction.getInputTypeRestriction());
       DBIDIter iter = or.order(relation.getDBIDs()).iter();
-      db.getHierarchy().add(or, computeSimilarityMatrixImage(relation, iter));
+      Metadata.of(or).hierarchy().addChild(computeSimilarityMatrixImage(relation, iter));
       nonefound = false;
     }
 
@@ -221,7 +217,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
       for(Database database : iter) {
         // Get an arbitrary representation
         Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction());
-        db.getHierarchy().add(db, computeSimilarityMatrixImage(relation, relation.iterDBIDs()));
+        Metadata.of(db).hierarchy().addChild(computeSimilarityMatrixImage(relation, relation.iterDBIDs()));
       }
     }
   }

@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.datasource.bundle.SingleObjectBundle;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.index.IndexFactory;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
@@ -97,7 +98,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     this.ids = DBIDUtil.newHashSet();
     this.idrep = new DBIDView(this.ids);
     this.relations.add(idrep);
-    this.addChildResult(idrep);
+    Metadata.of(this).hierarchy().addChild(idrep);
 
     // Add indexes.
     if(indexFactories != null) {
@@ -202,7 +203,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
     SimpleTypeInformation<Object> ometa = (SimpleTypeInformation<Object>) meta;
     Relation<?> relation = new MaterializedRelation<>(ometa, ids);
     relations.add(relation);
-    getHierarchy().add(this, relation);
+    Metadata.of(this).hierarchy().addChild(relation);
     // Try to add indexes where appropriate
     for(IndexFactory<?> factory : indexFactories) {
       if(factory.getInputTypeRestriction().isAssignableFromType(meta)) {
@@ -212,7 +213,7 @@ public class HashmapDatabase extends AbstractDatabase implements UpdatableDataba
         final Relation<Object> orep = (Relation<Object>) relation;
         Index index = ofact.instantiate(orep);
         index.initialize();
-        getHierarchy().add(relation, index);
+        Metadata.of(relation).hierarchy().addChild(index);
       }
     }
     return relation;

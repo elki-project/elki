@@ -32,10 +32,7 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.*;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -186,10 +183,8 @@ public class OutlierSmROCCurve implements Evaluator {
     }
 
     List<OutlierResult> oresults = OutlierResult.getOutlierResults(result);
-    List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     for(OutlierResult o : oresults) {
-      db.getHierarchy().add(o, computeSmROCResult(positiveids, o));
-      orderings.remove(o.getOrdering());
+      Metadata.of(o).hierarchy().addChild(computeSmROCResult(positiveids, o));
     }
   }
 

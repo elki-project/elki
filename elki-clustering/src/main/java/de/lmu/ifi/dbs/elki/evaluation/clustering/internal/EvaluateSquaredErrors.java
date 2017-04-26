@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -105,12 +106,12 @@ public class EvaluateSquaredErrors implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param db Database
+   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
    * @return ssq
    */
-  public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
+  public double evaluateClustering(ResultHierarchy hier, Relation<? extends NumberVector> rel, Clustering<?> c) {
     boolean square = !distance.isSquared();
     int ignorednoise = 0;
 
@@ -142,12 +143,12 @@ public class EvaluateSquaredErrors implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".rmsd", FastMath.sqrt(ssq / div)));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Mean distance", sum / div, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("Sum of Squares", ssq, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("RMSD", FastMath.sqrt(ssq / div), 0., Double.POSITIVE_INFINITY, true);
-    db.getHierarchy().add(c, ev);
+    hier.add(c, ev);
     return ssq;
   }
 
@@ -160,7 +161,7 @@ public class EvaluateSquaredErrors implements Evaluator {
     Database db = ResultUtil.findDatabase(hier);
     Relation<NumberVector> rel = db.getRelation(distance.getInputTypeRestriction());
     for(Clustering<?> c : crs) {
-      evaluateClustering(db, rel, c);
+      evaluateClustering(hier, rel, c);
     }
   }
 

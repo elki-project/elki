@@ -20,8 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.outlier.meta;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.algorithm.Algorithm;
 import de.lmu.ifi.dbs.elki.algorithm.outlier.OutlierAlgorithm;
@@ -35,12 +33,12 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
@@ -93,7 +91,7 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
   public OutlierResult run(Database database) {
     Result innerresult = algorithm.run(database);
 
-    OutlierResult or = getOutlierResult(database.getHierarchy(), innerresult);
+    OutlierResult or = getOutlierResult(innerresult);
     final DoubleRelation scores = or.getScores();
     if(scaling instanceof OutlierScaling) {
       ((OutlierScaling) scaling).prepare(or);
@@ -111,22 +109,22 @@ public class RescaleMetaOutlierAlgorithm extends AbstractAlgorithm<OutlierResult
     OutlierScoreMeta meta = new BasicOutlierScoreMeta(minmax.getMin(), minmax.getMax(), scaling.getMin(), scaling.getMax());
     DoubleRelation scoresult = new MaterializedDoubleRelation("Scaled Outlier", "scaled-outlier", scaledscores, scores.getDBIDs());
     OutlierResult result = new OutlierResult(meta, scoresult);
-    result.addChildResult(innerresult);
-
+    Metadata.of(result).hierarchy().addChild(innerresult);
     return result;
   }
 
   /**
    * Find an OutlierResult to work with.
    * 
-   * @param hier Result hierarchy
    * @param result Result object
+   * 
    * @return Iterator to work with
    */
-  private OutlierResult getOutlierResult(ResultHierarchy hier, Result result) {
-    List<OutlierResult> ors = ResultUtil.filterResults(hier, result, OutlierResult.class);
-    if(!ors.isEmpty()) {
-      return ors.get(0);
+  private OutlierResult getOutlierResult(Result result) {
+    It<OutlierResult> it = Metadata.of(result).hierarchy().iterDescendantsSelf()//
+        .filter(OutlierResult.class);
+    if(it.valid()) {
+      return it.get();
     }
     throw new IllegalStateException("Comparison algorithm expected at least one outlier result.");
   }

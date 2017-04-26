@@ -133,13 +133,13 @@ public class EvaluateSilhouette<O> implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param db Database
+   * @param hier Result hierarchy
    * @param rel Data relation
    * @param dq Distance query
    * @param c Clustering
    * @return Average silhouette
    */
-  public double evaluateClustering(Database db, Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
+  public double evaluateClustering(ResultHierarchy hier, Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     MeanVariance msil = new MeanVariance();
     int ignorednoise = 0;
@@ -220,10 +220,10 @@ public class EvaluateSilhouette<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".silhouette.stddev", stdsil));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Silhouette +-" + FormatUtil.NF2.format(stdsil), meansil, -1., 1., 0., false);
-    db.getHierarchy().resultChanged(ev);
+    hier.resultChanged(ev);
     return meansil;
   }
 
@@ -237,7 +237,7 @@ public class EvaluateSilhouette<O> implements Evaluator {
     Relation<O> rel = db.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> dq = db.getDistanceQuery(rel, distance);
     for(Clustering<?> c : crs) {
-      evaluateClustering(db, rel, dq, c);
+      evaluateClustering(hier, rel, dq, c);
     }
   }
 

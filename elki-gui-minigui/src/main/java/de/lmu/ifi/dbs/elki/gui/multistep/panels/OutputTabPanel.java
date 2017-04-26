@@ -98,7 +98,7 @@ public class OutputTabPanel extends ParameterTabPanel {
     }
     // Get the database and run the algorithms
     Database database = input.getInputStep().getDatabase();
-    outs.runResultHandlers(database.getHierarchy(), database);
+    outs.runResultHandlers(database);
     Result eres = evals.getEvaluationStep().getResult();
     basedOnResult = new WeakReference<Object>(eres);
   }

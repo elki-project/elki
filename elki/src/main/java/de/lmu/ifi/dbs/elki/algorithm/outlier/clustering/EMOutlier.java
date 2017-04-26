@@ -123,7 +123,7 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
     // combine results.
     OutlierResult result = new OutlierResult(meta, scoreres);
     // TODO: add a keep-EM flag?
-    result.addChildResult(emresult);
+    Metadata.of(result).hierarchy().addChild(emresult);
     return result;
   }
 

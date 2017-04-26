@@ -32,10 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.SetDBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.geometry.XYCurve;
-import de.lmu.ifi.dbs.elki.result.OrderingResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.*;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -96,7 +93,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
       DBIDs sorted = o.getOrdering().order(o.getOrdering().getDBIDs());
-      db.getHierarchy().add(o, computePrecisionResult(o.getScores().size(), positiveids, sorted));
+      Metadata.of(o).hierarchy().addChild(computePrecisionResult(o.getScores().size(), positiveids, sorted));
       // Process them only once.
       orderings.remove(o.getOrdering());
     }
@@ -105,7 +102,7 @@ public class OutlierPrecisionAtKCurve implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
-      db.getHierarchy().add(or, computePrecisionResult(or.getDBIDs().size(), positiveids, sorted));
+      Metadata.of(or).hierarchy().addChild(computePrecisionResult(or.getDBIDs().size(), positiveids, sorted));
     }
   }
 

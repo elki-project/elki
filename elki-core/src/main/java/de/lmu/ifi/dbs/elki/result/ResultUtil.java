@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
@@ -52,15 +51,8 @@ public final class ResultUtil {
    * @return List of all annotation results
    */
   public static List<Relation<?>> getRelations(Result r) {
-    if(r instanceof Relation<?>) {
-      List<Relation<?>> anns = new ArrayList<>(1);
-      anns.add((Relation<?>) r);
-      return anns;
-    }
-    if(r instanceof HierarchicalResult) {
-      return filterResults(((HierarchicalResult) r).getHierarchy(), r, Relation.class);
-    }
-    return Collections.emptyList();
+    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+        .<Relation<?>> filter(Relation.class).collect(new ArrayList<>());
   }
 
   /**
@@ -70,15 +62,8 @@ public final class ResultUtil {
    * @return List of ordering results
    */
   public static List<OrderingResult> getOrderingResults(Result r) {
-    if(r instanceof OrderingResult) {
-      List<OrderingResult> ors = new ArrayList<>(1);
-      ors.add((OrderingResult) r);
-      return ors;
-    }
-    if(r instanceof HierarchicalResult) {
-      return filterResults(((HierarchicalResult) r).getHierarchy(), r, OrderingResult.class);
-    }
-    return Collections.emptyList();
+    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+        .filter(OrderingResult.class).collect(new ArrayList<>());
   }
 
   /**
@@ -88,15 +73,8 @@ public final class ResultUtil {
    * @return List of collection results
    */
   public static List<CollectionResult<?>> getCollectionResults(Result r) {
-    if(r instanceof CollectionResult<?>) {
-      List<CollectionResult<?>> crs = new ArrayList<>(1);
-      crs.add((CollectionResult<?>) r);
-      return crs;
-    }
-    if(r instanceof HierarchicalResult) {
-      return filterResults(((HierarchicalResult) r).getHierarchy(), r, CollectionResult.class);
-    }
-    return Collections.emptyList();
+    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+        .<CollectionResult<?>> filter(CollectionResult.class).collect(new ArrayList<>());
   }
 
   /**
@@ -106,15 +84,8 @@ public final class ResultUtil {
    * @return List of iterable results
    */
   public static List<IterableResult<?>> getIterableResults(Result r) {
-    if(r instanceof IterableResult<?>) {
-      List<IterableResult<?>> irs = new ArrayList<>(1);
-      irs.add((IterableResult<?>) r);
-      return irs;
-    }
-    if(r instanceof HierarchicalResult) {
-      return filterResults(((HierarchicalResult) r).getHierarchy(), r, IterableResult.class);
-    }
-    return Collections.emptyList();
+    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+        .<IterableResult<?>> filter(IterableResult.class).collect(new ArrayList<>());
   }
 
   /**
@@ -127,10 +98,8 @@ public final class ResultUtil {
    * @return filtered results list
    */
   public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Result r, Class<? super C> restrictionClass) {
-    ArrayList<C> res = new ArrayList<>();
-    final It<C> it = Metadata.of(r).hierarchy().iterDescendantsSelf().filter(restrictionClass);
-    it.forEach(res::add);
-    return res;
+    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+        .<C> filter(restrictionClass).collect(new ArrayList<C>());
   }
 
   /**
@@ -154,8 +123,8 @@ public final class ResultUtil {
    * @param parent Parent
    * @param child Child
    */
-  public static void addChildResult(HierarchicalResult parent, Result child) {
-    parent.getHierarchy().add(parent, child);
+  public static void addChildResult(Result parent, Result child) {
+    Metadata.of(parent).hierarchy().addChild(child);
   }
 
   /**
@@ -182,17 +151,16 @@ public final class ResultUtil {
 
   /**
    * Recursively remove a result and its children.
-   *
-   * @param hierarchy Result hierarchy
+   * 
    * @param child Result to remove
    */
-  public static void removeRecursive(ResultHierarchy hierarchy, Object child) {
+  public static void removeRecursive(Object child) {
     final Hierarchy h = Metadata.of(child).hierarchy();
     for(It<Object> iter = h.iterParents(); iter.valid(); iter.advance()) {
       Metadata.of(iter.get()).hierarchy().removeChild(child);
     }
     for(It<Object> iter = h.iterChildren(); iter.valid(); iter.advance()) {
-      removeRecursive(hierarchy, iter.get());
+      removeRecursive(iter.get());
     }
   }
 }

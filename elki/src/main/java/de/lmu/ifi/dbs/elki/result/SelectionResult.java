@@ -20,9 +20,8 @@
  */
 package de.lmu.ifi.dbs.elki.result;
 
-import java.util.List;
-
 import de.lmu.ifi.dbs.elki.database.Database;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
  * Selection result wrapper.
@@ -79,12 +78,13 @@ public class SelectionResult implements Result {
    * @return selection result
    */
   public static SelectionResult ensureSelectionResult(final Database db) {
-    List<SelectionResult> selections = ResultUtil.filterResults(db.getHierarchy(), db, SelectionResult.class);
-    if(!selections.isEmpty()) {
-      return selections.get(0);
+    It<SelectionResult> it = Metadata.of(db).hierarchy().iterDescendantsSelf()//
+        .filter(SelectionResult.class);
+    if(it.valid()) {
+      return it.get();
     }
     SelectionResult sel = new SelectionResult();
-    ResultUtil.addChildResult(db, sel);
+    Metadata.of(db).hierarchy().addChild(sel);
     return sel;
   }
 }

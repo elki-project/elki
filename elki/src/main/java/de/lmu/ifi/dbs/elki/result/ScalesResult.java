@@ -20,12 +20,11 @@
  */
 package de.lmu.ifi.dbs.elki.result;
 
-import java.util.Collection;
-
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.math.scales.LinearScale;
 import de.lmu.ifi.dbs.elki.math.scales.Scales;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
  * Class to keep shared scales across visualizers.
@@ -99,12 +98,13 @@ public class ScalesResult extends BasicResult {
    * @return associated scales result
    */
   public static ScalesResult getScalesResult(final Relation<? extends SpatialComparable> rel) {
-    Collection<ScalesResult> scas = ResultUtil.filterResults(rel.getHierarchy(), rel, ScalesResult.class);
-    if(scas.isEmpty()) {
-      final ScalesResult newsca = new ScalesResult(rel);
-      ResultUtil.addChildResult(rel, newsca);
-      return newsca;
+    It<ScalesResult> it = Metadata.of(rel).hierarchy().iterDescendantsSelf()//
+        .filter(ScalesResult.class);
+    if(it.valid()) {
+      return it.get();
     }
-    return scas.iterator().next();
+    ScalesResult newsca = new ScalesResult(rel);
+    Metadata.of(rel).hierarchy().addChild(newsca);
+    return newsca;
   }
 }

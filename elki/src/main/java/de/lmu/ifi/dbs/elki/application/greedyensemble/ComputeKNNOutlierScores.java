@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.range.IntGenerator;
@@ -191,7 +192,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
     if(!(knnq instanceof PreprocessorKNNQuery)) {
       MaterializeKNNPreprocessor<O> preproc = new MaterializeKNNPreprocessor<>(relation, distf, lim);
       preproc.initialize();
-      relation.getHierarchy().add(relation, preproc);
+      Metadata.of(relation).hierarchy().addChild(preproc);
     }
 
     // Test that we now get a proper index query
@@ -372,7 +373,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
         LOG.statistics(time.end());
         if(result != null) {
           out.accept(String.format(Locale.ROOT, format, prefix, k), result);
-          ResultUtil.removeRecursive(result.getHierarchy(), result);
+          ResultUtil.removeRecursive(result);
         }
       }
     });

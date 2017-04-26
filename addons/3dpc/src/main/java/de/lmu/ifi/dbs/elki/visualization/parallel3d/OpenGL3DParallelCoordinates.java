@@ -153,7 +153,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
    */
   public StylingPolicy getStylePolicy(ResultHierarchy hier, StyleLibrary stylelib) {
     Database db = ResultUtil.findDatabase(hier);
-    AutomaticEvaluation.ensureClusteringResult(db, db);
+    AutomaticEvaluation.ensureClusteringResult(db);
     List<Clustering<? extends Model>> clusterings = Clustering.getClusteringResults(db);
     if(clusterings.isEmpty()) {
       throw new AbortException("No clustering result generated?!?");

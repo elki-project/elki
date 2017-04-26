@@ -109,12 +109,12 @@ public class EvaluatePBMIndex implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param db Database
+   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
    * @return PBM
    */
-  public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
+  public double evaluateClustering(ResultHierarchy hier, Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     NumberVector[] centroids = new NumberVector[clusters.size()];
     int ignorednoise = EvaluateSimplifiedSilhouette.centroids(rel, clusters, centroids, noiseHandling);
@@ -200,10 +200,10 @@ public class EvaluatePBMIndex implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".pbm", pbm));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("PBM-Index", pbm, 0., Double.POSITIVE_INFINITY, 0., false);
-    db.getHierarchy().resultChanged(ev);
+    hier.resultChanged(ev);
     return pbm;
   }
 
@@ -217,7 +217,7 @@ public class EvaluatePBMIndex implements Evaluator {
     Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
-      evaluateClustering(db, (Relation<? extends NumberVector>) rel, c);
+      evaluateClustering(hier, (Relation<? extends NumberVector>) rel, c);
     }
   }
 

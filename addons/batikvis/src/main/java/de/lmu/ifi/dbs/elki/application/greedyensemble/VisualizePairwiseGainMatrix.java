@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.evaluation.similaritymatrix.ComputeSimilarityMatrixIm
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVoting;
 import de.lmu.ifi.dbs.elki.utilities.ensemble.EnsembleVotingMean;
@@ -131,7 +131,6 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   @Override
   public void run() {
     final Database database = inputstep.getDatabase();
-    ResultHierarchy hier = database.getHierarchy();
     Relation<NumberVector> relation = database.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     final Relation<String> labels = DatabaseUtil.guessLabelRepresentation(database);
     final DBID firstid = DBIDUtil.deref(labels.iterDBIDs());
@@ -240,7 +239,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
       }
     }
     SimilarityMatrix smat = new ComputeSimilarityMatrixImage.SimilarityMatrix(img, relation, ids);
-    hier.add(database, smat);
+    Metadata.of(database).hierarchy().addChild(smat);
 
     VisualizerContext context = vispar.newContext(hier, smat);
 

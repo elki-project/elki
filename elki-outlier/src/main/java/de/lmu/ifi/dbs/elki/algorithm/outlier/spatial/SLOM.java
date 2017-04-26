@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.PrimitiveDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -190,7 +191,7 @@ public class SLOM<N, O> extends AbstractDistanceBasedSpatialOutlier<N, O> {
     DoubleRelation scoreResult = new MaterializedDoubleRelation("SLOM", "slom-outlier", sloms, relation.getDBIDs());
     OutlierScoreMeta scoreMeta = new BasicOutlierScoreMeta(slomminmax.getMin(), slomminmax.getMax(), 0.0, Double.POSITIVE_INFINITY);
     OutlierResult or = new OutlierResult(scoreMeta, scoreResult);
-    or.addChildResult(npred);
+    Metadata.of(or).hierarchy().addChild(npred);
     return or;
   }
 

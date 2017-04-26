@@ -110,12 +110,12 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param db Database
+   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
    * @return Variance Ratio Criteria
    */
-  public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
+  public double evaluateClustering(ResultHierarchy hier, Relation<? extends NumberVector> rel, Clustering<?> c) {
     // FIXME: allow using a precomputed distance matrix!
     final SquaredEuclideanDistanceFunction df = SquaredEuclideanDistanceFunction.STATIC;
 
@@ -172,9 +172,10 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".vrc", vrc));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(db.getHierarchy(), c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Variance Ratio Criteria", vrc, 0., 1., 0., false);
+    hier.resultChanged(ev);
     return vrc;
   }
 
@@ -225,7 +226,7 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
     Relation<? extends NumberVector> rel = db.getRelation(EuclideanDistanceFunction.STATIC.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
-      evaluateClustering(db, (Relation<? extends NumberVector>) rel, c);
+      evaluateClustering(hier, (Relation<? extends NumberVector>) rel, c);
     }
   }
 

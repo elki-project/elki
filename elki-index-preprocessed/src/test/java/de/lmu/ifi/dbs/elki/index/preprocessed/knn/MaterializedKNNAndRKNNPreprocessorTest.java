@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.datasource.InputStreamDatabaseConnection;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.datasource.parser.NumberVectorLabelParser;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
@@ -96,11 +97,11 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
       return;
     }
 
-    Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
-    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
+    Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
+    DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);
 
     // verify data set size.
-    assertEquals("Data set size doesn't match parameters.", shoulds, rep.size());
+    assertEquals("Data set size doesn't match parameters.", shoulds, rel.size());
 
     // get linear queries
     LinearScanDistanceKNNQuery<DoubleVector> lin_knn_query = new LinearScanDistanceKNNQuery<>(distanceQuery);
@@ -115,7 +116,7 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     RKNNQuery<DoubleVector> preproc_rknn_query = preproc.getRKNNQuery(distanceQuery);
     // add as index
-    db.getHierarchy().add(rep, preproc);
+    Metadata.of(rel).hierarchy().addChild(preproc);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
     assertFalse("Preprocessor rknn query class incorrect.", preproc_rknn_query instanceof LinearScanRKNNQuery);
 
@@ -127,15 +128,15 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
 
     // insert new objects
     List<DoubleVector> insertions = new ArrayList<>();
-    NumberVector.Factory<DoubleVector> o = RelationUtil.getNumberVectorFactory(rep);
-    int dim = RelationUtil.dimensionality(rep);
+    NumberVector.Factory<DoubleVector> o = RelationUtil.getNumberVectorFactory(rel);
+    int dim = RelationUtil.dimensionality(rel);
     Random random = new Random(seed);
     for(int i = 0; i < updatesize; i++) {
       DoubleVector obj = VectorUtil.randomVector(o, dim, random);
       insertions.add(obj);
     }
     // System.out.println("Insert " + insertions);
-    DBIDs deletions = db.insert(MultipleObjectsBundle.makeSimple(rep.getDataTypeInformation(), insertions));
+    DBIDs deletions = db.insert(MultipleObjectsBundle.makeSimple(rel.getDataTypeInformation(), insertions));
 
     // test queries
     MaterializedKNNPreprocessorTest.testKNNQueries(rep, lin_knn_query, preproc_knn_query, k);

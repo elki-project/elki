@@ -80,8 +80,7 @@ public class OutlierRankingEvaluation implements Evaluator {
     this.positiveClassName = positive_class_name;
   }
 
-  private EvaluationResult evaluateOutlierResult(int size, SetDBIDs positiveids, OutlierResult or) {
-    EvaluationResult res = EvaluationResult.findOrCreate(or.getHierarchy(), or, "Evaluation of ranking", "ranking-evaluation");
+  private void evaluateOutlierResult(EvaluationResult res, int size, SetDBIDs positiveids, OutlierResult or) {
     DBIDsTest test = new DBIDsTest(positiveids);
 
     final int pos = positiveids.size();
@@ -129,15 +128,13 @@ public class OutlierRankingEvaluation implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".dcg.normalized", ndcg));
       LOG.statistics(new DoubleStatistic(key + ".dcg.adjusted", adjndcg));
     }
-    return res;
   }
 
-  private EvaluationResult evaluateOrderingResult(int size, SetDBIDs positiveids, DBIDs order) {
+  private void evaluateOrderingResult(EvaluationResult res, int size, SetDBIDs positiveids, DBIDs order) {
     if(order.size() != size) {
       throw new IllegalStateException("Iterable result doesn't match database size - incomplete ordering?");
     }
 
-    EvaluationResult res = new EvaluationResult("Evaluation of ranking", "ranking-evaluation");
     DBIDsTest test = new DBIDsTest(positiveids);
 
     double rate = positiveids.size() / (double) size;
@@ -171,7 +168,6 @@ public class OutlierRankingEvaluation implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".f1.maximum", maxf1));
       LOG.statistics(new DoubleStatistic(key + ".f1.maximum.adjusted", adjmaxf1));
     }
-    return res;
   }
 
   @Override
@@ -189,7 +185,8 @@ public class OutlierRankingEvaluation implements Evaluator {
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
     // Outlier results are the main use case.
     for(OutlierResult o : oresults) {
-      db.getHierarchy().add(o, evaluateOutlierResult(o.getScores().size(), positiveids, o));
+      EvaluationResult res = EvaluationResult.findOrCreate(hier, o, "Evaluation of ranking", "ranking-evaluation");
+      evaluateOutlierResult(res, o.getScores().size(), positiveids, o);
       // Process them only once.
       orderings.remove(o.getOrdering());
       nonefound = false;
@@ -199,7 +196,8 @@ public class OutlierRankingEvaluation implements Evaluator {
     // otherwise apply an ordering to the database IDs.
     for(OrderingResult or : orderings) {
       DBIDs sorted = or.order(or.getDBIDs());
-      db.getHierarchy().add(or, evaluateOrderingResult(or.getDBIDs().size(), positiveids, sorted));
+      EvaluationResult res = EvaluationResult.findOrCreate(hier, or, "Evaluation of ranking", "ranking-evaluation");
+      evaluateOrderingResult(res, or.getDBIDs().size(), positiveids, sorted);
       nonefound = false;
     }
 

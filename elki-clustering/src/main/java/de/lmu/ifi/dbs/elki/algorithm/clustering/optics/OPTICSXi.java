@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.result.IterableResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -364,9 +365,9 @@ public class OPTICSXi extends AbstractAlgorithm<Clustering<OPTICSModel>> impleme
         clustering.addToplevelCluster(cluster);
       }
     }
-    clustering.addChildResult(clusterOrderResult);
+    Metadata.of(clustering).hierarchy().addChild(clusterOrderResult);
     if(salist != null) {
-      clusterOrderResult.addChildResult(new SteepAreaResult(salist));
+      Metadata.of(clusterOrderResult).hierarchy().addChild(new SteepAreaResult(salist));
     }
     return clustering;
   }

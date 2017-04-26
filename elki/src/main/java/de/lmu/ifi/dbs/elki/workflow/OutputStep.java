@@ -25,7 +25,6 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -60,14 +59,13 @@ public class OutputStep implements WorkflowStep {
   /**
    * Run the result handlers.
    *
-   * @param hier Result to run on
    * @param db Database
    */
-  public void runResultHandlers(ResultHierarchy hier, Database db) {
+  public void runResultHandlers(Database db) {
     // Run result handlers
     for(ResultHandler resulthandler : resulthandlers) {
       Thread.currentThread().setName(resulthandler.toString());
-      resulthandler.processNewResult(hier, db);
+      resulthandler.processNewResult(db);
     }
   }
 

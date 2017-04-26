@@ -37,10 +37,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialEntry;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialIndexTree;
 import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialPointLeafEntry;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
-import de.lmu.ifi.dbs.elki.result.CollectionResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
-import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.result.*;
 
 /**
  * Compute the purity of index pages as a naive measure for performance
@@ -95,7 +92,7 @@ public class IndexPurity implements Evaluator {
       }
       Collection<double[]> col = new ArrayList<>();
       col.add(new double[] { mv.getMean(), mv.getSampleStddev() });
-      database.getHierarchy().add((Result) index, new CollectionResult<>("Gini coefficient of index", "index-gini", col));
+      Metadata.of(index).hierarchy().addChild(new CollectionResult<>("Gini coefficient of index", "index-gini", col));
     }
   }
 }

@@ -20,10 +20,10 @@
  */
 package de.lmu.ifi.dbs.elki.result;
 
-import java.util.Collection;
-
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
+
 /**
  * Wrapper for storing the current database sample.
  * 
@@ -81,12 +81,13 @@ public class SamplingResult implements Result {
    * @return Sampling result.
    */
   public static SamplingResult getSamplingResult(final Relation<?> rel) {
-    Collection<SamplingResult> selections = ResultUtil.filterResults(rel.getHierarchy(), rel, SamplingResult.class);
-    if(selections.isEmpty()) {
-      final SamplingResult newsam = new SamplingResult(rel);
-      ResultUtil.addChildResult(rel, newsam);
-      return newsam;
+    It<SamplingResult> it = Metadata.of(rel).hierarchy().iterDescendantsSelf()//
+        .filter(SamplingResult.class);
+    if(it.valid()) {
+      return it.get();
     }
-    return selections.iterator().next();
+    SamplingResult newsam = new SamplingResult(rel);
+    Metadata.of(rel).hierarchy().addChild(newsam);
+    return newsam;
   }
 }

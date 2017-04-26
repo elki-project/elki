@@ -39,6 +39,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.*;
 import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Priority;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -115,7 +116,7 @@ public class SimplifiedHierarchyExtraction implements ClusteringAlgorithm<Cluste
    */
   public Clustering<DendrogramModel> run(PointerHierarchyRepresentationResult pointerresult) {
     Clustering<DendrogramModel> result = new Instance(pointerresult).run();
-    result.addChildResult(pointerresult);
+    Metadata.of(result).hierarchy().addChild(pointerresult);
     return result;
   }
 
