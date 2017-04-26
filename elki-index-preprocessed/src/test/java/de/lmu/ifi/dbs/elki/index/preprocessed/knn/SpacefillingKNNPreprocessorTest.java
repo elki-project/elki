@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.math.spacefillingcurves.BinarySplitSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.HilbertSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.PeanoSpatialSorter;
 import de.lmu.ifi.dbs.elki.math.spacefillingcurves.ZCurveSpatialSorter;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -93,7 +94,7 @@ public class SpacefillingKNNPreprocessorTest {
             .build().instantiate(rel);
     preproc.initialize();
     // add as index
-    db.getHierarchy().add(rel, preproc);
+    Metadata.of(rel).hierarchy().addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
@@ -128,7 +129,7 @@ public class SpacefillingKNNPreprocessorTest {
             .build().instantiate(rel);
     preproc.initialize();
     // add as index
-    db.getHierarchy().add(rel, preproc);
+    Metadata.of(rel).hierarchy().addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
@@ -163,7 +164,7 @@ public class SpacefillingKNNPreprocessorTest {
             .build().instantiate(rel);
     preproc.initialize();
     // add as index
-    db.getHierarchy().add(rel, preproc);
+    Metadata.of(rel).hierarchy().addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
@@ -198,7 +199,7 @@ public class SpacefillingKNNPreprocessorTest {
             .build().instantiate(rel);
     preproc.initialize();
     // add as index
-    db.getHierarchy().add(rel, preproc);
+    Metadata.of(rel).hierarchy().addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
@@ -233,7 +234,7 @@ public class SpacefillingKNNPreprocessorTest {
             .build().instantiate(rel);
     preproc.initialize();
     // add as index
-    db.getHierarchy().add(rel, preproc);
+    Metadata.of(rel).hierarchy().addChild(preproc);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 

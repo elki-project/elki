@@ -32,7 +32,6 @@ import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -83,7 +82,6 @@ public class AlgorithmStep implements WorkflowStep {
    * @return Algorithm result
    */
   public Result runAlgorithms(Database database) {
-    ResultHierarchy hier = database.getHierarchy();
     if(LOG.isStatistics()) {
       boolean first = true;
       for(It<Index> it = Metadata.of(database).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
@@ -114,7 +112,7 @@ public class AlgorithmStep implements WorkflowStep {
       }
       if(res != null) {
         // Make sure the result is attached, but usually this is a noop:
-        hier.add(database, res);
+        Metadata.of(database).hierarchy().addChild(res);
       }
     }
     return stepresult;

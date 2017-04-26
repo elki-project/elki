@@ -90,31 +90,16 @@ public final class ResultUtil {
 
   /**
    * Return only results of the given restriction class
-   *
-   * @param <C> Class type
-   * @param hier Result hierarchy
+   * 
    * @param r Starting position
    * @param restrictionClass Class restriction
-   * @return filtered results list
-   */
-  public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Result r, Class<? super C> restrictionClass) {
-    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
-        .<C> filter(restrictionClass).collect(new ArrayList<C>());
-  }
-
-  /**
-   * Return only results of the given restriction class
    *
    * @param <C> Class type
-   * @param hier Result hierarchy
-   * @param restrictionClass Class restriction
    * @return filtered results list
    */
-  public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Class<? super C> restrictionClass) {
-    ArrayList<C> res = new ArrayList<>();
-    It<C> it = hier.iterAll().filter(restrictionClass);
-    it.forEach(res::add);
-    return res;
+  public static <C extends Result> ArrayList<C> filterResults(Result r, Class<? super C> restrictionClass) {
+    return Metadata.of(r).hierarchy().iterDescendantsSelf()//
+        .<C> filter(restrictionClass).collect(new ArrayList<C>());
   }
 
   /**
@@ -130,23 +115,12 @@ public final class ResultUtil {
   /**
    * Find the first database result in the tree.
    *
-   * @param baseResult Result tree base.
+   * @param result Result hierarchy.
    * @return Database
    */
-  public static Database findDatabase(ResultHierarchy hier, Result baseResult) {
-    final List<Database> dbs = filterResults(hier, baseResult, Database.class);
-    return (!dbs.isEmpty()) ? dbs.get(0) : null;
-  }
-
-  /**
-   * Find the first database result in the tree.
-   *
-   * @param hier Result hierarchy.
-   * @return Database
-   */
-  public static Database findDatabase(ResultHierarchy hier) {
-    final List<Database> dbs = filterResults(hier, Database.class);
-    return (!dbs.isEmpty()) ? dbs.get(0) : null;
+  public static Database findDatabase(Result result) {
+    It<Database> it = Metadata.of(result).hierarchy().iterAncestors().filter(Database.class);
+    return it.valid() ? it.get() : null;
   }
 
   /**

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.range.RangeQuery;
 import de.lmu.ifi.dbs.elki.database.relation.DBIDView;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -99,12 +100,12 @@ public class LuceneDatabase extends AbstractDatabase {
       // ID relation:
       idrep = new DBIDView(ids);
       relations.add(idrep);
-      getHierarchy().add(this, idrep);
+      ResultUtil.addChildResult(this, idrep);
 
       // Documents relation:
       docrep = new LuceneDocumentRelation(ids, reader);
       relations.add(docrep);
-      getHierarchy().add(this, docrep);
+      ResultUtil.addChildResult(this, docrep);
 
       eventManager.fireObjectsInserted(ids);
     }

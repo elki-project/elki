@@ -112,7 +112,7 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
         new ELKIBuilder<MaterializeKNNAndRKNNPreprocessor.Factory<DoubleVector>>(MaterializeKNNAndRKNNPreprocessor.Factory.class) //
             .with(MaterializeKNNPreprocessor.Factory.DISTANCE_FUNCTION_ID, distanceQuery.getDistanceFunction()) //
             .with(MaterializeKNNPreprocessor.Factory.K_ID, k) //
-            .build().instantiate(rep);
+            .build().instantiate(rel);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     RKNNQuery<DoubleVector> preproc_rknn_query = preproc.getRKNNQuery(distanceQuery);
     // add as index
@@ -121,10 +121,10 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
     assertFalse("Preprocessor rknn query class incorrect.", preproc_rknn_query instanceof LinearScanRKNNQuery);
 
     // test queries
-    MaterializedKNNPreprocessorTest.testKNNQueries(rep, lin_knn_query, preproc_knn_query, k);
-    testRKNNQueries(rep, lin_rknn_query, preproc_rknn_query, k);
+    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    testRKNNQueries(rel, lin_rknn_query, preproc_rknn_query, k);
     // also test partial queries, forward only
-    MaterializedKNNPreprocessorTest.testKNNQueries(rep, lin_knn_query, preproc_knn_query, k / 2);
+    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k / 2);
 
     // insert new objects
     List<DoubleVector> insertions = new ArrayList<>();
@@ -139,16 +139,16 @@ public class MaterializedKNNAndRKNNPreprocessorTest {
     DBIDs deletions = db.insert(MultipleObjectsBundle.makeSimple(rel.getDataTypeInformation(), insertions));
 
     // test queries
-    MaterializedKNNPreprocessorTest.testKNNQueries(rep, lin_knn_query, preproc_knn_query, k);
-    testRKNNQueries(rep, lin_rknn_query, preproc_rknn_query, k);
+    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    testRKNNQueries(rel, lin_rknn_query, preproc_rknn_query, k);
 
     // delete objects
     // System.out.println("Delete " + deletions);
     db.delete(deletions);
 
     // test queries
-    MaterializedKNNPreprocessorTest.testKNNQueries(rep, lin_knn_query, preproc_knn_query, k);
-    testRKNNQueries(rep, lin_rknn_query, preproc_rknn_query, k);
+    MaterializedKNNPreprocessorTest.testKNNQueries(rel, lin_knn_query, preproc_knn_query, k);
+    testRKNNQueries(rel, lin_rknn_query, preproc_rknn_query, k);
   }
 
   public static void testRKNNQueries(Relation<DoubleVector> rep, RKNNQuery<DoubleVector> lin_rknn_query, RKNNQuery<DoubleVector> preproc_rknn_query, int k) {

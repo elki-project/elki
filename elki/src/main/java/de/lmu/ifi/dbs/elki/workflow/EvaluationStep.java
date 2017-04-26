@@ -28,7 +28,6 @@ import de.lmu.ifi.dbs.elki.evaluation.AutomaticEvaluation;
 import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -65,12 +64,12 @@ public class EvaluationStep implements WorkflowStep {
     this.evaluators = evaluators;
   }
 
-  public void runEvaluators(ResultHierarchy hier, Database db) {
+  public void runEvaluators(Database db) {
     // Currently only serves indication purposes.
     stepresult = new BasicResult("Evaluation Step", "evaluation-step");
     // Run evaluation helpers
     if(evaluators != null) {
-      new Evaluation(hier, evaluators).update(db);
+      new Evaluation(evaluators).update(db);
     }
   }
 
@@ -86,18 +85,11 @@ public class EvaluationStep implements WorkflowStep {
     private List<? extends Evaluator> evaluators;
 
     /**
-     * Result hierarchy
-     */
-    private ResultHierarchy hier;
-
-    /**
      * Constructor.
      *
-     * @param hier Result hierarchy
      * @param evaluators Evaluators
      */
-    public Evaluation(ResultHierarchy hier, List<? extends Evaluator> evaluators) {
-      this.hier = hier;
+    public Evaluation(List<? extends Evaluator> evaluators) {
       this.evaluators = evaluators;
 
       hier.addResultListener(this);
@@ -111,7 +103,7 @@ public class EvaluationStep implements WorkflowStep {
     public void update(Result r) {
       for(Evaluator evaluator : evaluators) {
         Thread.currentThread().setName(evaluator.toString());
-        evaluator.processNewResult(hier, r);
+        evaluator.processNewResult(r);
       }
     }
 

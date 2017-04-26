@@ -48,10 +48,10 @@ public class IndexStatistics implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
-    Database db = ResultUtil.findDatabase(hier);
+  public void processNewResult(Result newResult) {
+    Database db = ResultUtil.findDatabase(newResult);
     Collection<String> header = null;
-    final ArrayList<IndexTree<?, ?>> indexes = ResultUtil.filterResults(hier, newResult, IndexTree.class);
+    final ArrayList<IndexTree<?, ?>> indexes = ResultUtil.filterResults(newResult, IndexTree.class);
     if (indexes == null || indexes.isEmpty()) {
       return;
     }

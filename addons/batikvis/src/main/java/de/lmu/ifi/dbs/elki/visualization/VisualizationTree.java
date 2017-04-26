@@ -25,7 +25,6 @@ import java.util.function.BiConsumer;
 
 import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.StackedIter;
@@ -101,7 +100,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @return Iterator of results.
    */
   public static It<Object> findVis(VisualizerContext context) {
-    return new StackedIter<>(context.getHierarchy().iterAll(), context.getVisHierarchy());
+    return new StackedIter<>(Metadata.of(context.getBaseResult()).hierarchy().iterDescendantsSelf(), context.getVisHierarchy());
   }
 
   /**
@@ -147,7 +146,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    */
   public static <A extends Result, B extends VisualizationItem> void findNewSiblings(VisualizerContext context, Object start, Class<? super A> type1, Class<? super B> type2, BiConsumer<A, B> handler) {
     // Search start in first hierarchy:
-    final ResultHierarchy hier = context.getHierarchy();
+    final Metadata.Hierarchy hier = Metadata.of(context.getBaseResult()).hierarchy();
     final Hierarchy<Object> vistree = context.getVisHierarchy();
     if(start instanceof Result) {
       // New result:
@@ -163,7 +162,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
     for(It<B> it2 = vistree.iterDescendantsSelf(start).filter(type2); it2.valid(); it2.advance()) {
       final B vis = it2.get();
       // Existing result:
-      for(It<A> it1 = hier.iterAll().filter(type1); it1.valid(); it1.advance()) {
+      for(It<A> it1 = hier.iterDescendantsSelf().filter(type1); it1.valid(); it1.advance()) {
         handler.accept(it1.get(), vis);
       }
     }

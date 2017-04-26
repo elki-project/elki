@@ -143,7 +143,7 @@ public class SimilarityMatrixVisualizer implements VisFactory {
       final double hlsize = StyleLibrary.SCALE * zoom * iratio / size;
       final double vlsize = StyleLibrary.SCALE * zoom / size;
       int i = 0;
-      Database database = ResultUtil.findDatabase(context.getHierarchy());
+      Database database = ResultUtil.findDatabase(context.getBaseResult());
       final Relation<String> lrep = DatabaseUtil.guessObjectLabelRepresentation(database);
       for(DBIDIter id = result.getIDs().iter(); id.valid(); id.advance()) {
         String label = lrep.get(id);

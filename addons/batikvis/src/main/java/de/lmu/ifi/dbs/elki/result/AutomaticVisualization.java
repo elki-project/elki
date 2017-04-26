@@ -93,17 +93,17 @@ public class AutomaticVisualization implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(final ResultHierarchy hier, final Result result) {
+  public void processNewResult(final Result result) {
     if(window == null) {
       if(title == null) {
-        title = VisualizerParameterizer.getTitle(ResultUtil.findDatabase(hier), result);
+        title = VisualizerParameterizer.getTitle(ResultUtil.findDatabase(result), result);
         if(title == null) {
           title = DEFAULT_TITLE;
         }
       }
 
       GUIUtil.setLookAndFeel();
-      VisualizerContext context = manager.newContext(hier, result);
+      VisualizerContext context = manager.newContext(result);
       window = new ResultWindow(title, context, single);
     }
 

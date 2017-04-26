@@ -79,7 +79,7 @@ public class MoveObjectsToolVisualization implements VisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
-    Database db = ResultUtil.findDatabase(context.getHierarchy());
+    Database db = ResultUtil.findDatabase(context.getBaseResult());
     if(!(db instanceof UpdatableDatabase)) {
       return;
     }

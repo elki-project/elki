@@ -62,7 +62,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
  * DeliClu: Density-Based Hierarchical Clustering
  * <p>
  * A hierarchical algorithm to find density-connected sets in a database,
- * closely related to OPTICS but exploiting the structure of a R-tree for
+ * closely related to OPTICS but exploiting the Ostructure of a R-tree for
  * acceleration.
  * <p>
  * Reference:

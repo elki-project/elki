@@ -76,8 +76,8 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Database db = ResultUtil.findDatabase(hier);
+  public void processNewResult(Result result) {
+    Database db = ResultUtil.findDatabase(result);
     // Prepare
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
@@ -93,7 +93,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
       DBIDs sorted = o.getOrdering().order(o.getOrdering().getDBIDs());
       PRCurve curve = computePrecisionResult(positiveids, sorted.iter(), o.getScores());
       Metadata.of(o).hierarchy().addChild(curve);
-      EvaluationResult ev = EvaluationResult.findOrCreate(hier, o, "Evaluation of ranking", "ranking-evaluation");
+      EvaluationResult ev = EvaluationResult.findOrCreate(o, "Evaluation of ranking", "ranking-evaluation");
       ev.findOrCreateGroup("Evaluation measures").addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
       // Process them only once.
       orderings.remove(o.getOrdering());
@@ -105,7 +105,7 @@ public class OutlierPrecisionRecallCurve implements Evaluator {
       DBIDs sorted = or.order(or.getDBIDs());
       PRCurve curve = computePrecisionResult(positiveids, sorted.iter(), null);
       Metadata.of(or).hierarchy().addChild(curve);
-      EvaluationResult ev = EvaluationResult.findOrCreate(hier, or, "Evaluation of ranking", "ranking-evaluation");
+      EvaluationResult ev = EvaluationResult.findOrCreate(or, "Evaluation of ranking", "ranking-evaluation");
       ev.findOrCreateGroup("Evaluation measures").addMeasure(PRAUC_LABEL, curve.getAUC(), 0., 1., false);
     }
   }

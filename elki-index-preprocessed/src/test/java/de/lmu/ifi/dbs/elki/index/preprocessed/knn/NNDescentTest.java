@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.LinearScanDistanceKNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
 /**
@@ -76,7 +77,7 @@ public class NNDescentTest {
         .build().instantiate(rel);
     KNNQuery<DoubleVector> preproc_knn_query = preproc.getKNNQuery(distanceQuery, k);
     // add as index
-    db.getHierarchy().add(rel, preproc);
+    Metadata.of(rel).hierarchy().addChild(preproc);
     assertFalse("Preprocessor knn query class incorrect.", preproc_knn_query instanceof LinearScanDistanceKNNQuery);
 
     // test queries

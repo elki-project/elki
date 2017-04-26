@@ -32,8 +32,7 @@ public interface ResultProcessor {
   /**
    * Process a result.
    * 
-   * @param hier The base of the result tree.
    * @param newResult Newly added result subtree.
    */
-  void processNewResult(final ResultHierarchy hier, final Result newResult);
+  void processNewResult( Result newResult);
 }

@@ -35,9 +35,9 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -106,12 +106,11 @@ public class EvaluateSquaredErrors implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
    * @return ssq
    */
-  public double evaluateClustering(ResultHierarchy hier, Relation<? extends NumberVector> rel, Clustering<?> c) {
+  public double evaluateClustering(Relation<? extends NumberVector> rel, Clustering<?> c) {
     boolean square = !distance.isSquared();
     int ignorednoise = 0;
 
@@ -143,25 +142,26 @@ public class EvaluateSquaredErrors implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".rmsd", FastMath.sqrt(ssq / div)));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Mean distance", sum / div, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("Sum of Squares", ssq, 0., Double.POSITIVE_INFINITY, true);
     g.addMeasure("RMSD", FastMath.sqrt(ssq / div), 0., Double.POSITIVE_INFINITY, true);
-    hier.add(c, ev);
+    Metadata.of(c).hierarchy().addChild(ev);
+    // FIXME: notify of changes, if reused!
     return ssq;
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
+  public void processNewResult(Result result) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(result);
     if(crs.isEmpty()) {
       return;
     }
-    Database db = ResultUtil.findDatabase(hier);
+    Database db = ResultUtil.findDatabase(result);
     Relation<NumberVector> rel = db.getRelation(distance.getInputTypeRestriction());
     for(Clustering<?> c : crs) {
-      evaluateClustering(hier, rel, c);
+      evaluateClustering(rel, c);
     }
   }
 

@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.evaluation;
 
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -34,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  */
 public class NoAutomaticEvaluation implements Evaluator {
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
+  public void processNewResult(Result newResult) {
     // Noop.
   }
 

@@ -35,7 +35,6 @@ import de.lmu.ifi.dbs.elki.evaluation.outlier.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -64,20 +63,20 @@ public class AutomaticEvaluation implements Evaluator {
   private static final Logging LOG = Logging.getLogger(AutomaticEvaluation.class);
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
-    autoEvaluateClusterings(hier, newResult);
-    autoEvaluateOutliers(hier, newResult);
+  public void processNewResult(Result newResult) {
+    autoEvaluateClusterings(newResult);
+    autoEvaluateOutliers(newResult);
   }
 
-  protected void autoEvaluateOutliers(ResultHierarchy hier, Result newResult) {
-    Collection<OutlierResult> outliers = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
+  protected void autoEvaluateOutliers(Result newResult) {
+    Collection<OutlierResult> outliers = ResultUtil.filterResults(newResult, OutlierResult.class);
     if(LOG.isDebugging()) {
       LOG.debug("Number of new outlier results: " + outliers.size());
     }
     if(!outliers.isEmpty()) {
-      Database db = ResultUtil.findDatabase(hier);
+      Database db = ResultUtil.findDatabase(newResult);
       ensureClusteringResult(db);
-      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, db, Clustering.class);
+      Collection<Clustering<?>> clusterings = ResultUtil.filterResults(db, Clustering.class);
       if(clusterings.isEmpty()) {
         LOG.warning("Could not find a clustering result, even after running 'ensureClusteringResult'?!?");
         return;
@@ -110,20 +109,20 @@ public class AutomaticEvaluation implements Evaluator {
       LOG.verbose("Evaluating using minority class: " + label);
       Pattern pat = Pattern.compile("^" + Pattern.quote(label) + "$");
       // Evaluate rankings.
-      new OutlierRankingEvaluation(pat).processNewResult(hier, newResult);
+      new OutlierRankingEvaluation(pat).processNewResult(newResult);
       // Compute ROC curve
-      new OutlierROCCurve(pat).processNewResult(hier, newResult);
+      new OutlierROCCurve(pat).processNewResult(newResult);
       // Compute Precision at k
-      new OutlierPrecisionAtKCurve(pat, min << 1).processNewResult(hier, newResult);
+      new OutlierPrecisionAtKCurve(pat, min << 1).processNewResult(newResult);
       // Compute ROC curve
-      new OutlierPrecisionRecallCurve(pat).processNewResult(hier, newResult);
+      new OutlierPrecisionRecallCurve(pat).processNewResult(newResult);
       // Compute outlier histogram
-      new ComputeOutlierHistogram(pat, 50, new LinearScaling(), false).processNewResult(hier, newResult);
+      new ComputeOutlierHistogram(pat, 50, new LinearScaling(), false).processNewResult(newResult);
     }
   }
 
-  protected void autoEvaluateClusterings(ResultHierarchy hier, Result newResult) {
-    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(hier, newResult, Clustering.class);
+  protected void autoEvaluateClusterings(Result newResult) {
+    Collection<Clustering<?>> clusterings = ResultUtil.filterResults(newResult, Clustering.class);
     if(LOG.isDebugging()) {
       LOG.warning("Number of new clustering results: " + clusterings.size());
     }
@@ -144,7 +143,7 @@ public class AutomaticEvaluation implements Evaluator {
     }
     if(!clusterings.isEmpty()) {
       try {
-        new EvaluateClustering(new ByLabelClustering(), false, true).processNewResult(hier, newResult);
+        new EvaluateClustering(new ByLabelClustering(), false, true).processNewResult(newResult);
       }
       catch(NoSupportedDataTypeException e) {
         // Pass - the data probably did not have labels.

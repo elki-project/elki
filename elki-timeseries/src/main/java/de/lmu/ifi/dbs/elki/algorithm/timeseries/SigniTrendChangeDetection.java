@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.DoubleMinMax;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.outlier.BasicOutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
@@ -179,7 +180,7 @@ public class SigniTrendChangeDetection extends AbstractAlgorithm<ChangePoints> {
       }
       OutlierScoreMeta meta = new BasicOutlierScoreMeta(mm.getMin(), mm.getMax(), 0, Double.POSITIVE_INFINITY, 0.);
       DoubleRelation scores = new MaterializedDoubleRelation("Signi-Trend scores", "signitrend-scores", vals, relation.getDBIDs());
-      changepoints.addChildResult(new OutlierResult(meta, scores));
+      Metadata.of(changepoints).hierarchy().addChild(new OutlierResult(meta, scores));
       return changepoints;
     }
 

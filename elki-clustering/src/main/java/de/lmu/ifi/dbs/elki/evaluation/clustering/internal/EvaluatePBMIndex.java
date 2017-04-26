@@ -40,9 +40,9 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -50,6 +50,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -109,12 +110,11 @@ public class EvaluatePBMIndex implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
    * @return PBM
    */
-  public double evaluateClustering(ResultHierarchy hier, Relation<? extends NumberVector> rel, Clustering<?> c) {
+  public double evaluateClustering(Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     NumberVector[] centroids = new NumberVector[clusters.size()];
     int ignorednoise = EvaluateSimplifiedSilhouette.centroids(rel, clusters, centroids, noiseHandling);
@@ -200,24 +200,25 @@ public class EvaluatePBMIndex implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".pbm", pbm));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("PBM-Index", pbm, 0., Double.POSITIVE_INFINITY, 0., false);
-    hier.resultChanged(ev);
+    Metadata.of(c).hierarchy().addChild(ev);
+    // FIXME: notify of changes, if reused!
     return pbm;
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
+  public void processNewResult(Result result) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(result);
     if(crs.isEmpty()) {
       return;
     }
-    Database db = ResultUtil.findDatabase(hier);
+    Database db = ResultUtil.findDatabase(result);
     Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
-      evaluateClustering(hier, (Relation<? extends NumberVector>) rel, c);
+      evaluateClustering(rel, c);
     }
   }
 

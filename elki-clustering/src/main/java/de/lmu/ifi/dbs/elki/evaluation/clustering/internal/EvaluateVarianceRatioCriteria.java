@@ -39,9 +39,9 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.Centroid;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -110,15 +110,13 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
    * @return Variance Ratio Criteria
    */
-  public double evaluateClustering(ResultHierarchy hier, Relation<? extends NumberVector> rel, Clustering<?> c) {
+  public double evaluateClustering(Relation<? extends NumberVector> rel, Clustering<?> c) {
     // FIXME: allow using a precomputed distance matrix!
     final SquaredEuclideanDistanceFunction df = SquaredEuclideanDistanceFunction.STATIC;
-
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     double vrc = 0.;
     int ignorednoise = 0;
@@ -172,10 +170,11 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".vrc", vrc));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Variance Ratio Criteria", vrc, 0., 1., 0., false);
-    hier.resultChanged(ev);
+    Metadata.of(c).hierarchy().addChild(ev);
+    // FIXME: notify of changes, if reused!
     return vrc;
   }
 
@@ -217,16 +216,16 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
+  public void processNewResult(Result result) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(result);
     if(crs.isEmpty()) {
       return;
     }
-    Database db = ResultUtil.findDatabase(hier);
+    Database db = ResultUtil.findDatabase(result);
     Relation<? extends NumberVector> rel = db.getRelation(EuclideanDistanceFunction.STATIC.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
-      evaluateClustering(hier, (Relation<? extends NumberVector>) rel, c);
+      evaluateClustering(rel, c);
     }
   }
 

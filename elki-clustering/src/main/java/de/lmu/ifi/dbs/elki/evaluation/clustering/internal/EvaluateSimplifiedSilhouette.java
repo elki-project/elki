@@ -39,9 +39,9 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -106,12 +106,11 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
    * @return Mean simplified silhouette
    */
-  public double evaluateClustering(ResultHierarchy hier, Relation<? extends NumberVector> rel, Clustering<?> c) {
+  public double evaluateClustering(Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     NumberVector[] centroids = new NumberVector[clusters.size()];
     int ignorednoise = centroids(rel, clusters, centroids, noiseOption);
@@ -198,10 +197,11 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".simplified-silhouette.stddev", stdssil));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Simp. Silhouette +-" + FormatUtil.NF2.format(stdssil), meanssil, -1., 1., 0., false);
-    hier.resultChanged(ev);
+    Metadata.of(c).hierarchy().addChild(ev);
+    // FIXME: notify of changes, if reused!
     return meanssil;
   }
 
@@ -236,16 +236,16 @@ public class EvaluateSimplifiedSilhouette implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
+  public void processNewResult(Result result) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(result);
     if(crs.isEmpty()) {
       return;
     }
-    Database db = ResultUtil.findDatabase(hier);
+    Database db = ResultUtil.findDatabase(result);
     Relation<? extends NumberVector> rel = db.getRelation(this.distance.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
-      evaluateClustering(hier, rel, c);
+      evaluateClustering(rel, c);
     }
   }
 
