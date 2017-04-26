@@ -104,8 +104,8 @@ public class OutlierROCCurve implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Database db = ResultUtil.findDatabase(hier);
+  public void processNewResult(Result result) {
+    Database db = ResultUtil.findDatabase(result);
     // Prepare
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 
@@ -121,7 +121,7 @@ public class OutlierROCCurve implements Evaluator {
     for(OutlierResult o : oresults) {
       ROCResult rocres = computeROCResult(positiveids, o);
       Metadata.of(o).hierarchy().addChild(rocres);
-      EvaluationResult ev = EvaluationResult.findOrCreate(hier, o, "Evaluation of ranking", "ranking-evaluation");
+      EvaluationResult ev = EvaluationResult.findOrCreate(o, "Evaluation of ranking", "ranking-evaluation");
       MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");
       if(!g.hasMeasure(ROCAUC_LABEL)) {
         g.addMeasure(ROCAUC_LABEL, rocres.auc, 0., 1., false);
@@ -140,7 +140,7 @@ public class OutlierROCCurve implements Evaluator {
       }
       ROCResult rocres = computeROCResult(positiveids, sorted);
       Metadata.of(or).hierarchy().addChild(rocres);
-      EvaluationResult ev = EvaluationResult.findOrCreate(hier, or, "Evaluation of ranking", "ranking-evaluation");
+      EvaluationResult ev = EvaluationResult.findOrCreate(or, "Evaluation of ranking", "ranking-evaluation");
       MeasurementGroup g = ev.findOrCreateGroup("Evaluation measures");
       if(!g.hasMeasure(ROCAUC_LABEL)) {
         g.addMeasure(ROCAUC_LABEL, rocres.auc, 0., 1., false);

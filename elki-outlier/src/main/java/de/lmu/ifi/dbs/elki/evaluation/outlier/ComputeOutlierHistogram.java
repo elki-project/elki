@@ -188,9 +188,9 @@ public class ComputeOutlierHistogram implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
-    final Database db = ResultUtil.findDatabase(hier);
-    List<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
+  public void processNewResult(Result result) {
+    final Database db = ResultUtil.findDatabase(result);
+    List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
     if(ors == null || ors.isEmpty()) {
       // LOG.warning("No outlier results found for
       // "+ComputeOutlierHistogram.class.getSimpleName());

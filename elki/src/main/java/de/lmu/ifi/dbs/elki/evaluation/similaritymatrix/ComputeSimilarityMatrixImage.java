@@ -186,8 +186,8 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Database db = ResultUtil.findDatabase(hier);
+  public void processNewResult(Result result) {
+    Database db = ResultUtil.findDatabase(result);
     boolean nonefound = true;
     List<OutlierResult> oresults = OutlierResult.getOutlierResults(result);
     List<OrderingResult> orderings = ResultUtil.getOrderingResults(result);
@@ -213,7 +213,7 @@ public class ComputeSimilarityMatrixImage<O> implements Evaluator {
     if(nonefound) {
       // Use the database ordering.
       // But be careful to NOT cause a loop, process new databases only.
-      List<Database> iter = ResultUtil.filterResults(hier, Database.class);
+      List<Database> iter = ResultUtil.filterResults(result, Database.class);
       for(Database database : iter) {
         // Get an arbitrary representation
         Relation<O> relation = database.getRelation(distanceFunction.getInputTypeRestriction());

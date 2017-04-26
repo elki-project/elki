@@ -41,6 +41,7 @@ import de.lmu.ifi.dbs.elki.database.relation.MaterializedRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -109,7 +110,7 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       store1.put(iter, relation.get(iter).getCenterOfMass());
     }
-    return runClusteringAlgorithm(database.getHierarchy(), relation, ids, store1, dim, "Uncertain Model: Center of Mass");
+    return runClusteringAlgorithm(relation, ids, store1, dim, "Uncertain Model: Center of Mass");
   }
 
   /**
@@ -122,15 +123,15 @@ public class CenterOfMassMetaClustering<C extends Clustering<?>> extends Abstrac
    * @param title Title of relation
    * @return Clustering result
    */
-  protected C runClusteringAlgorithm(ResultHierarchy hierarchy, Result parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
+  protected C runClusteringAlgorithm(Result parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
     SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
     Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);
     C clusterResult = inner.run(d);
-    d.getHierarchy().remove(sample);
-    d.getHierarchy().remove(clusterResult);
-    hierarchy.add(parent, sample);
-    hierarchy.add(sample, clusterResult);
+    ResultHierarchy.remove(sample);
+    ResultHierarchy.remove(clusterResult);
+    Metadata.of(parent).hierarchy().addChild(sample);
+    Metadata.of(sample).hierarchy().addChild(clusterResult);
     return clusterResult;
   }
 

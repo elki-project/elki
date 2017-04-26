@@ -172,8 +172,8 @@ public class OutlierSmROCCurve implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Database db = ResultUtil.findDatabase(hier);
+  public void processNewResult(Result result) {
+    Database db = ResultUtil.findDatabase(result);
     // Prepare
     SetDBIDs positiveids = DBIDUtil.ensureSet(DatabaseUtil.getObjectsByLabelMatch(db, positiveClassName));
 

@@ -25,11 +25,7 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
@@ -41,9 +37,9 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
@@ -133,13 +129,12 @@ public class EvaluateSilhouette<O> implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param hier Result hierarchy
    * @param rel Data relation
    * @param dq Distance query
    * @param c Clustering
    * @return Average silhouette
    */
-  public double evaluateClustering(ResultHierarchy hier, Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
+  public double evaluateClustering(Relation<O> rel, DistanceQuery<O> dq, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     MeanVariance msil = new MeanVariance();
     int ignorednoise = 0;
@@ -220,24 +215,25 @@ public class EvaluateSilhouette<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".silhouette.stddev", stdsil));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Silhouette +-" + FormatUtil.NF2.format(stdsil), meansil, -1., 1., 0., false);
-    hier.resultChanged(ev);
+    Metadata.of(c).hierarchy().addChild(ev);
+    // FIXME: notify of changes, if reused!
     return meansil;
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
+  public void processNewResult(Result result) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(result);
     if(crs.isEmpty()) {
       return;
     }
-    Database db = ResultUtil.findDatabase(hier);
+    Database db = ResultUtil.findDatabase(result);
     Relation<O> rel = db.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> dq = db.getDistanceQuery(rel, distance);
     for(Clustering<?> c : crs) {
-      evaluateClustering(hier, rel, dq, c);
+      evaluateClustering(rel, dq, c);
     }
   }
 

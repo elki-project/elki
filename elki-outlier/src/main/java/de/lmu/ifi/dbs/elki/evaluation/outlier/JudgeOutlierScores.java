@@ -142,12 +142,10 @@ public class JudgeOutlierScores implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
-    Database db = ResultUtil.findDatabase(hier);
-    List<OutlierResult> ors = ResultUtil.filterResults(hier, OutlierResult.class);
-    if(ors == null || ors.isEmpty()) {
-      // logger.warning("No results found for
-      // "+JudgeOutlierScores.class.getSimpleName());
+  public void processNewResult(Result result) {
+    Database db = ResultUtil.findDatabase(result);
+    List<OutlierResult> ors = ResultUtil.filterResults(result, OutlierResult.class);
+    if (ors == null || ors.isEmpty()) {
       return;
     }
 

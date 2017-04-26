@@ -28,13 +28,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.media.opengl.DebugGL2;
-import javax.media.opengl.GL;
-import javax.media.opengl.GL2;
-import javax.media.opengl.GLAutoDrawable;
-import javax.media.opengl.GLCapabilities;
-import javax.media.opengl.GLEventListener;
-import javax.media.opengl.GLProfile;
+import javax.media.opengl.*;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 import javax.swing.JFrame;
@@ -55,7 +49,6 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.dependence.DependenceMeasure;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHandler;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -130,7 +123,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
+  public void processNewResult(Result newResult) {
     List<Relation<?>> rels = ResultUtil.getRelations(newResult);
     for(Relation<?> rel : rels) {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
@@ -141,7 +134,7 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
       ScalesResult scales = ScalesResult.getScalesResult(vrel);
       ProjectionParallel proj = new SimpleParallel(null, scales.getScales());
       PropertiesBasedStyleLibrary stylelib = new PropertiesBasedStyleLibrary();
-      StylingPolicy stylepol = getStylePolicy(hier, stylelib);
+      StylingPolicy stylepol = getStylePolicy(rel, stylelib);
       new Instance<>(vrel, proj, settings, stylepol, stylelib).run();
     }
   }
@@ -151,8 +144,8 @@ public class OpenGL3DParallelCoordinates<O extends NumberVector> implements Resu
    *
    * @return Style result
    */
-  public StylingPolicy getStylePolicy(ResultHierarchy hier, StyleLibrary stylelib) {
-    Database db = ResultUtil.findDatabase(hier);
+  public StylingPolicy getStylePolicy(Result r, StyleLibrary stylelib) {
+    Database db = ResultUtil.findDatabase(r);
     AutomaticEvaluation.ensureClusteringResult(db);
     List<Clustering<? extends Model>> clusterings = Clustering.getClusteringResults(db);
     if(clusterings.isEmpty()) {

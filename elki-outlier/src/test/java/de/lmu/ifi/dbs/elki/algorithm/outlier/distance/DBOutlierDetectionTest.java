@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.index.preprocessed.knn.MaterializeKNNPreprocessor;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 
@@ -63,7 +64,7 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
     Database db = makeSimpleDatabase(UNITTEST + "outlier-fire.ascii", 1025);
     Relation<NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
     MaterializeKNNPreprocessor<NumberVector> preproc = new MaterializeKNNPreprocessor<>(rel, EuclideanDistanceFunction.STATIC, 179);
-    db.getHierarchy().add(rel, preproc);
+    Metadata.of(rel).hierarchy().addChild(preproc);
     preproc.initialize();
     OutlierResult result = new ELKIBuilder<DBOutlierDetection<DoubleVector>>(DBOutlierDetection.class) //
         .with(DBOutlierDetection.Parameterizer.D_ID, 0.175) //
@@ -84,11 +85,10 @@ public class DBOutlierDetectionTest extends AbstractOutlierAlgorithmTest {
     PrecomputedDistanceMatrix<NumberVector> idx = new PrecomputedDistanceMatrix<NumberVector>(rel, (DBIDRange) rel.getDBIDs(), EuclideanDistanceFunction.STATIC) {
       @Override
       public KNNQuery<NumberVector> getKNNQuery(DistanceQuery<NumberVector> distanceQuery, Object... hints) {
-        return null; // Disable kNN queries, to force range queries to be
-                     // tested.
+        return null; // Disable kNN queries, to force range queries to be tested.
       }
     };
-    db.getHierarchy().add(rel, idx);
+    Metadata.of(rel).hierarchy().addChild(idx);
     idx.initialize();
     OutlierResult result = new ELKIBuilder<DBOutlierDetection<DoubleVector>>(DBOutlierDetection.class) //
         .with(DBOutlierDetection.Parameterizer.D_ID, 0.175) //

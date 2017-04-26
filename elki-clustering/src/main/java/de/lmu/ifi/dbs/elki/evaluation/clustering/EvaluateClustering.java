@@ -105,12 +105,12 @@ public class EvaluateClustering implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
+  public void processNewResult(Result newResult) {
     // We may just have added this result.
     if(newResult instanceof Clustering && isReferenceResult((Clustering<?>) newResult)) {
       return;
     }
-    Database db = ResultUtil.findDatabase(hier);
+    Database db = ResultUtil.findDatabase(newResult);
     List<Clustering<?>> crs = Clustering.getClusteringResults(newResult);
     if(crs == null || crs.isEmpty()) {
       return;
@@ -119,7 +119,7 @@ public class EvaluateClustering implements Evaluator {
     Clustering<?> refc = null;
     // Try to find an existing reference clustering (globally)
     {
-      Collection<Clustering<?>> cs = ResultUtil.filterResults(hier, db, Clustering.class);
+      Collection<Clustering<?>> cs = ResultUtil.filterResults(db, Clustering.class);
       for(Clustering<?> test : cs) {
         if(isReferenceResult(test)) {
           refc = test;
@@ -129,7 +129,7 @@ public class EvaluateClustering implements Evaluator {
     }
     // Try to find an existing reference clustering (locally)
     if(refc == null) {
-      Collection<Clustering<?>> cs = ResultUtil.filterResults(hier, newResult, Clustering.class);
+      Collection<Clustering<?>> cs = ResultUtil.filterResults(newResult, Clustering.class);
       for(Clustering<?> test : cs) {
         if(isReferenceResult(test)) {
           refc = test;

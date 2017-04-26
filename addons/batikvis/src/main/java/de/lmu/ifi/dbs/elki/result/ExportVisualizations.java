@@ -151,7 +151,7 @@ public class ExportVisualizations implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
+  public void processNewResult(Result newResult) {
     if(output.isFile()) {
       throw new AbortException("Output folder cannot be an existing file.");
     }
@@ -165,7 +165,7 @@ public class ExportVisualizations implements ResultHandler {
       LOG.warning("Note: Reusing visualization exporter for more than one result is untested.");
     }
     if(context == null) {
-      context = manager.newContext(hier, baseResult);
+      context = manager.newContext(baseResult);
     }
 
     // Projected visualizations

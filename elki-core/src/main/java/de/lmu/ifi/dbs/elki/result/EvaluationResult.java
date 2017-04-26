@@ -133,15 +133,15 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
 
   /**
    * Find or create an evaluation result.
-   *
-   * @param hierarchy Result hierarchy.
+   * 
    * @param parent Parent result
    * @param name Long name
    * @param shortname Short name
+   *
    * @return Evaluation result
    */
-  public static EvaluationResult findOrCreate(ResultHierarchy hierarchy, Result parent, String name, String shortname) {
-    ArrayList<EvaluationResult> ers = ResultUtil.filterResults(hierarchy, parent, EvaluationResult.class);
+  public static EvaluationResult findOrCreate(Result parent, String name, String shortname) {
+    ArrayList<EvaluationResult> ers = ResultUtil.filterResults(parent, EvaluationResult.class);
     EvaluationResult ev = null;
     for(EvaluationResult e : ers) {
       if(shortname.equals(e.getShortName())) {
@@ -151,7 +151,7 @@ public class EvaluationResult extends BasicResult implements TextWriteable, Iter
     }
     if(ev == null) {
       ev = new EvaluationResult(name, shortname);
-      hierarchy.add(parent, ev);
+      Metadata.of(parent).hierarchy().addChild(ev);
     }
     return ev;
   }

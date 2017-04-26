@@ -38,9 +38,9 @@ import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleHeap;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.heap.DoubleMaxHeap;
@@ -112,13 +112,12 @@ public class EvaluateCIndex<O> implements Evaluator {
 
   /**
    * Evaluate a single clustering.
-   *
-   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
+   *
    * @return C-Index
    */
-  public double evaluateClustering(ResultHierarchy hier, Relation<? extends O> rel, DistanceQuery<O> dq, Clustering<?> c) {
+  public double evaluateClustering(Relation<? extends O> rel, DistanceQuery<O> dq, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
 
     // Count ignored noise, and within-cluster distances
@@ -194,10 +193,11 @@ public class EvaluateCIndex<O> implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".c-index", cIndex));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("C-Index", cIndex, 0., 1., 0., true);
-    hier.resultChanged(ev);
+    Metadata.of(c).hierarchy().addChild(ev);
+    // FIXME: notify of changes, if reused!
     return cIndex;
   }
 
@@ -248,17 +248,17 @@ public class EvaluateCIndex<O> implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
+  public void processNewResult(Result result) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(result);
     if(crs.size() < 1) {
       return;
     }
-    Database db = ResultUtil.findDatabase(hier);
+    Database db = ResultUtil.findDatabase(result);
     Relation<O> rel = db.getRelation(distance.getInputTypeRestriction());
     DistanceQuery<O> dq = db.getDistanceQuery(rel, distance);
 
     for(Clustering<?> c : crs) {
-      evaluateClustering(hier, rel, dq, c);
+      evaluateClustering(rel, dq, c);
     }
   }
 

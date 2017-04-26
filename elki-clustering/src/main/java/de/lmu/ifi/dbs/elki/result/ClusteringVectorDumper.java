@@ -105,7 +105,7 @@ public class ClusteringVectorDumper implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
+  public void processNewResult(Result newResult) {
     List<Clustering<?>> cs = Clustering.getClusteringResults(newResult);
     if(cs.isEmpty()) {
       return;
@@ -120,7 +120,7 @@ public class ClusteringVectorDumper implements ResultHandler {
           PrintStream writer = new PrintStream(os)) {
         // TODO: dump settings, too?
         for(Clustering<?> c : cs) {
-          dumpClusteringOutput(writer, hier, c);
+          dumpClusteringOutput(writer, c);
         }
         append = true; // Append future results.
       }
@@ -130,7 +130,7 @@ public class ClusteringVectorDumper implements ResultHandler {
     }
     else {
       for(Clustering<?> c : cs) {
-        dumpClusteringOutput(System.out, hier, c);
+        dumpClusteringOutput(System.out, c);
       }
     }
   }
@@ -139,10 +139,9 @@ public class ClusteringVectorDumper implements ResultHandler {
    * Dump a single clustering result.
    * 
    * @param writer Output writer
-   * @param hierarchy Cluster hierarchy to process
    * @param c Clustering result
    */
-  protected void dumpClusteringOutput(PrintStream writer, ResultHierarchy hierarchy, Clustering<?> c) {
+  protected void dumpClusteringOutput(PrintStream writer, Clustering<?> c) {
     DBIDRange ids = null;
     for(It<Relation<?>> iter = Metadata.of(c).hierarchy().iterParents().filter(Relation.class); iter.valid(); iter.advance()) {
       DBIDs pids = iter.get().getDBIDs();

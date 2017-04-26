@@ -67,7 +67,7 @@ public class ResultHierarchy {
     return true;
   }
 
-  public void remove(Result r) {
+  public static void remove(Result r) {
     for(It<Object> it = Metadata.of(r).hierarchy().iterParentsReverse(); it.valid(); it.advance()) {
       Metadata.of(it.get()).hierarchy().removeChild(r);
     }

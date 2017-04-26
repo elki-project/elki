@@ -38,9 +38,9 @@ import de.lmu.ifi.dbs.elki.logging.statistics.LongStatistic;
 import de.lmu.ifi.dbs.elki.logging.statistics.StringStatistic;
 import de.lmu.ifi.dbs.elki.math.Mean;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -105,12 +105,11 @@ public class EvaluateDaviesBouldin implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param hier Result hierarchy
    * @param rel Data relation
    * @param c Clustering
    * @return DB-index
    */
-  public double evaluateClustering(ResultHierarchy hier, Relation<? extends NumberVector> rel, Clustering<?> c) {
+  public double evaluateClustering(Relation<? extends NumberVector> rel, Clustering<?> c) {
     List<? extends Cluster<?>> clusters = c.getAllClusters();
     NumberVector[] centroids = new NumberVector[clusters.size()];
     int noisecount = EvaluateSimplifiedSilhouette.centroids(rel, clusters, centroids, noiseOption);
@@ -172,10 +171,11 @@ public class EvaluateDaviesBouldin implements Evaluator {
       LOG.statistics(new DoubleStatistic(key + ".db-index", daviesBouldinMean));
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(hier, c, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(c, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Davies Bouldin Index", daviesBouldinMean, 0., Double.POSITIVE_INFINITY, 0., true);
-    hier.resultChanged(ev);
+    Metadata.of(c).hierarchy().addChild(ev);
+    // FIXME: notify of changes, if reused!
     return daviesBouldinMean;
   }
 
@@ -199,16 +199,16 @@ public class EvaluateDaviesBouldin implements Evaluator {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
+  public void processNewResult(Result result) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(result);
     if(crs.isEmpty()) {
       return;
     }
-    Database db = ResultUtil.findDatabase(hier);
+    Database db = ResultUtil.findDatabase(result);
     Relation<? extends NumberVector> rel = db.getRelation(this.distanceFunction.getInputTypeRestriction());
 
     for(Clustering<?> c : crs) {
-      evaluateClustering(hier, (Relation<? extends NumberVector>) rel, c);
+      evaluateClustering(rel, c);
     }
   }
 

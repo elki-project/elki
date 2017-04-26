@@ -70,11 +70,6 @@ public class VisualizerContext implements DataStoreListener, Result {
   private VisualizationTree vistree = new VisualizationTree();
 
   /**
-   * The full result object
-   */
-  private ResultHierarchy hier;
-
-  /**
    * The event listeners for this context.
    */
   private ArrayList<DataStoreListener> listenerList = new ArrayList<>();
@@ -107,22 +102,20 @@ public class VisualizerContext implements DataStoreListener, Result {
   /**
    * Constructor. We currently require a Database and a Result.
    *
-   * @param hier Result hierarchy
    * @param start Starting result
    * @param stylelib Style library
    * @param factories Visualizer Factories to use
    */
-  public VisualizerContext(ResultHierarchy hier, Result start, StyleLibrary stylelib, Collection<VisualizationProcessor> factories) {
+  public VisualizerContext(Result start, StyleLibrary stylelib, Collection<VisualizationProcessor> factories) {
     super();
-    this.hier = hier;
     this.baseResult = start;
     this.factories = factories;
 
     // Ensure that various common results needed by visualizers are
     // automatically created
-    final Database db = ResultUtil.findDatabase(hier);
+    final Database db = ResultUtil.findDatabase(start);
     if(db == null) {
-      LOG.warning("No database reachable from " + hier);
+      LOG.warning("No database reachable from " + start);
       return;
     }
     AutomaticEvaluation.ensureClusteringResult(db);
@@ -169,7 +162,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @param stylelib Style library
    */
   protected void makeStyleResult(StyleLibrary stylelib) {
-    final Database db = ResultUtil.findDatabase(hier);
+    final Database db = ResultUtil.findDatabase(baseResult);
     stylelibrary = stylelib;
     List<Clustering<? extends Model>> clusterings = Clustering.getClusteringResults(db);
     if(!clusterings.isEmpty()) {
@@ -179,15 +172,6 @@ public class VisualizerContext implements DataStoreListener, Result {
       Clustering<Model> c = generateDefaultClustering();
       stylepolicy = new ClusterStylingPolicy(c, stylelib);
     }
-  }
-
-  /**
-   * Get the hierarchy object
-   *
-   * @return hierarchy object
-   */
-  public ResultHierarchy getHierarchy() {
-    return hier;
   }
 
   /**
@@ -233,7 +217,7 @@ public class VisualizerContext implements DataStoreListener, Result {
    * @return generated clustering
    */
   private Clustering<Model> generateDefaultClustering() {
-    final Database db = ResultUtil.findDatabase(hier);
+    final Database db = ResultUtil.findDatabase(baseResult);
     Clustering<Model> c = null;
     try {
       // Try to cluster by labels

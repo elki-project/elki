@@ -31,7 +31,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
 import de.lmu.ifi.dbs.elki.result.Metadata;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
@@ -60,11 +59,10 @@ public abstract class AbstractOutlierAlgorithmTest extends AbstractSimpleAlgorit
     // Ensure the result has been added to the hierarchy:
     Metadata.of(db).hierarchy().addChild(result);
 
-    ResultHierarchy hier = db.getHierarchy();
     // Compute ROC and AUC:
-    rocCurve.processNewResult(hier, result);
+    rocCurve.processNewResult(result);
     // Find the ROC results
-    Collection<OutlierROCCurve.ROCResult> rocs = ResultUtil.filterResults(hier, result, OutlierROCCurve.ROCResult.class);
+    Collection<OutlierROCCurve.ROCResult> rocs = ResultUtil.filterResults(result, OutlierROCCurve.ROCResult.class);
     assertTrue("No ROC result found.", !rocs.isEmpty());
     double auc = rocs.iterator().next().getAUC();
     assertFalse("More than one ROC result found.", rocs.size() > 1);

@@ -33,7 +33,6 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.datasource.FileBasedDatabaseConnection;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.result.SettingsResult;
@@ -121,17 +120,16 @@ public class VisualizerParameterizer {
   /**
    * Make a new visualization context
    *
-   * @param hier Result hierarchy
    * @param start Starting result
    * @return New context
    */
-  public VisualizerContext newContext(ResultHierarchy hier, Result start) {
-    Collection<Relation<?>> rels = ResultUtil.filterResults(hier, Relation.class);
+  public VisualizerContext newContext(Result start) {
+    Collection<Relation<?>> rels = ResultUtil.filterResults(start, Relation.class);
     for(Relation<?> rel : rels) {
       if(samplesize == 0) {
         continue;
       }
-      if(!ResultUtil.filterResults(hier, rel, SamplingResult.class).isEmpty()) {
+      if(!ResultUtil.filterResults(rel, SamplingResult.class).isEmpty()) {
         continue;
       }
       if(rel.size() > samplesize) {
@@ -140,7 +138,7 @@ public class VisualizerParameterizer {
         ResultUtil.addChildResult(rel, sample);
       }
     }
-    return new VisualizerContext(hier, start, stylelib, factories);
+    return new VisualizerContext(start, stylelib, factories);
   }
 
   /**

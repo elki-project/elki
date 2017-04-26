@@ -181,7 +181,6 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
    * @return Clustering result
    */
   public Clustering<?> run(Database database, Relation<? extends UncertainObject> relation) {
-    ResultHierarchy hierarchy = database.getHierarchy();
     ArrayList<Clustering<?>> clusterings = new ArrayList<>();
     final int dim = RelationUtil.dimensionality(relation);
     DBIDs ids = relation.getDBIDs();
@@ -196,7 +195,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
         store.put(iter, relation.get(iter).drawSample(rand));
       }
-      clusterings.add(runClusteringAlgorithm(hierarchy, samples, ids, store, dim, "Sample " + i));
+      clusterings.add(runClusteringAlgorithm(samples, ids, store, dim, "Sample " + i));
       LOG.incrementProcessed(sampleP);
     }
     LOG.ensureCompleted(sampleP);
@@ -217,13 +216,13 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     PrecomputedDistanceMatrix<Clustering<?>> mat = new PrecomputedDistanceMatrix<>(crel, rids, distance);
     mat.initialize();
     ProxyDatabase d = new ProxyDatabase(rids, crel);
-    d.getHierarchy().add(crel, mat);
+    Metadata.of(crel).hierarchy().addChild(mat);
     Clustering<?> c = metaAlgorithm.run(d);
-    d.getHierarchy().remove(d, c); // Detach from database
+    Metadata.of(d).hierarchy().removeChild(c); // Detach from database
 
     // Evaluation
     Result reps = new BasicResult("Representants", "representative");
-    hierarchy.add(relation, reps);
+    Metadata.of(relation).hierarchy().addChild(reps);
 
     DistanceQuery<Clustering<?>> dq = mat.getDistanceQuery(distance);
     List<? extends Cluster<?>> cl = c.getAllClusters();
@@ -259,7 +258,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       final double cprob = computeConfidence(clus.size(), crel.size());
 
       // Build an evaluation result
-      hierarchy.add(bestc, new RepresentativenessEvaluation(gtau, besttau, cprob));
+      Metadata.of(bestc).hierarchy().addChild(new RepresentativenessEvaluation(gtau, besttau, cprob));
 
       evaluated.add(new DoubleObjPair<Clustering<?>>(cprob, bestc));
     }
@@ -268,15 +267,15 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     for(DoubleObjPair<Clustering<?>> pair : evaluated) {
       // Attach parent relation (= sample) to the representative samples.
       for(It<Relation<?>> it = Metadata.of(pair.second).hierarchy().iterParents().filter(Relation.class); it.valid(); it.advance()) {
-        hierarchy.add(reps, it.get());
+        Metadata.of(reps).hierarchy().addChild(it.get());
       }
     }
     // Add the random samples below the representative results only:
     if(keep) {
-      hierarchy.add(relation, samples);
+      Metadata.of(relation).hierarchy().addChild(samples);
     }
     else {
-      hierarchy.remove(samples);
+      ResultHierarchy.remove(samples);
     }
     return c;
   }
@@ -296,23 +295,24 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
 
   /**
    * Run a clustering algorithm on a single instance.
-   *
+   * 
    * @param parent Parent result to attach to
    * @param ids Object IDs to process
    * @param store Input data
    * @param dim Dimensionality
    * @param title Title of relation
+   *
    * @return Clustering result
    */
-  protected Clustering<?> runClusteringAlgorithm(ResultHierarchy hierarchy, Result parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
+  protected Clustering<?> runClusteringAlgorithm(Result parent, DBIDs ids, DataStore<DoubleVector> store, int dim, String title) {
     SimpleTypeInformation<DoubleVector> t = new VectorFieldTypeInformation<>(DoubleVector.FACTORY, dim);
     Relation<DoubleVector> sample = new MaterializedRelation<>(t, ids, title, store);
     ProxyDatabase d = new ProxyDatabase(ids, sample);
     Clustering<?> clusterResult = samplesAlgorithm.run(d);
-    d.getHierarchy().remove(sample);
-    d.getHierarchy().remove(clusterResult);
-    hierarchy.add(parent, sample);
-    hierarchy.add(sample, clusterResult);
+    ResultHierarchy.remove(sample);
+    ResultHierarchy.remove(clusterResult);
+    Metadata.of(parent).hierarchy().addChild(sample);
+    Metadata.of(sample).hierarchy().addChild(clusterResult);
     return clusterResult;
   }
 

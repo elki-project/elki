@@ -91,7 +91,7 @@ public class ResultWriter implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result result) {
+  public void processNewResult(Result result) {
     TextWriter writer = new TextWriter();
 
     try (StreamFactory output = openStreamFactory()) {

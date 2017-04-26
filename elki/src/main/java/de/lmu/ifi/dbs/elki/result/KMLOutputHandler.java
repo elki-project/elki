@@ -148,13 +148,13 @@ public class KMLOutputHandler implements ResultHandler {
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
-    ArrayList<OutlierResult> ors = ResultUtil.filterResults(hier, newResult, OutlierResult.class);
-    ArrayList<Clustering<?>> crs = ResultUtil.filterResults(hier, newResult, Clustering.class);
+  public void processNewResult(Result newResult) {
+    ArrayList<OutlierResult> ors = ResultUtil.filterResults(newResult, OutlierResult.class);
+    ArrayList<Clustering<?>> crs = ResultUtil.filterResults(newResult, Clustering.class);
     if(ors.size() + crs.size() > 1) {
       throw new AbortException("More than one visualizable result found. The KML writer only supports a single result!");
     }
-    Database database = ResultUtil.findDatabase(hier);
+    Database database = ResultUtil.findDatabase(newResult);
     for(OutlierResult outlierResult : ors) {
       try {
         XMLOutputFactory factory = XMLOutputFactory.newInstance();

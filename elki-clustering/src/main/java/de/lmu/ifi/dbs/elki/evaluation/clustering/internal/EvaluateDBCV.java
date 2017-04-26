@@ -41,15 +41,16 @@ import de.lmu.ifi.dbs.elki.evaluation.Evaluator;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.PrimsMinimumSpanningTree;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -93,13 +94,12 @@ public class EvaluateDBCV<O> implements Evaluator {
   /**
    * Evaluate a single clustering.
    *
-   * @param hier Result hierarchy
    * @param rel Data relation
    * @param cl Clustering
    *
    * @return dbcv DBCV-index
    */
-  public double evaluateClustering(ResultHierarchy hier, Relation<O> rel, Clustering<?> cl) {
+  public double evaluateClustering(Relation<O> rel, Clustering<?> cl) {
     final DistanceQuery<O> dq = rel.getDistanceQuery(distanceFunction);
 
     List<? extends Cluster<?>> clusters = cl.getAllClusters();
@@ -242,26 +242,27 @@ public class EvaluateDBCV<O> implements Evaluator {
       dbcv += weight * vc;
     }
 
-    EvaluationResult ev = EvaluationResult.findOrCreate(hier, cl, "Internal Clustering Evaluation", "internal evaluation");
+    EvaluationResult ev = EvaluationResult.findOrCreate(cl, "Internal Clustering Evaluation", "internal evaluation");
     MeasurementGroup g = ev.findOrCreateGroup("Distance-based Evaluation");
     g.addMeasure("Density Based Clustering Validation", dbcv, 0., Double.POSITIVE_INFINITY, 0., true);
-    hier.resultChanged(ev);
+    Metadata.of(cl).hierarchy().addChild(ev);
+    // FIXME: notify of changes, if reused!
     return dbcv;
   }
 
   @Override
-  public void processNewResult(ResultHierarchy hier, Result newResult) {
+  public void processNewResult(Result newResult) {
     List<Clustering<?>> crs = Clustering.getClusteringResults(newResult);
     if(crs.size() < 1) {
       return;
     }
-    Database db = ResultUtil.findDatabase(hier);
+    Database db = ResultUtil.findDatabase(newResult);
     TypeInformation typ = new CombinedTypeInformation(this.distanceFunction.getInputTypeRestriction(), TypeUtil.NUMBER_VECTOR_FIELD);
     Relation<O> rel = db.getRelation(typ);
 
     if(rel != null) {
       for(Clustering<?> cl : crs) {
-        evaluateClustering(hier, rel, cl);
+        evaluateClustering(rel, cl);
       }
     }
   }
