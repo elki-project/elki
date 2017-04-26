@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.Cluster;
 import de.lmu.ifi.dbs.elki.data.Clustering;
 import de.lmu.ifi.dbs.elki.data.model.OPTICSModel;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -94,7 +95,7 @@ public class OPTICSClusterVisualization implements VisFactory {
         }
       });
       // Also check parents, the current default behavior of OPTICSXi.
-      context.getHierarchy().iterAncestors(p.getResult()).filter(Clustering.class).forEach(clus -> {
+      Metadata.of(p.getResult()).hierarchy().iterAncestors().filter(Clustering.class).forEach(clus -> {
         if(clus.getToplevelClusters().size() == 0) {
           return;
         }

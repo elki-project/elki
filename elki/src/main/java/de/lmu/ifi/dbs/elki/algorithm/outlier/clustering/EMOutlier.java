@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.database.relation.DoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.MaterializedDoubleRelation;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierScoreMeta;
 import de.lmu.ifi.dbs.elki.result.outlier.ProbabilisticOutlierScore;
@@ -97,7 +98,7 @@ public class EMOutlier<V extends NumberVector> extends AbstractAlgorithm<Outlier
     emClustering.setSoft(true);
     Clustering<?> emresult = emClustering.run(database, relation);
     Relation<double[]> soft = null;
-    for(It<Relation<double[]>> iter = emresult.getHierarchy().iterChildren(emresult).filter(Relation.class); iter.valid(); iter.advance()) {
+    for(It<Relation<double[]>> iter = Metadata.of(emresult).hierarchy().iterChildren().filter(Relation.class); iter.valid(); iter.advance()) {
       if(iter.get().getDataTypeInformation() == EM.SOFT_TYPE) {
         soft = iter.get();
       }

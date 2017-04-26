@@ -32,14 +32,10 @@ import de.lmu.ifi.dbs.elki.distance.distancefunction.DBIDDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.DBIDSimilarityFunction;
 import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
-import de.lmu.ifi.dbs.elki.index.DistanceIndex;
-import de.lmu.ifi.dbs.elki.index.KNNIndex;
-import de.lmu.ifi.dbs.elki.index.RKNNIndex;
-import de.lmu.ifi.dbs.elki.index.RangeIndex;
-import de.lmu.ifi.dbs.elki.index.SimilarityIndex;
-import de.lmu.ifi.dbs.elki.index.SimilarityRangeIndex;
+import de.lmu.ifi.dbs.elki.index.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.AbstractHierarchicalResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 
@@ -64,7 +60,7 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
     if(distanceFunction == null) {
       throw new AbortException("Distance query requested for 'null' distance!");
     }
-    for(It<DistanceIndex<O>> it = getHierarchy().iterChildrenReverse(this).filter(DistanceIndex.class); it.valid(); it.advance()) {
+    for(It<DistanceIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(DistanceIndex.class); it.valid(); it.advance()) {
       DistanceQuery<O> q = it.get().getDistanceQuery(distanceFunction, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for distance query: " + it.get());
@@ -86,7 +82,7 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
     if(similarityFunction == null) {
       throw new AbortException("Similarity query requested for 'null' similarity!");
     }
-    for(It<SimilarityIndex<O>> it = getHierarchy().iterChildrenReverse(this).filter(SimilarityIndex.class); it.valid(); it.advance()) {
+    for(It<SimilarityIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(SimilarityIndex.class); it.valid(); it.advance()) {
       SimilarityQuery<O> q = it.get().getSimilarityQuery(similarityFunction, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for similarity query: " + it.get());
@@ -108,7 +104,7 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
     if(distanceQuery == null) {
       throw new AbortException("kNN query requested for 'null' distance!");
     }
-    for(It<KNNIndex<O>> it = getHierarchy().iterChildrenReverse(this).filter(KNNIndex.class); it.valid(); it.advance()) {
+    for(It<KNNIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(KNNIndex.class); it.valid(); it.advance()) {
       KNNQuery<O> q = it.get().getKNNQuery(distanceQuery, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for kNN query: " + it.get());
@@ -144,7 +140,7 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
     if(distanceQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
-    for(It<RangeIndex<O>> it = getHierarchy().iterChildrenReverse(this).filter(RangeIndex.class); it.valid(); it.advance()) {
+    for(It<RangeIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(RangeIndex.class); it.valid(); it.advance()) {
       RangeQuery<O> q = it.get().getRangeQuery(distanceQuery, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
@@ -180,7 +176,7 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
     if(simQuery == null) {
       throw new AbortException("Range query requested for 'null' distance!");
     }
-    for(It<SimilarityRangeIndex<O>> it = getHierarchy().iterChildrenReverse(this).filter(SimilarityRangeIndex.class); it.valid(); it.advance()) {
+    for(It<SimilarityRangeIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(SimilarityRangeIndex.class); it.valid(); it.advance()) {
       RangeQuery<O> q = it.get().getSimilarityRangeQuery(simQuery, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for range query: " + it.get());
@@ -216,7 +212,7 @@ public abstract class AbstractRelation<O> extends AbstractHierarchicalResult imp
     if(distanceQuery == null) {
       throw new AbortException("RKNN query requested for 'null' distance!");
     }
-    for(It<RKNNIndex<O>> it = getHierarchy().iterChildrenReverse(this).filter(RKNNIndex.class); it.valid(); it.advance()) {
+    for(It<RKNNIndex<O>> it = Metadata.of(this).hierarchy().iterChildrenReverse().filter(RKNNIndex.class); it.valid(); it.advance()) {
       RKNNQuery<O> q = it.get().getRKNNQuery(distanceQuery, hints);
       if(getLogger().isDebuggingFinest()) {
         getLogger().debugFinest((q != null ? "Using" : "Not using") + " index for RkNN query: " + it.get());

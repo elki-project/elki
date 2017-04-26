@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -94,7 +94,6 @@ public class TooltipScoreVisualization implements VisFactory {
 
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
-    final ResultHierarchy hier = context.getHierarchy();
     // TODO: we can also visualize other scores!
     VisualizationTree.findNewSiblings(context, result, OutlierResult.class, ScatterPlotProjector.class, (o, p) -> {
       final Relation<?> rel = p.getRelation();
@@ -104,7 +103,7 @@ public class TooltipScoreVisualization implements VisFactory {
       addTooltips(o.getLongName() + NAME_GEN, o.getScores(), context, p, rel);
     });
     VisualizationTree.findNewSiblings(context, result, Relation.class, ScatterPlotProjector.class, (r, p) -> {
-      if(hier.iterParents(r).filter(OutlierResult.class).valid()) {
+      if(Metadata.of(r).hierarchy().iterParents().filter(OutlierResult.class).valid()) {
         return; // Handled by above case already.
       }
       if(!TypeUtil.DOUBLE.isAssignableFromType(r.getDataTypeInformation()) && !TypeUtil.INTEGER.isAssignableFromType(r.getDataTypeInformation())) {

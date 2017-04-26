@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeEntry;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
@@ -152,7 +153,7 @@ public class MetricalIndexApproximationMaterializeKNNPreprocessor<O extends Numb
    */
   private MetricalIndexTree<O, N, E> getMetricalIndex(Relation<? extends O> relation) throws IllegalStateException {
     MetricalIndexTree<O, N, E> ret = null;
-    for(It<MetricalIndexTree<O, N, E>> iter = relation.getHierarchy().iterDescendants(relation).filter(MetricalIndexTree.class); iter.valid(); iter.advance()) {
+    for(It<MetricalIndexTree<O, N, E>> iter = Metadata.of(relation).hierarchy().iterDescendants().filter(MetricalIndexTree.class); iter.valid(); iter.advance()) {
       if(ret != null) {
         throw new IllegalStateException("More than one metrical index found - this is not supported!");
       }

@@ -144,7 +144,7 @@ public class ClusteringVectorDumper implements ResultHandler {
    */
   protected void dumpClusteringOutput(PrintStream writer, ResultHierarchy hierarchy, Clustering<?> c) {
     DBIDRange ids = null;
-    for(It<Relation<?>> iter = hierarchy.iterParents(c).filter(Relation.class); iter.valid(); iter.advance()) {
+    for(It<Relation<?>> iter = Metadata.of(c).hierarchy().iterParents().filter(Relation.class); iter.valid(); iter.advance()) {
       DBIDs pids = iter.get().getDBIDs();
       if(pids instanceof DBIDRange) {
         ids = (DBIDRange) pids;
@@ -154,7 +154,7 @@ public class ClusteringVectorDumper implements ResultHandler {
     }
     // Fallback: try to locate a database.
     if(ids == null) {
-      for(It<Database> iter = hierarchy.iterAll().filter(Database.class); iter.valid(); iter.advance()) {
+      for(It<Database> iter = Metadata.of(c).hierarchy().iterAncestors().filter(Database.class); iter.valid(); iter.advance()) {
         DBIDs pids = iter.get().getRelation(TypeUtil.ANY).getDBIDs();
         if(pids instanceof DBIDRange) {
           ids = (DBIDRange) pids;

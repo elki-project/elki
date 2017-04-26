@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.result.BasicResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
@@ -85,7 +86,7 @@ public class AlgorithmStep implements WorkflowStep {
     ResultHierarchy hier = database.getHierarchy();
     if(LOG.isStatistics()) {
       boolean first = true;
-      for(It<Index> it = hier.iterDescendants(database).filter(Index.class); it.valid(); it.advance()) {
+      for(It<Index> it = Metadata.of(database).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
         if(first) {
           LOG.statistics("Index statistics before running algorithms:");
           first = false;
@@ -103,7 +104,7 @@ public class AlgorithmStep implements WorkflowStep {
       }
       if(LOG.isStatistics()) {
         boolean first = true;
-        for(It<Index> it = hier.iterDescendants(database).filter(Index.class); it.valid(); it.advance()) {
+        for(It<Index> it = Metadata.of(database).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
           if(first) {
             LOG.statistics("Index statistics after running algorithm " + algorithm.toString() + ":");
             first = false;

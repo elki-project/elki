@@ -57,6 +57,7 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.statistics.Duration;
 import de.lmu.ifi.dbs.elki.math.statistics.intrinsicdimensionality.AggregatedHillEstimator;
 import de.lmu.ifi.dbs.elki.math.statistics.kernelfunctions.GaussianKernelDensityFunction;
+import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.range.IntGenerator;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -371,7 +372,7 @@ public class ComputeKNNOutlierScores<O extends NumberVector> extends AbstractApp
         LOG.statistics(time.end());
         if(result != null) {
           out.accept(String.format(Locale.ROOT, format, prefix, k), result);
-          result.getHierarchy().removeSubtree(result);
+          ResultUtil.removeRecursive(result.getHierarchy(), result);
         }
       }
     });

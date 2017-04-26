@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.strategies.bulk.Sort
 import de.lmu.ifi.dbs.elki.logging.LoggingConfiguration;
 import de.lmu.ifi.dbs.elki.math.geodesy.WGS84SpheroidEarthModel;
 import de.lmu.ifi.dbs.elki.persistent.AbstractPageFileFactory;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.ELKIBuilder;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
@@ -87,7 +88,7 @@ public class GeoIndexing {
     DBIDRange ids = (DBIDRange) rel.getDBIDs();
 
     // For all indexes, dump their statistics.
-    for(It<Index> it = db.getHierarchy().iterDescendants(db).filter(Index.class); it.valid(); it.advance()) {
+    for(It<Index> it = Metadata.of(db).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       it.get().logStatistics();
     }
 
@@ -124,7 +125,7 @@ public class GeoIndexing {
 
     // But also that we only read a small part of the data, and only computed
     // the distances to a few points in the data set.
-    for(It<Index> it = db.getHierarchy().iterDescendants(db).filter(Index.class); it.valid(); it.advance()) {
+    for(It<Index> it = Metadata.of(db).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       it.get().logStatistics();
     }
   }

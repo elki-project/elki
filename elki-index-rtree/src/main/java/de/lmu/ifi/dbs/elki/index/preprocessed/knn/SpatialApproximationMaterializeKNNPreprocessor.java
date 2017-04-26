@@ -36,6 +36,7 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.SpatialNode;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
@@ -142,7 +143,7 @@ public class SpatialApproximationMaterializeKNNPreprocessor<O extends NumberVect
 
   protected SpatialIndexTree<N, E> getSpatialIndex(Relation<O> relation) {
     SpatialIndexTree<N, E> ret = null;
-    for(It<SpatialIndexTree<N, E>> iter = relation.getHierarchy().iterDescendants(relation).filter(SpatialIndexTree.class); iter.valid(); iter.advance()) {
+    for(It<SpatialIndexTree<N, E>> iter = Metadata.of(relation).hierarchy().iterDescendants().filter(SpatialIndexTree.class); iter.valid(); iter.advance()) {
       if(ret != null) {
         throw new IllegalStateException("More than one spatial index found - this is not supported!");
       }

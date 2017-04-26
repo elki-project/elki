@@ -60,10 +60,7 @@ import de.lmu.ifi.dbs.elki.index.distancematrix.PrecomputedDistanceMatrix;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
-import de.lmu.ifi.dbs.elki.result.BasicResult;
-import de.lmu.ifi.dbs.elki.result.EvaluationResult;
-import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
+import de.lmu.ifi.dbs.elki.result.*;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -270,7 +267,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
     Collections.sort(evaluated, Collections.reverseOrder());
     for(DoubleObjPair<Clustering<?>> pair : evaluated) {
       // Attach parent relation (= sample) to the representative samples.
-      for(It<Relation<?>> it = hierarchy.iterParents(pair.second).filter(Relation.class); it.valid(); it.advance()) {
+      for(It<Relation<?>> it = Metadata.of(pair.second).hierarchy().iterParents().filter(Relation.class); it.valid(); it.advance()) {
         hierarchy.add(reps, it.get());
       }
     }
@@ -279,7 +276,7 @@ public class RepresentativeUncertainClustering extends AbstractAlgorithm<Cluster
       hierarchy.add(relation, samples);
     }
     else {
-      hierarchy.removeSubtree(samples);
+      hierarchy.remove(samples);
     }
     return c;
   }

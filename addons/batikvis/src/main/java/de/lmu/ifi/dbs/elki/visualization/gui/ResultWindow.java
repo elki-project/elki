@@ -54,8 +54,8 @@ import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
 import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
 
 import de.lmu.ifi.dbs.elki.KDDTask;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Result;
-import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.result.ResultWriter;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -209,21 +209,11 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       }
       menubar.removeAll();
       menubar.add(filemenu);
-      ResultHierarchy hier = context.getHierarchy();
       Hierarchy<Object> vistree = context.getVisHierarchy();
       Result start = context.getBaseResult();
       ArrayList<JMenuItem> items = new ArrayList<>();
-      if(start == null) {
-        for(It<Result> iter = hier.iterAll(); iter.valid(); iter.advance()) {
-          if(hier.numParents(iter.get()) == 0) {
-            recursiveBuildMenu(items, iter.get(), hier, vistree, proj);
-          }
-        }
-      }
-      else {
-        for(It<Result> iter = hier.iterChildren(start); iter.valid(); iter.advance()) {
-          recursiveBuildMenu(items, iter.get(), hier, vistree, proj);
-        }
+      for(It<Object> iter = Metadata.of(start).hierarchy().iterChildren(); iter.valid(); iter.advance()) {
+        recursiveBuildMenu(items, iter.get(), vistree, proj);
       }
       // Add all items.
       for(JMenuItem item : items) {
@@ -233,7 +223,7 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       menubar.repaint();
     }
 
-    private void recursiveBuildMenu(Collection<JMenuItem> items, Object r, ResultHierarchy hier, Hierarchy<Object> vistree, Projection proj) {
+    private void recursiveBuildMenu(Collection<JMenuItem> items, Object r, Hierarchy<Object> vistree, Projection proj) {
       // Make a submenu for this element
       final String nam;
       if(r instanceof Result) {
@@ -247,14 +237,12 @@ public class ResultWindow extends JFrame implements ResultListener, Visualizatio
       }
       ArrayList<JMenuItem> subitems = new ArrayList<>();
       // Add menus for any child results
-      if(r instanceof Result) {
-        for(It<Result> iter = hier.iterChildren((Result) r); iter.valid(); iter.advance()) {
-          recursiveBuildMenu(subitems, iter.get(), hier, vistree, proj);
-        }
+      for(It<Object> iter = Metadata.of(r).hierarchy().iterChildren(); iter.valid(); iter.advance()) {
+        recursiveBuildMenu(subitems, iter.get(), vistree, proj);
       }
       // Add visualizers:
       for(It<Object> iter = vistree.iterChildren(r); iter.valid(); iter.advance()) {
-        recursiveBuildMenu(subitems, iter.get(), hier, vistree, proj);
+        recursiveBuildMenu(subitems, iter.get(), vistree, proj);
       }
 
       // Item for the visualizer

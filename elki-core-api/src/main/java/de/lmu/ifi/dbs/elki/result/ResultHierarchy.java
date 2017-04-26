@@ -23,8 +23,7 @@ package de.lmu.ifi.dbs.elki.result;
 import java.util.ArrayList;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.ModifiableHierarchy;
+import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.EmptyIterator;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
@@ -34,7 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
  * @since 0.4.0
  */
 // TODO: add listener merging!
-public class ResultHierarchy extends HashMapHierarchy<Result> {
+public class ResultHierarchy {
   /**
    * Logger
    */
@@ -52,32 +51,26 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
     super();
   }
 
-  @Override
   public boolean add(Result parent, Result child) {
-    boolean changed = super.add(parent, child);
-    if(changed && child instanceof HierarchicalResult) {
-      HierarchicalResult hr = (HierarchicalResult) child;
-      ModifiableHierarchy<Result> h = hr.getHierarchy();
-      // Merge hierarchy
-      hr.setHierarchy(this);
-      // Add children of child
-      for(It<Result> iter = h.iterChildren(hr); iter.valid(); iter.advance()) {
-        Result desc = iter.get();
-        this.add(hr, desc);
-        if(desc instanceof HierarchicalResult) {
-          ((HierarchicalResult) desc).setHierarchy(this);
-        }
-      }
+    if(!Metadata.of(parent).hierarchy().addChild(child)) {
+      return false;
     }
     fireResultAdded(child, parent);
-    return changed;
+    return true;
   }
 
-  @Override
   public boolean remove(Result parent, Result child) {
-    boolean changed = super.remove(parent, child);
+    if(!Metadata.of(parent).hierarchy().removeChild(child)) {
+      return false;
+    }
     fireResultRemoved(child, parent);
-    return changed;
+    return true;
+  }
+
+  public void remove(Result r) {
+    for(It<Object> it = Metadata.of(r).hierarchy().iterParentsReverse(); it.valid(); it.advance()) {
+      Metadata.of(it.get()).hierarchy().removeChild(r);
+    }
   }
 
   /**
@@ -150,5 +143,9 @@ public class ResultHierarchy extends HashMapHierarchy<Result> {
     for(int i = listenerList.size(); --i >= 0;) {
       listenerList.get(i).resultRemoved(child, parent);
     }
+  }
+
+  public It<Object> iterAll() {
+    return EmptyIterator.empty();
   }
 }
