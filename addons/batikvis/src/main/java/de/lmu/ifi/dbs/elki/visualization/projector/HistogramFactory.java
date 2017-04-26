@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
@@ -63,7 +64,7 @@ public class HistogramFactory implements ProjectorFactory {
         return;
       }
       // Do not enable nested relations by default:
-      for(It<Relation<?>> it2 = context.getHierarchy().iterAncestors(rel).filter(Relation.class); it2.valid(); it2.advance()) {
+      for(It<Relation<?>> it2 = Metadata.of(rel).hierarchy().iterAncestors().filter(Relation.class); it2.valid(); it2.advance()) {
         // Parent relation
         final Relation<?> rel2 = it2.get();
         if(TypeUtil.SPATIAL_OBJECT.isAssignableFromType(rel2.getDataTypeInformation())) {

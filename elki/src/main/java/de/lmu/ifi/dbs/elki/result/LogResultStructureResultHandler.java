@@ -21,7 +21,6 @@
 package de.lmu.ifi.dbs.elki.result;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Description;
 
@@ -52,7 +51,7 @@ public class LogResultStructureResultHandler implements ResultHandler {
   public void processNewResult(ResultHierarchy hier, Result newResult) {
     if(LOG.isVerbose()) {
       StringBuilder buf = new StringBuilder();
-      recursiveLogResult(buf, hier, newResult, 0);
+      recursiveLogResult(buf, newResult, 0);
       LOG.verbose(buf.toString());
     }
   }
@@ -64,7 +63,7 @@ public class LogResultStructureResultHandler implements ResultHandler {
    * @param result Current result
    * @param depth Depth
    */
-  private void recursiveLogResult(StringBuilder buf, Hierarchy<Result> hier, Result result, int depth) {
+  private void recursiveLogResult(StringBuilder buf, Object result, int depth) {
     if(result == null) {
       buf.append("null");
       LOG.warning("null result!");
@@ -77,12 +76,13 @@ public class LogResultStructureResultHandler implements ResultHandler {
     for(int i = 0; i < depth; i++) {
       buf.append(' ');
     }
-    buf.append(result.getClass().getSimpleName()).append(": ").append(result.getLongName()) //
-        .append(" (").append(result.getShortName()).append(")\n");
-    if(hier.numChildren(result) > 0) {
-      for(It<Result> iter = hier.iterChildren(result); iter.valid(); iter.advance()) {
-        recursiveLogResult(buf, hier, iter.get(), depth + 1);
-      }
+    buf.append(result.getClass().getSimpleName()).append(": ");
+    if(result instanceof Result) {
+      buf.append(((Result) result).getLongName()).append(" (").append(((Result) result).getShortName()).append(')');
+    }
+    buf.append('\n');
+    for(It<Object> iter = Metadata.of(result).hierarchy().iterChildren(); iter.valid(); iter.advance()) {
+      recursiveLogResult(buf, iter.get(), depth + 1);
     }
   }
 }

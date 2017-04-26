@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
@@ -138,7 +139,7 @@ public class UncertainInstancesVisualization implements VisFactory {
       // database.
       Relation<? extends NumberVector> srel = null;
       boolean isChild = false;
-      for(It<Relation<?>> it = context.getHierarchy().iterAncestors(c).filter(Relation.class); it.valid(); it.advance()) {
+      for(It<Relation<?>> it = Metadata.of(c).hierarchy().iterAncestors().filter(Relation.class); it.valid(); it.advance()) {
         Relation<?> r = it.get();
         if(r == this.rel) {
           isChild = true;

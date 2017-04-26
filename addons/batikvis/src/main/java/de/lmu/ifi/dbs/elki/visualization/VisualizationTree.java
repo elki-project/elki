@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization;
 import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.HashMapHierarchy;
@@ -114,7 +115,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    */
   public static It<Object> findVis(VisualizerContext context, Object start) {
     if(start instanceof Result) { // In first hierarchy.
-      It<Result> it1 = context.getHierarchy().iterDescendantsSelf((Result) start);
+      It<Object> it1 = Metadata.of(start).hierarchy().iterDescendantsSelf();
       return new StackedIter<>(it1, context.getVisHierarchy());
     }
     return context.getVisHierarchy().iterDescendantsSelf(start);
@@ -127,8 +128,8 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    * @param start Starting object (in primary hierarchy!)
    * @return Iterator of results.
    */
-  public static It<Result> findNewResults(VisualizerContext context, Object start) {
-    return (start instanceof Result) ? context.getHierarchy().iterDescendantsSelf((Result) start) : EmptyIterator.empty();
+  public static It<Object> findNewResults(VisualizerContext context, Object start) {
+    return (start instanceof Result) ? Metadata.of(start).hierarchy().iterDescendantsSelf() : EmptyIterator.empty();
   }
 
   /**
@@ -150,7 +151,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
     final Hierarchy<Object> vistree = context.getVisHierarchy();
     if(start instanceof Result) {
       // New result:
-      for(It<A> it1 = hier.iterDescendantsSelf((Result) start).filter(type1); it1.valid(); it1.advance()) {
+      for(It<A> it1 = Metadata.of(start).hierarchy().iterDescendantsSelf().filter(type1); it1.valid(); it1.advance()) {
         final A result = it1.get();
         // Existing visualization:
         for(It<B> it2 = vistree.iterDescendantsSelf(context.getBaseResult()).filter(type2); it2.valid(); it2.advance()) {
@@ -185,10 +186,10 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
     final Hierarchy<Object> hier = context.getVisHierarchy();
     // Search start in first hierarchy:
     if(start instanceof Result) {
-      for(It<A> it1 = context.getHierarchy().iterDescendantsSelf((Result) start).filter(type1); it1.valid(); it1.advance()) {
+      for(It<A> it1 = Metadata.of(start).hierarchy().iterDescendantsSelf().filter(type1); it1.valid(); it1.advance()) {
         final A result = it1.get();
         // Find descendant results in result hierarchy:
-        for(It<Result> it3 = context.getHierarchy().iterDescendantsSelf(result); it3.valid(); it3.advance()) {
+        for(It<Object> it3 = Metadata.of(result).hierarchy().iterDescendantsSelf(); it3.valid(); it3.advance()) {
           // Find descendant in visualization hierarchy:
           for(It<B> it2 = hier.iterDescendantsSelf(it3.get()).filter(type2); it2.valid(); it2.advance()) {
             handler.accept(result, it2.get());
@@ -203,7 +204,7 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
         // Find ancestor result in visualization hierarchy:
         for(It<Result> it3 = hier.iterAncestorsSelf(vis).filter(Result.class); it3.valid(); it3.advance()) {
           // Find ancestor in result hierarchy:
-          for(It<A> it1 = context.getHierarchy().iterAncestorsSelf(it3.get()).filter(type1); it1.valid(); it1.advance()) {
+          for(It<A> it1 = Metadata.of(it3.get()).hierarchy().iterAncestorsSelf().filter(type1); it1.valid(); it1.advance()) {
             handler.accept(it1.get(), vis);
           }
         }

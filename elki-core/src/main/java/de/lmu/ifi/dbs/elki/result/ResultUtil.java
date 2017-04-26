@@ -26,6 +26,7 @@ import java.util.List;
 
 import de.lmu.ifi.dbs.elki.database.Database;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.Metadata.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 
 /**
@@ -127,7 +128,7 @@ public final class ResultUtil {
    */
   public static <C extends Result> ArrayList<C> filterResults(ResultHierarchy hier, Result r, Class<? super C> restrictionClass) {
     ArrayList<C> res = new ArrayList<>();
-    final It<C> it = hier.iterDescendantsSelf(r).filter(restrictionClass);
+    final It<C> it = Metadata.of(r).hierarchy().iterDescendantsSelf().filter(restrictionClass);
     it.forEach(res::add);
     return res;
   }
@@ -185,11 +186,12 @@ public final class ResultUtil {
    * @param hierarchy Result hierarchy
    * @param child Result to remove
    */
-  public static void removeRecursive(ResultHierarchy hierarchy, Result child) {
-    for(It<Result> iter = hierarchy.iterParents(child); iter.valid(); iter.advance()) {
-      hierarchy.remove(iter.get(), child);
+  public static void removeRecursive(ResultHierarchy hierarchy, Object child) {
+    final Hierarchy h = Metadata.of(child).hierarchy();
+    for(It<Object> iter = h.iterParents(); iter.valid(); iter.advance()) {
+      Metadata.of(iter.get()).hierarchy().removeChild(child);
     }
-    for(It<Result> iter = hierarchy.iterChildren(child); iter.valid(); iter.advance()) {
+    for(It<Object> iter = h.iterChildren(); iter.valid(); iter.advance()) {
       removeRecursive(hierarchy, iter.get());
     }
   }

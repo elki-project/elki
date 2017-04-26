@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.OPTICSXi;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
@@ -68,7 +69,7 @@ public class OPTICSSteepAreaVisualization implements VisFactory {
   public void processNewResult(VisualizerContext context, Object result) {
     VisualizationTree.findVis(context, result).filter(OPTICSProjector.class).forEach(p -> {
       ClusterOrder co = p.getResult();
-      It<OPTICSXi.SteepAreaResult> r = co.getHierarchy().iterChildren(co).filter(OPTICSXi.SteepAreaResult.class);
+      It<OPTICSXi.SteepAreaResult> r = Metadata.of(co).hierarchy().iterChildren().filter(OPTICSXi.SteepAreaResult.class);
       if(r.valid()) {
         final VisualizationTask task = new VisualizationTask(this, NAME, p.getResult(), null) //
             .level(VisualizationTask.LEVEL_DATA + 1);
@@ -125,7 +126,7 @@ public class OPTICSSteepAreaVisualization implements VisFactory {
     public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
       super(context, task, plot, width, height, proj);
       ClusterOrder co = this.optics.getResult();
-      this.areas = co.getHierarchy().iterChildren(co).filter(OPTICSXi.SteepAreaResult.class).get();
+      this.areas = Metadata.of(co).hierarchy().iterChildren().filter(OPTICSXi.SteepAreaResult.class).get();
     }
 
     @Override

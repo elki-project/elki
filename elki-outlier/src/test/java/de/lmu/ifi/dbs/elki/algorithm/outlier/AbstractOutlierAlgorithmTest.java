@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.evaluation.outlier.OutlierROCCurve;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
@@ -57,11 +58,9 @@ public abstract class AbstractOutlierAlgorithmTest extends AbstractSimpleAlgorit
         .with(OutlierROCCurve.Parameterizer.POSITIVE_CLASS_NAME_ID, positive).build();
 
     // Ensure the result has been added to the hierarchy:
-    ResultHierarchy hier = db.getHierarchy();
-    if(hier.numParents(result) < 1) {
-      hier.add(db, result);
-    }
+    Metadata.of(db).hierarchy().addChild(result);
 
+    ResultHierarchy hier = db.getHierarchy();
     // Compute ROC and AUC:
     rocCurve.processNewResult(hier, result);
     // Find the ROC results

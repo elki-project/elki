@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
@@ -127,7 +128,7 @@ public class BubbleVisualization implements VisFactory {
       boolean vis = true;
       // Quick and dirty hack: hide if parent result is also an outlier
       // result since that probably is already visible and we're redundant.
-      if(o.getHierarchy().iterParents(o).filter(OutlierResult.class).valid()) {
+      if(Metadata.of(o).hierarchy().iterParents().filter(OutlierResult.class).valid()) {
         vis = false;
       }
       final VisualizationTask task = new VisualizationTask(this, NAME, o, rel) //

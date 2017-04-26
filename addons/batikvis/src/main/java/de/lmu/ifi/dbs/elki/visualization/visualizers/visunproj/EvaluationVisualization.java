@@ -24,6 +24,7 @@ import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.result.EvaluationResult;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
@@ -153,7 +154,7 @@ public class EvaluationVisualization implements VisFactory {
         for(It<EvaluationResult> it = VisualizationTree.findNewResults(context, cpol.getClustering()).filter(c); it.valid(); it.advance()) {
           // This could be attached to a child clustering, in which case we
           // may end up displaying the wrong evaluation.
-          if(context.getHierarchy().iterAncestors(it.get()).find(cpol.getClustering())) {
+          if(Metadata.of(it.get()).hierarchy().iterAncestors().find(cpol.getClustering())) {
             sr = it.get();
             break;
           }

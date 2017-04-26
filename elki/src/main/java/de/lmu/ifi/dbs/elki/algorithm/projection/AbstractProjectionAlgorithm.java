@@ -24,6 +24,7 @@ import de.lmu.ifi.dbs.elki.algorithm.AbstractAlgorithm;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.index.Index;
 import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
@@ -70,7 +71,7 @@ public abstract class AbstractProjectionAlgorithm<R extends Result> extends Abst
       return;
     }
     boolean first = true;
-    for(It<Index> it = relation.getHierarchy().iterDescendants(relation).filter(Index.class); it.valid(); it.advance()) {
+    for(It<Index> it = Metadata.of(relation).hierarchy().iterDescendants().filter(Index.class); it.valid(); it.advance()) {
       if(first) {
         Logging.getLogger(getClass()).statistics("Index statistics when removing initial data relation.");
         first = false;

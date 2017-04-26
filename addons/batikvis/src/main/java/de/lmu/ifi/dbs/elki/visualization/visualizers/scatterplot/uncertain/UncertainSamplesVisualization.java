@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.data.uncertain.UncertainObject;
 import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
+import de.lmu.ifi.dbs.elki.result.Metadata;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
@@ -90,7 +91,7 @@ public class UncertainSamplesVisualization implements VisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
-      context.getHierarchy().iterAncestorsSelf((Relation<?>) p.getRelation()).filter(Relation.class).forEach(r2 -> {
+      Metadata.of(p.getRelation()).hierarchy().iterAncestorsSelf().filter(Relation.class).forEach(r2 -> {
         if(UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r2.getDataTypeInformation())) {
           context.addVis(p, new VisualizationTask(this, NAME, p, r2) //
               .level(VisualizationTask.LEVEL_DATA).visibility(false) //
