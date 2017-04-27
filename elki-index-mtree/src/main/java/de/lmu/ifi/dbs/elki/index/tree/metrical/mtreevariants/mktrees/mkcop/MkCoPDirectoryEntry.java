@@ -127,28 +127,4 @@ class MkCoPDirectoryEntry extends MTreeDirectoryEntry implements MkCoPEntry {
     super.readExternal(in);
     conservativeApproximation = (ApproximationLine) in.readObject();
   }
-
-  /**
-   * Indicates whether some other object is "equal to" this one.
-   * 
-   * @param o the object to be tested
-   * @return true, if the super method returns true and o is an MkCoPLeafEntry
-   *         and has the same conservative approximation as this entry.
-   */
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
-      return false;
-    }
-
-    final MkCoPDirectoryEntry that = (MkCoPDirectoryEntry) o;
-
-    return !(conservativeApproximation != null ? !conservativeApproximation.equals(that.conservativeApproximation) : that.conservativeApproximation != null);
-  }
 }

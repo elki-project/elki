@@ -663,6 +663,11 @@ public class AggarwalYuEvolutionary<V extends NumberVector> extends AbstractAgga
     }
 
     @Override
+    public int hashCode() {
+      return System.identityHashCode(this);
+    }
+
+    @Override
     public int compareTo(Individuum o) {
       return Double.compare(this.fitness, o.fitness);
     }

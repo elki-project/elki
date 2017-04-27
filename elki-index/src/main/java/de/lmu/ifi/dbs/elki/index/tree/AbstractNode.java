@@ -144,45 +144,13 @@ public abstract class AbstractNode<E extends Entry> extends AbstractExternalizab
   }
 
   /**
-   * Returns <code>true</code> if <code>this == o</code> has the value
-   * <code>true</code> or o is not null and o is of the same class as this
-   * instance and <code>super.equals(o)</code> returns <code>true</code> and
-   * both nodes are of the same type (leaf node or directory node) and have
-   * contain the same entries, <code>false</code> otherwise.
-   *
-   * @see de.lmu.ifi.dbs.elki.persistent.AbstractExternalizablePage#equals(Object)
-   */
-  @Override
-  public boolean equals(Object o) {
-    if(this == o) {
-      return true;
-    }
-    if(o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    if(!super.equals(o)) {
-      return false;
-    }
-
-    final AbstractNode<?> that = (AbstractNode<?>) o;
-
-    return isLeaf == that.isLeaf && numEntries == that.numEntries && Arrays.equals(entries, that.entries);
-  }
-
-  /**
    * Returns a string representation of this node.
    *
    * @return the type of this node (LeafNode or DirNode) followed by its id
    */
   @Override
-  public final String toString() {
-    if(isLeaf) {
-      return "LeafNode " + getPageID();
-    }
-    else {
-      return "DirNode " + getPageID();
-    }
+  public String toString() {
+    return (isLeaf ? "LeafNode " : "DirNode ") + getPageID();
   }
 
   /**

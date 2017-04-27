@@ -91,6 +91,11 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
     return other.similarityFunction.equals(other.similarityFunction);
   }
 
+  @Override
+  public int hashCode() {
+    return getClass().hashCode() ^ similarityFunction.hashCode();
+  }
+
   /**
    * Inner proxy class for SNN distance function.
    * 
@@ -148,7 +153,7 @@ public abstract class AbstractSimilarityAdapter<O> extends AbstractDatabaseDista
      * </p>
      */
     public static final OptionID SIMILARITY_FUNCTION_ID = new OptionID("adapter.similarityfunction", //
-    "Similarity function to derive the distance between database objects from.");
+        "Similarity function to derive the distance between database objects from.");
 
     /**
      * Holds the similarity function.

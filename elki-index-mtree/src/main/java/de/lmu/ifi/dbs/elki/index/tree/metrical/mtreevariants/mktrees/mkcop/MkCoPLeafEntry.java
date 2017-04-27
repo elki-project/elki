@@ -167,40 +167,6 @@ class MkCoPLeafEntry extends MTreeLeafEntry implements MkCoPEntry {
     progressiveApproximation = (ApproximationLine) in.readObject();
   }
 
-  /**
-   * Indicates whether some other object is "equal to" this one.
-   * 
-   * @param o the object to be tested
-   * @return true, if the super method returns true and o is an MkCoPLeafEntry
-   *         and has the same conservative and progressive approximation as this
-   *         entry.
-   */
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
-      return false;
-    }
-
-    final MkCoPLeafEntry that = (MkCoPLeafEntry) o;
-
-    if (conservativeApproximation != null ? !conservativeApproximation.equals(that.conservativeApproximation) : that.conservativeApproximation != null) {
-      return false;
-    }
-
-    return !(progressiveApproximation != null ? !progressiveApproximation.equals(that.progressiveApproximation) : that.progressiveApproximation != null);
-  }
-
-  /**
-   * Returns a string representation of this entry.
-   * 
-   * @return a string representation of this entry
-   */
   @Override
   public String toString() {
     return super.toString() + "\ncons " + conservativeApproximation + "\n";

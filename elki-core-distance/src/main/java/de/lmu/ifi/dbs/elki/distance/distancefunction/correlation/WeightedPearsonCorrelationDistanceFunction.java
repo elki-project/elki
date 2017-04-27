@@ -90,7 +90,7 @@ public class WeightedPearsonCorrelationDistanceFunction extends AbstractNumberVe
 
   @Override
   public int hashCode() {
-    return getClass().hashCode() + Arrays.hashCode(weights);
+    return System.identityHashCode(this);
   }
 
   @Override

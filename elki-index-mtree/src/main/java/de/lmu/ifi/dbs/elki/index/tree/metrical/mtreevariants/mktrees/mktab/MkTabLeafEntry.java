@@ -23,7 +23,6 @@ package de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.mktrees.mktab;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.Arrays;
 
 import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.MTreeLeafEntry;
@@ -121,25 +120,5 @@ class MkTabLeafEntry extends MTreeLeafEntry implements MkTabEntry {
     for(int i = 0; i < k_max; i++) {
       knnDistances[i] = in.readDouble();
     }
-  }
-
-  /**
-   * Indicates whether some other object is "equal to" this one.
-   * 
-   * @param o the object to be tested
-   * @return true, if the super method returns true and o is an MkTabLeafEntry
-   *         and has the same parameter k_max and knnDistances as this entry.
-   */
-  @Override
-  public boolean equals(Object o) {
-    if(this == o) {
-      return true;
-    }
-    if(o == null || getClass() != o.getClass() || !super.equals(o)) {
-      return false;
-    }
-
-    final MkTabLeafEntry that = (MkTabLeafEntry) o;
-    return Arrays.equals(knnDistances, that.knnDistances);
   }
 }

@@ -165,6 +165,11 @@ public class LCSSDistanceFunction extends AbstractNumberVectorDistanceFunction {
         && this.pEpsilon == ((LCSSDistanceFunction) obj).pEpsilon);
   }
 
+  @Override
+  public int hashCode() {
+    return getClass().hashCode() ^ (Double.hashCode(pDelta) * 31 + Double.hashCode(pEpsilon));
+  }
+
   /**
    * Parameterization class.
    * 

@@ -168,7 +168,7 @@ public class WeightedLPNormDistanceFunction extends LPNormDistanceFunction imple
 
   @Override
   public int hashCode() {
-    return Double.hashCode(p) * 31 + Arrays.hashCode(weights) + getClass().hashCode();
+    return System.identityHashCode(this);
   }
 
   @Override

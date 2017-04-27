@@ -93,7 +93,7 @@ public class WeightedSquaredPearsonCorrelationDistanceFunction extends AbstractN
 
   @Override
   public int hashCode() {
-    return getClass().hashCode() + Arrays.hashCode(weights);
+    return System.identityHashCode(this);
   }
 
   /**

@@ -95,28 +95,4 @@ class MkMaxLeafEntry extends MTreeLeafEntry implements MkMaxEntry {
     super.readExternal(in);
     this.knnDistance = in.readDouble();
   }
-
-  /**
-   * Indicates whether some other object is "equal to" this one.
-   * 
-   * @param o the object to be tested
-   * @return true, if the super method returns true and o is an MkMaxLeafEntry
-   *         and has the same knnDistance as this entry.
-   */
-  @Override
-  public boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if (!super.equals(o)) {
-      return false;
-    }
-
-    final MkMaxLeafEntry that = (MkMaxLeafEntry) o;
-
-    return Double.compare(knnDistance, that.knnDistance) == 0;
-  }
 }

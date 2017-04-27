@@ -151,7 +151,7 @@ public class Segment implements Comparable<Segment> {
 
   @Override
   public int hashCode() {
-    return Arrays.hashCode(clusterIds);
+    return System.identityHashCode(this);
   }
 
   @Override

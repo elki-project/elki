@@ -1559,7 +1559,7 @@ public final class VMath {
    * @return Hash code
    */
   public static int hashCode(final double[][] m1) {
-    return Arrays.hashCode(m1);
+    return Arrays.deepHashCode(m1);
   }
 
   /**

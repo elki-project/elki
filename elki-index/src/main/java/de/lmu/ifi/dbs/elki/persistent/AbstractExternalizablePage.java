@@ -37,7 +37,7 @@ public abstract class AbstractExternalizablePage implements Externalizable, Page
   /**
    * Serial version
    */
-  private static final long serialVersionUID = 1;
+  private static final long serialVersionUID = 2;
 
   /**
    * The unique id if this page.
@@ -47,7 +47,7 @@ public abstract class AbstractExternalizablePage implements Externalizable, Page
   /**
    * The dirty flag of this page.
    */
-  private boolean dirty;
+  private transient boolean dirty;
 
   /**
    * Empty constructor for Externalizable interface.
@@ -151,16 +151,8 @@ public abstract class AbstractExternalizablePage implements Externalizable, Page
    */
   @Override
   public boolean equals(Object o) {
-    if(this == o) {
-      return true;
-    }
-    if(o == null || getClass() != o.getClass()) {
-      return false;
-    }
-
-    final AbstractExternalizablePage that = (AbstractExternalizablePage) o;
-
-    return id == that.getPageID();
+    return this == o || (o != null && getClass() == o.getClass() //
+        && id == ((AbstractExternalizablePage) o).getPageID());
   }
 
   /**

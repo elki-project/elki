@@ -150,13 +150,19 @@ public class HyperBoundingBox implements SpatialComparable, Externalizable {
 
   @Override
   public boolean equals(Object obj) {
+    if(this == obj) {
+      return true;
+    }
+    if(obj == null || !(obj instanceof HyperBoundingBox)) {
+      return false;
+    }
     HyperBoundingBox box = (HyperBoundingBox) obj;
     return Arrays.equals(min, box.min) && Arrays.equals(max, box.max);
   }
 
   @Override
   public int hashCode() {
-    return 29 * Arrays.hashCode(min) + Arrays.hashCode(max);
+    return System.identityHashCode(this);
   }
 
   /**

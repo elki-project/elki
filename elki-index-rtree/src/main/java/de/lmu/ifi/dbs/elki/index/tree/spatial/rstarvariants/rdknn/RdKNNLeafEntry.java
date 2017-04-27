@@ -100,28 +100,4 @@ public class RdKNNLeafEntry extends SpatialPointLeafEntry implements RdKNNEntry 
     super.readExternal(in);
     this.knnDistance = in.readDouble();
   }
-
-  /**
-   * Indicates whether some other object is "equal to" this one.
-   * 
-   * @param o the object to be tested
-   * @return true, if the super method returns true and o is an RDkNNLeafEntry
-   *         and has the same knnDistance as this entry.
-   */
-  @Override
-  public boolean equals(Object o) {
-    if(this == o) {
-      return true;
-    }
-    if(o == null || getClass() != o.getClass()) {
-      return false;
-    }
-    if(!super.equals(o)) {
-      return false;
-    }
-
-    final RdKNNLeafEntry that = (RdKNNLeafEntry) o;
-
-    return knnDistance == that.knnDistance;
-  }
 }

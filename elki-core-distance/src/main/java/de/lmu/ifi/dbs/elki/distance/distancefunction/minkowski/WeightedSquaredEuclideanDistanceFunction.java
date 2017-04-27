@@ -132,6 +132,11 @@ public class WeightedSquaredEuclideanDistanceFunction extends AbstractNumberVect
     return Arrays.equals(this.weights, other.weights);
   }
 
+  @Override
+  public int hashCode() {
+    return System.identityHashCode(this);
+  }
+
   /**
    * Parameterization class.
    * 
