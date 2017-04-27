@@ -22,11 +22,14 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization;
 
 import de.lmu.ifi.dbs.elki.datasource.filter.ObjectFilter;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
+import de.lmu.ifi.dbs.elki.utilities.exceptions.NotImplementedException;
 
 /**
  * Normalization performs a normalization on a set of feature vectors and is
  * capable to transform a set of feature vectors to the original attribute
- * ranges. <p/> It can also transform a matrix describing an equation system of
+ * ranges.
+ *
+ * It can also transform a matrix describing an equation system of
  * linear dependencies derived on the normalized space to describe linear
  * dependencies quantitatively adapted to the original space.
  *
@@ -45,10 +48,12 @@ public interface Normalization<O> extends ObjectFilter {
    * @param featureVector a feature vector to be transformed into original space
    * @return a feature vector transformed into original space corresponding to
    *         the given feature vector
-   * @throws NonNumericFeaturesException feature vector is not compatible with values initialized
-   *                                     during normalization
+   * @throws NonNumericFeaturesException feature vector is not compatible with
+   *         values initialized during normalization
    */
-  O restore(O featureVector) throws NonNumericFeaturesException;
+  default O restore(O featureVector) throws NonNumericFeaturesException {
+    throw new NotImplementedException();
+  }
 
   /**
    * Transforms a linear equation system describing linear dependencies
@@ -57,10 +62,13 @@ public interface Normalization<O> extends ObjectFilter {
    *
    * @param linearEquationSystem the linear equation system to be transformed
    * @return a linear equation system describing linear dependencies
-   *         derived on the normalized space transformed into a linear equation system
-   *         describing linear dependencies quantitatively adapted to the original space
-   * @throws NonNumericFeaturesException if specified linear equation system is not compatible
-   *                                     with values initialized during normalization
+   *         derived on the normalized space transformed into a linear equation
+   *         system describing linear dependencies quantitatively adapted to the
+   *         original space
+   * @throws NonNumericFeaturesException if specified linear equation system is
+   *         not compatible with values initialized during normalization
    */
-  LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException;
+  default LinearEquationSystem transform(LinearEquationSystem linearEquationSystem) throws NonNumericFeaturesException {
+    throw new NotImplementedException();
+  }
 }

@@ -23,8 +23,9 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorConversionFilter;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
@@ -48,7 +49,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMinMaxNormalization", //
     "de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseMinMaxNormalization" })
-public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends AbstractNormalization<V> {
+public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends AbstractVectorConversionFilter<V, V> implements Normalization<V> {
   /**
    * Class logger.
    */
@@ -159,15 +160,13 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
     int[] row = linearEquationSystem.getRowPermutations();
     int[] col = linearEquationSystem.getColumnPermutations();
 
-    for(int i = 0; i < coeff.length; i++) {
-      for(int r = 0; r < coeff.length; r++) {
-        double sum = 0.0;
-        for(int c = 0; c < coeff[0].length; c++) {
-          sum += minima[c] * coeff[row[r]][col[c]] / factor(c);
-          coeff[row[r]][col[c]] = coeff[row[r]][col[c]] / factor(c);
-        }
-        rhs[row[r]] = rhs[row[r]] + sum;
+    for(int r = 0; r < coeff.length; r++) {
+      final double[] coeff_r = coeff[row[r]];
+      double sum = 0.0;
+      for(int c = 0; c < coeff_r.length; c++) {
+        sum += minima[c] * (coeff_r[col[c]] /= factor(c));
       }
+      rhs[row[r]] += sum;
     }
 
     return new LinearEquationSystem(coeff, rhs, row, col);
@@ -175,13 +174,19 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
 
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append("normalization class: ").append(getClass().getName());
-    result.append('\n');
-    result.append("normalization minima: ").append(FormatUtil.format(minima));
-    result.append('\n');
-    result.append("normalization maxima: ").append(FormatUtil.format(maxima));
-    return result.toString();
+    return new StringBuilder() //
+        .append("normalization class: ").append(getClass().getName()) //
+        .append('\n') //
+        .append("normalization minima: ").append(FormatUtil.format(minima)) //
+        .append('\n') //
+        .append("normalization maxima: ").append(FormatUtil.format(maxima)) //
+        .toString();
+  }
+
+  @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
   }
 
   @Override

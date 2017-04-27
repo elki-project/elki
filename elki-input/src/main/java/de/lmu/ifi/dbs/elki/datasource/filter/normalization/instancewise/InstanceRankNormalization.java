@@ -25,7 +25,8 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
@@ -37,7 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * @param <V> vector type
  */
-public class InstanceRankNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
+public class InstanceRankNormalization<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> implements Normalization<V> {
   /**
    * Constructor.
    */
@@ -69,6 +70,12 @@ public class InstanceRankNormalization<V extends NumberVector> extends AbstractS
       raw[i] = (first + last - 1) * scale;
     }
     return factory.newNumberVector(raw);
+  }
+
+  @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
   }
 
   @Override

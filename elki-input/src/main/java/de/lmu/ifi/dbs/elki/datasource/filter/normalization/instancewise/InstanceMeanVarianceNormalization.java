@@ -24,8 +24,10 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 import net.jafama.FastMath;
 
 /**
@@ -36,7 +38,7 @@ import net.jafama.FastMath;
  * 
  * @param <V> vector type
  */
-public class InstanceMeanVarianceNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
+public class InstanceMeanVarianceNormalization<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> implements Normalization<V> {
   /**
    * Multiplicity of the vector.
    */
@@ -135,6 +137,12 @@ public class InstanceMeanVarianceNormalization<V extends NumberVector> extends A
   protected void initializeOutputType(SimpleTypeInformation<V> type) {
     super.initializeOutputType(type);
     multiplicity = ((VectorTypeInformation<?>) type).getMultiplicity();
+  }
+
+  @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
   }
 
   @Override

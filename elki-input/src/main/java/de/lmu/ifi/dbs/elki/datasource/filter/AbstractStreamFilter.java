@@ -61,4 +61,9 @@ public abstract class AbstractStreamFilter implements StreamFilter {
   public MultipleObjectsBundle asMultipleObjectsBundle() {
     return MultipleObjectsBundle.fromStream(this);
   }
+
+  @Override
+  public String toString() {
+    return getClass().getName();
+  }
 }

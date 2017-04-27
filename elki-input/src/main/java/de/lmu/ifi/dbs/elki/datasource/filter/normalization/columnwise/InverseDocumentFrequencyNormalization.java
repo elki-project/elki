@@ -20,16 +20,18 @@
  */
 package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 
+import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
+import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
+import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
+import de.lmu.ifi.dbs.elki.logging.Logging;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
+
 import gnu.trove.iterator.TIntDoubleIterator;
 import gnu.trove.map.TIntDoubleMap;
 import gnu.trove.map.hash.TIntDoubleHashMap;
 import net.jafama.FastMath;
-import de.lmu.ifi.dbs.elki.data.SparseNumberVector;
-import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
-import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization;
-import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.utilities.Alias;
 
 /**
  * Normalization for text frequency (TF) vectors, using the inverse document
@@ -43,8 +45,8 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @param <V> Vector type
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.InverseDocumentFrequencyNormalization", //
-"de.lmu.ifi.dbs.elki.datasource.filter.InverseDocumentFrequencyNormalization" })
-public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector> extends AbstractNormalization<V> {
+    "de.lmu.ifi.dbs.elki.datasource.filter.InverseDocumentFrequencyNormalization" })
+public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector> extends AbstractVectorConversionFilter<V, V> implements Normalization<V> {
   /**
    * Class logger.
    */
@@ -116,6 +118,12 @@ public class InverseDocumentFrequencyNormalization<V extends SparseNumberVector>
       vals.put(dim, featureVector.iterDoubleValue(it) / idf.get(dim));
     }
     return ((SparseNumberVector.Factory<V>) factory).newNumberVector(vals, featureVector.getDimensionality());
+  }
+
+  @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
   }
 
   @Override

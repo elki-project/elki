@@ -23,8 +23,9 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorConversionFilter;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
@@ -35,11 +36,12 @@ import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
  * 
  * @author Erich Schubert
  * @since 0.7.0
- * @param <V> vector type
  * 
  * @apiviz.uses NumberVector
+ *
+ * @param <V> vector type
  */
-public class AttributeWiseMeanNormalization<V extends NumberVector> extends AbstractNormalization<V> {
+public class AttributeWiseMeanNormalization<V extends NumberVector> extends AbstractVectorConversionFilter<V, V> implements Normalization<V> {
   /**
    * Class logger.
    */
@@ -86,8 +88,7 @@ public class AttributeWiseMeanNormalization<V extends NumberVector> extends Abst
   protected void prepareProcessInstance(V featureVector) {
     // First object? Then init. (We didn't have a dimensionality before!)
     if(sums == null || sums.length == 0) {
-      int dimensionality = featureVector.getDimensionality();
-      sums = new double[dimensionality];
+      sums = new double[featureVector.getDimensionality()];
     }
     for(int d = 0; d < featureVector.getDimensionality(); d++) {
       sums[d] += featureVector.doubleValue(d);
@@ -97,7 +98,7 @@ public class AttributeWiseMeanNormalization<V extends NumberVector> extends Abst
 
   @Override
   protected void prepareComplete() {
-    StringBuilder buf = LOG.isVerbose() ? new StringBuilder() : null;
+    StringBuilder buf = LOG.isVerbose() ? new StringBuilder(200) : null;
     final int dimensionality = sums.length;
     mean = new double[dimensionality];
     if(buf != null) {
@@ -167,15 +168,13 @@ public class AttributeWiseMeanNormalization<V extends NumberVector> extends Abst
     int[] row = linearEquationSystem.getRowPermutations();
     int[] col = linearEquationSystem.getColumnPermutations();
 
-    for(int i = 0; i < coeff.length; i++) {
-      for(int r = 0; r < coeff.length; r++) {
-        double sum = 0.0;
-        for(int c = 0; c < coeff[0].length; c++) {
-          sum += coeff[row[r]][col[c]] / mean[c];
-          coeff[row[r]][col[c]] = coeff[row[r]][col[c]] / mean[c];
-        }
-        rhs[row[r]] = rhs[row[r]] + sum;
+    for(int r = 0; r < coeff.length; r++) {
+      final double[] coeff_r = coeff[row[r]];
+      double sum = 0.0;
+      for(int c = 0; c < coeff_r.length; c++) {
+        sum += (coeff_r[col[c]] /= mean[c]);
       }
+      rhs[row[r]] += sum;
     }
 
     return new LinearEquationSystem(coeff, rhs, row, col);
@@ -183,12 +182,17 @@ public class AttributeWiseMeanNormalization<V extends NumberVector> extends Abst
 
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append("normalization class: ").append(getClass().getName());
-    result.append('\n');
-    result.append("normalization means: ").append(FormatUtil.format(mean));
+    return new StringBuilder(200) //
+        .append("normalization class: ").append(getClass().getName())//
+        .append('\n')//
+        .append("normalization means: ").append(FormatUtil.format(mean))//
+        .toString();
+  }
 
-    return result.toString();
+  @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
   }
 
   @Override

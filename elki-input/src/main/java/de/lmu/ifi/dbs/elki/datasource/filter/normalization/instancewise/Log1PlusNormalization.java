@@ -23,12 +23,14 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraints;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
+
 import net.jafama.FastMath;
 
 /**
@@ -42,7 +44,7 @@ import net.jafama.FastMath;
  * 
  * @param <V> vector type
  */
-public class Log1PlusNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
+public class Log1PlusNormalization<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> implements Normalization<V> {
   /**
    * Static instance.
    */
@@ -75,6 +77,12 @@ public class Log1PlusNormalization<V extends NumberVector> extends AbstractStrea
   }
 
   @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
+  }
+
+  @Override
   protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_VARIABLE_LENGTH;
   }
@@ -102,7 +110,7 @@ public class Log1PlusNormalization<V extends NumberVector> extends AbstractStrea
       super.makeOptions(config);
 
       DoubleParameter boostP = new DoubleParameter(BOOST_ID, 1.) //
-      .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
+          .addConstraint(CommonConstraints.GREATER_THAN_ZERO_DOUBLE);
       if(config.grab(boostP)) {
         boost = boostP.doubleValue();
       }

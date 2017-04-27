@@ -159,4 +159,9 @@ public abstract class AbstractConversionFilter<I, O> implements ObjectFilter {
   protected void prepareComplete() {
     // optional - default NOOP.
   }
+
+  @Override
+  public String toString() {
+    return getClass().getName();
+  }
 }

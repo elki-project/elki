@@ -25,9 +25,11 @@ import java.util.Arrays;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 import net.jafama.FastMath;
 
 /**
@@ -39,7 +41,7 @@ import net.jafama.FastMath;
  * 
  * @param <V> vector type
  */
-public class InstanceLogRankNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
+public class InstanceLogRankNormalization<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> implements Normalization<V> {
   /**
    * Average value use for NaNs
    */
@@ -76,6 +78,12 @@ public class InstanceLogRankNormalization<V extends NumberVector> extends Abstra
       raw[i] = FastMath.log1p((first + last - 1) * scale) * MathUtil.ONE_BY_LOG2;
     }
     return factory.newNumberVector(raw);
+  }
+
+  @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
   }
 
   @Override

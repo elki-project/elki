@@ -23,8 +23,10 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+
 import net.jafama.FastMath;
 
 /**
@@ -40,7 +42,7 @@ import net.jafama.FastMath;
  * 
  * @param <V> vector type
  */
-public class HellingerHistogramNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
+public class HellingerHistogramNormalization<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> implements Normalization<V> {
   /**
    * Static instance.
    */
@@ -65,12 +67,16 @@ public class HellingerHistogramNormalization<V extends NumberVector> extends Abs
     // Normalize and sqrt:
     if(sum > 0.) {
       for(int d = 0; d < data.length; ++d) {
-        if(data[d] > 0) {
-          data[d] = FastMath.sqrt(data[d] / sum);
-        }
+        data[d] = data[d] > 0 ? FastMath.sqrt(data[d] / sum) : 0.;
       }
     }
     return factory.newNumberVector(data);
+  }
+
+  @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
   }
 
   @Override

@@ -23,8 +23,9 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorConversionFilter;
 import de.lmu.ifi.dbs.elki.datasource.filter.normalization.NonNumericFeaturesException;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.LinearEquationSystem;
@@ -56,7 +57,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormalization", //
     "z", "de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseVarianceNormalization" })
-public class AttributeWiseVarianceNormalization<V extends NumberVector> extends AbstractNormalization<V> {
+public class AttributeWiseVarianceNormalization<V extends NumberVector> extends AbstractVectorConversionFilter<V, V> implements Normalization<V> {
   /**
    * Class logger.
    */
@@ -105,8 +106,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
   protected void prepareProcessInstance(V featureVector) {
     // First object? Then init. (We didn't have a dimensionality before!)
     if(mvs == null || mvs.length == 0) {
-      int dimensionality = featureVector.getDimensionality();
-      mvs = MeanVariance.newArray(dimensionality);
+      mvs = MeanVariance.newArray(featureVector.getDimensionality());
     }
     for(int d = 0; d < featureVector.getDimensionality(); d++) {
       mvs[d].put(featureVector.doubleValue(d));
@@ -115,7 +115,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
 
   @Override
   protected void prepareComplete() {
-    StringBuilder buf = LOG.isVerbose() ? new StringBuilder() : null;
+    StringBuilder buf = LOG.isVerbose() ? new StringBuilder(300) : null;
     final int dimensionality = mvs.length;
     mean = new double[dimensionality];
     stddev = new double[dimensionality];
@@ -125,9 +125,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
     for(int d = 0; d < dimensionality; d++) {
       mean[d] = mvs[d].getMean();
       stddev[d] = mvs[d].getNaiveStddev();
-      if(stddev[d] == 0 || Double.isNaN(stddev[d])) {
-        stddev[d] = 1.0;
-      }
+      stddev[d] = stddev[d] > Double.MIN_NORMAL ? stddev[d] : 1.;
       if(buf != null) {
         buf.append(" m: ").append(mean[d]).append(" v: ").append(stddev[d]);
       }
@@ -190,15 +188,13 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
     int[] row = linearEquationSystem.getRowPermutations();
     int[] col = linearEquationSystem.getColumnPermutations();
 
-    for(int i = 0; i < coeff.length; i++) {
-      for(int r = 0; r < coeff.length; r++) {
-        double sum = 0.0;
-        for(int c = 0; c < coeff[0].length; c++) {
-          sum += mean[c] * coeff[row[r]][col[c]] / stddev[c];
-          coeff[row[r]][col[c]] = coeff[row[r]][col[c]] / stddev[c];
-        }
-        rhs[row[r]] = rhs[row[r]] + sum;
+    for(int r = 0; r < coeff.length; r++) {
+      final double[] coeff_r = coeff[row[r]];
+      double sum = 0.0;
+      for(int c = 0; c < coeff_r.length; c++) {
+        sum += mean[c] * (coeff_r[col[c]] /= stddev[c]);
       }
+      rhs[row[r]] += sum;
     }
 
     return new LinearEquationSystem(coeff, rhs, row, col);
@@ -206,14 +202,19 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
 
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append("normalization class: ").append(getClass().getName());
-    result.append('\n');
-    result.append("normalization means: ").append(FormatUtil.format(mean));
-    result.append('\n');
-    result.append("normalization stddevs: ").append(FormatUtil.format(stddev));
+    return new StringBuilder(200) //
+        .append("normalization class: ").append(getClass().getName())//
+        .append('\n')//
+        .append("normalization means: ").append(FormatUtil.format(mean))//
+        .append('\n')//
+        .append("normalization stddevs: ").append(FormatUtil.format(stddev))//
+        .toString();
+  }
 
-    return result.toString();
+  @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
   }
 
   @Override

@@ -23,14 +23,15 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorConversionFilter;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 
 /**
  * Attribute-wise Normalization using the error function. This mostly makes
- * sense when you have data that has been mean-variance normalized before.
+ * sense when you have data that has been mean-variance normalized before,
+ * i.e., after {@link AttributeWiseVarianceNormalization}.
  * 
  * @author Erich Schubert
  * @since 0.4.0
@@ -40,8 +41,8 @@ import de.lmu.ifi.dbs.elki.utilities.Alias;
  * @apiviz.uses NumberVector
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseErfNormalization", //
-"de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseErfNormalization" })
-public class AttributeWiseErfNormalization<V extends NumberVector> extends AbstractNormalization<V> {
+    "de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseErfNormalization" })
+public class AttributeWiseErfNormalization<V extends NumberVector> extends AbstractVectorConversionFilter<V, V> {
   /**
    * Class logger.
    */
@@ -64,12 +65,18 @@ public class AttributeWiseErfNormalization<V extends NumberVector> extends Abstr
   }
 
   @Override
-  protected Logging getLogger() {
-    return LOG;
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
   }
 
   @Override
   protected SimpleTypeInformation<? super V> getInputTypeRestriction() {
     return TypeUtil.NUMBER_VECTOR_FIELD;
+  }
+
+  @Override
+  protected Logging getLogger() {
+    return LOG;
   }
 }

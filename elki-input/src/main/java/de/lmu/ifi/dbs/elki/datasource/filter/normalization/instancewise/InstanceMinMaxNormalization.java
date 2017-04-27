@@ -24,7 +24,8 @@ import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.data.type.VectorTypeInformation;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.LessGlobalConstraint;
@@ -39,7 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleParameter;
  * 
  * @param <V> vector type
  */
-public class InstanceMinMaxNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
+public class InstanceMinMaxNormalization<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> implements Normalization<V> {
   /**
    * Minimum and maximum values.
    */
@@ -121,6 +122,12 @@ public class InstanceMinMaxNormalization<V extends NumberVector> extends Abstrac
   protected void initializeOutputType(SimpleTypeInformation<V> type) {
     super.initializeOutputType(type);
     multiplicity = ((VectorTypeInformation<?>) type).getMultiplicity();
+  }
+
+  @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
   }
 
   @Override

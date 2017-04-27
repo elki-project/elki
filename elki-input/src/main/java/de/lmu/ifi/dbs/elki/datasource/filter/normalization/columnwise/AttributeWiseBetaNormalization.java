@@ -201,10 +201,9 @@ public class AttributeWiseBetaNormalization<V extends NumberVector> implements N
 
   @Override
   public String toString() {
-    StringBuilder result = new StringBuilder();
-    result.append("normalization class: ").append(getClass().getName());
-    result.append('\n');
-    result.append("normalization distributions: ");
+    StringBuilder result = new StringBuilder(200);
+    result.append("normalization class: ").append(getClass().getName()).append('\n')//
+        .append("normalization distributions: ");
     boolean first = true;
     for(DistributionEstimator<?> est : estimators) {
       if(!first) {

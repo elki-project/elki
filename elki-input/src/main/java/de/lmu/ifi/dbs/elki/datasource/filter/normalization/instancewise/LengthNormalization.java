@@ -23,7 +23,8 @@ package de.lmu.ifi.dbs.elki.datasource.filter.normalization.instancewise;
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.data.type.SimpleTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
-import de.lmu.ifi.dbs.elki.datasource.filter.normalization.AbstractStreamNormalization;
+import de.lmu.ifi.dbs.elki.datasource.filter.AbstractVectorStreamConversionFilter;
+import de.lmu.ifi.dbs.elki.datasource.filter.normalization.Normalization;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.Norm;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.EuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.VMath;
@@ -42,8 +43,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.ObjectParameter;
  * 
  * @param <V> vector type
  */
-@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.LengthNormalization"})
-public class LengthNormalization<V extends NumberVector> extends AbstractStreamNormalization<V> {
+@Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.LengthNormalization" })
+public class LengthNormalization<V extends NumberVector> extends AbstractVectorStreamConversionFilter<V, V> implements Normalization<V> {
   /**
    * Norm to use.
    */
@@ -62,7 +63,13 @@ public class LengthNormalization<V extends NumberVector> extends AbstractStreamN
   @Override
   protected V filterSingleObject(V featureVector) {
     final double d = norm.norm(featureVector);
-    return factory.newNumberVector(VMath.timesEquals(featureVector.toArray(),1 / d));
+    return factory.newNumberVector(VMath.timesEquals(featureVector.toArray(), 1 / d));
+  }
+
+  @Override
+  protected SimpleTypeInformation<? super V> convertedType(SimpleTypeInformation<V> in) {
+    initializeOutputType(in);
+    return in;
   }
 
   @Override
