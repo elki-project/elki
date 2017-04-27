@@ -213,7 +213,7 @@ public class ExportVisualizations implements ResultHandler {
         continue;
       }
       try {
-        Visualization v = task.getFactory().makeVisualization(task, svgp, width, height, item.proj);
+        Visualization v = task.getFactory().makeVisualization(context, task, svgp, width, height, item.proj);
         layers.add(v);
       }
       catch(Exception e) {

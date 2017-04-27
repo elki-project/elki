@@ -93,7 +93,7 @@ public class HistogramProjector<V extends NumberVector> implements Projector {
       for(int d1 = 0; d1 < dmax; d1++) {
         PlotItem it = new PlotItem(d1 + xoff, 0, 1., lheight, null);
         LabelVisualization lbl = new LabelVisualization(RelationUtil.getColumnLabel(rel, d1));
-        it.tasks.add(new VisualizationTask("", context, null, null, lbl) //
+        it.tasks.add(new VisualizationTask(lbl, "", null, null) //
             .requestSize(1, lheight).with(RenderFlag.NO_DETAIL));
         master.subitems.add(it);
       }

@@ -94,14 +94,14 @@ public class ScatterPlotProjector<V extends SpatialComparable> implements Projec
         // Label at bottom
         {
           PlotItem it = new PlotItem(.1, 2., 2., .1, null);
-          it.tasks.add(new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 0))) //
+          it.tasks.add(new VisualizationTask(new LabelVisualization(RelationUtil.getColumnLabel(rel, 0)), "", null, null) //
               .requestSize(2., .1).with(RenderFlag.NO_DETAIL));
           master.subitems.add(it);
         }
         // Label on left
         {
           PlotItem it = new PlotItem(0, 0, .1, 2, null);
-          it.tasks.add(new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 1), true)) //
+          it.tasks.add(new VisualizationTask(new LabelVisualization(RelationUtil.getColumnLabel(rel, 1), true), "", null, null) //
               .requestSize(.1, 2.).with(RenderFlag.NO_DETAIL));
           master.subitems.add(it);
         }
@@ -133,14 +133,14 @@ public class ScatterPlotProjector<V extends SpatialComparable> implements Projec
         // Labels at bottom
         for(int d1 = 0; d1 < dmax - 1; d1++) {
           PlotItem it = new PlotItem(d1 + .1, dmax - 1, 1., .1, null);
-          it.tasks.add(new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d1))) //
+          it.tasks.add(new VisualizationTask(new LabelVisualization(RelationUtil.getColumnLabel(rel, d1)), "", null, null) //
               .requestSize(1, .1).with(RenderFlag.NO_DETAIL));
           master.subitems.add(it);
         }
         // Labels on left
         for(int d2 = 1; d2 < dmax; d2++) {
           PlotItem it = new PlotItem(0, d2 - 1, .1, 1, null);
-          it.tasks.add(new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d2), true)) //
+          it.tasks.add(new VisualizationTask(new LabelVisualization(RelationUtil.getColumnLabel(rel, d2), true), "", null, null) //
               .requestSize(.1, 1.).with(RenderFlag.NO_DETAIL));
           master.subitems.add(it);
         }

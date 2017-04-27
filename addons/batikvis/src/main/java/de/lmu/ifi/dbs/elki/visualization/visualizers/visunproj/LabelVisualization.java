@@ -89,8 +89,7 @@ public class LabelVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    VisualizerContext context = task.getContext();
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     CSSClass cls = new CSSClass(plot, "unmanaged");
     StyleLibrary style = context.getStyleLibrary();
     double fontsize = style.getTextSize("overview.labels") / StyleLibrary.SCALE;
@@ -110,7 +109,7 @@ public class LabelVisualization extends AbstractVisFactory {
       SVGUtil.setAtt(layer, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90)");
     }
-    return new StaticVisualizationInstance(task, plot, width, height, layer);
+    return new StaticVisualizationInstance(context, task, plot, width, height, layer);
   }
 
   @Override

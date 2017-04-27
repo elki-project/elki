@@ -100,14 +100,14 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance<DoubleVector>(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance<DoubleVector>(context, task, plot, width, height, proj);
   }
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(HistogramProjector.class).forEach(p -> {
-      context.addVis(p, new VisualizationTask(CNAME, context, p, p.getRelation(), ColoredHistogramVisualizer.this) //
+      context.addVis(p, new VisualizationTask(ColoredHistogramVisualizer.this, CNAME, p, p.getRelation()) //
           .level(VisualizationTask.LEVEL_DATA) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_STYLEPOLICY));
     });
@@ -149,14 +149,15 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Visualization task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       this.relation = task.getRelation();
       this.sample = SamplingResult.getSamplingResult(relation);
       addListeners();

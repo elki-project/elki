@@ -72,14 +72,14 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
     VisualizationTree.findVis(context, result).filter(OPTICSProjector.class).forEach(p -> {
-      context.addVis(p, new VisualizationTask(NAME, context, p.getResult(), null, this) //
+      context.addVis(p, new VisualizationTask(this, NAME, p.getResult(), null) //
           .level(VisualizationTask.LEVEL_INTERACTIVE));
     });
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
@@ -133,14 +133,15 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
     }
 
     @Override

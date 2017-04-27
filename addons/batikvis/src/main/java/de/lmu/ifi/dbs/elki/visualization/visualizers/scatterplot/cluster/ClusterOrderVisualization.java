@@ -68,8 +68,8 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
@@ -79,7 +79,7 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, co, rel, ClusterOrderVisualization.this) //
+      final VisualizationTask task = new VisualizationTask(ClusterOrderVisualization.this, NAME, co, rel) //
           .level(VisualizationTask.LEVEL_DATA - 1).defaultVisibility(false) //
           .with(UpdateFlag.ON_DATA);
       context.addVis(co, task);
@@ -109,14 +109,15 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
-     * @param task Visualization task.
+     * @param context Visualizer context
+     * @param task Visualization task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       result = task.getResult();
       addListeners();
     }

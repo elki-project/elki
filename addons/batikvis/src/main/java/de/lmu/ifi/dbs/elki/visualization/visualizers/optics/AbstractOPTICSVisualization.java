@@ -24,6 +24,7 @@ import org.apache.batik.util.SVGConstants;
 
 import de.lmu.ifi.dbs.elki.algorithm.clustering.optics.ClusterOrder;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.OPTICSProjection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -58,14 +59,15 @@ public abstract class AbstractOPTICSVisualization extends AbstractVisualization 
   /**
    * Constructor.
    *
+   * @param context Visualizer context
    * @param task Visualization task.
    * @param plot Plot to draw to
    * @param width Embedding width
    * @param height Embedding height
    * @param proj Projection
    */
-  public AbstractOPTICSVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    super(task, plot, width, height);
+  public AbstractOPTICSVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    super(context, task, plot, width, height);
     this.optics = (OPTICSProjection) proj;
   }
 

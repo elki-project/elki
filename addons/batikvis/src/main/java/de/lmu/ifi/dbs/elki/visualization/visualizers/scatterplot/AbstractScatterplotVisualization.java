@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -66,14 +67,15 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
   /**
    * Constructor.
    *
+   * @param context Visualizer context
    * @param task Visualization task
    * @param plot Plot to draw to
    * @param width Embedding width
    * @param height Embedding height
    * @param proj Projection
    */
-  public AbstractScatterplotVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    super(task, plot, width, height);
+  public AbstractScatterplotVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    super(context, task, plot, width, height);
     this.proj = (Projection2D) proj;
     this.rel = task.getRelation();
     this.sample = task.has(UpdateFlag.ON_SAMPLE) ? SamplingResult.getSamplingResult(rel) : null;

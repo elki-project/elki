@@ -22,6 +22,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers.histogram;
 
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
@@ -45,14 +46,15 @@ public abstract class AbstractHistogramVisualization extends AbstractVisualizati
   /**
    * Constructor.
    *
+   * @param context Visualizer context
    * @param task Visualization task
    * @param plot Plot to draw to
    * @param width Embedding width
    * @param height Embedding height
    * @param proj Projection
    */
-  public AbstractHistogramVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    super(task, plot, width, height);
+  public AbstractHistogramVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    super(context, task, plot, width, height);
     assert(proj instanceof Projection1D) : "Visualizer attached to wrong projection!";
     this.proj = (Projection1D) proj;
   }

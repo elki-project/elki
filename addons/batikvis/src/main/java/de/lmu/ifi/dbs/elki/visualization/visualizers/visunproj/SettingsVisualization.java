@@ -64,9 +64,8 @@ public class SettingsVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     SettingsResult sr = task.getResult();
-    VisualizerContext context = task.getContext();
 
     Collection<TrackedParameter> settings = sr.getSettings();
 
@@ -127,13 +126,13 @@ public class SettingsVisualization extends AbstractVisFactory {
     final String transform = SVGUtil.makeMarginTransform(width, height, cols, rows, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualizationInstance(task, plot, width, height, layer);
+    return new StaticVisualizationInstance(context, task, plot, width, height, layer);
   }
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(SettingsResult.class).forEach(sr -> {
-      context.addVis(sr, new VisualizationTask(NAME, context, sr, null, SettingsVisualization.this) //
+      context.addVis(sr, new VisualizationTask(SettingsVisualization.this, NAME, sr, null) //
           .level(VisualizationTask.LEVEL_STATIC).defaultVisibility(false));
     });
   }

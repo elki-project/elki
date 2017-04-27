@@ -69,8 +69,8 @@ public class PolygonVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @SuppressWarnings("unchecked")
@@ -85,7 +85,7 @@ public class PolygonVisualization extends AbstractVisFactory {
       }
       // Assume that a 2d projector is using the same coordinates as the
       // polygons.
-      final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel, PolygonVisualization.this) //
+      final VisualizationTask task = new VisualizationTask(PolygonVisualization.this, NAME, rel, rel) //
           .level(VisualizationTask.LEVEL_DATA - 10) //
           .with(UpdateFlag.ON_DATA);
       context.addVis(rel, task);
@@ -115,14 +115,15 @@ public class PolygonVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Task to visualize
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       this.rep = task.getResult(); // Note: relation was used for projection
       addListeners();
     }

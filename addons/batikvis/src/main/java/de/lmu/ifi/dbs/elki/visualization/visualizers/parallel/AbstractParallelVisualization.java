@@ -26,6 +26,7 @@ import org.w3c.dom.Element;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projections.ProjectionParallel;
@@ -72,14 +73,15 @@ public abstract class AbstractParallelVisualization<NV> extends AbstractVisualiz
   /**
    * Constructor.
    *
+   * @param context Visualizer context
    * @param task Visualization task
    * @param plot Plot to draw to
    * @param width Embedding width
    * @param height Embedding height
    * @param proj Projection
    */
-  public AbstractParallelVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    super(task, plot, width, height);
+  public AbstractParallelVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    super(context, task, plot, width, height);
     this.proj = (ProjectionParallel) proj;
     this.relation = task.getRelation();
     margins = new double[] { 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE, 0.05 * StyleLibrary.SCALE, 0.1 * StyleLibrary.SCALE };

@@ -100,12 +100,12 @@ public class BubbleVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     if(settings.scaling != null && settings.scaling instanceof OutlierScalingFunction) {
       final OutlierResult outlierResult = task.getResult();
       ((OutlierScalingFunction) settings.scaling).prepare(outlierResult);
     }
-    return new Instance(task, plot, width, height, proj);
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
@@ -121,7 +121,7 @@ public class BubbleVisualization extends AbstractVisFactory {
       if(o.getHierarchy().iterParents(o).filter(OutlierResult.class).valid()) {
         vis = false;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, o, rel, BubbleVisualization.this) //
+      final VisualizationTask task = new VisualizationTask(BubbleVisualization.this, NAME, o, rel) //
           .level(VisualizationTask.LEVEL_DATA) //
           .defaultVisibility(vis) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_STYLEPOLICY);
@@ -146,14 +146,15 @@ public class BubbleVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Visualization task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       this.result = task.getResult();
       addListeners();
     }

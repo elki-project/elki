@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.visualization.visualizers;
 import org.w3c.dom.Element;
 
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 
 /**
@@ -35,14 +36,15 @@ public class StaticVisualizationInstance extends AbstractVisualization {
   /**
    * Unchanging precomputed visualization.
    *
+   * @param context Visualizer context
    * @param task Task to visualize
    * @param plot Plot to draw to
    * @param width Embedding width
    * @param height Embedding height
    * @param element Element containing the resulting visualization
    */
-  public StaticVisualizationInstance(VisualizationTask task, VisualizationPlot plot, double width, double height, Element element) {
-    super(task, plot, width, height);
+  public StaticVisualizationInstance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Element element) {
+    super(context, task, plot, width, height);
     this.layer = element;
   }
 

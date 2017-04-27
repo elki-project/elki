@@ -77,8 +77,7 @@ public class XYPlotVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    VisualizerContext context = task.getContext();
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     XYPlot xyplot = task.getResult();
 
     setupCSS(context, plot, xyplot);
@@ -126,7 +125,7 @@ public class XYPlotVisualization extends AbstractVisFactory {
       layer.appendChild(labely);
     }
 
-    return new StaticVisualizationInstance(task, plot, width, height, layer);
+    return new StaticVisualizationInstance(context, task, plot, width, height, layer);
   }
 
   /**
@@ -157,7 +156,7 @@ public class XYPlotVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(XYPlot.class).forEach(plot -> {
-      context.addVis(plot, new VisualizationTask(NAME, context, plot, null, XYPlotVisualization.this) //
+      context.addVis(plot, new VisualizationTask(XYPlotVisualization.this, NAME, plot, null) //
           .level(VisualizationTask.LEVEL_STATIC));
     });
   }

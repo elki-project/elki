@@ -89,14 +89,14 @@ public class TreeMBRVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance<RStarTreeNode, SpatialEntry>(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance<RStarTreeNode, SpatialEntry>(context, task, plot, width, height, proj);
   }
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewSiblings(context, start, AbstractRStarTree.class, ScatterPlotProjector.class, (tree, p) -> {
-      final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, p.getRelation(), TreeMBRVisualization.this) //
+      final VisualizationTask task = new VisualizationTask(TreeMBRVisualization.this, NAME, (Result) tree, p.getRelation()) //
           .level(VisualizationTask.LEVEL_BACKGROUND + 1).defaultVisibility(false);
       context.addVis(tree, task);
       context.addVis(p, task);
@@ -124,6 +124,7 @@ public class TreeMBRVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Visualization task
      * @param plot Plot to draw to
      * @param width Embedding width
@@ -131,8 +132,8 @@ public class TreeMBRVisualization extends AbstractVisFactory {
      * @param proj Projection
      */
     @SuppressWarnings("unchecked")
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       this.tree = AbstractRStarTree.class.cast(task.getResult());
       addListeners();
     }

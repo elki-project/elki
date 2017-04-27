@@ -104,7 +104,7 @@ public class DendrogramVisualization extends AbstractVisFactory {
   public void processNewResult(VisualizerContext context, Object start) {
     // Ensure there is a clustering result:
     VisualizationTree.findNewResults(context, start).filter(PointerHierarchyRepresentationResult.class).forEach(pi -> {
-      final VisualizationTask task = new VisualizationTask(NAME, context, pi, null, this) //
+      final VisualizationTask task = new VisualizationTask(this, NAME, pi, null) //
           .level(VisualizationTask.LEVEL_STATIC) //
           .with(UpdateFlag.ON_STYLEPOLICY);
       context.addVis(context.getStylingPolicy(), task);
@@ -113,8 +113,8 @@ public class DendrogramVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height);
   }
 
   /**
@@ -188,13 +188,14 @@ public class DendrogramVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Visualization task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height) {
-      super(task, plot, width, height);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height) {
+      super(context, task, plot, width, height);
       addListeners();
     }
 

@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -92,6 +93,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
   /**
    * Constructor.
    *
+   * @param context Visualizer context
    * @param visFactory Visualizer Factory to use
    * @param task Task to use
    * @param plot Plot to draw to
@@ -100,8 +102,8 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
    * @param proj Projection
    * @param thumbsize Thumbnail size
    */
-  public ThumbnailVisualization(VisFactory visFactory, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj, int thumbsize) {
-    super(task, plot, width, height);
+  public ThumbnailVisualization(VisualizerContext context, VisFactory visFactory, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj, int thumbsize) {
+    super(context, task, plot, width, height);
     this.visFactory = visFactory;
     this.plot = plot;
     this.proj = proj;
@@ -164,7 +166,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       plot.getRoot().setAttribute(SVGConstants.SVG_VIEW_BOX_ATTRIBUTE, "0 0 " + getWidth() + " " + getHeight());
 
       // Work on a clone
-      Visualization vis = visFactory.makeVisualization(task, plot, getWidth(), getHeight(), proj);
+      Visualization vis = visFactory.makeVisualization(context, task, plot, getWidth(), getHeight(), proj);
 
       plot.getRoot().appendChild(vis.getLayer());
       plot.updateStyleElement();

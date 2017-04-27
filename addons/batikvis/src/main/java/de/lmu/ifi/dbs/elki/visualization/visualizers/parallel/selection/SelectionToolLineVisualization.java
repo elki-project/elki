@@ -86,8 +86,8 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
@@ -97,7 +97,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionToolLineVisualization.this) //
+      final VisualizationTask task = new VisualizationTask(SelectionToolLineVisualization.this, NAME, context.getSelectionResult(), rel) //
           .level(VisualizationTask.LEVEL_INTERACTIVE) //
           .tool(true).defaultVisibility(false) //
           .with(UpdateFlag.ON_SELECTION).with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT);
@@ -132,14 +132,15 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       addListeners();
     }
 

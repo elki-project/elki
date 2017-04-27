@@ -52,6 +52,7 @@ public interface VisFactory extends VisualizationProcessor {
   /**
    * Produce a visualization instance for the given task
    *
+   * @param context Visualization context
    * @param task Visualization task
    * @param plot Plot
    * @param width Width
@@ -59,11 +60,12 @@ public interface VisFactory extends VisualizationProcessor {
    * @param proj Projection
    * @return Visualization
    */
-  Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj);
+  Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj);
 
   /**
    * Produce a visualization instance for the given task that may use thumbnails
    *
+   * @param context Visualization context
    * @param task Visualization task
    * @param plot Plot
    * @param width Width
@@ -72,5 +74,5 @@ public interface VisFactory extends VisualizationProcessor {
    * @param thumbsize Thumbnail size
    * @return Visualization
    */
-  Visualization makeVisualizationOrThumbnail(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj, int thumbsize);
+  Visualization makeVisualizationOrThumbnail(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj, int thumbsize);
 }

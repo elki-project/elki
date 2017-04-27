@@ -74,7 +74,7 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
       }
       // FIXME: Make sure the reference points belong to this relation, and have
       // the same dimensionality. How can we encode this information?
-      final VisualizationTask task = new VisualizationTask(NAME, context, rp, rel, ReferencePointsVisualization.this) //
+      final VisualizationTask task = new VisualizationTask(ReferencePointsVisualization.this, NAME, rp, rel) //
           .level(VisualizationTask.LEVEL_DATA);
       context.addVis(rp, task);
       context.addVis(p, task);
@@ -82,8 +82,8 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   /**
@@ -110,14 +110,15 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Visualization task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       this.result = task.getResult();
       addListeners();
     }

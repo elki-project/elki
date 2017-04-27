@@ -82,7 +82,7 @@ public class KeyVisualization extends AbstractVisFactory {
         return; // At most one key per plot.
       }
     }
-    context.addVis(context.getStylingPolicy(), new VisualizationTask(NAME, context, context.getStylingPolicy(), null, this) //
+    context.addVis(context.getStylingPolicy(), new VisualizationTask(this, NAME, context.getStylingPolicy(), null) //
         .level(VisualizationTask.LEVEL_STATIC).with(UpdateFlag.ON_STYLEPOLICY));
   }
 
@@ -139,8 +139,8 @@ public class KeyVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height);
   }
 
   @Override
@@ -174,13 +174,14 @@ public class KeyVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Visualization task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height) {
-      super(task, plot, width, height);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height) {
+      super(context, task, plot, width, height);
       addListeners();
     }
 

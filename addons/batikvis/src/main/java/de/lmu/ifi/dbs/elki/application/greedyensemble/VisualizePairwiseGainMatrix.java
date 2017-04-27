@@ -251,7 +251,7 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
 
     VisualizationTree.findVis(context).filter(VisualizationTask.class).forEach(task -> {
       if(task.getFactory() == factory) {
-        showVisualization(factory, task);
+        showVisualization(context, factory, task);
       }
     });
   }
@@ -259,12 +259,13 @@ public class VisualizePairwiseGainMatrix extends AbstractApplication {
   /**
    * Show a single visualization.
    *
+   * @param context Visualizer context
    * @param factory Visualizer factory
    * @param task Visualization task
    */
-  private void showVisualization(SimilarityMatrixVisualizer factory, VisualizationTask task) {
+  private void showVisualization(VisualizerContext context, SimilarityMatrixVisualizer factory, VisualizationTask task) {
     VisualizationPlot plot = new VisualizationPlot();
-    Visualization vis = factory.makeVisualization(task, plot, 1.0, 1.0, null);
+    Visualization vis = factory.makeVisualization(context, task, plot, 1.0, 1.0, null);
     plot.getRoot().appendChild(vis.getLayer());
     plot.getRoot().setAttribute(SVGConstants.SVG_WIDTH_ATTRIBUTE, "20cm");
     plot.getRoot().setAttribute(SVGConstants.SVG_HEIGHT_ATTRIBUTE, "20cm");

@@ -92,8 +92,8 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
@@ -104,7 +104,7 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      context.addVis(p, new VisualizationTask(NAME, context, p, rel, ClusterOutlineVisualization.this) //
+      context.addVis(p, new VisualizationTask(ClusterOutlineVisualization.this, NAME, p, rel) //
           .level(VisualizationTask.LEVEL_DATA - 1).defaultVisibility(false) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_STYLEPOLICY));
     });
@@ -132,14 +132,15 @@ public class ClusterOutlineVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task VisualizationTask
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       addListeners();
     }
 

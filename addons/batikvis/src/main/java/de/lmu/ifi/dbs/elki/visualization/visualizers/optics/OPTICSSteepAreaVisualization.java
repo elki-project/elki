@@ -70,7 +70,7 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
       ClusterOrder co = p.getResult();
       It<OPTICSXi.SteepAreaResult> r = co.getHierarchy().iterChildren(co).filter(OPTICSXi.SteepAreaResult.class);
       if(r.valid()) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this) //
+        final VisualizationTask task = new VisualizationTask(this, NAME, p.getResult(), null) //
             .level(VisualizationTask.LEVEL_DATA + 1);
         context.addVis(p, task);
         context.addVis(r.get(), task);
@@ -79,8 +79,8 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
@@ -115,14 +115,15 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Visualization task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       ClusterOrder co = this.optics.getResult();
       this.areas = co.getHierarchy().iterChildren(co).filter(OPTICSXi.SteepAreaResult.class).get();
     }

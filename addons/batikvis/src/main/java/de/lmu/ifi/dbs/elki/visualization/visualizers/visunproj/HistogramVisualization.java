@@ -72,8 +72,7 @@ public class HistogramVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    VisualizerContext context = task.getContext();
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     HistogramResult curve = task.getResult();
 
     final StyleLibrary style = context.getStyleLibrary();
@@ -147,13 +146,13 @@ public class HistogramVisualization extends AbstractVisFactory {
       layer.appendChild(line);
     }
 
-    return new StaticVisualizationInstance(task, plot, width, height, layer);
+    return new StaticVisualizationInstance(context, task, plot, width, height, layer);
   }
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(HistogramResult.class).forEach(histogram -> {
-      context.addVis(histogram, new VisualizationTask(NAME, context, histogram, null, HistogramVisualization.this) //
+      context.addVis(histogram, new VisualizationTask(HistogramVisualization.this, NAME, histogram, null) //
           .requestSize(2.0, 1.0).level(VisualizationTask.LEVEL_STATIC));
     });
   }

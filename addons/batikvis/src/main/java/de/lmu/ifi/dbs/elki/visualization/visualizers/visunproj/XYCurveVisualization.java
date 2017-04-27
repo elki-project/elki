@@ -81,8 +81,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    VisualizerContext context = task.getContext();
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     XYCurve curve = task.getResult();
 
     setupCSS(context, plot);
@@ -157,7 +156,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
     }
 
     layer.appendChild(line);
-    return new StaticVisualizationInstance(task, plot, width, height, layer);
+    return new StaticVisualizationInstance(context, task, plot, width, height, layer);
   }
 
   /**
@@ -185,7 +184,7 @@ public class XYCurveVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(XYCurve.class).forEach(curve -> {
-      context.addVis(curve, new VisualizationTask(NAME, context, curve, null, XYCurveVisualization.this) //
+      context.addVis(curve, new VisualizationTask(XYCurveVisualization.this, NAME, curve, null) //
           .level(VisualizationTask.LEVEL_STATIC));
     });
   }

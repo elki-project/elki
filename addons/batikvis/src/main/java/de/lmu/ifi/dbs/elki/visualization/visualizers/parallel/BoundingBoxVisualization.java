@@ -73,8 +73,8 @@ public class BoundingBoxVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
@@ -87,7 +87,7 @@ public class BoundingBoxVisualization extends AbstractVisFactory {
       if(!TypeUtil.SPATIAL_OBJECT.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      context.addVis(p, new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), BoundingBoxVisualization.this) //
+      context.addVis(p, new VisualizationTask(BoundingBoxVisualization.this, NAME, p.getRelation(), p.getRelation()) //
           .level(VisualizationTask.LEVEL_DATA) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_STYLEPOLICY).with(UpdateFlag.ON_SAMPLE));
     });
@@ -113,14 +113,15 @@ public class BoundingBoxVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task VisualizationTask
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       this.sample = SamplingResult.getSamplingResult(relation);
       addListeners();
     }

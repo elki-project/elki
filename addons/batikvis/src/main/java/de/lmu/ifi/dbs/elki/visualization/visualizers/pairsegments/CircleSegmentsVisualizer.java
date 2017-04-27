@@ -112,8 +112,8 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height);
   }
 
   @Override
@@ -128,7 +128,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
         policy = new SegmentsStylingPolicy(segmentResult);
         context.addVis(segmentResult, policy);
       }
-      context.addVis(segmentResult, new VisualizationTask(NAME, context, policy, null, this) //
+      context.addVis(segmentResult, new VisualizationTask(this, NAME, policy, null) //
           .requestSize(2.0, 2.0).level(VisualizationTask.LEVEL_INTERACTIVE) //
           .with(UpdateFlag.ON_STYLEPOLICY));
     });
@@ -246,13 +246,14 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
     /**
      * Constructor
      *
+     * @param context Visualizer context
      * @param task Task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height) {
-      super(task, plot, width, height);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height) {
+      super(context, task, plot, width, height);
       policy = task.getResult();
       segments = policy.segments;
       // FIXME: handle this more generally.

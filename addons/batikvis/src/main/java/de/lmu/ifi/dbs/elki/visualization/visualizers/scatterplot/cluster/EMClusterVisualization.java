@@ -96,8 +96,8 @@ public class EMClusterVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Instance makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Instance makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
@@ -107,7 +107,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      context.addVis(p, new VisualizationTask(NAME, context, p, p.getRelation(), EMClusterVisualization.this) //
+      context.addVis(p, new VisualizationTask(EMClusterVisualization.this, NAME, p, p.getRelation()) //
           .level(VisualizationTask.LEVEL_DATA + 3) //
           .with(UpdateFlag.ON_STYLEPOLICY));
     });
@@ -149,14 +149,15 @@ public class EMClusterVisualization extends AbstractVisFactory {
     /**
      * Constructor
      *
+     * @param context Visualizer context
      * @param task VisualizationTask
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       addListeners();
     }
 

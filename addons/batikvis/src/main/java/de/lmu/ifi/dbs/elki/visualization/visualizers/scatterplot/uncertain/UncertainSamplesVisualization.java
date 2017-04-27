@@ -83,8 +83,8 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
@@ -92,7 +92,7 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
     VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
       context.getHierarchy().iterAncestorsSelf((Relation<?>) p.getRelation()).filter(Relation.class).forEach(r2 -> {
         if(UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r2.getDataTypeInformation())) {
-          context.addVis(p, new VisualizationTask(NAME, context, p, r2, this) //
+          context.addVis(p, new VisualizationTask(this, NAME, p, r2) //
               .level(VisualizationTask.LEVEL_DATA).defaultVisibility(false) //
               .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_STYLEPOLICY));
         }
@@ -125,15 +125,16 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
 
     /**
      * Constructor.
-     *
+     * 
+     * @param context Visualizer context
      * @param task Visualization task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       addListeners();
       this.rel = task.getRelation();
     }

@@ -72,14 +72,14 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findVis(context, start).filter(ParallelPlotProjector.class).forEach(p -> {
-      context.addVis(p, new VisualizationTask(NAME, context, p, p.getRelation(), this) //
+      context.addVis(p, new VisualizationTask(this, NAME, p, p.getRelation()) //
           .level(VisualizationTask.LEVEL_BACKGROUND));
     });
   }
@@ -112,14 +112,15 @@ public class ParallelAxisVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task VisualizationTask
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       addListeners();
     }
 

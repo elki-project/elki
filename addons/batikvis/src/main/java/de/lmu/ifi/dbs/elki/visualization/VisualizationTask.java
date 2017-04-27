@@ -168,11 +168,6 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   String name;
 
   /**
-   * The active context
-   */
-  VisualizerContext context;
-
-  /**
    * The factory
    */
   VisFactory factory;
@@ -199,17 +194,15 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
 
   /**
    * Visualization task.
-   *
+   * 
+   * @param factory Factory
    * @param name Name
-   * @param context Visualization context
    * @param result Result
    * @param relation Relation to use
-   * @param factory Factory
    */
-  public VisualizationTask(String name, VisualizerContext context, Object result, Relation<?> relation, VisFactory factory) {
+  public VisualizationTask(VisFactory factory, String name, Object result, Relation<?> relation) {
     super();
     this.name = name;
-    this.context = context;
     this.result = result;
     this.relation = relation;
     this.factory = factory;
@@ -304,15 +297,6 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
     visible = vis;
     default_visibility = vis;
     return this;
-  }
-
-  /**
-   * Get the visualizer context.
-   *
-   * @return context
-   */
-  public VisualizerContext getContext() {
-    return context;
   }
 
   /**

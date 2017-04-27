@@ -67,14 +67,14 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(SimilarityMatrix.class).forEach(pr -> {
-      context.addVis(pr, new VisualizationTask(NAME, context, pr, null, SimilarityMatrixVisualizer.this) //
+      context.addVis(pr, new VisualizationTask(SimilarityMatrixVisualizer.this, NAME, pr, null) //
           .level(VisualizationTask.LEVEL_STATIC));
     });
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height);
   }
 
   @Override
@@ -99,13 +99,14 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Visualization task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height) {
-      super(task, plot, width, height);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height) {
+      super(context, task, plot, width, height);
       this.result = task.getResult();
       addListeners();
     }

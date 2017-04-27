@@ -404,10 +404,10 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
   private Visualization embedOrThumbnail(final int thumbsize, PlotItem it, VisualizationTask task, Element parent) {
     final Visualization vis;
     if(!single) {
-      vis = task.getFactory().makeVisualizationOrThumbnail(task, plot, it.w, it.h, it.proj, thumbsize);
+      vis = task.getFactory().makeVisualizationOrThumbnail(context, task, plot, it.w, it.h, it.proj, thumbsize);
     }
     else {
-      vis = task.getFactory().makeVisualization(task, plot, it.w, it.h, it.proj);
+      vis = task.getFactory().makeVisualization(context, task, plot, it.w, it.h, it.proj);
     }
     if(vis == null || vis.getLayer() == null) {
       LoggingUtil.warning("Visualization returned empty layer: " + vis);

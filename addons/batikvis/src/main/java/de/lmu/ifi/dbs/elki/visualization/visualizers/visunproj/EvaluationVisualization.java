@@ -100,13 +100,13 @@ public class EvaluationVisualization extends AbstractVisFactory {
             return;
           }
         }
-        context.addVis(context.getBaseResult(), new VisualizationTask(NAME, context, c, null, EvaluationVisualization.this) //
+        context.addVis(context.getBaseResult(), new VisualizationTask(EvaluationVisualization.this, NAME, c, null) //
             .requestSize(.5, sr.numLines() * .05) //
             .level(VisualizationTask.LEVEL_STATIC) //
             .with(UpdateFlag.ON_STYLEPOLICY));
         return;
       }
-      context.addVis(sr, new VisualizationTask(NAME, context, sr, null, EvaluationVisualization.this) //
+      context.addVis(sr, new VisualizationTask(EvaluationVisualization.this, NAME, sr, null) //
           .requestSize(.5, sr.numLines() * .05).level(VisualizationTask.LEVEL_STATIC));
     });
   }
@@ -132,7 +132,7 @@ public class EvaluationVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
     // TODO: make a utility class to wrap SVGPlot + parent layer + ypos.
     // TODO: use CSSClass and StyleLibrary
 
@@ -145,7 +145,6 @@ public class EvaluationVisualization extends AbstractVisFactory {
     }
     else if(o instanceof Class && EvaluationResult.class.isAssignableFrom((Class<?>) o)) {
       // Use cluster evaluation of current style instead.
-      VisualizerContext context = task.getContext();
       StylingPolicy spol = context.getStylingPolicy();
       if(spol instanceof ClusterStylingPolicy) {
         ClusterStylingPolicy cpol = (ClusterStylingPolicy) spol;
@@ -162,7 +161,7 @@ public class EvaluationVisualization extends AbstractVisFactory {
       }
     }
     if(sr == null) {
-      return new StaticVisualizationInstance(task, plot, width, height, parent); // Failed.
+      return new StaticVisualizationInstance(context, task, plot, width, height, parent); // Failed.
     }
 
     for(String header : sr.getHeaderLines()) {
@@ -178,12 +177,12 @@ public class EvaluationVisualization extends AbstractVisFactory {
 
     // scale vis
     double cols = 10;
-    final StyleLibrary style = task.getContext().getStyleLibrary();
+    final StyleLibrary style = context.getStyleLibrary();
     final double margin = style.getSize(StyleLibrary.MARGIN);
     final String transform = SVGUtil.makeMarginTransform(width, height, cols, ypos, margin / StyleLibrary.SCALE);
     SVGUtil.setAtt(parent, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
 
-    return new StaticVisualizationInstance(task, plot, width, height, parent);
+    return new StaticVisualizationInstance(context, task, plot, width, height, parent);
   }
 
   @Override

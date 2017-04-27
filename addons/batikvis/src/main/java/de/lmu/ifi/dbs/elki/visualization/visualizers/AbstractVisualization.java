@@ -78,15 +78,16 @@ public abstract class AbstractVisualization implements Visualization, ResultList
   /**
    * Constructor.
    *
+   * @param context Visualizer context
    * @param task Visualization task
    * @param plot Plot to draw to
    * @param width Embedding width
    * @param height Embedding height
    */
-  public AbstractVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height) {
+  public AbstractVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height) {
     super();
     this.task = task;
-    this.context = task.getContext();
+    this.context = context;
     this.svgp = plot;
     this.width = width;
     this.height = height;

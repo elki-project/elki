@@ -63,7 +63,7 @@ public class PixmapVisualizer extends AbstractVisFactory {
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(PixmapResult.class).forEach(pr -> {
       // Add plots, attach visualizer
-      final VisualizationTask task = new VisualizationTask(NAME, context, pr, null, PixmapVisualizer.this) //
+      final VisualizationTask task = new VisualizationTask(PixmapVisualizer.this, NAME, pr, null) //
           .requestSize(pr.getImage().getWidth() / (double) pr.getImage().getHeight(), 1.0) //
           .level(VisualizationTask.LEVEL_STATIC);
       context.addVis(pr, task);
@@ -71,8 +71,8 @@ public class PixmapVisualizer extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height);
   }
 
   @Override
@@ -97,13 +97,14 @@ public class PixmapVisualizer extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Visualization task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height) {
-      super(task, plot, width, height);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height) {
+      super(context, task, plot, width, height);
       this.result = task.getResult();
       addListeners();
     }

@@ -109,7 +109,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
       if(!canVisualize(rel, tree)) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, tree, rel, TreeSphereVisualization.this) //
+      final VisualizationTask task = new VisualizationTask(TreeSphereVisualization.this, NAME, tree, rel) //
           .level(VisualizationTask.LEVEL_BACKGROUND + 1).defaultVisibility(false);
       context.addVis(tree, task);
       context.addVis(p, task);
@@ -117,8 +117,8 @@ public class TreeSphereVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance<MTreeNode<Object>, MTreeEntry>(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance<MTreeNode<Object>, MTreeEntry>(context, task, plot, width, height, proj);
   }
 
   /**
@@ -179,6 +179,7 @@ public class TreeSphereVisualization extends AbstractVisFactory {
     /**
      * Constructor
      *
+     * @param context Visualizer context
      * @param task Task
      * @param plot Plot to draw to
      * @param width Embedding width
@@ -186,8 +187,8 @@ public class TreeSphereVisualization extends AbstractVisFactory {
      * @param proj Projection
      */
     @SuppressWarnings("unchecked")
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       this.tree = AbstractMTree.class.cast(task.getResult());
       this.p = getLPNormP(this.tree);
       addListeners();

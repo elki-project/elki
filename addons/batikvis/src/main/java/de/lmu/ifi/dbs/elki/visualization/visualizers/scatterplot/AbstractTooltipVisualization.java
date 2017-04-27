@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
@@ -79,14 +80,15 @@ public abstract class AbstractTooltipVisualization extends AbstractScatterplotVi
   /**
    * Constructor.
    *
+   * @param context Visualizer context
    * @param task Visualization task
    * @param plot Plot to draw to
    * @param width Embedding width
    * @param height Embedding height
    * @param proj Projection
    */
-  public AbstractTooltipVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    super(task, plot, width, height, proj);
+  public AbstractTooltipVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    super(context, task, plot, width, height, proj);
   }
 
   @Override

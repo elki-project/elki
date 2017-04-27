@@ -74,8 +74,8 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
@@ -89,7 +89,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      context.addVis(p, new VisualizationTask(NAME, context, p.getRelation(), rel, MoveObjectsToolVisualization.this) //
+      context.addVis(p, new VisualizationTask(MoveObjectsToolVisualization.this, NAME, p.getRelation(), rel) //
           .level(VisualizationTask.LEVEL_INTERACTIVE).tool(true).defaultVisibility(false) //
           .with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_SELECTION));
@@ -123,14 +123,15 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Task
      * @param plot Plot to draw to
      * @param width Embedding width
      * @param height Embedding height
      * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       addListeners();
     }
 

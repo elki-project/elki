@@ -84,8 +84,8 @@ public class TooltipStringVisualization extends AbstractVisFactory {
   }
 
   @Override
-  public Visualization makeVisualization(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-    return new Instance(task, plot, width, height, proj);
+  public Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+    return new Instance(context, task, plot, width, height, proj);
   }
 
   @Override
@@ -112,7 +112,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
   }
 
   private void addTooltips(final String name, final Relation<?> rel, VisualizerContext context, Relation<?> rep, ScatterPlotProjector<?> p) {
-    final VisualizationTask task = new VisualizationTask(name, context, rep, rel, TooltipStringVisualization.this) //
+    final VisualizationTask task = new VisualizationTask(TooltipStringVisualization.this, name, rep, rel) //
         .tool(true).defaultVisibility(false) //
         .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE);
     context.addVis(rep, task);
@@ -141,10 +141,15 @@ public class TooltipStringVisualization extends AbstractVisFactory {
     /**
      * Constructor.
      *
+     * @param context Visualizer context
      * @param task Task
+     * @param plot Plot
+     * @param width Width
+     * @param height Height
+     * @param proj Projection
      */
-    public Instance(VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
-      super(task, plot, width, height, proj);
+    public Instance(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj) {
+      super(context, task, plot, width, height, proj);
       this.result = task.getResult();
       final StyleLibrary style = context.getStyleLibrary();
       this.fontsize = 3 * style.getTextSize(StyleLibrary.PLOT);

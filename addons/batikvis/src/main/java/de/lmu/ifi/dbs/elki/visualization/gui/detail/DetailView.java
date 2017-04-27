@@ -259,7 +259,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
    */
   private Visualization instantiateVisualization(VisualizationTask task) {
     try {
-      Visualization v = task.getFactory().makeVisualization(task, this, width, height, item.proj);
+      Visualization v = task.getFactory().makeVisualization(context, task, this, width, height, item.proj);
       if(task.has(RenderFlag.NO_EXPORT)) {
         v.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
       }
