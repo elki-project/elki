@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * @apiviz.uses NumberVector
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMinMaxNormalization", //
-"de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseMinMaxNormalization" })
+    "de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseMinMaxNormalization" })
 public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.
@@ -63,6 +63,13 @@ public class AttributeWiseMinMaxNormalization<V extends NumberVector> extends Ab
    * Stores the minimum in each dimension.
    */
   private double[] minima = new double[0];
+
+  /**
+   * Constructor.
+   */
+  public AttributeWiseMinMaxNormalization() {
+    super();
+  }
 
   /**
    * Constructor.
