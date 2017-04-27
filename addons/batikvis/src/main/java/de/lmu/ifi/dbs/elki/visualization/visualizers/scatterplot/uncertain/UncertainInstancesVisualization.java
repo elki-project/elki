@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
@@ -84,10 +85,9 @@ public class UncertainInstancesVisualization extends AbstractVisFactory {
       if(!UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, p, r, this);
-      task.level = VisualizationTask.LEVEL_DATA;
-      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
-      context.addVis(p, task);
+      context.addVis(p, new VisualizationTask(NAME, context, p, r, this) //
+          .level(VisualizationTask.LEVEL_DATA) //
+          .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_STYLEPOLICY));
     });
   }
 

@@ -109,9 +109,8 @@ public class TreeSphereVisualization extends AbstractVisFactory {
       if(!canVisualize(rel, tree)) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, tree, rel, TreeSphereVisualization.this);
-      task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
-      task.initDefaultVisibility(false);
+      final VisualizationTask task = new VisualizationTask(NAME, context, tree, rel, TreeSphereVisualization.this) //
+          .level(VisualizationTask.LEVEL_BACKGROUND + 1).defaultVisibility(false);
       context.addVis(tree, task);
       context.addVis(p, task);
     });

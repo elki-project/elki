@@ -38,6 +38,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.RenderFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
@@ -220,7 +221,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
         }
       }
       else {
-        if(task.hasAnyFlags(VisualizationTask.FLAG_NO_EXPORT)) {
+        if(task.has(RenderFlag.NO_EXPORT)) {
           layer.setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
         }
         if(prevlayer == null) {
@@ -259,7 +260,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
   private Visualization instantiateVisualization(VisualizationTask task) {
     try {
       Visualization v = task.getFactory().makeVisualization(task, this, width, height, item.proj);
-      if(task.hasAnyFlags(VisualizationTask.FLAG_NO_EXPORT)) {
+      if(task.has(RenderFlag.NO_EXPORT)) {
         v.getLayer().setAttribute(NO_EXPORT_ATTRIBUTE, NO_EXPORT_ATTRIBUTE);
       }
       return v;

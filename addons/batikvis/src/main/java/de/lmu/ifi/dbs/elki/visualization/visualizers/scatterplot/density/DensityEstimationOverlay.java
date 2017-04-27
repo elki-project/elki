@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.result.KMLOutputHandler;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
@@ -85,11 +86,9 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, rel, p.getRelation(), DensityEstimationOverlay.this);
-      task.level = VisualizationTask.LEVEL_DATA + 1;
-      task.addUpdateFlags(VisualizationTask.ON_DATA);
-      task.initDefaultVisibility(false);
-      context.addVis(p, task);
+      context.addVis(p, new VisualizationTask(NAME, context, rel, p.getRelation(), DensityEstimationOverlay.this) //
+          .level(VisualizationTask.LEVEL_DATA + 1).defaultVisibility(false) //
+          .with(UpdateFlag.ON_DATA));
     });
   }
 

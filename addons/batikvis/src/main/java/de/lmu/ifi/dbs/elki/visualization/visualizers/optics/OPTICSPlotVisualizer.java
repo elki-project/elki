@@ -64,11 +64,9 @@ public class OPTICSPlotVisualizer extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
     VisualizationTree.findVis(context, result).filter(OPTICSProjector.class).forEach(p -> {
-      // Add plots, attach visualizer
-      final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
-      task.level = VisualizationTask.LEVEL_DATA;
-      // FIXME: task.setUpdates(VisualizationTask.ON_STYLEPOLICY);
-      context.addVis(p, task);
+      context.addVis(p, new VisualizationTask(NAME, context, p.getResult(), null, this) //
+          // FIXME: .with(UpdateFlag.ON_STYLEPOLICY);
+          .level(VisualizationTask.LEVEL_DATA));
     });
   }
 

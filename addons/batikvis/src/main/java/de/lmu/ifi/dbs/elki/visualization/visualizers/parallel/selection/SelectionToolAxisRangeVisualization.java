@@ -36,6 +36,8 @@ import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.RenderFlag;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
@@ -89,12 +91,10 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionToolAxisRangeVisualization.this);
-      task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      task.tool = true;
-      task.addUpdateFlags(VisualizationTask.ON_SELECTION);
-      task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
-      task.initDefaultVisibility(false);
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionToolAxisRangeVisualization.this) //
+          .level(VisualizationTask.LEVEL_INTERACTIVE) //
+          .tool(true).defaultVisibility(false) //
+          .with(UpdateFlag.ON_SELECTION).with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT);
       context.addVis(context.getSelectionResult(), task);
       context.addVis(p, task);
     });

@@ -82,9 +82,8 @@ public class OPTICSClusterVisualization extends AbstractVisFactory {
         try {
           Cluster<?> firstcluster = ((Clustering<?>) clus).getToplevelClusters().iterator().next();
           if(firstcluster.getModel() instanceof OPTICSModel) {
-            final VisualizationTask task = new VisualizationTask(NAME, context, clus, null, this);
-            task.level = VisualizationTask.LEVEL_DATA;
-            context.addVis(p, task);
+            context.addVis(p, new VisualizationTask(NAME, context, clus, null, this) //
+                .level(VisualizationTask.LEVEL_DATA));
             // TODO: use and react to style policy!
           }
         }

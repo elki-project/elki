@@ -36,6 +36,68 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
  */
 public class VisualizationTask implements VisualizationItem, Comparable<VisualizationTask> {
   /**
+   * Rendering flags enum.
+   *
+   * @author Erich Schubert
+   */
+  public static enum RenderFlag {
+    /** Do not use thumbnails for easy visualizations. */
+    NO_THUMBNAIL(1),
+    /** Do not allow full-screening this task */
+    NO_DETAIL(2),
+    /** Do not include when exporting */
+    NO_EXPORT(4),
+    /** Do not embed */
+    NO_EMBED(8);
+
+    /**
+     * Bit.
+     */
+    public final int bit;
+
+    /**
+     * Constructor.
+     *
+     * @param bit Bit
+     */
+    private RenderFlag(int bit) {
+      this.bit = bit;
+    }
+  }
+
+  /**
+   * Update flags enum.
+   * 
+   * TODO: can these be replaced by listeners?
+   *
+   * @author Erich Schubert
+   */
+  public static enum UpdateFlag {
+    /** When data changes */
+    ON_DATA(1),
+    /** When selection changes */
+    ON_SELECTION(2),
+    /** When style changes */
+    ON_STYLEPOLICY(4),
+    /** When sample changes */
+    ON_SAMPLE(8);
+
+    /**
+     * Bit.
+     */
+    public final int bit;
+
+    /**
+     * Constructor.
+     *
+     * @param bit Bit
+     */
+    private UpdateFlag(int bit) {
+      this.bit = bit;
+    }
+  }
+
+  /**
    * Meta data key: Level for visualizer ordering
    *
    * Returns an integer indicating the "height" of this Visualizer. It is
@@ -55,29 +117,9 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   public boolean visible = true;
 
   /**
-   * Capabilities
+   * Render capabilities
    */
   private int flags;
-
-  /**
-   * Flag to signal there is no thumbnail needed.
-   */
-  public static final int FLAG_NO_THUMBNAIL = 1;
-
-  /**
-   * Mark as not having a (sensible) detail view.
-   */
-  public static final int FLAG_NO_DETAIL = 2;
-
-  /**
-   * Flag to signal the visualizer should not be exported.
-   */
-  public static final int FLAG_NO_EXPORT = 4;
-
-  /**
-   * Flag to signal the visualizer should not be embedded.
-   */
-  public static final int FLAG_NO_EMBED = 8;
 
   /**
    * Flag to signal default visibility of a visualizer.
@@ -121,26 +163,6 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   public int updatemask;
 
   /**
-   * Constant to listen for data changes
-   */
-  public static final int ON_DATA = 1;
-
-  /**
-   * Constant to listen for selection changes
-   */
-  public static final int ON_SELECTION = 2;
-
-  /**
-   * Constant to listen for style result changes
-   */
-  public static final int ON_STYLEPOLICY = 4;
-
-  /**
-   * Constant to listen for sampling result changes
-   */
-  public static final int ON_SAMPLE = 8;
-
-  /**
    * Name
    */
   String name;
@@ -168,12 +190,12 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   /**
    * Width request
    */
-  public double reqwidth;
+  public double reqwidth = 1.0;
 
   /**
    * Height request
    */
-  public double reqheight;
+  public double reqheight = 1.0;
 
   /**
    * Visualization task.
@@ -191,6 +213,97 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
     this.result = result;
     this.relation = relation;
     this.factory = factory;
+  }
+
+  /**
+   * Set (OR) the update flags.
+   *
+   * @param bits Bits to set
+   * @return {@code this}, for method chaining.
+   */
+  public VisualizationTask with(UpdateFlag f) {
+    updatemask |= f.bit;
+    return this;
+  }
+
+  /**
+   * Update if any oft these bits is set.
+   *
+   * @param bits Bits to check.
+   * @return {@code true} if any bit is set.
+   */
+  public boolean has(UpdateFlag f) {
+    return (updatemask & f.bit) != 0;
+  }
+
+  /**
+   * Set a task flag.
+   *
+   * @param bits Flag to set
+   * @return {@code this}, for method chaining.
+   */
+  public VisualizationTask with(RenderFlag f) {
+    flags |= f.bit;
+    return this;
+  }
+
+  /**
+   * Update if any oft these flags is set.
+   *
+   * @param bits Bits to check.
+   * @return {@code true} if any bit is set.
+   */
+  public boolean has(RenderFlag f) {
+    return (flags & f.bit) != 0;
+  }
+
+  /**
+   * Set the level of a visualization.
+   * 
+   * @param level Level
+   * @return {@code this}, for method chaining.
+   */
+  public VisualizationTask level(int level) {
+    this.level = level;
+    return this;
+  }
+
+  /**
+   * Flag as tool visualizer.
+   * 
+   * TODO: don't use a separate boolean for this, but e.g. interface?
+   * 
+   * @param t Tool flag
+   * @return {@code this}, for method chaining.
+   */
+  public VisualizationTask tool(boolean t) {
+    this.tool = t;
+    return this;
+  }
+
+  /**
+   * Set the size request.
+   *
+   * @param w Width
+   * @param h Height
+   * @return {@code this}, for method chaining.
+   */
+  public VisualizationTask requestSize(double w, double h) {
+    this.reqwidth = w;
+    this.reqheight = h;
+    return this;
+  }
+
+  /**
+   * Init the default visibility of a task.
+   *
+   * @param vis Visibility.
+   * @return {@code this}, for method chaining.
+   */
+  public VisualizationTask defaultVisibility(boolean vis) {
+    visible = vis;
+    default_visibility = vis;
+    return this;
   }
 
   /**
@@ -219,16 +332,6 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   @SuppressWarnings("unchecked")
   public <R extends Relation<?>> R getRelation() {
     return (R) relation;
-  }
-
-  /**
-   * Init the default visibility of a task.
-   *
-   * @param vis Visibility.
-   */
-  public void initDefaultVisibility(boolean vis) {
-    visible = vis;
-    default_visibility = vis;
   }
 
   @Override
@@ -272,43 +375,5 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   public boolean equals(Object o) {
     // Also don't inherit equals based on list contents!
     return (this == o);
-  }
-
-  /**
-   * Set (OR) the update flags.
-   *
-   * @param bits Bits to set
-   */
-  public void addUpdateFlags(int bits) {
-    updatemask |= bits;
-  }
-
-  /**
-   * Update if any oft these bits is set.
-   *
-   * @param bits Bits to check.
-   * @return {@code true} if any bit is set.
-   */
-  public boolean updateOnAny(int bits) {
-    return (updatemask & bits) != 0;
-  }
-
-  /**
-   * Update if any oft these flags is set.
-   *
-   * @param bits Bits to check.
-   * @return {@code true} if any bit is set.
-   */
-  public boolean hasAnyFlags(int bits) {
-    return (flags & bits) != 0;
-  }
-
-  /**
-   * Set a task flag.
-   *
-   * @param bits Flag to set
-   */
-  public void addFlags(int bits) {
-    flags |= bits;
   }
 }

@@ -72,9 +72,8 @@ public class OPTICSPlotCutVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
     VisualizationTree.findVis(context, result).filter(OPTICSProjector.class).forEach(p -> {
-      final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
-      task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      context.addVis(p, task);
+      context.addVis(p, new VisualizationTask(NAME, context, p.getResult(), null, this) //
+          .level(VisualizationTask.LEVEL_INTERACTIVE));
     });
   }
 

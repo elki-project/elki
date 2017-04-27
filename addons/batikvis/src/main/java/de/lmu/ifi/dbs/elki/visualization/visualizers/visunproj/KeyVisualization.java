@@ -20,10 +20,6 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.visualizers.visunproj;
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import net.jafama.FastMath;
-
 import java.util.List;
 
 import org.apache.batik.util.SVGConstants;
@@ -36,6 +32,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.pairs.DoubleDoublePair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -50,6 +47,10 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import net.jafama.FastMath;
 
 /**
  * Visualizer, displaying the key for a clustering.
@@ -81,12 +82,8 @@ public class KeyVisualization extends AbstractVisFactory {
         return; // At most one key per plot.
       }
     }
-    final VisualizationTask task = new VisualizationTask(NAME, context, context.getStylingPolicy(), null, this);
-    task.level = VisualizationTask.LEVEL_STATIC;
-    task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
-    task.reqwidth = 1.;
-    task.reqheight = 1.;
-    context.addVis(context.getStylingPolicy(), task);
+    context.addVis(context.getStylingPolicy(), new VisualizationTask(NAME, context, context.getStylingPolicy(), null, this) //
+        .level(VisualizationTask.LEVEL_STATIC).with(UpdateFlag.ON_STYLEPOLICY));
   }
 
   /**

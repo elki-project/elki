@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -106,11 +107,9 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(HistogramProjector.class).forEach(p -> {
-      // register self
-      final VisualizationTask task = new VisualizationTask(CNAME, context, p, p.getRelation(), ColoredHistogramVisualizer.this);
-      task.level = VisualizationTask.LEVEL_DATA;
-      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_STYLEPOLICY);
-      context.addVis(p, task);
+      context.addVis(p, new VisualizationTask(CNAME, context, p, p.getRelation(), ColoredHistogramVisualizer.this) //
+          .level(VisualizationTask.LEVEL_DATA) //
+          .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_STYLEPOLICY));
     });
   }
 

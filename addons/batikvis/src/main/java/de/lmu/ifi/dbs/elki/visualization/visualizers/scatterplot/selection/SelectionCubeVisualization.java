@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -92,9 +93,9 @@ public class SelectionCubeVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionCubeVisualization.this);
-      task.level = VisualizationTask.LEVEL_DATA - 2;
-      task.addUpdateFlags(VisualizationTask.ON_SELECTION);
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionCubeVisualization.this) //
+          .level(VisualizationTask.LEVEL_DATA - 2) //
+          .with(UpdateFlag.ON_SELECTION);
       context.addVis(context.getSelectionResult(), task);
       context.addVis(p, task);
     });

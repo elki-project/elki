@@ -27,10 +27,12 @@ import java.util.List;
 import de.lmu.ifi.dbs.elki.data.spatial.SpatialComparable;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
+import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.AffineTransformation;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.RenderFlag;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projections.AffineProjection;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
@@ -70,7 +72,7 @@ public class ScatterPlotProjector<V extends SpatialComparable> implements Projec
     super();
     this.rel = rel;
     this.dmax = maxdim;
-    assert(maxdim <= RelationUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
+    assert (maxdim <= RelationUtil.dimensionality(rel)) : "Requested dimensionality larger than data dimensionality?!?";
   }
 
   @Override
@@ -92,21 +94,15 @@ public class ScatterPlotProjector<V extends SpatialComparable> implements Projec
         // Label at bottom
         {
           PlotItem it = new PlotItem(.1, 2., 2., .1, null);
-          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 0)));
-          task.reqheight = .1;
-          task.reqwidth = 2.;
-          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
-          it.tasks.add(task);
+          it.tasks.add(new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 0))) //
+              .requestSize(2., .1).with(RenderFlag.NO_DETAIL));
           master.subitems.add(it);
         }
         // Label on left
         {
           PlotItem it = new PlotItem(0, 0, .1, 2, null);
-          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 1), true));
-          task.reqheight = 2.;
-          task.reqwidth = .1;
-          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
-          it.tasks.add(task);
+          it.tasks.add(new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, 1), true)) //
+              .requestSize(.1, 2.).with(RenderFlag.NO_DETAIL));
           master.subitems.add(it);
         }
       }
@@ -124,8 +120,8 @@ public class ScatterPlotProjector<V extends SpatialComparable> implements Projec
         }
         if(dmax >= 3) {
           AffineTransformation p = AffineProjection.axisProjection(RelationUtil.dimensionality(rel), 1, 2);
-          p.addRotation(0, 2, Math.PI / 180 * -10.);
-          p.addRotation(1, 2, Math.PI / 180 * 15.);
+          p.addRotation(0, 2, MathUtil.deg2rad(-10.));
+          p.addRotation(1, 2, MathUtil.deg2rad(15.));
           // Wanna try 4d? go ahead:
           // p.addRotation(0, 3, Math.PI / 180 * -20.);
           // p.addRotation(1, 3, Math.PI / 180 * 30.);
@@ -137,21 +133,15 @@ public class ScatterPlotProjector<V extends SpatialComparable> implements Projec
         // Labels at bottom
         for(int d1 = 0; d1 < dmax - 1; d1++) {
           PlotItem it = new PlotItem(d1 + .1, dmax - 1, 1., .1, null);
-          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d1)));
-          task.reqheight = .1;
-          task.reqwidth = 1;
-          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
-          it.tasks.add(task);
+          it.tasks.add(new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d1))) //
+              .requestSize(1, .1).with(RenderFlag.NO_DETAIL));
           master.subitems.add(it);
         }
         // Labels on left
         for(int d2 = 1; d2 < dmax; d2++) {
           PlotItem it = new PlotItem(0, d2 - 1, .1, 1, null);
-          final VisualizationTask task = new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d2), true));
-          task.reqheight = 1;
-          task.reqwidth = .1;
-          task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
-          it.tasks.add(task);
+          it.tasks.add(new VisualizationTask("", context, null, null, new LabelVisualization(RelationUtil.getColumnLabel(rel, d2), true)) //
+              .requestSize(.1, 1.).with(RenderFlag.NO_DETAIL));
           master.subitems.add(it);
         }
       }

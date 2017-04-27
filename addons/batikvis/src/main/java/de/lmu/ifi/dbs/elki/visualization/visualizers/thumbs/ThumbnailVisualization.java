@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.ThumbnailRegistryEntry;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -202,11 +203,11 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
       refreshThumbnail();
       return;
     }
-    if(task.updateOnAny(VisualizationTask.ON_SELECTION) && current instanceof SelectionResult) {
+    if(task.has(UpdateFlag.ON_SELECTION) && current instanceof SelectionResult) {
       refreshThumbnail();
       return;
     }
-    if(task.updateOnAny(VisualizationTask.ON_SAMPLE) && current instanceof SamplingResult) {
+    if(task.has(UpdateFlag.ON_SAMPLE) && current instanceof SamplingResult) {
       refreshThumbnail();
       return;
     }
@@ -214,7 +215,7 @@ public class ThumbnailVisualization extends AbstractVisualization implements Thu
 
   @Override
   public void visualizationChanged(VisualizationItem item) {
-    if(task == item || (task.updateOnAny(VisualizationTask.ON_STYLEPOLICY) && item instanceof StylingPolicy)) {
+    if(task == item || (task.has(UpdateFlag.ON_STYLEPOLICY) && item instanceof StylingPolicy)) {
       refreshThumbnail();
       return;
     }

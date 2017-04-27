@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBID;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -111,10 +112,9 @@ public class TooltipStringVisualization extends AbstractVisFactory {
   }
 
   private void addTooltips(final String name, final Relation<?> rel, VisualizerContext context, Relation<?> rep, ScatterPlotProjector<?> p) {
-    final VisualizationTask task = new VisualizationTask(name, context, rep, rel, TooltipStringVisualization.this);
-    task.tool = true;
-    task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
-    task.initDefaultVisibility(false);
+    final VisualizationTask task = new VisualizationTask(name, context, rep, rel, TooltipStringVisualization.this) //
+        .tool(true).defaultVisibility(false) //
+        .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE);
     context.addVis(rep, task);
     context.addVis(p, task);
   }

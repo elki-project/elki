@@ -153,11 +153,8 @@ public class HistogramVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(HistogramResult.class).forEach(histogram -> {
-      final VisualizationTask task = new VisualizationTask(NAME, context, histogram, null, HistogramVisualization.this);
-      task.reqwidth = 2.0;
-      task.reqheight = 1.0;
-      task.level = VisualizationTask.LEVEL_STATIC;
-      context.addVis(histogram, task);
+      context.addVis(histogram, new VisualizationTask(NAME, context, histogram, null, HistogramVisualization.this) //
+          .requestSize(2.0, 1.0).level(VisualizationTask.LEVEL_STATIC));
     });
   }
 

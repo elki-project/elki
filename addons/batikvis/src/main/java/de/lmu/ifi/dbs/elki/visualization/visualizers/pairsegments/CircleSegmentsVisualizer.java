@@ -48,6 +48,7 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.utilities.io.ParseUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -127,13 +128,9 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
         policy = new SegmentsStylingPolicy(segmentResult);
         context.addVis(segmentResult, policy);
       }
-      // create task for visualization
-      final VisualizationTask task = new VisualizationTask(NAME, context, policy, null, this);
-      task.reqwidth = 2.0;
-      task.reqheight = 2.0;
-      task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
-      context.addVis(segmentResult, task);
+      context.addVis(segmentResult, new VisualizationTask(NAME, context, policy, null, this) //
+          .requestSize(2.0, 2.0).level(VisualizationTask.LEVEL_INTERACTIVE) //
+          .with(UpdateFlag.ON_STYLEPOLICY));
     });
   }
 

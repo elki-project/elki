@@ -185,11 +185,8 @@ public class XYCurveVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(XYCurve.class).forEach(curve -> {
-      final VisualizationTask task = new VisualizationTask(NAME, context, curve, null, XYCurveVisualization.this);
-      task.reqwidth = 1.0;
-      task.reqheight = 1.0;
-      task.level = VisualizationTask.LEVEL_STATIC;
-      context.addVis(curve, task);
+      context.addVis(curve, new VisualizationTask(NAME, context, curve, null, XYCurveVisualization.this) //
+          .level(VisualizationTask.LEVEL_STATIC));
     });
   }
 

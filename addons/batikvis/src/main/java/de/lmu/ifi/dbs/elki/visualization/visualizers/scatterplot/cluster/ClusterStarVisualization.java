@@ -35,6 +35,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -85,11 +86,9 @@ public class ClusterStarVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, p, rel, ClusterStarVisualization.this);
-      task.level = VisualizationTask.LEVEL_DATA + 1;
-      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
-      task.initDefaultVisibility(false);
-      context.addVis(p, task);
+      context.addVis(p, new VisualizationTask(NAME, context, p, rel, ClusterStarVisualization.this) //
+          .level(VisualizationTask.LEVEL_DATA + 1).defaultVisibility(false) //
+          .with(UpdateFlag.ON_STYLEPOLICY));
     });
   }
 

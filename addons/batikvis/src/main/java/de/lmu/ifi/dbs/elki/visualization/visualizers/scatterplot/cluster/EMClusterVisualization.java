@@ -42,6 +42,7 @@ import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.math.geometry.GrahamScanConvexHull2D;
 import de.lmu.ifi.dbs.elki.math.linearalgebra.EigenvalueDecomposition;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -106,10 +107,9 @@ public class EMClusterVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), EMClusterVisualization.this);
-      task.level = VisualizationTask.LEVEL_DATA + 3;
-      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
-      context.addVis(p, task);
+      context.addVis(p, new VisualizationTask(NAME, context, p, p.getRelation(), EMClusterVisualization.this) //
+          .level(VisualizationTask.LEVEL_DATA + 3) //
+          .with(UpdateFlag.ON_STYLEPOLICY));
     });
   }
 

@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.result.SelectionResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
@@ -103,7 +104,7 @@ public abstract class AbstractVisualization implements Visualization, ResultList
     context.addResultListener(this);
     context.addVisualizationListener(this);
     // Listen for database events only when needed.
-    if(task.updateOnAny(VisualizationTask.ON_DATA)) {
+    if(task.has(UpdateFlag.ON_DATA)) {
       context.addDataStoreListener(this);
     }
   }
@@ -177,11 +178,11 @@ public abstract class AbstractVisualization implements Visualization, ResultList
       svgp.requestRedraw(this.task, this);
       return;
     }
-    if(task.updateOnAny(VisualizationTask.ON_SELECTION) && current instanceof SelectionResult) {
+    if(task.has(UpdateFlag.ON_SELECTION) && current instanceof SelectionResult) {
       svgp.requestRedraw(this.task, this);
       return;
     }
-    if(task.updateOnAny(VisualizationTask.ON_SAMPLE) && current instanceof SamplingResult) {
+    if(task.has(UpdateFlag.ON_SAMPLE) && current instanceof SamplingResult) {
       svgp.requestRedraw(this.task, this);
       return;
     }
@@ -199,7 +200,7 @@ public abstract class AbstractVisualization implements Visualization, ResultList
       svgp.requestRedraw(this.task, this);
       return;
     }
-    if(task.updateOnAny(VisualizationTask.ON_STYLEPOLICY) && item instanceof StylingPolicy) {
+    if(task.has(UpdateFlag.ON_STYLEPOLICY) && item instanceof StylingPolicy) {
       svgp.requestRedraw(this.task, this);
       return;
     }

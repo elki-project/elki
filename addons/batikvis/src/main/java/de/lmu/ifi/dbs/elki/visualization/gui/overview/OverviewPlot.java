@@ -44,6 +44,7 @@ import de.lmu.ifi.dbs.elki.utilities.pairs.Pair;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationListener;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.RenderFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.CSSHoverClass;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -301,7 +302,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
           if(!visibleInOverview(task)) {
             continue;
           }
-          hasDetails |= !task.hasAnyFlags(VisualizationTask.FLAG_NO_DETAIL);
+          hasDetails |= !task.has(RenderFlag.NO_DETAIL);
           Pair<Element, Visualization> pair = oldlayers.remove(it, task);
           if(pair == null) {
             pair = new Pair<>(null, null);
@@ -412,7 +413,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
       LoggingUtil.warning("Visualization returned empty layer: " + vis);
       return vis;
     }
-    if(task.hasAnyFlags(VisualizationTask.FLAG_NO_EXPORT)) {
+    if(task.has(RenderFlag.NO_EXPORT)) {
       vis.getLayer().setAttribute(SVGPlot.NO_EXPORT_ATTRIBUTE, SVGPlot.NO_EXPORT_ATTRIBUTE);
     }
     parent.appendChild(vis.getLayer());
@@ -485,9 +486,9 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
    */
   protected boolean visibleInOverview(VisualizationTask task) {
     if(single) {
-      return task.visible && !task.hasAnyFlags(VisualizationTask.FLAG_NO_EMBED);
+      return task.visible && !task.has(RenderFlag.NO_EMBED);
     }
-    return task.visible && !task.hasAnyFlags(VisualizationTask.FLAG_NO_THUMBNAIL);
+    return task.visible && !task.has(RenderFlag.NO_THUMBNAIL);
   }
 
   /**

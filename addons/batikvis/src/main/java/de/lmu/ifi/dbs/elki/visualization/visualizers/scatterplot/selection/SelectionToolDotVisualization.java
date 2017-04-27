@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.database.ids.HashSetModifiableDBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.RenderFlag;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
@@ -91,12 +93,10 @@ public class SelectionToolDotVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionToolDotVisualization.this);
-      task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      task.tool = true;
-      task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
-      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SELECTION);
-      task.initDefaultVisibility(false);
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionToolDotVisualization.this).level(VisualizationTask.LEVEL_INTERACTIVE) //
+          .tool(true).defaultVisibility(false) //
+          .with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT) //
+          .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SELECTION);
       context.addVis(context.getSelectionResult(), task);
       context.addVis(p, task);
     });

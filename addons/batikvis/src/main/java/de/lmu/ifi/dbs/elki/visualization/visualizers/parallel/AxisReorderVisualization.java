@@ -28,6 +28,7 @@ import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.data.NumberVector;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.RenderFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -72,10 +73,9 @@ public class AxisReorderVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findVis(context, start).filter(ParallelPlotProjector.class).forEach(p -> {
-      final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), AxisReorderVisualization.this);
-      task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
-      context.addVis(p, task);
+      context.addVis(p, new VisualizationTask(NAME, context, p.getRelation(), p.getRelation(), AxisReorderVisualization.this)//
+          .level(VisualizationTask.LEVEL_INTERACTIVE) //
+          .with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT));
     });
   }
 

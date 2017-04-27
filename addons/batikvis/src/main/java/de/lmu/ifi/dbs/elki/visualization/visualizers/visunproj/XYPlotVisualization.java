@@ -157,11 +157,8 @@ public class XYPlotVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(XYPlot.class).forEach(plot -> {
-      final VisualizationTask task = new VisualizationTask(NAME, context, plot, null, XYPlotVisualization.this);
-      task.reqwidth = 1.0;
-      task.reqheight = 1.0;
-      task.level = VisualizationTask.LEVEL_STATIC;
-      context.addVis(plot, task);
+      context.addVis(plot, new VisualizationTask(NAME, context, plot, null, XYPlotVisualization.this) //
+          .level(VisualizationTask.LEVEL_STATIC));
     });
   }
 

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.result.RangeSelection;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -77,9 +78,9 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionAxisRangeVisualization.this);
-      task.level = VisualizationTask.LEVEL_DATA - 1;
-      task.addUpdateFlags(VisualizationTask.ON_SELECTION);
+      final VisualizationTask task = new VisualizationTask(NAME, context, context.getSelectionResult(), rel, SelectionAxisRangeVisualization.this) //
+          .level(VisualizationTask.LEVEL_DATA - 1) //
+          .with(UpdateFlag.ON_SELECTION);
       context.addVis(context.getSelectionResult(), task);
       context.addVis(p, task);
     });

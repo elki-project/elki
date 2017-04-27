@@ -70,8 +70,8 @@ public class OPTICSSteepAreaVisualization extends AbstractVisFactory {
       ClusterOrder co = p.getResult();
       It<OPTICSXi.SteepAreaResult> r = co.getHierarchy().iterChildren(co).filter(OPTICSXi.SteepAreaResult.class);
       if(r.valid()) {
-        final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
-        task.level = VisualizationTask.LEVEL_DATA + 1;
+        final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this) //
+            .level(VisualizationTask.LEVEL_DATA + 1);
         context.addVis(p, task);
         context.addVis(r.get(), task);
       }

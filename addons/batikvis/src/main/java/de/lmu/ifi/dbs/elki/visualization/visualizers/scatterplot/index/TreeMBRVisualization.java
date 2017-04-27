@@ -96,9 +96,8 @@ public class TreeMBRVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewSiblings(context, start, AbstractRStarTree.class, ScatterPlotProjector.class, (tree, p) -> {
-      final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, p.getRelation(), TreeMBRVisualization.this);
-      task.level = VisualizationTask.LEVEL_BACKGROUND + 1;
-      task.initDefaultVisibility(false);
+      final VisualizationTask task = new VisualizationTask(NAME, context, (Result) tree, p.getRelation(), TreeMBRVisualization.this) //
+          .level(VisualizationTask.LEVEL_BACKGROUND + 1).defaultVisibility(false);
       context.addVis(tree, task);
       context.addVis(p, task);
     });

@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameteriz
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationMenuAction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -103,11 +104,9 @@ public class DendrogramVisualization extends AbstractVisFactory {
   public void processNewResult(VisualizerContext context, Object start) {
     // Ensure there is a clustering result:
     VisualizationTree.findNewResults(context, start).filter(PointerHierarchyRepresentationResult.class).forEach(pi -> {
-      final VisualizationTask task = new VisualizationTask(NAME, context, pi, null, this);
-      task.level = VisualizationTask.LEVEL_STATIC;
-      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
-      task.reqwidth = 1.;
-      task.reqheight = 1.;
+      final VisualizationTask task = new VisualizationTask(NAME, context, pi, null, this) //
+          .level(VisualizationTask.LEVEL_STATIC) //
+          .with(UpdateFlag.ON_STYLEPOLICY);
       context.addVis(context.getStylingPolicy(), task);
       context.addVis(pi, new SwitchStyleAction(task, context));
     });

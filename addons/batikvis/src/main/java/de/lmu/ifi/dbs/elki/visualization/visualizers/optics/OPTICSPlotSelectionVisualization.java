@@ -31,6 +31,7 @@ import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
@@ -82,10 +83,8 @@ public class OPTICSPlotSelectionVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object result) {
     VisualizationTree.findVis(context, result).filter(OPTICSProjector.class).forEach(p -> {
-      final VisualizationTask task = new VisualizationTask(NAME, context, p.getResult(), null, this);
-      task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      task.addUpdateFlags(VisualizationTask.ON_SELECTION);
-      context.addVis(p, task);
+      context.addVis(p, new VisualizationTask(NAME, context, p.getResult(), null, this) //
+          .level(VisualizationTask.LEVEL_INTERACTIVE).with(UpdateFlag.ON_SELECTION));
     });
   }
 

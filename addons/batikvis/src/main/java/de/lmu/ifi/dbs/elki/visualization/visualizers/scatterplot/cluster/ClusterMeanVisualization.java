@@ -32,6 +32,7 @@ import de.lmu.ifi.dbs.elki.data.model.PrototypeModel;
 import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -77,10 +78,8 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(final VisualizerContext context, Object start) {
     VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
-      final VisualizationTask task = new VisualizationTask(NAME, context, p, p.getRelation(), ClusterMeanVisualization.this);
-      task.level = VisualizationTask.LEVEL_DATA + 1;
-      task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
-      context.addVis(p, task);
+      context.addVis(p, new VisualizationTask(NAME, context, p, p.getRelation(), ClusterMeanVisualization.this)//
+          .level(VisualizationTask.LEVEL_DATA + 1).with(UpdateFlag.ON_STYLEPOLICY));
     });
   }
 

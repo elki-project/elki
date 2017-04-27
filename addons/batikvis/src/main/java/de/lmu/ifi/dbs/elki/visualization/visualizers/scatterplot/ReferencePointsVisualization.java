@@ -74,8 +74,8 @@ public class ReferencePointsVisualization extends AbstractVisFactory {
       }
       // FIXME: Make sure the reference points belong to this relation, and have
       // the same dimensionality. How can we encode this information?
-      final VisualizationTask task = new VisualizationTask(NAME, context, rp, rel, ReferencePointsVisualization.this);
-      task.level = VisualizationTask.LEVEL_DATA;
+      final VisualizationTask task = new VisualizationTask(NAME, context, rp, rel, ReferencePointsVisualization.this) //
+          .level(VisualizationTask.LEVEL_DATA);
       context.addVis(rp, task);
       context.addVis(p, task);
     });

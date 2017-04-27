@@ -34,6 +34,7 @@ import de.lmu.ifi.dbs.elki.result.outlier.OutlierResult;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Title;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -91,9 +92,9 @@ public class COPVectorVisualization extends AbstractVisFactory {
         if(!rel.getShortName().equals(COP.COP_ERRORVEC)) {
           return;
         }
-        final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel2, COPVectorVisualization.this);
-        task.level = VisualizationTask.LEVEL_DATA;
-        task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
+        final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel2, COPVectorVisualization.this) //
+            .level(VisualizationTask.LEVEL_DATA) //
+            .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE);
         context.addVis(o, task);
         context.addVis(p, task);
       });

@@ -51,6 +51,7 @@ import de.lmu.ifi.dbs.elki.index.preprocessed.knn.AbstractMaterializeKNNPreproce
 import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.DBIDSelection;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -109,9 +110,9 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, kNN, rel, DistanceFunctionVisualization.this);
-      task.level = VisualizationTask.LEVEL_DATA - 1;
-      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_SELECTION);
+      final VisualizationTask task = new VisualizationTask(NAME, context, kNN, rel, DistanceFunctionVisualization.this) //
+          .level(VisualizationTask.LEVEL_DATA - 1) //
+          .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_SELECTION);
       context.addVis(kNN, task);
       context.addVis(p, task);
     });

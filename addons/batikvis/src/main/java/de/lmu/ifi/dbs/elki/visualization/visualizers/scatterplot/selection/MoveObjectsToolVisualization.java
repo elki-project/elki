@@ -33,6 +33,8 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.RenderFlag;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.batikutil.DragableArea;
@@ -87,14 +89,10 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, p.getRelation(), rel, MoveObjectsToolVisualization.this);
-      task.level = VisualizationTask.LEVEL_INTERACTIVE;
-      task.tool = true;
-      task.addFlags(VisualizationTask.FLAG_NO_THUMBNAIL | VisualizationTask.FLAG_NO_EXPORT);
-      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_SELECTION);
-      task.initDefaultVisibility(false);
-      // baseResult.getHierarchy().add(p.getRelation(), task);
-      context.addVis(p, task);
+      context.addVis(p, new VisualizationTask(NAME, context, p.getRelation(), rel, MoveObjectsToolVisualization.this) //
+          .level(VisualizationTask.LEVEL_INTERACTIVE).tool(true).defaultVisibility(false) //
+          .with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT) //
+          .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_SELECTION));
     });
   }
 

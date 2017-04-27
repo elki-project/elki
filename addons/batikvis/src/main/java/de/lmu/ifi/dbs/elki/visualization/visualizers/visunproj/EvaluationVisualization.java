@@ -27,6 +27,7 @@ import de.lmu.ifi.dbs.elki.result.EvaluationResult;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
 import de.lmu.ifi.dbs.elki.utilities.io.FormatUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
@@ -99,19 +100,14 @@ public class EvaluationVisualization extends AbstractVisFactory {
             return;
           }
         }
-        final VisualizationTask task = new VisualizationTask(NAME, context, c, null, EvaluationVisualization.this);
-        task.reqwidth = .5;
-        task.reqheight = sr.numLines() * .05;
-        task.level = VisualizationTask.LEVEL_STATIC;
-        task.addUpdateFlags(VisualizationTask.ON_STYLEPOLICY);
-        context.addVis(context.getBaseResult(), task);
+        context.addVis(context.getBaseResult(), new VisualizationTask(NAME, context, c, null, EvaluationVisualization.this) //
+            .requestSize(.5, sr.numLines() * .05) //
+            .level(VisualizationTask.LEVEL_STATIC) //
+            .with(UpdateFlag.ON_STYLEPOLICY));
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, sr, null, EvaluationVisualization.this);
-      task.reqwidth = .5;
-      task.reqheight = sr.numLines() * .05;
-      task.level = VisualizationTask.LEVEL_STATIC;
-      context.addVis(sr, task);
+      context.addVis(sr, new VisualizationTask(NAME, context, sr, null, EvaluationVisualization.this) //
+          .requestSize(.5, sr.numLines() * .05).level(VisualizationTask.LEVEL_STATIC));
     });
   }
 

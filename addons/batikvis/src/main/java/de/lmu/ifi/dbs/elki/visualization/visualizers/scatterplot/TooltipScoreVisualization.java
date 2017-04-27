@@ -37,6 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.constraints.CommonConstraint
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -127,10 +128,9 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
    * @param rel Data projection relation
    */
   private void addTooltips(String nam, Relation<?> val, VisualizerContext context, ScatterPlotProjector<?> p, Relation<?> rel) {
-    final VisualizationTask task = new VisualizationTask(nam, context, val, rel, TooltipScoreVisualization.this);
-    task.tool = true;
-    task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE);
-    task.initDefaultVisibility(false);
+    final VisualizationTask task = new VisualizationTask(nam, context, val, rel, TooltipScoreVisualization.this) //
+        .tool(true).defaultVisibility(false) //
+        .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE);
     context.addVis(val, task);
     context.addVis(p, task);
   }

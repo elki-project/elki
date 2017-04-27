@@ -47,6 +47,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.FileParameter.FileType;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.IntParameter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.RenderFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerParameterizer;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
@@ -208,7 +209,7 @@ public class ExportVisualizations implements ResultHandler {
     ArrayList<Visualization> layers = new ArrayList<>();
     for(Iterator<VisualizationTask> iter = item.tasks.iterator(); iter.hasNext();) {
       VisualizationTask task = iter.next();
-      if(task.hasAnyFlags(VisualizationTask.FLAG_NO_DETAIL | VisualizationTask.FLAG_NO_EXPORT) || !task.visible) {
+      if(task.has(RenderFlag.NO_DETAIL) || task.has(RenderFlag.NO_EXPORT) || !task.visible) {
         continue;
       }
       try {

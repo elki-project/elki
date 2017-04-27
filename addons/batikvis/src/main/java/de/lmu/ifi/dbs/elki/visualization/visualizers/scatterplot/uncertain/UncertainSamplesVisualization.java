@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.utilities.random.RandomFactory;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
@@ -91,11 +92,9 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
     VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
       context.getHierarchy().iterAncestorsSelf((Relation<?>) p.getRelation()).filter(Relation.class).forEach(r2 -> {
         if(UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r2.getDataTypeInformation())) {
-          final VisualizationTask task = new VisualizationTask(NAME, context, p, r2, this);
-          task.level = VisualizationTask.LEVEL_DATA;
-          task.initDefaultVisibility(false);
-          task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
-          context.addVis(p, task);
+          context.addVis(p, new VisualizationTask(NAME, context, p, r2, this) //
+              .level(VisualizationTask.LEVEL_DATA).defaultVisibility(false) //
+              .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_STYLEPOLICY));
         }
       });
     });

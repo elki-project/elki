@@ -40,6 +40,7 @@ import de.lmu.ifi.dbs.elki.utilities.scaling.ScalingFunction;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierLinearScaling;
 import de.lmu.ifi.dbs.elki.utilities.scaling.outlier.OutlierScalingFunction;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.colors.ColorLibrary;
@@ -120,10 +121,10 @@ public class BubbleVisualization extends AbstractVisFactory {
       if(o.getHierarchy().iterParents(o).filter(OutlierResult.class).valid()) {
         vis = false;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, o, rel, BubbleVisualization.this);
-      task.level = VisualizationTask.LEVEL_DATA;
-      task.addUpdateFlags(VisualizationTask.ON_DATA | VisualizationTask.ON_SAMPLE | VisualizationTask.ON_STYLEPOLICY);
-      task.initDefaultVisibility(vis);
+      final VisualizationTask task = new VisualizationTask(NAME, context, o, rel, BubbleVisualization.this) //
+          .level(VisualizationTask.LEVEL_DATA) //
+          .defaultVisibility(vis) //
+          .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_STYLEPOLICY);
       context.addVis(o, task);
       context.addVis(p, task);
     });

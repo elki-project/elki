@@ -63,10 +63,9 @@ public class PixmapVisualizer extends AbstractVisFactory {
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(PixmapResult.class).forEach(pr -> {
       // Add plots, attach visualizer
-      final VisualizationTask task = new VisualizationTask(NAME, context, pr, null, PixmapVisualizer.this);
-      task.reqwidth = pr.getImage().getWidth() / (double) pr.getImage().getHeight();
-      task.reqheight = 1.0;
-      task.level = VisualizationTask.LEVEL_STATIC;
+      final VisualizationTask task = new VisualizationTask(NAME, context, pr, null, PixmapVisualizer.this) //
+          .requestSize(pr.getImage().getWidth() / (double) pr.getImage().getHeight(), 1.0) //
+          .level(VisualizationTask.LEVEL_STATIC);
       context.addVis(pr, task);
     });
   }

@@ -33,6 +33,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.ArrayListIter;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -84,9 +85,9 @@ public class PolygonVisualization extends AbstractVisFactory {
       }
       // Assume that a 2d projector is using the same coordinates as the
       // polygons.
-      final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel, PolygonVisualization.this);
-      task.level = VisualizationTask.LEVEL_DATA - 10;
-      task.addUpdateFlags(VisualizationTask.ON_DATA);
+      final VisualizationTask task = new VisualizationTask(NAME, context, rel, rel, PolygonVisualization.this) //
+          .level(VisualizationTask.LEVEL_DATA - 10) //
+          .with(UpdateFlag.ON_DATA);
       context.addVis(rel, task);
       context.addVis(p, task);
     });

@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDVar;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTree;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.css.CSSClass;
@@ -78,10 +79,9 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(NAME, context, co, rel, ClusterOrderVisualization.this);
-      task.initDefaultVisibility(false);
-      task.level = VisualizationTask.LEVEL_DATA - 1;
-      task.addUpdateFlags(VisualizationTask.ON_DATA);
+      final VisualizationTask task = new VisualizationTask(NAME, context, co, rel, ClusterOrderVisualization.this) //
+          .level(VisualizationTask.LEVEL_DATA - 1).defaultVisibility(false) //
+          .with(UpdateFlag.ON_DATA);
       context.addVis(co, task);
       context.addVis(p, task);
     });

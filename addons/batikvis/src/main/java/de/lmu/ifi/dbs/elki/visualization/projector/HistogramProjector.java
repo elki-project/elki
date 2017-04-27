@@ -29,6 +29,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.result.ScalesResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.RenderFlag;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.overview.PlotItem;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection1D;
@@ -92,11 +93,8 @@ public class HistogramProjector<V extends NumberVector> implements Projector {
       for(int d1 = 0; d1 < dmax; d1++) {
         PlotItem it = new PlotItem(d1 + xoff, 0, 1., lheight, null);
         LabelVisualization lbl = new LabelVisualization(RelationUtil.getColumnLabel(rel, d1));
-        final VisualizationTask task = new VisualizationTask("", context, null, null, lbl);
-        task.reqheight = lheight;
-        task.reqwidth = 1;
-        task.addFlags(VisualizationTask.FLAG_NO_DETAIL);
-        it.tasks.add(task);
+        it.tasks.add(new VisualizationTask("", context, null, null, lbl) //
+            .requestSize(1, lheight).with(RenderFlag.NO_DETAIL));
         master.subitems.add(it);
       }
     }

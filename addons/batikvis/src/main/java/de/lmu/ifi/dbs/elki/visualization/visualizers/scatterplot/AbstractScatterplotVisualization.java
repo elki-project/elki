@@ -28,6 +28,7 @@ import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.result.SamplingResult;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationItem;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
+import de.lmu.ifi.dbs.elki.visualization.VisualizationTask.UpdateFlag;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
@@ -75,7 +76,7 @@ public abstract class AbstractScatterplotVisualization extends AbstractVisualiza
     super(task, plot, width, height);
     this.proj = (Projection2D) proj;
     this.rel = task.getRelation();
-    this.sample = task.updateOnAny(VisualizationTask.ON_SAMPLE) ? SamplingResult.getSamplingResult(rel) : null;
+    this.sample = task.has(UpdateFlag.ON_SAMPLE) ? SamplingResult.getSamplingResult(rel) : null;
   }
 
   /**

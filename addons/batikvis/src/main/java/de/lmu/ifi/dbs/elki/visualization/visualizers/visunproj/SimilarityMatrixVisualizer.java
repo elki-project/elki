@@ -67,12 +67,8 @@ public class SimilarityMatrixVisualizer extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(SimilarityMatrix.class).forEach(pr -> {
-      // Add plots, attach visualizer
-      final VisualizationTask task = new VisualizationTask(NAME, context, pr, null, SimilarityMatrixVisualizer.this);
-      task.reqwidth = 1.0;
-      task.reqheight = 1.0;
-      task.level = VisualizationTask.LEVEL_STATIC;
-      context.addVis(pr, task);
+      context.addVis(pr, new VisualizationTask(NAME, context, pr, null, SimilarityMatrixVisualizer.this) //
+          .level(VisualizationTask.LEVEL_STATIC));
     });
   }
 
