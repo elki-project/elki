@@ -58,7 +58,7 @@ public class ClusterContingencyTableTest {
    */
   @Test
   public void testCompareDatabases() {
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, null, null);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
     // verify data set size.
     Relation<?> rel = db.getRelation(TypeUtil.ANY);

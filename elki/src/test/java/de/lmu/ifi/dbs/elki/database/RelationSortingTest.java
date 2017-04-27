@@ -49,7 +49,7 @@ public class RelationSortingTest {
 
   @Test
   public void testSorting() {
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(filename, -1, null, null);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(filename, -1);
     Relation<? extends NumberVector> rel = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
     ArrayModifiableDBIDs ids = DBIDUtil.newArray(rel.getDBIDs());

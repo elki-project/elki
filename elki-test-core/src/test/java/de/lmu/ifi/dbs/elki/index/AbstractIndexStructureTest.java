@@ -112,7 +112,7 @@ public abstract class AbstractIndexStructureTest {
    * @param inputparams
    */
   protected void testExactEuclidean(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams, null);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, EuclideanDistanceFunction.STATIC);
 
@@ -162,7 +162,7 @@ public abstract class AbstractIndexStructureTest {
    * @param inputparams
    */
   protected void testExactCosine(ListParameterization inputparams, Class<?> expectKNNQuery, Class<?> expectRangeQuery) {
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams, null);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<DoubleVector> rep = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector> dist = db.getDistanceQuery(rep, CosineDistanceFunction.STATIC);
 

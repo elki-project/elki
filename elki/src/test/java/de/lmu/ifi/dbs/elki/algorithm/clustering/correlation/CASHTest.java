@@ -47,7 +47,7 @@ public class CASHTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testCASHResults() {
     // Input
-    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600, new ListParameterization(), null);
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-3d2d1d.csv", 600);
 
     // CASH parameters
     ListParameterization params = new ListParameterization();
@@ -73,7 +73,7 @@ public class CASHTest extends AbstractClusterAlgorithmTest {
   @Test
   public void testCASHEmbedded() {
     // CASH input
-    Database db = makeSimpleDatabase(UNITTEST + "correlation-embedded-2-4d.ascii", 600, new ListParameterization(), null);
+    Database db = makeSimpleDatabase(UNITTEST + "correlation-embedded-2-4d.ascii", 600);
 
     // CASH parameters
     ListParameterization params = new ListParameterization();

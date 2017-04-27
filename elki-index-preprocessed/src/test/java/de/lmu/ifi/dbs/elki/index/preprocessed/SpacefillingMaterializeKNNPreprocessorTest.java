@@ -62,7 +62,7 @@ public class SpacefillingMaterializeKNNPreprocessorTest {
 
   @Test
   public void testPreprocessor() {
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, null, null);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
 
     Relation<DoubleVector> rel = db.getRelation(TypeUtil.DOUBLE_VECTOR_FIELD);
     DistanceQuery<DoubleVector> distanceQuery = db.getDistanceQuery(rel, EuclideanDistanceFunction.STATIC);

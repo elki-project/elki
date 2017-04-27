@@ -60,7 +60,7 @@ public class DeLiCluTest extends AbstractClusterAlgorithmTest {
     // We need a special index for this algorithm:
     indexparams.addParameter(StaticArrayDatabase.Parameterizer.INDEX_ID, DeLiCluTreeFactory.class);
     indexparams.addParameter(AbstractPageFileFactory.Parameterizer.PAGE_SIZE_ID, 1000);
-    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710, indexparams, null);
+    Database db = makeSimpleDatabase(UNITTEST + "hierarchical-2d.ascii", 710, indexparams);
 
     // Setup actual algorithm
     ListParameterization params = new ListParameterization();

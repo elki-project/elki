@@ -75,10 +75,21 @@ public abstract class AbstractSimpleAlgorithmTest {
    *
    * @param filename File to load
    * @param expectedSize Expected size in records
+   * @return Database
+   */
+  public static Database makeSimpleDatabase(String filename, int expectedSize) {
+    return makeSimpleDatabase(filename, expectedSize, new ListParameterization());
+  }
+
+  /**
+   * Generate a simple DoubleVector database from a file.
+   *
+   * @param filename File to load
+   * @param expectedSize Expected size in records
    * @param params Extra parameters
    * @return Database
    */
-  public static <T> Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params, Class<?>[] filters) {
+  public static Database makeSimpleDatabase(String filename, int expectedSize, ListParameterization params, Class<?>... filters) {
     // Allow loading test data from resources.
     try (InputStream is = open(filename)) {
       if(params == null) {
@@ -130,16 +141,5 @@ public abstract class AbstractSimpleAlgorithmTest {
       throw new IOException("Resource not found: " + filename);
     }
     return filename.endsWith(".gz") ? new GZIPInputStream(is) : is;
-  }
-
-  /**
-   * Generate a simple DoubleVector database from a file.
-   *
-   * @param filename File to load
-   * @param expectedSize Expected size in records
-   * @return Database
-   */
-  protected <T> Database makeSimpleDatabase(String filename, int expectedSize) {
-    return makeSimpleDatabase(filename, expectedSize, new ListParameterization(), null);
   }
 }

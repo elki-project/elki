@@ -73,7 +73,7 @@ public class KNNJoinTest {
 
   @Test
   public void testLinearScan() {
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, null, null);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds);
     Relation<NumberVector> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
     // Euclidean
@@ -153,7 +153,7 @@ public class KNNJoinTest {
    * @throws ParameterException
    */
   void doKNNJoin(ListParameterization inputparams) {
-    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams, null);
+    Database db = AbstractSimpleAlgorithmTest.makeSimpleDatabase(dataset, shoulds, inputparams);
     Relation<NumberVector> relation = db.getRelation(TypeUtil.NUMBER_VECTOR_FIELD);
 
     // Euclidean
