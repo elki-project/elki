@@ -20,6 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.datasource;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
@@ -118,7 +119,7 @@ public class InputStreamDatabaseConnection extends AbstractDatabaseConnection im
   }
 
   @Override
-  public void close() throws Exception {
+  public void close() throws IOException {
     in.close();
   }
 
