@@ -123,15 +123,8 @@ public abstract class AbstractParameterization implements Parameterization {
       LOG.warning("Option " + opt.getName() + " is already set!");
     }
     try {
-      if(setValueForOption(opt)) {
-        return true;
-      }
-      // Try default value instead.
-      if(opt.tryDefaultValue()) {
-        return true;
-      }
-      // No value available.
-      return false;
+      // Given value of default value instead.
+      return setValueForOption(opt) || opt.tryDefaultValue();
     }
     catch(ParameterException e) {
       reportError(e);
@@ -149,11 +142,13 @@ public abstract class AbstractParameterization implements Parameterization {
   @Override
   public abstract boolean setValueForOption(Parameter<?> opt) throws ParameterException;
 
-  /** Upon destruction, report any errors that weren't handled yet.
-   *  
-   * @throws Throwable Errors */
+  /**
+   * Upon destruction, report any errors that weren't handled yet.
+   * 
+   * @throws Throwable Errors
+   */
   @Override
-  public void finalize() throws Throwable {
+  protected void finalize() throws Throwable {
     failOnErrors();
     super.finalize();
   }
@@ -162,12 +157,12 @@ public abstract class AbstractParameterization implements Parameterization {
   public boolean checkConstraint(GlobalParameterConstraint constraint) {
     try {
       constraint.test();
+      return true;
     }
     catch(ParameterException e) {
       reportError(e);
       return false;
     }
-    return true;
   }
 
   @Override
@@ -177,7 +172,7 @@ public abstract class AbstractParameterization implements Parameterization {
     }
     catch(Exception e) {
       LOG.exception(e);
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
       return null;
     }
   }
@@ -189,7 +184,7 @@ public abstract class AbstractParameterization implements Parameterization {
     }
     catch(Exception e) {
       LOG.exception(e);
-      reportError(new InternalParameterizationErrors("Error instantiating internal class: "+c.getName(), e));
+      reportError(new InternalParameterizationErrors("Error instantiating internal class: " + c.getName(), e));
       return null;
     }
   }

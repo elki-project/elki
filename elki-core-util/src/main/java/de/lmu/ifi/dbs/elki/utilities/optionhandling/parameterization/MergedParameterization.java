@@ -139,15 +139,8 @@ public class MergedParameterization implements Parameterization {
   @Override
   public boolean grab(Parameter<?> opt) {
     try {
-      if(setValueForOption(opt)) {
-        return true;
-      }
-      // Try default value instead.
-      if(opt.tryDefaultValue()) {
-        return true;
-      }
-      // No value available.
-      return false;
+      // Try given or default value:
+      return setValueForOption(opt) || opt.tryDefaultValue();
     }
     catch(ParameterException e) {
       reportError(e);

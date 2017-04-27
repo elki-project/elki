@@ -62,11 +62,13 @@ public class IntParameter extends NumberParameter<IntParameter, Integer> {
     if(obj instanceof Integer) {
       return (Integer) obj;
     }
-    try {
-      final String s = obj.toString();
-      return (int) ParseUtil.parseLongBase10(s);
+    if(obj instanceof Number) {
+      return ((Number) obj).intValue();
     }
-    catch(NullPointerException | NumberFormatException e) {
+    try {
+      return (int) ParseUtil.parseLongBase10(obj.toString());
+    }
+    catch(NumberFormatException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires an integer value, read: " + obj + "!\n");
     }
   }

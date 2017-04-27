@@ -60,15 +60,15 @@ public class Polygon implements SpatialComparable {
     super();
     this.points = points;
     // Compute the bounds.
-    if (!points.isEmpty()) {
+    if(!points.isEmpty()) {
       final Iterator<double[]> iter = points.iterator();
       final double[] first = iter.next();
       final int dim = first.length;
       min = first.clone();
       max = first.clone();
-      while (iter.hasNext()) {
+      while(iter.hasNext()) {
         double[] next = iter.next();
-        for (int i = 0; i < dim; i++) {
+        for(int i = 0; i < dim; i++) {
           final double cur = next[i];
           min[i] = Math.min(min[i], cur);
           max[i] = Math.max(max[i], cur);
@@ -98,27 +98,26 @@ public class Polygon implements SpatialComparable {
    * 
    * @param buf Buffer to append to
    */
-  public void appendToBuffer(StringBuilder buf) {
+  public StringBuilder appendToBuffer(StringBuilder buf) {
     Iterator<double[]> iter = points.iterator();
-    while (iter.hasNext()) {
+    while(iter.hasNext()) {
       double[] data = iter.next();
-      for (int i = 0; i < data.length; i++) {
-        if (i > 0) {
-          buf.append(",");
+      for(int i = 0; i < data.length; i++) {
+        if(i > 0) {
+          buf.append(',');
         }
         buf.append(data[i]);
       }
-      if (iter.hasNext()) {
-        buf.append(" ");
+      if(iter.hasNext()) {
+        buf.append(' ');
       }
     }
+    return buf;
   }
 
   @Override
   public String toString() {
-    StringBuilder buf = new StringBuilder();
-    appendToBuffer(buf);
-    return buf.toString();
+    return appendToBuffer(new StringBuilder(points.size() * 20)).toString();
   }
 
   /**
@@ -161,7 +160,7 @@ public class Polygon implements SpatialComparable {
    * @return -1, 0, 1 for counterclockwise, undefined and clockwise.
    */
   public int testClockwise() {
-    if (points.size() < 3) {
+    if(points.size() < 3) {
       return 0;
     }
     final int size = points.size();
@@ -169,7 +168,7 @@ public class Polygon implements SpatialComparable {
     int c = 0;
 
     // TODO: faster when using an iterator?
-    for (int i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
       // Three consecutive points
       final int j = (i + 1) % size;
       final int k = (i + 2) % size;
@@ -178,19 +177,14 @@ public class Polygon implements SpatialComparable {
       final double dyji = points.get(j)[1] - points.get(i)[1];
       final double dxkj = points.get(k)[0] - points.get(j)[0];
       final double z = (dxji * dykj) - (dyji * dxkj);
-      if (z < 0) {
+      if(z < 0) {
         c--;
-      } else if (z > 0) {
+      }
+      else if(z > 0) {
         c++;
       }
     }
-    if (c > 0) {
-      return -1;
-    } else if (c < 0) {
-      return +1;
-    } else {
-      return 0;
-    }
+    return (c > 0) ? -1 : (c < 0) ? +1 : 0;
   }
 
   /**
@@ -215,13 +209,13 @@ public class Polygon implements SpatialComparable {
   public boolean intersects2DIncomplete(Polygon other) {
     assert (this.getDimensionality() == 2);
     assert (other.getDimensionality() == 2);
-    for (double[] v : this.points) {
-      if (other.containsPoint2D(v)) {
+    for(double[] v : this.points) {
+      if(other.containsPoint2D(v)) {
         return true;
       }
     }
-    for (double[] v : other.points) {
-      if (this.containsPoint2D(v)) {
+    for(double[] v : other.points) {
+      if(this.containsPoint2D(v)) {
         return true;
       }
     }
@@ -246,14 +240,12 @@ public class Polygon implements SpatialComparable {
 
     Iterator<double[]> it = points.iterator();
     double[] pre = points.get(points.size() - 1);
-    while (it.hasNext()) {
+    while(it.hasNext()) {
       final double[] cur = it.next();
-      final double curx = cur[0],
-      cury = cur[1];
-      final double prex = pre[0],
-      prey = pre[1];
-      if (((cury > testy) != (prey > testy))) {
-        if ((testx < (prex - curx) * (testy - cury) / (prey - cury) + curx)) {
+      final double curx = cur[0], cury = cur[1];
+      final double prex = pre[0], prey = pre[1];
+      if(((cury > testy) != (prey > testy))) {
+        if((testx < (prex - curx) * (testy - cury) / (prey - cury) + curx)) {
           c = !c;
         }
       }

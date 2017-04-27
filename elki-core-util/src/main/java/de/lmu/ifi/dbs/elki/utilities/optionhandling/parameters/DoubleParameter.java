@@ -61,10 +61,13 @@ public class DoubleParameter extends NumberParameter<DoubleParameter, Double> {
     if(obj instanceof Double) {
       return (Double) obj;
     }
+    if(obj instanceof Number) {
+      return ((Number) obj).doubleValue();
+    }
     try {
       return ParseUtil.parseDouble(obj.toString());
     }
-    catch(NullPointerException|NumberFormatException e) {
+    catch(NumberFormatException e) {
       throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a double value, read: " + obj + "!\n");
     }
   }

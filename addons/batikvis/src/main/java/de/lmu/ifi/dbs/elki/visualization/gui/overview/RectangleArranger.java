@@ -417,7 +417,7 @@ public class RectangleArranger<T> {
    * Debug logging
    */
   protected void logSizes() {
-    StringBuilder buf = new StringBuilder();
+    StringBuilder buf = new StringBuilder(1000);
     final int cols = widths.size();
     final int rows = heights.size();
     {
@@ -443,7 +443,7 @@ public class RectangleArranger<T> {
     {
       for(int y = 0; y < rows; y++) {
         for(int x = 0; x < cols; x++) {
-          buf.append(usage.get(y).get(x) != null ? "X" : "_");
+          buf.append(usage.get(y).get(x) != null ? 'X' : '_');
         }
         buf.append("|\n");
       }

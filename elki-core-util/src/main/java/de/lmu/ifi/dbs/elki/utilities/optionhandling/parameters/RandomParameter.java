@@ -77,7 +77,7 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
   @Override
   public void setValue(Object obj) throws ParameterException {
     // This is a bit hackish. Set both seed and random (via super.setValue())
-    if(obj instanceof RandomFactory) {
+    if(obj == null || obj instanceof RandomFactory) {
       seed = null;
     }
     else if(obj instanceof Long) {
@@ -96,7 +96,7 @@ public class RandomParameter extends AbstractParameter<RandomParameter, RandomFa
         seed = Long.valueOf(obj.toString());
         obj = RandomFactory.get(seed);
       }
-      catch(NullPointerException | NumberFormatException e) {
+      catch(NumberFormatException e) {
         throw new WrongParameterValueException("Wrong parameter format! Parameter \"" + getName() + "\" requires a long seed value or a random generator factory, read: " + obj + "!\n");
       }
     }

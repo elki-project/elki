@@ -203,10 +203,9 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
 
   @Override
   public String getFullDescription() {
-    StringBuilder description = new StringBuilder();
+    StringBuilder description = new StringBuilder(1000);
     // description.append(getParameterType()).append(" ");
-    description.append(shortDescription);
-    description.append(FormatUtil.NEWLINE);
+    description.append(shortDescription).append(FormatUtil.NEWLINE);
     if(hasValuesDescription()) {
       final String valuesDescription = getValuesDescription();
       description.append(valuesDescription);
@@ -215,28 +214,17 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
       }
     }
     if(hasDefaultValue()) {
-      description.append("Default: ");
-      description.append(getDefaultValueAsString());
-      description.append(FormatUtil.NEWLINE);
+      description.append("Default: ").append(getDefaultValueAsString()).append(FormatUtil.NEWLINE);
     }
     if(constraints != null && !constraints.isEmpty()) {
-      if(constraints.size() == 1) {
-        description.append("Constraint: ");
-      }
-      else if(constraints.size() > 1) {
-        description.append("Constraints: ");
-      }
+      description.append((constraints.size() == 1) ? "Constraint: " : "Constraints: ");
       for(int i = 0; i < constraints.size(); i++) {
-        ParameterConstraint<? super T> constraint = constraints.get(i);
         if(i > 0) {
           description.append(", ");
         }
-        description.append(constraint.getDescription(getName()));
-        if(i == constraints.size() - 1) {
-          description.append('.');
-        }
+        description.append(constraints.get(i).getDescription(getName()));
       }
-      description.append(FormatUtil.NEWLINE);
+      description.append('.').append(FormatUtil.NEWLINE);
     }
     return description.toString();
   }
@@ -279,13 +267,14 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
 
   @Override
   public void setValue(Object obj) throws ParameterException {
-    T val = parseValue(obj);
-    if(validate(val)) {
-      setValueInternal(val);
+    if(obj != null) {
+      T val = parseValue(obj);
+      if(validate(val)) {
+        setValueInternal(val);
+        return;
+      }
     }
-    else {
-      throw new InvalidParameterException("Value for option \"" + getName() + "\" did not validate: " + obj.toString());
-    }
+    throw new InvalidParameterException("Value for option \"" + getName() + "\" did not validate: " + obj.toString());
   }
 
   /**
@@ -312,8 +301,7 @@ public abstract class AbstractParameter<THIS extends AbstractParameter<THIS, T>,
 
   @Override
   public final boolean isValid(Object obj) throws ParameterException {
-    T val = parseValue(obj);
-    return validate(val);
+    return obj != null && validate(parseValue(obj));
   }
 
   @Override

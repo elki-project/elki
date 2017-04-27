@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -31,7 +32,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.WrongParameterValueException
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.Parameterization;
 
 /**
- * Parameter that represents a list of objects (in contrast to a class list parameter, they will be instanced at most once.)
+ * Parameter that represents a list of objects (in contrast to a class list
+ * parameter, they will be instanced at most once.)
  * 
  * @author Erich Schubert
  * @since 0.3
@@ -43,8 +45,8 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
   /**
    * Cache for the generated instances.
    */
-  private ArrayList<C> instances = null;
-  
+  private List<C> instances = null;
+
   /**
    * Constructor with optional flag.
    * 
@@ -65,7 +67,7 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
   public ObjectListParameter(OptionID optionID, Class<?> restrictionClass) {
     super(optionID, restrictionClass);
   }
-  
+
   @Override
   public String getSyntax() {
     return "<object_1|class_1,...,object_n|class_n>";
@@ -77,23 +79,26 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
     if(obj == null) {
       throw new UnspecifiedParameterException(this);
     }
-    if (List.class.isInstance(obj)) {
+    if(List.class.isInstance(obj)) {
       List<?> l = (List<?>) obj;
       ArrayList<C> inst = new ArrayList<>(l.size());
       ArrayList<Class<? extends C>> classes = new ArrayList<>(l.size());
-      for (Object o : l) {
+      for(Object o : l) {
         // does the given objects class fit?
-        if (restrictionClass.isInstance(o)) {
+        if(restrictionClass.isInstance(o)) {
           inst.add((C) o);
           classes.add((Class<? extends C>) o.getClass());
-        } else if (o instanceof Class) {
-          if (restrictionClass.isAssignableFrom((Class<?>)o)) {
-          inst.add(null);
-          classes.add((Class<? extends C>) o);
-          } else {
-            throw new WrongParameterValueException(this, ((Class<?>)o).getName(), "Given class not a subclass / implementation of " + restrictionClass.getName());
+        }
+        else if(o instanceof Class) {
+          if(restrictionClass.isAssignableFrom((Class<?>) o)) {
+            inst.add(null);
+            classes.add((Class<? extends C>) o);
           }
-        } else {
+          else {
+            throw new WrongParameterValueException(this, ((Class<?>) o).getName(), "Given class not a subclass / implementation of " + restrictionClass.getName());
+          }
+        }
+        else {
           throw new WrongParameterValueException(this, o.getClass().getName(), "Given instance not an implementation of " + restrictionClass.getName());
         }
       }
@@ -103,10 +108,10 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
     // Did we get a single instance?
     try {
       C inst = restrictionClass.cast(obj);
-      this.instances = new ArrayList<>(1);
-      this.instances.add(inst);
+      this.instances = Arrays.asList(inst);
       return super.parseValue(inst.getClass());
-    } catch (ClassCastException e) {
+    }
+    catch(ClassCastException e) {
       // Continue
     }
     return super.parseValue(obj);
@@ -114,19 +119,18 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
 
   @Override
   public List<C> instantiateClasses(Parameterization config) {
-    if (instances == null) {
+    if(instances == null) {
       // instantiateClasses will descend itself.
-      instances = new ArrayList<>(super.instantiateClasses(config));
-    } else {
+      instances = super.instantiateClasses(config);
+    }
+    else {
       Parameterization cfg = null;
-      for (int i = 0; i < instances.size(); i++) {
-        if (instances.get(i) == null) {
+      for(int i = 0; i < instances.size(); i++) {
+        if(instances.get(i) == null) {
           Class<? extends C> cls = getValue().get(i);
           try {
             // Descend at most once, and only when needed
-            if (cfg == null) {
-              cfg = config.descend(this);
-            }
+            cfg = (cfg == null) ? config.descend(this) : null;
             C instance = ClassGenericsUtil.tryInstantiate(restrictionClass, cls, cfg);
             instances.set(i, instance);
           }
@@ -137,5 +141,5 @@ public class ObjectListParameter<C> extends ClassListParameter<C> {
       }
     }
     return new ArrayList<>(instances);
-  } 
+  }
 }

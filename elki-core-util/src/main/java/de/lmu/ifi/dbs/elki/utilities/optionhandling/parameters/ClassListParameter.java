@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
@@ -79,34 +80,30 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
 
   @Override
   public String getValueAsString() {
-    StringBuilder buf = new StringBuilder();
-    final String defPackage = restrictionClass.getPackage().getName() + ".";
-    for(Class<? extends C> c : getValue()) {
-      if(buf.length() > 0) {
-        buf.append(LIST_SEP);
-      }
-      String name = c.getName();
-      if(name.startsWith(defPackage)) {
-        name = name.substring(defPackage.length());
-      }
-      buf.append(name);
-    }
-    return buf.toString();
+    return formatValue(getValue());
   }
 
   @Override
   public String getDefaultValueAsString() {
-    StringBuilder buf = new StringBuilder();
-    final String defPackage = restrictionClass.getPackage().getName() + ".";
-    for(Class<? extends C> c : getDefaultValue()) {
+    return formatValue(getDefaultValue());
+  }
+
+  /**
+   * Format as string.
+   * 
+   * @param val Value to format
+   * @return String
+   */
+  protected String formatValue(List<Class<? extends C>> val) {
+    StringBuilder buf = new StringBuilder(50 + val.size() * 25);
+    String pkgname = restrictionClass.getPackage().getName();
+    for(Class<? extends C> c : val) {
       if(buf.length() > 0) {
         buf.append(LIST_SEP);
       }
       String name = c.getName();
-      if(name.startsWith(defPackage)) {
-        name = name.substring(defPackage.length());
-      }
-      buf.append(name);
+      boolean stripPrefix = name.length() > pkgname.length() && name.startsWith(pkgname) && name.charAt(pkgname.length()) == '.';
+      buf.append(name, stripPrefix ? pkgname.length() + 1 : 0, name.length());
     }
     return buf.toString();
   }
@@ -132,9 +129,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
     // Did we get a single class?
     try {
       if(restrictionClass.isAssignableFrom((Class<?>) obj)) {
-        List<Class<? extends C>> clss = new ArrayList<>(1);
-        clss.add((Class<? extends C>) obj);
-        return clss;
+        return Arrays.asList((Class<? extends C>) obj);
       }
     }
     catch(ClassCastException e) {
@@ -150,12 +145,10 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
       List<Class<? extends C>> cls = new ArrayList<>(classes.length);
       for(String cl : classes) {
         Class<? extends C> clz = ELKIServiceRegistry.findImplementation(restrictionClass, cl);
-        if(clz != null) {
-          cls.add(clz);
-        }
-        else {
+        if(clz == null) {
           throw new WrongParameterValueException(this, (String) obj, "Class '" + cl + "' not found for given value. Must be a subclass / implementation of " + restrictionClass.getName());
         }
+        cls.add(clz);
       }
       return cls;
     }
@@ -224,8 +217,7 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
       // NOTE: There is a duplication of this code in ObjectListParameter - keep
       // in sync!
       try {
-        C instance = ClassGenericsUtil.tryInstantiate(restrictionClass, cls, config);
-        instances.add(instance);
+        instances.add(ClassGenericsUtil.tryInstantiate(restrictionClass, cls, config));
       }
       catch(Exception e) {
         config.reportError(new WrongParameterValueException(this, cls.getName(), e));
@@ -242,31 +234,22 @@ public class ClassListParameter<C> extends ListParameter<ClassListParameter<C>, 
    *         or interface as specified in the properties
    */
   public String restrictionString() {
-    String prefix = restrictionClass.getPackage().getName() + ".";
-    StringBuilder info = new StringBuilder();
-    if(restrictionClass.isInterface()) {
-      info.append("Implementing ");
-    }
-    else {
-      info.append("Extending ");
-    }
-    info.append(restrictionClass.getName());
-    info.append(FormatUtil.NEWLINE);
+    String pkgName = restrictionClass.getPackage().getName();
+    StringBuilder info = new StringBuilder(500);
+    info.append(restrictionClass.isInterface() ? "Implementing " : "Extending ") //
+        .append(restrictionClass.getName()) //
+        .append(FormatUtil.NEWLINE);
 
     List<Class<?>> known = getKnownImplementations();
     if(!known.isEmpty()) {
-      info.append("Known classes (default package " + prefix + "):");
-      info.append(FormatUtil.NEWLINE);
+      info.append("Known classes (default package ").append(pkgName).append("):") //
+          .append(FormatUtil.NEWLINE);
       for(Class<?> c : known) {
-        info.append("->" + FormatUtil.NONBREAKING_SPACE);
         String name = c.getName();
-        if(name.startsWith(prefix)) {
-          info.append(name.substring(prefix.length()));
-        }
-        else {
-          info.append(name);
-        }
-        info.append(FormatUtil.NEWLINE);
+        final boolean stripPrefix = name.length() > pkgName.length() && name.startsWith(pkgName) && name.charAt(pkgName.length()) == '.';
+        info.append("->").append(FormatUtil.NONBREAKING_SPACE) //
+            .append(name, stripPrefix ? pkgName.length() + 1 : 0, name.length()) //
+            .append(FormatUtil.NEWLINE);
       }
     }
     return info.toString();

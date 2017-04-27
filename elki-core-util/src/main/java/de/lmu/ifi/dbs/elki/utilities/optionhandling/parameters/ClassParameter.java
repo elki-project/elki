@@ -145,10 +145,7 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
     if(!restrictionClass.isAssignableFrom(obj)) {
       throw new WrongParameterValueException(this, obj.getName(), "Given class not a subclass / implementation of " + restrictionClass.getName());
     }
-    if(!super.validate(obj)) {
-      return false;
-    }
-    return true;
+    return super.validate(obj);
   }
 
   /**
@@ -179,24 +176,19 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
   @Override
   public String getValuesDescription() {
     if(restrictionClass != null && restrictionClass != Object.class) {
-      StringBuilder info = new StringBuilder();
-      if(restrictionClass.isInterface()) {
-        info.append("Implementing ");
-      }
-      else {
-        info.append("Extending ");
-      }
-      info.append(restrictionClass.getName());
-      info.append(FormatUtil.NEWLINE);
+      StringBuilder info = new StringBuilder(500);
+      info.append(restrictionClass.isInterface() ? "Implementing " : "Extending ") //
+          .append(restrictionClass.getName()).append(FormatUtil.NEWLINE);
 
       List<Class<?>> known = getKnownImplementations();
       if(!known.isEmpty()) {
-        info.append("Known classes (default package " + restrictionClass.getPackage().getName() + "):");
-        info.append(FormatUtil.NEWLINE);
+        info.append("Known classes (default package ")//
+            .append(restrictionClass.getPackage().getName())//
+            .append("):").append(FormatUtil.NEWLINE);
         for(Class<?> c : known) {
-          info.append("->").append(FormatUtil.NONBREAKING_SPACE);
-          info.append(canonicalClassName(c, getRestrictionClass()));
-          info.append(FormatUtil.NEWLINE);
+          info.append("->").append(FormatUtil.NONBREAKING_SPACE) //
+              .append(canonicalClassName(c, getRestrictionClass())) //
+              .append(FormatUtil.NEWLINE);
         }
       }
       return info.toString();
@@ -207,6 +199,44 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
   @Override
   public String getValueAsString() {
     return canonicalClassName(getValue(), getRestrictionClass());
+  }
+
+  @Override
+  public String getDefaultValueAsString() {
+    return canonicalClassName(getDefaultValue(), getRestrictionClass());
+  }
+
+  /**
+   * Get the "simple" form of a class name.
+   *
+   * @param c Class
+   * @param pkg Package
+   *
+   * @return Simplified class name
+   */
+  public static String canonicalClassName(Class<?> c, Package pkg) {
+    String name = c.getName();
+    if(pkg != null) {
+      final String pkgname = pkg.getName();
+      if(name.length() > pkgname.length() && name.startsWith(pkgname) && name.charAt(pkgname.length()) == '.') {
+        name = name.substring(pkgname.length() + 1);
+      }
+    }
+    if(name.endsWith(ELKIServiceRegistry.FACTORY_POSTFIX)) {
+      name = name.substring(0, name.length() - ELKIServiceRegistry.FACTORY_POSTFIX.length());
+    }
+    return name;
+  }
+
+  /**
+   * Get the "simple" form of a class name.
+   *
+   * @param c Class name
+   * @param parent Parent/restriction class (to get package name to strip)
+   * @return Simplified class name.
+   */
+  public static String canonicalClassName(Class<?> c, Class<?> parent) {
+    return canonicalClassName(c, parent == null ? null : parent.getPackage());
   }
 
   /**
@@ -251,47 +281,5 @@ public class ClassParameter<C> extends AbstractParameter<ClassParameter<C>, Clas
    */
   public List<Class<?>> getKnownImplementations() {
     return ELKIServiceRegistry.findAllImplementations(getRestrictionClass());
-  }
-
-  /**
-   * Get the "simple" form of a class name.
-   *
-   * @param c Class
-   * @param pkg Package
-   * @param postfix Postfix to strip
-   *
-   * @return Simplified class name
-   */
-  public static String canonicalClassName(Class<?> c, Package pkg, String postfix) {
-    String name = c.getName();
-    if(pkg != null) {
-      String prefix = pkg.getName() + ".";
-      if(name.startsWith(prefix)) {
-        name = name.substring(prefix.length());
-      }
-    }
-    if(postfix != null && name.endsWith(postfix)) {
-      name = name.substring(0, name.length() - postfix.length());
-    }
-    return name;
-  }
-
-  /**
-   * Get the "simple" form of a class name.
-   *
-   * @param c Class name
-   * @param parent Parent/restriction class (to get package name to strip)
-   * @return Simplified class name.
-   */
-  public static String canonicalClassName(Class<?> c, Class<?> parent) {
-    if(parent == null) {
-      return canonicalClassName(c, null, ELKIServiceRegistry.FACTORY_POSTFIX);
-    }
-    return canonicalClassName(c, parent.getPackage(), ELKIServiceRegistry.FACTORY_POSTFIX);
-  }
-
-  @Override
-  public String getDefaultValueAsString() {
-    return canonicalClassName(getDefaultValue(), getRestrictionClass());
   }
 }
