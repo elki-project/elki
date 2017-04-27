@@ -42,6 +42,12 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * Class to perform and undo a normalization on real vectors with respect to
  * given mean and standard deviation in each dimension.
  * 
+ * We use the biased variance ({@link MeanVariance#getNaiveStddev()}), because
+ * this produces that with exactly standard deviation 1. While often the
+ * unbiased estimate ({@link MeanVariance#getSampleStddev()}) is more
+ * appropriate, it will not ensure this interesting property. For large data,
+ * the difference will be small anyway.
+ * 
  * @author Erich Schubert
  * @since 0.4.0
  * @param <V> vector type
@@ -49,7 +55,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
  * @apiviz.uses NumberVector
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormalization", //
-"z", "de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseVarianceNormalization" })
+    "z", "de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseVarianceNormalization" })
 public class AttributeWiseVarianceNormalization<V extends NumberVector> extends AbstractNormalization<V> {
   /**
    * Class logger.
@@ -118,7 +124,7 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
     }
     for(int d = 0; d < dimensionality; d++) {
       mean[d] = mvs[d].getMean();
-      stddev[d] = mvs[d].getSampleStddev();
+      stddev[d] = mvs[d].getNaiveStddev();
       if(stddev[d] == 0 || Double.isNaN(stddev[d])) {
         stddev[d] = 1.0;
       }
@@ -252,12 +258,12 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
     protected void makeOptions(Parameterization config) {
       super.makeOptions(config);
       DoubleListParameter meanP = new DoubleListParameter(MEAN_ID) //
-      .setOptional(true);
+          .setOptional(true);
       if(config.grab(meanP)) {
         mean = meanP.getValue().clone();
       }
       DoubleListParameter stddevP = new DoubleListParameter(STDDEV_ID) //
-      .setOptional(true);
+          .setOptional(true);
       if(config.grab(stddevP)) {
         stddev = stddevP.getValue().clone();
 
