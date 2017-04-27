@@ -107,7 +107,7 @@ public class EMClusterVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      context.addVis(p, new VisualizationTask(EMClusterVisualization.this, NAME, p, p.getRelation()) //
+      context.addVis(p, new VisualizationTask(this, NAME, p, p.getRelation()) //
           .level(VisualizationTask.LEVEL_DATA + 3) //
           .with(UpdateFlag.ON_STYLEPOLICY));
     });

@@ -79,7 +79,7 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(ClusterOrderVisualization.this, NAME, co, rel) //
+      final VisualizationTask task = new VisualizationTask(this, NAME, co, rel) //
           .level(VisualizationTask.LEVEL_DATA - 1).visibility(false) //
           .with(UpdateFlag.ON_DATA);
       context.addVis(co, task);

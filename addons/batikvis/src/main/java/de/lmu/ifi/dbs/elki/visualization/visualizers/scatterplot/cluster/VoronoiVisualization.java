@@ -128,7 +128,7 @@ public class VoronoiVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
-      final VisualizationTask task = new VisualizationTask(VoronoiVisualization.this, NAME, p, p.getRelation()) //
+      final VisualizationTask task = new VisualizationTask(this, NAME, p, p.getRelation()) //
           .level(VisualizationTask.LEVEL_DATA + 3).with(UpdateFlag.ON_STYLEPOLICY);
       context.addVis(p, task);
       context.addVis(p, new SwitchModeAction(task, context));

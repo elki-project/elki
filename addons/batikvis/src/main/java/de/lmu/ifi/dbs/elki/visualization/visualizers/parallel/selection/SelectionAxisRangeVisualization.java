@@ -78,7 +78,7 @@ public class SelectionAxisRangeVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(SelectionAxisRangeVisualization.this, NAME, context.getSelectionResult(), rel) //
+      final VisualizationTask task = new VisualizationTask(this, NAME, context.getSelectionResult(), rel) //
           .level(VisualizationTask.LEVEL_DATA - 1) //
           .with(UpdateFlag.ON_SELECTION);
       context.addVis(context.getSelectionResult(), task);

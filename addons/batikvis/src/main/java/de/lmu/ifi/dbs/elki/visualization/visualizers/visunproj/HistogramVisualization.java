@@ -152,7 +152,7 @@ public class HistogramVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(HistogramResult.class).forEach(histogram -> {
-      context.addVis(histogram, new VisualizationTask(HistogramVisualization.this, NAME, histogram, null) //
+      context.addVis(histogram, new VisualizationTask(this, NAME, histogram, null) //
           .requestSize(2.0, 1.0).level(VisualizationTask.LEVEL_STATIC));
     });
   }

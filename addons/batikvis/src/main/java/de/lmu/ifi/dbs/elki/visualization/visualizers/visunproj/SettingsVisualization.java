@@ -132,7 +132,7 @@ public class SettingsVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(SettingsResult.class).forEach(sr -> {
-      context.addVis(sr, new VisualizationTask(SettingsVisualization.this, NAME, sr, null) //
+      context.addVis(sr, new VisualizationTask(this, NAME, sr, null) //
           .level(VisualizationTask.LEVEL_STATIC).visibility(false));
     });
   }

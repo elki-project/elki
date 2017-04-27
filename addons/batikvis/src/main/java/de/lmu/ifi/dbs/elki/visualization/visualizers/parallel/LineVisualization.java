@@ -83,7 +83,7 @@ public class LineVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      context.addVis(p, new VisualizationTask(LineVisualization.this, NAME, p.getRelation(), p.getRelation()) //
+      context.addVis(p, new VisualizationTask(this, NAME, p.getRelation(), p.getRelation()) //
           .level(VisualizationTask.LEVEL_DATA) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_STYLEPOLICY).with(UpdateFlag.ON_SAMPLE));
     });

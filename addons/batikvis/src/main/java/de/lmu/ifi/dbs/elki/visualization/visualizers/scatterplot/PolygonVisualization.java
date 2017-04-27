@@ -85,7 +85,7 @@ public class PolygonVisualization extends AbstractVisFactory {
       }
       // Assume that a 2d projector is using the same coordinates as the
       // polygons.
-      final VisualizationTask task = new VisualizationTask(PolygonVisualization.this, NAME, rel, rel) //
+      final VisualizationTask task = new VisualizationTask(this, NAME, rel, rel) //
           .level(VisualizationTask.LEVEL_DATA - 10) //
           .with(UpdateFlag.ON_DATA);
       context.addVis(rel, task);

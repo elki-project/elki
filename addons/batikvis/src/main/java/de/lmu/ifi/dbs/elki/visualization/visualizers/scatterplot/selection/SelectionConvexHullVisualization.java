@@ -83,7 +83,7 @@ public class SelectionConvexHullVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(SelectionConvexHullVisualization.this, NAME, context.getSelectionResult(), rel) //
+      final VisualizationTask task = new VisualizationTask(this, NAME, context.getSelectionResult(), rel) //
           .level(VisualizationTask.LEVEL_DATA - 2) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SELECTION);
       context.addVis(context.getSelectionResult(), task);

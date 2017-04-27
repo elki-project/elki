@@ -73,7 +73,7 @@ public class AxisVisibilityVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findVis(context, start).filter(ParallelPlotProjector.class).forEach(p -> {
-      context.addVis(p, new VisualizationTask(AxisVisibilityVisualization.this, NAME, p.getRelation(), p.getRelation())//
+      context.addVis(p, new VisualizationTask(this, NAME, p.getRelation(), p.getRelation())//
           .level(VisualizationTask.LEVEL_INTERACTIVE) //
           .with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT));
     });

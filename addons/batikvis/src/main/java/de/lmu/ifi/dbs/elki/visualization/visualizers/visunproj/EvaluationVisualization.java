@@ -100,13 +100,13 @@ public class EvaluationVisualization extends AbstractVisFactory {
             return;
           }
         }
-        context.addVis(context.getBaseResult(), new VisualizationTask(EvaluationVisualization.this, NAME, c, null) //
+        context.addVis(context.getBaseResult(), new VisualizationTask(this, NAME, c, null) //
             .requestSize(.5, sr.numLines() * .05) //
             .level(VisualizationTask.LEVEL_STATIC) //
             .with(UpdateFlag.ON_STYLEPOLICY));
         return;
       }
-      context.addVis(sr, new VisualizationTask(EvaluationVisualization.this, NAME, sr, null) //
+      context.addVis(sr, new VisualizationTask(this, NAME, sr, null) //
           .requestSize(.5, sr.numLines() * .05).level(VisualizationTask.LEVEL_STATIC));
     });
   }

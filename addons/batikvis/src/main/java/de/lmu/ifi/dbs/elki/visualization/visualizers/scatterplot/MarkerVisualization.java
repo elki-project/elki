@@ -79,7 +79,7 @@ public class MarkerVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      context.addVis(p, new VisualizationTask(MarkerVisualization.this, NAME, p, rel) //
+      context.addVis(p, new VisualizationTask(this, NAME, p, rel) //
           .level(VisualizationTask.LEVEL_DATA) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_STYLEPOLICY));
     });

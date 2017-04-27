@@ -92,7 +92,7 @@ public class COPVectorVisualization extends AbstractVisFactory {
         if(!rel.getShortName().equals(COP.COP_ERRORVEC)) {
           return;
         }
-        final VisualizationTask task = new VisualizationTask(COPVectorVisualization.this, NAME, rel, rel2) //
+        final VisualizationTask task = new VisualizationTask(this, NAME, rel, rel2) //
             .level(VisualizationTask.LEVEL_DATA) //
             .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE);
         context.addVis(o, task);

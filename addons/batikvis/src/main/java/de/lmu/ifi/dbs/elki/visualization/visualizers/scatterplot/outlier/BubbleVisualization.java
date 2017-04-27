@@ -121,7 +121,7 @@ public class BubbleVisualization extends AbstractVisFactory {
       if(o.getHierarchy().iterParents(o).filter(OutlierResult.class).valid()) {
         vis = false;
       }
-      final VisualizationTask task = new VisualizationTask(BubbleVisualization.this, NAME, o, rel) //
+      final VisualizationTask task = new VisualizationTask(this, NAME, o, rel) //
           .level(VisualizationTask.LEVEL_DATA) //
           .visibility(vis) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_STYLEPOLICY);

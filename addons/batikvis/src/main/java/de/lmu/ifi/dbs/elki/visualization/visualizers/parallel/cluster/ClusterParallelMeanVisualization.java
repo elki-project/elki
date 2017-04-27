@@ -87,7 +87,7 @@ public class ClusterParallelMeanVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      context.addVis(p, new VisualizationTask(ClusterParallelMeanVisualization.this, NAME, p, rel) //
+      context.addVis(p, new VisualizationTask(this, NAME, p, rel) //
           .level(VisualizationTask.LEVEL_DATA + 1) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_STYLEPOLICY));
     });

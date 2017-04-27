@@ -78,7 +78,7 @@ public class ClusterMeanVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(final VisualizerContext context, Object start) {
     VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
-      context.addVis(p, new VisualizationTask(ClusterMeanVisualization.this, NAME, p, p.getRelation())//
+      context.addVis(p, new VisualizationTask(this, NAME, p, p.getRelation())//
           .level(VisualizationTask.LEVEL_DATA + 1).with(UpdateFlag.ON_STYLEPOLICY));
     });
   }

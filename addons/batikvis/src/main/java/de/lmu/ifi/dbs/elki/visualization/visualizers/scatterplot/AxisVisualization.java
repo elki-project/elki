@@ -71,7 +71,7 @@ public class AxisVisualization extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findVis(context, start).filter(ScatterPlotProjector.class).forEach(p -> {
-      context.addVis(p, new VisualizationTask(AxisVisualization.this, NAME, p.getRelation(), p.getRelation()) //
+      context.addVis(p, new VisualizationTask(this, NAME, p.getRelation(), p.getRelation()) //
           .level(VisualizationTask.LEVEL_BACKGROUND));
     });
   }

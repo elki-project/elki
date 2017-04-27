@@ -107,7 +107,7 @@ public class ColoredHistogramVisualizer extends AbstractVisFactory {
   @Override
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewResults(context, start).filter(HistogramProjector.class).forEach(p -> {
-      context.addVis(p, new VisualizationTask(ColoredHistogramVisualizer.this, CNAME, p, p.getRelation()) //
+      context.addVis(p, new VisualizationTask(this, CNAME, p, p.getRelation()) //
           .level(VisualizationTask.LEVEL_DATA) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_STYLEPOLICY));
     });

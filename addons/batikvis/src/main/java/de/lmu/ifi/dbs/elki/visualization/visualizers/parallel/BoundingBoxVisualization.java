@@ -87,7 +87,7 @@ public class BoundingBoxVisualization extends AbstractVisFactory {
       if(!TypeUtil.SPATIAL_OBJECT.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      context.addVis(p, new VisualizationTask(BoundingBoxVisualization.this, NAME, p.getRelation(), p.getRelation()) //
+      context.addVis(p, new VisualizationTask(this, NAME, p.getRelation(), p.getRelation()) //
           .level(VisualizationTask.LEVEL_DATA) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_STYLEPOLICY).with(UpdateFlag.ON_SAMPLE));
     });

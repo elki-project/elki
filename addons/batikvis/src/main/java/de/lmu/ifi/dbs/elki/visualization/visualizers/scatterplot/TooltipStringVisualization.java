@@ -112,7 +112,7 @@ public class TooltipStringVisualization extends AbstractVisFactory {
   }
 
   private void addTooltips(final String name, final Relation<?> rel, VisualizerContext context, Relation<?> rep, ScatterPlotProjector<?> p) {
-    final VisualizationTask task = new VisualizationTask(TooltipStringVisualization.this, name, rep, rel) //
+    final VisualizationTask task = new VisualizationTask(this, name, rep, rel) //
         .tool(true).visibility(false) //
         .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE);
     context.addVis(rep, task);

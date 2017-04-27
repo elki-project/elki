@@ -91,7 +91,7 @@ public class SelectionToolAxisRangeVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(SelectionToolAxisRangeVisualization.this, NAME, context.getSelectionResult(), rel) //
+      final VisualizationTask task = new VisualizationTask(this, NAME, context.getSelectionResult(), rel) //
           .level(VisualizationTask.LEVEL_INTERACTIVE) //
           .tool(true).visibility(false) //
           .with(UpdateFlag.ON_SELECTION).with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT);

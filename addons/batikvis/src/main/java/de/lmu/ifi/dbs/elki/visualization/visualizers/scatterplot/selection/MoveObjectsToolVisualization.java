@@ -89,7 +89,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      context.addVis(p, new VisualizationTask(MoveObjectsToolVisualization.this, NAME, p.getRelation(), rel) //
+      context.addVis(p, new VisualizationTask(this, NAME, p.getRelation(), rel) //
           .level(VisualizationTask.LEVEL_INTERACTIVE).tool(true).visibility(false) //
           .with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_SELECTION));

@@ -110,7 +110,7 @@ public class DistanceFunctionVisualization extends AbstractVisFactory {
       if(!TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(rel.getDataTypeInformation())) {
         return;
       }
-      final VisualizationTask task = new VisualizationTask(DistanceFunctionVisualization.this, NAME, kNN, rel) //
+      final VisualizationTask task = new VisualizationTask(this, NAME, kNN, rel) //
           .level(VisualizationTask.LEVEL_DATA - 1) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_SELECTION);
       context.addVis(kNN, task);
