@@ -33,7 +33,14 @@ import de.lmu.ifi.dbs.elki.utilities.io.FileUtil;
  * @author Erich Schubert
  * @since 0.6.0
  */
-public class ShaderUtil {
+public final class ShaderUtil {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private ShaderUtil() {
+    // Do not use.
+  }
+
   /**
    * Compile a shader from a file.
    *

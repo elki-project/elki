@@ -36,7 +36,14 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.iterator.It;
  *
  * @apiviz.uses Result oneway - - filters
  */
-public class ResultUtil {
+public final class ResultUtil {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private ResultUtil() {
+    // Do not use.
+  }
+
   /**
    * Collect all Annotation results from a Result
    *

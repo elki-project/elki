@@ -42,7 +42,14 @@ import net.jafama.FastMath;
  * @apiviz.uses StyleLibrary
  * @apiviz.uses Element oneway - - «create»
  */
-public class SVGSimpleLinearAxis {
+public final class SVGSimpleLinearAxis {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private SVGSimpleLinearAxis() {
+    // Do not use.
+  }
+
   /**
    * Flag for axis label position. First char: right-hand or left-hand side of
    * line. Second char: text alignment

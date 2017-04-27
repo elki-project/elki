@@ -41,9 +41,17 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @apiviz.uses IntegerComparator
  */
 @Reference(authors = "Vladimir Yaroslavskiy", //
-title = "Dual-Pivot Quicksort", booktitle = "http://iaroslavski.narod.ru/quicksort/", //
-url = "http://iaroslavski.narod.ru/quicksort/")
+    title = "Dual-Pivot Quicksort", //
+    booktitle = "http://iaroslavski.narod.ru/quicksort/", //
+    url = "http://iaroslavski.narod.ru/quicksort/")
 public class IntegerArrayQuickSort {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private IntegerArrayQuickSort() {
+    // Do not use.
+  }
+
   /**
    * Threshold for using insertion sort. Value taken from Javas QuickSort,
    * assuming that it will be similar for our data sets.

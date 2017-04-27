@@ -282,6 +282,13 @@ public class ClusterContingencyTable {
    */
   public static final class Util {
     /**
+     * Private constructor. Static methods only.
+     */
+    private Util() {
+      // Do not use.
+    }
+
+    /**
      * F-Measure
      * 
      * @param precision Precision

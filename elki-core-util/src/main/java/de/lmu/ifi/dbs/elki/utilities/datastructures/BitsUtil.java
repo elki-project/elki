@@ -39,6 +39,13 @@ import gnu.trove.strategy.HashingStrategy;
  */
 public final class BitsUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private BitsUtil() {
+    // Do not use.
+  }
+
+  /**
    * Shift factor for a long: 2^6 == 64 == Long.SIZE
    */
   private static final int LONG_LOG2_SIZE = 6;

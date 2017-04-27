@@ -63,14 +63,16 @@ import net.jafama.FastMath;
  * @since 0.7.0
  */
 @Reference(authors = "T. W. Anderson, and D. A. Darling", //
-title = "Asymptotic theory of certain 'goodness of fit' criteria based on stochastic processes", //
-booktitle = "Annals of mathematical statistics 23(2)", //
-url = "http://dx.doi.org/10.1214/aoms/1177729437")
+    title = "Asymptotic theory of certain 'goodness of fit' criteria based on stochastic processes", //
+    booktitle = "Annals of mathematical statistics 23(2)", //
+    url = "http://dx.doi.org/10.1214/aoms/1177729437")
 public class AndersonDarlingTest {
   /**
-   * Static instance.
+   * Private constructor. Static methods only.
    */
-  public static final AndersonDarlingTest STATIC = new AndersonDarlingTest();
+  private AndersonDarlingTest() {
+    // Do not use.
+  }
 
   /**
    * Test a <i>sorted</i> data set against the standard normal distribution.
@@ -162,10 +164,10 @@ public class AndersonDarlingTest {
    * @param n Sample size
    * @return Unbiased test statistic
    */
-  @Reference(authors = "M. A. Stephens",//
-  title = "EDF Statistics for Goodness of Fit and Some Comparisons",//
-  booktitle = "Journal of the American Statistical Association, Volume 69, Issue 347", //
-  url = "http://dx.doi.org/10.1080/01621459.1974.10480196")
+  @Reference(authors = "M. A. Stephens", //
+      title = "EDF Statistics for Goodness of Fit and Some Comparisons", //
+      booktitle = "Journal of the American Statistical Association, Volume 69, Issue 347", //
+      url = "http://dx.doi.org/10.1080/01621459.1974.10480196")
   public static double removeBiasNormalDistribution(double A2, int n) {
     return A2 * (1 + 4. / n - 25. / (n * n));
   }

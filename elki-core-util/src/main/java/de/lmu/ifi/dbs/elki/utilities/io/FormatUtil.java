@@ -37,6 +37,13 @@ import java.util.*;
  */
 public final class FormatUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private FormatUtil() {
+    // Do not use.
+  }
+
+  /**
    * Dynamic number formatter, but with language constraint.
    */
   public static final NumberFormat NF = NumberFormat.getInstance(Locale.US);

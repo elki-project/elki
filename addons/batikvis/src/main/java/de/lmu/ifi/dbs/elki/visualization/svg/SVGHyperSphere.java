@@ -36,7 +36,14 @@ import net.jafama.FastMath;
  * @apiviz.uses SVGPath
  * @apiviz.uses Projection2D
  */
-public class SVGHyperSphere {
+public final class SVGHyperSphere {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private SVGHyperSphere() {
+    // Do not use.
+  }
+
   /**
    * Factor used for approximating circles with cubic beziers.
    *

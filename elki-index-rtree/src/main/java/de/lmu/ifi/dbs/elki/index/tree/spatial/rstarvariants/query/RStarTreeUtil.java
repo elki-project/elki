@@ -46,6 +46,13 @@ import de.lmu.ifi.dbs.elki.index.tree.spatial.rstarvariants.AbstractRStarTree;
  */
 public final class RStarTreeUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private RStarTreeUtil() {
+    // Do not use.
+  }
+
+  /**
    * Get an RTree range query, using an optimized double implementation when
    * possible.
    * 

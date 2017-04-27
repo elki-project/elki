@@ -41,6 +41,13 @@ import org.w3c.dom.Element;
  */
 public final class HTMLUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private HTMLUtil() {
+    // Do not use.
+  }
+
+  /**
    * HTML namespace
    */
   public static final String HTML_NAMESPACE = "http://www.w3.org/1999/xhtml";

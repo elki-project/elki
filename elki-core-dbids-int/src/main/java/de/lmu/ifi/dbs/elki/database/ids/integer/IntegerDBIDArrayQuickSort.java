@@ -42,8 +42,18 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * 
  * @apiviz.uses IntegerArrayDBIDs
  */
-@Reference(authors = "Vladimir Yaroslavskiy", title = "Dual-Pivot Quicksort", booktitle = "http://iaroslavski.narod.ru/quicksort/", url = "http://iaroslavski.narod.ru/quicksort/")
-class IntegerDBIDArrayQuickSort {
+@Reference(authors = "Vladimir Yaroslavskiy", //
+    title = "Dual-Pivot Quicksort", //
+    booktitle = "http://iaroslavski.narod.ru/quicksort/", //
+    url = "http://iaroslavski.narod.ru/quicksort/")
+final class IntegerDBIDArrayQuickSort {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private IntegerDBIDArrayQuickSort() {
+    // Do not use.
+  }
+
   /**
    * Threshold for using insertion sort. Value taken from Javas QuickSort,
    * assuming that it will be similar for DBIDs.
@@ -85,17 +95,18 @@ class IntegerDBIDArrayQuickSort {
    */
   private static void quickSort(int[] data, final int start, final int end, Comparator<? super DBIDRef> comp, IntegerDBIDVar vl, IntegerDBIDVar vk, IntegerDBIDVar vr) {
     final int len = end - start;
-    if (len < INSERTION_THRESHOLD) {
+    if(len < INSERTION_THRESHOLD) {
       // Classic insertion sort.
-      for (int i = start + 1; i <= end; i++) {
-        for (int j = i; j > start; j--) {
+      for(int i = start + 1; i <= end; i++) {
+        for(int j = i; j > start; j--) {
           vl.internalSetIndex(data[j]);
           vr.internalSetIndex(data[j - 1]);
-          if (comp.compare(vl, vr) < 0) {
+          if(comp.compare(vl, vr) < 0) {
             int tmp = data[j - 1];
             data[j - 1] = data[j];
             data[j] = tmp;
-          } else {
+          }
+          else {
             break;
           }
         }
@@ -113,47 +124,47 @@ class IntegerDBIDArrayQuickSort {
 
     // Explicit (and optimal) sorting network for 5 elements
     // See Knuth for details.
-    if (compare(vl, data[m1], vk, data[m2], comp) > 0) {
+    if(compare(vl, data[m1], vk, data[m2], comp) > 0) {
       int tmp = data[m2];
       data[m2] = data[m1];
       data[m1] = tmp;
     }
-    if (compare(vl, data[m1], vk, data[m3], comp) > 0) {
+    if(compare(vl, data[m1], vk, data[m3], comp) > 0) {
       int tmp = data[m3];
       data[m3] = data[m1];
       data[m1] = tmp;
     }
-    if (compare(vl, data[m2], vk, data[m3], comp) > 0) {
+    if(compare(vl, data[m2], vk, data[m3], comp) > 0) {
       int tmp = data[m3];
       data[m3] = data[m2];
       data[m2] = tmp;
     }
-    if (compare(vl, data[m4], vk, data[m5], comp) > 0) {
+    if(compare(vl, data[m4], vk, data[m5], comp) > 0) {
       int tmp = data[m5];
       data[m5] = data[m4];
       data[m4] = tmp;
     }
-    if (compare(vl, data[m1], vk, data[m4], comp) > 0) {
+    if(compare(vl, data[m1], vk, data[m4], comp) > 0) {
       int tmp = data[m4];
       data[m4] = data[m1];
       data[m1] = tmp;
     }
-    if (compare(vl, data[m3], vk, data[m4], comp) > 0) {
+    if(compare(vl, data[m3], vk, data[m4], comp) > 0) {
       int tmp = data[m4];
       data[m4] = data[m3];
       data[m3] = tmp;
     }
-    if (compare(vl, data[m2], vk, data[m5], comp) > 0) {
+    if(compare(vl, data[m2], vk, data[m5], comp) > 0) {
       int tmp = data[m5];
       data[m5] = data[m2];
       data[m2] = tmp;
     }
-    if (compare(vl, data[m2], vk, data[m3], comp) > 0) {
+    if(compare(vl, data[m2], vk, data[m3], comp) > 0) {
       int tmp = data[m3];
       data[m3] = data[m2];
       data[m2] = tmp;
     }
-    if (compare(vl, data[m4], vk, data[m5], comp) > 0) {
+    if(compare(vl, data[m4], vk, data[m5], comp) > 0) {
       int tmp = data[m5];
       data[m5] = data[m4];
       data[m4] = tmp;
@@ -177,24 +188,27 @@ class IntegerDBIDArrayQuickSort {
     // Note: we merged the ties and no ties cases.
     // This likely is marginally slower, but not at a macro level
     // And you never know with hotspot.
-    for (int k = left; k <= right; k++) {
+    for(int k = left; k <= right; k++) {
       int tmp = data[k];
       vk.internalSetIndex(tmp);
       final int c = comp.compare(vk, vl);
-      if (c == 0) {
+      if(c == 0) {
         continue;
-      } else if (c < 0) {
+      }
+      else if(c < 0) {
         // Traditional quicksort
         data[k] = data[left];
         data[left] = tmp;
         left++;
-      } else if (tied || comp.compare(vk, vr) > 0) {
+      }
+      else if(tied || comp.compare(vk, vr) > 0) {
         // Now look at the right. First skip correct entries there, too
-        while (true) {
+        while(true) {
           vk.internalSetIndex(data[right]);
-          if (comp.compare(vk, vr) > 0 && k < right) {
+          if(comp.compare(vk, vr) > 0 && k < right) {
             right--;
-          } else {
+          }
+          else {
             break;
           }
         }
@@ -204,7 +218,7 @@ class IntegerDBIDArrayQuickSort {
         right--;
         // Test the element we just inserted: left or center?
         vk.internalSetIndex(data[k]);
-        if (comp.compare(vk, vl) < 0) {
+        if(comp.compare(vk, vl) < 0) {
           tmp = data[k];
           data[k] = data[left];
           data[left] = tmp;
@@ -221,7 +235,7 @@ class IntegerDBIDArrayQuickSort {
     // v1 and v3 are now safe to modify again. Perform recursion:
     quickSort(data, start, left - 2, comp, vl, vk, vr);
     // Handle the middle part - if necessary:
-    if (!tied) {
+    if(!tied) {
       // TODO: the original publication had a special tie handling here.
       // It shouldn't affect correctness, but probably improves situations
       // with a lot of tied elements.

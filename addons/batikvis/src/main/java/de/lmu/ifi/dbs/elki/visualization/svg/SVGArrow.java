@@ -33,6 +33,13 @@ import org.w3c.dom.Element;
  */
 public final class SVGArrow {
   /**
+   * Private constructor. Static methods only.
+   */
+  private SVGArrow() {
+    // Do not use.
+  }
+
+  /**
    * Direction constants
    * 
    * @author Erich Schubert

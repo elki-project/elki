@@ -35,7 +35,14 @@ import javax.swing.tree.TreeNode;
  *
  * @apiviz.has TreeNode
  */
-public class ClassTree {
+public final class ClassTree {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private ClassTree() {
+    // Do not use.
+  }
+
   /**
    * Build the class tree for a given set of choices.
    *

@@ -29,6 +29,13 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.BitsUtil;
  */
 public final class ParseUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private ParseUtil() {
+    // Do not use.
+  }
+
+  /**
    * Preallocated exceptions.
    */
   private static final NumberFormatException EMPTY_STRING = new NumberFormatException("Parser called on an empty string.") {

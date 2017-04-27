@@ -38,6 +38,13 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  */
 public final class DataStoreUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private DataStoreUtil() {
+    // Do not use.
+  }
+
+  /**
    * Make a new storage, to associate the given ids with an object of class
    * dataclass.
    *

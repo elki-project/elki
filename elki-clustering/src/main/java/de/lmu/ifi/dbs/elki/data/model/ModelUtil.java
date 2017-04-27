@@ -38,6 +38,13 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.NumberVectorAdapte
  */
 public final class ModelUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private ModelUtil() {
+    // Do not use.
+  }
+
+  /**
    * Get (and convert!) the representative vector for a cluster model.
    * 
    * <b>Only representative-based models are supported!</b>

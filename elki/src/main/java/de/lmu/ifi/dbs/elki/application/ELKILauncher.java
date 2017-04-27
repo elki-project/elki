@@ -35,7 +35,14 @@ import de.lmu.ifi.dbs.elki.utilities.ELKIServiceRegistry;
  *
  * @apiviz.uses AbstractApplication
  */
-public class ELKILauncher {
+public final class ELKILauncher {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private ELKILauncher() {
+    // Do not use.
+  }
+
   /**
    * Application to run by default.
    */

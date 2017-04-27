@@ -36,7 +36,14 @@ import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
  * @since 0.4.0
  * @apiviz.landmark
  */
-public class StockIcon {
+public final class StockIcon {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private StockIcon() {
+    // Do not use.
+  }
+
   public static final String DIALOG_ERROR = "dialog-error";
 
   public static final String DIALOG_INFORMATION = "dialog-information";

@@ -29,7 +29,14 @@ import org.w3c.dom.Element;
  * @author Erich Schubert
  * @since 0.5.0
  */
-public class SVGEffects {
+public final class SVGEffects {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private SVGEffects() {
+    // Do not use.
+  }
+
   /**
    * ID for the drop shadow effect
    */

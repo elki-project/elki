@@ -32,7 +32,14 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class ClusteringAlgorithmUtil {
+public final class ClusteringAlgorithmUtil {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private ClusteringAlgorithmUtil() {
+    // Do not use.
+  }
+
   /**
    * Collect clusters from their [0;k-1] integer labels.
    * 

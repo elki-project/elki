@@ -55,7 +55,14 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
  *
  * @apiviz.composedOf SaveOptionsPanel
  */
-public class SVGSaveDialog {
+public final class SVGSaveDialog {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private SVGSaveDialog() {
+    // Do not use.
+  }
+
   /** The default title. "Save as ...". */
   public static final String DEFAULT_TITLE = "Save as ...";
 

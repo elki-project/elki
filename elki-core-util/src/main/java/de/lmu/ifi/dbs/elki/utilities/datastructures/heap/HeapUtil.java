@@ -31,6 +31,13 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.heap;
  */
 public final class HeapUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private HeapUtil() {
+    // Do not use.
+  }
+
+  /**
    * Find the next power of 2.
    *
    * Classic bit operation, for signed 32-bit. Valid for positive integers only

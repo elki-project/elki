@@ -46,7 +46,14 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
  * @apiviz.has BlockArrayRunner
  * @apiviz.uses ParallelCore
  */
-public class ParallelExecutor {
+public final class ParallelExecutor {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private ParallelExecutor() {
+    // Do not use.
+  }
+
   /**
    * Run a task on all available CPUs.
    *

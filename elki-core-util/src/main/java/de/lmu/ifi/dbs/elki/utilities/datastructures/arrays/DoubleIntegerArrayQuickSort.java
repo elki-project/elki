@@ -27,7 +27,14 @@ package de.lmu.ifi.dbs.elki.utilities.datastructures.arrays;
  * @author Erich Schubert
  * @since 0.5.5
  */
-public class DoubleIntegerArrayQuickSort {
+public final class DoubleIntegerArrayQuickSort {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private DoubleIntegerArrayQuickSort() {
+    // Do not use.
+  }
+
   /**
    * Threshold for using insertion sort.
    */

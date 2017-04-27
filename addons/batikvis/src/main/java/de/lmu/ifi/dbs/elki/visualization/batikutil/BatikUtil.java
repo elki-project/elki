@@ -36,6 +36,13 @@ import org.w3c.dom.svg.SVGPoint;
  */
 public final class BatikUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private BatikUtil() {
+    // Do not use.
+  }
+
+  /**
    * Get the relative coordinates of a point within the coordinate system of a
    * particular SVG Element.
    *

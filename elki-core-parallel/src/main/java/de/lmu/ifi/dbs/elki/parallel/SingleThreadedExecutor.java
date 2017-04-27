@@ -38,7 +38,14 @@ import de.lmu.ifi.dbs.elki.parallel.variables.SharedVariable.Instance;
  * 
  * @apiviz.has SingleThreadedRunner
  */
-public class SingleThreadedExecutor {
+public final class SingleThreadedExecutor {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private SingleThreadedExecutor() {
+    // Do not use.
+  }
+
   /**
    * Run a task on a single thread.
    * 

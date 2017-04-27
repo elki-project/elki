@@ -55,6 +55,13 @@ import net.jafama.FastMath;
  */
 public final class SVGUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private SVGUtil() {
+    // Do not use.
+  }
+
+  /**
    * Formatter to output numbers in a valid SVG number format.
    */
   public static final NumberFormat FMT = NumberFormat.getInstance(Locale.ROOT);

@@ -38,6 +38,13 @@ import java.util.logging.Logger;
  */
 public final class LoggingUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private LoggingUtil() {
+    // Do not use.
+  }
+
+  /**
    * Expensive logging function that is convenient, but should only be used in
    * rare conditions.
    * 

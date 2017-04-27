@@ -40,7 +40,14 @@ import de.lmu.ifi.dbs.elki.database.ids.ModifiableDBIDs;
  * @apiviz.uses ClusterOrder
  */
 // TODO: add non-flat clusterings
-public class OPTICSCut {
+public final class OPTICSCut {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private OPTICSCut() {
+    // Do not use.
+  }
+
   /**
    * Compute an OPTICS cut clustering
    *

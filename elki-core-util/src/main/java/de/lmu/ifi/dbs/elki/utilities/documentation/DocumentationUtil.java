@@ -32,6 +32,13 @@ package de.lmu.ifi.dbs.elki.utilities.documentation;
  */
 public final class DocumentationUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private DocumentationUtil() {
+    // Do not use.
+  }
+
+  /**
    * Get a useful title from a class, either by reading the
    * "title" annotation, or by using the class name.
    * 
@@ -45,7 +52,7 @@ public final class DocumentationUtil {
     }
     return c.getSimpleName();
   }
-  
+
   /**
    * Get a class description if defined, an empty string otherwise.
    * 
@@ -54,12 +61,12 @@ public final class DocumentationUtil {
    */
   public static String getDescription(Class<?> c) {
     Description desc = c.getAnnotation(Description.class);
-    if (desc != null) {
+    if(desc != null) {
       return desc.value();
     }
     return "";
   }
-  
+
   /**
    * Get the reference annotation of a class, or {@code null}.
    * 

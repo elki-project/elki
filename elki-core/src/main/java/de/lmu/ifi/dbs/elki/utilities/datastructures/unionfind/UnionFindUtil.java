@@ -29,7 +29,14 @@ import de.lmu.ifi.dbs.elki.database.ids.StaticDBIDs;
  * @author Erich Schubert
  * @since 0.7.0
  */
-public class UnionFindUtil {
+public final class UnionFindUtil {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private UnionFindUtil() {
+    // Do not use.
+  }
+
   /**
    * Make a new instance (automatically choosing the best implementation).
    *

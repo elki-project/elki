@@ -41,7 +41,14 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
  * @apiviz.uses SVGPath
  * @apiviz.uses Projection2D
  */
-public class SVGHyperCube {
+public final class SVGHyperCube {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private SVGHyperCube() {
+    // Do not use.
+  }
+
   /**
    * Wireframe hypercube.
    *

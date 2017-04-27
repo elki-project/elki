@@ -59,6 +59,13 @@ import de.lmu.ifi.dbs.elki.distance.similarityfunction.SimilarityFunction;
  */
 public final class QueryUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private QueryUtil() {
+    // Do not use.
+  }
+
+  /**
    * Get a distance query for a given distance function, automatically choosing
    * a relation.
    *

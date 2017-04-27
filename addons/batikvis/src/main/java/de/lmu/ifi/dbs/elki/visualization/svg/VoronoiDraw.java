@@ -38,7 +38,14 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection2D;
  * @apiviz.uses de.lmu.ifi.dbs.elki.math.geometry.SweepHullDelaunay2D.Triangle
  * @apiviz.uses Projection2D
  */
-public class VoronoiDraw {
+public final class VoronoiDraw {
+  /**
+   * Private constructor. Static methods only.
+   */
+  private VoronoiDraw() {
+    // Do not use.
+  }
+
   /**
    * Draw the Delaunay triangulation.
    * 

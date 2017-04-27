@@ -32,6 +32,13 @@ import de.lmu.ifi.dbs.elki.index.tree.metrical.mtreevariants.AbstractMTree;
  */
 public final class MTreeQueryUtil {
   /**
+   * Private constructor. Static methods only.
+   */
+  private MTreeQueryUtil() {
+    // Do not use.
+  }
+
+  /**
    * Get an RTree knn query, using an optimized double implementation when
    * possible.
    * 
