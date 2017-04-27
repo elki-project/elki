@@ -301,7 +301,7 @@ public class CircleSegmentsVisualizer extends AbstractVisFactory {
       // Setup scaling for canvas: 0 to StyleLibrary.SCALE (usually 100 to avoid
       // a
       // Java drawing bug!)
-      String transform = SVGUtil.makeMarginTransform(task.reqwidth, task.reqheight, StyleLibrary.SCALE, StyleLibrary.SCALE, 0) + "  translate(" + (StyleLibrary.SCALE * .5) + " " + (StyleLibrary.SCALE * .5) + ")";
+      String transform = SVGUtil.makeMarginTransform(task.getRequestedWidth(), task.getRequestedHeight(), StyleLibrary.SCALE, StyleLibrary.SCALE, 0) + "  translate(" + (StyleLibrary.SCALE * .5) + " " + (StyleLibrary.SCALE * .5) + ")";
       visLayer.setAttribute(SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
       ctrlLayer = svgp.svgElement(SVGConstants.SVG_G_TAG);
 

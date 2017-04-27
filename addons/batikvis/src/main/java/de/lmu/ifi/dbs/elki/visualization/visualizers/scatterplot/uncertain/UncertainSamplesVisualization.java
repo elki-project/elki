@@ -93,7 +93,7 @@ public class UncertainSamplesVisualization extends AbstractVisFactory {
       context.getHierarchy().iterAncestorsSelf((Relation<?>) p.getRelation()).filter(Relation.class).forEach(r2 -> {
         if(UncertainObject.UNCERTAIN_OBJECT_FIELD.isAssignableFromType(r2.getDataTypeInformation())) {
           context.addVis(p, new VisualizationTask(this, NAME, p, r2) //
-              .level(VisualizationTask.LEVEL_DATA).defaultVisibility(false) //
+              .level(VisualizationTask.LEVEL_DATA).visibility(false) //
               .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_STYLEPOLICY));
         }
       });

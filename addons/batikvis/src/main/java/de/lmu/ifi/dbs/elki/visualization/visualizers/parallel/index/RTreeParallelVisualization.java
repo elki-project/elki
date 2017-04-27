@@ -96,7 +96,7 @@ public class RTreeParallelVisualization extends AbstractVisFactory {
   public void processNewResult(VisualizerContext context, Object start) {
     VisualizationTree.findNewSiblings(context, start, AbstractRStarTree.class, ParallelPlotProjector.class, (tree, p) -> {
       final VisualizationTask task = new VisualizationTask(RTreeParallelVisualization.this, NAME, tree, p.getRelation())//
-          .level(VisualizationTask.LEVEL_BACKGROUND + 2).defaultVisibility(false);
+          .level(VisualizationTask.LEVEL_BACKGROUND + 2).visibility(false);
       context.addVis(tree, task);
       context.addVis(p, task);
     });

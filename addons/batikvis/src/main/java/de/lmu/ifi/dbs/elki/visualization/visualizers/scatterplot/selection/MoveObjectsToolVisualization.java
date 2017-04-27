@@ -90,7 +90,7 @@ public class MoveObjectsToolVisualization extends AbstractVisFactory {
         return;
       }
       context.addVis(p, new VisualizationTask(MoveObjectsToolVisualization.this, NAME, p.getRelation(), rel) //
-          .level(VisualizationTask.LEVEL_INTERACTIVE).tool(true).defaultVisibility(false) //
+          .level(VisualizationTask.LEVEL_INTERACTIVE).tool(true).visibility(false) //
           .with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_SELECTION));
     });

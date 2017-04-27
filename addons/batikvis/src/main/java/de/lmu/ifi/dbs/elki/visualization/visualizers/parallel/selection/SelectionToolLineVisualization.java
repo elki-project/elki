@@ -99,7 +99,7 @@ public class SelectionToolLineVisualization extends AbstractVisFactory {
       }
       final VisualizationTask task = new VisualizationTask(SelectionToolLineVisualization.this, NAME, context.getSelectionResult(), rel) //
           .level(VisualizationTask.LEVEL_INTERACTIVE) //
-          .tool(true).defaultVisibility(false) //
+          .tool(true).visibility(false) //
           .with(UpdateFlag.ON_SELECTION).with(RenderFlag.NO_THUMBNAIL).with(RenderFlag.NO_EXPORT);
       context.addVis(context.getSelectionResult(), task);
       context.addVis(p, task);

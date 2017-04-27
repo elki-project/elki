@@ -129,7 +129,7 @@ public class TooltipScoreVisualization extends AbstractVisFactory {
    */
   private void addTooltips(String nam, Relation<?> val, VisualizerContext context, ScatterPlotProjector<?> p, Relation<?> rel) {
     final VisualizationTask task = new VisualizationTask(TooltipScoreVisualization.this, nam, val, rel) //
-        .tool(true).defaultVisibility(false) //
+        .tool(true).visibility(false) //
         .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE);
     context.addVis(val, task);
     context.addVis(p, task);

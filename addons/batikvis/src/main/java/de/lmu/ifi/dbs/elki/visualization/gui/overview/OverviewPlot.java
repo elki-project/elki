@@ -35,7 +35,6 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.events.EventTarget;
 
 import de.lmu.ifi.dbs.elki.logging.Logging;
-import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultListener;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.hierarchy.Hierarchy;
@@ -210,17 +209,17 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
 
     nextTask: for(It<VisualizationTask> iter2 = vistree.iterAll().filter(VisualizationTask.class); iter2.valid(); iter2.advance()) {
       VisualizationTask task = iter2.get();
-      if(!task.visible) {
+      if(!task.isVisible()) {
         continue;
       }
       if(vistree.iterParents(task).filter(Projector.class).valid()) {
         continue nextTask;
       }
-      if(task.reqwidth <= 0.0 || task.reqheight <= 0.0) {
+      if(task.getRequestedWidth() <= 0.0 || task.getRequestedHeight() <= 0.0) {
         LOG.warning("Task with improper size information: " + task);
         continue;
       }
-      PlotItem it = new PlotItem(task.reqwidth, task.reqheight, null);
+      PlotItem it = new PlotItem(task.getRequestedWidth(), task.getRequestedHeight(), null);
       it.tasks.add(task);
       plotmap.put(it.w, it.h, it);
     }
@@ -305,8 +304,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
           hasDetails |= !task.has(RenderFlag.NO_DETAIL);
           Pair<Element, Visualization> pair = oldlayers.remove(it, task);
           if(pair == null) {
-            pair = new Pair<>(null, null);
-            pair.first = plot.svgElement(SVGConstants.SVG_G_TAG);
+            pair = new Pair<>(plot.svgElement(SVGConstants.SVG_G_TAG), null);
           }
           if(pair.second == null) {
             pair.second = embedOrThumbnail(thumbsize, it, task, pair.first);
@@ -410,7 +408,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
       vis = task.getFactory().makeVisualization(context, task, plot, it.w, it.h, it.proj);
     }
     if(vis == null || vis.getLayer() == null) {
-      LoggingUtil.warning("Visualization returned empty layer: " + vis);
+      LOG.warning("Visualization returned empty layer: " + vis);
       return vis;
     }
     if(task.has(RenderFlag.NO_EXPORT)) {
@@ -485,10 +483,7 @@ public class OverviewPlot implements ResultListener, VisualizationListener {
    * @return visibility
    */
   protected boolean visibleInOverview(VisualizationTask task) {
-    if(single) {
-      return task.visible && !task.has(RenderFlag.NO_EMBED);
-    }
-    return task.visible && !task.has(RenderFlag.NO_THUMBNAIL);
+    return task.isVisible() && !task.has(single ? RenderFlag.NO_EMBED : RenderFlag.NO_THUMBNAIL);
   }
 
   /**

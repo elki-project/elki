@@ -164,7 +164,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
     // TODO: center/arrange visualizations?
     for(Iterator<VisualizationTask> tit = item.tasks.iterator(); tit.hasNext();) {
       VisualizationTask task = tit.next();
-      if(task.visible) {
+      if(task.isVisible()) {
         Visualization v = instantiateVisualization(task);
         if(v != null) {
           layers.add(v);
@@ -214,10 +214,10 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
       if(prevlayer == layer) { // Unchanged:
         // Current visibility ("not hidden")
         boolean isVisible = !SVGConstants.CSS_HIDDEN_VALUE.equals(layer.getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY));
-        if(task.visible != isVisible) {
+        if(task.isVisible() != isVisible) {
           // scheduleUpdate(new AttributeModifier(
           layer.setAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY, //
-              task.visible ? SVGConstants.CSS_VISIBLE_VALUE : SVGConstants.CSS_HIDDEN_VALUE);
+              task.isVisible() ? SVGConstants.CSS_VISIBLE_VALUE : SVGConstants.CSS_HIDDEN_VALUE);
         }
       }
       else {
@@ -380,7 +380,7 @@ public class DetailView extends VisualizationPlot implements ResultListener, Vis
       }
       else {
         boolean isVisible = !SVGConstants.CSS_HIDDEN_VALUE.equals(layer.getAttribute(SVGConstants.CSS_VISIBILITY_PROPERTY));
-        if(task.visible != isVisible) {
+        if(task.isVisible() != isVisible) {
           lazyRefresh(); // Visibility has changed.
         }
       }

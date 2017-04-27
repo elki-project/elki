@@ -109,12 +109,12 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
    * Note that this value is only a recommendation, as it is totally up to the
    * framework to ignore it.
    */
-  public int level = 0;
+  private int level = 0;
 
   /**
    * Flag to control visibility.
    */
-  public boolean visible = true;
+  private boolean visible = true;
 
   /**
    * Render capabilities
@@ -122,14 +122,16 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   private int flags;
 
   /**
-   * Flag to signal default visibility of a visualizer.
+   * The update event mask. See {@link UpdateFlag#ON_DATA},
+   * {@link UpdateFlag#ON_SELECTION}, {@link UpdateFlag#ON_STYLEPOLICY},
+   * {@link UpdateFlag#ON_SAMPLE}.
    */
-  public boolean default_visibility = true;
+  private int updatemask;
 
   /**
    * Flag to mark the visualizer as tool.
    */
-  public boolean tool = false;
+  private boolean tool = false;
 
   /**
    * Background layer
@@ -157,40 +159,34 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   public static final int LEVEL_INTERACTIVE = 1000;
 
   /**
-   * The update event mask. See {@link #ON_DATA}, {@link #ON_SELECTION},
-   * {@link #ON_STYLEPOLICY}, {@link #ON_SAMPLE}.
-   */
-  public int updatemask;
-
-  /**
    * Name
    */
-  String name;
+  private String name;
 
   /**
    * The factory
    */
-  VisFactory factory;
+  private VisFactory factory;
 
   /**
    * The result we are attached to
    */
-  Object result;
+  private Object result;
 
   /**
    * The main representation
    */
-  Relation<?> relation;
+  private Relation<?> relation;
 
   /**
    * Width request
    */
-  public double reqwidth = 1.0;
+  private double reqwidth = 1.0;
 
   /**
    * Height request
    */
-  public double reqheight = 1.0;
+  private double reqheight = 1.0;
 
   /**
    * Visualization task.
@@ -251,7 +247,7 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   }
 
   /**
-   * Set the level of a visualization.
+   * Set the level (priority) of a visualization.
    * 
    * @param level Level
    * @return {@code this}, for method chaining.
@@ -259,6 +255,15 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   public VisualizationTask level(int level) {
     this.level = level;
     return this;
+  }
+
+  /**
+   * Get the level (priority) of the visualization.
+   * 
+   * @return Level
+   */
+  public int level() {
+    return level;
   }
 
   /**
@@ -275,6 +280,35 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   }
 
   /**
+   * Get the "tool" flag of the visualizer.
+   * 
+   * @return tool flag.
+   */
+  public boolean isTool() {
+    return tool;
+  }
+
+  /**
+   * Init the default visibility of a task.
+   *
+   * @param vis Visibility.
+   * @return {@code this}, for method chaining.
+   */
+  public VisualizationTask visibility(boolean vis) {
+    visible = vis;
+    return this;
+  }
+
+  /**
+   * Get the visibility flag.
+   * 
+   * @return Visibility
+   */
+  public boolean isVisible() {
+    return visible;
+  }
+
+  /**
    * Set the size request.
    *
    * @param w Width
@@ -288,15 +322,21 @@ public class VisualizationTask implements VisualizationItem, Comparable<Visualiz
   }
 
   /**
-   * Init the default visibility of a task.
-   *
-   * @param vis Visibility.
-   * @return {@code this}, for method chaining.
+   * Get the requested width.
+   * 
+   * @return Width
    */
-  public VisualizationTask defaultVisibility(boolean vis) {
-    visible = vis;
-    default_visibility = vis;
-    return this;
+  public double getRequestedWidth() {
+    return reqwidth;
+  }
+
+  /**
+   * Get the requested height.
+   * 
+   * @return Height
+   */
+  public double getRequestedHeight() {
+    return reqheight;
   }
 
   /**

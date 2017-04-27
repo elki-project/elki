@@ -87,7 +87,7 @@ public class DensityEstimationOverlay extends AbstractVisFactory {
         return;
       }
       context.addVis(p, new VisualizationTask(DensityEstimationOverlay.this, NAME, rel, p.getRelation()) //
-          .level(VisualizationTask.LEVEL_DATA + 1).defaultVisibility(false) //
+          .level(VisualizationTask.LEVEL_DATA + 1).visibility(false) //
           .with(UpdateFlag.ON_DATA));
     });
   }

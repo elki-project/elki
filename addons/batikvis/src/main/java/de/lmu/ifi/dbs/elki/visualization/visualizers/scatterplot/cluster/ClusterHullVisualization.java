@@ -115,7 +115,7 @@ public class ClusterHullVisualization extends AbstractVisFactory {
         return;
       }
       context.addVis(p, new VisualizationTask(ClusterHullVisualization.this, NAME, p, rel) //
-          .level(VisualizationTask.LEVEL_DATA - 1).defaultVisibility(false) //
+          .level(VisualizationTask.LEVEL_DATA - 1).visibility(false) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_STYLEPOLICY));
     });
   }

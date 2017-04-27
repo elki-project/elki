@@ -217,17 +217,17 @@ public class VisualizationTree extends HashMapHierarchy<Object> {
    */
   public static void setVisible(VisualizerContext context, VisualizationTask task, boolean visibility) {
     // Hide other tools
-    if(visibility && task.tool) {
+    if(visibility && task.isTool()) {
       Hierarchy<Object> vistree = context.getVisHierarchy();
       for(It<VisualizationTask> iter2 = vistree.iterAll().filter(VisualizationTask.class); iter2.valid(); iter2.advance()) {
         VisualizationTask other = iter2.get();
-        if(other != task && other.tool && other.visible) {
-          other.visible = false;
+        if(other != task && other.isTool() && other.isVisible()) {
+          other.visibility(false);
           context.visChanged(other);
         }
       }
     }
-    task.visible = visibility;
+    task.visibility(visibility);
     context.visChanged(task);
   }
 }

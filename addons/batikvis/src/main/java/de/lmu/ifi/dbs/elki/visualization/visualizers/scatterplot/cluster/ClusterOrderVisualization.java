@@ -80,7 +80,7 @@ public class ClusterOrderVisualization extends AbstractVisFactory {
         return;
       }
       final VisualizationTask task = new VisualizationTask(ClusterOrderVisualization.this, NAME, co, rel) //
-          .level(VisualizationTask.LEVEL_DATA - 1).defaultVisibility(false) //
+          .level(VisualizationTask.LEVEL_DATA - 1).visibility(false) //
           .with(UpdateFlag.ON_DATA);
       context.addVis(co, task);
       context.addVis(p, task);

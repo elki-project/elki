@@ -123,7 +123,7 @@ public class BubbleVisualization extends AbstractVisFactory {
       }
       final VisualizationTask task = new VisualizationTask(BubbleVisualization.this, NAME, o, rel) //
           .level(VisualizationTask.LEVEL_DATA) //
-          .defaultVisibility(vis) //
+          .visibility(vis) //
           .with(UpdateFlag.ON_DATA).with(UpdateFlag.ON_SAMPLE).with(UpdateFlag.ON_STYLEPOLICY);
       context.addVis(o, task);
       context.addVis(p, task);
