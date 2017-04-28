@@ -39,7 +39,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
@@ -54,7 +54,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @apiviz.uses Instance oneway - - «create»
  */
 // TODO: draw sample only?
-public class ClusterOrderVisualization extends AbstractVisFactory {
+public class ClusterOrderVisualization implements VisFactory {
   /**
    * A short name characterizing this Visualizer.
    */

@@ -45,7 +45,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
@@ -60,7 +60,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @apiviz.uses Instance oneway - - «create»
  */
 // TODO: Does not use the relation. Always enable, but hide in the menu?
-public class SelectionCubeVisualization extends AbstractVisFactory {
+public class SelectionCubeVisualization implements VisFactory {
   /**
    * A short name characterizing this Visualizer.
    */

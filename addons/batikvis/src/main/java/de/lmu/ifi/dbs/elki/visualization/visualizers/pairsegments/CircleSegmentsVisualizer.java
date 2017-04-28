@@ -57,8 +57,8 @@ import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGCheckbox;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
@@ -93,7 +93,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
     authors = "Elke Achtert, Sascha Goldhofer, Hans-Peter Kriegel, Erich Schubert, Arthur Zimek", //
     booktitle = "Proc. 28th International Conference on Data Engineering (ICDE) 2012", //
     url = "http://dx.doi.org/10.1109/ICDE.2012.128")
-public class CircleSegmentsVisualizer extends AbstractVisFactory {
+public class CircleSegmentsVisualizer implements VisFactory {
   /**
    * Class logger
    */

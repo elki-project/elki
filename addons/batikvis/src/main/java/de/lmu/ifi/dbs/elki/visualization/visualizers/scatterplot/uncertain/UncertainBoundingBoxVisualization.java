@@ -41,7 +41,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperCube;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-public class UncertainBoundingBoxVisualization extends AbstractVisFactory {
+public class UncertainBoundingBoxVisualization implements VisFactory {
   /**
    * A short name characterizing this Visualizer.
    */

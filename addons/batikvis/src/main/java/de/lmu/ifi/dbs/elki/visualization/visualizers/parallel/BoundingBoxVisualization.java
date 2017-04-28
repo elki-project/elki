@@ -46,7 +46,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.lines.LineStyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 /**
@@ -59,7 +59,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
  * @apiviz.uses Instance oneway - - «create»
  */
 // TODO: draw filled instead?
-public class BoundingBoxVisualization extends AbstractVisFactory {
+public class BoundingBoxVisualization implements VisFactory {
   /**
    * A short name characterizing this Visualizer.
    */

@@ -44,8 +44,8 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.style.marker.MarkerLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 import gnu.trove.map.TObjectIntMap;
@@ -65,7 +65,7 @@ import net.jafama.FastMath;
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-public class KeyVisualization extends AbstractVisFactory {
+public class KeyVisualization implements VisFactory {
   /**
    * Name for this visualizer.
    */

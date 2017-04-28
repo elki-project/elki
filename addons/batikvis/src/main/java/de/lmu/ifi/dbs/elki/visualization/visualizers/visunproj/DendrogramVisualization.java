@@ -52,8 +52,8 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 import net.jafama.FastMath;
@@ -67,7 +67,7 @@ import net.jafama.FastMath;
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-public class DendrogramVisualization extends AbstractVisFactory {
+public class DendrogramVisualization implements VisFactory {
   /**
    * Visualizer name.
    */

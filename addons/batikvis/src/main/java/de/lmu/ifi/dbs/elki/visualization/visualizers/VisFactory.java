@@ -20,11 +20,13 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.visualizers;
 
+import de.lmu.ifi.dbs.elki.logging.LoggingUtil;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationProcessor;
 import de.lmu.ifi.dbs.elki.visualization.VisualizationTask;
 import de.lmu.ifi.dbs.elki.visualization.VisualizerContext;
 import de.lmu.ifi.dbs.elki.visualization.gui.VisualizationPlot;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.thumbs.ThumbnailVisualization;
 
 /**
  * Defines the requirements for a visualizer. <br>
@@ -63,6 +65,17 @@ public interface VisFactory extends VisualizationProcessor {
   Visualization makeVisualization(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj);
 
   /**
+   * Test whether to do a thumbnail or a full rendering.
+   *
+   * Override this with "false" to disable thumbnails!
+   *
+   * @param task Task requested
+   */
+  default boolean allowThumbnails(VisualizationTask task) {
+    return true;
+  }
+
+  /**
    * Produce a visualization instance for the given task that may use thumbnails
    *
    * @param context Visualization context
@@ -74,5 +87,14 @@ public interface VisFactory extends VisualizationProcessor {
    * @param thumbsize Thumbnail size
    * @return Visualization
    */
-  Visualization makeVisualizationOrThumbnail(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj, int thumbsize);
+  default Visualization makeVisualizationOrThumbnail(VisualizerContext context, VisualizationTask task, VisualizationPlot plot, double width, double height, Projection proj, int thumbsize) {
+    if(width <= 0 || height <= 0) {
+      LoggingUtil.warning("Cannot generate visualization of 0 size.", new Throwable());
+      return null;
+    }
+    if(allowThumbnails(task)) {
+      return new ThumbnailVisualization(context, this, task, plot, width, height, proj, thumbsize);
+    }
+    return makeVisualization(context, task, plot, width, height, proj);
+  }
 }

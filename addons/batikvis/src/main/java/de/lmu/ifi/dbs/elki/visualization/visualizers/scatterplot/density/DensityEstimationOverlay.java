@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.visualization.projections.CanvasSize;
 import de.lmu.ifi.dbs.elki.visualization.projections.Projection;
 import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
@@ -61,7 +61,7 @@ import net.jafama.FastMath;
  * @apiviz.uses Instance oneway - - «create»
  */
 // TODO: Use sample only
-public class DensityEstimationOverlay extends AbstractVisFactory {
+public class DensityEstimationOverlay implements VisFactory {
   /**
    * A short name characterizing this Visualizer.
    */

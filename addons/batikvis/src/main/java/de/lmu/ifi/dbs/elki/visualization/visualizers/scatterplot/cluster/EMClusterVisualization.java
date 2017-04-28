@@ -56,7 +56,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
 import net.jafama.FastMath;
@@ -72,7 +72,7 @@ import net.jafama.FastMath;
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-public class EMClusterVisualization extends AbstractVisFactory {
+public class EMClusterVisualization implements VisFactory {
   /**
    * Class logger.
    */

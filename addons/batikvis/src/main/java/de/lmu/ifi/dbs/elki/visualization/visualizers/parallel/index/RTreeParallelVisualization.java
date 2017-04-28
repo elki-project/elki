@@ -47,7 +47,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index.TreeMBRVisualization;
@@ -61,7 +61,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.index.TreeMBRVi
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-public class RTreeParallelVisualization extends AbstractVisFactory {
+public class RTreeParallelVisualization implements VisFactory {
   /**
    * Generic tag to indicate the type of element. Used in IDs, CSS-Classes etc.
    */

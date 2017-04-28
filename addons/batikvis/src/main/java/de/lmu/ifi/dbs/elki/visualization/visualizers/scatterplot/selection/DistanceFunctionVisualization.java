@@ -20,14 +20,7 @@
  */
 package de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.selection;
 
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.copy;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.euclideanLength;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minus;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.minusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.plusTimesEquals;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.scalarProduct;
-import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.timesEquals;
+import static de.lmu.ifi.dbs.elki.math.linearalgebra.VMath.*;
 
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
@@ -37,11 +30,7 @@ import de.lmu.ifi.dbs.elki.data.VectorUtil;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.datastore.DataStoreListener;
 import de.lmu.ifi.dbs.elki.database.datastore.ObjectNotFoundException;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDPair;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.ArcCosineDistanceFunction;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.CosineDistanceFunction;
@@ -65,9 +54,10 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGHyperSphere;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
+
 import net.jafama.DoubleWrapper;
 import net.jafama.FastMath;
 
@@ -85,7 +75,7 @@ import net.jafama.FastMath;
  * @apiviz.uses Instance oneway - - «create»
  */
 // FIXME: for >2 dimensions, cosine doesn't seem to be correct yet.
-public class DistanceFunctionVisualization extends AbstractVisFactory {
+public class DistanceFunctionVisualization implements VisFactory {
   /**
    * A short name characterizing this Visualizer.
    */

@@ -55,7 +55,7 @@ import de.lmu.ifi.dbs.elki.visualization.style.StylingPolicy;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPath;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.parallel.AbstractParallelVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.ClusterHullVisualization;
@@ -70,7 +70,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.cluster.Cluster
  * @apiviz.uses Instance oneway - - «create»
  */
 // TODO: make parameterizable: rounded.
-public class ClusterOutlineVisualization extends AbstractVisFactory {
+public class ClusterOutlineVisualization implements VisFactory {
   /**
    * A short name characterizing this Visualizer.
    */

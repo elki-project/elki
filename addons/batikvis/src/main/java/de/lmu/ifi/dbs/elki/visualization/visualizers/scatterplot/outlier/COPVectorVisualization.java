@@ -44,7 +44,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGPlot;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatterplotVisualization;
 
@@ -63,7 +63,7 @@ import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AbstractScatter
     title = "Outlier Detection in Arbitrarily Oriented Subspaces", //
     booktitle = "Proc. IEEE International Conference on Data Mining (ICDM 2012)", //
     url = "http://dx.doi.org/10.1109/ICDM.2012.21")
-public class COPVectorVisualization extends AbstractVisFactory {
+public class COPVectorVisualization implements VisFactory {
   /**
    * A short name characterizing this Visualizer.
    */

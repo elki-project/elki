@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.visualization.projector.ScatterPlotProjector;
 import de.lmu.ifi.dbs.elki.visualization.style.StyleLibrary;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGSimpleLinearAxis;
 import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
-import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisFactory;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
 
 import net.jafama.FastMath;
@@ -50,7 +50,7 @@ import net.jafama.FastMath;
  * @apiviz.stereotype factory
  * @apiviz.uses Instance oneway - - «create»
  */
-public class AxisVisualization extends AbstractVisFactory {
+public class AxisVisualization implements VisFactory {
   /**
    * A short name characterizing this Visualizer.
    */
