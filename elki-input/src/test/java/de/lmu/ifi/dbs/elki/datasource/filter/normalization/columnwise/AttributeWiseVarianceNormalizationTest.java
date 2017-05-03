@@ -31,10 +31,12 @@ import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
 import de.lmu.ifi.dbs.elki.math.MeanVariance;
+import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
  * Test the min-max normalization filter.
- * 
+ *
  * @author Erich Schubert
  */
 public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTest {
@@ -45,7 +47,8 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
   public void defaultParameters() {
     String filename = UNITTEST + "normalization-test-1.csv";
     // Allow loading test data from resources.
-    MultipleObjectsBundle bundle = readBundle(filename, new AttributeWiseVarianceNormalization<DoubleVector>());
+    AttributeWiseVarianceNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseVarianceNormalization.class, new ListParameterization());
+    MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
     // This cast is now safe (vector field):
@@ -58,7 +61,10 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
       assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
       DoubleVector d = (DoubleVector) obj;
       for(int col = 0; col < dim; col++) {
-        mvs[col].put(d.doubleValue(col));
+        final double v = d.doubleValue(col);
+        if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
+          mvs[col].put(v);
+        }
       }
     }
     for(int col = 0; col < dim; col++) {

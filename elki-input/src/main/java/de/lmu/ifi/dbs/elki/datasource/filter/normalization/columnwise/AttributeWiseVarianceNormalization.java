@@ -42,17 +42,17 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.DoubleListParamet
 /**
  * Class to perform and undo a normalization on real vectors with respect to
  * given mean and standard deviation in each dimension.
- * 
+ *
  * We use the biased variance ({@link MeanVariance#getNaiveStddev()}), because
  * this produces that with exactly standard deviation 1. While often the
  * unbiased estimate ({@link MeanVariance#getSampleStddev()}) is more
  * appropriate, it will not ensure this interesting property. For large data,
  * the difference will be small anyway.
- * 
+ *
  * @author Erich Schubert
  * @since 0.4.0
  * @param <V> vector type
- * 
+ *
  * @apiviz.uses NumberVector
  */
 @Alias({ "de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormalization", //
@@ -80,6 +80,13 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
 
   /**
    * Constructor.
+   */
+  public AttributeWiseVarianceNormalization() {
+    super();
+  }
+
+  /**
+   * Constructor.
    * 
    * @param mean Mean value
    * @param stddev Standard deviation
@@ -88,13 +95,6 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
     super();
     this.mean = mean;
     this.stddev = stddev;
-  }
-
-  /**
-   * Constructor.
-   */
-  public AttributeWiseVarianceNormalization() {
-    super();
   }
 
   @Override
@@ -109,7 +109,10 @@ public class AttributeWiseVarianceNormalization<V extends NumberVector> extends 
       mvs = MeanVariance.newArray(featureVector.getDimensionality());
     }
     for(int d = 0; d < featureVector.getDimensionality(); d++) {
-      mvs[d].put(featureVector.doubleValue(d));
+      final double v = featureVector.doubleValue(d);
+      if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
+        mvs[d].put(v);
+      }
     }
   }
 
