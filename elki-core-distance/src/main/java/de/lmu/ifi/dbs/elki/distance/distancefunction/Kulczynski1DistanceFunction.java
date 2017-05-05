@@ -38,8 +38,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.4.0
  */
 @Reference(authors = "M.-M. Deza and E. Deza", //
-title = "Dictionary of distances", //
-booktitle = "Dictionary of distances")
+    title = "Dictionary of distances", //
+    booktitle = "Dictionary of distances")
 public class Kulczynski1DistanceFunction extends AbstractNumberVectorDistanceFunction implements SpatialPrimitiveDistanceFunction<NumberVector>, NumberVectorDistanceFunction<NumberVector> {
   /**
    * Static instance.
@@ -60,7 +60,7 @@ public class Kulczynski1DistanceFunction extends AbstractNumberVectorDistanceFun
   public double distance(NumberVector v1, NumberVector v2) {
     final int dim = dimensionality(v1, v2);
     double sumdiff = 0., summin = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double xd = v1.doubleValue(d), yd = v2.doubleValue(d);
       sumdiff += Math.abs(xd - yd);
       summin += Math.min(xd, yd);
@@ -72,16 +72,10 @@ public class Kulczynski1DistanceFunction extends AbstractNumberVectorDistanceFun
   public double minDist(SpatialComparable mbr1, SpatialComparable mbr2) {
     final int dim = dimensionality(mbr1, mbr2);
     double sumdiff = 0., summin = 0.;
-    for (int d = 0; d < dim; d++) {
+    for(int d = 0; d < dim; d++) {
       final double min1 = mbr1.getMin(d), max1 = mbr1.getMax(d);
       final double min2 = mbr2.getMin(d), max2 = mbr2.getMax(d);
-      if (max1 < min2) {
-        sumdiff += min2 - max1;
-      } else if (min1 > max2) {
-        sumdiff += min1 - max2;
-      } else {
-        // Minimum difference is 0
-      }
+      sumdiff += (max1 < min2) ? min2 - max1 : (min1 > max2) ? min1 - max2 : 0.;
       summin += Math.min(min1, min2);
     }
     return sumdiff / summin;

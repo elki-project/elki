@@ -366,7 +366,7 @@ public class KMeansElkan<V extends NumberVector> extends AbstractKMeans<V, KMean
     assert (means.length == k);
     assert (newmeans.length == k);
     assert (dists.length == k);
-    boolean issquared = distanceFunction.isSquared();;
+    boolean issquared = distanceFunction.isSquared();
     double max = 0.;
     for(int i = 0; i < k; i++) {
       double d = distanceFunction.distance(DoubleVector.wrap(means[i]), DoubleVector.wrap(newmeans[i]));

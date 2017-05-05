@@ -212,7 +212,6 @@ public class DoubleVector implements NumberVector {
     public DoubleVector fromByteBuffer(ByteBuffer buffer) throws IOException {
       final byte dimensionality = buffer.get();
       assert (buffer.remaining() >= ByteArrayUtil.SIZE_DOUBLE * dimensionality) : "Not enough data remaining in buffer to read " + dimensionality + " doubles";
-      ;
       final double[] values = new double[dimensionality];
       for(int i = 0; i < dimensionality; i++) {
         values[i] = buffer.getDouble();
