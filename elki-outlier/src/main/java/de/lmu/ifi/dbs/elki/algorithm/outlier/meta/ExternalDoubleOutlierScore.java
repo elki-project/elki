@@ -168,7 +168,7 @@ public class ExternalDoubleOutlierScore extends AbstractAlgorithm<OutlierResult>
             if(id != null) {
               throw new AbortException("ID pattern matched twice: previous value " + id + " second value: " + tokenizer.getSubstring());
             }
-            id = Integer.parseInt(buf.subSequence(mi.end(), tokenizer.getEnd()).toString());
+            id = ParseUtil.parseIntBase10(buf, mi.end(), tokenizer.getEnd());
           }
           if(msf) {
             if(!Double.isNaN(score)) {

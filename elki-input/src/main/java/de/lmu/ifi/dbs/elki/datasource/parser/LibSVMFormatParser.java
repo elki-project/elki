@@ -92,7 +92,7 @@ public class LibSVMFormatParser<V extends SparseNumberVector> extends SparseNumb
 
     while(tokenizer.valid()) {
       try {
-        int index = (int) tokenizer.getLongBase10();
+        int index = tokenizer.getIntBase10();
         tokenizer.advance();
         double attribute = tokenizer.getDouble();
         tokenizer.advance();

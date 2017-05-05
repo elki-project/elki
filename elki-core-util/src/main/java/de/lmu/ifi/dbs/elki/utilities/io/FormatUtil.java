@@ -902,7 +902,7 @@ public final class FormatUtil {
   public static int getConsoleWidth() {
     final int default_termwidth = 78;
     try {
-      return Integer.parseInt(System.getenv("COLUMNS")) - 1;
+      return ParseUtil.parseIntBase10(System.getenv("COLUMNS")) - 1;
     }
     catch(SecurityException|NumberFormatException e) {
       return default_termwidth;

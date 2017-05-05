@@ -191,18 +191,26 @@ public class Tokenizer implements Iter {
    *
    * @return double value
    * @throws NumberFormatException when current value cannot be parsed as double
-   *         value.
    */
   public double getDouble() throws NumberFormatException {
     return ParseUtil.parseDouble(input, start, end);
   }
 
   /**
+   * Get current value as int.
+   *
+   * @return int value
+   * @throws NumberFormatException when current value cannot be parsed as int.
+   */
+  public int getIntBase10() throws NumberFormatException {
+    return ParseUtil.parseIntBase10(input, start, end);
+  }
+
+  /**
    * Get current value as long.
    *
-   * @return double value
-   * @throws NumberFormatException when current value cannot be parsed as long
-   *         value.
+   * @return long value
+   * @throws NumberFormatException when current value cannot be parsed as long.
    */
   public long getLongBase10() throws NumberFormatException {
     return ParseUtil.parseLongBase10(input, start, end);

@@ -128,7 +128,7 @@ public class ExternalClustering extends AbstractAlgorithm<Clustering<? extends M
       line: while(reader.nextLineExceptComments()) {
         for(/* initialized by nextLineExceptComments */; tokenizer.valid(); tokenizer.advance()) {
           try {
-            assignment.add((int) tokenizer.getLongBase10());
+            assignment.add(tokenizer.getIntBase10());
           }
           catch(NumberFormatException e) {
             name.add(tokenizer.getSubstring());
