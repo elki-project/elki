@@ -55,6 +55,7 @@ import de.lmu.ifi.dbs.elki.visualization.svg.SVGUtil;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.AbstractVisualization;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.VisFactory;
 import de.lmu.ifi.dbs.elki.visualization.visualizers.Visualization;
+import de.lmu.ifi.dbs.elki.visualization.visualizers.scatterplot.AxisVisualization;
 
 import net.jafama.FastMath;
 
@@ -207,6 +208,7 @@ public class DendrogramVisualization implements VisFactory {
       StylingPolicy spol = context.getStylingPolicy();
 
       PointerHierarchyRepresentationResult p = task.getResult();
+      final boolean squared = p.isSquared();
 
       DBIDs ids = p.getDBIDs();
       DBIDDataStore par = p.getParentStore();
@@ -230,14 +232,26 @@ public class DendrogramVisualization implements VisFactory {
         }
         maxh = v > maxh ? v : maxh;
       }
-      LinearScale yscale = new LinearScale(0, maxh);
+      LinearScale yscale = new LinearScale(0, squared ? FastMath.sqrt(maxh) : maxh);
       // add axes
       try {
         SVGSimpleLinearAxis.drawAxis(svgp, layer, yscale, 0, height, 0, 0, SVGSimpleLinearAxis.LabelStyle.LEFTHAND, style);
+        final double lxoff = style.getTextSize(StyleLibrary.AXIS_LABEL) * -3.5;
+        Element label = svgp.svgText(lxoff, .5 * height, squared ? "sqrt(distance)" : "distance");
+        CSSClass alcls = new CSSClass(AxisVisualization.class, "unmanaged");
+        alcls.setStatement(SVGConstants.CSS_FONT_SIZE_PROPERTY, SVGUtil.fmt(1.1 * style.getTextSize(StyleLibrary.AXIS_LABEL)));
+        alcls.setStatement(SVGConstants.CSS_FILL_PROPERTY, style.getTextColor(StyleLibrary.AXIS_LABEL));
+        alcls.setStatement(SVGConstants.CSS_FONT_FAMILY_PROPERTY, style.getFontFamily(StyleLibrary.AXIS_LABEL));
+
+        SVGUtil.setAtt(label, SVGConstants.SVG_STYLE_ATTRIBUTE, alcls.inlineCSS());
+        SVGUtil.setAtt(label, SVGConstants.SVG_TEXT_ANCHOR_ATTRIBUTE, SVGConstants.SVG_MIDDLE_VALUE);
+        SVGUtil.setAtt(label, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, "rotate(-90," + lxoff + "," + .5 * height + ")");
+        layer.appendChild(label);
       }
       catch(CSSNamingConflict e) {
         LoggingUtil.exception(e);
       }
+      // FIXME: add axis label.
 
       // Initial positions:
       double[] xy = new double[size << 1];
@@ -265,13 +279,14 @@ public class DendrogramVisualization implements VisFactory {
           final int p1 = cspol.getStyleForDBID(it);
           double x1 = xy[o1], y1 = xy[o1 + size];
           if(DBIDUtil.equal(it, pa)) {
-            paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(height * (1 - yscale.getScaled(h)));
+            paths[p1 - mins + 1].moveTo(x1, y1).verticalLineTo(height * (1 - yscale.getScaled(squared ? FastMath.sqrt(h) : h)));
             continue; // Root
           }
           final int o2 = pos.intValue(pa);
           final int p2 = cspol.getStyleForDBID(pa);
           double x2 = xy[o2], y2 = xy[o2 + size];
-          double x3 = (x1 + x2) * .5, y3 = height * (1 - yscale.getScaled(h));
+          double x3 = (x1 + x2) * .5,
+              y3 = height * (1 - yscale.getScaled(squared ? FastMath.sqrt(h) : h));
           switch(DendrogramVisualization.this.style){
           case RECTANGULAR:
             if(p1 == p2) {
@@ -315,12 +330,13 @@ public class DendrogramVisualization implements VisFactory {
           final int o1 = pos.intValue(it);
           double x1 = xy[o1], y1 = xy[o1 + size];
           if(DBIDUtil.equal(it, par.assignVar(it, pa))) {
-            dendrogram.moveTo(x1, y1).verticalLineTo(height * (1 - yscale.getScaled(h)));
+            dendrogram.moveTo(x1, y1).verticalLineTo(height * (1 - yscale.getScaled(squared ? FastMath.sqrt(h) : h)));
             continue; // Root
           }
           final int o2 = pos.intValue(pa);
           double x2 = xy[o2], y2 = xy[o2 + size];
-          double x3 = (x1 + x2) * .5, y3 = height * (1 - yscale.getScaled(h));
+          double x3 = (x1 + x2) * .5,
+              y3 = height * (1 - yscale.getScaled(squared ? FastMath.sqrt(h) : h));
           switch(DendrogramVisualization.this.style){
           case RECTANGULAR:
             dendrogram.moveTo(x1, y1).verticalLineTo(y3).horizontalLineTo(x2).verticalLineTo(y2);
@@ -338,7 +354,7 @@ public class DendrogramVisualization implements VisFactory {
       }
 
       final double margin = style.getSize(StyleLibrary.MARGIN);
-      final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), width, height, margin);
+      final String transform = SVGUtil.makeMarginTransform(getWidth(), getHeight(), width, height, 2. * margin, margin, margin, margin);
       SVGUtil.setAtt(layer, SVGConstants.SVG_TRANSFORM_ATTRIBUTE, transform);
     }
 
