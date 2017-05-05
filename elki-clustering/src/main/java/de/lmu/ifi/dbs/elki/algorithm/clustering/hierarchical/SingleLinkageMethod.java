@@ -29,7 +29,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * 
  * Reference:
  * <p>
- * K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S. Zubrzycki<br/>
+ * K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S.
+ * Zubrzycki<br/>
  * Sur la liaison et la division des points d'un ensemble fini<br />
  * In Colloquium Mathematicae (Vol. 2, No. 3-4)
  * </p>
@@ -38,8 +39,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
  * @since 0.3
  */
 @Reference(authors = "K. Florek and J. Łukaszewicz and J. Perkal and H. Steinhaus and S. Zubrzycki", //
-title = "Sur la liaison et la division des points d'un ensemble fini",//
-booktitle = "Colloquium Mathematicae (Vol. 2, No. 3-4)")
+    title = "Sur la liaison et la division des points d'un ensemble fini", //
+    booktitle = "Colloquium Mathematicae (Vol. 2, No. 3-4)")
 @Alias({ "single-link", "single", "slink", "nearest", "nearest-neighbor" })
 public class SingleLinkageMethod implements LinkageMethod {
   /**

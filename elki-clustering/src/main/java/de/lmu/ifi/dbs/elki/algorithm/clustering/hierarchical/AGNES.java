@@ -151,8 +151,8 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     // Compute the initial (lower triangular) distance matrix.
     double[] scratch = new double[triangleSize(size)];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
-    boolean square = WardLinkageMethod.class.isInstance(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
-    initializeDistanceMatrix(scratch, dq, ix, iy, square);
+    boolean isSquare = SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction());
+    initializeDistanceMatrix(scratch, dq, linkage, ix, iy, isSquare);
 
     // Initialize space for result:
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids);
@@ -190,23 +190,30 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    *
    * @param scratch Scratch space to be used.
    * @param dq Distance query
+   * @param linkage Linkage method
    * @param ix Data iterator
    * @param iy Data iterator
-   * @param square Flag to use squared distances.
+   * @param issquare Flag to use squared distances.
    */
-  protected static void initializeDistanceMatrix(double[] scratch, DistanceQuery<?> dq, DBIDArrayIter ix, DBIDArrayIter iy, boolean square) {
+  protected static void initializeDistanceMatrix(double[] scratch, DistanceQuery<?> dq, LinkageMethod linkage, DBIDArrayIter ix, DBIDArrayIter iy, boolean issquare) {
     int pos = 0;
+    FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Distance matrix computation", scratch.length, LOG) : null;
     for(ix.seek(0); ix.valid(); ix.advance()) {
       final int x = ix.getOffset();
       assert (pos == triangleSize(x));
       for(iy.seek(0); iy.getOffset() < x; iy.advance()) {
-        double dist = dq.distance(ix, iy);
-        // Ward uses variances -- i.e. squared values
-        dist = square ? (dist * dist) : dist;
-        scratch[pos] = dist;
+        scratch[pos] = linkage.initial(dq.distance(ix, iy), issquare);
         pos++;
       }
+      if(prog != null) {
+        prog.setProcessed(pos, LOG);
+      }
     }
+    // Avoid logging errors in case scratch space was too large:
+    if(prog != null) {
+      prog.setProcessed(scratch.length, LOG);
+    }
+    LOG.ensureCompleted(prog);
   }
 
   /**

@@ -20,16 +20,15 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
-import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
  * Ward's method clustering method.
  * 
- * This criterion minimizes variances, and makes most sense when used with
- * squared Euclidean distance, see
- * {@link de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction}
+ * This criterion minimizes the increase of squared errors, and should be used
+ * with <em>squared Euclidean</em> distance.
  * 
  * Reference:
  * <p>
@@ -42,10 +41,10 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.6.0
  */
 @Reference(authors = "J. H. Ward Jr", //
-title = "Hierarchical grouping to optimize an objective function", //
-booktitle = "Journal of the American statistical association 58.301", //
-url = "http://dx.doi.org/10.1080/01621459.1963.10500845")
-@Alias({ "ward", "variance" })
+    title = "Hierarchical grouping to optimize an objective function", //
+    booktitle = "Journal of the American statistical association 58.301", //
+    url = "http://dx.doi.org/10.1080/01621459.1963.10500845")
+@Alias({ "ward", "ssq" })
 public class WardLinkageMethod implements LinkageMethod {
   /**
    * Static instance of class.
@@ -63,11 +62,13 @@ public class WardLinkageMethod implements LinkageMethod {
   }
 
   @Override
+  public double initial(double d, boolean issquare) {
+    return (issquare ? d : (d * d)) * .5;
+  }
+
+  @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    final double wx = (sizex + sizej) / (double) (sizex + sizey + sizej);
-    final double wy = (sizey + sizej) / (double) (sizex + sizey + sizej);
-    final double beta = sizej / (double) (sizex + sizey + sizej);
-    return wx * dx + wy * dy - beta * dxy;
+    return ((sizex + sizej) * dx + (sizey + sizej) * dy - sizej * dxy) / (double) (sizex + sizey + sizej);
   }
 
   /**

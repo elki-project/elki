@@ -21,6 +21,7 @@
 package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
+
 /**
  * Abstract interface for implementing a new linkage method into hierarchical
  * clustering.
@@ -37,10 +38,21 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
  * @since 0.4.0
  */
 @Reference(authors = "G. N. Lance and W. T. Williams", //
-title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //
-booktitle = "The computer journal 9.4", //
-url = "http://dx.doi.org/ 10.1093/comjnl/9.4.373")
+    title = "A general theory of classificatory sorting strategies 1. Hierarchical systems", //
+    booktitle = "The computer journal 9.4", //
+    url = "http://dx.doi.org/ 10.1093/comjnl/9.4.373")
 public interface LinkageMethod {
+  /**
+   * Initialization of the distance matrix.
+   *
+   * @param d Distance
+   * @param issquare Flag to indicate the input values are already squared
+   * @return Initial value
+   */
+  default double initial(double d, boolean issquare) {
+    return d;
+  }
+
   /**
    * Compute combined linkage for two clusters.
    * 

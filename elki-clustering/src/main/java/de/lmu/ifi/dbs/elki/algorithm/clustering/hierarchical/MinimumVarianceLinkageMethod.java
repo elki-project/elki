@@ -25,27 +25,31 @@ import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 
 /**
- * Group-average linkage clustering method.
- * 
+ * Minimum variance linkage.
+ *
+ * This is subtly different from Ward's method ({@link WardLinkageMethod}),
+ * because variance is normalized by the cluster size; and Ward minimizes the
+ * increase in sum of squares (without normalization).
+ *
  * Reference:
  * <p>
- * A. K. Jain and R. C. Dubes<br />
- * Algorithms for Clustering Data<br />
- * Prentice-Hall
+ * J. Podani<br />
+ * New Combinatorial Clustering Methods<br />
+ * Vegetatio 81(1/2)
  * </p>
  * 
  * @author Erich Schubert
- * @since 0.3
  */
-@Alias({ "upgma", "average", "average-link", "average-linkage", "UPGMA" })
-@Reference(authors = "A. K. Jain and R. C. Dubes", //
-    title = "Algorithms for Clustering Data", //
-    booktitle = "Algorithms for Clustering Data, Prentice-Hall")
-public class GroupAverageLinkageMethod implements LinkageMethod {
+@Reference(authors = "J. Podani", //
+    title = "New Combinatorial Clustering Methods", //
+    booktitle = "Vegetatio 81(1/2)", //
+    url = "http://dx.doi.org/10.1007/978-94-009-2432-1_5")
+@Alias({ "variance" })
+public class MinimumVarianceLinkageMethod implements LinkageMethod {
   /**
    * Static instance of class.
    */
-  public static final GroupAverageLinkageMethod STATIC = new GroupAverageLinkageMethod();
+  public static final MinimumVarianceLinkageMethod STATIC = new MinimumVarianceLinkageMethod();
 
   /**
    * Constructor.
@@ -53,13 +57,21 @@ public class GroupAverageLinkageMethod implements LinkageMethod {
    * @deprecated use the static instance {@link #STATIC} instead.
    */
   @Deprecated
-  public GroupAverageLinkageMethod() {
+  public MinimumVarianceLinkageMethod() {
     super();
   }
 
   @Override
+  public double initial(double d, boolean issquare) {
+    return (issquare ? d : (d * d)) * .25;
+  }
+
+  @Override
   public double combine(int sizex, double dx, int sizey, double dy, int sizej, double dxy) {
-    return (sizex * dx + sizey * dy) / (double) (sizex + sizey);
+    final int xj = sizex + sizej;
+    final int yj = sizey + sizej;
+    final int n = sizex + sizey + sizej;
+    return (xj * (double) xj * dx + yj * (double) yj * dy - (sizej * (double) (sizex + sizey)) * dxy) / (n * (double) n);
   }
 
   /**
@@ -73,7 +85,7 @@ public class GroupAverageLinkageMethod implements LinkageMethod {
    */
   public static class Parameterizer extends AbstractParameterizer {
     @Override
-    protected GroupAverageLinkageMethod makeInstance() {
+    protected MinimumVarianceLinkageMethod makeInstance() {
       return STATIC;
     }
   }

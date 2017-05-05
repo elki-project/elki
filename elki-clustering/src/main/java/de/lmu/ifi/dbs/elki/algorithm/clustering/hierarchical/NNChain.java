@@ -107,8 +107,8 @@ public class NNChain<O> extends AGNES<O> {
     double[] scratch = new double[triangleSize(size)];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     // Position counter - must agree with computeOffset!
-    final boolean square = WardLinkageMethod.class.isInstance(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
-    initializeDistanceMatrix(scratch, dq, ix, iy, square);
+    boolean isSquare = SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction());
+    initializeDistanceMatrix(scratch, dq, linkage, ix, iy, isSquare);
 
     // Initialize space for result:
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids);
