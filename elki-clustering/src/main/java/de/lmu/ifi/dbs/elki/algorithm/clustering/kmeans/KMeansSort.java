@@ -210,13 +210,12 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
     for(ModifiableDBIDs cluster : clusters) {
       cluster.clear();
     }
-    final NumberVectorDistanceFunction<?> df = getDistanceFunction();
-    double mult = (df instanceof SquaredEuclideanDistanceFunction) ? 4 : 2;
+    double mult = (distanceFunction instanceof SquaredEuclideanDistanceFunction) ? 4 : 2;
     for(DBIDIter iditer = relation.iterDBIDs(); iditer.valid(); iditer.advance()) {
       final int cur = assignment.intValue(iditer), ini = cur >= 0 ? cur : 0;
       // Distance to current mean:
       V fv = relation.get(iditer);
-      double mindist = df.distance(fv, DoubleVector.wrap(means[ini]));
+      double mindist = distanceFunction.distance(fv, DoubleVector.wrap(means[ini]));
       ++dists;
       final double threshold = mult * mindist;
       int minIndex = ini;
@@ -224,7 +223,7 @@ public class KMeansSort<V extends NumberVector> extends AbstractKMeans<V, KMeans
         if(cdist[minIndex][i] >= threshold) { // Sort pruning
           break; // All following can only be worse.
         }
-        double dist = df.distance(fv, DoubleVector.wrap(means[i]));
+        double dist = distanceFunction.distance(fv, DoubleVector.wrap(means[i]));
         ++dists;
         if(dist < mindist) {
           minIndex = i;

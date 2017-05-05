@@ -114,7 +114,7 @@ public class GaussianAffinityMatrixBuilder<O> implements AffinityMatrixBuilder<O
   protected double[][] buildDistanceMatrix(ArrayDBIDs ids, DistanceQuery<?> dq) {
     final int size = ids.size();
     double[][] dmat = new double[size][size];
-    final boolean square = !SquaredEuclideanDistanceFunction.class.isInstance(dq.getDistanceFunction());
+    final boolean square = !dq.getDistanceFunction().isSquared();
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix", (size * (size - 1)) >>> 1, LOG) : null;
     Duration timer = LOG.isStatistics() ? LOG.newDuration(this.getClass().getName() + ".runtime.distancematrix").begin() : null;
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();

@@ -20,18 +20,12 @@
  */
 package de.lmu.ifi.dbs.elki.algorithm.projection;
 
-import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRange;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDRef;
-import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
-import de.lmu.ifi.dbs.elki.database.ids.DoubleDBIDListIter;
-import de.lmu.ifi.dbs.elki.database.ids.KNNList;
+import de.lmu.ifi.dbs.elki.database.ids.*;
 import de.lmu.ifi.dbs.elki.database.query.LinearScanQuery;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.query.knn.KNNQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.logging.statistics.DoubleStatistic;
@@ -42,6 +36,7 @@ import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.DoubleArray;
 import de.lmu.ifi.dbs.elki.utilities.datastructures.arraylike.IntegerArray;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.exceptions.AbortException;
+
 import net.jafama.FastMath;
 
 /**
@@ -114,7 +109,7 @@ public class NearestNeighborAffinityMatrixBuilder<O> extends PerplexityAffinityM
     // Sparse affinity graph
     double[][] pij = new double[size][];
     int[][] indices = new int[size][];
-    final boolean square = !SquaredEuclideanDistanceFunction.class.isInstance(dq.getDistanceFunction());
+    final boolean square = !dq.getDistanceFunction().isSquared();
     computePij(rids, knnq, square, numberOfNeighbours, pij, indices, initialScale);
     SparseAffinityMatrix mat = new SparseAffinityMatrix(pij, indices, rids);
     return mat;

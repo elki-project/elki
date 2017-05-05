@@ -166,7 +166,7 @@ public class FastMultidimensionalScalingTransform<I, O extends NumberVector> imp
   protected double[][] computeDistanceMatrix(final List<I> col) {
     final int size = col.size();
     double[][] imat = new double[size][size];
-    boolean squared = dist instanceof SquaredEuclideanDistanceFunction;
+    boolean squared = dist.isSquared();
     FiniteProgress dprog = LOG.isVerbose() ? new FiniteProgress("Computing distance matrix", (size * (size - 1)) >>> 1, LOG) : null;
     for(int x = 0; x < size; x++) {
       final I ox = col.get(x);

@@ -119,8 +119,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     double[] scratch = new double[AGNES.triangleSize(size)];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
     // Position counter - must agree with computeOffset!
-    boolean isSquare = SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction());
-    AGNES.initializeDistanceMatrix(scratch, dq, linkage, ix, iy, isSquare);
+    AGNES.initializeDistanceMatrix(scratch, dq, linkage, ix, iy);
 
     // Arrays used for caching:
     double[] bestd = new double[size];

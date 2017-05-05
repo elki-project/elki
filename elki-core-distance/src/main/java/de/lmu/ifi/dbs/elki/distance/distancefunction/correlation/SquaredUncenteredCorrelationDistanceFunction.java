@@ -56,6 +56,11 @@ public class SquaredUncenteredCorrelationDistanceFunction extends AbstractNumber
   }
 
   @Override
+  public boolean isSquared() {
+    return true;
+  }
+
+  @Override
   public String toString() {
     return "SquaredUncenteredCorrelationDistanceFunction";
   }

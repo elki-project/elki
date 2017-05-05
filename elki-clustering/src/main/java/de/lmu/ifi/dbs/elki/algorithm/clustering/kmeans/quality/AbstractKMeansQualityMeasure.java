@@ -34,7 +34,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDs;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.database.relation.RelationUtil;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.NumberVectorDistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.math.MathUtil;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import net.jafama.FastMath;
@@ -106,7 +105,7 @@ public abstract class AbstractKMeansQualityMeasure<O extends NumberVector> imple
     DBIDs ids = cluster.getIDs();
     DoubleVector mean = DoubleVector.wrap(model.getMean());
 
-    boolean squared = (distanceFunction instanceof SquaredEuclideanDistanceFunction);
+    boolean squared = distanceFunction.isSquared();
     double variance = 0.;
     for(DBIDIter iter = ids.iter(); iter.valid(); iter.advance()) {
       double dist = distanceFunction.distance(relation.get(iter), mean);

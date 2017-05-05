@@ -151,8 +151,7 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
     // Compute the initial (lower triangular) distance matrix.
     double[] scratch = new double[triangleSize(size)];
     DBIDArrayIter ix = ids.iter(), iy = ids.iter();
-    boolean isSquare = SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction());
-    initializeDistanceMatrix(scratch, dq, linkage, ix, iy, isSquare);
+    initializeDistanceMatrix(scratch, dq, linkage, ix, iy);
 
     // Initialize space for result:
     PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids);
@@ -193,9 +192,9 @@ public class AGNES<O> extends AbstractDistanceBasedAlgorithm<O, PointerHierarchy
    * @param linkage Linkage method
    * @param ix Data iterator
    * @param iy Data iterator
-   * @param issquare Flag to use squared distances.
    */
-  protected static void initializeDistanceMatrix(double[] scratch, DistanceQuery<?> dq, LinkageMethod linkage, DBIDArrayIter ix, DBIDArrayIter iy, boolean issquare) {
+  protected static void initializeDistanceMatrix(double[] scratch, DistanceQuery<?> dq, LinkageMethod linkage, DBIDArrayIter ix, DBIDArrayIter iy) {
+    final boolean issquare = dq.getDistanceFunction().isSquared();
     int pos = 0;
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Distance matrix computation", scratch.length, LOG) : null;
     for(ix.seek(0); ix.valid(); ix.advance()) {

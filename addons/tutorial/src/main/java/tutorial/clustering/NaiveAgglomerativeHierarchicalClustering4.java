@@ -27,11 +27,7 @@ import de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.SLINK;
 import de.lmu.ifi.dbs.elki.data.type.TypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.database.Database;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreFactory;
-import de.lmu.ifi.dbs.elki.database.datastore.DataStoreUtil;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDBIDDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableDoubleDataStore;
-import de.lmu.ifi.dbs.elki.database.datastore.WritableIntegerDataStore;
+import de.lmu.ifi.dbs.elki.database.datastore.*;
 import de.lmu.ifi.dbs.elki.database.ids.ArrayDBIDs;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDArrayIter;
 import de.lmu.ifi.dbs.elki.database.ids.DBIDIter;
@@ -39,7 +35,6 @@ import de.lmu.ifi.dbs.elki.database.ids.DBIDUtil;
 import de.lmu.ifi.dbs.elki.database.query.distance.DistanceQuery;
 import de.lmu.ifi.dbs.elki.database.relation.Relation;
 import de.lmu.ifi.dbs.elki.distance.distancefunction.DistanceFunction;
-import de.lmu.ifi.dbs.elki.distance.distancefunction.minkowski.SquaredEuclideanDistanceFunction;
 import de.lmu.ifi.dbs.elki.logging.Logging;
 import de.lmu.ifi.dbs.elki.logging.progress.FiniteProgress;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
@@ -183,7 +178,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
     DBIDArrayIter ix = ids.iter(), iy = ids.iter(), ij = ids.iter();
     // Position counter - must agree with computeOffset!
     int pos = 0;
-    boolean square = Linkage.WARD.equals(linkage) && !(SquaredEuclideanDistanceFunction.class.isInstance(getDistanceFunction()));
+    boolean square = Linkage.WARD.equals(linkage) && !getDistanceFunction().isSquared();
     for(int x = 0; ix.valid(); x++, ix.advance()) {
       iy.seek(0);
       for(int y = 0; y < x; y++, iy.advance()) {
