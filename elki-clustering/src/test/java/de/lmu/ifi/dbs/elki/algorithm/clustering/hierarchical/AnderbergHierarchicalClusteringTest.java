@@ -115,6 +115,29 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
    * the result to a golden standard.
    */
   @Test
+  public void testWeightedAverage() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, WeightedAverageLinkageMethod.class);
+    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
+    testParameterizationOk(params);
+
+    // run clustering algorithm on database
+    Result result = c.run(db);
+    Clustering<?> clustering = findSingleClustering(result);
+    testFMeasure(db, clustering, 0.93866265);
+    testClusterSizes(clustering, new int[] { 200, 211, 227 });
+  }
+
+  /**
+   * Run agglomerative hierarchical clustering with fixed parameters and compare
+   * the result to a golden standard.
+   */
+  @Test
   public void testCompleteLink() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
 
