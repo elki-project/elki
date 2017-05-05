@@ -54,6 +54,17 @@ public interface LinkageMethod {
   }
 
   /**
+   * Restore a distance to the original scale.
+   *
+   * @param d Distance
+   * @param issquare Flag to indicate the input values were already squared
+   * @return Initial value
+   */
+  default double restore(double d, boolean issquare) {
+    return d;
+  }
+
+  /**
    * Compute combined linkage for two clusters.
    * 
    * @param sizex Size of first cluster x before merging

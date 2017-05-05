@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Minimum variance linkage.
@@ -63,7 +64,12 @@ public class MinimumVarianceLinkageMethod implements LinkageMethod {
 
   @Override
   public double initial(double d, boolean issquare) {
-    return (issquare ? d : (d * d)) * .25;
+    return .25 * (issquare ? d : (d * d));
+  }
+
+  @Override
+  public double restore(double d, boolean issquare) {
+    return issquare ? 4. * d : FastMath.sqrt(4. * d);
   }
 
   @Override

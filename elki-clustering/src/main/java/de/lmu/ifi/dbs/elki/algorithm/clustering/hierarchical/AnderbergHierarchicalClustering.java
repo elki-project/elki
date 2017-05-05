@@ -127,7 +127,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     initializeNNCache(scratch, bestd, besti);
 
     // Initialize space for result:
-    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids);
+    PointerHierarchyRepresentationBuilder builder = new PointerHierarchyRepresentationBuilder(ids, dq.getDistanceFunction().isSquared());
 
     // Repeat until everything merged into 1 cluster
     FiniteProgress prog = LOG.isVerbose() ? new FiniteProgress("Agglomerative clustering", size - 1, LOG) : null;
@@ -236,7 +236,7 @@ public class AnderbergHierarchicalClustering<O> extends AbstractDistanceBasedAlg
     // Perform merge in data structure: x -> y
     assert (y < x);
     // Since y < x, prefer keeping y, dropping x.
-    builder.add(ix, mindist, iy);
+    builder.add(ix, linkage.restore(mindist, getDistanceFunction().isSquared()), iy);
     // Update cluster size for y:
     final int sizex = builder.getSize(ix), sizey = builder.getSize(iy);
     builder.setSize(iy, sizex + sizey);

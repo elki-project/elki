@@ -139,7 +139,7 @@ public class SLINKHDBSCANLinearMemory<O> extends AbstractHDBSCAN<O, PointerDensi
     }
     LOG.ensureCompleted(progress);
 
-    return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, coredists);
+    return new PointerDensityHierarchyRepresentationResult(ids, pi, lambda, distQ.getDistanceFunction().isSquared(), coredists);
   }
 
   /**

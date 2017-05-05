@@ -81,11 +81,17 @@ public class PointerHierarchyRepresentationBuilder {
   protected WritableDBIDDataStore prototypes;
 
   /**
+   * Flag to indicate squared distances.
+   */
+  protected boolean isSquared;
+
+  /**
    * Constructor.
    *
    * @param ids IDs
+   * @param isSquared Flag to indicate squared distances
    */
-  public PointerHierarchyRepresentationBuilder(DBIDs ids) {
+  public PointerHierarchyRepresentationBuilder(DBIDs ids, boolean isSquared) {
     super();
     this.ids = ids;
     this.parent = DataStoreUtil.makeDBIDStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC);
@@ -94,6 +100,7 @@ public class PointerHierarchyRepresentationBuilder {
       parent.put(it, it);
     }
     this.order = DataStoreUtil.makeIntegerStorage(ids, DataStoreFactory.HINT_DB | DataStoreFactory.HINT_HOT | DataStoreFactory.HINT_STATIC, ids.size());
+    this.isSquared = isSquared;
   }
 
   /**
@@ -158,9 +165,9 @@ public class PointerHierarchyRepresentationBuilder {
       LOG.warning(mergecount + " merges were added to the hierarchy, expected " + (ids.size() - 1));
     }
     if(prototypes != null) {
-      return new PointerPrototypeHierarchyRepresentationResult(ids, parent, parentDistance, order, prototypes);
+      return new PointerPrototypeHierarchyRepresentationResult(ids, parent, parentDistance, isSquared, order, prototypes);
     }
-    return new PointerHierarchyRepresentationResult(ids, parent, parentDistance, order);
+    return new PointerHierarchyRepresentationResult(ids, parent, parentDistance, isSquared, order);
   }
 
   /**

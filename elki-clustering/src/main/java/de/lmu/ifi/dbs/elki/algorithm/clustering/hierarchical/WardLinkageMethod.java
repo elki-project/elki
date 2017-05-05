@@ -23,6 +23,7 @@ package de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical;
 import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
+import net.jafama.FastMath;
 
 /**
  * Ward's method clustering method.
@@ -63,7 +64,12 @@ public class WardLinkageMethod implements LinkageMethod {
 
   @Override
   public double initial(double d, boolean issquare) {
-    return (issquare ? d : (d * d)) * .5;
+    return .5 * (issquare ? d : (d * d));
+  }
+
+  @Override
+  public double restore(double d, boolean issquare) {
+    return issquare ? 2. * d : FastMath.sqrt(2. * d);
   }
 
   @Override

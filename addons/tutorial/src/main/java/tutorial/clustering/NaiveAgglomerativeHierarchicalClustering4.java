@@ -266,7 +266,7 @@ public class NaiveAgglomerativeHierarchicalClustering4<O> extends AbstractDistan
     }
     LOG.ensureCompleted(prog);
 
-    return new PointerHierarchyRepresentationResult(ids, parent, height);
+    return new PointerHierarchyRepresentationResult(ids, parent, height, dq.getDistanceFunction().isSquared());
   }
 
   /**
