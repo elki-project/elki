@@ -155,6 +155,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
     testFMeasure(db, clustering, 0.938167802);
     testClusterSizes(clustering, new int[] { 200, 217, 221 });
   }
+
   /**
    * Run agglomerative hierarchical clustering with fixed parameters and compare
    * the result to a golden standard.
@@ -208,7 +209,7 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
   @Test
   public void testMinimumVariance() {
     Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
-  
+
     // Setup algorithm
     ListParameterization params = new ListParameterization();
     params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
@@ -216,11 +217,35 @@ public class AnderbergHierarchicalClusteringTest extends AbstractClusterAlgorith
     params.addParameter(AGNES.Parameterizer.LINKAGE_ID, MinimumVarianceLinkageMethod.class);
     CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
     testParameterizationOk(params);
-  
+
     // run clustering algorithm on database
     Result result = c.run(db);
     Clustering<?> clustering = findSingleClustering(result);
     testFMeasure(db, clustering, 0.93866265);
     testClusterSizes(clustering, new int[] { 200, 211, 227 });
+  }
+
+  /**
+   * Run agglomerative hierarchical clustering with fixed parameters and compare
+   * the result to a golden standard.
+   */
+  @Test
+  public void testBetaVariance() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, AnderbergHierarchicalClustering.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, FlexibleBetaLinkageMethod.class);
+    params.addParameter(FlexibleBetaLinkageMethod.Parameterizer.BETA_ID, -.33);
+    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
+    testParameterizationOk(params);
+
+    // run clustering algorithm on database
+    Result result = c.run(db);
+    Clustering<?> clustering = findSingleClustering(result);
+    testFMeasure(db, clustering, 0.9277466);
+    testClusterSizes(clustering, new int[] { 196, 200, 242 });
   }
 }

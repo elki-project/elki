@@ -6,3 +6,4 @@ de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.WeightedAverageLinkageMeth
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.CentroidLinkageMethod centroid upgmc
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MedianLinkageMethod wpgmc WPGMC weighted-centroid
 de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.MinimumVarianceLinkageMethod variance
+de.lmu.ifi.dbs.elki.algorithm.clustering.hierarchical.FlexibleBetaLinkageMethod flex beta

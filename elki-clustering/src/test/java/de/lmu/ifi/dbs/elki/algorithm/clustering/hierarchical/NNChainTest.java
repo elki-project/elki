@@ -222,4 +222,28 @@ public class NNChainTest extends AbstractClusterAlgorithmTest {
     testFMeasure(db, clustering, 0.93866265);
     testClusterSizes(clustering, new int[] { 200, 211, 227 });
   }
+
+  /**
+   * Run agglomerative hierarchical clustering with fixed parameters and compare
+   * the result to a golden standard.
+   */
+  @Test
+  public void testBetaVariance() {
+    Database db = makeSimpleDatabase(UNITTEST + "single-link-effect.ascii", 638);
+
+    // Setup algorithm
+    ListParameterization params = new ListParameterization();
+    params.addParameter(CutDendrogramByNumberOfClusters.Parameterizer.MINCLUSTERS_ID, 3);
+    params.addParameter(AbstractAlgorithm.ALGORITHM_ID, NNChain.class);
+    params.addParameter(AGNES.Parameterizer.LINKAGE_ID, FlexibleBetaLinkageMethod.class);
+    params.addParameter(FlexibleBetaLinkageMethod.Parameterizer.BETA_ID, -.33);
+    CutDendrogramByNumberOfClusters c = ClassGenericsUtil.parameterizeOrAbort(CutDendrogramByNumberOfClusters.class, params);
+    testParameterizationOk(params);
+
+    // run clustering algorithm on database
+    Result result = c.run(db);
+    Clustering<?> clustering = findSingleClustering(result);
+    testFMeasure(db, clustering, 0.9381678);
+    testClusterSizes(clustering, new int[] { 200, 217, 221 });
+  }
 }

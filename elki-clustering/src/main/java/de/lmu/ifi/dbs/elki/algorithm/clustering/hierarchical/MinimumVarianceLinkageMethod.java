@@ -38,6 +38,11 @@ import net.jafama.FastMath;
  * New Combinatorial Clustering Methods<br />
  * Vegetatio 81(1/2)
  * </p>
+ * attributes this to (but we did not verify):
+ * <p>
+ * E. Diday, J. Lemaire, J. Pouget, and F.Testu<br />
+ * Elements d'analyse de donnees
+ * </p>
  * 
  * @author Erich Schubert
  */
@@ -51,6 +56,14 @@ public class MinimumVarianceLinkageMethod implements LinkageMethod {
    * Static instance of class.
    */
   public static final MinimumVarianceLinkageMethod STATIC = new MinimumVarianceLinkageMethod();
+
+  /**
+   * Additional reference.
+   */
+  @Reference(authors = "E. Diday, J. Lemaire, J. Pouget, and F.Testu", //
+      title = "Elements d'analyse de donnees", //
+      booktitle = "Elements d'analyse de donnees")
+  private static Void SECOND_REFERENCE = null;
 
   /**
    * Constructor.
