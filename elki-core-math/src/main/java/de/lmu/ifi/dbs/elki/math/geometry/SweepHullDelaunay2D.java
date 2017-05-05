@@ -543,7 +543,7 @@ public class SweepHullDelaunay2D {
       default:
         throw new RuntimeException("Neighbor triangles not aligned?");
       }
-      if(cur.inCircle(points.get(opp))) { // if(cur.inCircle(points.get(opp))) {
+      if(cur.inCircle(points.get(opp))) {
         // Replace edge AB, connect c with "opp" instead.
         final int a = cur.c, b = cur.a, c = opp, d = cur.b;
         final int ab = cur.ca, bc = lef, cd = rig, da = cur.bc;
@@ -591,7 +591,7 @@ public class SweepHullDelaunay2D {
       default:
         throw new RuntimeException("Neighbor triangles not aligned? " + orient);
       }
-      if(cur.inCircle(points.get(opp))) { // if(cur.inCircle(points.get(opp))) {
+      if(cur.inCircle(points.get(opp))) {
         // Replace edge BC, connect A with "opp" instead.
         final int a = cur.a, b = cur.b, c = opp, d = cur.c;
         final int ab = cur.ab, bc = lef, cd = rig, da = cur.ca;
@@ -639,7 +639,7 @@ public class SweepHullDelaunay2D {
       default:
         throw new RuntimeException("Neighbor triangles not aligned?");
       }
-      if(cur.inCircle(points.get(opp))) { // if(cur.inCircle(points.get(opp))) {
+      if(cur.inCircle(points.get(opp))) {
         // Replace edge CA, connect B with "opp" instead.
         final int a = cur.b, b = cur.c, c = opp, d = cur.a;
         final int ab = cur.bc, bc = lef, cd = rig, da = cur.ab;
@@ -818,9 +818,9 @@ public class SweepHullDelaunay2D {
      * @param ca Edge
      */
     void set(int a, int ab, int b, int bc, int c, int ca) {
-      assert (ab != bc);
-      assert (ab != ca);
-      assert (bc != ca);
+      assert (ab != bc || ab == -1);
+      assert (ab != ca || ab == -1);
+      assert (bc != ca || bc == -1);
       this.a = a;
       this.ab = ab;
       this.b = b;
