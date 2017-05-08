@@ -35,7 +35,7 @@ import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Test the min-max normalization filter.
+ * Test the variance-max normalization filter.
  *
  * @author Erich Schubert
  */
@@ -54,7 +54,7 @@ public class AttributeWiseVarianceNormalizationTest extends AbstractDataSourceTe
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
 
-    // We verify that the resulting data has mean 0 and variance 1:
+    // We verify that the resulting data has mean 0 and variance 1 in each column:
     MeanVariance[] mvs = MeanVariance.newArray(dim);
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
