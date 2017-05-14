@@ -33,7 +33,7 @@ import net.jafama.FastMath;
  *
  * Reference:
  * <p>
- * Q. Zhao, M. Xu, P. Fränti:<br />
+ * Q. Zhao, M. Xu, P. Fränti:<br />
  * Knee Point Detection on Bayesian Information Criterion<br />
  * 20th IEEE International Conference on Tools with Artificial Intelligence
  * </p>
@@ -42,10 +42,10 @@ import net.jafama.FastMath;
  * @author Erich Schubert
  * @since 0.2
  */
-@Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
-title = "Knee Point Detection on Bayesian Information Criterion", //
-booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
-url = "http://dx.doi.org/10.1109/ICTAI.2008.154")
+@Reference(authors = "Q. Zhao, M. Xu, P. Fränti", //
+    title = "Knee Point Detection on Bayesian Information Criterion", //
+    booktitle = "20th IEEE International Conference on Tools with Artificial Intelligence", //
+    url = "http://dx.doi.org/10.1109/ICTAI.2008.154")
 public class BayesianInformationCriterionZhao extends AbstractKMeansQualityMeasure<NumberVector> {
   @Override
   public <V extends NumberVector> double quality(Clustering<? extends MeanModel> clustering, NumberVectorDistanceFunction<? super V> distanceFunction, Relation<V> relation) {
