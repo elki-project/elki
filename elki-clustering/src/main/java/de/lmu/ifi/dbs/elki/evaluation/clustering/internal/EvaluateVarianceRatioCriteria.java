@@ -67,9 +67,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
  * @apiviz.composedOf NoiseHandling
  */
 @Reference(authors = "R. B. Calinski and J. Harabasz", //
-title = "A dendrite method for cluster analysis",//
-booktitle = "Communications in Statistics-theory and Methods, 3(1)",//
-url = "http://dx.doi.org/10.1080/03610927408827101")
+    title = "A dendrite method for cluster analysis", //
+    booktitle = "Communications in Statistics-theory and Methods, 3(1)", //
+    url = "http://dx.doi.org/10.1080/03610927408827101")
 public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
   /**
    * Logger for debug output.
@@ -112,46 +112,53 @@ public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
    * @return Variance Ratio Criteria
    */
   public double evaluateClustering(Database db, Relation<? extends NumberVector> rel, Clustering<?> c) {
+    // FIXME: allow using a precomputed distance matrix!
+    final SquaredEuclideanDistanceFunction df = SquaredEuclideanDistanceFunction.STATIC;
+
     List<? extends Cluster<?>> clusters = c.getAllClusters();
-    NumberVector[] centroids = new NumberVector[clusters.size()];
-    int ignorednoise = EvaluateSimplifiedSilhouette.centroids(rel, clusters, centroids, noiseOption);
+    double vrc = 0.;
+    int ignorednoise = 0;
+    if(clusters.size() > 1) {
+      NumberVector[] centroids = new NumberVector[clusters.size()];
+      ignorednoise = EvaluateSimplifiedSilhouette.centroids(rel, clusters, centroids, noiseOption);
 
-    // Build global centroid and cluster count:
-    final int dim = RelationUtil.dimensionality(rel);
-    Centroid overallCentroid = new Centroid(dim);
-    int clustercount = globalCentroid(overallCentroid, rel, clusters, centroids, noiseOption);
+      // Build global centroid and cluster count:
+      final int dim = RelationUtil.dimensionality(rel);
+      Centroid overallCentroid = new Centroid(dim);
+      int clustercount = globalCentroid(overallCentroid, rel, clusters, centroids, noiseOption);
 
-    // a: Distance to own centroid
-    // b: Distance to overall centroid
-    double a = 0, b = 0;
-    Iterator<? extends Cluster<?>> ci = clusters.iterator();
-    for(int i = 0; ci.hasNext(); i++) {
-      Cluster<?> cluster = ci.next();
-      if(cluster.size() <= 1 || cluster.isNoise()) {
-        switch(noiseOption){
-        case IGNORE_NOISE:
-          continue; // Ignored
-        case TREAT_NOISE_AS_SINGLETONS:
-          // Singletons: a = 0 by definition.
-          for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
-            b += SquaredEuclideanDistanceFunction.STATIC.distance(overallCentroid, rel.get(it));
+      // a: Distance to own centroid
+      // b: Distance to overall centroid
+      double a = 0, b = 0;
+      Iterator<? extends Cluster<?>> ci = clusters.iterator();
+      for(int i = 0; ci.hasNext(); i++) {
+        Cluster<?> cluster = ci.next();
+        if(cluster.size() <= 1 || cluster.isNoise()) {
+          switch(noiseOption){
+          case IGNORE_NOISE:
+            continue; // Ignored
+          case TREAT_NOISE_AS_SINGLETONS:
+            // Singletons: a = 0 by definition.
+            for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
+              b += df.distance(overallCentroid, rel.get(it));
+            }
+            continue; // with NEXT cluster.
+          case MERGE_NOISE:
+            break; // Treat like a cluster below:
           }
-          continue; // with NEXT cluster.
-        case MERGE_NOISE:
-          break; // Treat like a cluster below:
+        }
+        for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
+          NumberVector vec = rel.get(it);
+          a += df.distance(centroids[i], vec);
+          b += df.distance(overallCentroid, vec);
         }
       }
-      for(DBIDIter it = cluster.getIDs().iter(); it.valid(); it.advance()) {
-        NumberVector vec = rel.get(it);
-        a += SquaredEuclideanDistanceFunction.STATIC.distance(centroids[i], vec);
-        b += SquaredEuclideanDistanceFunction.STATIC.distance(overallCentroid, vec);
-      }
-    }
 
-    double vrc = ((b - a) / a) * ((rel.size() - clustercount) / (clustercount - 1.));
-    // Only if {@link NoiseHandling#IGNORE_NOISE}:
-    if(penalize && ignorednoise > 0) {
-      vrc *= (rel.size() - ignorednoise) / (double) rel.size();
+      vrc = ((b - a) / a) * ((rel.size() - clustercount) / (clustercount - 1.));
+      // Only if {@link NoiseHandling#IGNORE_NOISE}:
+      if(penalize && ignorednoise > 0) {
+        vrc *= (rel.size() - ignorednoise) / (double) rel.size();
+      }
     }
     if(LOG.isStatistics()) {
       LOG.statistics(new StringStatistic(key + ".vrc.noise-handling", noiseOption.toString()));
