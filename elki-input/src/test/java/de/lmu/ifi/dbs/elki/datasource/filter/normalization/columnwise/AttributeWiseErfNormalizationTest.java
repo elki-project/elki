@@ -30,34 +30,46 @@ import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.math.MeanVariance;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
 /**
- * Test the MAD normalization filter.
+ * Test the Erf normalization filter.
  *
  * @author Matthew Arcifa
  */
-public class AttributeWiseMADNormalizationTest extends AbstractDataSourceTest {
+public class AttributeWiseErfNormalizationTest extends AbstractDataSourceTest {
   /**
    * Test with default parameters.
    */
   @Test
   public void defaultParameters() {
-    String filename = UNITTEST + "normalization-test-1.csv";
+    String filename = UNITTEST + "normally-distributed-data-1.csv";
     // Allow loading test data from resources.
-    AttributeWiseMADNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseMADNormalization.class, new ListParameterization());
+    AttributeWiseErfNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseErfNormalization.class, new ListParameterization());
     MultipleObjectsBundle bundle = readBundle(filename, filter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
     
-    // Count how many values in each column are positive, how many are negative, and how many are greater than 1
-    // or less than -1.
-    int[] countNotPositive = new int[dim];
-    int[] countPositive = new int[dim];
-    int[] countAbsGreaterOne = new int[dim];
+    // We calculate the mean and standard deviation of each column.
+    MeanVariance[] mvs = MeanVariance.newArray(dim);
+    for(int row = 0; row < bundle.dataLength(); row++) {
+      Object obj = bundle.data(row, 0);
+      assertEquals("Unexpected data type", DoubleVector.class, obj.getClass());
+      DoubleVector d = (DoubleVector) obj;
+      for(int col = 0; col < dim; col++) {
+        final double v = d.doubleValue(col);
+        if(v > Double.NEGATIVE_INFINITY && v < Double.POSITIVE_INFINITY) {
+          mvs[col].put(v);
+        }
+      }
+    }
+    
+    // Count how many values in each column are within one standard deviation of the mean.
+    int[] countWithinOneStdDev = new int[dim];
     
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
@@ -65,22 +77,15 @@ public class AttributeWiseMADNormalizationTest extends AbstractDataSourceTest {
       DoubleVector d = (DoubleVector) obj;
       for(int col = 0; col < dim; col++) {
         final double val = d.doubleValue(col);
-        if(val > 0.0){
-          countPositive[col]++;
-        } else {
-          countNotPositive[col]++;
-        }
-        if(Math.abs(val) >= 1.){
-          countAbsGreaterOne[col]++;
+        if(Math.abs(val - mvs[col].getMean()) <= Math.sqrt(mvs[col].getSampleVariance())){
+          countWithinOneStdDev[col]++;
         }
       }
     }
 
-    // Verify that ~50% of the values in each column are negative (=> ~50% of the values are positive).
-    // Verify that ~50% of the values are either greater than 1 or less than -1.
+    // Verify that ~68% of the values in each column are within one standard deviation of the mean.
     for(int col = 0; col < dim; col++) {
-      assertEquals("~50% of the values in each column should be positive", .5, (double)countPositive[col] / (double)bundle.dataLength(), .1);
-      assertEquals("~50% of the values in each column should be > 1 or < -1", .5, (double)countAbsGreaterOne[col] / (double)bundle.dataLength(), .3);
+      assertEquals("~68% of the values in each column should be within 1 standard deviation of the mean", .68, (double)countWithinOneStdDev[col] / (double)bundle.dataLength(), .2);
     }
   }
 }
