@@ -47,8 +47,9 @@ public class AttributeWiseErfNormalizationTest extends AbstractDataSourceTest {
   public void defaultParameters() {
     String filename = UNITTEST + "normally-distributed-data-1.csv";
     // Allow loading test data from resources.
-    AttributeWiseErfNormalization<DoubleVector> filter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseErfNormalization.class, new ListParameterization());
-    MultipleObjectsBundle bundle = readBundle(filename, filter);
+    AttributeWiseVarianceNormalization<DoubleVector> varianceFilter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseVarianceNormalization.class, new ListParameterization());
+    AttributeWiseErfNormalization<DoubleVector> erfFilter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseErfNormalization.class, new ListParameterization());
+    MultipleObjectsBundle bundle = readBundle(filename, varianceFilter, erfFilter);
     // Ensure the first column are the vectors.
     assertTrue("Test file not as expected", TypeUtil.NUMBER_VECTOR_FIELD.isAssignableFromType(bundle.meta(0)));
     // This cast is now safe (vector field):
