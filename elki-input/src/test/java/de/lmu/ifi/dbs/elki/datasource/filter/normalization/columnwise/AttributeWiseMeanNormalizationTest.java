@@ -37,7 +37,7 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParamet
 /**
  * Test the mean normalization filter.
  *
- * @author //TODO: DO I NEED TO CHANGE THIS? 
+ * @author Matthew Arcifa
  */
 public class AttributeWiseMeanNormalizationTest extends AbstractDataSourceTest {
   /**
@@ -54,7 +54,7 @@ public class AttributeWiseMeanNormalizationTest extends AbstractDataSourceTest {
     // This cast is now safe (vector field):
     int dim = ((FieldTypeInformation) bundle.meta(0)).getDimensionality();
 
-    // We verify that all columns have the same mean:
+    // We verify that all columns have a mean of 0:
     Mean[] ms = Mean.newArray(dim);
     for(int row = 0; row < bundle.dataLength(); row++) {
       Object obj = bundle.data(row, 0);
@@ -67,8 +67,8 @@ public class AttributeWiseMeanNormalizationTest extends AbstractDataSourceTest {
         }
       }
     }
-    for(int col = 1; col < dim; col++) {
-      assertEquals("Means are not the same", ms[col-1].getMean(), ms[col].getMean(), 1e-15);
+    for(int col = 0; col < dim; col++) {
+      assertEquals("Mean is not 0", 0., ms[col].getMean(), 1e-15);
     }
   }
 }
