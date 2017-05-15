@@ -45,7 +45,7 @@ public class AttributeWiseErfNormalizationTest extends AbstractDataSourceTest {
    */
   @Test
   public void defaultParameters() {
-    String filename = UNITTEST + "normally-distributed-data-1.csv";
+    String filename = UNITTEST + "normally-distributed-data-2.csv";
     // Allow loading test data from resources.
     AttributeWiseVarianceNormalization<DoubleVector> varianceFilter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseVarianceNormalization.class, new ListParameterization());
     AttributeWiseErfNormalization<DoubleVector> erfFilter = ClassGenericsUtil.parameterizeOrAbort(AttributeWiseErfNormalization.class, new ListParameterization());
