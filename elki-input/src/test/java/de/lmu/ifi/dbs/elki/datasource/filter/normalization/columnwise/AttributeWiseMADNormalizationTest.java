@@ -30,6 +30,7 @@ import de.lmu.ifi.dbs.elki.data.type.FieldTypeInformation;
 import de.lmu.ifi.dbs.elki.data.type.TypeUtil;
 import de.lmu.ifi.dbs.elki.datasource.AbstractDataSourceTest;
 import de.lmu.ifi.dbs.elki.datasource.bundle.MultipleObjectsBundle;
+import de.lmu.ifi.dbs.elki.math.statistics.distribution.NormalDistribution;
 import de.lmu.ifi.dbs.elki.utilities.ClassGenericsUtil;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameterization.ListParameterization;
 
@@ -70,7 +71,7 @@ public class AttributeWiseMADNormalizationTest extends AbstractDataSourceTest {
         } else {
           countNotPositive[col]++;
         }
-        if(Math.abs(val) >= 1.){
+        if(Math.abs(val) >= NormalDistribution.PHIINV075){
           countAbsGreaterOne[col]++;
         }
       }
@@ -79,8 +80,8 @@ public class AttributeWiseMADNormalizationTest extends AbstractDataSourceTest {
     // Verify that ~50% of the values in each column are negative (=> ~50% of the values are positive).
     // Verify that ~50% of the values are either greater than 1 or less than -1.
     for(int col = 0; col < dim; col++) {
-      assertEquals("~50% of the values in each column should be positive", .5, (double)countPositive[col] / (double)bundle.dataLength(), .1);
-      assertEquals("~50% of the values in each column should be > 1 or < -1", .5, (double)countAbsGreaterOne[col] / (double)bundle.dataLength(), .3);
+      assertEquals("~50% of the values in each column should be positive", .5, (double)countPositive[col] / (double)bundle.dataLength(), 0.);
+      assertEquals("~50% of the values in each column should be > 1 or < -1", .5, (double)countAbsGreaterOne[col] / (double)bundle.dataLength(), 0.);
     }
   }
 }

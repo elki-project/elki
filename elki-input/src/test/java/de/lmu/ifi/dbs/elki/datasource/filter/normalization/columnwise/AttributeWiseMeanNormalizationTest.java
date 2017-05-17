@@ -68,7 +68,7 @@ public class AttributeWiseMeanNormalizationTest extends AbstractDataSourceTest {
       }
     }
     for(int col = 0; col < dim; col++) {
-      assertEquals("Mean is not 0", 0., ms[col].getMean(), 1e-8);
+      assertEquals("Mean is not 1", 1., ms[col].getMean(), 1e-8);
     }
   }
 }
