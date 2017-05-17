@@ -18,7 +18,6 @@ de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseMinM
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseVarianceNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseVarianceNormalization z de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseVarianceNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseMeanNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseMADNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseMADNormalization
-de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseErfNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseErfNormalization de.lmu.ifi.dbs.elki.datasource.filter.AttributeWiseErfNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseCDFNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.AttributeWiseCDFNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.AttributeWiseBetaNormalization
 de.lmu.ifi.dbs.elki.datasource.filter.normalization.columnwise.InverseDocumentFrequencyNormalization de.lmu.ifi.dbs.elki.datasource.filter.InverseDocumentFrequencyNormalization de.lmu.ifi.dbs.elki.datasource.filter.normalization.InverseDocumentFrequencyNormalization
