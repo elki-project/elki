@@ -43,6 +43,7 @@ import de.lmu.ifi.dbs.elki.result.EvaluationResult.MeasurementGroup;
 import de.lmu.ifi.dbs.elki.result.Result;
 import de.lmu.ifi.dbs.elki.result.ResultHierarchy;
 import de.lmu.ifi.dbs.elki.result.ResultUtil;
+import de.lmu.ifi.dbs.elki.utilities.Alias;
 import de.lmu.ifi.dbs.elki.utilities.documentation.Reference;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.AbstractParameterizer;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.OptionID;
@@ -51,7 +52,8 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.EnumParameter;
 import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
 
 /**
- * Compute the Variance Ratio Criteria of a data set.
+ * Compute the Variance Ratio Criteria of a data set, also known as
+ * Calinski-Harabasz index.
  *
  * Reference:
  * <p>
@@ -70,8 +72,9 @@ import de.lmu.ifi.dbs.elki.utilities.optionhandling.parameters.Flag;
     title = "A dendrite method for cluster analysis", //
     booktitle = "Communications in Statistics-theory and Methods, 3(1)", //
     url = "http://dx.doi.org/10.1080/03610927408827101")
+@Alias({ "calinski-harabasz" })
 public class EvaluateVarianceRatioCriteria<O> implements Evaluator {
-  /**
+  /**F
    * Logger for debug output.
    */
   private static final Logging LOG = Logging.getLogger(EvaluateVarianceRatioCriteria.class);
